@@ -1,0 +1,238 @@
+
+package com.ardor3d.extension.terrain.client;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
+import javax.swing.JFrame;
+
+import com.ardor3d.extension.terrain.util.BresenhamYUpGridTracer;
+import com.ardor3d.extension.terrain.util.TerrainGridCachePanel;
+import com.ardor3d.extension.terrain.util.TextureGridCachePanel;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Camera;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+public class TerrainBuilder {
+    private int cacheBufferSize = 4;
+
+    /** The Constant logger. */
+    private static final Logger logger = Logger.getLogger(TerrainBuilder.class.getName());
+
+    public static int MAX_PICK_CHECKS = 500;
+
+    private final TerrainDataProvider terrainDataProvider;
+    private final Camera camera;
+
+    private int clipmapTerrainCount = 20;
+    private int clipmapTerrainSize = 127; // pow2 - 1
+    private int clipmapTextureCount = 20;
+    private int clipmapTextureSize = 128;
+
+    private int gridCacheThreadCount = 10;
+
+    private int mapId = -1;
+
+    private boolean showDebugPanels = false;
+
+    private final List<TextureSource> extraTextureSources = Lists.newArrayList();
+
+    public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera) {
+        this.terrainDataProvider = terrainDataProvider;
+        this.camera = camera;
+    }
+
+    public void addTextureConnection(final TextureSource textureSource) {
+        extraTextureSources.add(textureSource);
+    }
+
+    public Terrain build() throws Exception {
+        final Map<Integer, String> availableMaps = terrainDataProvider.getAvailableMaps();
+        if (availableMaps.isEmpty()) {
+            throw new Exception("No available maps found on this terrain provider.");
+        }
+
+        int selectedMapId = 0;
+        if (mapId < 0) {
+            selectedMapId = availableMaps.keySet().iterator().next();
+        } else {
+            if (!availableMaps.containsKey(mapId)) {
+                throw new IllegalArgumentException(mapId + " is not a valid terrain ID on this terrain provider.");
+            }
+            selectedMapId = mapId;
+        }
+
+        final TerrainSource terrainSource = terrainDataProvider.getTerrainSource(selectedMapId);
+        final Terrain terrain = buildTerrainSystem(terrainSource);
+
+        final TextureSource textureSource = terrainDataProvider.getTextureSource(selectedMapId);
+        if (textureSource != null) {
+            terrain.addTextureClipmap(buildTextureSystem(textureSource));
+
+            for (final TextureSource extraSource : extraTextureSources) {
+                terrain.addTextureClipmap(buildTextureSystem(extraSource));
+            }
+        }
+
+        final TextureSource normalSource = terrainDataProvider.getNormalMapSource(selectedMapId);
+        if (normalSource != null) {
+            terrain.setNormalClipmap(buildTextureSystem(normalSource));
+        }
+
+        return terrain;
+    }
+
+    private Terrain buildTerrainSystem(final TerrainSource terrainSource) throws Exception {
+        final TerrainConfiguration terrainConfiguration = terrainSource.getConfiguration();
+        logger.info(terrainConfiguration.toString());
+
+        final int clipmapLevels = terrainConfiguration.getTotalNrClipmapLevels();
+        final int clipLevelCount = Math.min(clipmapLevels, clipmapTerrainCount);
+
+        final int tileSize = terrainConfiguration.getCacheGridSize();
+
+        int cacheSize = (clipmapTerrainSize + 1) / tileSize + cacheBufferSize;
+        cacheSize += cacheSize & 1 ^ 1;
+
+        logger.info("server clipmapLevels: " + clipmapLevels);
+
+        final List<TerrainCache> cacheList = Lists.newArrayList();
+        TerrainCache parentCache = null;
+
+        final int baseLevel = Math.max(clipmapLevels - clipLevelCount, 0);
+        int level = clipLevelCount - 1;
+
+        logger.info("baseLevel: " + baseLevel);
+        logger.info("level: " + level);
+
+        final ThreadPoolExecutor tileThreadService = new ThreadPoolExecutor(gridCacheThreadCount, gridCacheThreadCount,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactoryBuilder()
+                        .setThreadFactory(Executors.defaultThreadFactory()).setDaemon(true)
+                        .setNameFormat("TerrainTileThread-%s").setPriority(Thread.MIN_PRIORITY).build());
+
+        for (int i = baseLevel; i < clipmapLevels; i++) {
+            final TerrainCache gridCache = new TerrainGridCache(parentCache, cacheSize, terrainSource, tileSize,
+                    clipmapTerrainSize, terrainConfiguration, level--, i, tileThreadService);
+
+            parentCache = gridCache;
+            cacheList.add(gridCache);
+        }
+        Collections.reverse(cacheList);
+
+        final Terrain terrain = new Terrain(camera, cacheList, clipmapTerrainSize, terrainConfiguration);
+
+        terrain.makePickable(BresenhamYUpGridTracer.class, MAX_PICK_CHECKS, new Vector3(1, 0, 1));
+
+        logger.info("client clipmapLevels: " + cacheList.size());
+
+        if (showDebugPanels) {
+            final TerrainGridCachePanel panel = new TerrainGridCachePanel(cacheList, cacheSize);
+            final JFrame frame = new JFrame("Terrain Cache Debug");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(panel);
+            frame.setBounds(10, 10, panel.getSize().width, panel.getSize().height);
+            frame.setVisible(true);
+        }
+
+        return terrain;
+    }
+
+    private TextureClipmap buildTextureSystem(final TextureSource textureSource) throws Exception {
+        final TextureConfiguration textureConfiguration = textureSource.getConfiguration();
+        logger.info(textureConfiguration.toString());
+
+        final int clipmapLevels = textureConfiguration.getTotalNrClipmapLevels();
+        final int textureClipLevelCount = Math.min(clipmapLevels, clipmapTextureCount);
+
+        final int tileSize = textureConfiguration.getCacheGridSize();
+
+        int cacheSize = (clipmapTextureSize + 1) / tileSize + cacheBufferSize;
+        cacheSize += cacheSize & 1 ^ 1;
+
+        logger.info("server clipmapLevels: " + clipmapLevels);
+
+        final List<TextureCache> cacheList = Lists.newArrayList();
+        TextureCache parentCache = null;
+        final int baseLevel = Math.max(clipmapLevels - textureClipLevelCount, 0);
+        int level = textureClipLevelCount - 1;
+
+        logger.info("baseLevel: " + baseLevel);
+        logger.info("level: " + level);
+
+        final ThreadPoolExecutor tileThreadService = new ThreadPoolExecutor(gridCacheThreadCount, gridCacheThreadCount,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactoryBuilder()
+                        .setThreadFactory(Executors.defaultThreadFactory()).setDaemon(true)
+                        .setNameFormat("TextureTileThread-%s").setPriority(Thread.MIN_PRIORITY).build());
+
+        for (int i = baseLevel; i < clipmapLevels; i++) {
+            final TextureCache gridCache = new TextureGridCache(parentCache, cacheSize, textureSource, tileSize,
+                    clipmapTextureSize, textureConfiguration, level--, i, tileThreadService);
+
+            parentCache = gridCache;
+            cacheList.add(gridCache);
+        }
+        Collections.reverse(cacheList);
+
+        logger.info("client clipmapLevels: " + cacheList.size());
+
+        final TextureClipmap textureClipmap = new TextureClipmap(cacheList, clipmapTextureSize, textureConfiguration);
+
+        if (showDebugPanels) {
+            final TextureGridCachePanel panel = new TextureGridCachePanel(cacheList, cacheSize);
+            final JFrame frame = new JFrame("Texture Cache Debug");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(panel);
+            frame.setBounds(10, 120, panel.getSize().width, panel.getSize().height);
+            frame.setVisible(true);
+        }
+
+        return textureClipmap;
+    }
+
+    public TerrainBuilder setCacheBufferSize(final int size) {
+        cacheBufferSize = size;
+        return this;
+    }
+
+    public TerrainBuilder setClipmapTerrainCount(final int clipmapTerrainCount) {
+        this.clipmapTerrainCount = clipmapTerrainCount;
+        return this;
+    }
+
+    public TerrainBuilder setClipmapTerrainSize(final int clipmapTerrainSize) {
+        this.clipmapTerrainSize = clipmapTerrainSize;
+        return this;
+    }
+
+    public TerrainBuilder setClipmapTextureCount(final int clipmapTextureCount) {
+        this.clipmapTextureCount = clipmapTextureCount;
+        return this;
+    }
+
+    public TerrainBuilder setClipmapTextureSize(final int clipmapTextureSize) {
+        this.clipmapTextureSize = clipmapTextureSize;
+        return this;
+    }
+
+    public TerrainBuilder setShowDebugPanels(final boolean showDebugPanels) {
+        this.showDebugPanels = showDebugPanels;
+        return this;
+    }
+
+    public TerrainBuilder setMapId(final int mapId) {
+        this.mapId = mapId;
+        return this;
+    }
+
+    public TerrainBuilder setGridCacheThreadCount(final int gridCacheThreadCount) {
+        this.gridCacheThreadCount = gridCacheThreadCount;
+        return this;
+    }
+}

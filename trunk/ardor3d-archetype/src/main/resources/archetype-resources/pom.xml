@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <packaging>jar</packaging>
+  <version>${version}</version>
+
+  <properties>
+    <!-- Update this property to upgrade to a new version of Ardor3D -->
+    <a3d.version>0.5-SNAPSHOT</a3d.version>
+  </properties>
+
+  <!--
+      This section specifies the configuration of dependencies as opposed to actually defining them.
+      The definition is done in the <dependencies/> section below. Separating the two from each other is
+      primarily useful in multi-module projects, where you don't want to repeat dependency version information
+      in every module, but it is done here as a 'best practice'.
+   -->
+  <dependencyManagement>
+    <!-- 
+	 It's not necessarily the case that your project will need all of the A3D modules, so you may want 
+	 to remove some of them. Note that some A3D modules (core especially) are included transitively.
+	 ardor3d-awt needs ardor3d-core, so core will be automatically included in your project if you
+	 specify that you want awt.
+     -->
+    <dependencies>
+    <!-- Windowing toolkit wrappers -->
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-awt</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-swt</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Open GL Implementation wrappers -->
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-jogl</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-lwjgl</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+
+    <!-- A3D engine modules -->
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-effects</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-core</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-examples</artifactId>
+      <version>0.5-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Other stuff -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+    </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+    
+
+  <!-- Select the dependencies that you are going to use here -->
+  <dependencies>
+    <!--
+	This is just an example - normally, you won't want to package all the example classes in your
+	application, so you should specify a more reduced set of dependencies. This dependency will 
+	lead to the inclusion of every A3D module.
+     -->
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-examples</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+

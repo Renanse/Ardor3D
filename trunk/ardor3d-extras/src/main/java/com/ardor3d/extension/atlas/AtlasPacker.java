@@ -1,0 +1,32 @@
+/**
+ * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it 
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ */
+
+package com.ardor3d.extension.atlas;
+
+
+public class AtlasPacker {
+    private final AtlasNode rootNode;
+
+    public AtlasPacker(final int width, final int height) {
+        rootNode = new AtlasNode(width, height);
+    }
+
+    public AtlasNode insert(final int width, final int height) {
+        return rootNode.insert(new AtlasRectangle(0, 0, width, height));
+    }
+
+    public AtlasNode insert(final AtlasRectangle image) {
+        return rootNode.insert(image);
+    }
+
+    public AtlasNode getRootNode() {
+        return rootNode;
+    }
+}

@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.ardor3d</groupId>
+    <artifactId>ardor3d</artifactId>
+    <relativePath>../pom.xml</relativePath>
+    <version>0.8-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ardor3d-jogl</artifactId>
+  <packaging>bundle</packaging>
+  <name>Ardor 3D JOGL</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ardor3d-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jogl</groupId>
+      <artifactId>jogl</artifactId>
+    </dependency>
+    <!--
+     NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
+     and since it is at the moment more work than it is worth to get it ready. Later on, when
+     we have solved some more fundamental problems, it is probably time to revisit this.
+    -->
+
+    <!-- dependency>
+      <groupId>net.java.dev.jogl</groupId>
+      <artifactId>jogl-natives</artifactId>
+    </dependency -->
+    <dependency>
+      <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
+      <artifactId>gluegen-rt</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+

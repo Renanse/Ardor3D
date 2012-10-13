@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl/jinput.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl/lwjgl_util_applet.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl/lwjgl_util.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl/lwjgl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ardor3d-lwjgl/lib/lwjgl/native/windows"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
