@@ -11,10 +11,11 @@
 package com.ardor3d.renderer.queue;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public final class RenderBucketType {
 
-    public static final RenderBucketType getRenderBucketType(final String name) {
+    public static RenderBucketType getRenderBucketType(final String name) {
         if (name == null) {
             throw new IllegalArgumentException("name must not be null!");
         }
@@ -22,11 +23,12 @@ public final class RenderBucketType {
         RenderBucketType bucketType = bucketTypeMap.get(name);
         if (bucketType == null) {
             bucketType = new RenderBucketType(name);
+			  bucketTypeMap.put(name, bucketType);
         }
         return bucketType;
     }
 
-    private static final HashMap<String, RenderBucketType> bucketTypeMap = new HashMap<String, RenderBucketType>();
+    private static final Map<String, RenderBucketType> bucketTypeMap = new HashMap<String, RenderBucketType>();
 
     private final String name;
 
@@ -41,16 +43,6 @@ public final class RenderBucketType {
     @Override
     public String toString() {
         return name();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return this == obj;
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
     }
 
     /**
