@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it 
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ */
 
 package com.ardor3d.extension.terrain.client;
 
@@ -144,7 +153,7 @@ public class TerrainBuilder {
         return terrain;
     }
 
-    private TextureClipmap buildTextureSystem(final TextureSource textureSource) throws Exception {
+    public TextureClipmap buildTextureSystem(final TextureSource textureSource) throws Exception {
         final TextureConfiguration textureConfiguration = textureSource.getConfiguration();
         logger.info(textureConfiguration.toString());
 
@@ -201,9 +210,17 @@ public class TerrainBuilder {
         return this;
     }
 
+    public int getCacheBufferSize() {
+        return cacheBufferSize;
+    }
+
     public TerrainBuilder setClipmapTerrainCount(final int clipmapTerrainCount) {
         this.clipmapTerrainCount = clipmapTerrainCount;
         return this;
+    }
+
+    public int getClipmapTerrainCount() {
+        return clipmapTerrainCount;
     }
 
     public TerrainBuilder setClipmapTerrainSize(final int clipmapTerrainSize) {
@@ -211,9 +228,17 @@ public class TerrainBuilder {
         return this;
     }
 
+    public int getClipmapTerrainSize() {
+        return clipmapTerrainSize;
+    }
+
     public TerrainBuilder setClipmapTextureCount(final int clipmapTextureCount) {
         this.clipmapTextureCount = clipmapTextureCount;
         return this;
+    }
+
+    public int getClipmapTextureCount() {
+        return clipmapTextureCount;
     }
 
     public TerrainBuilder setClipmapTextureSize(final int clipmapTextureSize) {
@@ -221,9 +246,17 @@ public class TerrainBuilder {
         return this;
     }
 
+    public int getClipmapTextureSize() {
+        return clipmapTextureSize;
+    }
+
     public TerrainBuilder setShowDebugPanels(final boolean showDebugPanels) {
         this.showDebugPanels = showDebugPanels;
         return this;
+    }
+
+    public boolean isShowDebugPanels() {
+        return showDebugPanels;
     }
 
     public TerrainBuilder setMapId(final int mapId) {
@@ -231,8 +264,16 @@ public class TerrainBuilder {
         return this;
     }
 
+    public int getMapId() {
+        return mapId;
+    }
+
     public TerrainBuilder setGridCacheThreadCount(final int gridCacheThreadCount) {
         this.gridCacheThreadCount = gridCacheThreadCount;
         return this;
+    }
+
+    public int getGridCacheThreadCount() {
+        return gridCacheThreadCount;
     }
 }
