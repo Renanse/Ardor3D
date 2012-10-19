@@ -153,7 +153,7 @@ public class TerrainBuilder {
         return terrain;
     }
 
-    public TextureClipmap buildTextureSystem(final TextureSource textureSource) throws Exception {
+    private TextureClipmap buildTextureSystem(final TextureSource textureSource) throws Exception {
         final TextureConfiguration textureConfiguration = textureSource.getConfiguration();
         logger.info(textureConfiguration.toString());
 
