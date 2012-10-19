@@ -1,1 +1,1 @@
-lwjgl version: 2.8.2
+lwjgl version: 2.8.4
