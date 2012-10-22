@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.atlas;
 
+import com.ardor3d.math.Rectangle2;
 
 public class AtlasPacker {
     private final AtlasNode rootNode;
@@ -19,10 +20,10 @@ public class AtlasPacker {
     }
 
     public AtlasNode insert(final int width, final int height) {
-        return rootNode.insert(new AtlasRectangle(0, 0, width, height));
+        return rootNode.insert(new Rectangle2(0, 0, width, height));
     }
 
-    public AtlasNode insert(final AtlasRectangle image) {
+    public AtlasNode insert(final Rectangle2 image) {
         return rootNode.insert(image);
     }
 

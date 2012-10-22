@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 import com.ardor3d.extension.atlas.AtlasNode;
 import com.ardor3d.extension.atlas.AtlasPacker;
-import com.ardor3d.extension.atlas.AtlasRectangle;
+import com.ardor3d.math.Rectangle2;
 
 public class AtlasPainter extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -33,7 +33,7 @@ public class AtlasPainter extends JPanel {
         if (node == null) {
             return;
         }
-        final AtlasRectangle im = node.getRectangle();
+        final Rectangle2 im = node.getRectangle();
         if (node.isSet()) {
             g2.setColor(Color.red);
         } else {

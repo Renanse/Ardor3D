@@ -1,21 +1,21 @@
 
 package com.ardor3d.extension.atlas;
 
+import com.ardor3d.math.Rectangle2;
+
 public class AtlasNode {
     private boolean isLeaf = true;
     private boolean isSet = false;
     private final AtlasNode child[] = new AtlasNode[2];
-    private AtlasRectangle localRectangle;
+    private Rectangle2 localRectangle;
 
-    private AtlasNode() {
-
-    }
+    private AtlasNode() {}
 
     public AtlasNode(final int width, final int height) {
-        localRectangle = new AtlasRectangle(0, 0, width, height);
+        localRectangle = new Rectangle2(0, 0, width, height);
     }
 
-    public AtlasNode insert(final AtlasRectangle rectangle) {
+    public AtlasNode insert(final Rectangle2 rectangle) {
         if (!isLeaf) {
             final AtlasNode newNode = child[0].insert(rectangle);
             if (newNode != null) {
@@ -47,14 +47,14 @@ public class AtlasNode {
             final int dh = localRectangle.getHeight() - rectangle.getHeight();
 
             if (dw > dh) {
-                child[0].localRectangle = new AtlasRectangle(localRectangle.getX(), localRectangle.getY(), rectangle
-                        .getWidth(), localRectangle.getHeight());
-                child[1].localRectangle = new AtlasRectangle(localRectangle.getX() + rectangle.getWidth(),
+                child[0].localRectangle = new Rectangle2(localRectangle.getX(), localRectangle.getY(),
+                        rectangle.getWidth(), localRectangle.getHeight());
+                child[1].localRectangle = new Rectangle2(localRectangle.getX() + rectangle.getWidth(),
                         localRectangle.getY(), dw, localRectangle.getHeight());
             } else {
-                child[0].localRectangle = new AtlasRectangle(localRectangle.getX(), localRectangle.getY(),
+                child[0].localRectangle = new Rectangle2(localRectangle.getX(), localRectangle.getY(),
                         localRectangle.getWidth(), rectangle.getHeight());
-                child[1].localRectangle = new AtlasRectangle(localRectangle.getX(), localRectangle.getY()
+                child[1].localRectangle = new Rectangle2(localRectangle.getX(), localRectangle.getY()
                         + rectangle.getHeight(), localRectangle.getWidth(), dh);
             }
 
@@ -66,7 +66,7 @@ public class AtlasNode {
         return child[childIndex];
     }
 
-    public AtlasRectangle getRectangle() {
+    public Rectangle2 getRectangle() {
         return localRectangle;
     }
 

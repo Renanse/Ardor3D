@@ -24,6 +24,7 @@ import com.ardor3d.image.Texture.WrapAxis;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
@@ -175,7 +176,7 @@ public class TexturePacker {
 
         parameterObject.setAtlasIndex(index);
 
-        final AtlasRectangle rectangle = node.getRectangle();
+        final Rectangle2 rectangle = node.getRectangle();
         final ByteBuffer data = dataBuffers.get(index);
         final ByteBuffer lightData = parameterObject.getTexture().getImage().getData(0);
 
@@ -236,7 +237,7 @@ public class TexturePacker {
         }
     }
 
-    private void repeat(final ByteBuffer data, final AtlasRectangle rectangle, final int textureWidth,
+    private void repeat(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
             final int textureHeight, final TextureParameter parameterObject) {
         for (int y = 0; y < textureHeight; y++) {
             localCopyBuffer(data, rectangle, textureWidth, y + 1, 0, y + 1);
@@ -252,7 +253,7 @@ public class TexturePacker {
         localCopyBuffer(data, rectangle, 1, 1, textureWidth + 1, textureHeight + 1);
     }
 
-    private void edgeClamp(final ByteBuffer data, final AtlasRectangle rectangle, final int textureWidth,
+    private void edgeClamp(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
             final int textureHeight, final TextureParameter parameterObject) {
         for (int y = 0; y < textureHeight; y++) {
             localCopyBuffer(data, rectangle, 1, y + 1, 0, y + 1);
@@ -268,7 +269,7 @@ public class TexturePacker {
         localCopyBuffer(data, rectangle, textureWidth, textureHeight, textureWidth + 1, textureHeight + 1);
     }
 
-    private void clamp(final ByteBuffer data, final AtlasRectangle rectangle, final int textureWidth,
+    private void clamp(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
             final int textureHeight, final TextureParameter parameterObject) {
         for (int y = 0; y < textureHeight; y++) {
             localCopyBuffer(data, rectangle, 1, y + 1, 0, y + 1);
@@ -284,7 +285,7 @@ public class TexturePacker {
         localCopyBuffer(data, rectangle, textureWidth, textureHeight, textureWidth + 1, textureHeight + 1);
     }
 
-    private void borderClamp(final ByteBuffer data, final AtlasRectangle rectangle, final int textureWidth,
+    private void borderClamp(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
             final int textureHeight, final TextureParameter parameterObject, final ReadOnlyColorRGBA col) {
         for (int y = 0; y < textureHeight; y++) {
             setColor(data, rectangle, 0, y + 1, col);
@@ -347,7 +348,7 @@ public class TexturePacker {
         return packers.size() - 1;
     }
 
-    private void localCopyBuffer(final ByteBuffer dataAsFloatBuffer, final AtlasRectangle rectangle, final int xFrom,
+    private void localCopyBuffer(final ByteBuffer dataAsFloatBuffer, final Rectangle2 rectangle, final int xFrom,
             final int yFrom, final int xTo, final int yTo) {
         final int componentsTarget = useAlpha ? 4 : 3;
 
@@ -357,7 +358,7 @@ public class TexturePacker {
         fillDataBuffer(dataAsFloatBuffer, dataAsFloatBuffer, sourceIndex, targetIndex, useAlpha);
     }
 
-    private void setDataPixel(final AtlasRectangle rectangle, final int width, final int height,
+    private void setDataPixel(final Rectangle2 rectangle, final int width, final int height,
             final ByteBuffer lightData, final ByteBuffer dataAsFloatBuffer, final int y, final int x,
             final boolean sourceAlpha) {
         final int componentsSource = sourceAlpha ? 4 : 3;
@@ -383,7 +384,7 @@ public class TexturePacker {
         }
     }
 
-    private void setColor(final ByteBuffer dataAsFloatBuffer, final AtlasRectangle rectangle, final int x, final int y,
+    private void setColor(final ByteBuffer dataAsFloatBuffer, final Rectangle2 rectangle, final int x, final int y,
             final ReadOnlyColorRGBA color) {
         final int componentsTarget = useAlpha ? 4 : 3;
 
