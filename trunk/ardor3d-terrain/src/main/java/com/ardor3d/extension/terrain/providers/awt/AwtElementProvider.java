@@ -12,7 +12,7 @@ package com.ardor3d.extension.terrain.providers.awt;
 
 import java.util.List;
 
-import com.ardor3d.math.Vector4;
+import com.ardor3d.math.type.ReadOnlyVector4;
 import com.google.common.collect.Lists;
 
 public class AwtElementProvider implements ElementUpdateListener {
@@ -26,6 +26,7 @@ public class AwtElementProvider implements ElementUpdateListener {
     public void addElement(final AbstractAwtElement element) {
         _elements.add(element);
         element.setUpdateListener(this);
+        elementUpdated(element.getBounds(), element.getBounds());
     }
 
     public void clear() {
@@ -53,7 +54,7 @@ public class AwtElementProvider implements ElementUpdateListener {
     }
 
     @Override
-    public void elementUpdated(final Vector4 oldBounds, final Vector4 newBounds) {
+    public void elementUpdated(final ReadOnlyVector4 oldBounds, final ReadOnlyVector4 newBounds) {
         for (final ElementUpdateListener listener : _updateListeners) {
             listener.elementUpdated(oldBounds, newBounds);
         }

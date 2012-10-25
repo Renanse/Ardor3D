@@ -10,8 +10,8 @@
 
 package com.ardor3d.extension.terrain.providers.awt;
 
-import com.ardor3d.math.Vector4;
+import com.ardor3d.math.type.ReadOnlyVector4;
 
 public interface ElementUpdateListener {
-    void elementUpdated(Vector4 oldBounds, Vector4 newBounds);
+    void elementUpdated(ReadOnlyVector4 oldBounds, ReadOnlyVector4 newBounds);
 }

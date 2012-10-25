@@ -27,7 +27,6 @@ import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
-import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -207,12 +206,12 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
     }
 
     @Override
-    public void elementUpdated(final Vector4 oldBounds, final Vector4 newBounds) {
+    public void elementUpdated(final ReadOnlyVector4 oldBounds, final ReadOnlyVector4 newBounds) {
         addTiles(oldBounds);
         addTiles(newBounds);
     }
 
-    protected void addTiles(final Vector4 bounds) {
+    protected void addTiles(final ReadOnlyVector4 bounds) {
         for (int i = 0; i < availableClipmapLevels; i++) {
             final double scale = 1.0 / (tileSize * MathUtils.pow2(i));
             final int minX = (int) MathUtils.floor(bounds.getX() * scale);
