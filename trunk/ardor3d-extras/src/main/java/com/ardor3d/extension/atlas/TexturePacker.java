@@ -269,22 +269,6 @@ public class TexturePacker {
         localCopyBuffer(data, rectangle, textureWidth, textureHeight, textureWidth + 1, textureHeight + 1);
     }
 
-    private void clamp(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
-            final int textureHeight, final TextureParameter parameterObject) {
-        for (int y = 0; y < textureHeight; y++) {
-            localCopyBuffer(data, rectangle, 1, y + 1, 0, y + 1);
-            localCopyBuffer(data, rectangle, textureWidth, y + 1, textureWidth + 1, y + 1);
-        }
-        for (int x = 0; x < textureWidth; x++) {
-            localCopyBuffer(data, rectangle, x + 1, 1, x + 1, 0);
-            localCopyBuffer(data, rectangle, x + 1, textureHeight, x + 1, textureHeight + 1);
-        }
-        localCopyBuffer(data, rectangle, 1, 1, 0, 0);
-        localCopyBuffer(data, rectangle, textureWidth, 1, textureWidth + 1, 0);
-        localCopyBuffer(data, rectangle, 1, textureHeight, 0, textureHeight + 1);
-        localCopyBuffer(data, rectangle, textureWidth, textureHeight, textureWidth + 1, textureHeight + 1);
-    }
-
     private void borderClamp(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
             final int textureHeight, final TextureParameter parameterObject, final ReadOnlyColorRGBA col) {
         for (int y = 0; y < textureHeight; y++) {
