@@ -14,17 +14,19 @@ import com.google.common.collect.PeekingIterator;
 
 public interface ControllerWrapper {
     /**
-     * Allows the keyboard wrapper implementation to initialise itself.
+     * Allows the controller wrapper implementation to initialize itself.
      */
     public void init();
 
     /**
-     * Returns a peeking iterator that allows the client to loop through all keyboard events that have not yet been
+     * Returns a peeking iterator that allows the client to loop through all controller events that have not yet been
      * handled.
      * 
      * @return an iterator that allows the client to check which events have still not been handled
      */
     public PeekingIterator<ControllerEvent> getEvents();
 
-    public ControllerState getBlankState();
+    public int getControllerCount();
+
+    public ControllerInfo getControllerInfo(int controllerIndex);
 }

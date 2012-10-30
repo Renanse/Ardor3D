@@ -87,8 +87,6 @@ public class TestPhysicalLayer {
         controllerWrapper.init();
         focusWrapper.init();
 
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
-
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(Adown.iterator()));
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator()));
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator()));
@@ -125,8 +123,6 @@ public class TestPhysicalLayer {
         mouseWrapper.init();
         controllerWrapper.init();
         focusWrapper.init();
-
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
 
         expect(keyboardWrapper.getEvents()).andReturn(adau);
         expect(keyboardWrapper.getEvents()).andReturn(adau);
@@ -170,8 +166,6 @@ public class TestPhysicalLayer {
 
         final PeekingIterator<KeyEvent> keyIterator = Iterators.peekingIterator(AdownBdown.iterator());
 
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
-
         expect(keyboardWrapper.getEvents()).andReturn(keyIterator).times(4);
         expect(mouseWrapper.getEvents()).andReturn(Iterators.peekingIterator(noMice.iterator())).times(4);
         expect(controllerWrapper.getEvents()).andReturn(Iterators.peekingIterator(nothing.iterator())).times(4);
@@ -209,8 +203,6 @@ public class TestPhysicalLayer {
         focusWrapper.init();
         controllerWrapper.init();
 
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
-
         expect(keyboardWrapper.getEvents()).andReturn(iter).atLeastOnce();
         expect(mouseWrapper.getEvents()).andReturn(Iterators.peekingIterator(noMice.iterator())).atLeastOnce();
         expect(controllerWrapper.getEvents()).andReturn(Iterators.peekingIterator(nothing.iterator())).atLeastOnce();
@@ -230,8 +222,6 @@ public class TestPhysicalLayer {
         focusWrapper.init();
         controllerWrapper.init();
 
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
-
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator())).atLeastOnce();
         expect(mouseWrapper.getEvents()).andReturn(iter).atLeastOnce();
         expect(controllerWrapper.getEvents()).andReturn(Iterators.peekingIterator(nothing.iterator())).atLeastOnce();
@@ -248,8 +238,6 @@ public class TestPhysicalLayer {
         mouseWrapper.init();
         focusWrapper.init();
         controllerWrapper.init();
-
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
 
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(Adown.iterator()));
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator()));
@@ -279,8 +267,6 @@ public class TestPhysicalLayer {
         mouseWrapper.init();
         focusWrapper.init();
         controllerWrapper.init();
-
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
 
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(Adown.iterator()));
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator()));
@@ -317,8 +303,6 @@ public class TestPhysicalLayer {
         mouseWrapper.init();
         focusWrapper.init();
         controllerWrapper.init();
-
-        expect(controllerWrapper.getBlankState()).andReturn(new ControllerState()).anyTimes();
 
         expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator())).times(3);
         expect(mouseWrapper.getEvents()).andReturn(Iterators.peekingIterator(buttonDown.iterator()));

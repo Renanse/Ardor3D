@@ -11,7 +11,7 @@
 package com.ardor3d.input.logical;
 
 import com.ardor3d.input.ControllerEvent;
-import com.ardor3d.input.ControllerState;
+import com.ardor3d.input.ControllerInfo;
 import com.ardor3d.input.ControllerWrapper;
 import com.google.common.collect.PeekingIterator;
 
@@ -34,10 +34,6 @@ public class DummyControllerWrapper implements ControllerWrapper {
         }
     };
 
-    public ControllerState getBlankState() {
-        return new ControllerState();
-    }
-
     public PeekingIterator<ControllerEvent> getEvents() {
         return empty;
     }
@@ -46,4 +42,13 @@ public class DummyControllerWrapper implements ControllerWrapper {
         ; // ignore, does nothing
     }
 
+    @Override
+    public int getControllerCount() {
+        return 0;
+    }
+
+    @Override
+    public ControllerInfo getControllerInfo(final int controllerIndex) {
+        return null;
+    }
 }
