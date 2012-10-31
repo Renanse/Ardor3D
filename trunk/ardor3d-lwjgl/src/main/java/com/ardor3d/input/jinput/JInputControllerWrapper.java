@@ -57,7 +57,7 @@ public class JInputControllerWrapper implements ControllerWrapper {
     @Override
     public int getControllerCount() {
         init();
-        return ControllerEnvironment.getDefaultEnvironment().getControllers().length;
+        return _controllers.size();
     }
 
     @Override
@@ -75,8 +75,8 @@ public class JInputControllerWrapper implements ControllerWrapper {
             ControllerEnvironment.getDefaultEnvironment();
 
             for (final Controller controller : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
-                _controllers.add(getControllerInfo(controller));
                 if (controller.getType() != Type.KEYBOARD && controller.getType() != Type.MOUSE) {
+                    _controllers.add(getControllerInfo(controller));
                     for (final Component component : controller.getComponents()) {
                         ControllerState.NOTHING.set(controller.getName(), component.getIdentifier().getName(), 0);
                     }
