@@ -82,9 +82,10 @@ public class JInputControllerWrapper implements ControllerWrapper {
                     }
                 }
             }
-
         } catch (final Exception e) {
             e.printStackTrace();
+        } finally {
+            _inited = true;
         }
     }
 
