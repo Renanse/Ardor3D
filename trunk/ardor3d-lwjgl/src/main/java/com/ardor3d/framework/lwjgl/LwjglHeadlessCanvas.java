@@ -28,10 +28,10 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRenderer;
@@ -54,7 +54,7 @@ public class LwjglHeadlessCanvas {
     private final Scene _scene;
     private final Renderer _renderer = new LwjglRenderer();
     protected final DisplaySettings _settings;
-    protected final Camera _camera;
+    protected Camera _camera;
 
     private final int _fboID, _depthRBID, _colorRBID;
     private final IntBuffer _data;
@@ -77,8 +77,8 @@ public class LwjglHeadlessCanvas {
 
         try {
             // Create a Pbuffer so we can have a valid gl context to work with
-            final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(), _settings
-                    .getStencilBits()).withSamples(_settings.getSamples());
+            final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(),
+                    _settings.getStencilBits()).withSamples(_settings.getSamples());
             _buff = new Pbuffer(1, 1, format, null);
             _buff.makeCurrent();
         } catch (final LWJGLException ex) {
@@ -140,7 +140,7 @@ public class LwjglHeadlessCanvas {
         ContextManager.switchContext(this);
 
         // Turn on multisample if requested...
-        if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
+        if (_settings.getSamples() != 0 && caps.isMultisampleSupported()) {
             GL11.glEnable(ARBMultisample.GL_MULTISAMPLE_ARB);
         }
 
@@ -148,8 +148,8 @@ public class LwjglHeadlessCanvas {
         _renderer.setBackgroundColor(ColorRGBA.BLACK);
 
         // Setup a default camera
-        _camera = new Camera(width, settings.getHeight());
-        _camera.setFrustumPerspective(45.0f, (float) width / (float) settings.getHeight(), 1, 1000);
+        _camera = new Camera(width, _settings.getHeight());
+        _camera.setFrustumPerspective(45.0f, (float) width / (float) _settings.getHeight(), 1, 1000);
         _camera.setProjectionMode(ProjectionMode.Perspective);
 
         // setup camera orientation and position.
@@ -196,9 +196,7 @@ public class LwjglHeadlessCanvas {
         // read data from our color buffer
         _data.rewind();
         GL11.glReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
-        GL11
-                .glReadPixels(0, 0, _settings.getWidth(), _settings.getHeight(), GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE,
-                        _data);
+        GL11.glReadPixels(0, 0, _settings.getWidth(), _settings.getHeight(), GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, _data);
 
         if (Constants.useMultipleContexts) {
             // release our FBO.
@@ -216,5 +214,9 @@ public class LwjglHeadlessCanvas {
 
     public Camera getCamera() {
         return _camera;
+    }
+
+    public void setCamera(final Camera camera) {
+        _camera = camera;
     }
 }
