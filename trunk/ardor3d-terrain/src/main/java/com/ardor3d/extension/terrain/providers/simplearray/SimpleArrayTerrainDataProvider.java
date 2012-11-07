@@ -18,9 +18,7 @@ import com.ardor3d.extension.terrain.client.TerrainSource;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.providers.image.ImageTextureSource;
 import com.ardor3d.extension.terrain.util.NormalMapUtil;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.util.TextureManager;
+import com.ardor3d.image.Image;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -67,8 +65,7 @@ public class SimpleArrayTerrainDataProvider implements TerrainDataProvider {
     public TextureSource getNormalMapSource(final int mapId) {
         if (generateNormalMap) {
             try {
-                final Texture normal = TextureManager.loadFromImage(NormalMapUtil.constructNormalMap(heightData, 1, 1,
-                        1, side), MinificationFilter.BilinearNoMipMaps);
+                final Image normalImage = NormalMapUtil.constructNormalMap(heightData, side, 1, 1, 1);
                 final List<Integer> heightMapSizes = Lists.newArrayList();
                 int currentSize = side;
                 heightMapSizes.add(currentSize);
@@ -76,7 +73,7 @@ public class SimpleArrayTerrainDataProvider implements TerrainDataProvider {
                     currentSize /= 2;
                     heightMapSizes.add(currentSize);
                 }
-                return new ImageTextureSource(tileSize, normal.getImage(), heightMapSizes);
+                return new ImageTextureSource(tileSize, normalImage, heightMapSizes);
             } catch (final Exception e) {
                 e.printStackTrace();
             }

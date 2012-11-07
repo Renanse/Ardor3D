@@ -71,6 +71,7 @@ public class PhysicalLayer {
 
         _currentKeyboardState = KeyboardState.NOTHING;
         _currentMouseState = MouseState.NOTHING;
+        _currentControllerState = ControllerState.NOTHING;
     }
 
     /**
@@ -131,7 +132,7 @@ public class PhysicalLayer {
         final PeekingIterator<ControllerEvent> eventIterator = _controllerWrapper.getEvents();
 
         if (eventIterator.hasNext()) {
-            _currentControllerState = new ControllerState();
+            _currentControllerState = new ControllerState(_currentControllerState);
             while (eventIterator.hasNext()) {
                 final ControllerEvent event = eventIterator.next();
                 _currentControllerState.addEvent(event);
@@ -199,7 +200,7 @@ public class PhysicalLayer {
         _stateQueue.add(InputState.LOST_FOCUS);
         _currentKeyboardState = KeyboardState.NOTHING;
         _currentMouseState = MouseState.NOTHING;
-        _currentControllerState = _controllerWrapper.getBlankState();
+        _currentControllerState = ControllerState.NOTHING;
     }
 
     private void init() {
@@ -209,7 +210,17 @@ public class PhysicalLayer {
         _mouseWrapper.init();
         _focusWrapper.init();
         _controllerWrapper.init();
+    }
 
-        _currentControllerState = _controllerWrapper.getBlankState();
+    public ControllerWrapper getControllerWrapper() {
+        return _controllerWrapper;
+    }
+
+    public KeyboardWrapper getKeyboardWrapper() {
+        return _keyboardWrapper;
+    }
+
+    public MouseWrapper getMouseWrapper() {
+        return _mouseWrapper;
     }
 }

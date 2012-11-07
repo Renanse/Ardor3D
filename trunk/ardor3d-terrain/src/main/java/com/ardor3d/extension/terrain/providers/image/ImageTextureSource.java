@@ -56,7 +56,6 @@ public class ImageTextureSource implements TextureSource {
         // populate mips
         for (int i = 1; i < max; i++) {
             currentSize = heightMapSizes.get(max - i - 1);
-            System.err.println(currentSize);
             final byte[] heightMapMip = new byte[currentSize * currentSize * 3];
             for (int x = 0; x < currentSize; x++) {
                 for (int z = 0; z < currentSize; z++) {
