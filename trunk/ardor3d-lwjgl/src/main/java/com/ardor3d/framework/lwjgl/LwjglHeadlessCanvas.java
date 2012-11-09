@@ -41,7 +41,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <p>
- * A "canvas" class for use in drawing Scene data to an offscreen target. The data is read back after each call to draw
+ * A "canvas" class for use in drawing Scene data to an off-screen target. The data is read back after each call to draw
  * into a local IntBuffer for use.
  * </p>
  * 
@@ -51,14 +51,14 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class LwjglHeadlessCanvas {
 
-    private final Scene _scene;
-    private final Renderer _renderer = new LwjglRenderer();
+    protected Scene _scene;
+    protected Renderer _renderer = new LwjglRenderer();
     protected final DisplaySettings _settings;
     protected Camera _camera;
 
-    private final int _fboID, _depthRBID, _colorRBID;
-    private final IntBuffer _data;
-    private Pbuffer _buff;
+    protected int _fboID, _depthRBID, _colorRBID;
+    protected IntBuffer _data;
+    protected Pbuffer _buff;
 
     /**
      * Construct a new LwjglHeadlessCanvas. Only width, height, alpha, depth and stencil are used. Samples will be
@@ -72,6 +72,10 @@ public class LwjglHeadlessCanvas {
     public LwjglHeadlessCanvas(final DisplaySettings settings, final Scene scene) {
         _scene = scene;
         _settings = settings;
+        init();
+    }
+
+    protected void init() {
         final int width = _settings.getWidth();
         final int height = _settings.getHeight();
 
@@ -201,6 +205,32 @@ public class LwjglHeadlessCanvas {
         if (Constants.useMultipleContexts) {
             // release our FBO.
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+        }
+    }
+
+    public void cleanup() {
+        if (_fboID != 0) {
+            final IntBuffer id = BufferUtils.createIntBuffer(1);
+            id.put(_fboID);
+            id.rewind();
+            EXTFramebufferObject.glDeleteFramebuffersEXT(id);
+            _fboID = 0;
+        }
+
+        if (_depthRBID != 0) {
+            final IntBuffer id = BufferUtils.createIntBuffer(1);
+            id.put(_depthRBID);
+            id.rewind();
+            EXTFramebufferObject.glDeleteRenderbuffersEXT(id);
+            _depthRBID = 0;
+        }
+
+        if (_colorRBID != 0) {
+            final IntBuffer id = BufferUtils.createIntBuffer(1);
+            id.put(_colorRBID);
+            id.rewind();
+            EXTFramebufferObject.glDeleteRenderbuffersEXT(id);
+            _colorRBID = 0;
         }
     }
 
