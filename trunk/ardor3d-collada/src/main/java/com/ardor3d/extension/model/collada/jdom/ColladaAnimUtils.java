@@ -490,9 +490,10 @@ public class ColladaAnimUtils {
                         final short[] indices = new short[maxWeightsPerVert];
                         int originalIndex;
                         for (int x = 0; x < verts; x++) {
-                            originalIndex = pairsMap.getIndices()[x];
                             if (vertMap != null) {
                                 originalIndex = pairsMap.getIndices()[vertMap.getFirstOldIndex(x)];
+                            } else {
+                                originalIndex = pairsMap.getIndices()[x];
                             }
 
                             j = 0;

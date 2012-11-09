@@ -12,6 +12,7 @@ package com.ardor3d.extension.animation.skeletal;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.TreeSet;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.extension.animation.skeletal.util.SkinUtils;
@@ -27,6 +28,7 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
+import com.google.common.collect.Sets;
 
 /**
  * Mesh supporting deformation via skeletal animation.
@@ -604,6 +606,59 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         setJointIndices(jointIndices);
     }
 
+    /**
+     * Rewrites the weights on this SkinnedMesh, if necessary, to reduce the number of weights per vert to the given
+     * max. This is done by dropping the least significant weight and balancing the remainder to total 1.0 again.
+     * 
+     * @param maxCount
+     *            the desired maximum weightsPerVert. If this is >= the current weightsPerVert, this method is a NOOP.
+     */
+    public void constrainWeightCount(final int maxCount) {
+        if (maxCount >= _weightsPerVert) {
+            return;
+        }
+
+        // Generate new joint and weight buffers
+        final int vcount = _weights.length / _weightsPerVert;
+        final short[] joints = new short[vcount * maxCount];
+        final float[] weights = new float[vcount * maxCount];
+
+        final TreeSet<JointWeight> weightSort = Sets.newTreeSet();
+        // Walk through old data vertex by vertex
+        int index;
+        for (int i = 0; i < vcount; i++) {
+            weightSort.clear();
+            for (int j = 0; j < _weightsPerVert; j++) {
+                index = i * _weightsPerVert + j;
+                weightSort.add(new JointWeight(_jointIndices[index], _weights[index]));
+            }
+            // go through and grab the top values
+            float totalWeight = 0;
+            index = 0;
+            for (final JointWeight jw : weightSort) {
+                if (index < maxCount) {
+                    if (jw.weight > 0) {
+                        totalWeight += jw.weight;
+                        joints[i * maxCount + index] = jw.joint;
+                        weights[i * maxCount + index] = jw.weight;
+                        index++;
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (totalWeight > 0) {
+                // normalize
+                for (int j = 0; j < maxCount; j++) {
+                    weights[i * maxCount + j] /= totalWeight;
+                }
+            }
+        }
+        _weightsPerVert = maxCount;
+        setJointIndices(joints);
+        setWeights(weights);
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////
@@ -652,6 +707,50 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         // make sure pose listener added
         if (_currentPose != null) {
             _currentPose.addPoseListener(this);
+        }
+    }
+
+    class JointWeight implements Comparable<JointWeight> {
+        short joint;
+        float weight;
+
+        public JointWeight(final short joint, final float weight) {
+            this.joint = joint;
+            this.weight = weight;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 17;
+
+            // only care about joint
+            result += 31 * result + joint;
+
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof JointWeight)) {
+                return false;
+            }
+            final JointWeight comp = (JointWeight) o;
+            // only care about joint
+            return joint == comp.joint;
+        }
+
+        @Override
+        public int compareTo(final JointWeight o) {
+            if (o.weight < weight) {
+                return -1;
+            } else if (o.weight > weight) {
+                return 1;
+            } else {
+                return o.joint - joint;
+            }
         }
     }
 }
