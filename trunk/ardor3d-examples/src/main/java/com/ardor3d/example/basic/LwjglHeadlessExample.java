@@ -10,15 +10,19 @@
 
 package com.ardor3d.example.basic;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.net.URISyntaxException;
 import java.nio.IntBuffer;
+import java.util.concurrent.Callable;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.Purpose;
@@ -42,6 +46,8 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -86,6 +92,8 @@ public class LwjglHeadlessExample implements Scene {
     // A int array we'll reuse when transferring data between opengl and the labelImage.
     private final int[] tmpData;
 
+    private boolean run = true;
+
     /**
      * Our main entry point to the example. News up the example and calls start.
      * 
@@ -112,7 +120,7 @@ public class LwjglHeadlessExample implements Scene {
 
         // Set up a frame and label with icon to show our image in.
         frame = new JFrame("Headless Example - close window to exit");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         label = new JLabel("View of Headless Content:");
         label.setVerticalTextPosition(SwingConstants.TOP);
         label.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -121,6 +129,19 @@ public class LwjglHeadlessExample implements Scene {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(final WindowEvent e) {
+                GameTaskQueueManager.getManager(canvas).render(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        run = false;
+                        return null;
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -129,9 +150,15 @@ public class LwjglHeadlessExample implements Scene {
     private void start() {
         initExample();
 
-        while (true) {
+        while (run) {
             updateExample();
-            canvas.draw();
+
+            GameTaskQueueManager.getManager(canvas).getQueue(GameTaskQueue.RENDER).execute();
+            if (run) { // still run?
+                canvas.draw();
+            } else {
+                break;
+            }
 
             final IntBuffer data = canvas.getDataBuffer();
 
@@ -143,6 +170,9 @@ public class LwjglHeadlessExample implements Scene {
 
             label.setIcon(new ImageIcon(labelImage));
         }
+
+        canvas.cleanup();
+        System.exit(0);
     }
 
     /**
@@ -228,6 +258,8 @@ public class LwjglHeadlessExample implements Scene {
      */
     private void updateExample() {
         timer.update();
+
+        GameTaskQueueManager.getManager(canvas).getQueue(GameTaskQueue.UPDATE).execute();
 
         counter += timer.getTimePerFrame();
         frames++;
