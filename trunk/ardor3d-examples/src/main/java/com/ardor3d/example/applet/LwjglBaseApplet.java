@@ -119,8 +119,8 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
                                 public Void call() throws Exception {
                                     final Camera cam = _glCanvas.getCanvasRenderer().getCamera();
                                     cam.resize(getWidth(), getHeight());
-                                    cam.setFrustumPerspective(cam.getFovY(), getWidth() / (float) getHeight(), cam
-                                            .getFrustumNear(), cam.getFrustumFar());
+                                    cam.setFrustumPerspective(cam.getFovY(), getWidth() / (double) getHeight(),
+                                            cam.getFrustumNear(), cam.getFrustumFar());
                                     appletResized(getWidth(), getHeight());
                                     return null;
                                 }
@@ -234,8 +234,8 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
                     if (_glCanvas.isFullScreen()) {
                         final DisplayMode mode = Display.getDisplayMode();
                         cam.resize(mode.getWidth(), mode.getHeight());
-                        cam.setFrustumPerspective(cam.getFovY(), mode.getWidth() / (float) mode.getHeight(), cam
-                                .getFrustumNear(), cam.getFrustumFar());
+                        cam.setFrustumPerspective(cam.getFovY(), mode.getWidth() / (float) mode.getHeight(),
+                                cam.getFrustumNear(), cam.getFrustumFar());
                         appletResized(mode.getWidth(), mode.getHeight());
                     } else {
                         cam.resize(getWidth(), getHeight());

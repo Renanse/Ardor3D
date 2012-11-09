@@ -260,8 +260,8 @@ public class JoglSwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(ResourceLocatorTool.getClassPathResourceAsStream(
-                JoglSwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = awtImageLoader.load(
+                ResourceLocatorTool.getClassPathResourceAsStream(JoglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
@@ -278,7 +278,7 @@ public class JoglSwtExample {
                 final float aspect = (float) size.width / (float) size.height;
                 final Camera camera = canvasRenderer.getCamera();
                 if (camera != null) {
-                    final float fovY = 45; // XXX no camera.getFov()
+                    final double fovY = camera.getFovY();
                     final double near = camera.getFrustumNear();
                     final double far = camera.getFrustumFar();
                     camera.setFrustumPerspective(fovY, aspect, near, far);
