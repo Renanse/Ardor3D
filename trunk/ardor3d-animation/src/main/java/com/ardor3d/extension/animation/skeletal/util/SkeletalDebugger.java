@@ -37,8 +37,8 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Pyramid;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BasicText;
 
 /**
  * Utility useful for drawing Skeletons found in a scene.
@@ -307,6 +307,8 @@ public class SkeletalDebugger {
         // Update our joint and make it ready for use.
         SkeletalDebugger.joint.updateGeometricState(0);
     }
+    private static Transform spTransform = new Transform();
+    private static Matrix3 spMatrix = new Matrix3();
 
     /**
      * Draw a single Joint using the given world-space joint transform.
@@ -326,9 +328,10 @@ public class SkeletalDebugger {
             SkeletalDebugger.measureSphere.mergeLocal(vol);
             size = SkeletalDebugger.BONE_RATIO * SkeletalDebugger.measureSphere.getRadius();
         }
-        SkeletalDebugger.joint.setWorldTransform(scene.getWorldTransform().multiply(jntTransform, null));
-        SkeletalDebugger.joint.setWorldRotation(SkeletalDebugger.joint.getWorldRotation());
-        SkeletalDebugger.joint.setWorldScale(size);
+        scene.getWorldTransform().multiply(jntTransform, SkeletalDebugger.spTransform);
+        SkeletalDebugger.spTransform.getMatrix().scale(new Vector3(size, size, size), SkeletalDebugger.spMatrix);
+        SkeletalDebugger.spTransform.setRotation(SkeletalDebugger.spMatrix);
+        SkeletalDebugger.joint.setWorldTransform(SkeletalDebugger.spTransform);
         SkeletalDebugger.joint.draw(renderer);
     }
 
