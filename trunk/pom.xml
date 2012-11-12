@@ -4,7 +4,7 @@
     <groupId>com.ardor3d</groupId>
     <artifactId>ardor3d</artifactId>
     <packaging>pom</packaging>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <name>Ardor 3D</name>
 
     <modules>
