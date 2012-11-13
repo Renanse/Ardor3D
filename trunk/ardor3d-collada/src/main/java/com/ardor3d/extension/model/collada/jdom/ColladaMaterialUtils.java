@@ -35,7 +35,6 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceSource;
 
 /**
@@ -44,22 +43,19 @@ import com.ardor3d.util.resource.ResourceSource;
 public class ColladaMaterialUtils {
     private static final Logger logger = Logger.getLogger(ColladaMaterialUtils.class.getName());
 
-    private final boolean _loadTextures;
+    private final ColladaImporter _importer;
     private final DataCache _dataCache;
     private final ColladaDOMUtil _colladaDOMUtil;
-    private final ResourceLocator _textureLocator;
-    private final boolean _compressTextures;
-    private final boolean _flipTransparency;
+    private final boolean _compressTextures, _loadTextures, _flipTransparency;
 
-    public ColladaMaterialUtils(final boolean loadTextures, final DataCache dataCache,
-            final ColladaDOMUtil colladaDOMUtil, final ResourceLocator textureLocator, final boolean compressTextures,
-            final boolean flipTransparency) {
-        _loadTextures = loadTextures;
+    public ColladaMaterialUtils(final ColladaImporter importer, final DataCache dataCache,
+            final ColladaDOMUtil colladaDOMUtil) {
+        _importer = importer;
         _dataCache = dataCache;
         _colladaDOMUtil = colladaDOMUtil;
-        _textureLocator = textureLocator;
-        _compressTextures = compressTextures;
-        _flipTransparency = flipTransparency;
+        _compressTextures = _importer.isCompressTextures();
+        _loadTextures = _importer.isLoadTextures();
+        _flipTransparency = _importer.isFlipTransparency();
     }
 
     /**
@@ -281,7 +277,11 @@ public class ColladaMaterialUtils {
                  */
                 property = technique.getChild("extra");
                 if (property != null) {
-                    getTexturesFromElement(mesh, property, effect, loadedTextures, mInfo);
+                    // process with any plugins
+                    if (!_importer.readExtra(property, mesh)) {
+                        // no plugin processed our mesh, so process ourselves.
+                        getTexturesFromElement(mesh, property, effect, loadedTextures, mInfo);
+                    }
                 }
 
                 // XXX: There are some issues with clarity on how to use alpha blending in OpenGL FFP.
@@ -563,11 +563,11 @@ public class ColladaMaterialUtils {
         }
 
         final Texture texture;
-        if (_textureLocator == null) {
+        if (_importer.getTextureLocator() == null) {
             texture = TextureManager.load(path, minFilter, _compressTextures ? TextureStoreFormat.GuessCompressedFormat
                     : TextureStoreFormat.GuessNoCompressedFormat, true);
         } else {
-            final ResourceSource source = _textureLocator.locateResource(path);
+            final ResourceSource source = _importer.getTextureLocator().locateResource(path);
             texture = TextureManager.load(source, minFilter,
                     _compressTextures ? TextureStoreFormat.GuessCompressedFormat
                             : TextureStoreFormat.GuessNoCompressedFormat, true);

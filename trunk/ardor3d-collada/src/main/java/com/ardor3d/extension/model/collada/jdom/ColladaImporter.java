@@ -37,6 +37,7 @@ import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
+import com.ardor3d.extension.model.collada.jdom.plugin.ColladaExtraPlugin;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.geom.GeometryTool.MatchCondition;
@@ -46,6 +47,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -57,8 +59,6 @@ import com.google.common.collect.Multimap;
  * </p>
  */
 public class ColladaImporter {
-    private static final Logger LOGGER = Logger.getLogger(ColladaImporter.class.getName());
-
     private boolean _loadTextures = true;
     private boolean _flipTransparency = false;
     private boolean _loadAnimations = true;
@@ -69,6 +69,7 @@ public class ColladaImporter {
     private final EnumSet<MatchCondition> _optimizeSettings = EnumSet.of(MatchCondition.UVs, MatchCondition.Normal,
             MatchCondition.Color);
     private Map<String, Joint> _externalJointMapping;
+    private final List<ColladaExtraPlugin> _extraPlugins = Lists.newArrayList();
 
     public boolean isLoadTextures() {
         return _loadTextures;
@@ -99,6 +100,14 @@ public class ColladaImporter {
 
     public boolean isFlipTransparency() {
         return _flipTransparency;
+    }
+
+    public void addExtraPlugin(final ColladaExtraPlugin plugin) {
+        _extraPlugins.add(plugin);
+    }
+
+    public void clearExtraPlugins() {
+        _extraPlugins.clear();
     }
 
     /**
@@ -198,8 +207,7 @@ public class ColladaImporter {
             dataCache.getExternalJointMapping().putAll(_externalJointMapping);
         }
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
-        final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(_loadTextures, dataCache,
-                colladaDOMUtil, _textureLocator, _compressTextures, _flipTransparency);
+        final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(this, dataCache, colladaDOMUtil);
         final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils,
                 _optimizeMeshes, _optimizeSettings);
         final ColladaAnimUtils colladaAnimUtils = new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil,
@@ -477,5 +485,14 @@ public class ColladaImporter {
             return Float.POSITIVE_INFINITY;
         }
         return Float.parseFloat(candidate);
+    }
+
+    public boolean readExtra(final Element extra, final Object... params) {
+        for (final ColladaExtraPlugin plugin : _extraPlugins) {
+            if (plugin.processExtra(extra, params)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
