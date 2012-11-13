@@ -53,7 +53,7 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
      * A percentage value of how much of each state to blend for our final result, generated based on time and blend
      * type.
      */
-    private double _percent = 0;
+    protected double _percent = 0;
 
     /** The method to use in determining how much of each state to use based on the current time of the transition. */
     private BlendType _type = BlendType.Linear;
@@ -162,7 +162,7 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
         // if we're outside the fade time...
         if (currentTime > getFadeTime()) {
             // transition over to end state
-            getLastStateOwner().replaceState(this, getStateB());
+            replaceOwnerWhenDone();
             return;
         }
 
@@ -181,6 +181,10 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
                 setPercent(percent);
                 break;
         }
+    }
+
+    protected void replaceOwnerWhenDone() {
+        getLastStateOwner().replaceState(this, getStateB());
     }
 
     @Override

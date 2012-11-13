@@ -36,4 +36,8 @@ public class OutputClipSourceMap extends LoggingMap<String, ClipSource> {
             OutputClipSourceMap.logger.warning("Replaced clip source in OutputClipSourceMap with same name. " + key);
         }
     }
+    
+    public static Logger getLogger() {
+        return logger;
+    }
 }

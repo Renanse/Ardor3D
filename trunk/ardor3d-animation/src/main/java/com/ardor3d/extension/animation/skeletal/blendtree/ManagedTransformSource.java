@@ -17,10 +17,13 @@ import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.extension.animation.skeletal.clip.JointData;
+import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This tree source maintains its own source data, which can be modified directly using setJointXXX. This source is
@@ -30,7 +33,8 @@ public class ManagedTransformSource implements BlendTreeSource {
 
     /** Our local source data. */
     private final Map<String, JointData> data = Maps.newHashMap();
-
+  /** our class logger */
+    private static final Logger logger = Logger.getLogger(AnimationLayer.class.getName());
     /** optional: name of source we were initialized from, if given. */
     private String sourceName;
 
@@ -153,6 +157,22 @@ public class ManagedTransformSource implements BlendTreeSource {
     public void initJointsByName(final SkeletonPose pose, final AnimationClip clip, final String... jointNames) {
         for (final String name : jointNames) {
             final int jointIndex = pose.getSkeleton().findJointByName(name);
+            if (jointIndex < 0) {
+               logger.log(Level.WARNING, "SKELETON INIT ERROR! {0} : Joint Index: {1} >> {2}", new Object[]{clip.getName(), jointIndex, this.getClass().toString()});
+                return;
+            }
+            JointChannel jc = ((JointChannel) clip.findChannelByName(JointChannel.JOINT_CHANNEL_NAME + jointIndex));
+            if (jc == null) {
+               logger.log(Level.WARNING, " SKELETON INIT ERROR! {0} : JointChannel: {1} >> {2}", new Object[]{clip.getName(), jc, this.getClass().toString()});
+                
+                return;
+            }
+            JointData jd = jc.getJointData(0, new JointData(jointIndex));
+            if (jd == null) {
+               logger.log(Level.WARNING, " SKELETON INIT ERROR! {0} : JointData: {1} >> {2}", new Object[]{clip.getName(), jc, this.getClass().toString()});
+                
+                return;
+            }
             setJointTransformData(jointIndex, ((JointChannel) clip.findChannelByName(JointChannel.JOINT_CHANNEL_NAME
                     + jointIndex)).getJointData(0, new JointData(jointIndex)));
         }
@@ -179,5 +199,14 @@ public class ManagedTransformSource implements BlendTreeSource {
 
     public void setSourceName(final String name) {
         sourceName = name;
+    }
+
+    @Override
+    public boolean isInEndingWindow(double window) {
+        return false;
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 }

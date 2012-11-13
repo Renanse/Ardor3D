@@ -189,4 +189,9 @@ public class BinaryLERPSource extends AbstractTwoPartSource {
         }
         return foundActive;
     }
+
+    @Override
+    public boolean isInEndingWindow(double window) {
+        return false;
+}
 }

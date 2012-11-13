@@ -17,6 +17,7 @@ import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
 import com.ardor3d.extension.animation.skeletal.state.AbstractFiniteState;
+import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.animation.skeletal.util.LoggingMap;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -42,38 +43,38 @@ public class AnimationManager {
      * A timer to use as our "global" time keeper. All animation sources under this manager will use this timer as their
      * time reference.
      */
-    private ReadOnlyTimer _globalTimer;
+    protected ReadOnlyTimer _globalTimer;
 
     /** The pose(s) this manager manipulates on update. */
-    private List<SkeletonPose> _applyToPoses;
+    protected List<SkeletonPose> _applyToPoses;
 
     /** The root of a scenegraph we can look for transform animation targets under. */
-    private final Spatial _sceneRoot;
+    protected final Spatial _sceneRoot;
 
     /** Local instance information for any clips referenced by the layers/blend trees in this manager. */
-    private final Map<AnimationClip, AnimationClipInstance> _clipInstances = new MapMaker().weakKeys().makeMap();
+    protected final Map<AnimationClip, AnimationClipInstance> _clipInstances = new MapMaker().weakKeys().makeMap();
 
     /** A logic object responsible for taking animation data and applying it to skeleton poses. */
-    private AnimationApplier _applier;
+    protected AnimationApplier _applier;
 
     /** Our animation layers. */
-    private final List<AnimationLayer> _layers = Lists.newArrayList();
+    protected final List<AnimationLayer> _layers = Lists.newArrayList();
 
     /**
      * A map of key->Double values, allowing control over elements under this manager without needing precise knowledge
      * of the layout of those layers, blend trees, etc. Missing keys will return 0.0 and log a warning.
      */
-    private final LoggingMap<String, Double> _valuesStore = new LoggingMap<String, Double>();
+    protected final LoggingMap<String, Double> _valuesStore = new LoggingMap<String, Double>();
 
     /**
      * The throttle rate of animation. Default is 60fps (1/60.0). Set to 0 to disable throttling.
      */
-    private double _updateRate = 1.0 / 60.0;
+    protected double _updateRate = 1.0 / 60.0;
 
     /**
      * The global time we last processed an animation. (To use when checking our throttle.)
      */
-    private double _lastUpdate = 0.0;
+    protected double _lastUpdate = 0.0;
 
     /**
      * Construct a new AnimationManager.
@@ -217,8 +218,38 @@ public class AnimationManager {
         for (int i = 0; i < _layers.size(); ++i) {
             final AnimationLayer layer = _layers.get(i);
             final AbstractFiniteState state = layer.getCurrentState();
+
             if (state != null) {
+
+                /*
+                 * Update our current state
+                 */
+
                 state.update(globalTime, layer);
+                /*
+                 * Handle out transitions from interactive layer states
+                 */
+                if (!layer.getName().equals(AnimationLayer.BASE_LAYER_NAME)) {
+
+                    if (state instanceof SteadyState) {
+                        
+                        SteadyState s = (SteadyState) state;
+                        
+                        if (s.isReadyForEndTransition()) {
+                        
+                        AbstractFiniteState nextState = s.doOutTransition(layer);
+                            
+                            if (nextState != null) {
+                                
+                                if (nextState != state) {
+                                    
+                                    layer.setCurrentState(nextState, false);
+                                    nextState.update(globalTime, layer);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -411,4 +442,8 @@ public class AnimationManager {
     public LoggingMap<String, Double> getValuesStore() {
         return _valuesStore;
     }
+
+    public List<AnimationLayer> getAnimationLayers() {
+        return _layers;
+}
 }
