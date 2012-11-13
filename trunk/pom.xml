@@ -22,7 +22,6 @@
         <module>ardor3d-ui</module>
         <module>ardor3d-terrain</module>
         <module>ardor3d-examples</module>
-        <module>ardor3d-archetype</module>
     </modules>
 
     <scm>
