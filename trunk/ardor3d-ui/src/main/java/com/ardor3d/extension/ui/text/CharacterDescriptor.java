@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.ui.text;
 
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class CharacterDescriptor {
@@ -34,7 +35,7 @@ public class CharacterDescriptor {
     private double _scale = 1;
 
     /** tiny to apply - optional */
-    private ReadOnlyColorRGBA _tint = null;
+    private ColorRGBA _tint = null;
 
     public CharacterDescriptor(final int x, final int y, final int width, final int height, final int xAdvance) {
         this(xAdvance, y, width, height, xAdvance, 0, 0, 1, null);
@@ -54,6 +55,7 @@ public class CharacterDescriptor {
         _xAdvance = xAdvance;
         _xOffset = xOffset;
         _yOffset = yOffset;
+        setTint(tint);
     }
 
     public int getXAdvance() {
@@ -97,6 +99,20 @@ public class CharacterDescriptor {
     }
 
     public void setTint(final ReadOnlyColorRGBA tint) {
-        _tint = tint;
+        if (tint == null) {
+            _tint = null;
+        } else if (_tint == null) {
+            _tint = new ColorRGBA(tint);
+        } else {
+            _tint.set(tint);
+        }
+    }
+
+    public void setTintAlpha(final float alpha) {
+        if (_tint == null) {
+            _tint = new ColorRGBA(1.0f, 1.0f, 1.0f, alpha);
+        } else {
+            _tint.setAlpha(alpha);
+        }
     }
 }
