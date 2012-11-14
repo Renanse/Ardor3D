@@ -246,4 +246,38 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
         // CursorUtil.getCursorFactory().getDefaultCursor().setActive();
         }
     }
+
+    /*
+     * Get the Rendered Text Lenght. Usefull When using Styled Text.
+     */
+    public int getTextWidth() {
+        int width = 0;
+
+        final String textVal = getText();
+        if (textVal.length() > 0) {
+            width += Math.round(_uiText.getWidth());
+        }
+        return width;
+    }
+
+    public int getTextHeight() {
+        int height = 0;
+
+        final String textVal = getText();
+        if (textVal.length() > 0) {
+            height += Math.round(_uiText.getHeight());
+        }
+        return height;
+    }
+    /*
+     * @MWaltz Change alpha on all characters
+     */
+
+    @Override
+    public void setOpacity(float alpha) {
+        super.setOpacity(alpha);
+        if (_uiText != null) {
+            _uiText.setOpacity(alpha);
+        }
+    }
 }
