@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util;
+package com.ardor3d.image.util.awt;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
