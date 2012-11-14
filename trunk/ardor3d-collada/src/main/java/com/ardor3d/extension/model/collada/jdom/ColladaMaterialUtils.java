@@ -106,11 +106,19 @@ public class ColladaMaterialUtils {
             final HashMap<String, Texture> loadedTextures = new HashMap<String, Texture>();
             final Element effect = effectNode;
             // XXX: For now, just grab the common technique:
-            if (effect.getChild("profile_COMMON") != null) {
+            final Element common = effect.getChild("profile_COMMON");
+            if (common != null) {
                 if (mInfo != null) {
                     mInfo.setProfile("COMMON");
                 }
-                final Element technique = effect.getChild("profile_COMMON").getChild("technique");
+
+                final Element commonExtra = common.getChild("extra");
+                if (commonExtra != null) {
+                    // process with any plugins
+                    _importer.readExtra(commonExtra, mesh);
+                }
+
+                final Element technique = common.getChild("technique");
                 String type = "blinn";
                 if (technique.getChild(type) == null) {
                     type = "phong";
