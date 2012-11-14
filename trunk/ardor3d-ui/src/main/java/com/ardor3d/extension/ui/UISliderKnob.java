@@ -180,7 +180,7 @@ public class UISliderKnob extends UIContainer {
         private int _initialHudLoc;
         private int _delta;
 
-        public void startDrag(final int x, final int y) {
+        public void startDrag(final int x, final int y,final MouseButton mouseButton) {
             // skip out if not enabled.
             if (!isEnabled()) {
                 return;
@@ -228,9 +228,10 @@ public class UISliderKnob extends UIContainer {
                     _parentSlider);
         }
 
-        public void endDrag(final UIComponent dropOn, final int x, final int y) {
+        public boolean endDrag(final UIComponent dropOn, final int x, final int y,final MouseButton mouseButton,final boolean mousePressed) {
             // call back to our parent slider, allowing for snapping
             _parentSlider.knobReleased();
+            return true;
         }
 
         public boolean isDragHandle(final UIComponent w, final int x, final int y) {

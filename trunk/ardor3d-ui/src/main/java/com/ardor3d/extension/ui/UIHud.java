@@ -80,31 +80,31 @@ public class UIHud extends Node {
     private boolean _ignoreMouseInputOnGrabbed = true;
 
     /** Which button is used for drag operations. Defaults to LEFT. */
-    private MouseButton _dragButton = MouseButton.LEFT;
+    protected MouseButton _dragButton = MouseButton.LEFT;
 
     /** Tracks the previous component our mouse was over so we can properly handle mouse entered and departed events. */
-    private UIComponent _lastMouseOverComponent;
+    protected UIComponent _lastMouseOverComponent;
 
     /** Tracks last mouse location so we can detect movement. */
-    private int _lastMouseX, _lastMouseY;
+    protected int _lastMouseX, _lastMouseY;
 
     /** Tracks last mouse pressed so we can detect clicks. */
-    private int _mousePressedX, _mousePressedY;
+    protected int _mousePressedX, _mousePressedY;
 
     /**
      * List of potential drag listeners. When a drag operation is detected, we will offer it to each item in the list
      * until one accepts it.
      */
-    private final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
+    protected final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
 
     /** Our current drag listener. When an drag finished, this is set back to null. */
-    private DragListener _dragListener = null;
+    protected DragListener _dragListener = null;
 
     /** The component that currently has key focus - key events will be sent to this component. */
     private UIComponent _focusedComponent = null;
 
     /** The last component to be pressed. This component will receive any next mouseUp event. */
-    private UIComponent _mousePressedComponent = null;
+    protected UIComponent _mousePressedComponent = null;
 
     /**
      * List of hud listeners.
@@ -114,7 +114,7 @@ public class UIHud extends Node {
     /**
      * An optional mouseManager, required in order to test mouse is grabbed.
      */
-    private MouseManager _mouseManager;
+    protected MouseManager _mouseManager;
 
     /**
      * The list of currently displayed popup menus, with each entry being a submenu of the one previous.
@@ -138,6 +138,7 @@ public class UIHud extends Node {
         setRenderState(zstate);
 
         setupLogicalLayer();
+		
     }
 
     /**
@@ -671,7 +672,7 @@ public class UIHud extends Node {
             }
 
             if (listener.isDragHandle(over, mouseX, mouseY)) {
-                listener.startDrag(mouseX, mouseY);
+                listener.startDrag(mouseX, mouseY,button);
                 _dragListener = listener;
                 consumed = true;
                 break;
@@ -714,7 +715,7 @@ public class UIHud extends Node {
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.endDrag(component, mouseX, mouseY);
+            _dragListener.endDrag(component, mouseX, mouseY,button,false);
             _dragListener = null;
             consumed = true;
         }
