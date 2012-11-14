@@ -25,10 +25,10 @@ import com.google.common.collect.Lists;
  */
 public class RowLayout extends UILayout {
 
-    private static final int MAX_RELAX = 50;
-    private final boolean _horizontal;
-    private final boolean _expandsHorizontally;
-    private final boolean _expandsVertically;
+    protected static final int MAX_RELAX = 50;
+    protected final boolean _horizontal;
+    protected final boolean _expandsHorizontally;
+    protected final boolean _expandsVertically;
 
     /**
      * Construct a new RowLayout
@@ -225,7 +225,7 @@ public class RowLayout extends UILayout {
         container.setMinimumContentSize(minW, minH);
     }
 
-    private int getSumOfAllHeights(final List<Spatial> content) {
+    protected int getSumOfAllHeights(final List<Spatial> content) {
         int sum = 0;
         if (content != null) {
             final Rectangle2 store = new Rectangle2();
@@ -239,7 +239,7 @@ public class RowLayout extends UILayout {
         return sum;
     }
 
-    private int getSumOfAllWidths(final List<Spatial> content) {
+    protected int getSumOfAllWidths(final List<Spatial> content) {
         int sum = 0;
         if (content != null) {
             final Rectangle2 store = new Rectangle2();
