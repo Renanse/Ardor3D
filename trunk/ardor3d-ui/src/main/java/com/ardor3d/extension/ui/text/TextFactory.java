@@ -44,6 +44,10 @@ public enum TextFactory {
     private final static float[] WHITE = new float[] { 1, 1, 1, 1 };
 
     TextFactory() {
+        setStyleParser(new ForumLikeMarkupParser());
+    }
+
+    public void initDefaultFontProvider() {
         final BMFontProvider fontProvider = new BMFontProvider();
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-12-regular", "Arial", 12, false, false);
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-16-bold-regular", "Arial", 16, true, false);
@@ -52,14 +56,16 @@ public enum TextFactory {
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-bold-italic", "Arial", 18, true, true);
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-24-bold", "Arial", 24, false, false);
         setFontProvider(fontProvider);
-        setStyleParser(new ForumLikeMarkupParser());
     }
-
+    
     public void setFontProvider(final FontProvider provider) {
         _fontProvider = provider;
     }
 
     public FontProvider getFontProvider() {
+        if (_fontProvider == null) {
+            initDefaultFontProvider();
+        }
         return _fontProvider;
     }
 
