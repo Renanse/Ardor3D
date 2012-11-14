@@ -40,19 +40,32 @@ public class DefaultSliderModel implements SliderModel {
         setMaxValue(maxValue);
     }
 
+    public float getCurrentValuePercent() {
+        return (_currentValue - _minValue) / (float)(_maxValue - _minValue);
+    }
+
+
     public int getCurrentValue() {
         return _currentValue;
     }
 
+    /*
+     * This should be used to set the first initial value.
+     */
     public void setCurrentValue(final int currentValue) {
-        setCurrentValue(currentValue, null);
+        _currentValue = currentValue;
     }
 
     public void setCurrentValue(final int currentValue, final UISlider slider) {
-        if (_currentValue == currentValue) {
+        
+        int adjustedValue = currentValue +_minValue;
+        
+        if (_currentValue == adjustedValue) {
             return;
         }
-        _currentValue = MathUtils.clamp(currentValue, _minValue, _maxValue);
+        
+        _currentValue = adjustedValue; //MathUtils.clamp(candidate, _minValue, _maxValue);
+        
         if (slider != null) {
             slider.fireChangeEvent();
         }
