@@ -48,7 +48,7 @@ public class UIFrameBar extends UIPanel {
             _helpButton = createFrameButton("?");
             _helpButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent event) {
-                // TODO: Implement
+                    onHelp();
                 }
             });
             attachChild(_helpButton);
@@ -60,7 +60,7 @@ public class UIFrameBar extends UIPanel {
             _minimizeButton = createFrameButton("_");
             _minimizeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent event) {
-                // TODO: Implement
+                    onMinimize();
                 }
             });
             attachChild(_minimizeButton);
@@ -72,13 +72,7 @@ public class UIFrameBar extends UIPanel {
             _maximizeButton = createFrameButton("^");
             _maximizeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent event) {
-                    // XXX: Should this also update the button img?
-                    final UIFrame frame = (UIFrame) getParent();
-                    if (frame.isMaximized()) {
-                        frame.restore();
-                    } else {
-                        frame.maximize();
-                    }
+                    onMaximize();
                 }
             });
             attachChild(_maximizeButton);
@@ -90,13 +84,35 @@ public class UIFrameBar extends UIPanel {
             _closeButton = createFrameButton("x");
             _closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent event) {
-                    ((UIFrame) getParent()).close();
+                    onClose();
                 }
             });
             attachChild(_closeButton);
         } else {
             _closeButton = null;
         }
+    }
+    
+    protected void onHelp() {
+        // TODO: Implement
+    }
+
+    protected void onMinimize() {
+        // TODO: Implement
+    }
+
+    protected void onMaximize() {
+        // XXX: Should this also update the button img?
+        final UIFrame frame = (UIFrame) getParent();
+        if (frame.isMaximized()) {
+            frame.restore();
+        } else {
+            frame.maximize();
+        }
+    }
+
+    protected void onClose() {
+        ((UIFrame) getParent()).close();
     }
 
     private UIButton createFrameButton(final String string) {
