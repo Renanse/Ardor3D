@@ -480,13 +480,27 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
         return _contentsSize.getWidth();
     }
 
+    public int getTotalWidth() {
+        int totalW = getContentWidth();
+        if (getBorder() != null) {
+            totalW += getBorder().getLeft() + getBorder().getRight();
+        }
+        return totalW;
+    }
     /**
      * @return the height of the content area of this component.
      */
     public int getContentHeight() {
         return _contentsSize.getHeight();
     }
-
+    
+    public int getTotalHeight() {
+        int totalH = getContentHeight();
+        if (getBorder() != null) {
+            totalH += getBorder().getTop() + getBorder().getBottom();
+        }
+        return totalH;
+    }
     /**
      * Sets the maximum content size of this component to the values given.
      * 
