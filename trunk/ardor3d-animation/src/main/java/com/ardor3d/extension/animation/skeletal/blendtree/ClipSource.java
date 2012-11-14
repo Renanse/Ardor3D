@@ -58,13 +58,26 @@ public class ClipSource implements BlendTreeSource {
         return manager.getClipInstance(getClip()).getChannelData();
     }
 
+    /*
+     * Return if the animation has passed a certain time in its playback and a fade out transition should be called.
+     */
+    private double localTime = 0;
+
+    public boolean isInEndingWindow(final double window) {
+        if (localTime > (_clip.getMaxTimeIndex() - window)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Sets the current time on our AnimationClip instance, accounting for looping and time scaling.
      */
     public boolean setTime(final double globalTime, final AnimationManager manager) {
         final AnimationClipInstance instance = manager.getClipInstance(_clip);
         if (instance.isActive()) {
-            double clockTime = instance.getTimeScale() * (globalTime - instance.getStartTime());
+            localTime = globalTime - instance.getStartTime();
+            double clockTime = instance.getTimeScale() * localTime;
 
             final double maxTime = _clip.getMaxTimeIndex();
             if (maxTime <= 0) {

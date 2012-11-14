@@ -97,7 +97,7 @@ public abstract class AbstractFiniteState {
     /**
      * @return the global time this state was last set to use as a start reference. Meant for subclass use only.
      */
-    protected double getGlobalStartTime() {
+    public double getGlobalStartTime() {
         return _globalStartTime;
     }
 }

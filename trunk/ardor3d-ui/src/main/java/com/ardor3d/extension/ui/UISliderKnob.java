@@ -28,6 +28,8 @@ public class UISliderKnob extends UIContainer {
 
     /** The slider we are part of. */
     private UISlider _parentSlider = null;
+    
+    private final int scrollSpeed;
 
     /** A reusable drag listener, added to the hud when we are attached. */
     private final DragListener _dragListener = new KnobDragListener();
@@ -47,6 +49,10 @@ public class UISliderKnob extends UIContainer {
         // create and attach our knob handle
         _knobLabel = new UILabel("");
         _knobLabel.getSceneHints().setAllPickingHints(true);
+        
+        float diff = Math.abs(_parentSlider.getModel().getMaxValue() - _parentSlider.getModel().getMinValue());
+        scrollSpeed = MathUtils.round(diff * .15f);
+        
         attachChild(_knobLabel);
     }
 
@@ -154,18 +160,22 @@ public class UISliderKnob extends UIContainer {
                 final int x = mouseX - UISliderKnob.this.getHudX();
                 // check which side we are on and step
                 if (x < getSliderFrontEdge()) {
-                    _parentSlider.setValue(_parentSlider.getValue() - 1);
+                    _parentSlider.setInitialValue(_parentSlider.getValue() - scrollSpeed);
+                    _parentSlider.fireChangeEvent();
                 } else {
-                    _parentSlider.setValue(_parentSlider.getValue() + 1);
+                    _parentSlider.setInitialValue(_parentSlider.getValue() + scrollSpeed);
+                    _parentSlider.fireChangeEvent();
                 }
             } else {
                 final int y = mouseY - UISliderKnob.this.getHudY();
 
                 // check which side we are on and step
                 if (y < getSliderFrontEdge()) {
-                    _parentSlider.setValue(_parentSlider.getValue() - 1);
+                    _parentSlider.setInitialValue(_parentSlider.getValue() - scrollSpeed);
+                    _parentSlider.fireChangeEvent();
                 } else {
-                    _parentSlider.setValue(_parentSlider.getValue() + 1);
+                    _parentSlider.setInitialValue(_parentSlider.getValue() + scrollSpeed);
+                    _parentSlider.fireChangeEvent();
                 }
             }
             return true;
@@ -180,7 +190,7 @@ public class UISliderKnob extends UIContainer {
         private int _initialHudLoc;
         private int _delta;
 
-        public void startDrag(final int x, final int y) {
+        public void startDrag(final int x, final int y,final MouseButton mouseButton) {
             // skip out if not enabled.
             if (!isEnabled()) {
                 return;
@@ -228,9 +238,10 @@ public class UISliderKnob extends UIContainer {
                     _parentSlider);
         }
 
-        public void endDrag(final UIComponent dropOn, final int x, final int y) {
+        public boolean endDrag(final UIComponent dropOn, final int x, final int y,final MouseButton mouseButton,final boolean mousePressed) {
             // call back to our parent slider, allowing for snapping
             _parentSlider.knobReleased();
+            return true;
         }
 
         public boolean isDragHandle(final UIComponent w, final int x, final int y) {

@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import com.ardor3d.image.util.AWTImageUtil;
+import com.ardor3d.image.util.awt.AWTImageUtil;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseManager;

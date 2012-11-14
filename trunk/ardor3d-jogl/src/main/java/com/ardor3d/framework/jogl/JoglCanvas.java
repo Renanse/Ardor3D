@@ -36,6 +36,7 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.renderer.jogl.JoglPbufferTextureRenderer;
+import java.nio.ByteBuffer;
 
 /**
  * A canvas implementation for use with native JOGL windows.
@@ -276,5 +277,20 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             // Release the OpenGL resources.
             GLContext.getCurrent().getGL().setSwapInterval(enabled ? 1 : 0);
         }
+    }
+
+    @Override
+    public void setIcon(ByteBuffer[] icon) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setDisplayMode(DisplaySettings settings) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void toggleFullScreen() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

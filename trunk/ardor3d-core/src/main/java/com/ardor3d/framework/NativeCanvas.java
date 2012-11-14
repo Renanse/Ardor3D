@@ -11,6 +11,7 @@
 package com.ardor3d.framework;
 
 import com.ardor3d.image.Image;
+import java.nio.ByteBuffer;
 
 public interface NativeCanvas extends Canvas {
 
@@ -72,6 +73,8 @@ public interface NativeCanvas extends Canvas {
      */
     void setIcon(Image[] iconImages);
 
+    void setIcon(final ByteBuffer[] icon);
+
     /**
      * If running in windowed mode, move the window's position to the given display coordinates.
      * 
@@ -79,4 +82,9 @@ public interface NativeCanvas extends Canvas {
      * @param locY
      */
     void moveWindowTo(int locX, int locY);
+
+    void setDisplayMode(DisplaySettings settings);
+
+    void toggleFullScreen();
+    
 }

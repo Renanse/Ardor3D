@@ -157,8 +157,8 @@ public class UITabbedPane extends UIPanel {
      * @param label
      *            the text of the tab label
      */
-    public void add(final UIComponent component, final String label) {
-        add(component, label, null);
+    public UITab add(final UIComponent component, final String label) {
+       return add(component, label, null);
     }
 
     /**
@@ -171,10 +171,10 @@ public class UITabbedPane extends UIPanel {
      * @param icon
      *            the icon of the tab label
      */
-    public void add(final UIComponent component, final String label, final SubTex icon) {
+    public UITab add(final UIComponent component, final String label, final SubTex icon) {
         if (component == null) {
             UITabbedPane.logger.log(Level.WARNING, "Can not add a null component to a TabbedPane.");
-            return;
+            return null;
         }
 
         // make sure the component uses center layout position
@@ -191,6 +191,7 @@ public class UITabbedPane extends UIPanel {
         if (_contents.size() == 1) {
             setCurrentTab(0);
         }
+        return tab;
     }
 
     /**

@@ -12,6 +12,7 @@ package com.ardor3d.extension.ui.event;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.Rectangle2;
 
 /**
@@ -26,7 +27,7 @@ public class FrameDragListener implements DragListener {
         this.uiFrame = uiFrame;
     }
 
-    public void startDrag(final int mouseX, final int mouseY) {
+    public void startDrag(final int mouseX, final int mouseY,final MouseButton mouseButton) {
         oldX = mouseX;
         oldY = mouseY;
     }
@@ -63,7 +64,7 @@ public class FrameDragListener implements DragListener {
     /**
      * Do nothing.
      */
-    public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
+    public boolean endDrag(final UIComponent component, final int mouseX, final int mouseY,final MouseButton mouseButton,final boolean mousePressed) {return true;}
 
     /**
      * Check if we are dragging's the frames title bar label.

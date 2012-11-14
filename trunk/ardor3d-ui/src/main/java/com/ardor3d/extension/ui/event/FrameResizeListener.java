@@ -13,6 +13,7 @@ package com.ardor3d.extension.ui.event;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIFrameStatusBar;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 
@@ -28,7 +29,7 @@ public final class FrameResizeListener implements DragListener {
         _uiFrameStatusBar = uiFrameStatusBar;
     }
 
-    public void startDrag(final int mouseX, final int mouseY) {
+    public void startDrag(final int mouseX, final int mouseY,final MouseButton mouseButton) {
         final Vector3 vec = Vector3.fetchTempInstance();
         vec.set(mouseX, mouseY, 0);
         _uiFrameStatusBar.getWorldTransform().applyInverseVector(vec);
@@ -48,8 +49,9 @@ public final class FrameResizeListener implements DragListener {
         resizeFrameByPosition(mouseX, mouseY);
     }
 
-    public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {
+    public boolean endDrag(final UIComponent component, final int mouseX, final int mouseY,final MouseButton mouseButton,final boolean mousePressed) {
         resizeFrameByPosition(mouseX, mouseY);
+        return true;
     }
 
     private void resizeFrameByPosition(final int mouseX, final int mouseY) {

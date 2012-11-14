@@ -364,4 +364,8 @@ public class AnimationLayer implements StateOwner {
         }
         return false;
     }
+    
+    public static Logger getLogger() {
+        return logger;
+    }
 }

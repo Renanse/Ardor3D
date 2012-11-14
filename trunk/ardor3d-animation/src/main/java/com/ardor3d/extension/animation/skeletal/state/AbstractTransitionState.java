@@ -30,7 +30,7 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
     /**
      * The name of the steady state we want the Animation Layer to be in at the end of the transition.
      */
-    private final String _targetState;
+    private String _targetState;
 
     /**
      * Construct a new transition state.
@@ -95,7 +95,7 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
      * @return the new state to transition to. May be null if the transition was not possible or was ignored for some
      *         reason.
      */
-    public final AbstractFiniteState doTransition(final AbstractFiniteState callingState, final AnimationLayer layer) {
+    public AbstractFiniteState doTransition(final AbstractFiniteState callingState, final AnimationLayer layer) {
         if (layer.getCurrentState() == null) {
             return null;
         }
@@ -112,7 +112,7 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
      *            the state's local time
      * @return true if the given time lands within our window.
      */
-    private boolean isInTimeWindow(final double localTime) {
+    public boolean isInTimeWindow(final double localTime) {
         if (getStartWindow() <= 0) {
             if (getEndWindow() <= 0) {
                 // no window, so true
@@ -144,5 +144,9 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
      *            the layer our state belongs to.
      * @return the state to transition to. Often ourselves.
      */
-    abstract AbstractFiniteState getTransitionState(AbstractFiniteState callingState, AnimationLayer layer);
+    abstract protected AbstractFiniteState getTransitionState(AbstractFiniteState callingState, AnimationLayer layer);
+    
+    public void setTargetState(String target) {
+        _targetState = target;
+    }
 }

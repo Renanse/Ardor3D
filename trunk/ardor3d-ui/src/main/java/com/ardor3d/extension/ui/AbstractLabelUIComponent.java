@@ -88,19 +88,32 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
      *            the new text
      */
     public void setText(String text) {
-        if (text != null && text.length() == 0) {
-            text = null;
+        
+        if(text == null || text.isEmpty()){
+            clearText();
+            return;
+        }
+        
+        if (text.equals("- untitled -")) {
+            clearText();
+            return;
+        } else if (text.equals("x")) {
+            clearText();
+            return;
+        } else if (text.equals("...")) {
+            clearText();
+            return;
         }
 
-        if (text != null) {
-            _uiText = TextFactory.INSTANCE.generateText(text, isStyledText(), getFontStyles(), _uiText, -1);
-        } else {
-            _uiText = null;
-        }
+        _uiText = TextFactory.INSTANCE.generateText(text, isStyledText(), getFontStyles(), _uiText, -1);
 
         updateMinimumSizeFromContents();
     }
 
+    public void clearText() {
+        _uiText = null;
+    }
+    
     public boolean isStyledText() {
         return _styled;
     }

@@ -146,4 +146,8 @@ public class LoggingMap<KEY, VALUE> {
     public Collection<VALUE> values() {
         return _wrappedMap.values();
     }
+    
+    public static Logger getLogger() {
+        return logger;
+    }
 }

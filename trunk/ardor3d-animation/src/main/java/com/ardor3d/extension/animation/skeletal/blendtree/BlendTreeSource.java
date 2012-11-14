@@ -56,4 +56,6 @@ public interface BlendTreeSource {
      */
     boolean isActive(AnimationManager manager);
 
+    public boolean isInEndingWindow(final double window);
+
 }

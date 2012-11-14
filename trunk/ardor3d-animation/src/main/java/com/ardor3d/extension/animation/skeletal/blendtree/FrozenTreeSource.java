@@ -54,4 +54,9 @@ public class FrozenTreeSource implements BlendTreeSource {
     public boolean isActive(final AnimationManager manager) {
         return true;
     }
+
+    @Override
+    public boolean isInEndingWindow(double window) {
+        return false;
+}
 }

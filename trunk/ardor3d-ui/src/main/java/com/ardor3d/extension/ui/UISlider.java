@@ -82,7 +82,7 @@ public class UISlider extends UIContainer {
         attachChild(_knob);
 
         // Set our initial value
-        setValue(initialValue);
+        setInitialValue(initialValue);
 
         // Apply our skin.
         applySkin();
@@ -159,12 +159,20 @@ public class UISlider extends UIContainer {
         updateKnob();
     }
 
+    /*
+     * This should be used to set value from save only
+     */
+    public void setInitialValue(final int value) {
+        _model.setCurrentValue(value);
+        updateKnob();
+    }
+    
     /**
      * Update our knob's position.
      */
     private void updateKnob() {
         if ((float) (_model.getMaxValue() - _model.getMinValue()) != 0) {
-            _knob.setPosition(_model.getCurrentValue() / (float) (_model.getMaxValue() - _model.getMinValue()));
+            _knob.setPosition(_model.getCurrentValuePercent());
         } else {
             _knob.setPosition(_model.getMinValue());
         }
@@ -176,7 +184,7 @@ public class UISlider extends UIContainer {
     public int getValue() {
         return _model.getCurrentValue();
     }
-
+    
     /**
      * @return the data model for the slider.
      */
@@ -259,4 +267,4 @@ public class UISlider extends UIContainer {
     public boolean isSnapToValues() {
         return _snapToValues;
     }
-}
+    }

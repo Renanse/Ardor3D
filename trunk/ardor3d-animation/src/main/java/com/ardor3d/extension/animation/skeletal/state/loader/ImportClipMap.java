@@ -35,4 +35,9 @@ public class ImportClipMap extends LoggingMap<String, AnimationClip> {
             ImportClipMap.logger.warning("Replaced clip in ImportClipStore with same name. " + clip.getName());
         }
     }
+
+    public static Logger getLogger() {
+        return logger;
+    }
+    
 }

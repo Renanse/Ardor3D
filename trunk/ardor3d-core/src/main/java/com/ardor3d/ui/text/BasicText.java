@@ -28,18 +28,9 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class BasicText extends BMText {
     static Logger logger = Logger.getLogger(BasicText.class.getName());
 
-    public static BMFont DEFAULT_FONT;
+    private static BMFont DEFAULT_FONT;
 
     public static double DEFAULT_FONT_SIZE = 24;
-
-    static {
-        try {
-            DEFAULT_FONT = new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BasicText.class,
-                    "com/ardor3d/ui/text/arial-24-bold-regular.fnt")), true);
-        } catch (final Exception ex) {
-            logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
-        }
-    }
 
     public static BasicText initSavable() {
         return new BasicText();
@@ -85,6 +76,26 @@ public class BasicText extends BMText {
 
     public static BasicText createDefaultTextLabel(final String name, final String text) {
         return new BasicText(name, text, DEFAULT_FONT, DEFAULT_FONT_SIZE);
+    }
+        
+    public static void setDefaultFont(BMFont defaultFont) {
+        DEFAULT_FONT = defaultFont;
+    }
+
+    public static BMFont getDefaultFont() {
+        if (DEFAULT_FONT == null) {
+            try {
+                DEFAULT_FONT = new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BasicText.class,
+                        "com/ardor3d/ui/text/arial-24-bold-regular.fnt")), true);
+            } catch (final Exception ex) {
+                logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
+            }
+        }
+        return DEFAULT_FONT;
+    } 
+
+    public static void setDefaultFontSize(int newSize) {
+        DEFAULT_FONT_SIZE = newSize;
     }
 
 }

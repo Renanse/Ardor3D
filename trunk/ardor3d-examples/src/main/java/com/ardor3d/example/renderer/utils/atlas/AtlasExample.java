@@ -24,7 +24,7 @@ import com.ardor3d.extension.atlas.TexturePacker;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
-import com.ardor3d.image.util.AWTImageUtil;
+import com.ardor3d.image.util.awt.AWTImageUtil;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;

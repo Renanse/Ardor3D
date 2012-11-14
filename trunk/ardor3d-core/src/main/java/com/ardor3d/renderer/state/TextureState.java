@@ -373,4 +373,10 @@ public class TextureState extends RenderState {
         newTState.setEnabled(foundEnabled);
         return newTState;
     }
+    
+    public static void setDefaultTexture(Texture defaultTexture) {
+        defaultTextureLoaded = true;
+        _defaultTexture = defaultTexture;
+
+    }
 }

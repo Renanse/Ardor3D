@@ -226,4 +226,11 @@ public class RenderedText extends Node implements Renderable {
     public boolean isStyled() {
         return _styled;
     }
+
+    public void setOpacity(float alpha) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
+            ((TextMesh) _children.get(i)).setOpacity(alpha);
+        }
+    }
+    
 }

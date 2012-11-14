@@ -31,6 +31,12 @@ public interface SliderModel {
     int getCurrentValue();
 
     /**
+     * @return the current value as a percent in relation with the min and max value.
+     */
+    
+    float getCurrentValuePercent();
+    
+    /**
      * Set a new current value. No change event will be fired.
      * 
      * @param currentValue

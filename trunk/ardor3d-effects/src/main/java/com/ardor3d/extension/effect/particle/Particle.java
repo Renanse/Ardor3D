@@ -493,4 +493,9 @@ public class Particle implements Savable {
     public Class<? extends Particle> getClassTag() {
         return this.getClass();
     }
+
+    public ParticleSystem getParent() {
+        return parent;
+    }
+
 }

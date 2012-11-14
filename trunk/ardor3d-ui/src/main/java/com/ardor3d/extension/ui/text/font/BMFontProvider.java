@@ -51,16 +51,30 @@ public class BMFontProvider implements FontProvider {
         _fonts.add(fontInfo);
     }
 
+    public void addFont(final BMFont font, final String family, final boolean bold,final boolean italic) {
+        final FontInfo fontInfo = new FontInfo();
+        fontInfo.bmFont = font;
+        fontInfo.family = family;
+        fontInfo.size = font.getSize();
+        fontInfo.bold = bold;
+        fontInfo.italic = italic;
+        _fonts.add(fontInfo);
+    }
+
     @Override
     public UIFont getClosestMatchingFont(final Map<String, Object> currentStyles, final AtomicReference<Double> scale) {
-        final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD) ? (Boolean) currentStyles
-                .get(StyleConstants.KEY_BOLD) : false;
-        final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS) ? (Boolean) currentStyles
-                .get(StyleConstants.KEY_ITALICS) : false;
-        final int size = currentStyles.containsKey(StyleConstants.KEY_SIZE) ? (Integer) currentStyles
-                .get(StyleConstants.KEY_SIZE) : UIComponent.getDefaultFontSize();
-        final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY) ? currentStyles.get(
-                StyleConstants.KEY_FAMILY).toString() : UIComponent.getDefaultFontFamily();
+
+        final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD)
+                ? (Boolean) currentStyles.get(StyleConstants.KEY_BOLD) : false;
+
+        final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS)
+                ? (Boolean) currentStyles.get(StyleConstants.KEY_ITALICS) : false;
+
+        final int size = currentStyles.containsKey(StyleConstants.KEY_SIZE)
+                ? (Integer) currentStyles.get(StyleConstants.KEY_SIZE) : UIComponent.getDefaultFontSize();
+
+        final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY)
+                ? currentStyles.get(StyleConstants.KEY_FAMILY).toString() : UIComponent.getDefaultFontFamily();
 
         FontInfo closest = null;
         int score, bestScore = Integer.MIN_VALUE;

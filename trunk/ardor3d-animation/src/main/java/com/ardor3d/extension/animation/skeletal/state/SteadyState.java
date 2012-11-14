@@ -16,6 +16,8 @@ import java.util.Set;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.BlendTreeSource;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
+import com.ardor3d.extension.animation.skeletal.layer.AnimationLayerFadeIn;
+import com.ardor3d.extension.animation.skeletal.layer.AnimationLayerFadeOut;
 import com.google.common.collect.Maps;
 
 /**
@@ -35,6 +37,31 @@ public class SteadyState extends AbstractFiniteState {
 
     /** Our state may be a blend of multiple clips, etc. This is the root of our blend tree. */
     private BlendTreeSource _sourceTree;
+    /*
+     * To be eventuallay implemented to be the only thing used in transition
+     */
+    private double _fadeInTime = 0.1;
+    private double _fadeOutTime = 0;
+
+    public double getFadeInTime() {
+        return _fadeInTime;
+    }
+
+    public void setFadeInTime(double _fadeInTime) {
+        _fadeInTime = _fadeInTime;
+        inTransition.setFadeTime(_fadeInTime);
+    }
+
+    public double getFadeOutTime() {
+        return _fadeOutTime;
+    }
+
+    public void setFadeOutTime(double _fadeOutTime) {
+        _fadeOutTime = _fadeOutTime;
+        outTransition.setFadeTime(_fadeOutTime);
+    }
+    private final AnimationLayerFadeIn inTransition = new AnimationLayerFadeIn(_fadeInTime, AbstractTwoStateLerpTransition.BlendType.Linear);
+    private final AnimationLayerFadeOut outTransition = new AnimationLayerFadeOut(_fadeOutTime, AbstractTwoStateLerpTransition.BlendType.Linear);
 
     /**
      * Create a new steady state.
@@ -174,13 +201,26 @@ public class SteadyState extends AbstractFiniteState {
      *         reason.
      */
     public AbstractFiniteState doTransition(final String key, final AnimationLayer layer) {
-        AbstractTransitionState state = _transitions.get(key);
-        if (state == null) {
-            state = _transitions.get("*");
+        AbstractTransitionState state;
+        if (_transitions.containsKey(key)) {
+            state = _transitions.get(key);
         } else {
+            state = _transitions.get("*");
+        }
+        if (state != null) {
             return state.doTransition(this, layer);
         }
         return null;
+    }
+
+    public AbstractFiniteState doInTransition(final AnimationLayer layer) {
+
+        return inTransition.doTransition(this, layer);
+    }
+
+    public AbstractFiniteState doOutTransition(final AnimationLayer layer) {
+
+        return outTransition.doTransition(this, layer);
     }
 
     @Override
@@ -199,6 +239,13 @@ public class SteadyState extends AbstractFiniteState {
                 }
             }
         }
+    }
+
+    public boolean isReadyForEndTransition() {
+        if (_fadeOutTime <= 0) {
+            return false;
+        }
+        return getSourceTree().isInEndingWindow(_fadeOutTime);
     }
 
     @Override

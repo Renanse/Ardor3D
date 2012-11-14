@@ -317,4 +317,8 @@ public class TransformChannel extends AbstractAnimationChannel {
         _translations = null;
         _scales = null;
     }
+    
+    public static Logger getLogger() {
+        return logger;
+    }
 }

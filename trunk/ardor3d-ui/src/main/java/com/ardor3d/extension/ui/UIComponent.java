@@ -53,7 +53,7 @@ import com.google.common.collect.Maps;
  * 
  * TODO: alert/dirty needed for font style changes.
  */
-public abstract class UIComponent extends Node implements UIKeyHandler {
+public abstract class UIComponent extends Node implements UIKeyHandler, IComponent {
     /** If true, use opacity settings to blend the components. Default is false. */
     private static boolean _useTransparency = false;
 
@@ -156,6 +156,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * @return true if this component should be drawn.
      */
+    @Override
     public boolean isVisible() {
         return _visible;
     }
@@ -164,6 +165,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      * @param visible
      *            true if this component should be drawn.
      */
+    @Override
     public void setVisible(final boolean visible) {
         _visible = visible;
     }
@@ -476,17 +478,35 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * @return the width of the content area of this component.
      */
+    @Override
     public int getContentWidth() {
         return _contentsSize.getWidth();
     }
 
+    @Override
+    public int getTotalWidth() {
+        int totalW = getContentWidth();
+        if (getBorder() != null) {
+            totalW += getBorder().getLeft() + getBorder().getRight();
+        }
+        return totalW;
+    }
     /**
      * @return the height of the content area of this component.
      */
+    @Override
     public int getContentHeight() {
         return _contentsSize.getHeight();
     }
-
+    
+    @Override
+    public int getTotalHeight() {
+        int totalH = getContentHeight();
+        if (getBorder() != null) {
+            totalH += getBorder().getTop() + getBorder().getBottom();
+        }
+        return totalH;
+    }
     /**
      * Sets the maximum content size of this component to the values given.
      * 
@@ -768,13 +788,27 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     public boolean isAttachedToHUD() {
         return getParent() instanceof UIHud;
     }
+    /**
+     * @return true if catching all mouse input.
+     */
+    private boolean catchAllMouseInput = false;
 
+    public boolean isCatchingAllMouseInput() {
+        return catchAllMouseInput;
+    }
+
+    public void setCatchAllMouseInput(boolean value) {
+        catchAllMouseInput = value;
+    }
     /**
      * @return the first instance of UIComponent found in this Component's UIComponent ancestry that is attached to the
      *         hud, or null if none are found. Returns "this" component if it is directly attached to the hud.
      */
     public UIComponent getTopLevelComponent() {
         if (isAttachedToHUD()) {
+            return this;
+        }
+        if (isCatchingAllMouseInput()) {
             return this;
         }
         final Node parent = getParent();
@@ -788,6 +822,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * @return the first instance of UIHud found in this Component's UIComponent ancestry or null if none are found.
      */
+    @Override
     public UIHud getHud() {
         final Node parent = getParent();
         if (parent instanceof UIHud) {
@@ -1595,5 +1630,26 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      */
     public void setKeyFocusTarget(final UIComponent target) {
         _keyFocusTarget = target;
+    }
+    
+    public boolean isMinimized() {
+        return false;
+    }
+    
+    @Override
+    public void show() {
+        setVisible();
+        activateInteraction();
+    }
+
+    @Override
+    public void hide() {
+        setInVisible();
+        removeInteraction();
+    }
+ 
+    @Override
+    public void updateGeometricState(final double time) {
+        super.updateGeometricState(time);
     }
 }
