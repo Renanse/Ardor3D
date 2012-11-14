@@ -18,7 +18,11 @@ import com.ardor3d.extension.ui.layout.UILayout;
 public class UIPanel extends UIContainer {
 
     public UIPanel() {}
-
+    
+    public UIPanel(String name) {
+        this.setName(name);
+    }
+    
     public UIPanel(final UILayout layout) {
         setLayout(layout);
     }
