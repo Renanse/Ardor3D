@@ -317,4 +317,7 @@ public class Point extends Mesh {
         super.render(renderer);
     }
 
+     public void udpatePointsData(final FloatBuffer vertices) {
+        _meshData.setVertexBuffer(vertices);
+    }
 }

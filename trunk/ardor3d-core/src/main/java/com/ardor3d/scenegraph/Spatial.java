@@ -98,6 +98,9 @@ public abstract class Spatial implements Savable, Hintable {
     /** The hints for Ardor3D's use when evaluating and rendering this spatial. */
     protected SceneHints _sceneHints;
 
+    /** Visibility setting that can be used after the scenegraph hierarchical culling */
+    private boolean _isVisible = true;
+    
     /** The render delegates to use for this Spatial, mapped by glContext reference. */
     protected transient Map<Object, RenderDelegate> _delegateMap = null;
 
@@ -730,6 +733,9 @@ public abstract class Spatial implements Savable, Hintable {
      *            the renderer used for display.
      */
     public void onDraw(final Renderer r) {
+        if (!_isVisible) {
+            return;
+        }
         final CullHint cm = _sceneHints.getCullHint();
         if (cm == CullHint.Always) {
             setLastFrustumIntersection(Camera.FrustumIntersect.Outside);
@@ -1420,4 +1426,60 @@ public abstract class Spatial implements Savable, Hintable {
             capsule.writeSavableList(list, "controllers", null);
         }
     }
+    
+    /**
+     * Allow to toggle a Spatial visibility.
+     */
+
+    public boolean isVisible() {
+        return _isVisible;
+    }
+
+    public void setVisible() {
+        setVisible(true);
+    }
+
+    public void setInVisible() {
+        setVisible(false);
+    }
+
+    public void setVisible(boolean value) {
+        _isVisible = value;
+    }
+
+    /**
+     * Remove interaction on a Spatial.
+     */
+    
+    public void removeInteraction() {
+        getSceneHints().setAllPickingHints(false);
+    }
+
+    public void activateInteraction() {
+        getSceneHints().setAllPickingHints(true);
+    }
+    
+    /**
+     * Allow to directly move a Spatial coordinates.
+     */
+    public void setX(final double x) {
+        setTranslation(x, getTranslation().getY(), getTranslation().getZ());
+    }
+
+    public void setY(final double y) {
+        setTranslation(getTranslation().getX(), y, getTranslation().getZ());
+    }
+
+    public void setZ(final double z) {
+        setTranslation(getTranslation().getX(), getTranslation().getY(), z);
+    }
+
+    public void offsetY(final double y) {
+        setY(getTranslation().getY() + y);
+    }
+
+    public void offsetZ(final double z) {
+        setZ(getTranslation().getZ() + z);
+    }
+    
 }

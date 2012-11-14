@@ -39,7 +39,7 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
 
     private final LwjglCanvasRenderer _canvasRenderer;
 
-    private final DisplaySettings _settings;
+    private DisplaySettings _settings;
     private boolean _inited = false;
 
     private volatile boolean _focusLost = false;
@@ -277,4 +277,91 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     public void setVSyncEnabled(final boolean enabled) {
         Display.setVSyncEnabled(enabled);
     }
+
+    /**
+     * Set the display mode to be used 
+     * 
+     * @param width The width of the display required
+     * @param height The height of the display required
+     * @param fullscreen True if we want fullscreen mode
+     */
+    public void toggleFullScreen() {
+        setDisplayMode(_settings.getWidth(), _settings.getHeight(), !Display.isFullscreen());
+}
+
+    @Override
+    public void setDisplayMode(DisplaySettings settings) {
+        _settings = settings;
+        setDisplayMode(settings.getWidth(), settings.getHeight(), settings.isFullScreen());
+
+    }
+
+    /*
+     * From:
+     * http://www.lwjgl.org/wiki/index.php?title=LWJGL_Basics_5_(Fullscreen)
+     */
+    
+    public void setDisplayMode(int width, int height, boolean fullscreen) {
+
+        // return if requested DisplayMode is already set
+        if ((Display.getDisplayMode().getWidth() == width)
+                && (Display.getDisplayMode().getHeight() == height)
+                && (Display.isFullscreen() == fullscreen)) {
+          logger.info("Target display is same as request! ");
+            return;
+        }
+
+        try {
+            DisplayMode targetDisplayMode = null;
+
+            if (fullscreen) {
+                DisplayMode[] modes = Display.getAvailableDisplayModes();
+                int freq = 0;
+
+                for (int i = 0; i < modes.length; i++) {
+                    DisplayMode current = modes[i];
+
+                    if ((current.getWidth() == width) && (current.getHeight() == height)) {
+                        if ((targetDisplayMode == null) || (current.getFrequency() >= freq)) {
+                            if ((targetDisplayMode == null) || (current.getBitsPerPixel() > targetDisplayMode.getBitsPerPixel())) {
+                                targetDisplayMode = current;
+                                freq = targetDisplayMode.getFrequency();
+                            }
+                        }
+
+                        // If we've found a match for bpp and frequence against the 
+                        // original display mode then it's probably best to go for this one
+                        // since it's most likely compatible with the monitor
+                        if ((current.getBitsPerPixel() == Display.getDesktopDisplayMode().getBitsPerPixel())
+                                && (current.getFrequency() == Display.getDesktopDisplayMode().getFrequency())) {
+                            targetDisplayMode = current;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                targetDisplayMode = new DisplayMode(width, height);
+            }
+
+            if (targetDisplayMode == null) {
+                logger.warning("Failed to find value mode: " + width + "x" + height + " fs=" + fullscreen);
+                return;
+            }
+
+            Display.setDisplayMode(targetDisplayMode);
+            Display.setFullscreen(fullscreen);
+            _canvasRenderer._camera.resize(width, height);
+
+            logger.info("Changed display for: " + width + "x" + height + " fs=" + fullscreen);
+
+        } catch (LWJGLException e) {
+            logger.warning("Unable to setup mode " + width + "x" + height + " fullscreen=" + fullscreen + e);
+        }
+    }
+    
+    @Override
+    public void setIcon(final ByteBuffer[] icon) {
+        Display.setIcon(icon);
+    }
+
 }

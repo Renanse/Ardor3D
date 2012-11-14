@@ -31,6 +31,7 @@ public class ScreenShotImageExporter implements ScreenExportable {
     protected boolean _useAlpha;
 
     protected File _lastFile;
+    protected boolean timeStamp = true;
 
     /**
      * Make a new exporter with the default settings:
@@ -67,7 +68,13 @@ public class ScreenShotImageExporter implements ScreenExportable {
         _useAlpha = useAlpha;
     }
 
+    @Override
     public void export(final ByteBuffer data, final int width, final int height) {
+        BufferedImage img = processImage(data, width, height);
+        saveImage(img);
+    }
+
+    protected BufferedImage processImage(final ByteBuffer data, final int width, final int height) {
         final BufferedImage img = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB
                 : BufferedImage.TYPE_INT_RGB);
 
@@ -90,10 +97,44 @@ public class ScreenShotImageExporter implements ScreenExportable {
                 img.setRGB(x, y, argb);
             }
         }
+        return img;
+    }
 
+    protected void saveImage(BufferedImage img) {
         try {
-            final File out = new File(_directory, _prepend + System.currentTimeMillis() + "." + _fileFormat);
+
+            String fileName = _prepend;
+
+            if (timeStamp) {
+                fileName += System.currentTimeMillis();
+            }
+            fileName += "." + _fileFormat;
+
+            fileName = fileName.toLowerCase();
+
+            final File out = new File(_directory, fileName);
+
             logger.fine("Taking screenshot: " + out.getAbsolutePath());
+
+            // write out the screen shot image to a file.
+            ImageIO.write(img, _fileFormat, out);
+            // save our successful file to be accessed as desired.
+
+            _lastFile = out;
+        } catch (final IOException e) {
+            logger.logp(Level.WARNING, getClass().getName(), "export(ByteBuffer, int, int)", e.getLocalizedMessage(), e);
+        }
+    }
+
+    public void export(final BufferedImage img, final String filename) {
+        if (img == null) {
+            return;
+        }
+        try {
+            final File out = new File(_directory, filename + "." + _fileFormat);
+            if (out.exists()) {
+                out.delete();
+            }
 
             // write out the screen shot image to a file.
             ImageIO.write(img, _fileFormat, out);
@@ -101,9 +142,7 @@ public class ScreenShotImageExporter implements ScreenExportable {
             // save our successful file to be accessed as desired.
             _lastFile = out;
         } catch (final IOException e) {
-            logger
-                    .logp(Level.WARNING, getClass().getName(), "export(ByteBuffer, int, int)", e.getLocalizedMessage(),
-                            e);
+            logger.logp(Level.WARNING, getClass().getName(), "export(ByteBuffer, int, int)", e.getLocalizedMessage(), e);
         }
     }
 
@@ -116,7 +155,8 @@ public class ScreenShotImageExporter implements ScreenExportable {
     }
 
     /**
-     * @return the last File written by this exporter, or null if none were written.
+     * @return the last File written by this exporter, or null if none were
+     * written.
      */
     public File getLastFile() {
         return _lastFile;
@@ -153,4 +193,8 @@ public class ScreenShotImageExporter implements ScreenExportable {
     public void setFileFormat(final String format) {
         _fileFormat = format;
     }
+
+    public void setTimeStamp(boolean timeStamp) {
+        this.timeStamp = timeStamp;
+}
 }

@@ -33,7 +33,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class LwjglMouseManager implements MouseManager {
     private boolean _inited = false;
 
-    private void init() {
+    protected void init() {
         if (!_inited) {
             if (!Mouse.isCreated()) {
                 try {
@@ -119,15 +119,23 @@ public class LwjglMouseManager implements MouseManager {
         switch (grabbedState) {
             case GRABBED:
                 Mouse.setGrabbed(true);
+                onGrab();
                 break;
             case NOT_GRABBED:
                 Mouse.setGrabbed(false);
+                onRelease();
                 break;
             default:
                 throw new IllegalStateException("Unhandled GrabbedState: " + grabbedState);
         }
     }
 
+    public void onGrab(){
+    }
+    
+    public void onRelease(){ 
+    }
+    
     public boolean isSetPositionSupported() {
         return true;
     }

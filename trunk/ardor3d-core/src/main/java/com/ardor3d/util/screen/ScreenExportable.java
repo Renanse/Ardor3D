@@ -13,6 +13,7 @@ package com.ardor3d.util.screen;
 import java.nio.ByteBuffer;
 
 import com.ardor3d.image.ImageDataFormat;
+import java.awt.image.BufferedImage;
 
 public interface ScreenExportable {
 
@@ -27,6 +28,8 @@ public interface ScreenExportable {
      * @param height
      */
     public void export(ByteBuffer data, int width, int height);
+
+    public void export(final BufferedImage img, final String filename);
 
     /**
      * 

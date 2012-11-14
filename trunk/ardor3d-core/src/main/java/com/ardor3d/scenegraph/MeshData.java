@@ -1249,5 +1249,11 @@ public class MeshData implements Savable {
     public void setInstancingManager(final InstancingManager info) {
         _instancingManager = info;
     }
-
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        _textureCoords = null;
+        _indexBuffer = null;
+        _indexModes = null;
+    }
 }

@@ -265,7 +265,11 @@ public class Node extends Spatial {
      * @return the child at a specified index.
      */
     public Spatial getChild(final int i) {
-        return _children.get(i);
+        if (_children.size() > (i)) {
+            return _children.get(i);
+        } else {
+            return null;
+        }
     }
 
     /**

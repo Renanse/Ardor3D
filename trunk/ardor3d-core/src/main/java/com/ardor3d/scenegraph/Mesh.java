@@ -75,9 +75,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /** Default color to use when no per vertex colors are set */
     protected ColorRGBA _defaultColor = new ColorRGBA(ColorRGBA.WHITE);
 
-    /** Visibility setting that can be used after the scenegraph hierarchical culling */
-    protected boolean _isVisible = true;
-
     /**
      * Constructs a new Mesh.
      */
@@ -414,13 +411,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         stack.extract(_states, this);
     }
 
-    public boolean isVisible() {
-        return _isVisible;
-    }
-
-    public void setVisible(final boolean isVisible) {
-        _isVisible = isVisible;
-    }
 
     /**
      * 
@@ -630,7 +620,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         // copy our basic properties
         mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
         mesh.setDefaultColor(_defaultColor);
-        mesh.setVisible(_isVisible);
+        mesh.setVisible(isVisible());
 
         // return
         return mesh;
@@ -645,7 +635,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         mesh.setMeshData(_meshData);
         mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
         mesh._defaultColor = _defaultColor;
-        mesh.setVisible(_isVisible);
+        mesh.setVisible(isVisible());
         return mesh;
     }
 
@@ -763,7 +753,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         capsule.write(_meshData, "meshData", null);
         capsule.write(_modelBound, "modelBound", null);
         capsule.write(_defaultColor, "defaultColor", new ColorRGBA(ColorRGBA.WHITE));
-        capsule.write(_isVisible, "visible", true);
+        capsule.write(isVisible(), "visible", true);
     }
 
     @Override
@@ -772,6 +762,10 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         _meshData = (MeshData) capsule.readSavable("meshData", null);
         _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);
         _defaultColor = (ColorRGBA) capsule.readSavable("defaultColor", new ColorRGBA(ColorRGBA.WHITE));
-        _isVisible = capsule.readBoolean("visible", true);
+        setVisible(capsule.readBoolean("visible", true));
     }
+
+    public float getDefaultAlpha() {
+        return _defaultColor.getAlpha();
+}
 }
