@@ -788,13 +788,27 @@ public abstract class UIComponent extends Node implements UIKeyHandler, ICompone
     public boolean isAttachedToHUD() {
         return getParent() instanceof UIHud;
     }
+    /**
+     * @return true if catching all mouse input.
+     */
+    private boolean catchAllMouseInput = false;
 
+    public boolean isCatchingAllMouseInput() {
+        return catchAllMouseInput;
+    }
+
+    public void setCatchAllMouseInput(boolean value) {
+        catchAllMouseInput = value;
+    }
     /**
      * @return the first instance of UIComponent found in this Component's UIComponent ancestry that is attached to the
      *         hud, or null if none are found. Returns "this" component if it is directly attached to the hud.
      */
     public UIComponent getTopLevelComponent() {
         if (isAttachedToHUD()) {
+            return this;
+        }
+        if (isCatchingAllMouseInput()) {
             return this;
         }
         final Node parent = getParent();
