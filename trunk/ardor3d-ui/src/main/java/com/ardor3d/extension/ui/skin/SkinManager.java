@@ -27,7 +27,7 @@ public class SkinManager {
 
     public static void applyCurrentSkin(final UIComponent component) {
         if (SkinManager._skin == null) {
-                return;
+            return;
         }
 
         // apply skin to component
