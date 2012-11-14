@@ -18,6 +18,7 @@ import org.jdom.Element;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
+import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
 import com.ardor3d.extension.model.collada.jdom.data.ControllerStore;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
@@ -111,6 +112,7 @@ public class ColladaNodeUtils {
                             + joint.getParentIndex());
                 }
                 _dataCache.addSkeleton(skeleton);
+                _skeleton = skeleton;
             }
 
             // update our world transforms so we can use them to init the default bind matrix of any joints.
@@ -374,5 +376,28 @@ public class ColladaNodeUtils {
             }
         }
         return new Transform().fromHomogeneousMatrix(finalMat);
+    }
+    
+    private Skeleton _skeleton;
+
+    public SkeletonPose getSkeletonPose() {
+
+        SkeletonPose skPose = null;
+
+        if (_dataCache == null || _skeleton == null || _dataCache.getSkeletonPoseMapping() == null) {
+            return skPose;
+        }
+
+        // Make our skeleton pose
+        skPose = _dataCache.getSkeletonPoseMapping().get(_skeleton);
+        if (skPose == null) {
+            skPose = new SkeletonPose(_skeleton);
+            _dataCache.getSkeletonPoseMapping().put(_skeleton, skPose);
+
+            // Skeleton's default to bind position, so update the global transforms.
+            skPose.updateTransforms();
+        }
+
+        return skPose;
     }
 }

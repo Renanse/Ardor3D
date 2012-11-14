@@ -34,6 +34,7 @@ import org.jdom.input.SAXHandler;
 import org.xml.sax.SAXException;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
+import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
@@ -235,6 +236,7 @@ public class ColladaImporter {
 
             // Collada may or may not have a scene, so this can return null.
             final Node scene = colladaNodeUtils.getVisualScene(collada);
+            _skeletonPose = colladaNodeUtils.getSkeletonPose();
 
             if (_loadAnimations) {
                 colladaAnimUtils.parseLibraryAnimations(collada);
@@ -494,5 +496,11 @@ public class ColladaImporter {
             }
         }
         return false;
+    }
+
+    private SkeletonPose _skeletonPose;
+
+    public SkeletonPose getSkeletonPose() {
+        return _skeletonPose;
     }
 }
