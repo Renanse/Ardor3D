@@ -15,15 +15,19 @@ import com.ardor3d.extension.ui.skin.generic.GenericSkin;
 
 public class SkinManager {
 
-    private static Skin _skin = new GenericSkin();
+    private static Skin _skin = null;
 
+    public static void setDefaultSkin() {
+         _skin = new GenericSkin();
+    }
+    
     public static void setCurrentSkin(final Skin skin) {
         SkinManager._skin = skin;
     }
 
     public static void applyCurrentSkin(final UIComponent component) {
         if (SkinManager._skin == null) {
-            return;
+                return;
         }
 
         // apply skin to component
