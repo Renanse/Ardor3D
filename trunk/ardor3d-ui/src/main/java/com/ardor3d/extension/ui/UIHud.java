@@ -52,7 +52,7 @@ import com.google.common.collect.Lists;
  * UIHud represents a "Heads Up Display" or the base of a game UI scenegraph. Various UI Input, dragging, events, etc.
  * are handled through this class.
  */
-public class UIHud extends Node {
+public class UIHud extends Node implements IComponent{
     private static final Logger _logger = Logger.getLogger(UIHud.class.getName());
 
     public static int MOUSE_CLICK_SENSITIVITY = 5;
@@ -892,5 +892,42 @@ public class UIHud extends Node {
     public void showSubPopupMenu(final UIPopupMenu menu) {
         _popupMenus.add(menu);
         menu.setHud(this);
+    }
+    
+    @Override
+    public UIHud getHud() {
+        return this;
+    }
+
+    @Override
+    public int getContentWidth() {
+        return getWidth();
+    }
+
+    @Override
+    public int getTotalWidth() {
+        return getContentWidth();
+    }
+
+    @Override
+    public int getContentHeight() {
+        return getHeight();
+    }
+
+    @Override
+    public int getTotalHeight() {
+        return getContentHeight();
+    }
+
+    @Override
+    public void show() {
+        setVisible();
+        activateInteraction();
+    }
+
+    @Override
+    public void hide() {
+        setInVisible();
+        removeInteraction();
     }
 }
