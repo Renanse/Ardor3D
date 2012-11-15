@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,10 @@ import com.google.common.collect.MapMaker;
  * </p>
  */
 public class AnimationManager {
+
+    public enum AnimationUpdateState {
+        play, pause, stop
+    }
 
     /**
      * A timer to use as our "global" time keeper. All animation sources under this manager will use this timer as their
@@ -74,6 +79,13 @@ public class AnimationManager {
      * The global time we last processed an animation. (To use when checking our throttle.)
      */
     private double _lastUpdate = 0.0;
+
+    /**
+     * Sets the current animationState used to control if animation is playing, pausing or stopped.
+     */
+    protected AnimationUpdateState _currentAnimationState = AnimationUpdateState.play;
+
+    protected AnimationUpdateState _previousAnimationState;
 
     /**
      * Construct a new AnimationManager.
@@ -136,6 +148,25 @@ public class AnimationManager {
      */
     public void setGlobalTimer(final Timer timer) {
         _globalTimer = timer;
+    }
+
+    /**
+     * @param newAnimationState
+     *            the new animation state in the animation Manager.
+     */
+    public void setAnimationState(final AnimationUpdateState newAnimationState) {
+        if (newAnimationState == AnimationUpdateState.pause && _currentAnimationState == AnimationUpdateState.stop) {
+            return;
+        }
+        _previousAnimationState = _currentAnimationState;
+        _currentAnimationState = newAnimationState;
+    }
+
+    /**
+     * @return the currentAnimationState.
+     */
+    public AnimationUpdateState getAnimationState() {
+        return _currentAnimationState;
     }
 
     /**
@@ -213,6 +244,11 @@ public class AnimationManager {
             _lastUpdate = globalTime - (globalTime - _lastUpdate) % _updateRate;
         }
 
+        // update animationState
+        if (!updateLayersForAnimationState(globalTime)) {
+            return;
+        }
+
         // move the time forward on the layers
         for (int i = 0; i < _layers.size(); ++i) {
             final AnimationLayer layer = _layers.get(i);
@@ -241,6 +277,37 @@ public class AnimationManager {
                 state.postUpdate(layer);
             }
         }
+    }
+
+    /**
+     * @param globalTime
+     *            current global time in seconds
+     * @return
+     */
+    protected boolean updateLayersForAnimationState(final double globalTime) {
+        boolean canUpdate = false;
+        final Collection<AnimationClipInstance> clipInstances = _clipInstances.values();
+        for (final AnimationClipInstance instance : clipInstances) {
+            switch (_currentAnimationState) {
+                case stop:
+                    instance.setActive(false);
+                    canUpdate = true;
+                    break;
+                case pause:
+                    if (instance.isActive()) {
+                        final double startTime = globalTime - instance.getCurrentTime() / instance.getTimeScale();
+                        instance.setStartTime(startTime);
+                    }
+                    canUpdate = true;
+                    break;
+                case play:
+                    instance.setActive(true);
+                    // do nothing
+                    canUpdate = true;
+                    break;
+            }
+        }
+        return canUpdate;
     }
 
     /**
