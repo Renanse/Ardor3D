@@ -287,6 +287,9 @@ public class AnimationManager {
     protected boolean updateLayersForAnimationState(final double globalTime) {
         boolean canUpdate = false;
         final Collection<AnimationClipInstance> clipInstances = _clipInstances.values();
+        if (clipInstances.isEmpty()) {
+            return _currentAnimationState == AnimationUpdateState.play ? true : false;
+        }
         for (final AnimationClipInstance instance : clipInstances) {
             switch (_currentAnimationState) {
                 case stop:
