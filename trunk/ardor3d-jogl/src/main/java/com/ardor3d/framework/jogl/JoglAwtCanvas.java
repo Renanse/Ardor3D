@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,13 +11,18 @@
 package com.ardor3d.framework.jogl;
 
 import java.util.concurrent.CountDownLatch;
-
-import javax.media.opengl.GLCanvas;
-
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLRunnable;
+import javax.media.opengl.awt.GLCanvas;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 
+/**
+ * FIXME there is still a deadlock when using several instances of this class in the same container, see JOGL bug 572
+ * Rather use JoglNewtAwtCanvas in this case.
+ *
+ */
 public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
     private static final long serialVersionUID = 1L;
@@ -26,9 +31,12 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
     private boolean _inited = false;
 
     private final DisplaySettings _settings;
+    
+    private final JoglDrawerRunnable _drawerGLRunnable;
 
     public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
         super(CapsUtil.getCapsForSettings(settings));
+        _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
         _settings = settings;
         _canvasRenderer = canvasRenderer;
 
@@ -37,17 +45,29 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         setSize(_settings.getWidth(), _settings.getHeight());
         setIgnoreRepaint(true);
         setAutoSwapBufferMode(false);
-
-        _canvasRenderer.setContext(getContext());
     }
 
     @MainThread
     public void init() {
-        if (_inited) {
+    	if (_inited) {
             return;
         }
-
-        _canvasRenderer.init(_settings, true); // true - do swap in renderer.
+    	
+        // Make the window visible to realize the OpenGL surface.
+        setVisible(true);
+        
+        // Request the focus here as it cannot work when the window is not visible
+        requestFocus();
+        
+        _canvasRenderer.setContext(getContext());
+        
+        invoke(true, new GLRunnable() {
+            @Override
+            public boolean run(GLAutoDrawable glAutoDrawable) {     
+                _canvasRenderer.init(_settings, true);// true - do swap in renderer.
+                return true;
+            }
+        });
         _inited = true;
     }
 
@@ -57,7 +77,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         }
 
         if (isShowing()) {
-            _canvasRenderer.draw();
+        	invoke(true, _drawerGLRunnable);
         }
         if (latch != null) {
             latch.countDown();

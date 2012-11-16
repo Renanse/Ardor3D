@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,9 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2ES1;
+import javax.media.opengl.GL2ES2;
+import javax.media.opengl.GL2GL3;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -79,7 +82,7 @@ public abstract class JoglBlendStateUtil {
                 if (caps.isSeparateBlendEquationsSupported()) {
                     final int blendEqAlpha = getGLEquationValue(state.getBlendEquationAlpha(), caps);
                     if (record.blendEqRGB != blendEqRGB || record.blendEqAlpha != blendEqAlpha) {
-                        gl.glBlendEquationSeparateEXT(blendEqRGB, blendEqAlpha);
+                        gl.glBlendEquationSeparate(blendEqRGB, blendEqAlpha);
                         record.blendEqRGB = blendEqRGB;
                         record.blendEqAlpha = blendEqAlpha;
                     }
@@ -101,7 +104,7 @@ public abstract class JoglBlendStateUtil {
                 final int blendEqRGB = getGLEquationValue(state.getBlendEquationRGB(), caps);
                 if (caps.isSeparateBlendEquationsSupported()) {
                     final int blendEqAlpha = getGLEquationValue(state.getBlendEquationAlpha(), caps);
-                    gl.glBlendEquationSeparateEXT(blendEqRGB, blendEqAlpha);
+                    gl.glBlendEquationSeparate(blendEqRGB, blendEqAlpha);
                     record.blendEqRGB = blendEqRGB;
                     record.blendEqAlpha = blendEqAlpha;
                 } else if (caps.isBlendEquationSupported()) {
@@ -125,7 +128,7 @@ public abstract class JoglBlendStateUtil {
             if (applyConstant && caps.isConstantBlendColorSupported()) {
                 final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
-                    gl.glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(), constant.getAlpha());
+                    gl.getGL2GL3().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(), constant.getAlpha());
                     record.blendColor.set(constant);
                 }
             }
@@ -143,7 +146,7 @@ public abstract class JoglBlendStateUtil {
                     final int glDstAlpha = getGLDstValue(state.getDestinationFunctionAlpha(), caps);
                     if (record.srcFactorRGB != glSrcRGB || record.dstFactorRGB != glDstRGB
                             || record.srcFactorAlpha != glSrcAlpha || record.dstFactorAlpha != glDstAlpha) {
-                        gl.glBlendFuncSeparateEXT(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
+                        gl.glBlendFuncSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
                         record.srcFactorRGB = glSrcRGB;
                         record.dstFactorRGB = glDstRGB;
                         record.srcFactorAlpha = glSrcAlpha;
@@ -162,7 +165,7 @@ public abstract class JoglBlendStateUtil {
                 if (caps.isSeparateBlendFunctionsSupported()) {
                     final int glSrcAlpha = getGLSrcValue(state.getSourceFunctionAlpha(), caps);
                     final int glDstAlpha = getGLDstValue(state.getDestinationFunctionAlpha(), caps);
-                    gl.glBlendFuncSeparateEXT(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
+                    gl.glBlendFuncSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
                     record.srcFactorRGB = glSrcRGB;
                     record.dstFactorRGB = glDstRGB;
                     record.srcFactorAlpha = glSrcAlpha;
@@ -268,22 +271,22 @@ public abstract class JoglBlendStateUtil {
                 return GL.GL_SRC_ALPHA_SATURATE;
             case ConstantColor:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_CONSTANT_COLOR;
+                    return GL2ES2.GL_CONSTANT_COLOR;
                 }
                 // FALLS THROUGH
             case OneMinusConstantColor:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_ONE_MINUS_CONSTANT_COLOR;
+                    return GL2ES2.GL_ONE_MINUS_CONSTANT_COLOR;
                 }
                 // FALLS THROUGH
             case ConstantAlpha:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_CONSTANT_ALPHA;
+                    return GL2ES2.GL_CONSTANT_ALPHA;
                 }
                 // FALLS THROUGH
             case OneMinusConstantAlpha:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_ONE_MINUS_CONSTANT_ALPHA;
+                    return GL2ES2.GL_ONE_MINUS_CONSTANT_ALPHA;
                 }
                 // FALLS THROUGH
             case One:
@@ -310,22 +313,22 @@ public abstract class JoglBlendStateUtil {
                 return GL.GL_ONE_MINUS_DST_ALPHA;
             case ConstantColor:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_CONSTANT_COLOR;
+                    return GL2ES2.GL_CONSTANT_COLOR;
                 }
                 // FALLS THROUGH
             case OneMinusConstantColor:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_ONE_MINUS_CONSTANT_COLOR;
+                    return GL2ES2.GL_ONE_MINUS_CONSTANT_COLOR;
                 }
                 // FALLS THROUGH
             case ConstantAlpha:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_CONSTANT_ALPHA;
+                    return GL2ES2.GL_CONSTANT_ALPHA;
                 }
                 // FALLS THROUGH
             case OneMinusConstantAlpha:
                 if (caps.isConstantBlendColorSupported()) {
-                    return GL.GL_ONE_MINUS_CONSTANT_ALPHA;
+                    return GL2ES2.GL_ONE_MINUS_CONSTANT_ALPHA;
                 }
                 // FALLS THROUGH
             case One:
@@ -338,12 +341,12 @@ public abstract class JoglBlendStateUtil {
         switch (eq) {
             case Min:
                 if (caps.isMinMaxBlendEquationsSupported()) {
-                    return GL.GL_MIN;
+                    return GL2GL3.GL_MIN;
                 }
                 // FALLS THROUGH
             case Max:
                 if (caps.isMinMaxBlendEquationsSupported()) {
-                    return GL.GL_MAX;
+                    return GL2GL3.GL_MAX;
                 } else {
                     return GL.GL_FUNC_ADD;
                 }
@@ -368,30 +371,30 @@ public abstract class JoglBlendStateUtil {
         if (record.isValid()) {
             if (enabled) {
                 if (!record.testEnabled) {
-                    gl.glEnable(GL.GL_ALPHA_TEST);
+                    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
                     record.testEnabled = true;
                 }
                 final int glFunc = getGLFuncValue(state.getTestFunction());
                 if (record.alphaFunc != glFunc || record.alphaRef != state.getReference()) {
-                    gl.glAlphaFunc(glFunc, state.getReference());
+                    gl.getGL2().glAlphaFunc(glFunc, state.getReference());
                     record.alphaFunc = glFunc;
                     record.alphaRef = state.getReference();
                 }
             } else if (record.testEnabled) {
-                gl.glDisable(GL.GL_ALPHA_TEST);
+                gl.glDisable(GL2ES1.GL_ALPHA_TEST);
                 record.testEnabled = false;
             }
 
         } else {
             if (enabled) {
-                gl.glEnable(GL.GL_ALPHA_TEST);
+                gl.glEnable(GL2ES1.GL_ALPHA_TEST);
                 record.testEnabled = true;
                 final int glFunc = getGLFuncValue(state.getTestFunction());
-                gl.glAlphaFunc(glFunc, state.getReference());
+                gl.getGL2().glAlphaFunc(glFunc, state.getReference());
                 record.alphaFunc = glFunc;
                 record.alphaRef = state.getReference();
             } else {
-                gl.glDisable(GL.GL_ALPHA_TEST);
+                gl.glDisable(GL2ES1.GL_ALPHA_TEST);
                 record.testEnabled = false;
             }
         }

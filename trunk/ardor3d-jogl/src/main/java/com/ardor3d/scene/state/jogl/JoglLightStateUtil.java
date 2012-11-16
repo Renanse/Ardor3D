@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,9 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2ES1;
+import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.light.DirectionalLight;
@@ -164,9 +167,9 @@ public abstract class JoglLightStateUtil {
 
         if (!record.isValid() || lr.isEnabled() != enable) {
             if (enable) {
-                gl.glEnable(GL.GL_LIGHT0 + index);
+                gl.glEnable(GLLightingFunc.GL_LIGHT0 + index);
             } else {
-                gl.glDisable(GL.GL_LIGHT0 + index);
+                gl.glDisable(GLLightingFunc.GL_LIGHT0 + index);
             }
 
             lr.setEnabled(enable);
@@ -178,9 +181,9 @@ public abstract class JoglLightStateUtil {
 
         if (!record.isValid() || record.isEnabled() != enable) {
             if (enable) {
-                gl.glEnable(GL.GL_LIGHTING);
+                gl.glEnable(GLLightingFunc.GL_LIGHTING);
             } else {
-                gl.glDisable(GL.GL_LIGHTING);
+                gl.glDisable(GLLightingFunc.GL_LIGHTING);
             }
             record.setEnabled(enable);
         }
@@ -191,9 +194,9 @@ public abstract class JoglLightStateUtil {
 
         if (!record.isValid() || record.isTwoSidedOn() != twoSided) {
             if (twoSided) {
-                gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE);
+                gl.getGL2().glLightModeli(GL2ES1.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE);
             } else {
-                gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_FALSE);
+                gl.getGL2().glLightModeli(GL2ES1.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_FALSE);
             }
             record.setTwoSidedOn(twoSided);
         }
@@ -204,9 +207,9 @@ public abstract class JoglLightStateUtil {
 
         if (!record.isValid() || record.isLocalViewer() != localViewer) {
             if (localViewer) {
-                gl.glLightModeli(GL.GL_LIGHT_MODEL_LOCAL_VIEWER, GL.GL_TRUE);
+                gl.getGL2().glLightModeli(GL2.GL_LIGHT_MODEL_LOCAL_VIEWER, GL.GL_TRUE);
             } else {
-                gl.glLightModeli(GL.GL_LIGHT_MODEL_LOCAL_VIEWER, GL.GL_FALSE);
+                gl.getGL2().glLightModeli(GL2.GL_LIGHT_MODEL_LOCAL_VIEWER, GL.GL_FALSE);
             }
             record.setLocalViewer(localViewer);
         }
@@ -217,9 +220,9 @@ public abstract class JoglLightStateUtil {
 
         if (!record.isValid() || record.isSeparateSpecular() != separateSpecularOn) {
             if (separateSpecularOn) {
-                gl.glLightModeli(GL.GL_LIGHT_MODEL_COLOR_CONTROL, GL.GL_SEPARATE_SPECULAR_COLOR);
+                gl.getGL2().glLightModeli(GL2.GL_LIGHT_MODEL_COLOR_CONTROL, GL2.GL_SEPARATE_SPECULAR_COLOR);
             } else {
-                gl.glLightModeli(GL.GL_LIGHT_MODEL_COLOR_CONTROL, GL.GL_SINGLE_COLOR);
+                gl.getGL2().glLightModeli(GL2.GL_LIGHT_MODEL_COLOR_CONTROL, GL2.GL_SINGLE_COLOR);
             }
             record.setSeparateSpecular(separateSpecularOn);
         }
@@ -235,7 +238,7 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(globalAmbient.getBlue());
             record.lightBuffer.put(globalAmbient.getAlpha());
             record.lightBuffer.flip();
-            gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightModelfv(GL2ES1.GL_LIGHT_MODEL_AMBIENT, record.lightBuffer); // TODO Check for float
             record.globalAmbient.set(globalAmbient);
         }
     }
@@ -251,7 +254,7 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(ambient.getBlue());
             record.lightBuffer.put(ambient.getAlpha());
             record.lightBuffer.flip();
-            gl.glLightfv(GL.GL_LIGHT0 + index, GL.GL_AMBIENT, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_AMBIENT, record.lightBuffer); // TODO Check for float
             lr.ambient.set(ambient);
         }
     }
@@ -267,7 +270,7 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(diffuse.getBlue());
             record.lightBuffer.put(diffuse.getAlpha());
             record.lightBuffer.flip();
-            gl.glLightfv(GL.GL_LIGHT0 + index, GL.GL_DIFFUSE, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_DIFFUSE, record.lightBuffer); // TODO Check for float
             lr.diffuse.set(diffuse);
         }
     }
@@ -283,7 +286,7 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(specular.getBlue());
             record.lightBuffer.put(specular.getAlpha());
             record.lightBuffer.flip();
-            gl.glLightfv(GL.GL_LIGHT0 + index, GL.GL_SPECULAR, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPECULAR, record.lightBuffer); // TODO Check for float
             lr.specular.set(specular);
         }
     }
@@ -315,12 +318,12 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(positionZ);
             record.lightBuffer.put(positionW);
             record.lightBuffer.flip();
-            gl.glLightfv(GL.GL_LIGHT0 + index, GL.GL_POSITION, record.lightBuffer);
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_POSITION, record.lightBuffer);
 
             lr.position.set(positionX, positionY, positionZ, positionW);
-            if (!Camera.getCurrentCamera().isFrameDirty()) {
-                lr.modelViewMatrix.set(modelViewMatrix);
-            }
+            if (!Camera.getCurrentCamera().isFrameDirty()) { 
+                lr.modelViewMatrix.set(modelViewMatrix); 
+            } 
         }
     }
 
@@ -343,14 +346,14 @@ public abstract class JoglLightStateUtil {
         record.lightBuffer.put(directionZ);
         record.lightBuffer.put(value);
         record.lightBuffer.flip();
-        gl.glLightfv(GL.GL_LIGHT0 + index, GL.GL_SPOT_DIRECTION, record.lightBuffer); // TODO Check for float
+        gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_DIRECTION, record.lightBuffer); // TODO Check for float
     }
 
     private static void setConstant(final int index, final float constant, final LightRecord lr, final boolean force) {
         final GL gl = GLU.getCurrentGL();
 
         if (force || constant != lr.getConstant()) {
-            gl.glLightf(GL.GL_LIGHT0 + index, GL.GL_CONSTANT_ATTENUATION, constant);
+            gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_CONSTANT_ATTENUATION, constant);
             lr.setConstant(constant);
         }
     }
@@ -359,7 +362,7 @@ public abstract class JoglLightStateUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (force || linear != lr.getLinear()) {
-            gl.glLightf(GL.GL_LIGHT0 + index, GL.GL_LINEAR_ATTENUATION, linear);
+            gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_LINEAR_ATTENUATION, linear);
             lr.setLinear(linear);
         }
     }
@@ -368,7 +371,7 @@ public abstract class JoglLightStateUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (force || quad != lr.getQuadratic()) {
-            gl.glLightf(GL.GL_LIGHT0 + index, GL.GL_QUADRATIC_ATTENUATION, quad);
+            gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_QUADRATIC_ATTENUATION, quad);
             lr.setQuadratic(quad);
         }
     }
@@ -392,7 +395,7 @@ public abstract class JoglLightStateUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (!record.isValid() || lr.getSpotExponent() != exponent) {
-            gl.glLightf(GL.GL_LIGHT0 + index, GL.GL_SPOT_EXPONENT, exponent);
+            gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_EXPONENT, exponent);
             lr.setSpotExponent(exponent);
         }
     }
@@ -402,7 +405,7 @@ public abstract class JoglLightStateUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (!record.isValid() || lr.getSpotCutoff() != cutoff) {
-            gl.glLightf(GL.GL_LIGHT0 + index, GL.GL_SPOT_CUTOFF, cutoff);
+            gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_CUTOFF, cutoff);
             lr.setSpotCutoff(cutoff);
         }
     }

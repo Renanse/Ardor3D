@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,9 +11,14 @@
 package com.ardor3d.scene.state.jogl.util;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2ES1;
+import javax.media.opengl.GL2ES2;
+import javax.media.opengl.GL2GL3;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.CombinerFunctionAlpha;
 import com.ardor3d.image.Texture.CombinerFunctionRGB;
@@ -25,32 +30,27 @@ import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.Texture.DepthTextureMode;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.state.TextureState.CorrectionType;
 
 public abstract class JoglTextureUtil {
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
-        // first some frequently used formats
+            // first some frequently used formats
             case RGBA8:
                 return GL.GL_RGBA8;
             case RGB8:
                 return GL.GL_RGB8;
             case Alpha8:
-                return GL.GL_ALPHA8;
+                return GL2.GL_ALPHA8;
             case CompressedRGBA:
-                return GL.GL_COMPRESSED_RGBA;
+                return GL2GL3.GL_COMPRESSED_RGBA;
             case CompressedRGB:
-                return GL.GL_COMPRESSED_RGB;
-            case CompressedRG:
-                return 0x8226;// GL.GL_COMPRESSED_RG;
-            case CompressedRed:
-                return 0x8225;// GL.GL_COMPRESSED_RED;
+                return GL2GL3.GL_COMPRESSED_RGB;
             case CompressedLuminance:
-                return GL.GL_COMPRESSED_LUMINANCE;
+                return GL2.GL_COMPRESSED_LUMINANCE;
             case CompressedLuminanceAlpha:
-                return GL.GL_COMPRESSED_LUMINANCE_ALPHA;
+                return GL2.GL_COMPRESSED_LUMINANCE_ALPHA;
             case NativeDXT1:
                 return GL.GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
             case NativeDXT1A:
@@ -60,59 +60,59 @@ public abstract class JoglTextureUtil {
             case NativeDXT5:
                 return GL.GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
             case NativeLATC_L:
-                return GL.GL_COMPRESSED_LUMINANCE_LATC1_EXT;
+                return GL2.GL_COMPRESSED_LUMINANCE_LATC1_EXT;
             case NativeLATC_LA:
-                return GL.GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT;
+                return GL2.GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT;
 
                 // The rest...
             case Alpha4:
-                return GL.GL_ALPHA4;
+                return GL2.GL_ALPHA4;
             case Alpha12:
-                return GL.GL_ALPHA12;
+                return GL2.GL_ALPHA12;
             case Alpha16:
-                return GL.GL_ALPHA16;
+                return GL2.GL_ALPHA16;
             case Luminance4:
-                return GL.GL_LUMINANCE4;
+                return GL2.GL_LUMINANCE4;
             case Luminance8:
-                return GL.GL_LUMINANCE8;
+                return GL2.GL_LUMINANCE8;
             case Luminance12:
-                return GL.GL_LUMINANCE12;
+                return GL2.GL_LUMINANCE12;
             case Luminance16:
-                return GL.GL_LUMINANCE16;
+                return GL2.GL_LUMINANCE16;
             case Intensity4:
-                return GL.GL_INTENSITY4;
+                return GL2.GL_INTENSITY4;
             case Intensity8:
-                return GL.GL_INTENSITY8;
+                return GL2.GL_INTENSITY8;
             case Intensity12:
-                return GL.GL_INTENSITY12;
+                return GL2.GL_INTENSITY12;
             case Intensity16:
-                return GL.GL_INTENSITY16;
+                return GL2.GL_INTENSITY16;
             case Luminance4Alpha4:
-                return GL.GL_LUMINANCE4_ALPHA4;
+                return GL2.GL_LUMINANCE4_ALPHA4;
             case Luminance6Alpha2:
-                return GL.GL_LUMINANCE6_ALPHA2;
+                return GL2.GL_LUMINANCE6_ALPHA2;
             case Luminance8Alpha8:
-                return GL.GL_LUMINANCE8_ALPHA8;
+                return GL2.GL_LUMINANCE8_ALPHA8;
             case Luminance12Alpha4:
-                return GL.GL_LUMINANCE12_ALPHA4;
+                return GL2.GL_LUMINANCE12_ALPHA4;
             case Luminance12Alpha12:
-                return GL.GL_LUMINANCE12_ALPHA12;
+                return GL2.GL_LUMINANCE12_ALPHA12;
             case Luminance16Alpha16:
-                return GL.GL_LUMINANCE16_ALPHA16;
+                return GL2.GL_LUMINANCE16_ALPHA16;
             case R3G3B2:
-                return GL.GL_R3_G3_B2;
+                return GL2GL3.GL_R3_G3_B2;
             case RGB4:
-                return GL.GL_RGB4;
+                return GL2GL3.GL_RGB4;
             case RGB5:
-                return GL.GL_RGB5;
+                return GL2GL3.GL_RGB5;
             case RGB10:
                 return GL.GL_RGB10;
             case RGB12:
-                return GL.GL_RGB12;
+                return GL2GL3.GL_RGB12;
             case RGB16:
-                return GL.GL_RGB16;
+                return GL2GL3.GL_RGB16;
             case RGBA2:
-                return GL.GL_RGBA2;
+                return GL2GL3.GL_RGBA2;
             case RGBA4:
                 return GL.GL_RGBA4;
             case RGB5A1:
@@ -120,83 +120,93 @@ public abstract class JoglTextureUtil {
             case RGB10A2:
                 return GL.GL_RGB10_A2;
             case RGBA12:
-                return GL.GL_RGBA12;
+                return GL2GL3.GL_RGBA12;
             case RGBA16:
-                return GL.GL_RGBA16;
+                return GL2GL3.GL_RGBA16;
             case Depth:
-                return GL.GL_DEPTH_COMPONENT;
+                return GL2ES2.GL_DEPTH_COMPONENT;
             case Depth16:
-                return GL.GL_DEPTH_COMPONENT16_ARB;
+                return GL.GL_DEPTH_COMPONENT16;
             case Depth24:
-                return GL.GL_DEPTH_COMPONENT24_ARB;
+                return GL.GL_DEPTH_COMPONENT24;
             case Depth32:
-                return GL.GL_DEPTH_COMPONENT32_ARB;
+                return GL.GL_DEPTH_COMPONENT32;
             case Depth32F:
-                return GL.GL_DEPTH_COMPONENT32F_NV;
+                return GL2GL3.GL_DEPTH_COMPONENT32F;
             case RGB16F:
-                return GL.GL_RGB16F_ARB;
+                return GL2ES2.GL_RGB16F;
             case RGB32F:
-                return GL.GL_RGB32F_ARB;
+                return GL.GL_RGB32F;
             case RGBA16F:
-                return GL.GL_RGBA16F_ARB;
+                return GL2ES2.GL_RGBA16F;
             case RGBA32F:
-                return GL.GL_RGBA32F_ARB;
+                return GL.GL_RGBA32F;
             case Alpha16F:
-                return GL.GL_ALPHA16F_ARB;
+                return GL2.GL_ALPHA16F;
             case Alpha32F:
-                return GL.GL_ALPHA32F_ARB;
+                return GL2.GL_ALPHA32F;
             case Luminance16F:
-                return GL.GL_LUMINANCE16F_ARB;
+                return GL2.GL_LUMINANCE16F;
             case Luminance32F:
-                return GL.GL_LUMINANCE32F_ARB;
+                return GL2.GL_LUMINANCE32F;
             case LuminanceAlpha16F:
-                return GL.GL_LUMINANCE_ALPHA16F_ARB;
+                return GL2.GL_LUMINANCE_ALPHA16F;
             case LuminanceAlpha32F:
-                return GL.GL_LUMINANCE_ALPHA32F_ARB;
+                return GL2.GL_LUMINANCE_ALPHA32F;
             case Intensity16F:
-                return GL.GL_INTENSITY16F_ARB;
+                return GL2.GL_INTENSITY16F;
             case Intensity32F:
-                return GL.GL_INTENSITY32F_ARB;
-            case R8:
-                return 0x8229;// GL.GL_R8;
+                return GL2.GL_INTENSITY32F;
+            case CompressedRG:
+            	break;
+            case CompressedRed:
+            	break;
+            case GuessCompressedFormat:
+            	break;
+            case GuessNoCompressedFormat:
+            	break;
             case R16:
-                return 0x822A;// GL.GL_R16;
-            case RG8:
-                return 0x822B;// GL.GL_RG8;
-            case RG16:
-                return 0x822C;// GL.GL_RG16;
+            	break;
             case R16F:
-                return 0x822D;// GL.GL_R16F;
-            case R32F:
-                return 0x822E;// GL.GL_R32F;
-            case RG16F:
-                return 0x822F;// GL.GL_RG16F;
-            case RG32F:
-                return 0x8230;// GL.GL_RG32F;
-            case R8I:
-                return 0x8231;// GL.GL_R8I;
-            case R8UI:
-                return 0x8232;// GL.GL_R8UI;
+            	break;
             case R16I:
-                return 0x8233;// GL.GL_R16I;
+            	break;
             case R16UI:
-                return 0x8234;// GL.GL_R16UI;
+            	break;
+            case R32F:
+            	break;
             case R32I:
-                return 0x8235;// GL.GL_R32I;
+            	break;
             case R32UI:
-                return 0x8236;// GL.GL_R32UI;
-            case RG8I:
-                return 0x8237;// GL.GL_RG8I;
-            case RG8UI:
-                return 0x8238;// GL.GL_RG8UI;
+            	break;
+            case R8:
+            	break;
+            case R8I:
+            	break;
+            case R8UI:
+            	break;
+            case RG16:
+            	break;
+            case RG16F:
+            	break;
             case RG16I:
-                return 0x8239;// GL.GL_RG16I;
+            	break;
             case RG16UI:
-                return 0x823A;// GL.GL_RG16UI;
+            	break;
+            case RG32F:
+            	break;
             case RG32I:
-                return 0x823B;// GL.GL_RG32I;
+            	break;
             case RG32UI:
-                return 0x823C;// GL.GL_RG32UI;
+            	break;
+            case RG8:
+            	break;
+            case RG8I:
+            	break;
+            case RG8UI:
+            	break;
+            default:
+            	break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -208,41 +218,17 @@ public abstract class JoglTextureUtil {
             case Float:
                 return GL.GL_FLOAT;
             case HalfFloat:
-                return GL.GL_HALF_FLOAT_ARB;
+                return GL.GL_HALF_FLOAT;
             case Short:
                 return GL.GL_SHORT;
             case UnsignedShort:
                 return GL.GL_UNSIGNED_SHORT;
             case Int:
-                return GL.GL_INT;
+                return GL2ES2.GL_INT;
             case UnsignedInt:
                 return GL.GL_UNSIGNED_INT;
             case UnsignedByte:
                 return GL.GL_UNSIGNED_BYTE;
-            case UnsignedByte_3_3_2:
-                return GL.GL_UNSIGNED_BYTE_3_3_2;
-            case UnsignedByte_2_3_3_Rev:
-                return GL.GL_UNSIGNED_BYTE_2_3_3_REV;
-            case UnsignedShort_5_6_5:
-                return GL.GL_UNSIGNED_SHORT_5_6_5;
-            case UnsignedShort_5_6_5_Rev:
-                return GL.GL_UNSIGNED_SHORT_5_6_5_REV;
-            case UnsignedShort_4_4_4_4:
-                return GL.GL_UNSIGNED_SHORT_4_4_4_4;
-            case UnsignedShort_4_4_4_4_Rev:
-                return GL.GL_UNSIGNED_SHORT_4_4_4_4_REV;
-            case UnsignedShort_5_5_5_1:
-                return GL.GL_UNSIGNED_SHORT_5_5_5_1;
-            case UnsignedShort_1_5_5_5_Rev:
-                return GL.GL_UNSIGNED_SHORT_1_5_5_5_REV;
-            case UnsignedInt_8_8_8_8:
-                return GL.GL_UNSIGNED_INT_8_8_8_8;
-            case UnsignedInt_8_8_8_8_Rev:
-                return GL.GL_UNSIGNED_INT_8_8_8_8_REV;
-            case UnsignedInt_10_10_10_2:
-                return GL.GL_UNSIGNED_INT_10_10_10_2;
-            case UnsignedInt_2_10_10_10_Rev:
-                return GL.GL_UNSIGNED_INT_2_10_10_10_REV;
             default:
                 throw new Error("Unhandled type: " + type);
         }
@@ -254,32 +240,46 @@ public abstract class JoglTextureUtil {
                 return GL.GL_RGBA;
             case RGB:
                 return GL.GL_RGB;
-            case RG:
-                return 0x8227;// GL.GL_RG;
             case Alpha:
                 return GL.GL_ALPHA;
             case Luminance:
                 return GL.GL_LUMINANCE;
             case Intensity:
-                return GL.GL_INTENSITY;
+                return GL2.GL_INTENSITY;
             case LuminanceAlpha:
                 return GL.GL_LUMINANCE_ALPHA;
             case Depth:
-                return GL.GL_DEPTH_COMPONENT;
+                return GL2ES2.GL_DEPTH_COMPONENT;
             case BGR:
-                return GL.GL_BGR;
+                return GL2GL3.GL_BGR;
             case BGRA:
-                return GL.GL_BGRA;
+                return GL2.GL_BGRA;
             case Red:
-                return GL.GL_RED;
+                return GL2ES2.GL_RED;
             case Blue:
-                return GL.GL_BLUE;
+                return GL2GL3.GL_BLUE;
             case Green:
-                return GL.GL_GREEN;
+                return GL2GL3.GL_GREEN;
             case ColorIndex:
-                return GL.GL_COLOR_INDEX;
+                return GL2.GL_COLOR_INDEX;
             case StencilIndex:
-                return GL.GL_STENCIL_INDEX;
+                return GL2ES2.GL_STENCIL_INDEX;
+		    case PrecompressedDXT1:
+			    break;
+		    case PrecompressedDXT1A:
+			    break;
+		    case PrecompressedDXT3:
+			    break;
+		    case PrecompressedDXT5:
+			    break;
+		    case PrecompressedLATC_L:
+			    break;
+		    case PrecompressedLATC_LA:
+			    break;
+		    case RG:
+			    break;
+		    default:
+			    break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -334,7 +334,7 @@ public abstract class JoglTextureUtil {
             case Intensity16:
             case Intensity16F:
             case Intensity32F:
-                return GL.GL_INTENSITY;
+                return GL2.GL_INTENSITY;
             case Luminance4Alpha4:
             case Luminance6Alpha2:
             case Luminance8Alpha8:
@@ -351,31 +351,57 @@ public abstract class JoglTextureUtil {
             case Depth24:
             case Depth32:
             case Depth32F:
-                return GL.GL_DEPTH_COMPONENT;
-            case R8:
-            case R16:
-            case R16F:
-            case R32F:
-            case R8I:
-            case R8UI:
-            case R16I:
-            case R16UI:
-            case R32I:
-            case R32UI:
-            case CompressedRed:
-                return GL.GL_RED;
-            case RG8:
-            case RG16:
-            case RG16F:
-            case RG32F:
-            case RG8I:
-            case RG8UI:
-            case RG16I:
-            case RG16UI:
-            case RG32I:
-            case RG32UI:
+                return GL2ES2.GL_DEPTH_COMPONENT;
             case CompressedRG:
-                return 0x8227; // Jogl1 missing GL_RG
+            	break;
+            case CompressedRed:
+            	break;
+            case GuessCompressedFormat:
+            	break;
+            case GuessNoCompressedFormat:
+            	break;
+            case R16:
+            	break;
+            case R16F:
+            	break;
+            case R16I:
+            	break;
+            case R16UI:
+            	break;
+            case R32F:
+            	break;
+            case R32I:
+            	break;
+            case R32UI:
+            	break;
+            case R8:
+            	break;
+            case R8I:
+            	break;
+            case R8UI:
+            	break;
+            case RG16:
+            	break;
+            case RG16F:
+            	break;
+            case RG16I:
+            	break;
+            case RG16UI:
+            	break;
+            case RG32F:
+            	break;
+            case RG32I:
+            	break;
+            case RG32UI:
+            	break;
+            case RG8:
+            	break;
+            case RG8I:
+            	break;
+            case RG8UI:
+            	break;
+            default:
+            	break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -388,14 +414,14 @@ public abstract class JoglTextureUtil {
                 return GL.GL_LUMINANCE;
             case Intensity:
             default:
-                return GL.GL_INTENSITY;
+                return GL2.GL_INTENSITY;
         }
     }
 
     public static int getGLDepthTextureCompareMode(final DepthTextureCompareMode mode) {
         switch (mode) {
             case RtoTexture:
-                return GL.GL_COMPARE_R_TO_TEXTURE_ARB;
+                return GL2.GL_COMPARE_R_TO_TEXTURE;
             case None:
             default:
                 return GL.GL_NONE;
@@ -448,13 +474,13 @@ public abstract class JoglTextureUtil {
             case Blend:
                 return GL.GL_BLEND;
             case Combine:
-                return GL.GL_COMBINE;
+                return GL2ES1.GL_COMBINE;
             case Decal:
-                return GL.GL_DECAL;
+                return GL2ES1.GL_DECAL;
             case Add:
-                return GL.GL_ADD;
+                return GL2ES1.GL_ADD;
             case Modulate:
-                return GL.GL_MODULATE;
+                return GL2ES1.GL_MODULATE;
         }
         throw new IllegalArgumentException("invalid ApplyMode type: " + apply);
     }
@@ -498,11 +524,11 @@ public abstract class JoglTextureUtil {
             case CurrentTexture:
                 return GL.GL_TEXTURE;
             case PrimaryColor:
-                return GL.GL_PRIMARY_COLOR;
+                return GL2ES1.GL_PRIMARY_COLOR;
             case Constant:
-                return GL.GL_CONSTANT;
+                return GL2ES1.GL_CONSTANT;
             case Previous:
-                return GL.GL_PREVIOUS;
+                return GL2ES1.GL_PREVIOUS;
             case TextureUnit0:
                 return GL.GL_TEXTURE0;
             case TextureUnit1:
@@ -574,17 +600,17 @@ public abstract class JoglTextureUtil {
     public static int getGLCombineFuncAlpha(final CombinerFunctionAlpha combineFunc) {
         switch (combineFunc) {
             case Modulate:
-                return GL.GL_MODULATE;
+                return GL2ES1.GL_MODULATE;
             case Replace:
                 return GL.GL_REPLACE;
             case Add:
-                return GL.GL_ADD;
+                return GL2ES1.GL_ADD;
             case AddSigned:
-                return GL.GL_ADD_SIGNED;
+                return GL2ES1.GL_ADD_SIGNED;
             case Subtract:
-                return GL.GL_SUBTRACT;
+                return GL2ES1.GL_SUBTRACT;
             case Interpolate:
-                return GL.GL_INTERPOLATE;
+                return GL2ES1.GL_INTERPOLATE;
         }
         throw new IllegalArgumentException("invalid CombinerFunctionAlpha type: " + combineFunc);
     }
@@ -592,21 +618,21 @@ public abstract class JoglTextureUtil {
     public static int getGLCombineFuncRGB(final CombinerFunctionRGB combineFunc) {
         switch (combineFunc) {
             case Modulate:
-                return GL.GL_MODULATE;
+                return GL2ES1.GL_MODULATE;
             case Replace:
                 return GL.GL_REPLACE;
             case Add:
-                return GL.GL_ADD;
+                return GL2ES1.GL_ADD;
             case AddSigned:
-                return GL.GL_ADD_SIGNED;
+                return GL2ES1.GL_ADD_SIGNED;
             case Subtract:
-                return GL.GL_SUBTRACT;
+                return GL2ES1.GL_SUBTRACT;
             case Interpolate:
-                return GL.GL_INTERPOLATE;
+                return GL2ES1.GL_INTERPOLATE;
             case Dot3RGB:
-                return GL.GL_DOT3_RGB;
+                return GL2ES1.GL_DOT3_RGB;
             case Dot3RGBA:
-                return GL.GL_DOT3_RGBA;
+                return GL2ES1.GL_DOT3_RGBA;
         }
         throw new IllegalArgumentException("invalid CombinerFunctionRGB type: " + combineFunc);
     }

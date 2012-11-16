@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -27,8 +27,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
+import javax.media.opengl.GLRunnable;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -84,7 +86,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     @Override
     public void addFocusListener(final FocusListener l) {
-        _glCanvas.addFocusListener(l); // To change body of overridden methods use File | Settings | File Templates.
+        _glCanvas.addFocusListener(l);
     }
 
     @MainThread
@@ -268,13 +270,16 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     }
 
     public void setIcon(final Image[] iconImages) {
-    // TODO Auto-generated method stub
+        // FIXME not implemented
     }
 
     public void setVSyncEnabled(final boolean enabled) {
-        if (GLContext.getCurrent() != null) {
-            // Release the OpenGL resources.
-            GLContext.getCurrent().getGL().setSwapInterval(enabled ? 1 : 0);
-        }
+        _glCanvas.invoke(true, new GLRunnable() {
+            @Override
+            public boolean run(GLAutoDrawable glAutoDrawable) {
+            	_glCanvas.getGL().setSwapInterval(enabled ? 1 : 0);
+                return false;
+            }
+        });
     }
 }
