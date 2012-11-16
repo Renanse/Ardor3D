@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2ES1;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -53,18 +54,18 @@ public abstract class JoglClipStateUtil {
 
         if (enable) {
             if (!record.isValid() || !record.planeEnabled[planeIndex]) {
-                gl.glEnable(GL.GL_CLIP_PLANE0 + planeIndex);
+                gl.glEnable(GL2ES1.GL_CLIP_PLANE0 + planeIndex);
                 record.planeEnabled[planeIndex] = true;
             }
 
             record.buf.rewind();
             record.buf.put(state.getPlaneEquations(planeIndex));
             record.buf.flip();
-            gl.glClipPlane(GL.GL_CLIP_PLANE0 + planeIndex, record.buf);
+            gl.getGL2().glClipPlane(GL2ES1.GL_CLIP_PLANE0 + planeIndex, record.buf);
 
         } else {
             if (!record.isValid() || record.planeEnabled[planeIndex]) {
-                gl.glDisable(GL.GL_CLIP_PLANE0 + planeIndex);
+                gl.glDisable(GL2ES1.GL_CLIP_PLANE0 + planeIndex);
                 record.planeEnabled[planeIndex] = false;
             }
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -12,10 +12,12 @@ package com.ardor3d.framework.jogl;
 
 import java.util.logging.Logger;
 
-import javax.media.opengl.DebugGL;
+import javax.media.opengl.DebugGL2;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
+import javax.media.opengl.GLException;
+import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.annotation.MainThread;
@@ -37,22 +39,6 @@ import com.ardor3d.util.Ardor3dException;
 public class JoglCanvasRenderer implements CanvasRenderer {
 
     private static final Logger LOGGER = Logger.getLogger(JoglCanvasRenderer.class.getName());
-
-    // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
-    // and since it is at the moment more work than it is worth to get it ready. Later on, when
-    // we have solved some more fundamental problems, it is probably time to revisit this.
-
-    // ensure availability of JOGL natives
-    // {
-    // final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
-    // .getProperty("os.arch"));
-    //
-    // try {
-    // NativeLoader.makeLibrariesAvailable(libraryPaths);
-    // } catch (final Exception e) {
-    // ; // ignore
-    // }
-    // }
 
     protected Scene _scene;
     protected Camera _camera;
@@ -83,20 +69,27 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     }
 
     public void makeCurrentContext() throws Ardor3dException {
-        int value;
-        int attempt = 1;
-        while ((value = _context.makeCurrent()) == GLContext.CONTEXT_NOT_CURRENT) {
-            if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
-                // failed, throw exception
-                throw new Ardor3dException("Failed to claim OpenGL context.");
-            }
-            attempt++;
-            try {
-                Thread.sleep(5);
-            } catch (final InterruptedException e1) {
-                e1.printStackTrace();
-            }
+        int value = GLContext.CONTEXT_NOT_CURRENT;
+        int attempt = 0;
+        do {
+        	try {
+        		value = _context.makeCurrent();
+        	} catch(GLException gle) {
+        		gle.printStackTrace();
+        	} finally {
+        		attempt++;
+        		if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
+                    // failed, throw exception
+                    throw new Ardor3dException("Failed to claim OpenGL context.");
+                }
+        	}        	
+        	try {
+        		Thread.sleep(5);
+        	} catch (final InterruptedException e1) {
+        		e1.printStackTrace();
+        	}
         }
+        while(value == GLContext.CONTEXT_NOT_CURRENT);
         if (value == GLContext.CONTEXT_CURRENT_NEW) {
             ContextManager.getCurrentContext().contextLost();
 
@@ -109,8 +102,12 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     }
 
     public void releaseCurrentContext() {
-        if (_context.equals(GLContext.getCurrent())) {
-            _context.release();
+        if (_context.equals(GLContext.getCurrent())) {            
+            try {
+            	_context.release();
+        	} catch(GLException gle) {
+        		gle.printStackTrace();
+        	}
         }
     }
 
@@ -123,50 +120,55 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
         if (_context == null) {
-            _context = GLDrawableFactory.getFactory().createExternalGLContext();
+            _context = GLDrawableFactory.getFactory(GLProfile.getMaxFixedFunc(true)).createExternalGLContext();
         }
 
         _context.makeCurrent();
 
-        // Look up a shared context, if a shared JoglCanvasRenderer is given.
-        RenderContext sharedContext = null;
-        if (settings.getShareContext() != null) {
-            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
-                    .getContextKey());
-        }
+        try {
 
-        final ContextCapabilities caps = createContextCapabilities();
-        _currentContext = new RenderContext(_context, caps, sharedContext);
+        	// Look up a shared context, if a shared JoglCanvasRenderer is given.
+        	RenderContext sharedContext = null;
+        	if (settings.getShareContext() != null) {
+        		sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
+        				.getContextKey());
+        	}
 
-        ContextManager.addContext(_context, _currentContext);
-        ContextManager.switchContext(_context);
+        	final ContextCapabilities caps = createContextCapabilities();
+        	_currentContext = new RenderContext(_context, caps, sharedContext);
 
-        _renderer = new JoglRenderer();
+        	ContextManager.addContext(_context, _currentContext);
+        	ContextManager.switchContext(_context);
 
-        if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
-            final GL gl = GLU.getCurrentGL();
-            gl.glEnable(GL.GL_MULTISAMPLE);
-        }
+        	_renderer = new JoglRenderer();
 
-        _renderer.setBackgroundColor(ColorRGBA.BLACK);
+        	if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
+        		final GL gl = GLU.getCurrentGL();
+        		gl.glEnable(GL.GL_MULTISAMPLE);
+        	}
 
-        if (_camera == null) {
-            /** Set up how our camera sees. */
-            _camera = new Camera(settings.getWidth(), settings.getHeight());
-            _camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1, 1000);
-            _camera.setProjectionMode(ProjectionMode.Perspective);
+        	_renderer.setBackgroundColor(ColorRGBA.BLACK);
 
-            final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
-            final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-            final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
-            final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
-            /** Move our camera to a correct place and orientation. */
-            _camera.setFrame(loc, left, up, dir);
-        } else {
-            // use new width and height to set ratio.
-            _camera.setFrustumPerspective(_camera.getFovY(),
-                    (float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(), _camera
-                            .getFrustumFar());
+        	if (_camera == null) {
+        		/** Set up how our camera sees. */
+        		_camera = new Camera(settings.getWidth(), settings.getHeight());
+        		_camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1, 1000);
+        		_camera.setProjectionMode(ProjectionMode.Perspective);
+
+        		final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
+        		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+        		final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+        		final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
+        		/** Move our camera to a correct place and orientation. */
+        		_camera.setFrame(loc, left, up, dir);
+        	} else {
+        		// use new width and height to set ratio.
+        		_camera.setFrustumPerspective(_camera.getFovY(),
+        				(float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(), _camera
+        				.getFrustumFar());
+        	}
+        } finally {
+        	_context.release();
         }
     }
 
@@ -188,7 +190,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // Enable Debugging if requested.
         if (_useDebug != _debugEnabled) {
-            _context.setGL(new DebugGL(_context.getGL()));
+            _context.setGL(new DebugGL2(_context.getGL().getGL2()));
             _debugEnabled = true;
 
             LOGGER.info("DebugGL Enabled");

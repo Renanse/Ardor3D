@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -73,7 +74,7 @@ public abstract class JoglMaterialStateUtil {
                     record.tempColorBuff.put(frontColor.getRed()).put(frontColor.getGreen()).put(frontColor.getBlue())
                             .put(frontColor.getAlpha());
                     record.tempColorBuff.flip();
-                    gl.glMaterialfv(getGLMaterialFace(MaterialFace.FrontAndBack), glMat, record.tempColorBuff);
+                    gl.getGL2().glMaterialfv(getGLMaterialFace(MaterialFace.FrontAndBack), glMat, record.tempColorBuff);
                     record.setColor(MaterialFace.FrontAndBack, glMatColor, frontColor);
                 }
             }
@@ -84,7 +85,7 @@ public abstract class JoglMaterialStateUtil {
                     record.tempColorBuff.put(frontColor.getRed()).put(frontColor.getGreen()).put(frontColor.getBlue())
                             .put(frontColor.getAlpha());
                     record.tempColorBuff.flip();
-                    gl.glMaterialfv(getGLMaterialFace(MaterialFace.Front), glMat, record.tempColorBuff);
+                    gl.getGL2().glMaterialfv(getGLMaterialFace(MaterialFace.Front), glMat, record.tempColorBuff);
                     record.setColor(MaterialFace.Front, glMatColor, frontColor);
                 }
             }
@@ -95,7 +96,7 @@ public abstract class JoglMaterialStateUtil {
                     record.tempColorBuff.put(backColor.getRed()).put(backColor.getGreen()).put(backColor.getBlue())
                             .put(backColor.getAlpha());
                     record.tempColorBuff.flip();
-                    gl.glMaterialfv(getGLMaterialFace(MaterialFace.Back), glMat, record.tempColorBuff);
+                    gl.getGL2().glMaterialfv(getGLMaterialFace(MaterialFace.Back), glMat, record.tempColorBuff);
                     record.setColor(MaterialFace.Back, glMatColor, backColor);
                 }
             }
@@ -118,6 +119,12 @@ public abstract class JoglMaterialStateUtil {
                 return record.colorMaterial == ColorMaterial.Specular;
             case Emissive:
                 return record.colorMaterial == ColorMaterial.Emissive;
+            case AmbientAndDiffuse:
+            	break;
+            case None:
+            	break;
+            default:
+            	break;
         }
         return false;
     }
@@ -128,13 +135,13 @@ public abstract class JoglMaterialStateUtil {
             final GL gl = GLU.getCurrentGL();
 
             if (colorMaterial == ColorMaterial.None) {
-                gl.glDisable(GL.GL_COLOR_MATERIAL);
+                gl.glDisable(GLLightingFunc.GL_COLOR_MATERIAL);
             } else {
                 final int glMat = getGLColorMaterial(colorMaterial);
                 final int glFace = getGLMaterialFace(face);
 
-                gl.glColorMaterial(glFace, glMat);
-                gl.glEnable(GL.GL_COLOR_MATERIAL);
+                gl.getGL2().glColorMaterial(glFace, glMat);
+                gl.glEnable(GLLightingFunc.GL_COLOR_MATERIAL);
                 record.resetColorsForCM(face, colorMaterial);
             }
             record.colorMaterial = colorMaterial;
@@ -149,17 +156,17 @@ public abstract class JoglMaterialStateUtil {
         if (frontShininess == backShininess) {
             // consolidate to one call
             if (!record.isValid() || frontShininess != record.frontShininess || record.backShininess != backShininess) {
-                gl.glMaterialf(getGLMaterialFace(MaterialFace.FrontAndBack), GL.GL_SHININESS, frontShininess);
+                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.FrontAndBack), GLLightingFunc.GL_SHININESS, frontShininess);
                 record.backShininess = record.frontShininess = frontShininess;
             }
         } else {
             if (!record.isValid() || frontShininess != record.frontShininess) {
-                gl.glMaterialf(getGLMaterialFace(MaterialFace.Front), GL.GL_SHININESS, frontShininess);
+                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.Front), GLLightingFunc.GL_SHININESS, frontShininess);
                 record.frontShininess = frontShininess;
             }
 
             if (!record.isValid() || backShininess != record.backShininess) {
-                gl.glMaterialf(getGLMaterialFace(MaterialFace.Back), GL.GL_SHININESS, backShininess);
+                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.Back), GLLightingFunc.GL_SHININESS, backShininess);
                 record.backShininess = backShininess;
             }
         }
@@ -175,15 +182,15 @@ public abstract class JoglMaterialStateUtil {
             case None:
                 return GL.GL_NONE;
             case Ambient:
-                return GL.GL_AMBIENT;
+                return GLLightingFunc.GL_AMBIENT;
             case Diffuse:
-                return GL.GL_DIFFUSE;
+                return GLLightingFunc.GL_DIFFUSE;
             case AmbientAndDiffuse:
-                return GL.GL_AMBIENT_AND_DIFFUSE;
+                return GLLightingFunc.GL_AMBIENT_AND_DIFFUSE;
             case Emissive:
-                return GL.GL_EMISSION;
+                return GLLightingFunc.GL_EMISSION;
             case Specular:
-                return GL.GL_SPECULAR;
+                return GLLightingFunc.GL_SPECULAR;
         }
         throw new IllegalArgumentException("invalid color material setting: " + material);
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -39,9 +40,9 @@ public final class JoglFragmentProgramStateUtil {
         if (gl.glGetError() == GL.GL_INVALID_OPERATION) {
             // retrieve the error position
             final IntBuffer errorloc = BufferUtils.createIntBuffer(16);
-            gl.glGetIntegerv(GL.GL_PROGRAM_ERROR_POSITION_ARB, errorloc); // TODO Check for integer
+            gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, errorloc); // TODO Check for integer
 
-            logger.severe("Error " + gl.glGetString(GL.GL_PROGRAM_ERROR_STRING_ARB) + " in fragment program on line "
+            logger.severe("Error " + gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB) + " in fragment program on line "
                     + errorloc.get(0));
         }
     }
@@ -51,13 +52,13 @@ public final class JoglFragmentProgramStateUtil {
 
         final IntBuffer buf = BufferUtils.createIntBuffer(1);
 
-        gl.glGenProgramsARB(buf.limit(), buf); // TODO Check <size>
-        gl.glBindProgramARB(GL.GL_FRAGMENT_PROGRAM_ARB, buf.get(0));
+        gl.getGL2().glGenProgramsARB(buf.limit(), buf); // TODO Check <size>
+        gl.getGL2().glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, buf.get(0));
 
         final byte array[] = new byte[program.limit()];
         program.rewind();
         program.get(array);
-        gl.glProgramStringARB(GL.GL_FRAGMENT_PROGRAM_ARB, GL.GL_PROGRAM_FORMAT_ASCII_ARB, array.length, new String(
+        gl.getGL2().glProgramStringARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, array.length, new String(
                 array)); // TODO Check cost of using non-buffer
 
         checkProgramError();
@@ -88,8 +89,8 @@ public final class JoglFragmentProgramStateUtil {
                         }
                     }
 
-                    gl.glEnable(GL.GL_FRAGMENT_PROGRAM_ARB);
-                    gl.glBindProgramARB(GL.GL_FRAGMENT_PROGRAM_ARB, state._getProgramID());
+                    gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+                    gl.getGL2().glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, state._getProgramID());
 
                     // load environmental parameters...
                     // TODO: Reevaluate how this is done.
@@ -104,7 +105,7 @@ public final class JoglFragmentProgramStateUtil {
                         // no parameters are used
                         for (int i = 0; i < state._getParameters().length; i++) {
                             if (state._getParameters()[i] != null) {
-                                gl.glProgramLocalParameter4fARB(GL.GL_FRAGMENT_PROGRAM_ARB, i,
+                                gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_FRAGMENT_PROGRAM_ARB, i,
                                         state._getParameters()[i][0], state._getParameters()[i][1], state
                                                 ._getParameters()[i][2], state._getParameters()[i][3]);
                             }
@@ -112,7 +113,7 @@ public final class JoglFragmentProgramStateUtil {
                     }
 
                 } else {
-                    gl.glDisable(GL.GL_FRAGMENT_PROGRAM_ARB);
+                    gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
                 }
             }
 

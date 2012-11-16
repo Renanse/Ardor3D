@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,8 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2ES1;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -41,23 +43,23 @@ public abstract class JoglFogStateUtil {
 
             if (record.isValid()) {
                 if (record.fogStart != state.getStart()) {
-                    gl.glFogf(GL.GL_FOG_START, state.getStart());
+                    gl.getGL2ES1().glFogf(GL2ES1.GL_FOG_START, state.getStart());
                     record.fogStart = state.getStart();
                 }
                 if (record.fogEnd != state.getEnd()) {
-                    gl.glFogf(GL.GL_FOG_END, state.getEnd());
+                    gl.getGL2ES1().glFogf(GL2ES1.GL_FOG_END, state.getEnd());
                     record.fogEnd = state.getEnd();
                 }
                 if (record.density != state.getDensity()) {
-                    gl.glFogf(GL.GL_FOG_DENSITY, state.getDensity());
+                    gl.getGL2ES1().glFogf(GL2ES1.GL_FOG_DENSITY, state.getDensity());
                     record.density = state.getDensity();
                 }
             } else {
-                gl.glFogf(GL.GL_FOG_START, state.getStart());
+                gl.getGL2ES1().glFogf(GL2ES1.GL_FOG_START, state.getStart());
                 record.fogStart = state.getStart();
-                gl.glFogf(GL.GL_FOG_END, state.getEnd());
+                gl.getGL2ES1().glFogf(GL2ES1.GL_FOG_END, state.getEnd());
                 record.fogEnd = state.getEnd();
-                gl.glFogf(GL.GL_FOG_DENSITY, state.getDensity());
+                gl.getGL2ES1().glFogf(GL2ES1.GL_FOG_DENSITY, state.getDensity());
                 record.density = state.getDensity();
             }
 
@@ -80,17 +82,17 @@ public abstract class JoglFogStateUtil {
 
         if (record.isValid()) {
             if (enable && !record.enabled) {
-                gl.glEnable(GL.GL_FOG);
+                gl.glEnable(GL2ES1.GL_FOG);
                 record.enabled = true;
             } else if (!enable && record.enabled) {
-                gl.glDisable(GL.GL_FOG);
+                gl.glDisable(GL2ES1.GL_FOG);
                 record.enabled = false;
             }
         } else {
             if (enable) {
-                gl.glEnable(GL.GL_FOG);
+                gl.glEnable(GL2ES1.GL_FOG);
             } else {
-                gl.glDisable(GL.GL_FOG);
+                gl.glDisable(GL2ES1.GL_FOG);
             }
             record.enabled = enable;
         }
@@ -105,7 +107,7 @@ public abstract class JoglFogStateUtil {
             record.colorBuff.put(record.fogColor.getRed()).put(record.fogColor.getGreen()).put(
                     record.fogColor.getBlue()).put(record.fogColor.getAlpha());
             record.colorBuff.flip();
-            gl.glFogfv(GL.GL_FOG_COLOR, record.colorBuff);
+            gl.getGL2ES1().glFogfv(GL2ES1.GL_FOG_COLOR, record.colorBuff);
         }
     }
 
@@ -116,9 +118,9 @@ public abstract class JoglFogStateUtil {
         if (caps.isFogCoordinatesSupported()) {
             if (!record.isValid() || !source.equals(record.source)) {
                 if (source == CoordinateSource.Depth) {
-                    gl.glFogi(GL.GL_FOG_COORDINATE_SOURCE_EXT, GL.GL_FRAGMENT_DEPTH_EXT);
+                    gl.getGL2().glFogi(GL2.GL_FOG_COORDINATE_SOURCE, GL2.GL_FRAGMENT_DEPTH);
                 } else {
-                    gl.glFogi(GL.GL_FOG_COORDINATE_SOURCE_EXT, GL.GL_FOG_COORDINATE_EXT);
+                    gl.getGL2().glFogi(GL2.GL_FOG_COORDINATE_SOURCE, GL2.GL_FOG_COORDINATE);
                 }
             }
         }
@@ -130,18 +132,18 @@ public abstract class JoglFogStateUtil {
         int glMode = 0;
         switch (densityFunction) {
             case Exponential:
-                glMode = GL.GL_EXP;
+                glMode = GL2ES1.GL_EXP;
                 break;
             case Linear:
                 glMode = GL.GL_LINEAR;
                 break;
             case ExponentialSquared:
-                glMode = GL.GL_EXP2;
+                glMode = GL2ES1.GL_EXP2;
                 break;
         }
 
         if (!record.isValid() || record.fogMode != glMode) {
-            gl.glFogi(GL.GL_FOG_MODE, glMode);
+            gl.getGL2().glFogi(GL2ES1.GL_FOG_MODE, glMode);
             record.fogMode = glMode;
         }
     }
@@ -160,7 +162,7 @@ public abstract class JoglFogStateUtil {
         }
 
         if (!record.isValid() || record.fogHint != glHint) {
-            gl.glHint(GL.GL_FOG_HINT, glHint);
+            gl.glHint(GL2ES1.GL_FOG_HINT, glHint);
             record.fogHint = glHint;
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -39,9 +40,9 @@ public abstract class JoglVertexProgramStateUtil {
         if (gl.glGetError() == GL.GL_INVALID_OPERATION) {
             // retrieve the error position
             final IntBuffer errorloc = BufferUtils.createIntBuffer(16);
-            gl.glGetIntegerv(GL.GL_PROGRAM_ERROR_POSITION_ARB, errorloc); // TODO Check for integer
+            gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, errorloc); // TODO Check for integer
 
-            logger.severe("Error " + gl.glGetString(GL.GL_PROGRAM_ERROR_STRING_ARB) + " in vertex program on line "
+            logger.severe("Error " + gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB) + " in vertex program on line "
                     + errorloc.get(0));
         }
     }
@@ -51,14 +52,14 @@ public abstract class JoglVertexProgramStateUtil {
 
         final IntBuffer buf = BufferUtils.createIntBuffer(1);
 
-        gl.glGenProgramsARB(buf.limit(), buf);
-        gl.glBindProgramARB(GL.GL_VERTEX_PROGRAM_ARB, buf.get(0));
+        gl.getGL2().glGenProgramsARB(buf.limit(), buf);
+        gl.getGL2().glBindProgramARB(GL2.GL_VERTEX_PROGRAM_ARB, buf.get(0));
 
         final byte array[] = new byte[program.limit()];
         program.rewind();
         program.get(array);
-        gl
-                .glProgramStringARB(GL.GL_VERTEX_PROGRAM_ARB, GL.GL_PROGRAM_FORMAT_ASCII_ARB, array.length, new String(
+        gl.getGL2()
+                .glProgramStringARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, array.length, new String(
                         array));
 
         checkProgramError();
@@ -90,13 +91,13 @@ public abstract class JoglVertexProgramStateUtil {
                         }
                     }
 
-                    gl.glEnable(GL.GL_VERTEX_PROGRAM_ARB);
-                    gl.glBindProgramARB(GL.GL_VERTEX_PROGRAM_ARB, state._getProgramID());
+                    gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
+                    gl.getGL2().glBindProgramARB(GL2.GL_VERTEX_PROGRAM_ARB, state._getProgramID());
 
                     // load environmental parameters...
                     for (int i = 0; i < VertexProgramState._getEnvParameters().length; i++) {
                         if (VertexProgramState._getEnvParameters()[i] != null) {
-                            gl.glProgramEnvParameter4fARB(GL.GL_VERTEX_PROGRAM_ARB, i, VertexProgramState
+                            gl.getGL2().glProgramEnvParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i, VertexProgramState
                                     ._getEnvParameters()[i][0], VertexProgramState._getEnvParameters()[i][1],
                                     VertexProgramState._getEnvParameters()[i][2], VertexProgramState
                                             ._getEnvParameters()[i][3]);
@@ -108,7 +109,7 @@ public abstract class JoglVertexProgramStateUtil {
                         // no parameters are used
                         for (int i = 0; i < state._getParameters().length; i++) {
                             if (state._getParameters()[i] != null) {
-                                gl.glProgramLocalParameter4fARB(GL.GL_VERTEX_PROGRAM_ARB, i,
+                                gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
                                         state._getParameters()[i][0], state._getParameters()[i][1], state
                                                 ._getParameters()[i][2], state._getParameters()[i][3]);
                             }
@@ -116,7 +117,7 @@ public abstract class JoglVertexProgramStateUtil {
                     }
 
                 } else {
-                    gl.glDisable(GL.GL_VERTEX_PROGRAM_ARB);
+                    gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
                 }
             }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextManager;
@@ -32,10 +33,10 @@ public abstract class JoglShadingStateUtil {
         context.setCurrentState(StateType.Shading, state);
 
         // If not enabled, we'll use smooth
-        final int toApply = state.isEnabled() ? getGLShade(state.getShadingMode()) : GL.GL_SMOOTH;
+        final int toApply = state.isEnabled() ? getGLShade(state.getShadingMode()) : GLLightingFunc.GL_SMOOTH;
         // only apply if we're different. Update record to reflect any changes.
         if (!record.isValid() || toApply != record.lastShade) {
-            gl.glShadeModel(toApply);
+            gl.getGL2().glShadeModel(toApply);
             record.lastShade = toApply;
         }
 
@@ -47,9 +48,9 @@ public abstract class JoglShadingStateUtil {
     private static int getGLShade(final ShadingMode shadeMode) {
         switch (shadeMode) {
             case Smooth:
-                return GL.GL_SMOOTH;
+                return GLLightingFunc.GL_SMOOTH;
             case Flat:
-                return GL.GL_FLAT;
+                return GLLightingFunc.GL_FLAT;
         }
         throw new IllegalStateException("unknown shade mode: " + shadeMode);
     }

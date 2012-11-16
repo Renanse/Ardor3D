@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -14,6 +14,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GL2ES1;
+import javax.media.opengl.GL2ES2;
+import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLAutoDrawable;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -55,13 +59,13 @@ public class JoglContextCapabilities extends ContextCapabilities {
 
         _supportsTextureLodBias = gl.isExtensionAvailable("GL_EXT_texture_lod_bias");
         if (_supportsTextureLodBias) {
-            gl.glGetIntegerv(GL.GL_MAX_TEXTURE_LOD_BIAS_EXT, buf);
+            gl.glGetIntegerv(GL2GL3.GL_MAX_TEXTURE_LOD_BIAS, buf);
             _maxTextureLodBias = buf.get(0);
         } else {
             _maxTextureLodBias = 0f;
         }
 
-        gl.glGetIntegerv(GL.GL_MAX_CLIP_PLANES, buf);
+        gl.glGetIntegerv(GL2ES1.GL_MAX_CLIP_PLANES, buf);
         _maxUserClipPlanes = buf.get(0);
 
         _glslSupported = gl.isExtensionAvailable("GL_ARB_shader_objects")
@@ -70,11 +74,12 @@ public class JoglContextCapabilities extends ContextCapabilities {
 
         _geometryShader4Supported = gl.isExtensionAvailable("GL_ARB_geometry_shader4") && _glslSupported;
 
-        _geometryInstancingSupported = gl.isExtensionAvailable("GL_EXT_draw_instanced")
-                || gl.isExtensionAvailable("GL_VERSION_3_0");
-
+        _geometryInstancingSupported = gl.isExtensionAvailable("GL_EXT_draw_instanced") || gl.isExtensionAvailable("GL_VERSION_3_0");
+        
+        _tessellationShadersSupported = gl.isExtensionAvailable("GL_ARB_tessellation_shader") && _glslSupported;
+        
         if (_glslSupported) {
-            gl.glGetIntegerv(GL.GL_MAX_VERTEX_ATTRIBS_ARB, buf);
+            gl.glGetIntegerv(GL2.GL_MAX_VERTEX_ATTRIBS_ARB, buf);
             _maxGLSLVertexAttribs = buf.get(0);
         }
 
@@ -85,7 +90,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
         _fboSupported = gl.isExtensionAvailable("GL_EXT_framebuffer_object");
         if (_fboSupported) {
             if (gl.isExtensionAvailable("GL_ARB_draw_buffers")) {
-                gl.glGetIntegerv(GL.GL_MAX_COLOR_ATTACHMENTS_EXT, buf);
+                gl.glGetIntegerv(GL2ES2.GL_MAX_COLOR_ATTACHMENTS, buf);
                 _maxFBOColorAttachments = buf.get(0);
             } else {
                 _maxFBOColorAttachments = 1;
@@ -94,7 +99,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
             // Max multisample samples.
             if (gl.isExtensionAvailable("GL_EXT_framebuffer_multisample")
                     && gl.isExtensionAvailable("GL_EXT_framebuffer_blit")) {
-                gl.glGetIntegerv(GL.GL_MAX_SAMPLES_EXT, buf);
+                gl.glGetIntegerv(GL2GL3.GL_MAX_SAMPLES, buf);
                 _maxFBOSamples = buf.get(0);
             } else {
                 _maxFBOSamples = 0;
@@ -107,7 +112,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
         _stencilWrapSupport = gl.isExtensionAvailable("GL_EXT_stencil_wrap");
 
         // number of available auxiliary draw buffers
-        gl.glGetIntegerv(GL.GL_AUX_BUFFERS, buf);
+        gl.glGetIntegerv(GL2.GL_AUX_BUFFERS, buf);
         _numAuxDrawBuffers = buf.get(0);
 
         // max texture size.
@@ -117,11 +122,11 @@ public class JoglContextCapabilities extends ContextCapabilities {
         // Check for support of multitextures.
         _supportsMultiTexture = gl.isExtensionAvailable("GL_ARB_multitexture");
 
-        // Support for texture formats
-        _supportsFloatTextures = gl.isExtensionAvailable("GL_ARB_texture_float");
-        _supportsIntegerTextures = gl.isExtensionAvailable("GL_EXT_texture_integer");
-        _supportsOneTwoComponentTextures = gl.isExtensionAvailable("GL_ARB_texture_rg");
-
+        // Support for texture formats 
+        _supportsFloatTextures = gl.isExtensionAvailable("GL_ARB_texture_float"); 
+        _supportsIntegerTextures = gl.isExtensionAvailable("GL_EXT_texture_integer"); 
+        _supportsOneTwoComponentTextures = gl.isExtensionAvailable("GL_ARB_texture_rg"); 
+        
         // Check for support of fixed function dot3 environment settings
         _supportsEnvDot3 = gl.isExtensionAvailable("GL_ARB_texture_env_dot3");
 
@@ -137,7 +142,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
         // If we do support multitexturing, find out how many textures we
         // can handle.
         if (_supportsMultiTexture) {
-            gl.glGetIntegerv(GL.GL_MAX_TEXTURE_UNITS, buf);
+            gl.glGetIntegerv(GL2ES1.GL_MAX_TEXTURE_UNITS, buf);
             _numFixedTexUnits = buf.get(0);
         } else {
             _numFixedTexUnits = 1;
@@ -147,11 +152,11 @@ public class JoglContextCapabilities extends ContextCapabilities {
         // fragment shaders
         if (gl.isExtensionAvailable("GL_ARB_shader_objects") && gl.isExtensionAvailable("GL_ARB_vertex_shader")
                 && gl.isExtensionAvailable("GL_ARB_fragment_shader")) {
-            gl.glGetIntegerv(GL.GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, buf);
+            gl.glGetIntegerv(GL2ES2.GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, buf);
             _numVertexTexUnits = buf.get(0);
-            gl.glGetIntegerv(GL.GL_MAX_TEXTURE_IMAGE_UNITS_ARB, buf);
+            gl.glGetIntegerv(GL2ES2.GL_MAX_TEXTURE_IMAGE_UNITS, buf);
             _numFragmentTexUnits = buf.get(0);
-            gl.glGetIntegerv(GL.GL_MAX_TEXTURE_COORDS_ARB, buf);
+            gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_COORDS, buf);
             _numFragmentTexCoordUnits = buf.get(0);
         } else {
             // based on nvidia dev doc:
@@ -167,8 +172,8 @@ public class JoglContextCapabilities extends ContextCapabilities {
         }
 
         // Now determine the maximum number of supported texture units
-        _numTotalTexUnits = Math.max(_numFragmentTexCoordUnits,
-                Math.max(_numFixedTexUnits, Math.max(_numFragmentTexUnits, _numVertexTexUnits)));
+        _numTotalTexUnits = Math.max(_numFragmentTexCoordUnits, Math.max(_numFixedTexUnits, Math.max(
+                _numFragmentTexUnits, _numVertexTexUnits)));
 
         // Check for S3 texture compression capability.
         _supportsS3TCCompression = gl.isExtensionAvailable("GL_EXT_texture_compression_s3tc");
@@ -231,7 +236,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
 
         if (_glslSupported) {
             try {
-                _shadingLanguageVersion = gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION);
+                _shadingLanguageVersion = gl.glGetString(GL2ES2.GL_SHADING_LANGUAGE_VERSION);
             } catch (final Exception e) {
                 _shadingLanguageVersion = "Unable to retrieve shading language version.";
             }

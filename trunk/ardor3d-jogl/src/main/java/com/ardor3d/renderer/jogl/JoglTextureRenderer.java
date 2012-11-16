@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2ES2;
+import javax.media.opengl.GL2GL3;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.framework.Scene;
@@ -59,7 +61,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         if (caps.getMaxFBOColorAttachments() > 1) {
             _attachBuffer = BufferUtils.createIntBuffer(caps.getMaxFBOColorAttachments());
             for (int i = 0; i < caps.getMaxFBOColorAttachments(); i++) {
-                _attachBuffer.put(GL.GL_COLOR_ATTACHMENT0_EXT + i);
+                _attachBuffer.put(GL.GL_COLOR_ATTACHMENT0 + i);
             }
         }
     }
@@ -99,7 +101,8 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         final int pixelDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
 
         if (tex.getType() == Type.TwoDimensional) {
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType, null);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
+                    null);
         } else {
             for (final Face face : Face.values()) {
                 gl.glTexImage2D(JoglTextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0,
@@ -109,7 +112,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
         // Initialize mipmapping for this texture, if requested
         if (tex.getMinificationFilter().usesMipMapLevels()) {
-            gl.glGenerateMipmapEXT(JoglTextureStateUtil.getGLType(tex.getType()));
+            gl.glGenerateMipmap(JoglTextureStateUtil.getGLType(tex.getType()));
         }
 
         // Setup filtering and wrap
@@ -197,10 +200,10 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 while (colorsAdded < maxDrawBuffers && !colors.isEmpty()) {
                     final Texture tex = colors.removeFirst();
                     if (tex.getType() == Type.TwoDimensional) {
-                        gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT + colorsAdded,
+                        gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0 + colorsAdded,
                                 GL.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else if (tex.getType() == Type.CubeMap) {
-                        gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT + colorsAdded,
+                        gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0 + colorsAdded,
                                 JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
                                 tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else {
@@ -214,10 +217,10 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = depths.removeFirst();
                     // Set up our depth texture
                     if (tex.getType() == Type.TwoDimensional) {
-                        gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT,
+                        gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
                                 GL.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else if (tex.getType() == Type.CubeMap) {
-                        gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT,
+                        gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
                                 JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
                                 tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else {
@@ -226,13 +229,13 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     _usingDepthRB = false;
                 } else if (!_usingDepthRB) {
                     // setup our default depth render buffer if not already set
-                    gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT,
-                            GL.GL_RENDERBUFFER_EXT, _depthRBID);
+                    gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
+                            GL.GL_RENDERBUFFER, _depthRBID);
                     _usingDepthRB = true;
                 }
 
                 setDrawBuffers(colorsAdded);
-                setReadBuffer(colorsAdded != 0 ? GL.GL_COLOR_ATTACHMENT0_EXT : GL.GL_NONE);
+                setReadBuffer(colorsAdded != 0 ? GL.GL_COLOR_ATTACHMENT0 : GL.GL_NONE);
 
                 // Check FBO complete
                 checkFBOComplete(_fboID);
@@ -253,10 +256,9 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 final Texture tex = texs.get(x);
                 if (tex.getMinificationFilter().usesMipMapLevels()) {
                     JoglTextureStateUtil.doTextureBind(tex, 0, true);
-                    gl.glGenerateMipmapEXT(JoglTextureStateUtil.getGLType(tex.getType()));
+                    gl.glGenerateMipmap(JoglTextureStateUtil.getGLType(tex.getType()));
                 }
             }
-
         } finally {
             ContextManager.getCurrentContext().popFBOTextureRenderer();
         }
@@ -271,15 +273,15 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
         if (tex.getTextureStoreFormat().isDepthFormat()) {
             // No color buffer
-            gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_RENDERBUFFER_EXT,
+            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_RENDERBUFFER,
                     0);
 
             // Setup depth texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
-                gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D,
+                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D,
                         textureId, 0);
             } else if (tex.getType() == Type.CubeMap) {
-                gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT,
+                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
                         JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId, 0);
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
@@ -290,21 +292,21 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         } else {
             // Set color texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
-                gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D,
+                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D,
                         textureId, 0);
             } else if (tex.getType() == Type.CubeMap) {
-                gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT,
+                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0,
                         JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId, 0);
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
             }
 
             // setup depth RB
-            gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_RENDERBUFFER_EXT,
+            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
                     _depthRBID);
 
-            setDrawBuffer(GL.GL_COLOR_ATTACHMENT0_EXT);
-            setReadBuffer(GL.GL_COLOR_ATTACHMENT0_EXT);
+            setDrawBuffer(GL.GL_COLOR_ATTACHMENT0);
+            setReadBuffer(GL.GL_COLOR_ATTACHMENT0);
         }
 
         // Check FBO complete
@@ -314,25 +316,25 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     private void setReadBuffer(final int attachVal) {
         final GL gl = GLU.getCurrentGL();
 
-        gl.glReadBuffer(attachVal);
+        gl.getGL2GL3().glReadBuffer(attachVal);
     }
 
     private void setDrawBuffer(final int attachVal) {
         final GL gl = GLU.getCurrentGL();
 
-        gl.glDrawBuffer(attachVal);
+        gl.getGL2GL3().glDrawBuffer(attachVal);
     }
 
     private void setDrawBuffers(final int maxEntry) {
         final GL gl = GLU.getCurrentGL();
 
         if (maxEntry <= 1) {
-            setDrawBuffer(maxEntry != 0 ? GL.GL_COLOR_ATTACHMENT0_EXT : GL.GL_NONE);
+            setDrawBuffer(maxEntry != 0 ? GL.GL_COLOR_ATTACHMENT0 : GL.GL_NONE);
         } else {
             // We should only get to this point if we support ARBDrawBuffers.
             _attachBuffer.clear();
             _attachBuffer.limit(maxEntry);
-            gl.glDrawBuffersARB(_attachBuffer.limit(), _attachBuffer); // TODO Check <size>
+            gl.getGL2GL3().glDrawBuffers(_attachBuffer.limit(), _attachBuffer); // TODO Check <size>
         }
     }
 
@@ -343,7 +345,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
             JoglTextureStateUtil.doTextureBind(tex, 0, true);
-            gl.glGenerateMipmapEXT(JoglTextureStateUtil.getGLType(tex.getType()));
+            gl.glGenerateMipmap(JoglTextureStateUtil.getGLType(tex.getType()));
         }
     }
 
@@ -351,21 +353,21 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     protected void setMSFBO() {
         final GL gl = GLU.getCurrentGL();
 
-        gl.glBindFramebufferEXT(GL.GL_DRAW_FRAMEBUFFER_EXT, _msfboID);
+        gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, _msfboID);
     }
 
     @Override
     protected void blitMSFBO() {
         final GL gl = GLU.getCurrentGL();
 
-        gl.glBindFramebufferEXT(GL.GL_READ_FRAMEBUFFER_EXT, _msfboID);
-        gl.glBindFramebufferEXT(GL.GL_DRAW_FRAMEBUFFER_EXT, _fboID);
-        gl.glBlitFramebufferEXT(0, 0, _width, _height, 0, 0, _width, _height, GL.GL_COLOR_BUFFER_BIT
+        gl.glBindFramebuffer(GL2GL3.GL_READ_FRAMEBUFFER, _msfboID);
+        gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, _fboID);
+        gl.getGL2GL3().glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL.GL_COLOR_BUFFER_BIT
                 | GL.GL_DEPTH_BUFFER_BIT, GL.GL_NEAREST);
 
-        gl.glBindFramebufferEXT(GL.GL_READ_FRAMEBUFFER_EXT, 0);
-        gl.glBindFramebufferEXT(GL.GL_DRAW_FRAMEBUFFER_EXT, 0);
-        gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, 0);
+        gl.glBindFramebuffer(GL2GL3.GL_READ_FRAMEBUFFER, 0);
+        gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, 0);
+        gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
     }
 
     /**
@@ -377,32 +379,32 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     public static void checkFBOComplete(final int fboID) {
         final GL gl = GLU.getCurrentGL();
 
-        final int status = gl.glCheckFramebufferStatusEXT(GL.GL_FRAMEBUFFER_EXT);
+        final int status = gl.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER);
         switch (status) {
-            case GL.GL_FRAMEBUFFER_COMPLETE_EXT:
+            case GL.GL_FRAMEBUFFER_COMPLETE:
                 break;
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+            case GL.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+            case GL.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            case GL.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+            case GL2GL3.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            case GL.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+            case GL2GL3.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
-            case GL.GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+            case GL.GL_FRAMEBUFFER_UNSUPPORTED:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
-            case GL.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT:
+            case GL2GL3.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT exception.");
             default:
@@ -443,67 +445,67 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             final IntBuffer buffer = BufferUtils.createIntBuffer(1);
 
             // Create our texture binding FBO
-            gl.glGenFramebuffersEXT(1, buffer); // generate id
+            gl.glGenFramebuffers(1, buffer); // generate id
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
-            gl.glGenRenderbuffersEXT(1, buffer); // generate id
+            gl.glGenRenderbuffers(1, buffer); // generate id
             _depthRBID = buffer.get(0);
-            gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, _depthRBID);
-            int format = GL.GL_DEPTH_COMPONENT;
+            gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _depthRBID);
+            int format = GL2ES2.GL_DEPTH_COMPONENT;
             if (_supportsDepthTexture && _depthBits > 0) {
                 switch (_depthBits) {
                     case 16:
-                        format = GL.GL_DEPTH_COMPONENT16_ARB;
+                        format = GL.GL_DEPTH_COMPONENT16;
                         break;
                     case 24:
-                        format = GL.GL_DEPTH_COMPONENT24_ARB;
+                        format = GL.GL_DEPTH_COMPONENT24;
                         break;
                     case 32:
-                        format = GL.GL_DEPTH_COMPONENT32_ARB;
+                        format = GL.GL_DEPTH_COMPONENT32;
                         break;
                     default:
                         // stick with the "undefined" GL_DEPTH_COMPONENT
                 }
             }
-            gl.glRenderbufferStorageEXT(GL.GL_RENDERBUFFER_EXT, format, _width, _height);
+            gl.glRenderbufferStorage(GL.GL_RENDERBUFFER, format, _width, _height);
 
             // unbind...
-            gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, 0);
-            gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, 0);
+            gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, 0);
+            gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
 
             // If we support it, rustle up a multisample framebuffer + renderbuffers
             if (_samples != 0 && _supportsMultisample) {
                 // create ms framebuffer object
-                gl.glGenFramebuffersEXT(1, buffer);
+                gl.glGenFramebuffers(1, buffer);
                 _msfboID = buffer.get(0);
 
                 // create ms renderbuffers
-                gl.glGenRenderbuffersEXT(1, buffer); // generate id
+                gl.glGenRenderbuffers(1, buffer); // generate id
                 _mscolorRBID = buffer.get(0);
-                gl.glGenRenderbuffersEXT(1, buffer); // generate id
+                gl.glGenRenderbuffers(1, buffer); // generate id
                 _msdepthRBID = buffer.get(0);
 
                 // set up renderbuffer properties
-                gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, _mscolorRBID);
-                gl.glRenderbufferStorageMultisampleEXT(GL.GL_RENDERBUFFER_EXT, _samples, GL.GL_RGBA, _width, _height);
+                gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _mscolorRBID);
+                gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, GL.GL_RGBA, _width, _height);
 
-                gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, _msdepthRBID);
-                gl.glRenderbufferStorageMultisampleEXT(GL.GL_RENDERBUFFER_EXT, _samples, format, _width, _height);
+                gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _msdepthRBID);
+                gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, format, _width, _height);
 
-                gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, 0);
+                gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, 0);
 
-                gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, _msfboID);
-                gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT,
-                        GL.GL_RENDERBUFFER_EXT, _mscolorRBID);
-                gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT,
-                        GL.GL_RENDERBUFFER_EXT, _msdepthRBID);
+                gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, _msfboID);
+                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0,
+                        GL.GL_RENDERBUFFER, _mscolorRBID);
+                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
+                        GL.GL_RENDERBUFFER, _msdepthRBID);
 
                 // check for errors
                 checkFBOComplete(_msfboID);
 
                 // release
-                gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, 0);
+                gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
             }
 
         }
@@ -524,7 +526,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
             gl.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                     _backgroundColor.getAlpha());
-            gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, _fboID);
+            gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, _fboID);
             ContextManager.getCurrentContext().pushEnforcedStates();
             ContextManager.getCurrentContext().clearEnforcedStates();
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);
@@ -539,7 +541,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         if (_active == 1) {
             final ReadOnlyColorRGBA bgColor = _parentRenderer.getBackgroundColor();
             gl.glClearColor(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), bgColor.getAlpha());
-            gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, 0);
+            gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
             ContextManager.getCurrentContext().popEnforcedStates();
 
             if (_neededClip) {
@@ -556,14 +558,14 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_fboID);
             id.rewind();
-            gl.glDeleteFramebuffersEXT(id.limit(), id);
+            gl.glDeleteFramebuffers(id.limit(), id);
         }
 
         if (_depthRBID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_depthRBID);
             id.rewind();
-            gl.glDeleteRenderbuffersEXT(id.limit(), id);
+            gl.glDeleteRenderbuffers(id.limit(), id);
         }
     }
 }
