@@ -358,14 +358,14 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         example._settings = settings;
 
         // get our framework
-        if ("LWJGL".equalsIgnoreCase(prefs.getRenderer())) {
+        if (prefs.getRenderer().startsWith("LWJGL")) {
             final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
             example._canvas = new LwjglCanvas(settings, canvasRenderer);
             example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
                     new LwjglControllerWrapper(), (LwjglCanvas) example._canvas);
             example._mouseManager = new LwjglMouseManager();
             TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
-        } else if ("JOGL".equalsIgnoreCase(prefs.getRenderer())) {
+        } else if (prefs.getRenderer().startsWith("JOGL")) {
             final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
             example._canvas = new JoglCanvas(canvasRenderer, settings);
             final JoglCanvas canvas = (JoglCanvas) example._canvas;

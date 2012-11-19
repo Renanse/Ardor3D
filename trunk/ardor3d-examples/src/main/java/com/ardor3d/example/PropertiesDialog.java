@@ -429,8 +429,15 @@ public final class PropertiesDialog extends JDialog {
      * @return the list of renderers.
      */
     private JComboBox setUpRendererChooser() {
-        final JComboBox nameBox = new JComboBox(new String[] { "LWJGL", "JOGL" });
-        nameBox.setSelectedItem(source.getRenderer());
+        final JComboBox nameBox = new JComboBox(new String[] { "LWJGL 2.8.4", "JOGL 2.0rc11" });
+        final String old = source.getRenderer();
+        if (old != null) {
+            if (old.startsWith("LWJGL")) {
+                nameBox.setSelectedIndex(0);
+            } else if (old.startsWith("JOGL")) {
+                nameBox.setSelectedIndex(1);
+            }
+        }
         return nameBox;
     }
 
@@ -624,9 +631,9 @@ public final class PropertiesDialog extends JDialog {
         }
 
         public void run() {
-            if ("LWJGL".equals(renderer)) {
+            if (renderer.startsWith("LWJGL")) {
                 // TODO: can we implement this?
-            } else if ("JOGL".equals(renderer)) {
+            } else if (renderer.startsWith("JOGL")) {
                 // TODO: can we implement this?
             }
             ready = true;
