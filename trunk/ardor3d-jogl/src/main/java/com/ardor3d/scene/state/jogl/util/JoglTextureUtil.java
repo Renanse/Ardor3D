@@ -18,7 +18,6 @@ import javax.media.opengl.GL2GL3;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.CombinerFunctionAlpha;
 import com.ardor3d.image.Texture.CombinerFunctionRGB;
@@ -30,13 +29,14 @@ import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.Texture.DepthTextureMode;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.state.TextureState.CorrectionType;
 
 public abstract class JoglTextureUtil {
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
-            // first some frequently used formats
+        // first some frequently used formats
             case RGBA8:
                 return GL.GL_RGBA8;
             case RGB8:
@@ -47,6 +47,10 @@ public abstract class JoglTextureUtil {
                 return GL2GL3.GL_COMPRESSED_RGBA;
             case CompressedRGB:
                 return GL2GL3.GL_COMPRESSED_RGB;
+            case CompressedRG:
+                return GL2GL3.GL_COMPRESSED_RG;
+            case CompressedRed:
+                return GL2GL3.GL_COMPRESSED_RED;
             case CompressedLuminance:
                 return GL2.GL_COMPRESSED_LUMINANCE;
             case CompressedLuminanceAlpha:
@@ -157,56 +161,48 @@ public abstract class JoglTextureUtil {
                 return GL2.GL_INTENSITY16F;
             case Intensity32F:
                 return GL2.GL_INTENSITY32F;
-            case CompressedRG:
-            	break;
-            case CompressedRed:
-            	break;
-            case GuessCompressedFormat:
-            	break;
-            case GuessNoCompressedFormat:
-            	break;
-            case R16:
-            	break;
-            case R16F:
-            	break;
-            case R16I:
-            	break;
-            case R16UI:
-            	break;
-            case R32F:
-            	break;
-            case R32I:
-            	break;
-            case R32UI:
-            	break;
             case R8:
-            	break;
-            case R8I:
-            	break;
-            case R8UI:
-            	break;
-            case RG16:
-            	break;
-            case RG16F:
-            	break;
-            case RG16I:
-            	break;
-            case RG16UI:
-            	break;
-            case RG32F:
-            	break;
-            case RG32I:
-            	break;
-            case RG32UI:
-            	break;
+                return GL2ES2.GL_R8;
+            case R16:
+                return GL2GL3.GL_R16;
             case RG8:
-            	break;
+                return GL2ES2.GL_RG8;
+            case RG16:
+                return GL2GL3.GL_RG16;
+            case R16F:
+                return GL2ES2.GL_R16F;
+            case R32F:
+                return GL2GL3.GL_R32F;
+            case RG16F:
+                return GL2ES2.GL_RG16F;
+            case RG32F:
+                return GL2GL3.GL_RG32F;
+            case R8I:
+                return GL2GL3.GL_R8I;
+            case R8UI:
+                return GL2GL3.GL_R8UI;
+            case R16I:
+                return GL2GL3.GL_R16I;
+            case R16UI:
+                return GL2GL3.GL_R16UI;
+            case R32I:
+                return GL2GL3.GL_R32I;
+            case R32UI:
+                return GL2GL3.GL_R32UI;
             case RG8I:
-            	break;
+                return GL2GL3.GL_RG8I;
             case RG8UI:
-            	break;
+                return GL2GL3.GL_RG8UI;
+            case RG16I:
+                return GL2GL3.GL_RG16I;
+            case RG16UI:
+                return GL2GL3.GL_RG16UI;
+            case RG32I:
+                return GL2GL3.GL_RG32I;
+            case RG32UI:
+                return GL2GL3.GL_RG32UI;
             default:
-            	break;
+                break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -253,7 +249,7 @@ public abstract class JoglTextureUtil {
             case BGR:
                 return GL2GL3.GL_BGR;
             case BGRA:
-                return GL2.GL_BGRA;
+                return GL.GL_BGRA;
             case Red:
                 return GL2ES2.GL_RED;
             case Blue:
@@ -264,22 +260,22 @@ public abstract class JoglTextureUtil {
                 return GL2.GL_COLOR_INDEX;
             case StencilIndex:
                 return GL2ES2.GL_STENCIL_INDEX;
-		    case PrecompressedDXT1:
-			    break;
-		    case PrecompressedDXT1A:
-			    break;
-		    case PrecompressedDXT3:
-			    break;
-		    case PrecompressedDXT5:
-			    break;
-		    case PrecompressedLATC_L:
-			    break;
-		    case PrecompressedLATC_LA:
-			    break;
-		    case RG:
-			    break;
-		    default:
-			    break;
+            case PrecompressedDXT1:
+                break;
+            case PrecompressedDXT1A:
+                break;
+            case PrecompressedDXT3:
+                break;
+            case PrecompressedDXT5:
+                break;
+            case PrecompressedLATC_L:
+                break;
+            case PrecompressedLATC_LA:
+                break;
+            case RG:
+                break;
+            default:
+                break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -352,56 +348,32 @@ public abstract class JoglTextureUtil {
             case Depth32:
             case Depth32F:
                 return GL2ES2.GL_DEPTH_COMPONENT;
-            case CompressedRG:
-            	break;
-            case CompressedRed:
-            	break;
-            case GuessCompressedFormat:
-            	break;
-            case GuessNoCompressedFormat:
-            	break;
-            case R16:
-            	break;
-            case R16F:
-            	break;
-            case R16I:
-            	break;
-            case R16UI:
-            	break;
-            case R32F:
-            	break;
-            case R32I:
-            	break;
-            case R32UI:
-            	break;
             case R8:
-            	break;
+            case R16:
+            case R16F:
+            case R32F:
             case R8I:
-            	break;
             case R8UI:
-            	break;
-            case RG16:
-            	break;
-            case RG16F:
-            	break;
-            case RG16I:
-            	break;
-            case RG16UI:
-            	break;
-            case RG32F:
-            	break;
-            case RG32I:
-            	break;
-            case RG32UI:
-            	break;
+            case R16I:
+            case R16UI:
+            case R32I:
+            case R32UI:
+            case CompressedRed:
+                return GL2ES2.GL_RED;
             case RG8:
-            	break;
+            case RG16:
+            case RG16F:
+            case RG32F:
             case RG8I:
-            	break;
             case RG8UI:
-            	break;
+            case RG16I:
+            case RG16UI:
+            case RG32I:
+            case RG32UI:
+            case CompressedRG:
+                return GL2ES2.GL_RG;
             default:
-            	break;
+                break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }

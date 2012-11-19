@@ -211,6 +211,8 @@ public abstract class LwjglTextureUtil {
                 return ARBTextureRg.GL_RG32I;
             case RG32UI:
                 return ARBTextureRg.GL_RG32UI;
+            default:
+                break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -294,6 +296,8 @@ public abstract class LwjglTextureUtil {
                 return GL11.GL_COLOR_INDEX;
             case StencilIndex:
                 return GL11.GL_STENCIL_INDEX;
+            default:
+                break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
@@ -390,6 +394,8 @@ public abstract class LwjglTextureUtil {
             case RG32UI:
             case CompressedRG:
                 return ARBTextureRg.GL_RG;
+            default:
+                break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }

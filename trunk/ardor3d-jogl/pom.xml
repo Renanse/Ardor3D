@@ -23,32 +23,30 @@
         </plugins>
     </build>
     <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ardor3d-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jogamp.gluegen</groupId>
-      <artifactId>gluegen-rt-main</artifactId>
-      <version>2.0-rc11</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jogamp.jogl</groupId>
-      <artifactId>jogl-all-main</artifactId>
-      <version>2.0-rc11</version>
-    </dependency>
-    <!-- 
-    <dependency>
-      <groupId>org.jogamp.joal</groupId>
-      <artifactId>joal-main</artifactId>
-      <version>2.0-rc11</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jogamp.jocl</groupId>
-      <artifactId>jocl-main</artifactId>
-      <version>2.0-rc11</version>
-    </dependency> -->
-  </dependencies>
+	    <dependency>
+	      <groupId>${project.groupId}</groupId>
+	      <artifactId>ardor3d-core</artifactId>
+	      <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.jogamp.gluegen</groupId>
+	      <artifactId>gluegen-rt-main</artifactId>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.jogamp.jogl</groupId>
+	      <artifactId>jogl-all-main</artifactId>
+	    </dependency>
+	    <!-- 
+	    <dependency>
+	      <groupId>org.jogamp.joal</groupId>
+	      <artifactId>joal-main</artifactId>
+	      <version>2.0-rc11</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.jogamp.jocl</groupId>
+	      <artifactId>jocl-main</artifactId>
+	      <version>2.0-rc11</version>
+	    </dependency> -->
+	</dependencies>
 </project>
 

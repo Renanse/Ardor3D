@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBGeometryShader4;
 import org.lwjgl.opengl.ARBShaderObjects;
+import org.lwjgl.opengl.ARBTessellationShader;
 import org.lwjgl.opengl.ARBVertexProgram;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
@@ -124,6 +125,61 @@ public abstract class LwjglShaderObjectsStateUtil {
             }
         }
 
+        if (caps.isTessellationShadersSupported()) {
+            if (state.getTessellationControlShader() != null) {
+                if (state._tessellationControlShaderID != -1) {
+                    removeTessControlShader(state);
+                }
+
+                state._tessellationControlShaderID = ARBShaderObjects
+                        .glCreateShaderObjectARB(ARBTessellationShader.GL_TESS_CONTROL_SHADER);
+
+                // Create the sources
+                ARBShaderObjects.glShaderSourceARB(state._tessellationControlShaderID,
+                        state.getTessellationControlShader());
+
+                // Compile the tessellation control shader
+                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                ARBShaderObjects.glCompileShaderARB(state._tessellationControlShaderID);
+                ARBShaderObjects.glGetObjectParameterARB(state._tessellationControlShaderID,
+                        ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                checkProgramError(compiled, state._tessellationControlShaderID, state._tessellationControlShaderName);
+
+                // Attach the program
+                ARBShaderObjects.glAttachObjectARB(state._programID, state._tessellationControlShaderID);
+            } else if (state._tessellationControlShaderID != -1) {
+                removeTessControlShader(state);
+                state._tessellationControlShaderID = -1;
+            }
+
+            if (state.getTessellationEvaluationShader() != null) {
+                if (state._tessellationEvaluationShaderID != -1) {
+                    removeTessEvalShader(state);
+                }
+
+                state._tessellationEvaluationShaderID = ARBShaderObjects
+                        .glCreateShaderObjectARB(ARBTessellationShader.GL_TESS_CONTROL_SHADER);
+
+                // Create the sources
+                ARBShaderObjects.glShaderSourceARB(state._tessellationEvaluationShaderID,
+                        state.getTessellationEvaluationShader());
+
+                // Compile the tessellation control shader
+                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                ARBShaderObjects.glCompileShaderARB(state._tessellationEvaluationShaderID);
+                ARBShaderObjects.glGetObjectParameterARB(state._tessellationEvaluationShaderID,
+                        ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                checkProgramError(compiled, state._tessellationEvaluationShaderID,
+                        state._tessellationEvaluationShaderName);
+
+                // Attach the program
+                ARBShaderObjects.glAttachObjectARB(state._programID, state._tessellationEvaluationShaderID);
+            } else if (state._tessellationEvaluationShaderID != -1) {
+                removeTessEvalShader(state);
+                state._tessellationEvaluationShaderID = -1;
+            }
+        }
+
         ARBShaderObjects.glLinkProgramARB(state._programID);
         checkLinkError(state._programID);
         state.setNeedsRefresh(true);
@@ -176,6 +232,22 @@ public abstract class LwjglShaderObjectsStateUtil {
         if (state._vertexShaderID != -1) {
             ARBShaderObjects.glDetachObjectARB(state._programID, state._vertexShaderID);
             ARBShaderObjects.glDeleteObjectARB(state._vertexShaderID);
+        }
+    }
+
+    /** Removes the tessellation control shader */
+    private static void removeTessControlShader(final GLSLShaderObjectsState state) {
+        if (state._tessellationControlShaderID != -1) {
+            ARBShaderObjects.glDetachObjectARB(state._programID, state._tessellationControlShaderID);
+            ARBShaderObjects.glDeleteObjectARB(state._tessellationControlShaderID);
+        }
+    }
+
+    /** Removes the tessellation evaluation shader */
+    private static void removeTessEvalShader(final GLSLShaderObjectsState state) {
+        if (state._tessellationEvaluationShaderID != -1) {
+            ARBShaderObjects.glDetachObjectARB(state._programID, state._tessellationEvaluationShaderID);
+            ARBShaderObjects.glDeleteObjectARB(state._tessellationEvaluationShaderID);
         }
     }
 
