@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.framework.jogl;
 
 import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLProfile;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.util.Ardor3dException;
@@ -30,7 +31,7 @@ public class CapsUtil {
             throw new Ardor3dException("Invalid pixel depth: " + settings.getColorDepth());
         }
 
-        final GLCapabilities caps = new GLCapabilities();
+        final GLCapabilities caps = new GLCapabilities(GLProfile.getMaxFixedFunc(true));
         caps.setHardwareAccelerated(true);
         caps.setDoubleBuffered(true);
         caps.setAlphaBits(settings.getAlphaBits());

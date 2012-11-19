@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2GL3;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextManager;
@@ -33,18 +34,18 @@ public abstract class JoglWireframeStateUtil {
 
             switch (state.getFace()) {
                 case Front:
-                    applyPolyMode(GL.GL_LINE, GL.GL_FILL, record);
+                    applyPolyMode(GL2GL3.GL_LINE, GL2GL3.GL_FILL, record);
                     break;
                 case Back:
-                    applyPolyMode(GL.GL_FILL, GL.GL_LINE, record);
+                    applyPolyMode(GL2GL3.GL_FILL, GL2GL3.GL_LINE, record);
                     break;
                 case FrontAndBack:
                 default:
-                    applyPolyMode(GL.GL_LINE, GL.GL_LINE, record);
+                    applyPolyMode(GL2GL3.GL_LINE, GL2GL3.GL_LINE, record);
                     break;
             }
         } else {
-            applyPolyMode(GL.GL_FILL, GL.GL_FILL, record);
+            applyPolyMode(GL2GL3.GL_FILL, GL2GL3.GL_FILL, record);
         }
 
         if (!record.isValid()) {
@@ -57,26 +58,26 @@ public abstract class JoglWireframeStateUtil {
 
         if (record.isValid()) {
             if (frontMode == backMode && (record.frontMode != frontMode || record.backMode != backMode)) {
-                gl.glPolygonMode(GL.GL_FRONT_AND_BACK, frontMode);
+                gl.getGL2GL3().glPolygonMode(GL.GL_FRONT_AND_BACK, frontMode);
                 record.frontMode = frontMode;
                 record.backMode = backMode;
             } else if (frontMode != backMode) {
                 if (record.frontMode != frontMode) {
-                    gl.glPolygonMode(GL.GL_FRONT, frontMode);
+                    gl.getGL2GL3().glPolygonMode(GL.GL_FRONT, frontMode);
                     record.frontMode = frontMode;
                 }
                 if (record.backMode != backMode) {
-                    gl.glPolygonMode(GL.GL_BACK, backMode);
+                    gl.getGL2GL3().glPolygonMode(GL.GL_BACK, backMode);
                     record.backMode = backMode;
                 }
             }
 
         } else {
             if (frontMode == backMode) {
-                gl.glPolygonMode(GL.GL_FRONT_AND_BACK, frontMode);
+                gl.getGL2GL3().glPolygonMode(GL.GL_FRONT_AND_BACK, frontMode);
             } else if (frontMode != backMode) {
-                gl.glPolygonMode(GL.GL_FRONT, frontMode);
-                gl.glPolygonMode(GL.GL_BACK, backMode);
+                gl.getGL2GL3().glPolygonMode(GL.GL_FRONT, frontMode);
+                gl.getGL2GL3().glPolygonMode(GL.GL_BACK, backMode);
             }
             record.frontMode = frontMode;
             record.backMode = backMode;

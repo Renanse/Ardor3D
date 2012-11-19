@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -25,7 +25,7 @@ public abstract class JoglRendererUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (!rendRecord.isMatrixValid() || rendRecord.getMatrixMode() != mode) {
-            gl.glMatrixMode(mode);
+            gl.getGL2().glMatrixMode(mode);
             rendRecord.setMatrixMode(mode);
             rendRecord.setMatrixValid(true);
         }
@@ -35,7 +35,7 @@ public abstract class JoglRendererUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (!rendRecord.isVboValid() || rendRecord.getCurrentVboId() != id) {
-            gl.glBindBufferARB(GL.GL_ARRAY_BUFFER_ARB, id);
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, id);
             rendRecord.setCurrentVboId(id);
             rendRecord.setVboValid(true);
         }
@@ -45,7 +45,7 @@ public abstract class JoglRendererUtil {
         final GL gl = GLU.getCurrentGL();
 
         if (!rendRecord.isElementVboValid() || rendRecord.getCurrentElementVboId() != id) {
-            gl.glBindBufferARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, id);
+            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, id);
             rendRecord.setCurrentElementVboId(id);
             rendRecord.setElementVboValid(true);
         }

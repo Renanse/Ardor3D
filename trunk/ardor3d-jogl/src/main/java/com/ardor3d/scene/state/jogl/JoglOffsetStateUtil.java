@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2GL3;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextManager;
@@ -81,9 +82,9 @@ public abstract class JoglOffsetStateUtil {
             case Fill:
                 return GL.GL_POLYGON_OFFSET_FILL;
             case Line:
-                return GL.GL_POLYGON_OFFSET_LINE;
+                return GL2GL3.GL_POLYGON_OFFSET_LINE;
             case Point:
-                return GL.GL_POLYGON_OFFSET_POINT;
+                return GL2GL3.GL_POLYGON_OFFSET_POINT;
         }
         throw new IllegalArgumentException("invalid type: " + type);
     }

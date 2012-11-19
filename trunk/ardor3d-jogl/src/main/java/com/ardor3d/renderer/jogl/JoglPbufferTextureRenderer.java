@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -20,6 +20,7 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLPbuffer;
+import javax.media.opengl.GLProfile;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.framework.DisplaySettings;
@@ -98,8 +99,8 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         // Initialize our texture with some default data.
         final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
         final int dataFormat = JoglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
-        final int pixelDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
-
+        final int pixelDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType()); 
+     	
         gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType, null);
 
         // Setup filtering and wrap
@@ -261,8 +262,8 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             }
 
             // Make our GLPbuffer...
-            final GLDrawableFactory fac = GLDrawableFactory.getFactory();
-            final GLCapabilities caps = new GLCapabilities();
+            final GLDrawableFactory fac = GLDrawableFactory.getFactory(GLProfile.getMaxFixedFunc(true));
+            final GLCapabilities caps = new GLCapabilities(GLProfile.getMaxFixedFunc(true));
             caps.setHardwareAccelerated(true);
             caps.setDoubleBuffered(true);
             caps.setAlphaBits(_settings.getAlphaBits());
@@ -271,7 +272,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             caps.setSampleBuffers(_settings.getSamples() != 0);
             caps.setStencilBits(_settings.getStencilBits());
             caps.setDoubleBuffered(false);
-            _pbuffer = fac.createGLPbuffer(caps, null, _width, _height, _parentContext);
+            _pbuffer = fac.createGLPbuffer(null, caps, null, _width, _height, _parentContext);
             _context = _pbuffer.getContext();
 
             _context.makeCurrent();

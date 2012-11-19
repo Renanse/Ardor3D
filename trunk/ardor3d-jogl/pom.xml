@@ -29,23 +29,26 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.java.dev.jogl</groupId>
-      <artifactId>jogl</artifactId>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>2.0-rc11</version>
     </dependency>
-    <!--
-     NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
-     and since it is at the moment more work than it is worth to get it ready. Later on, when
-     we have solved some more fundamental problems, it is probably time to revisit this.
-    -->
-
-    <!-- dependency>
-      <groupId>net.java.dev.jogl</groupId>
-      <artifactId>jogl-natives</artifactId>
-    </dependency -->
     <dependency>
-      <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
-      <artifactId>gluegen-rt</artifactId>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-main</artifactId>
+      <version>2.0-rc11</version>
     </dependency>
+    <!-- 
+    <dependency>
+      <groupId>org.jogamp.joal</groupId>
+      <artifactId>joal-main</artifactId>
+      <version>2.0-rc11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.jocl</groupId>
+      <artifactId>jocl-main</artifactId>
+      <version>2.0-rc11</version>
+    </dependency> -->
   </dependencies>
 </project>
 

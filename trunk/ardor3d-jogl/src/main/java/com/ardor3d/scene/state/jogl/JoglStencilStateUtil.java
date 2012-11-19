@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -37,14 +38,14 @@ public abstract class JoglStencilStateUtil {
         setEnabled(state.isEnabled(), caps.isTwoSidedStencilSupported() ? state.isUseTwoSided() : false, record, caps);
         if (state.isEnabled()) {
             if (state.isUseTwoSided() && caps.isTwoSidedStencilSupported()) {
-                gl.glActiveStencilFaceEXT(GL.GL_BACK);
+                gl.getGL2().glActiveStencilFaceEXT(GL.GL_BACK);
                 applyMask(state.getStencilWriteMaskBack(), record, 2);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionBack()), state.getStencilReferenceBack(), state
                         .getStencilFuncMaskBack(), record, 2);
                 applyOp(getGLStencilOp(state.getStencilOpFailBack(), caps), getGLStencilOp(state
                         .getStencilOpZFailBack(), caps), getGLStencilOp(state.getStencilOpZPassBack(), caps), record, 2);
 
-                gl.glActiveStencilFaceEXT(GL.GL_FRONT);
+                gl.getGL2().glActiveStencilFaceEXT(GL.GL_FRONT);
                 applyMask(state.getStencilWriteMaskFront(), record, 1);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionFront()), state.getStencilReferenceFront(),
                         state.getStencilFuncMaskFront(), record, 1);
@@ -94,14 +95,14 @@ public abstract class JoglStencilStateUtil {
                 return GL.GL_KEEP;
             case DecrementWrap:
                 if (caps.isStencilWrapSupported()) {
-                    return GL.GL_DECR_WRAP_EXT;
+                    return GL.GL_DECR_WRAP;
                 }
                 // FALLS THROUGH
             case Decrement:
                 return GL.GL_DECR;
             case IncrementWrap:
                 if (caps.isStencilWrapSupported()) {
-                    return GL.GL_INCR_WRAP_EXT;
+                    return GL.GL_INCR_WRAP;
                 }
                 // FALLS THROUGH
             case Increment:
@@ -145,15 +146,15 @@ public abstract class JoglStencilStateUtil {
         if (caps.isTwoSidedStencilSupported()) {
             if (record.isValid()) {
                 if (enable && !record.useTwoSided) {
-                    gl.glEnable(GL.GL_STENCIL_TEST_TWO_SIDE_EXT);
+                    gl.glEnable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
                 } else if (!enable && record.useTwoSided) {
-                    gl.glDisable(GL.GL_STENCIL_TEST_TWO_SIDE_EXT);
+                    gl.glDisable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
                 }
             } else {
                 if (enable) {
-                    gl.glEnable(GL.GL_STENCIL_TEST_TWO_SIDE_EXT);
+                    gl.glEnable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
                 } else {
-                    gl.glDisable(GL.GL_STENCIL_TEST_TWO_SIDE_EXT);
+                    gl.glDisable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
                 }
             }
         }
