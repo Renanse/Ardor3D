@@ -13,6 +13,7 @@ package com.ardor3d.example.pipeline;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -45,6 +46,7 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
 import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
@@ -52,6 +54,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
@@ -62,6 +65,8 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.visitor.Visitor;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.MeshCombiner;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -102,7 +107,16 @@ public class AnimationCopyExample extends ExampleBase {
     @Override
     protected void initExample() {
         _canvas.setTitle("Ardor3D - Animation Copy Example - 100 Skeleton copies");
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.BLACK);
+                return null;
+            }
+        });
 
         // set camera
         final Camera cam = _canvas.getCanvasRenderer().getCamera();

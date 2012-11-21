@@ -12,12 +12,16 @@ package com.ardor3d.example.ui;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.MaterialState;
@@ -29,6 +33,8 @@ import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 
 /**
  * Illustrates how to modify text properties (e.g. font, color, alignment) and display on a canvas.
@@ -48,7 +54,16 @@ public class BMTextExample extends ExampleBase {
     protected void initExample() {
         _canvas.setTitle("BMFont Text Example");
         final ColorRGBA backgroundColor = new ColorRGBA(0.3f, 0.3f, 0.5f, 1);
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(backgroundColor);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(backgroundColor);
+                return null;
+            }
+        });
 
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);

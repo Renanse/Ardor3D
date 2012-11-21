@@ -2,16 +2,20 @@
 package com.ardor3d.example.effect;
 
 import java.nio.FloatBuffer;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.TextureState;
@@ -19,6 +23,8 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Point.PointType;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
@@ -44,15 +50,24 @@ public class PointSpritesExample extends ExampleBase {
     protected void updateExample(final ReadOnlyTimer timer) {
         _pointSpriteShaderState.setUniform("time", (float) timer.getTimeInSeconds());
 
-        rotation.fromAngles(0.0 * timer.getTimeInSeconds(), 0.1 * timer.getTimeInSeconds(), 0.0 * timer
-                .getTimeInSeconds());
+        rotation.fromAngles(0.0 * timer.getTimeInSeconds(), 0.1 * timer.getTimeInSeconds(),
+                0.0 * timer.getTimeInSeconds());
         _pointSprites.setRotation(rotation);
     }
 
     @Override
     protected void initExample() {
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.BLACK);
+                return null;
+            }
+        });
         _canvas.setVSyncEnabled(true);
         _canvas.setTitle("PointSprites");
         cam.setLocation(new Vector3(0, 30, 40));
@@ -106,9 +121,9 @@ public class PointSpritesExample extends ExampleBase {
             vBuf.put((float) x).put((float) (12 - 0.5 * r) * i / _spriteCount).put((float) y);
             final float rnd = (float) Math.random();
             final float rnd2 = rnd * (0.8f - 0.2f * (float) Math.random());
-            cBuf.put((float) (20 - 0.9 * r) / 20 * (rnd + (1 - rnd) * i / _spriteCount)).put(
-                    (float) (20 - 0.9 * r) / 20 * (rnd2 + (1 - rnd2) * i / _spriteCount)).put(
-                    (float) (20 - 0.9 * r) / 20 * (0.2f + 0.2f * i / _spriteCount)).put((float) r);
+            cBuf.put((float) (20 - 0.9 * r) / 20 * (rnd + (1 - rnd) * i / _spriteCount))
+                    .put((float) (20 - 0.9 * r) / 20 * (rnd2 + (1 - rnd2) * i / _spriteCount))
+                    .put((float) (20 - 0.9 * r) / 20 * (0.2f + 0.2f * i / _spriteCount)).put((float) r);
         }
         _pointSprites.getMeshData().setVertexBuffer(vBuf);
         _pointSprites.getMeshData().setColorBuffer(cBuf);

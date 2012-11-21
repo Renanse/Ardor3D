@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -43,17 +44,21 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
 import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
@@ -104,7 +109,16 @@ public class ColladaExample extends ExampleBase {
         final File rootDir = new File(".");
         daeFiles = findFiles(rootDir, ".dae", null);
 
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.GRAY);
+                return null;
+            }
+        });
 
         // Create our options frame and fps label
         createHUD();
