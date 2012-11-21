@@ -10,15 +10,22 @@
 
 package com.ardor3d.example.renderer;
 
+import java.util.concurrent.Callable;
+
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
@@ -88,15 +95,24 @@ public class WireframeGeometryShaderExample extends ExampleBase {
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
-        rotation.fromAngles(0.2 * timer.getTimeInSeconds(), 0.5 * timer.getTimeInSeconds(), 0.8 * timer
-                .getTimeInSeconds());
+        rotation.fromAngles(0.2 * timer.getTimeInSeconds(), 0.5 * timer.getTimeInSeconds(),
+                0.8 * timer.getTimeInSeconds());
         box.setRotation(rotation);
     }
 
     @Override
     protected void initExample() {
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.DARK_GRAY);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.DARK_GRAY);
+                return null;
+            }
+        });
         _canvas.setVSyncEnabled(true);
         _canvas.setTitle("WireframeGeometryShader Test");
         cam.setLocation(new Vector3(0, 0, 50));

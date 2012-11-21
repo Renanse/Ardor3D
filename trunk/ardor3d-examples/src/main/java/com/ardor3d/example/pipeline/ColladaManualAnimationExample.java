@@ -11,6 +11,7 @@
 package com.ardor3d.example.pipeline;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -25,6 +26,7 @@ import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -37,6 +39,7 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Node;
@@ -44,6 +47,8 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
@@ -201,7 +206,16 @@ public class ColladaManualAnimationExample extends ExampleBase {
         ballSphere = new Sphere("Ball", Vector3.ZERO, 32, 32, 0.5);
         _root.attachChild(ballSphere);
 
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.GRAY);
+                return null;
+            }
+        });
 
         final BasicText t1 = BasicText.createDefaultTextLabel("Text1", "[K] Show Skeleton.");
         t1.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
@@ -242,8 +256,8 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
         // Add fps display
         frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
-        frameRateLabel.setTranslation(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getHeight(), 0);
+        frameRateLabel.setTranslation(5,
+                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getHeight(), 0);
         frameRateLabel.setTextColor(ColorRGBA.WHITE);
         frameRateLabel.getSceneHints().setOrthoOrder(-1);
         _root.attachChild(frameRateLabel);
@@ -259,8 +273,8 @@ public class ColladaManualAnimationExample extends ExampleBase {
                 radius = ((BoundingSphere) bounding).getRadius();
             } else if (bounding instanceof BoundingBox) {
                 final BoundingBox boundingBox = (BoundingBox) bounding;
-                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox
-                        .getZExtent());
+                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()),
+                        boundingBox.getZExtent());
             }
 
             final Vector3 vec = new Vector3(center);
@@ -268,10 +282,13 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
             _canvas.getCanvasRenderer().getCamera().setLocation(vec);
             _canvas.getCanvasRenderer().getCamera().lookAt(center, Vector3.UNIT_Y);
-            _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(
-                    50.0,
-                    (float) _canvas.getCanvasRenderer().getCamera().getWidth()
-                            / _canvas.getCanvasRenderer().getCamera().getHeight(), 1.0f, Math.max(radius * 3, 10000.0));
+            _canvas.getCanvasRenderer()
+                    .getCamera()
+                    .setFrustumPerspective(
+                            50.0,
+                            (float) _canvas.getCanvasRenderer().getCamera().getWidth()
+                                    / _canvas.getCanvasRenderer().getCamera().getHeight(), 1.0f,
+                            Math.max(radius * 3, 10000.0));
 
             _controlHandle.setMoveSpeed(radius / 1.0);
         }

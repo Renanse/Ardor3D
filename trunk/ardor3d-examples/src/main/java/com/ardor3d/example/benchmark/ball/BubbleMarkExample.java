@@ -11,6 +11,7 @@
 package com.ardor3d.example.benchmark.ball;
 
 import java.net.URISyntaxException;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.CanvasRenderer;
@@ -27,12 +28,15 @@ import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ContextGarbageCollector;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -182,7 +186,16 @@ public class BubbleMarkExample implements Scene {
 
         // setup scene
         // Add background
-        canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+        final CanvasRenderer canvasRenderer = canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.WHITE);
+                return null;
+            }
+        });
 
         int ballCount = 16;
         if (System.getProperty("balls") != null) {
