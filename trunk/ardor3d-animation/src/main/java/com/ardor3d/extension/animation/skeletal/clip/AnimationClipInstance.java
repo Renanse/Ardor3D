@@ -39,6 +39,8 @@ public class AnimationClipInstance {
     /** The global start time of our clip instance. */
     private double _startTime = 0.0;
 
+    private double _currentTime = 0.0;
+
     /** Map of channel name -> state tracking objects. */
     private final Map<String, Object> _clipStateObjects = Maps.newHashMap();
 
@@ -118,6 +120,14 @@ public class AnimationClipInstance {
         _startTime = startTime;
     }
 
+    public double getCurrentTime() {
+        return _currentTime;
+    }
+
+    public void setCurrentTime(final double duration) {
+        _currentTime = duration;
+    }
+
     public Object getApplyTo(final AbstractAnimationChannel channel) {
         final String channelName = channel.getChannelName();
         Object rVal = _clipStateObjects.get(channelName);
@@ -141,7 +151,7 @@ public class AnimationClipInstance {
         }
 
         for (final AnimationListener animationListener : animationListeners) {
-            animationListener.animationFinished();
+            animationListener.animationFinished(this);
         }
     }
 }

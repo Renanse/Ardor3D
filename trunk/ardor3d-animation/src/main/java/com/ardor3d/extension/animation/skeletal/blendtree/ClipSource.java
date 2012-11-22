@@ -94,6 +94,8 @@ public class ClipSource implements BlendTreeSource {
 
             // update the clip with the correct clip local time.
             _clip.update(clockTime, instance);
+
+            instance.setCurrentTime(clockTime);
         }
         return instance.isActive();
     }

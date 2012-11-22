@@ -18,10 +18,10 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.AnimationListener;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
+import com.ardor3d.extension.animation.skeletal.AnimationManager.AnimationUpdateState;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.SkinnedMeshCombineLogic;
-import com.ardor3d.extension.animation.skeletal.blendtree.ManagedTransformSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
@@ -49,8 +49,6 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
@@ -60,7 +58,6 @@ import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -72,16 +69,15 @@ import com.ardor3d.util.resource.URLResourceSource;
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationCopyExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationCopyExample.jpg", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationStateExample", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationStateExample.jpg", //
 maxHeapMemory = 64)
-public class AnimationCopyExample extends ExampleBase {
+public class AnimationStateExample extends ExampleBase {
 
     private Spatial primeModel;
     private boolean showSkeleton = false, showJointLabels = false;
 
     private UILabel frameRateLabel;
-    private UICheckBox headCheck;
     private UIHud hud;
 
     private int frames = 0;
@@ -90,19 +86,19 @@ public class AnimationCopyExample extends ExampleBase {
     private AnimationManager manager;
     private SkeletonPose pose;
 
-    private UIButton runWalkButton, punchButton;
+    private UIButton runWalkButton, punchButton, playPauseButton, stopButton;
 
     private GLSLShaderObjectsState gpuShader;
 
-    private final Node skNode = new Node("skeletons");
+    private final Node skNode = new Node("model");
 
     public static void main(final String[] args) {
-        ExampleBase.start(AnimationCopyExample.class);
+        ExampleBase.start(AnimationStateExample.class);
     }
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Ardor3D - Animation Copy Example - 100 Skeleton copies");
+        _canvas.setTitle("Ardor3D - Animation State Example");
         _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
 
         // set camera
@@ -179,20 +175,36 @@ public class AnimationCopyExample extends ExampleBase {
         });
         basePanel.add(punchButton);
 
-        headCheck = new UICheckBox("Procedurally turn head");
-        headCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, punchButton, Alignment.BOTTOM_LEFT, 0, -5));
-        headCheck.setSelected(true);
-        headCheck.addActionListener(new ActionListener() {
-
+        playPauseButton = new UIButton("Pause");
+        playPauseButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, punchButton, Alignment.BOTTOM_LEFT, 0,
+                -5));
+        playPauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                manager.getValuesStore().put("head_blend", headCheck.isSelected() ? 1.0 : 0.0);
+                if (playPauseButton.getText().equals("Pause")) {
+                    manager.setAnimationState(AnimationUpdateState.pause);
+                    playPauseButton.setButtonText("Play");
+                } else {
+                    manager.setAnimationState(AnimationUpdateState.play);
+                    playPauseButton.setButtonText("Pause");
+                }
             }
         });
-        basePanel.add(headCheck);
+        basePanel.add(playPauseButton);
+
+        stopButton = new UIButton("Stop");
+        stopButton
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
+        stopButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                manager.setAnimationState(AnimationUpdateState.stop);
+                playPauseButton.setButtonText("Play");
+            }
+        });
+        basePanel.add(stopButton);
 
         final UICheckBox gpuSkinningCheck = new UICheckBox("Use GPU skinning");
-        gpuSkinningCheck
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, headCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        gpuSkinningCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, stopButton, Alignment.BOTTOM_LEFT, 0,
+                -5));
         gpuSkinningCheck.setSelected(false);
         gpuSkinningCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -293,10 +305,10 @@ public class AnimationCopyExample extends ExampleBase {
             gpuShader = new GLSLShaderObjectsState();
             gpuShader.setEnabled(true);
             try {
-                gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationCopyExample.class,
+                gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationStateExample.class,
                         "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
                 gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                        AnimationCopyExample.class,
+                        AnimationStateExample.class,
                         "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
 
                 gpuShader.setUniform("texture", 0);
@@ -373,7 +385,7 @@ public class AnimationCopyExample extends ExampleBase {
         // Load our layer and states from script
         try {
             final ResourceSource layersFile = new URLResourceSource(ResourceLocatorTool.getClassPathResource(
-                    AnimationCopyExample.class, "com/ardor3d/example/pipeline/AnimationCopyExample.js"));
+                    AnimationStateExample.class, "com/ardor3d/example/pipeline/AnimationCopyExample.js"));
             JSLayerImporter.addLayers(layersFile, manager, input);
         } catch (final Exception e) {
             e.printStackTrace();
@@ -381,37 +393,10 @@ public class AnimationCopyExample extends ExampleBase {
 
         // kick things off by setting our starting states
         manager.getBaseAnimationLayer().setCurrentState("walk_anim", true);
-        manager.findAnimationLayer("head").setCurrentState("head_rotate", true);
-
-        // add a head rotator
-        final int headJoint = pose.getSkeleton().findJointByName("Bip01_Head");
-        final ManagedTransformSource headSource = (ManagedTransformSource) manager.findAnimationLayer("head")
-                .getSteadyState("head_rotate").getSourceTree();
-        _root.addController(new SpatialController<Node>() {
-            private final Quaternion headRotation = new Quaternion();
-
-            public void update(final double time, final Node caller) {
-                // update the head's position
-                if (headCheck != null && headCheck.isSelected()) {
-                    double angle = _timer.getTimeInSeconds();
-                    // range 0 to 180 degrees
-                    angle %= MathUtils.PI;
-                    // range -90 to 90 degrees
-                    angle -= MathUtils.HALF_PI;
-                    // range is now 0 to 90 degrees, reflected
-                    angle = Math.abs(angle);
-                    // range is now -45 to 45 degrees
-                    angle -= MathUtils.HALF_PI / 2.0;
-
-                    headRotation.fromAngleAxis(angle, Vector3.UNIT_X);
-                    headSource.setJointRotation(headJoint, headRotation);
-                }
-            }
-        });
 
         // add callback for our UI
         manager.findClipInstance("skeleton.punch").addAnimationListener(new AnimationListener() {
-            public void animationFinished(final AnimationClipInstance instance) {
+            public void animationFinished(final AnimationClipInstance source) {
                 punchButton.setEnabled(true);
             }
         });
