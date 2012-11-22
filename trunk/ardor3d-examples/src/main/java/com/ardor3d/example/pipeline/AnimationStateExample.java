@@ -24,6 +24,7 @@ import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.SkinnedMeshCombineLogic;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
 import com.ardor3d.extension.animation.skeletal.state.loader.InputStore;
 import com.ardor3d.extension.animation.skeletal.state.loader.JSLayerImporter;
 import com.ardor3d.extension.animation.skeletal.util.MissingCallback;
@@ -395,7 +396,7 @@ public class AnimationStateExample extends ExampleBase {
 
         // add callback for our UI
         manager.findClipInstance("skeleton.punch").addAnimationListener(new AnimationListener() {
-            public void animationFinished() {
+            public void animationFinished(final AnimationClipInstance source) {
                 punchButton.setEnabled(true);
             }
         });
