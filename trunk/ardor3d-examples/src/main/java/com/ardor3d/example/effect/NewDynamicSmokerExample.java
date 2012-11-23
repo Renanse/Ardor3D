@@ -11,6 +11,7 @@
 package com.ardor3d.example.effect;
 
 import java.util.EnumSet;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -30,6 +31,7 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
@@ -47,6 +49,7 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
@@ -55,6 +58,8 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Arrow;
 import com.ardor3d.scenegraph.shape.Disk;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
@@ -87,7 +92,16 @@ public class NewDynamicSmokerExample extends ExampleBase {
     @Override
     protected void initExample() {
         _canvas.setTitle("Smoking Rocket");
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.BLUE);
+        final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
+        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        final Renderer renderer = canvasRenderer.getRenderer();
+        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                renderer.setBackgroundColor(ColorRGBA.BLUE);
+                return null;
+            }
+        });
 
         // set our camera at a fixed position
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
