@@ -245,9 +245,8 @@ public class AnimationManager {
         }
 
         // update animationState
-        if (!updateLayersForAnimationState(globalTime)) {
-            return;
-        }
+		updateLayersForAnimationState(globalTime);
+
 
         // move the time forward on the layers
         for (int i = 0; i < _layers.size(); ++i) {
@@ -284,33 +283,25 @@ public class AnimationManager {
      *            current global time in seconds
      * @return
      */
-    protected boolean updateLayersForAnimationState(final double globalTime) {
-        boolean canUpdate = false;
+    protected void updateLayersForAnimationState(final double globalTime) {
+        
         final Collection<AnimationClipInstance> clipInstances = _clipInstances.values();
-        if (clipInstances.isEmpty()) {
-            return _currentAnimationState == AnimationUpdateState.play ? true : false;
-        }
         for (final AnimationClipInstance instance : clipInstances) {
             switch (_currentAnimationState) {
                 case stop:
                     instance.setActive(false);
-                    canUpdate = true;
                     break;
                 case pause:
                     if (instance.isActive()) {
                         final double startTime = globalTime - instance.getCurrentTime() / instance.getTimeScale();
                         instance.setStartTime(startTime);
                     }
-                    canUpdate = true;
                     break;
                 case play:
                     instance.setActive(true);
-                    // do nothing
-                    canUpdate = true;
                     break;
             }
         }
-        return canUpdate;
     }
 
     /**
