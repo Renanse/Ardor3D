@@ -85,6 +85,11 @@ public class AnimationManager {
     protected AnimationUpdateState _currentAnimationState = AnimationUpdateState.Play;
 
     /**
+     * boolean threshold to allow stop state to be updated one last time...
+     */
+    private boolean _canSetStopState = false;
+
+    /**
      * Listeners for changes to this manager's AnimationUpdateState.
      */
     protected final List<AnimationUpdateStateListener> _updateStateListeners = Lists.newArrayList();
@@ -207,6 +212,12 @@ public class AnimationManager {
                     }
                 }
             }
+        } else {
+            for (final AnimationClipInstance instance : _clipInstances.values()) {
+                if (instance.isActive()) {
+                    instance.setStartTime(currentTime);
+                }
+            }
         }
 
         final AnimationUpdateState oldState = _currentAnimationState;
@@ -327,10 +338,15 @@ public class AnimationManager {
     public void update() {
 
         if (_currentAnimationState != AnimationUpdateState.Play) {
-            // no animation allowed. Exit.
-            return;
+            if (_currentAnimationState == AnimationUpdateState.Stop && !_canSetStopState) {
+                _canSetStopState = true;
+            } else {
+                return;
+            }
+            // return;
+        } else {
+            _canSetStopState = false;
         }
-
         // grab current global time
         final double globalTime = _globalTimer.getTimeInSeconds();
 
