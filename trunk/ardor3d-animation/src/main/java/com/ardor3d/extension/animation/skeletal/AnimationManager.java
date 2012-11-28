@@ -343,7 +343,6 @@ public class AnimationManager {
             } else {
                 return;
             }
-            // return;
         } else {
             _canSetStopState = false;
         }
