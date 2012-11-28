@@ -180,10 +180,10 @@ public class AnimationStateExample extends ExampleBase {
         playPauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 if (playPauseButton.getText().equals("Pause")) {
-                    manager.setAnimationState(AnimationUpdateState.pause);
+                    manager.setAnimationUpdateState(AnimationUpdateState.Pause);
                     playPauseButton.setButtonText("Play");
                 } else {
-                    manager.setAnimationState(AnimationUpdateState.play);
+                    manager.setAnimationUpdateState(AnimationUpdateState.Play);
                     playPauseButton.setButtonText("Pause");
                 }
             }
@@ -195,7 +195,7 @@ public class AnimationStateExample extends ExampleBase {
                 .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                manager.setAnimationState(AnimationUpdateState.stop);
+                manager.setAnimationUpdateState(AnimationUpdateState.Stop);
                 playPauseButton.setButtonText("Play");
             }
         });

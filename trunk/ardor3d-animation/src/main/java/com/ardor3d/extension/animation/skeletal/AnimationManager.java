@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,52 +39,55 @@ import com.google.common.collect.MapMaker;
 public class AnimationManager {
 
     public enum AnimationUpdateState {
-        play, pause, stop
+        Play, Pause, Stop
     }
 
     /**
      * A timer to use as our "global" time keeper. All animation sources under this manager will use this timer as their
      * time reference.
      */
-    private ReadOnlyTimer _globalTimer;
+    protected ReadOnlyTimer _globalTimer;
 
     /** The pose(s) this manager manipulates on update. */
-    private List<SkeletonPose> _applyToPoses;
+    protected List<SkeletonPose> _applyToPoses;
 
     /** The root of a scenegraph we can look for transform animation targets under. */
-    private final Spatial _sceneRoot;
+    protected final Spatial _sceneRoot;
 
     /** Local instance information for any clips referenced by the layers/blend trees in this manager. */
-    private final Map<AnimationClip, AnimationClipInstance> _clipInstances = new MapMaker().weakKeys().makeMap();
+    protected final Map<AnimationClip, AnimationClipInstance> _clipInstances = new MapMaker().weakKeys().makeMap();
 
     /** A logic object responsible for taking animation data and applying it to skeleton poses. */
-    private AnimationApplier _applier;
+    protected AnimationApplier _applier;
 
     /** Our animation layers. */
-    private final List<AnimationLayer> _layers = Lists.newArrayList();
+    protected final List<AnimationLayer> _layers = Lists.newArrayList();
 
     /**
      * A map of key->Double values, allowing control over elements under this manager without needing precise knowledge
      * of the layout of those layers, blend trees, etc. Missing keys will return 0.0 and log a warning.
      */
-    private final LoggingMap<String, Double> _valuesStore = new LoggingMap<String, Double>();
+    protected final LoggingMap<String, Double> _valuesStore = new LoggingMap<String, Double>();
 
     /**
      * The throttle rate of animation. Default is 60fps (1/60.0). Set to 0 to disable throttling.
      */
-    private double _updateRate = 1.0 / 60.0;
+    protected double _updateRate = 1.0 / 60.0;
 
     /**
      * The global time we last processed an animation. (To use when checking our throttle.)
      */
-    private double _lastUpdate = 0.0;
+    protected double _lastUpdate = 0.0;
 
     /**
      * Sets the current animationState used to control if animation is playing, pausing or stopped.
      */
-    protected AnimationUpdateState _currentAnimationState = AnimationUpdateState.play;
+    protected AnimationUpdateState _currentAnimationState = AnimationUpdateState.Play;
 
-    protected AnimationUpdateState _previousAnimationState;
+    /**
+     * Listeners for changes to this manager's AnimationUpdateState.
+     */
+    protected final List<AnimationUpdateStateListener> _updateStateListeners = Lists.newArrayList();
 
     /**
      * Construct a new AnimationManager.
@@ -150,22 +152,114 @@ public class AnimationManager {
         _globalTimer = timer;
     }
 
+    public void play() {
+        setAnimationUpdateState(AnimationUpdateState.Play);
+    }
+
+    public void pause() {
+        setAnimationUpdateState(AnimationUpdateState.Pause);
+    }
+
+    public void stop() {
+        setAnimationUpdateState(AnimationUpdateState.Stop);
+    }
+
+    public boolean isPlaying() {
+        return _currentAnimationState == AnimationUpdateState.Play;
+    }
+
+    public boolean isPaused() {
+        return _currentAnimationState == AnimationUpdateState.Pause;
+    }
+
     /**
      * @param newAnimationState
      *            the new animation state in the animation Manager.
      */
-    public void setAnimationState(final AnimationUpdateState newAnimationState) {
-        if (newAnimationState == AnimationUpdateState.pause && _currentAnimationState == AnimationUpdateState.stop) {
+    public void setAnimationUpdateState(final AnimationUpdateState newAnimationState) {
+        if (newAnimationState == _currentAnimationState) {
+            // ignore if unchanged.
             return;
         }
-        _previousAnimationState = _currentAnimationState;
+        final double currentTime = _globalTimer.getTimeInSeconds();
+        if (newAnimationState == AnimationUpdateState.Pause) {
+            if (_currentAnimationState == AnimationUpdateState.Stop) {
+                // ignore a non-allowed situation
+                return;
+            }
+
+            // Keep track of current time so we can resume active clips
+            _lastUpdate = currentTime;
+        } else if (newAnimationState == AnimationUpdateState.Play) {
+            // reset instances
+            if (_currentAnimationState == AnimationUpdateState.Pause) {
+                final double offset = currentTime - _lastUpdate;
+                for (final AnimationClipInstance instance : _clipInstances.values()) {
+                    if (instance.isActive()) {
+                        instance.setStartTime(instance.getStartTime() + offset);
+                    }
+                }
+            } else {
+                // must be resuming from stop, so restart clips
+                for (final AnimationClipInstance instance : _clipInstances.values()) {
+                    if (instance.isActive()) {
+                        instance.setStartTime(currentTime);
+                    }
+                }
+            }
+        }
+
+        final AnimationUpdateState oldState = _currentAnimationState;
         _currentAnimationState = newAnimationState;
+
+        // Let listeners know we have changed state.
+        fireAnimationUpdateStateChange(oldState);
+    }
+
+    /**
+     * Notify any listeners of the state change
+     * 
+     * @param oldState
+     *            previous state
+     */
+    protected void fireAnimationUpdateStateChange(final AnimationUpdateState oldState) {
+        for (final AnimationUpdateStateListener listener : _updateStateListeners) {
+            listener.stateChanged(oldState, _currentAnimationState);
+        }
+    }
+
+    /**
+     * Add an AnimationUpdateStateListener to this manager.
+     * 
+     * @param listener
+     *            the listener to add.
+     */
+    public void addAnimationUpdateStateListener(final AnimationUpdateStateListener listener) {
+        _updateStateListeners.add(listener);
+    }
+
+    /**
+     * Remove an AnimationUpdateStateListener from this manager.
+     * 
+     * @param listener
+     *            the listener to remove.
+     * @return true if the listener was found
+     */
+    public boolean removeAnimationUpdateStateListener(final AnimationUpdateStateListener listener) {
+        return _updateStateListeners.remove(listener);
+    }
+
+    /**
+     * Remove any AnimationUpdateStateListeners registered with this manager.
+     */
+    public void clearAnimationUpdateStateListeners() {
+        _updateStateListeners.clear();
     }
 
     /**
      * @return the currentAnimationState.
      */
-    public AnimationUpdateState getAnimationState() {
+    public AnimationUpdateState getAnimationUpdateState() {
         return _currentAnimationState;
     }
 
@@ -231,6 +325,12 @@ public class AnimationManager {
      * SkeletonPoses set on the manager.
      */
     public void update() {
+
+        if (_currentAnimationState != AnimationUpdateState.Play) {
+            // no animation allowed. Exit.
+            return;
+        }
+
         // grab current global time
         final double globalTime = _globalTimer.getTimeInSeconds();
 
@@ -243,10 +343,6 @@ public class AnimationManager {
             // we subtract a bit to maintain our desired rate, even if there are some gc pauses, etc.
             _lastUpdate = globalTime - (globalTime - _lastUpdate) % _updateRate;
         }
-
-        // update animationState
-		updateLayersForAnimationState(globalTime);
-
 
         // move the time forward on the layers
         for (int i = 0; i < _layers.size(); ++i) {
@@ -274,32 +370,6 @@ public class AnimationManager {
             final AbstractFiniteState state = layer.getCurrentState();
             if (state != null) {
                 state.postUpdate(layer);
-            }
-        }
-    }
-
-    /**
-     * @param globalTime
-     *            current global time in seconds
-     * @return
-     */
-    protected void updateLayersForAnimationState(final double globalTime) {
-        
-        final Collection<AnimationClipInstance> clipInstances = _clipInstances.values();
-        for (final AnimationClipInstance instance : clipInstances) {
-            switch (_currentAnimationState) {
-                case stop:
-                    instance.setActive(false);
-                    break;
-                case pause:
-                    if (instance.isActive()) {
-                        final double startTime = globalTime - instance.getCurrentTime() / instance.getTimeScale();
-                        instance.setStartTime(startTime);
-                    }
-                    break;
-                case play:
-                    instance.setActive(true);
-                    break;
             }
         }
     }
