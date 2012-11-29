@@ -85,6 +85,16 @@ public class AnimationManager {
     protected AnimationUpdateState _currentAnimationState = AnimationUpdateState.Play;
 
     /**
+     * boolean flag to allow stop state to be updated one last time.
+     */
+    protected boolean _canSetStopState = false;
+
+    /**
+     * boolean flag to reset Clips automatically once they are stopped.
+     */
+    protected boolean _resetClipsOnStop = false;
+
+    /**
      * Listeners for changes to this manager's AnimationUpdateState.
      */
     protected final List<AnimationUpdateStateListener> _updateStateListeners = Lists.newArrayList();
@@ -152,6 +162,24 @@ public class AnimationManager {
         _globalTimer = timer;
     }
 
+    /**
+     * 
+     * @return True if clips will reset if the currentUpdateState is Stop.
+     */
+    public boolean isResetClipsOnStop() {
+        return _resetClipsOnStop;
+    }
+
+    /**
+     * @param resetClipsOnStop
+     *            True if clips are to be reset when currentUpdateState is Stop, false otherwise.
+     * 
+     * 
+     */
+    public void setResetClipsOnStop(final boolean resetClipsOnStop) {
+        _resetClipsOnStop = resetClipsOnStop;
+    }
+
     public void play() {
         setAnimationUpdateState(AnimationUpdateState.Play);
     }
@@ -160,7 +188,8 @@ public class AnimationManager {
         setAnimationUpdateState(AnimationUpdateState.Pause);
     }
 
-    public void stop() {
+    public void stop(final boolean resetOnStop) {
+        setResetClipsOnStop(resetOnStop);
         setAnimationUpdateState(AnimationUpdateState.Stop);
     }
 
@@ -200,11 +229,20 @@ public class AnimationManager {
                     }
                 }
             } else {
-                // must be resuming from stop, so restart clips
-                for (final AnimationClipInstance instance : _clipInstances.values()) {
-                    if (instance.isActive()) {
-                        instance.setStartTime(currentTime);
+                // if newState is check if we will restart clips.
+                if (_resetClipsOnStop) {
+                    for (final AnimationClipInstance instance : _clipInstances.values()) {
+                        if (instance.isActive()) {
+                            instance.setStartTime(currentTime);
+                        }
                     }
+                }
+
+            }
+        } else {
+            for (final AnimationClipInstance instance : _clipInstances.values()) {
+                if (instance.isActive()) {
+                    instance.setStartTime(currentTime);
                 }
             }
         }
@@ -327,10 +365,20 @@ public class AnimationManager {
     public void update() {
 
         if (_currentAnimationState != AnimationUpdateState.Play) {
-            // no animation allowed. Exit.
-            return;
+            if (_resetClipsOnStop) {
+                if (_currentAnimationState == AnimationUpdateState.Stop && !_canSetStopState) {
+                    _canSetStopState = true;
+                } else {
+                    // pause state or reset update has occurred
+                    return;
+                }
+            } else {
+                // stop update without reseting
+                return;
+            }
+        } else {
+            _canSetStopState = false;
         }
-
         // grab current global time
         final double globalTime = _globalTimer.getTimeInSeconds();
 
