@@ -19,7 +19,6 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.AnimationListener;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.AnimationManager.AnimationUpdateState;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.SkinnedMeshCombineLogic;
@@ -194,10 +193,10 @@ public class AnimationStateExample extends ExampleBase {
         playPauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 if (playPauseButton.getText().equals("Pause")) {
-                    manager.setAnimationUpdateState(AnimationUpdateState.Pause);
+                    manager.pause();
                     playPauseButton.setButtonText("Play");
                 } else {
-                    manager.setAnimationUpdateState(AnimationUpdateState.Play);
+                    manager.play();
                     playPauseButton.setButtonText("Pause");
                 }
             }
@@ -209,7 +208,7 @@ public class AnimationStateExample extends ExampleBase {
                 .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                manager.setAnimationUpdateState(AnimationUpdateState.Stop);
+                manager.stop();
                 playPauseButton.setButtonText("Play");
             }
         });

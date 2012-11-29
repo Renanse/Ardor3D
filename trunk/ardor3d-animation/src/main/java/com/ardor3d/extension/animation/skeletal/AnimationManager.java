@@ -188,8 +188,7 @@ public class AnimationManager {
         setAnimationUpdateState(AnimationUpdateState.Pause);
     }
 
-    public void stop(final boolean resetOnStop) {
-        setResetClipsOnStop(resetOnStop);
+    public void stop() {
         setAnimationUpdateState(AnimationUpdateState.Stop);
     }
 
@@ -199,6 +198,10 @@ public class AnimationManager {
 
     public boolean isPaused() {
         return _currentAnimationState == AnimationUpdateState.Pause;
+    }
+
+    public boolean isStopped() {
+        return _currentAnimationState == AnimationUpdateState.Stop;
     }
 
     /**
