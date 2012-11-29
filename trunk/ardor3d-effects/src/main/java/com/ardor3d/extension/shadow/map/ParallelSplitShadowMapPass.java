@@ -589,12 +589,13 @@ public class ParallelSplitShadowMapPass extends Pass {
         direction = direction.set(dl.getDirection());
         final double distance = Math.max(radius, _minimumLightDistance);
 
-        final Vector3 tmpVec = new Vector3();
+        final Vector3 tmpVec = Vector3.fetchTempInstance();
         tmpVec.set(direction);
         tmpVec.negateLocal();
         tmpVec.multiplyLocal(distance);
         tmpVec.addLocal(center);
 
+        // temporary location
         shadowCam.setLocation(tmpVec);
         shadowCam.lookAt(center, Vector3.UNIT_Y);
 
@@ -621,12 +622,16 @@ public class ParallelSplitShadowMapPass extends Pass {
             Quaternion.releaseTempInstance(q);
         }
 
-        shadowCam.setLocation(tmpVec);
+        // updated location
+        final double x = tmpVec.getX();
+        final double y = tmpVec.getY();
+        final double z = tmpVec.getZ();
+        final double farZ = tmpVec.subtractLocal(center).length() + radius;
+        Vector3.releaseTempInstance(tmpVec);
 
-        final double farZ = tmpVec.set(tmpVec).subtractLocal(center).length() + radius;
-
+        // set frustum, then location
         shadowCam.setFrustum(1, farZ, -radius, radius, radius, -radius);
-        shadowCam.update();
+        shadowCam.setLocation(x, y, z);
     }
 
     /**
