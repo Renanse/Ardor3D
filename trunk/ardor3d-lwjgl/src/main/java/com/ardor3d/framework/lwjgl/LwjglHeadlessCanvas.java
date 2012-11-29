@@ -208,6 +208,10 @@ public class LwjglHeadlessCanvas {
         }
     }
 
+    public void releaseContext() throws LWJGLException {
+        _buff.releaseContext();
+    }
+
     public void cleanup() {
         if (_fboID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
@@ -232,6 +236,7 @@ public class LwjglHeadlessCanvas {
             EXTFramebufferObject.glDeleteRenderbuffersEXT(id);
             _colorRBID = 0;
         }
+        ContextManager.removeContext(this);
     }
 
     public IntBuffer getDataBuffer() {
