@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.scenegraph.FloatBufferData;

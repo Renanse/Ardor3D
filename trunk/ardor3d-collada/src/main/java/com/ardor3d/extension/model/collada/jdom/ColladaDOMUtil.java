@@ -18,15 +18,15 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jdom.Attribute;
-import org.jdom.CDATA;
-import org.jdom.Comment;
-import org.jdom.DataConversionException;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.ProcessingInstruction;
-import org.jdom.Text;
-import org.jdom.xpath.XPath;
+import org.jdom2.Attribute;
+import org.jdom2.CDATA;
+import org.jdom2.Comment;
+import org.jdom2.DataConversionException;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.ProcessingInstruction;
+import org.jdom2.Text;
+import org.jdom2.xpath.XPath;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.math.ColorRGBA;
@@ -361,7 +361,7 @@ public class ColladaDOMUtil {
      */
     @SuppressWarnings("unchecked")
     public Element getPositionSource(final Element v) {
-        for (final Element input : (List<Element>) v.getChildren("input")) {
+        for (final Element input : v.getChildren("input")) {
             if ("POSITION".equals(input.getAttributeValue("semantic"))) {
                 final Element n = findTargetWithId(input.getAttributeValue("source"));
                 if (n != null && "source".equals(n.getName())) {
