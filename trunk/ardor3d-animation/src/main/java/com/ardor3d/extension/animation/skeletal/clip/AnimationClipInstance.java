@@ -141,7 +141,7 @@ public class AnimationClipInstance {
         }
 
         for (final AnimationListener animationListener : animationListeners) {
-            animationListener.animationFinished();
+            animationListener.animationFinished(this);
         }
     }
 }
