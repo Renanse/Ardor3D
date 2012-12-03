@@ -590,4 +590,11 @@ public class AnimationManager {
     public LoggingMap<String, Double> getValuesStore() {
         return _valuesStore;
     }
+
+    /**
+     * @return the Map containing the AnimationClips and their respective AnimationClipInstances.
+     */
+    public Map<AnimationClip, AnimationClipInstance> getClipInstancesStore() {
+        return _clipInstances;
+    }
 }
