@@ -347,7 +347,7 @@ public enum TextureStoreFormat {
     RG32F;
 
     public boolean isDepthFormat() {
-        return this == Depth16 || this == Depth24 || this == Depth32;
+        return this == Depth16 || this == Depth24 || this == Depth32 || this == Depth || this == Depth32F;
     }
 
     public boolean isCompressed() {
