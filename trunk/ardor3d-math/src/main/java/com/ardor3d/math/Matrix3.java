@@ -1625,7 +1625,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
         final Vector3 yAxis = Vector3.fetchTempInstance();
         final Vector3 zAxis = Vector3.fetchTempInstance();
         direction.normalize(zAxis);
-        up.normalize(xAxis).crossLocal(zAxis);
+        up.normalize(xAxis).crossLocal(zAxis).normalizeLocal();
         zAxis.cross(xAxis, yAxis);
 
         fromAxes(xAxis, yAxis, zAxis);
