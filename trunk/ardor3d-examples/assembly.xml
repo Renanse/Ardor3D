@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly>
+	<!-- 
+	When unzipped, run with:
+	java -Djava.library.path=lib -jar ardor3d-examples-...jar
+	 -->
     <id>release</id>
     <formats>
         <format>zip</format>
@@ -12,25 +16,16 @@
     </files>
     <fileSets>
         <fileSet>
-            <directory>${lwjgl.natives}/linux</directory>
-            <outputDirectory>lib/lwjgl/native/linux</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${lwjgl.natives}/win32</directory>
-            <outputDirectory>lib/lwjgl/native/win32</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${lwjgl.natives}/macosx</directory>
-            <outputDirectory>lib/lwjgl/native/macosx</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${lwjgl.natives}/solaris</directory>
-            <outputDirectory>lib/lwjgl/native/solaris</outputDirectory>
+            <directory>target/natives</directory>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
+            <excludes>
+            	<exclude>*:*:*:natives-*:*</exclude>
+            </excludes>
             <outputDirectory>lib</outputDirectory>
         </dependencySet>
     </dependencySets>

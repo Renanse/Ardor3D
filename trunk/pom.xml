@@ -148,11 +148,6 @@
 			    <artifactId>lwjgl_util</artifactId>
 			    <version>${lwjgl.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>net.java.games.input</groupId>
-                <artifactId>jinput</artifactId>
-                <version>ardor3d-20100503</version>
-            </dependency>
 			<dependency>
 			    <groupId>org.jdom</groupId>
 			    <artifactId>jdom2</artifactId>
