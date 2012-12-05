@@ -36,8 +36,8 @@ public class InterpolatedFloatChannel extends AbstractAnimationChannel {
      *            the name of this channel.
      * @param times
      *            the time samples
-     * @param keys
-     *            our key samples. Entries may be null. Should have as many entries as the times array.
+     * @param values
+     *            our value samples. Entries may be null. Should have as many entries as the times array.
      */
     public InterpolatedFloatChannel(final String channelName, final float[] times, final float[] values) {
         super(channelName, times);

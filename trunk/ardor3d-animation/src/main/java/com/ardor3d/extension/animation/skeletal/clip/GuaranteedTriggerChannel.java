@@ -39,11 +39,6 @@ public class GuaranteedTriggerChannel extends TriggerChannel {
     }
 
     @Override
-    public TriggerData createStateDataObject(final AnimationClipInstance instance) {
-        return new TriggerData();
-    }
-
-    @Override
     public void setCurrentSample(final int sampleIndex, final double progressPercent, final Object applyTo) {
         final TriggerData triggerData = (TriggerData) applyTo;
 

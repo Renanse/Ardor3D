@@ -164,7 +164,7 @@ public class TransformData implements Savable {
 
         tData.setScale(scaleX, scaleY, scaleZ);
         tData.setTranslation(transX, transY, transZ);
-        tData.setRotation(getRotation().slerpLocal(blendTo.getRotation(), weight));
+        Quaternion.slerp(_rotation, blendTo.getRotation(), weight, tData._rotation);
         return tData;
     }
 

@@ -124,12 +124,17 @@ public class JointChannel extends TransformChannel {
         jointData.setJointIndex(_jointIndex);
     }
 
+    @Override
+    public JointData createStateDataObject(final AnimationClipInstance instance) {
+        return new JointData();
+    }
+
     public JointData getJointData(final int index, final JointData store) {
         JointData rVal = store;
         if (rVal == null) {
             rVal = new JointData();
         }
-        super.getTransformData(index, store);
+        super.getTransformData(index, rVal);
         rVal.setJointIndex(_jointIndex);
         return rVal;
     }
@@ -166,11 +171,6 @@ public class JointChannel extends TransformChannel {
         } else {
             _jointIndex = -1;
         }
-    }
-
-    @Override
-    public JointData createStateDataObject(final AnimationClipInstance instance) {
-        return new JointData();
     }
 
     public static JointChannel initSavable() {
