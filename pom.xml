@@ -148,7 +148,6 @@
                 <groupId>org.easymock</groupId>
                 <artifactId>easymockclassextension</artifactId>
                 <version>2.4</version>
-                <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.jogamp.gluegen</groupId>
@@ -249,7 +248,7 @@
                                     <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
                                     </bottom>
                                     <links>
-                                        <link>http://java.sun.com/javase/6/docs/api</link>
+                                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
                                     </links>
                                     <linksource>true</linksource>
                                     <quiet>true</quiet>
