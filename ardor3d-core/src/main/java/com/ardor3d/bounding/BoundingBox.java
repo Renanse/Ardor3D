@@ -426,6 +426,33 @@ public class BoundingBox extends BoundingVolume {
         }
     }
 
+    @Override
+    public BoundingVolume asType(final Type newType) {
+        if (newType == null) {
+            return null;
+        }
+
+        switch (newType) {
+            case AABB: {
+                return this.clone(null);
+            }
+
+            case Sphere: {
+                final BoundingSphere sphere = new BoundingSphere(0, _center);
+                return sphere.merge(this);
+            }
+
+            case OBB: {
+                final OrientedBoundingBox obb = new OrientedBoundingBox();
+                obb.setCenter(_center);
+                return obb.merge(this);
+            }
+
+            default:
+                return null;
+        }
+    }
+
     /**
      * Merges this AABB with the given OBB.
      * 

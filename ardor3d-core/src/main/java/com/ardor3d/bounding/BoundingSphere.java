@@ -20,10 +20,10 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyPlane;
+import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -103,6 +103,7 @@ public class BoundingSphere extends BoundingVolume {
      * 
      * @return the radius of the bounding sphere.
      */
+    @Override
     public double getRadius() {
         return _radius;
     }
@@ -269,9 +270,9 @@ public class BoundingSphere extends BoundingVolume {
             _center.set(0, 0, 0);
             setRadius(0);
         } else {
-            final Vector3 o = a.cross(b, null).multiplyLocal(c.lengthSquared()).addLocal(
-                    c.cross(a, null).multiplyLocal(b.lengthSquared())).addLocal(
-                    b.cross(c, null).multiplyLocal(a.lengthSquared())).divideLocal(Denominator);
+            final Vector3 o = a.cross(b, null).multiplyLocal(c.lengthSquared())
+                    .addLocal(c.cross(a, null).multiplyLocal(b.lengthSquared()))
+                    .addLocal(b.cross(c, null).multiplyLocal(a.lengthSquared())).divideLocal(Denominator);
 
             setRadius(o.length() * radiusEpsilon);
             O.add(o, _center);
@@ -301,8 +302,8 @@ public class BoundingSphere extends BoundingVolume {
             setRadius(0);
         } else {
 
-            final Vector3 o = acrossB.cross(a, null).multiplyLocal(b.lengthSquared()).addLocal(
-                    b.cross(acrossB, null).multiplyLocal(a.lengthSquared())).divideLocal(Denominator);
+            final Vector3 o = acrossB.cross(a, null).multiplyLocal(b.lengthSquared())
+                    .addLocal(b.cross(acrossB, null).multiplyLocal(a.lengthSquared())).divideLocal(Denominator);
             setRadius(o.length() * radiusEpsilon);
             O.add(o, _center);
         }
@@ -562,6 +563,33 @@ public class BoundingSphere extends BoundingVolume {
         return store;
     }
 
+    @Override
+    public BoundingVolume asType(final Type newType) {
+        if (newType == null) {
+            return null;
+        }
+
+        switch (newType) {
+            case AABB: {
+                final BoundingBox box = new BoundingBox(_center, 0, 0, 0);
+                return box.merge(this);
+            }
+
+            case Sphere: {
+                return this.clone(null);
+            }
+
+            case OBB: {
+                final OrientedBoundingBox obb = new OrientedBoundingBox();
+                obb.setCenter(_center);
+                return obb.merge(this);
+            }
+
+            default:
+                return null;
+        }
+    }
+
     /**
      * <code>clone</code> creates a new BoundingSphere object containing the same data as this one.
      * 
@@ -662,8 +690,8 @@ public class BoundingSphere extends BoundingVolume {
             discr = (a1 * a1) - a;
             root = Math.sqrt(discr);
             final double[] distances = new double[] { root - a1 };
-            final Vector3[] points = new Vector3[] { ray.getDirection().multiply(distances[0], new Vector3()).addLocal(
-                    ray.getOrigin()) };
+            final Vector3[] points = new Vector3[] { ray.getDirection().multiply(distances[0], new Vector3())
+                    .addLocal(ray.getOrigin()) };
             return new IntersectionRecord(distances, points);
         }
 
@@ -687,8 +715,8 @@ public class BoundingSphere extends BoundingVolume {
         }
 
         final double[] distances = new double[] { -a1 };
-        final Vector3[] points = new Vector3[] { ray.getDirection().multiply(distances[0], new Vector3()).addLocal(
-                ray.getOrigin()) };
+        final Vector3[] points = new Vector3[] { ray.getDirection().multiply(distances[0], new Vector3())
+                .addLocal(ray.getOrigin()) };
         return new IntersectionRecord(distances, points);
     }
 

@@ -241,6 +241,15 @@ public abstract class BoundingVolume implements Serializable, Savable {
      */
     public abstract boolean contains(ReadOnlyVector3 point);
 
+    /**
+     * Convert this bounding volume to another, given bounding type.
+     * 
+     * @param newType
+     *            the type of bounding volume to convert to.
+     * @return a new bounding volume of the given type, containing this bounding volume.
+     */
+    public abstract BoundingVolume asType(Type newType);
+
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_center, "center", new Vector3(Vector3.ZERO));
     }
