@@ -196,7 +196,6 @@ public class SkeletonPose implements Savable {
         }
         Transform.releaseTempInstance(temp);
         updateTransforms();
-        firePoseUpdated();
     }
 
     /**

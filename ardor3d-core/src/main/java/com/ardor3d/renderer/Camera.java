@@ -1386,8 +1386,6 @@ public class Camera implements Savable, Externalizable {
      */
     private void checkModelViewProjection() {
         if (_updateMVPMatrix) {
-            checkModelView();
-            checkProjection();
             _modelViewProjection.set(getModelViewMatrix()).multiplyLocal(getProjectionMatrix());
             _updateMVPMatrix = false;
         }

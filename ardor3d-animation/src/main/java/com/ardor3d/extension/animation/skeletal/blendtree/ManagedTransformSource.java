@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 
 /**
  * This tree source maintains its own source data, which can be modified directly using setJointXXX. This source is
- * meant to be used for controlling a particular joint or set of joints programmatically.
+ * meant to be used for controlling a particular joint or set of joints programatically.
  */
 public class ManagedTransformSource implements BlendTreeSource {
 
