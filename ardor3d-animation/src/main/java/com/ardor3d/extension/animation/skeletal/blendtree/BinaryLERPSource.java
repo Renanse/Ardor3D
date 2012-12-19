@@ -95,7 +95,8 @@ public class BinaryLERPSource extends AbstractTwoPartSource {
      */
     public static Map<String, ? extends Object> combineSourceData(final Map<String, ? extends Object> sourceAData,
             final Map<String, ? extends Object> sourceBData, final Double blendWeight) {
-        return BinaryLERPSource.combineSourceData(sourceAData, sourceBData, blendWeight, null);
+        return BinaryLERPSource.combineSourceData(sourceAData, sourceBData,
+                blendWeight != null ? blendWeight.doubleValue() : 0.0, null);
     }
 
     public static Map<String, ? extends Object> combineSourceData(final Map<String, ? extends Object> sourceAData,
