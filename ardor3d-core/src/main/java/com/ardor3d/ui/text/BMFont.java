@@ -234,7 +234,7 @@ public class BMFont implements Savable {
             xml.append(_info.padding[i]);
 
             if (i < (_info.padding.length - 1)) {
-                xml.append(",");
+                xml.append(',');
             }
         }
 
@@ -244,7 +244,7 @@ public class BMFont implements Savable {
             xml.append(_info.spacing[i]);
 
             if (i < (_info.spacing.length - 1)) {
-                xml.append(",");
+                xml.append(',');
             }
         }
 
@@ -859,7 +859,7 @@ public class BMFont implements Savable {
 
         void setUseBlend(final boolean blend) {
             _useBlend = blend;
-            if (blend == false) {
+            if (!_useBlend) {
                 blendState.setBlendEnabled(false);
                 blendState.setReference(_blendDisabledTestRef);
                 zBuffState.setWritable(true);

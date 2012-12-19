@@ -166,7 +166,7 @@ public class RampEntry implements Savable {
             builder.append(convColorToHex(_color).toUpperCase());
             builder.append(" a: ");
             builder.append((int) (_color.getAlpha() * 100));
-            builder.append("%");
+            builder.append('%');
         }
 
         if (_size != DEFAULT_SIZE) {

@@ -53,7 +53,7 @@ public class DOMSerializer {
     public void setIndent(final int numSpaces) {
         final StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < numSpaces; i++) {
-            buffer.append("\t");
+            buffer.append('\t');
         }
         _indent = buffer.toString();
     }

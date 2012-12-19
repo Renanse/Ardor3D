@@ -75,7 +75,7 @@ public class AnimationEntry implements Savable {
         final StringBuilder sb = new StringBuilder();
         for (final int frame : frames) {
             sb.append(frame);
-            sb.append(",");
+            sb.append(',');
         }
         return sb.substring(0, sb.length() - 1);
     }

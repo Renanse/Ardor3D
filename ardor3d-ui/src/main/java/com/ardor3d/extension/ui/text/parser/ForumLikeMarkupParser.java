@@ -51,13 +51,13 @@ public class ForumLikeMarkupParser implements StyleParser {
                         index++;
                         continue;
                     } else {
-                        rVal.append("\\");
+                        rVal.append('\\');
                         rVal.append(token);
                         index += token.length() + 1;
                         continue;
                     }
                 } else {
-                    rVal.append("\\");
+                    rVal.append('\\');
                     index++;
                     continue;
                 }
@@ -138,9 +138,9 @@ public class ForumLikeMarkupParser implements StyleParser {
                     endSpan(StyleConstants.KEY_FAMILY, store, index, buildingSpans);
                 } else {
                     // not really a tag, so put it back.
-                    rVal.append("[");
+                    rVal.append('[');
                     rVal.append(currTagText);
-                    rVal.append("]");
+                    rVal.append(']');
                     tagStatus = TagStatus.NONE;
                 }
 

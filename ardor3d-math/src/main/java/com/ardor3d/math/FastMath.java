@@ -83,7 +83,7 @@ public enum FastMath {
     /** inverseSqrt: (0,‚àû) -> (0,‚àû) **/
     public final static double inverseSqrt(double x) {
         final double xhalves = 0.5d * x;
-        x = Double.longBitsToDouble(0x5FE6EB50C7B537AAl - (Double.doubleToRawLongBits(x) >> 1));
+        x = Double.longBitsToDouble(0x5FE6EB50C7B537AAL - (Double.doubleToRawLongBits(x) >> 1));
         return x * (1.5d - xhalves * x * x); // more iterations possible
     }
 

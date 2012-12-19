@@ -443,19 +443,19 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
         final String blue = Integer.toHexString(Math.round(MathUtils.clamp(getBlue(), 0f, 1f) * 255));
         final String alpha = Integer.toHexString(Math.round(MathUtils.clamp(getAlpha(), 0f, 1f) * 255));
         if (red.length() < 2) {
-            sb.append("0");
+            sb.append('0');
         }
         sb.append(red);
         if (green.length() < 2) {
-            sb.append("0");
+            sb.append('0');
         }
         sb.append(green);
         if (blue.length() < 2) {
-            sb.append("0");
+            sb.append('0');
         }
         sb.append(blue);
         if (alpha.length() < 2) {
-            sb.append("0");
+            sb.append('0');
         }
         sb.append(alpha);
         return sb.toString();
@@ -995,7 +995,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
         }
 
         // XXX: should we parse words too? eg 'red'...
-        if (!colorString.startsWith("#")) {
+        if (colorString.length() == 0 || colorString.charAt(0) != '#') {
             throw new IllegalArgumentException("must start with #.");
         }
 

@@ -46,8 +46,6 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class ParticleSystem extends Node {
     private static final Logger logger = Logger.getLogger(ParticleSystem.class.getName());
 
-    protected static final long serialVersionUID = 2L;
-
     public enum ParticleType {
         Quad, Triangle, Point, Line, GeomMesh;
     }
