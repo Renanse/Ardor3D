@@ -346,11 +346,14 @@ public class MeshData implements Savable {
      * @see #setTextureCoords(FloatBufferData, int)
      */
     public void setTextureBuffer(final FloatBuffer textureBuffer, final int index) {
-        while (_textureCoords.size() <= index) {
-            _textureCoords.add(null);
+        if (textureBuffer != null) {
+            while (_textureCoords.size() <= index) {
+                _textureCoords.add(null);
+            }
+            _textureCoords.set(index, new FloatBufferData(textureBuffer, 2));
+        } else if (index < _textureCoords.size()) {
+            _textureCoords.set(index, null);
         }
-        _textureCoords.set(index, new FloatBufferData(textureBuffer, 2));
-        refreshInterleaved();
     }
 
     /**
