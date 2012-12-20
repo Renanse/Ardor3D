@@ -354,6 +354,7 @@ public class MeshData implements Savable {
         } else if (index < _textureCoords.size()) {
             _textureCoords.set(index, null);
         }
+        refreshInterleaved();
     }
 
     /**
