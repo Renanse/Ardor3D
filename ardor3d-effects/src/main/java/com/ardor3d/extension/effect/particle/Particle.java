@@ -250,9 +250,6 @@ public class Particle implements Savable {
      * (interpolating between start and end size), spin (using parent's spin speed) and current age of particle. If this
      * particle's age is greater than its lifespan, it is set to status DEAD.
      * </p>
-     * <p>
-     * Note that this only changes the parameters of the Particle, not the geometry the particle is associated with.
-     * </p>
      * 
      * @param secondsPassed
      *            number of seconds passed since last update.
