@@ -98,7 +98,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
                 _debugEnabled = false;
             }
 
-            ContextManager.switchContext(_context);
+            if (ContextManager.getContextForKey(_context) != null) {
+                ContextManager.switchContext(_context);
+            }
         }
     }
 
