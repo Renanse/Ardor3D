@@ -40,6 +40,19 @@ public class CapsUtil {
         caps.setSampleBuffers(settings.getSamples() != 0);
         caps.setStereo(settings.isStereo());
         caps.setStencilBits(settings.getStencilBits());
+        switch (settings.getColorDepth()) {
+            case 32:
+            case 24:
+                caps.setRedBits(8);
+                caps.setBlueBits(8);
+                caps.setGreenBits(8);
+                break;
+            case 16:
+                caps.setRedBits(4);
+                caps.setBlueBits(4);
+                caps.setGreenBits(4);
+                break;
+        }
         return caps;
     }
 
