@@ -10,9 +10,12 @@
 
 package com.ardor3d.input.jogl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
+
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.framework.jogl.NewtWindowContainer;
 import com.ardor3d.input.ButtonState;
@@ -32,9 +35,6 @@ import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.newt.opengl.GLWindow;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-
 public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     @GuardedBy("this")
@@ -47,11 +47,11 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     protected MouseState _lastState = null;
 
     protected final GLWindow _newtWindow;
-    
+
     protected final MouseManager _manager;
-    
+
     protected boolean _consumeEvents = false;
-    
+
     protected final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
     protected final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     protected final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
@@ -82,7 +82,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
         return _currentIterator;
     }
-    
+
     private void expireClickEvents() {
         if (!_clicks.isEmpty()) {
             for (final MouseButton mb : MouseButton.values()) {
@@ -92,9 +92,9 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
             }
         }
     }
-    
+
     @Override
-    public synchronized void mousePressed(MouseEvent me) {
+    public synchronized void mousePressed(final MouseEvent me) {
         final MouseButton b = getButtonForEvent(me);
         if (_clickArmed.contains(b)) {
             _clicks.setCount(b, 0);
@@ -115,7 +115,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     }
 
     @Override
-    public synchronized void mouseReleased(MouseEvent me) {
+    public synchronized void mouseReleased(final MouseEvent me) {
         initState(me);
         if (_consumeEvents) {
             me.setAttachment(InputEvent.consumedTag);
@@ -137,14 +137,14 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
         addNewState(me, buttons, null);
     }
-    
+
     @Override
-    public synchronized void mouseDragged(MouseEvent me) {
-        mouseMoved(me);        
+    public synchronized void mouseDragged(final MouseEvent me) {
+        mouseMoved(me);
     }
-    
+
     @Override
-    public synchronized void mouseMoved(MouseEvent me) {
+    public synchronized void mouseMoved(final MouseEvent me) {
         _clickArmed.clear();
         _clicks.clear();
 
@@ -159,7 +159,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
         // check the state against the "ignore next" values
         if (_ignoreX != Integer.MAX_VALUE // shortcut to prevent dx/dy calculations
-            && (_ignoreX == getDX(me) && _ignoreY == getDY(me))) {
+                && (_ignoreX == getDX(me) && _ignoreY == getDY(me))) {
 
             // we matched, so we'll consider this a "mouse pointer reset move"
             // so reset ignore to let the next move event through.
@@ -197,11 +197,11 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
                 _ignoreX = Integer.MAX_VALUE;
                 _ignoreY = Integer.MAX_VALUE;
             }
-        }      
+        }
     }
 
     @Override
-    public void mouseWheelMoved(MouseEvent me) {
+    public void mouseWheelMoved(final MouseEvent me) {
         initState(me);
 
         addNewState(me, _lastState.getButtonStates(), null);
@@ -209,24 +209,24 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
             me.setAttachment(InputEvent.consumedTag);
         }
     }
-    
+
     private void initState(final MouseEvent mouseEvent) {
         if (_lastState == null) {
             _lastState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), 0, 0, 0, null, null);
         }
     }
-    
+
     private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
         final MouseState newState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent),
-                getDY(mouseEvent), mouseEvent.getWheelRotation(), enumMap, clicks);
+                getDY(mouseEvent), (int) mouseEvent.getWheelRotation(), enumMap, clicks);
 
         synchronized (JoglNewtMouseWrapper.this) {
             _upcomingEvents.add(newState);
         }
         _lastState = newState;
-    }   
-    
+    }
+
     private int getDX(final MouseEvent me) {
         return me.getX() - _lastState.getX();
     }
@@ -234,7 +234,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     private int getDY(final MouseEvent me) {
         return getArdor3DY(me) - _lastState.getY();
     }
-    
+
     /**
      * @param e
      *            our mouseEvent
@@ -244,16 +244,16 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     private int getArdor3DY(final MouseEvent me) {
         return _newtWindow.getHeight() - me.getY();
     }
-    
+
     private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
             final ButtonState buttonState) {
         final MouseButton button = getButtonForEvent(e);
         buttons.put(button, buttonState);
     }
-    
+
     private MouseButton getButtonForEvent(final MouseEvent me) {
         MouseButton button;
-        switch(me.getButton()) {
+        switch (me.getButton()) {
             case MouseEvent.BUTTON1:
                 button = MouseButton.LEFT;
                 break;
@@ -268,9 +268,9 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
         }
         return button;
     }
-    
+
     private class JoglNewtMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
-    
+
         @Override
         protected MouseState computeNext() {
             synchronized (JoglNewtMouseWrapper.this) {
@@ -281,25 +281,25 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
             }
         }
     }
-    
+
     @Override
-    public synchronized void mouseClicked(MouseEvent me) {
+    public synchronized void mouseClicked(final MouseEvent me) {
         // Yes, we could use the click count here, but in the interests of this working the same way as SWT and Native,
         // we
         // will do it the same way they do it.
-        
+
     }
 
     @Override
-    public synchronized void mouseEntered(MouseEvent me) {
-        // ignore this       
+    public synchronized void mouseEntered(final MouseEvent me) {
+        // ignore this
     }
 
     @Override
-    public synchronized void mouseExited(MouseEvent me) {
-        // ignore this       
-    }  
-    
+    public synchronized void mouseExited(final MouseEvent me) {
+        // ignore this
+    }
+
     public boolean isConsumeEvents() {
         return _consumeEvents;
     }
