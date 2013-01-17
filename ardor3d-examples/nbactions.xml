@@ -8,7 +8,7 @@
         </goals>
         <properties>
             <exec.classpathScope>${classPathScope}</exec.classpathScope>
-            <exec.args>-Djava.library.path=${library.path} -classpath %classpath ${packageClassName}</exec.args>
+            <exec.args>-Djava.library.path=target/natives -classpath %classpath ${packageClassName}</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
     </action>
