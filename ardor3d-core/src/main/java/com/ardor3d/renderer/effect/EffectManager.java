@@ -18,11 +18,11 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -139,7 +139,7 @@ public class EffectManager {
         _fsq = new Mesh("fsq");
         _fsq.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(-1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1));
         _fsq.getMeshData().setTextureBuffer(BufferUtils.createFloatBuffer(0, 0, 1, 0, 1, 1, 0, 1), 0);
-        _fsq.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(0, 1, 3, 1, 2, 3));
+        _fsq.getMeshData().setIndices(BufferUtils.createIndexBufferData(new int[] { 0, 1, 3, 1, 2, 3 }, 3));
 
         _fsq.getSceneHints().setCullHint(CullHint.Never);
         _fsq.getSceneHints().setLightCombineMode(LightCombineMode.Off);

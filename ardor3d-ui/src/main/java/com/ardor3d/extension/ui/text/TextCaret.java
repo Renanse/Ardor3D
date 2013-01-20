@@ -37,7 +37,7 @@ public class TextCaret {
     public TextCaret() {
         final MeshData md = _strip.getMeshData();
         md.setVertexBuffer(BufferUtils.createVector3Buffer(4));
-        md.setIndexBuffer(BufferUtils.createIntBuffer(new int[] { 0, 1, 3, 2 }));
+        md.setIndices(BufferUtils.createIndexBufferData(new int[] { 0, 1, 3, 2 }, 3));
         md.setIndexMode(IndexMode.TriangleStrip);
         final float[] vals = new float[] { 0, 0, 0, //
                 1, 0, 0, //

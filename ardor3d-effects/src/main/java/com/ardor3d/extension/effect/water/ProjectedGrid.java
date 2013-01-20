@@ -11,7 +11,6 @@
 package com.ardor3d.extension.effect.water;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +32,7 @@ import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.ExtendedCamera;
 import com.ardor3d.util.Timer;
@@ -52,7 +52,6 @@ public class ProjectedGrid extends Mesh {
     private FloatBuffer vertBuf;
     private final FloatBuffer normBuf;
     private final FloatBuffer texs;
-    private IntBuffer indexBuffer;
 
     private final ExtendedCamera mainCamera = new ExtendedCamera();
     private final Camera projectorCamera = new Camera();
@@ -593,8 +592,8 @@ public class ProjectedGrid extends Mesh {
 
         // set up the indices
         final int triangleQuantity = ((sizeX - 1) * (sizeY - 1)) * 2;
-        indexBuffer = BufferUtils.createIntBuffer(triangleQuantity * 3);
-        _meshData.setIndexBuffer(indexBuffer);
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(triangleQuantity * 3, vertexCount - 1);
+        _meshData.setIndices(indices);
 
         // go through entire array up to the second to last column.
         for (int i = 0; i < (sizeX * (sizeY - 1)); i++) {
@@ -606,17 +605,17 @@ public class ProjectedGrid extends Mesh {
                 // logger.info("i: "+i);
             }
             // set the top left corner.
-            indexBuffer.put(i);
+            indices.put(i);
             // set the bottom right corner.
-            indexBuffer.put((1 + sizeX) + i);
+            indices.put((1 + sizeX) + i);
             // set the top right corner.
-            indexBuffer.put(1 + i);
+            indices.put(1 + i);
             // set the top left corner
-            indexBuffer.put(i);
+            indices.put(i);
             // set the bottom left corner
-            indexBuffer.put(sizeX + i);
+            indices.put(sizeX + i);
             // set the bottom right corner
-            indexBuffer.put((1 + sizeX) + i);
+            indices.put((1 + sizeX) + i);
         }
     }
 

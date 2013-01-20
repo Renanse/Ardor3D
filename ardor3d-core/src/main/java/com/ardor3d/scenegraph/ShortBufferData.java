@@ -106,6 +106,20 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
     }
 
     @Override
+    public void put(final int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            put(array[i]);
+        }
+    }
+
+    @Override
+    public void put(final int[] array, final int offset, final int length) {
+        for (int i = offset, max = offset + length; i < max; i++) {
+            put(array[i]);
+        }
+    }
+
+    @Override
     public int getByteCount() {
         return 2;
     }

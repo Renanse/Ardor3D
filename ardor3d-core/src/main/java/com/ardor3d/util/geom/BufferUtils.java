@@ -1552,6 +1552,31 @@ public final class BufferUtils {
     }
 
     /**
+     * Create a new IndexBufferData large enough to fit the contents of the given array. The specific implementation
+     * will be chosen based on the max value you need to store in your buffer. If that value is less than 2^8, a
+     * ByteBufferData is used. If it is less than 2^16, a ShortBufferData is used. Otherwise an IntBufferData is used.
+     * 
+     * @param contents
+     *            an array of index values to store in your newly created IndexBufferData.
+     * @param maxValue
+     *            the largest value you will need to store in your buffer. Often this is equal to
+     *            ("size of vertex buffer" - 1).
+     * @return the new IndexBufferData
+     */
+    public static IndexBufferData<?> createIndexBufferData(final int[] contents, final int maxValue) {
+        final IndexBufferData<?> buffer;
+        if (maxValue < 256) { // 2^8
+            buffer = createIndexBufferData(contents.length, ByteBufferData.class);
+        } else if (maxValue < 65536) { // 2^16
+            buffer = createIndexBufferData(contents.length, ShortBufferData.class);
+        } else {
+            buffer = createIndexBufferData(contents.length, IntBufferData.class);
+        }
+        buffer.put(contents);
+        return buffer;
+    }
+
+    /**
      * Create a new IndexBufferData of the specified size and class.
      * 
      * @param size

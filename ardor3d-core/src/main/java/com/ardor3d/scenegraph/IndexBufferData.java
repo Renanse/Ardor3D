@@ -66,6 +66,26 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
     public abstract void put(IndexBufferData<?> buf);
 
     /**
+     * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
+     * the get/put methods in IndexBufferData.
+     * 
+     * @param array
+     *            the source int array.
+     */
+    public abstract void put(int[] array);
+
+    /**
+     * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
+     * the get/put methods in IndexBufferData.
+     * 
+     * @param array
+     *            the source int array.
+     * @param offset
+     * @param length
+     */
+    public abstract void put(int[] array, int offset, int length);
+
+    /**
      * Get the underlying nio buffer.
      */
     @Override
@@ -118,6 +138,20 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      */
     public void rewind() {
         getBuffer().rewind();
+    }
+
+    /**
+     * @see Buffer#flip();
+     */
+    public void flip() {
+        getBuffer().flip();
+    }
+
+    /**
+     * @see Buffer#clear();
+     */
+    public void clear() {
+        getBuffer().clear();
     }
 
     /**
