@@ -172,7 +172,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
             fb.rewind();
             entry.area.getMeshData().setVertexBuffer(fb);
             entry.area.setScale(new Vector3(scaleWidth, scaleHeight, 1));
-            entry.area.getMeshData().getIndexBuffer().limit(entry.verts.size());
+            entry.area.getMeshData().getIndices().limit(entry.verts.size());
 
             // - attach to root as needed
             if (!_graphRoot.equals(entry.area.getParent())) {

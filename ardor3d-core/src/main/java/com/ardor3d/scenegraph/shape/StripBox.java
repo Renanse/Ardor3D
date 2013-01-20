@@ -201,7 +201,7 @@ public class StripBox extends Mesh {
      */
     private void setIndexData() {
         _meshData.setIndexMode(IndexMode.TriangleStrip);
-        if (_meshData.getIndexBuffer() == null) {
+        if (_meshData.getIndices() == null) {
             final byte[] indices = new byte[] { 2, 3, 6, 7, 5, 3, 0, 2, 1, 6, 4, 5, 1, 0 };
             final ByteBuffer buf = BufferUtils.createByteBuffer(indices.length);
             buf.put(indices);

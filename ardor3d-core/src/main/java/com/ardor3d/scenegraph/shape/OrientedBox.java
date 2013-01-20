@@ -90,7 +90,7 @@ public class OrientedBox extends Mesh {
      * Sets the correct indices array for the box.
      */
     private void setIndexData() {
-        if (_meshData.getIndexBuffer() == null) {
+        if (_meshData.getIndices() == null) {
             _meshData.setIndexBuffer(BufferUtils.createByteBuffer(36));
 
             for (int i = 0; i < 6; i++) {

@@ -264,9 +264,9 @@ public class MeshCombiner {
             totalVertices += md.getVertexCount();
 
             // check for indices
-            if (useIndices || md.getIndexBuffer() != null) {
+            if (useIndices || md.getIndices() != null) {
                 useIndices = true;
-                if (md.getIndexBuffer() != null) {
+                if (md.getIndices() != null) {
                     totalIndices += md.getIndices().capacity();
                 } else {
                     totalIndices += md.getVertexCount();
@@ -304,7 +304,7 @@ class IndexCombiner {
 
     public void addEntry(final MeshData source, final int vertexOffset) {
         // arrays or elements?
-        if (source.getIndexBuffer() == null) {
+        if (source.getIndices() == null) {
             // arrays...
             int offset = 0;
             int indexModeCounter = 0;
