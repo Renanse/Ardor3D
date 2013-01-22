@@ -25,7 +25,6 @@ public class JoglInitializerRunnable implements Runnable {
 
     @Override
     public void run() {
-        _joglAwtCanvas.setExclusiveContextThread(Thread.currentThread());
         // Make the window visible to realize the OpenGL surface.
         _joglAwtCanvas.setVisible(true);
         // Force the realization
