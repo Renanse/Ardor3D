@@ -202,7 +202,7 @@ public class Tube extends Mesh {
     }
 
     private void setIndexData() {
-        _meshData.getIndexBuffer().rewind();
+        _meshData.getIndices().rewind();
 
         final int outerCylinder = (_axisSamples + 1) * (_radialSamples + 1);
         final int bottomEdge = 2 * outerCylinder;

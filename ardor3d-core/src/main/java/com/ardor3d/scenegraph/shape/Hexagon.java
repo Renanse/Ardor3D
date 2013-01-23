@@ -78,7 +78,7 @@ public class Hexagon extends Mesh {
      */
 
     private void setIndexData() {
-        _meshData.getIndexBuffer().rewind();
+        _meshData.getIndices().rewind();
         // tri 1
         _meshData.getIndices().put(0);
         _meshData.getIndices().put(6);

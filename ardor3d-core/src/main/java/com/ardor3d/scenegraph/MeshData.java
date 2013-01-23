@@ -794,7 +794,7 @@ public class MeshData implements Savable {
         }
 
         for (int i = 0; i < rSize; i++) {
-            if (getIndexBuffer() != null) {
+            if (getIndices() != null) {
                 result[i] = getIndices().get(getVertexIndex(primitiveIndex, i, section));
             } else {
                 result[i] = getVertexIndex(primitiveIndex, i, section);
@@ -833,7 +833,7 @@ public class MeshData implements Savable {
             if (result[i] == null) {
                 result[i] = new Vector3();
             }
-            if (getIndexBuffer() != null) {
+            if (getIndices() != null) {
                 // indexed geometry
                 BufferUtils.populateFromBuffer(result[i], getVertexBuffer(),
                         getIndices().get(getVertexIndex(primitiveIndex, i, section)));
@@ -960,7 +960,7 @@ public class MeshData implements Savable {
 
         // Now, based on IndexMode, pick a point on that primitive
         final IndexMode mode = getIndexMode(section);
-        final boolean hasIndices = getIndexBuffer() != null;
+        final boolean hasIndices = getIndices() != null;
         switch (mode) {
             case Triangles:
             case TriangleFan:

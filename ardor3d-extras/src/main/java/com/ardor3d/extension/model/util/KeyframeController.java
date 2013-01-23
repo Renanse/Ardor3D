@@ -12,11 +12,11 @@ package com.ardor3d.extension.model.util;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
@@ -379,17 +379,18 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
             dcNorms.put(mmNorms);
             dcNorms.flip();
         }
-        if (_morphMesh.getMeshData().getIndexBuffer() != null) {
-            IntBuffer dcInds = (IntBuffer) dataCopy.getMeshData().getIndexBuffer();
+        if (_morphMesh.getMeshData().getIndices() != null) {
+            IndexBufferData<?> dcInds = dataCopy.getMeshData().getIndices();
             if (dcInds != null) {
-                dcInds.clear();
+                dcInds.rewind();
             }
-            final IntBuffer mmInds = (IntBuffer) _morphMesh.getMeshData().getIndexBuffer();
+            final IndexBufferData<?> mmInds = _morphMesh.getMeshData().getIndices();
             mmInds.clear();
-            if (dcInds == null || dcInds.capacity() != mmInds.capacity()) {
-                dcInds = BufferUtils.createIntBuffer(mmInds.capacity());
+            if (dcInds == null || dcInds.capacity() != mmInds.capacity() || dcInds.getClass() != mmInds.getClass()) {
+                dcInds = BufferUtils.createIndexBufferData(mmInds.capacity(), _morphMesh.getMeshData()
+                        .getVertexBuffer().capacity() - 1);
                 dcInds.clear();
-                dataCopy.getMeshData().setIndexBuffer(dcInds);
+                dataCopy.getMeshData().setIndices(dcInds);
             }
 
             dcInds.put(mmInds);

@@ -19,7 +19,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -299,13 +298,6 @@ public class TrailMesh extends Mesh {
 
     private void setIndexData() {
         getMeshData().setIndexMode(IndexMode.TriangleStrip);
-        if (getMeshData().getIndexBuffer() == null) {
-            getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(trailVertices));
-            final IndexBufferData<?> indexBuf = getMeshData().getIndices();
-            for (int i = 0; i < trailVertices; i++) {
-                indexBuf.put(i);
-            }
-        }
     }
 
     @Override

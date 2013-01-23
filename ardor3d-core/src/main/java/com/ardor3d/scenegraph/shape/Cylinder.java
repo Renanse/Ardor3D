@@ -322,7 +322,7 @@ public class Cylinder extends Mesh {
     }
 
     private void setIndexData() {
-        _meshData.getIndexBuffer().rewind();
+        _meshData.getIndices().rewind();
 
         // generate connectivity
         for (int axisCount = 0, axisStart = 0; axisCount < _axisSamples - 1; axisCount++) {

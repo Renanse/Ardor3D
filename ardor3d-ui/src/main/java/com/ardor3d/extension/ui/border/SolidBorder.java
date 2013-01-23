@@ -18,11 +18,12 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
+import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -198,7 +199,9 @@ public class SolidBorder extends UIBorder {
         mesh.getMeshData().setVertexCoords(new FloatBufferData(BufferUtils.createVector2Buffer(8), 2));
         mesh.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(8));
         mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-        mesh.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 0, 1 }));
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(10, 7);
+        indices.put(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 0, 1 });
+        mesh.getMeshData().setIndices(indices);
 
         // set up alpha blending.
         final BlendState blend = new BlendState();
