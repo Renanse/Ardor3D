@@ -427,6 +427,12 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     public void setContentSize(final int width, final int height) {
         setContentWidth(width);
         setContentHeight(height);
+        if (_maximumContentsSize.getWidth() < width) {
+            _maximumContentsSize.setWidth(width);
+        }
+        if (_maximumContentsSize.getHeight() < height) {
+            _maximumContentsSize.setHeight(height);
+        }
     }
 
     /**
@@ -437,8 +443,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *            the new height
      */
     public void setContentHeight(final int height) {
-        _contentsSize.setHeight(MathUtils.clamp(height, _minimumContentsSize.getHeight(), _maximumContentsSize
-                .getHeight()));
+        _contentsSize.setHeight(MathUtils.clamp(height, _minimumContentsSize.getHeight(),
+                _maximumContentsSize.getHeight()));
     }
 
     /**
@@ -607,8 +613,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
             final Rectangle2 rect = getRelativeMinComponentBounds(null);
             final float ratio = Math.min((float) width / rect.getWidth(), (float) height / rect.getHeight());
 
-            setLocalComponentSize(Math.round(getMinimumLocalComponentWidth() * ratio), Math
-                    .round(getMinimumLocalComponentHeight() * ratio));
+            setLocalComponentSize(Math.round(getMinimumLocalComponentWidth() * ratio),
+                    Math.round(getMinimumLocalComponentHeight() * ratio));
         }
     }
 
