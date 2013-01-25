@@ -90,12 +90,12 @@ import com.ardor3d.scene.state.jogl.JoglZBufferStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -122,7 +122,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setBackgroundColor(final ReadOnlyColorRGBA c) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         _backgroundColor.set(c);
         gl.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
@@ -163,7 +163,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void clearBuffers(final int buffers, final boolean strict) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         int clear = 0;
 
@@ -214,7 +214,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void flushFrame(final boolean doSwap) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         renderBuckets();
 
@@ -240,7 +240,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setOrtho() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (_inOrthoMode) {
             throw new Ardor3dException("Already in Orthographic mode.");
@@ -261,7 +261,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void unsetOrtho() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!_inOrthoMode) {
             throw new Ardor3dException("Not in Orthographic mode.");
@@ -278,7 +278,7 @@ public class JoglRenderer extends AbstractRenderer {
 
     public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final int x, final int y,
             final int w, final int h) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int pixFormat = JoglTextureUtil.getGLPixelFormat(format);
         gl.glReadPixels(x, y, w, h, pixFormat, GL.GL_UNSIGNED_BYTE, store);
@@ -303,23 +303,23 @@ public class JoglRenderer extends AbstractRenderer {
      * re-initializes the GL context for rendering of another piece of geometry.
      */
     protected void postdrawGeometry(final Mesh g) {
-    // Nothing to do here yet
+        // Nothing to do here yet
     }
 
     public void flushGraphics() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.glFlush();
     }
 
     public void finishGraphics() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.glFinish();
     }
 
     public void applyNormalsMode(final NormalsMode normalsMode, final ReadOnlyTransform worldTransform) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
         if (normalsMode != NormalsMode.Off) {
@@ -403,17 +403,17 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         if (defaultColor != null) {
-            gl.getGL2().glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), defaultColor
-                    .getAlpha());
+            gl.getGL2().glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
+                    defaultColor.getAlpha());
         } else {
             gl.getGL2().glColor4f(1, 1, 1, 1);
         }
     }
 
     public void deleteVBOs(final Collection<Integer> ids) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
         idBuffer.clear();
         for (final Integer i : ids) {
@@ -428,7 +428,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void deleteDisplayLists(final Collection<Integer> ids) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         for (final Integer i : ids) {
             if (i != null && i != 0) {
                 gl.getGL2().glDeleteLists(i, 1);
@@ -441,7 +441,7 @@ public class JoglRenderer extends AbstractRenderer {
             return;
         }
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
@@ -492,7 +492,7 @@ public class JoglRenderer extends AbstractRenderer {
             final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
             final int srcTotalHeight, final Face dstFace) {
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // Ignore textures that do not have an id set
         if (destination.getTextureIdForContext(ContextManager.getCurrentContext().getGlContextRep()) == 0) {
@@ -537,12 +537,12 @@ public class JoglRenderer extends AbstractRenderer {
         }
 
         // Grab pixel format
-        final int pixelFormat; 
-     	if (destination.getImage() != null) {
-     	    pixelFormat = JoglTextureUtil.getGLPixelFormat(destination.getImage().getDataFormat()); 
-     	} else { 
-     	    pixelFormat = JoglTextureUtil.getGLPixelFormatFromStoreFormat(destination.getTextureStoreFormat()); 
-     	} 
+        final int pixelFormat;
+        if (destination.getImage() != null) {
+            pixelFormat = JoglTextureUtil.getGLPixelFormat(destination.getImage().getDataFormat());
+        } else {
+            pixelFormat = JoglTextureUtil.getGLPixelFormatFromStoreFormat(destination.getTextureStoreFormat());
+        }
 
         // bind...
         JoglTextureStateUtil.doTextureBind(destination, 0, false);
@@ -577,12 +577,12 @@ public class JoglRenderer extends AbstractRenderer {
                             GL.GL_UNSIGNED_BYTE, source);
                     break;
                 case OneDimensional:
-                    gl.getGL2GL3().glTexSubImage1D(GL2GL3.GL_TEXTURE_1D, 0, dstOffsetX, dstWidth, pixelFormat, GL.GL_UNSIGNED_BYTE,
-                            source);
+                    gl.getGL2GL3().glTexSubImage1D(GL2GL3.GL_TEXTURE_1D, 0, dstOffsetX, dstWidth, pixelFormat,
+                            GL.GL_UNSIGNED_BYTE, source);
                     break;
                 case ThreeDimensional:
-                    gl.getGL2GL3().glTexSubImage3D(GL2ES2.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight,
-                            dstDepth, pixelFormat, GL.GL_UNSIGNED_BYTE, source);
+                    gl.getGL2GL3().glTexSubImage3D(GL2ES2.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ,
+                            dstWidth, dstHeight, dstDepth, pixelFormat, GL.GL_UNSIGNED_BYTE, source);
                     break;
                 case CubeMap:
                     gl.glTexSubImage2D(JoglTextureStateUtil.getGLCubeMapFace(dstFace), 0, dstOffsetX, dstOffsetY,
@@ -621,7 +621,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void checkCardError() throws Ardor3dException {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final GLU glu = new GLU();
 
         try {
@@ -645,7 +645,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public boolean doTransforms(final ReadOnlyTransform transform) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // set world matrix
         if (!transform.isIdentity()) {
@@ -663,7 +663,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void undoTransforms(final ReadOnlyTransform transform) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
@@ -671,7 +671,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupVertexData(final FloatBufferData vertexBufferData) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
 
@@ -685,7 +685,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupNormalData(final FloatBufferData normalBufferData) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final FloatBuffer normalBuffer = normalBufferData != null ? normalBufferData.getBuffer() : null;
 
@@ -699,7 +699,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupColorData(final FloatBufferData colorBufferData) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final FloatBuffer colorBuffer = colorBufferData != null ? colorBufferData.getBuffer() : null;
 
@@ -713,7 +713,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupFogData(final FloatBufferData fogBufferData) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final FloatBuffer fogBuffer = fogBufferData != null ? fogBufferData.getBuffer() : null;
 
@@ -727,7 +727,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupTextureData(final List<FloatBufferData> textureCoords) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
@@ -791,7 +791,7 @@ public class JoglRenderer extends AbstractRenderer {
             return;
         }
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int type = getGLDataType(indices);
         if (indexLengths == null) {
@@ -802,8 +802,8 @@ public class JoglRenderer extends AbstractRenderer {
             if (primcount < 0) {
                 gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
             } else {
-                gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer(),
-                        primcount);
+                gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
+                        indices.getBuffer(), primcount);
             }
 
             if (Constants.stats) {
@@ -844,7 +844,7 @@ public class JoglRenderer extends AbstractRenderer {
             return 0;
         }
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RendererRecord rendRecord = context.getRendererRecord();
         int vboID = data.getVBOID(context.getGlContextRep());
@@ -873,12 +873,11 @@ public class JoglRenderer extends AbstractRenderer {
     private static void updateVBO(final AbstractBufferData<? extends Buffer> data, final RendererRecord rendRecord,
             final int vboID, final int offsetBytes) {
         if (data.isNeedsRefresh()) {
-            final GL gl = GLU.getCurrentGL();
+            final GL gl = GLContext.getCurrentGL();
             final Buffer dataBuffer = data.getBuffer();
             dataBuffer.rewind();
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offsetBytes, dataBuffer.limit() * data.getByteCount(),
-                    dataBuffer);
+            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offsetBytes, dataBuffer.limit() * data.getByteCount(), dataBuffer);
             data.setNeedsRefresh(false);
         }
     }
@@ -889,7 +888,7 @@ public class JoglRenderer extends AbstractRenderer {
             return 0;
         }
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         int vboID = data.getVBOID(context.getGlContextRep());
         if (vboID != 0) {
@@ -897,8 +896,7 @@ public class JoglRenderer extends AbstractRenderer {
                 final Buffer dataBuffer = data.getBuffer();
                 dataBuffer.rewind();
                 JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-                gl.glBufferSubData(GL.GL_ELEMENT_ARRAY_BUFFER, 0, dataBuffer.limit() * data.getByteCount(),
-                        dataBuffer);
+                gl.glBufferSubData(GL.GL_ELEMENT_ARRAY_BUFFER, 0, dataBuffer.limit() * data.getByteCount(), dataBuffer);
                 data.setNeedsRefresh(false);
             }
 
@@ -923,7 +921,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupVertexDataVBO(final FloatBufferData data) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -940,7 +938,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupNormalDataVBO(final FloatBufferData data) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -957,7 +955,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupColorDataVBO(final FloatBufferData data) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -974,7 +972,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupFogDataVBO(final FloatBufferData data) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
@@ -996,7 +994,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setupTextureDataVBO(final List<FloatBufferData> textureCoords) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -1071,7 +1069,7 @@ public class JoglRenderer extends AbstractRenderer {
     public void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
             final FloatBufferData normalCoords, final FloatBufferData colorCoords,
             final List<FloatBufferData> textureCoords) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -1157,7 +1155,8 @@ public class JoglRenderer extends AbstractRenderer {
                         }
 
                         // send data
-                        gl.getGL2().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
+                        gl.getGL2().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
+                                offsetBytes);
                         offsetBytes += textureBufferData.getBufferLimit() * 4;
                     }
                 }
@@ -1188,7 +1187,7 @@ public class JoglRenderer extends AbstractRenderer {
         interleaved.getBuffer().rewind();
         interleaved.getBuffer().put(bufferSize);
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
@@ -1198,21 +1197,17 @@ public class JoglRenderer extends AbstractRenderer {
 
         rendRecord.invalidateVBO();
         JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-        gl
-                .glBufferData(GL.GL_ARRAY_BUFFER, bufferSize, null, getGLVBOAccessMode(interleaved
-                        .getVboAccessMode()));
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, bufferSize, null, getGLVBOAccessMode(interleaved.getVboAccessMode()));
 
         int offset = 0;
         if (normalCoords != null) {
             normalCoords.getBuffer().rewind();
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, normalCoords.getBufferLimit() * 4, normalCoords
-                    .getBuffer());
+            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, normalCoords.getBufferLimit() * 4, normalCoords.getBuffer());
             offset += normalCoords.getBufferLimit() * 4;
         }
         if (colorCoords != null) {
             colorCoords.getBuffer().rewind();
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, colorCoords.getBufferLimit() * 4, colorCoords
-                    .getBuffer());
+            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, colorCoords.getBufferLimit() * 4, colorCoords.getBuffer());
             offset += colorCoords.getBufferLimit() * 4;
         }
         if (textureCoords != null) {
@@ -1236,8 +1231,7 @@ public class JoglRenderer extends AbstractRenderer {
         }
         if (vertexCoords != null) {
             vertexCoords.getBuffer().rewind();
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, vertexCoords.getBufferLimit() * 4, vertexCoords
-                    .getBuffer());
+            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, vertexCoords.getBufferLimit() * 4, vertexCoords.getBuffer());
         }
 
         interleaved.setNeedsRefresh(false);
@@ -1245,7 +1239,7 @@ public class JoglRenderer extends AbstractRenderer {
 
     public void drawElementsVBO(final IndexBufferData<?> indices, final int[] indexLengths,
             final IndexMode[] indexModes, final int primcount) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -1262,8 +1256,8 @@ public class JoglRenderer extends AbstractRenderer {
             if (primcount < 0) {
                 gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, 0);
             } else {
-                gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer(),
-                    primcount);
+                gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
+                        indices.getBuffer(), primcount);
             }
 
             if (Constants.stats) {
@@ -1306,7 +1300,7 @@ public class JoglRenderer extends AbstractRenderer {
 
     public void drawArrays(final FloatBufferData vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes,
             final int primcount) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
@@ -1331,7 +1325,7 @@ public class JoglRenderer extends AbstractRenderer {
                 if (primcount < 0) {
                     gl.glDrawArrays(glIndexMode, offset, count);
                 } else {
-                gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, offset, count, primcount);
+                    gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, offset, count, primcount);
                 }
 
                 if (Constants.stats) {
@@ -1348,7 +1342,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     private static int makeVBOId() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
         gl.glGenBuffers(1, idBuff);
@@ -1457,7 +1451,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     private void loadMatrix(final FloatBuffer matrix) {
-        GLU.getCurrentGL().getGL2().glLoadMatrixf(matrix);
+        GLContext.getCurrentGL().getGL2().glLoadMatrixf(matrix);
     }
 
     public FloatBuffer getModelViewMatrix(final FloatBuffer store) {
@@ -1473,16 +1467,16 @@ public class JoglRenderer extends AbstractRenderer {
         if (result.remaining() < 16) {
             result = BufferUtils.createFloatBuffer(16);
         }
-        GLU.getCurrentGL().glGetFloatv(matrixType, store);
+        GLContext.getCurrentGL().glGetFloatv(matrixType, store);
         return result;
     }
 
     public void setViewport(final int x, final int y, final int width, final int height) {
-        GLU.getCurrentGL().glViewport(x, y, width, height);
+        GLContext.getCurrentGL().glViewport(x, y, width, height);
     }
 
     public void setDepthRange(final double depthRangeNear, final double depthRangeFar) {
-        GLU.getCurrentGL().glDepthRange(depthRangeNear, depthRangeFar);
+        GLContext.getCurrentGL().glDepthRange(depthRangeNear, depthRangeFar);
     }
 
     public void setDrawBuffer(final DrawBufferTarget target) {
@@ -1531,14 +1525,14 @@ public class JoglRenderer extends AbstractRenderer {
                     break;
             }
 
-            GLU.getCurrentGL().getGL2GL3().glDrawBuffer(buffer);
+            GLContext.getCurrentGL().getGL2GL3().glDrawBuffer(buffer);
             record.setDrawBufferTarget(target);
         }
     }
 
     public void setupLineParameters(final float lineWidth, final int stippleFactor, final short stipplePattern,
             final boolean antialiased) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final LineRecord lineRecord = ContextManager.getCurrentContext().getLineRecord();
 
@@ -1588,7 +1582,7 @@ public class JoglRenderer extends AbstractRenderer {
             final boolean useDistanceAttenuation, final FloatBuffer attenuationCoefficients, final float minPointSize,
             final float maxPointSize) {
         final RenderContext context = ContextManager.getCurrentContext();
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // TODO: make this into a pointrecord call
         gl.getGL2GL3().glPointSize(pointSize);
@@ -1683,7 +1677,7 @@ public class JoglRenderer extends AbstractRenderer {
      * @return id of new display list
      */
     public int startDisplayList() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int id = gl.getGL2().glGenLists(1);
 
@@ -1696,14 +1690,14 @@ public class JoglRenderer extends AbstractRenderer {
      * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
      */
     public void endDisplayList() {
-        GLU.getCurrentGL().getGL2().glEndList();
+        GLContext.getCurrentGL().getGL2().glEndList();
     }
 
     /**
      * Draw the given display list.
      */
     public void renderDisplayList(final int displayListID) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.getGL2().glCallList(displayListID);
     }

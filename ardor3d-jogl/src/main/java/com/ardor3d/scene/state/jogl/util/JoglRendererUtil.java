@@ -13,7 +13,7 @@ package com.ardor3d.scene.state.jogl.util;
 import java.util.Stack;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyRectangle2;
@@ -22,7 +22,7 @@ import com.ardor3d.renderer.state.record.RendererRecord;
 public abstract class JoglRendererUtil {
 
     public static void switchMode(final RendererRecord rendRecord, final int mode) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!rendRecord.isMatrixValid() || rendRecord.getMatrixMode() != mode) {
             gl.getGL2().glMatrixMode(mode);
@@ -32,7 +32,7 @@ public abstract class JoglRendererUtil {
     }
 
     public static void setBoundVBO(final RendererRecord rendRecord, final int id) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!rendRecord.isVboValid() || rendRecord.getCurrentVboId() != id) {
             gl.glBindBuffer(GL.GL_ARRAY_BUFFER, id);
@@ -42,7 +42,7 @@ public abstract class JoglRendererUtil {
     }
 
     public static void setBoundElementVBO(final RendererRecord rendRecord, final int id) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!rendRecord.isElementVboValid() || rendRecord.getCurrentElementVboId() != id) {
             gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, id);
@@ -52,7 +52,7 @@ public abstract class JoglRendererUtil {
     }
 
     public static void applyScissors(final RendererRecord rendRecord) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final Stack<ReadOnlyRectangle2> clips = rendRecord.getScissorClips();
 
         if (clips.size() > 0) {
@@ -93,7 +93,7 @@ public abstract class JoglRendererUtil {
     }
 
     public static void setClippingEnabled(final RendererRecord rendRecord, final boolean enabled) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (enabled && (!rendRecord.isClippingTestValid() || !rendRecord.isClippingTestEnabled())) {
             gl.glEnable(GL.GL_SCISSOR_TEST);

@@ -12,7 +12,7 @@ package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2GL3;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -55,7 +55,7 @@ public abstract class JoglOffsetStateUtil {
 
     private static void setOffsetEnabled(final OffsetType type, final boolean typeEnabled,
             final OffsetStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int glType = getGLType(type);
         if (!record.isValid() || typeEnabled != record.enabledOffsets.contains(type)) {
@@ -68,7 +68,7 @@ public abstract class JoglOffsetStateUtil {
     }
 
     private static void setOffset(final float factor, final float units, final OffsetStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.factor != factor || record.units != units) {
             gl.glPolygonOffset(factor, units);

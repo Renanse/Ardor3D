@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -35,7 +35,7 @@ public final class JoglFragmentProgramStateUtil {
      * message.
      */
     private static void checkProgramError() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (gl.glGetError() == GL.GL_INVALID_OPERATION) {
             // retrieve the error position
@@ -48,7 +48,7 @@ public final class JoglFragmentProgramStateUtil {
     }
 
     private static int create(final ByteBuffer program) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final IntBuffer buf = BufferUtils.createIntBuffer(1);
 
@@ -58,8 +58,8 @@ public final class JoglFragmentProgramStateUtil {
         final byte array[] = new byte[program.limit()];
         program.rewind();
         program.get(array);
-        gl.getGL2().glProgramStringARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, array.length, new String(
-                array)); // TODO Check cost of using non-buffer
+        gl.getGL2().glProgramStringARB(GL2.GL_FRAGMENT_PROGRAM_ARB, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, array.length,
+                new String(array)); // TODO Check cost of using non-buffer
 
         checkProgramError();
 
@@ -67,7 +67,7 @@ public final class JoglFragmentProgramStateUtil {
     }
 
     public static void apply(final JoglRenderer renderer, final FragmentProgramState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 
@@ -106,8 +106,8 @@ public final class JoglFragmentProgramStateUtil {
                         for (int i = 0; i < state._getParameters().length; i++) {
                             if (state._getParameters()[i] != null) {
                                 gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_FRAGMENT_PROGRAM_ARB, i,
-                                        state._getParameters()[i][0], state._getParameters()[i][1], state
-                                                ._getParameters()[i][2], state._getParameters()[i][3]);
+                                        state._getParameters()[i][0], state._getParameters()[i][1],
+                                        state._getParameters()[i][2], state._getParameters()[i][3]);
                             }
                         }
                     }
