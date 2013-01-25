@@ -18,7 +18,6 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLException;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -146,7 +145,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             _renderer = new JoglRenderer();
 
             if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
-                final GL gl = GLU.getCurrentGL();
+                final GL gl = GLContext.getCurrentGL();
                 gl.glEnable(GL.GL_MULTISAMPLE);
             }
 

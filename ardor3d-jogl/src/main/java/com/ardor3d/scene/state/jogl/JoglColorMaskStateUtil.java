@@ -11,7 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -23,7 +23,7 @@ import com.ardor3d.renderer.state.record.ColorMaskStateRecord;
 public abstract class JoglColorMaskStateUtil {
 
     public static void apply(final JoglRenderer renderer, final ColorMaskState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();

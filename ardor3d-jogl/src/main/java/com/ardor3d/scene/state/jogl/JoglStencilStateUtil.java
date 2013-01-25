@@ -12,14 +12,14 @@ package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
-import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.StencilState.StencilFunction;
 import com.ardor3d.renderer.state.StencilState.StencilOperation;
 import com.ardor3d.renderer.state.record.StencilStateRecord;
@@ -27,7 +27,7 @@ import com.ardor3d.renderer.state.record.StencilStateRecord;
 public abstract class JoglStencilStateUtil {
 
     public static void apply(final JoglRenderer renderer, final StencilState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
@@ -40,25 +40,26 @@ public abstract class JoglStencilStateUtil {
             if (state.isUseTwoSided() && caps.isTwoSidedStencilSupported()) {
                 gl.getGL2().glActiveStencilFaceEXT(GL.GL_BACK);
                 applyMask(state.getStencilWriteMaskBack(), record, 2);
-                applyFunc(getGLStencilFunction(state.getStencilFunctionBack()), state.getStencilReferenceBack(), state
-                        .getStencilFuncMaskBack(), record, 2);
-                applyOp(getGLStencilOp(state.getStencilOpFailBack(), caps), getGLStencilOp(state
-                        .getStencilOpZFailBack(), caps), getGLStencilOp(state.getStencilOpZPassBack(), caps), record, 2);
+                applyFunc(getGLStencilFunction(state.getStencilFunctionBack()), state.getStencilReferenceBack(),
+                        state.getStencilFuncMaskBack(), record, 2);
+                applyOp(getGLStencilOp(state.getStencilOpFailBack(), caps),
+                        getGLStencilOp(state.getStencilOpZFailBack(), caps),
+                        getGLStencilOp(state.getStencilOpZPassBack(), caps), record, 2);
 
                 gl.getGL2().glActiveStencilFaceEXT(GL.GL_FRONT);
                 applyMask(state.getStencilWriteMaskFront(), record, 1);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionFront()), state.getStencilReferenceFront(),
                         state.getStencilFuncMaskFront(), record, 1);
-                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps), getGLStencilOp(state
-                        .getStencilOpZFailFront(), caps), getGLStencilOp(state.getStencilOpZPassFront(), caps), record,
-                        1);
+                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZPassFront(), caps), record, 1);
             } else {
                 applyMask(state.getStencilWriteMaskFront(), record, 0);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionFront()), state.getStencilReferenceFront(),
                         state.getStencilFuncMaskFront(), record, 0);
-                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps), getGLStencilOp(state
-                        .getStencilOpZFailFront(), caps), getGLStencilOp(state.getStencilOpZPassFront(), caps), record,
-                        0);
+                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZPassFront(), caps), record, 0);
             }
         }
 
@@ -119,7 +120,7 @@ public abstract class JoglStencilStateUtil {
 
     private static void setEnabled(final boolean enable, final boolean twoSided, final StencilStateRecord record,
             final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (record.isValid()) {
             if (enable && !record.enabled) {
@@ -141,7 +142,7 @@ public abstract class JoglStencilStateUtil {
 
     private static void setTwoSidedEnabled(final boolean enable, final StencilStateRecord record,
             final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (caps.isTwoSidedStencilSupported()) {
             if (record.isValid()) {
@@ -162,7 +163,7 @@ public abstract class JoglStencilStateUtil {
     }
 
     private static void applyMask(final int writeMask, final StencilStateRecord record, final int face) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // if (!record.isValid() || writeMask != record.writeMask[face]) {
         gl.glStencilMask(writeMask);
@@ -172,7 +173,7 @@ public abstract class JoglStencilStateUtil {
 
     private static void applyFunc(final int glfunc, final int stencilRef, final int funcMask,
             final StencilStateRecord record, final int face) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // if (!record.isValid() || glfunc != record.func[face] || stencilRef != record.ref[face]
         // || funcMask != record.funcMask[face]) {
@@ -185,7 +186,7 @@ public abstract class JoglStencilStateUtil {
 
     private static void applyOp(final int fail, final int zfail, final int zpass, final StencilStateRecord record,
             final int face) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // if (!record.isValid() || fail != record.fail[face] || zfail != record.zfail[face]
         // || zpass != record.zpass[face]) {

@@ -12,7 +12,7 @@ package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2ES1;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -50,7 +50,7 @@ public abstract class JoglClipStateUtil {
 
     private static void enableClipPlane(final int planeIndex, final boolean enable, final ClipState state,
             final ClipStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (enable) {
             if (!record.isValid() || !record.planeEnabled[planeIndex]) {

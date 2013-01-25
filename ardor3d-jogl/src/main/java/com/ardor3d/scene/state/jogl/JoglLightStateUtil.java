@@ -13,8 +13,8 @@ package com.ardor3d.scene.state.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
+import javax.media.opengl.GLContext;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
-import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.light.Light;
@@ -163,7 +163,7 @@ public abstract class JoglLightStateUtil {
 
     private static void setSingleLightEnabled(final boolean enable, final int index, final LightStateRecord record,
             final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || lr.isEnabled() != enable) {
             if (enable) {
@@ -177,7 +177,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setLightEnabled(final boolean enable, final LightStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.isEnabled() != enable) {
             if (enable) {
@@ -190,7 +190,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setTwoSided(final boolean twoSided, final LightStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.isTwoSidedOn() != twoSided) {
             if (twoSided) {
@@ -203,7 +203,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setLocalViewer(final boolean localViewer, final LightStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.isLocalViewer() != localViewer) {
             if (localViewer) {
@@ -216,7 +216,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setSpecularControl(final boolean separateSpecularOn, final LightStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.isSeparateSpecular() != separateSpecularOn) {
             if (separateSpecularOn) {
@@ -229,7 +229,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setModelAmbient(final LightStateRecord record, final ReadOnlyColorRGBA globalAmbient) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || !record.globalAmbient.equals(globalAmbient)) {
             record.lightBuffer.clear();
@@ -245,7 +245,7 @@ public abstract class JoglLightStateUtil {
 
     private static void setAmbient(final int index, final LightStateRecord record, final ReadOnlyColorRGBA ambient,
             final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || !lr.ambient.equals(ambient)) {
             record.lightBuffer.clear();
@@ -254,14 +254,17 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(ambient.getBlue());
             record.lightBuffer.put(ambient.getAlpha());
             record.lightBuffer.flip();
-            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_AMBIENT, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_AMBIENT, record.lightBuffer); // TODO
+                                                                                                                    // Check
+                                                                                                                    // for
+                                                                                                                    // float
             lr.ambient.set(ambient);
         }
     }
 
     private static void setDiffuse(final int index, final LightStateRecord record, final ReadOnlyColorRGBA diffuse,
             final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || !lr.diffuse.equals(diffuse)) {
             record.lightBuffer.clear();
@@ -270,14 +273,17 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(diffuse.getBlue());
             record.lightBuffer.put(diffuse.getAlpha());
             record.lightBuffer.flip();
-            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_DIFFUSE, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_DIFFUSE, record.lightBuffer); // TODO
+                                                                                                                    // Check
+                                                                                                                    // for
+                                                                                                                    // float
             lr.diffuse.set(diffuse);
         }
     }
 
     private static void setSpecular(final int index, final LightStateRecord record, final ReadOnlyColorRGBA specular,
             final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || !lr.specular.equals(specular)) {
             record.lightBuffer.clear();
@@ -286,14 +292,17 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(specular.getBlue());
             record.lightBuffer.put(specular.getAlpha());
             record.lightBuffer.flip();
-            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPECULAR, record.lightBuffer); // TODO Check for float
+            gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPECULAR, record.lightBuffer); // TODO
+                                                                                                                     // Check
+                                                                                                                     // for
+                                                                                                                     // float
             lr.specular.set(specular);
         }
     }
 
     private static void setPosition(final int index, final LightStateRecord record, final float positionX,
             final float positionY, final float positionZ, final float positionW, final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // From OpenGL Docs:
         // The light position is transformed by the contents of the current top
@@ -321,15 +330,15 @@ public abstract class JoglLightStateUtil {
             gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_POSITION, record.lightBuffer);
 
             lr.position.set(positionX, positionY, positionZ, positionW);
-            if (!Camera.getCurrentCamera().isFrameDirty()) { 
-                lr.modelViewMatrix.set(modelViewMatrix); 
-            } 
+            if (!Camera.getCurrentCamera().isFrameDirty()) {
+                lr.modelViewMatrix.set(modelViewMatrix);
+            }
         }
     }
 
     private static void setSpotDirection(final int index, final LightStateRecord record, final float directionX,
             final float directionY, final float directionZ, final float value) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // From OpenGL Docs:
         // The light position is transformed by the contents of the current top
@@ -346,11 +355,14 @@ public abstract class JoglLightStateUtil {
         record.lightBuffer.put(directionZ);
         record.lightBuffer.put(value);
         record.lightBuffer.flip();
-        gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_DIRECTION, record.lightBuffer); // TODO Check for float
+        gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_DIRECTION, record.lightBuffer); // TODO
+                                                                                                                       // Check
+                                                                                                                       // for
+                                                                                                                       // float
     }
 
     private static void setConstant(final int index, final float constant, final LightRecord lr, final boolean force) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (force || constant != lr.getConstant()) {
             gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_CONSTANT_ATTENUATION, constant);
@@ -359,7 +371,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setLinear(final int index, final float linear, final LightRecord lr, final boolean force) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (force || linear != lr.getLinear()) {
             gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_LINEAR_ATTENUATION, linear);
@@ -368,7 +380,7 @@ public abstract class JoglLightStateUtil {
     }
 
     private static void setQuadratic(final int index, final float quad, final LightRecord lr, final boolean force) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (force || quad != lr.getQuadratic()) {
             gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_QUADRATIC_ATTENUATION, quad);
@@ -392,7 +404,7 @@ public abstract class JoglLightStateUtil {
 
     private static void setSpotExponent(final int index, final LightStateRecord record, final float exponent,
             final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || lr.getSpotExponent() != exponent) {
             gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_EXPONENT, exponent);
@@ -402,7 +414,7 @@ public abstract class JoglLightStateUtil {
 
     private static void setSpotCutoff(final int index, final LightStateRecord record, final float cutoff,
             final LightRecord lr) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || lr.getSpotCutoff() != cutoff) {
             gl.getGL2().glLightf(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_CUTOFF, cutoff);
