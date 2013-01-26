@@ -14,7 +14,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL2GL3;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -37,7 +37,7 @@ public abstract class JoglBlendStateUtil {
         final ContextCapabilities caps = context.getCapabilities();
         context.setCurrentState(StateType.Blend, state);
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state.isEnabled()) {
             applyBlendEquations(gl, state.isBlendEnabled(), state, record, caps);
@@ -128,7 +128,8 @@ public abstract class JoglBlendStateUtil {
             if (applyConstant && caps.isConstantBlendColorSupported()) {
                 final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
-                    gl.getGL2GL3().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(), constant.getAlpha());
+                    gl.getGL2GL3().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
+                            constant.getAlpha());
                     record.blendColor.set(constant);
                 }
             }

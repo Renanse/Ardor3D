@@ -11,8 +11,8 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLContext;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
-import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextManager;
@@ -63,7 +63,7 @@ public abstract class JoglMaterialStateUtil {
 
     private static void applyColor(final ColorMaterial glMatColor, final ReadOnlyColorRGBA frontColor,
             final ReadOnlyColorRGBA backColor, final MaterialStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int glMat = getGLColorMaterial(glMatColor);
         if (frontColor.equals(backColor)) {
@@ -120,11 +120,11 @@ public abstract class JoglMaterialStateUtil {
             case Emissive:
                 return record.colorMaterial == ColorMaterial.Emissive;
             case AmbientAndDiffuse:
-            	break;
+                break;
             case None:
-            	break;
+                break;
             default:
-            	break;
+                break;
         }
         return false;
     }
@@ -132,7 +132,7 @@ public abstract class JoglMaterialStateUtil {
     private static void applyColorMaterial(final ColorMaterial colorMaterial, final MaterialFace face,
             final MaterialStateRecord record) {
         if (!record.isValid() || face != record.colorMaterialFace || colorMaterial != record.colorMaterial) {
-            final GL gl = GLU.getCurrentGL();
+            final GL gl = GLContext.getCurrentGL();
 
             if (colorMaterial == ColorMaterial.None) {
                 gl.glDisable(GLLightingFunc.GL_COLOR_MATERIAL);
@@ -151,22 +151,25 @@ public abstract class JoglMaterialStateUtil {
 
     private static void applyShininess(final float frontShininess, final float backShininess,
             final MaterialStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (frontShininess == backShininess) {
             // consolidate to one call
             if (!record.isValid() || frontShininess != record.frontShininess || record.backShininess != backShininess) {
-                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.FrontAndBack), GLLightingFunc.GL_SHININESS, frontShininess);
+                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.FrontAndBack), GLLightingFunc.GL_SHININESS,
+                        frontShininess);
                 record.backShininess = record.frontShininess = frontShininess;
             }
         } else {
             if (!record.isValid() || frontShininess != record.frontShininess) {
-                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.Front), GLLightingFunc.GL_SHININESS, frontShininess);
+                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.Front), GLLightingFunc.GL_SHININESS,
+                        frontShininess);
                 record.frontShininess = frontShininess;
             }
 
             if (!record.isValid() || backShininess != record.backShininess) {
-                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.Back), GLLightingFunc.GL_SHININESS, backShininess);
+                gl.getGL2().glMaterialf(getGLMaterialFace(MaterialFace.Back), GLLightingFunc.GL_SHININESS,
+                        backShininess);
                 record.backShininess = backShininess;
             }
         }

@@ -21,7 +21,6 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLPbuffer;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
@@ -76,7 +75,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         if (tex.getType() != Type.TwoDimensional) {
             throw new IllegalArgumentException("Unsupported type: " + tex.getType());
         }
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
@@ -99,8 +98,8 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         // Initialize our texture with some default data.
         final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
         final int dataFormat = JoglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
-        final int pixelDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType()); 
-     	
+        final int pixelDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
+
         gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType, null);
 
         // Setup filtering and wrap
@@ -236,7 +235,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
     public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
             final int xoffset, final int yoffset) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         JoglTextureStateUtil.doTextureBind(tex, 0, true);
 
@@ -245,7 +244,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
     @Override
     protected void clearBuffers(final int clear) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.glDisable(GL.GL_SCISSOR_TEST);
         _parentRenderer.clearBuffers(clear);
@@ -320,7 +319,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);
 
             if (_bgColorDirty) {
-                final GL gl = GLU.getCurrentGL();
+                final GL gl = GLContext.getCurrentGL();
 
                 gl.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                         _backgroundColor.getAlpha());
@@ -357,7 +356,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             }
         } else {
             // XXX: Is this WGL specific query right?
-            if (GLU.getCurrentGL().isExtensionAvailable("WGL_ARB_render_texture")) {
+            if (GLContext.getCurrentGL().isExtensionAvailable("WGL_ARB_render_texture")) {
                 logger.fine("Render to Texture Pbuffer supported!");
                 _useDirectRender = true;
             } else {

@@ -11,21 +11,21 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLContext;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
-import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
-import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.renderer.state.record.ShadingStateRecord;
 
 public abstract class JoglShadingStateUtil {
 
     public static void apply(final JoglRenderer renderer, final ShadingState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
