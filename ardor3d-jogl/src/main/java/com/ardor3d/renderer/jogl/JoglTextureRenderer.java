@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL2GL3;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
@@ -75,7 +75,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             throw new IllegalArgumentException("Texture type not supported: " + tex.getType());
         }
 
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
@@ -101,8 +101,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         final int pixelDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
 
         if (tex.getType() == Type.TwoDimensional) {
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
-                    null);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType, null);
         } else {
             for (final Face face : Face.values()) {
                 gl.glTexImage2D(JoglTextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0,
@@ -138,7 +137,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
             final List<Texture> texs, final int clear) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int maxDrawBuffers = ContextManager.getCurrentContext().getCapabilities().getMaxFBOColorAttachments();
 
@@ -217,8 +216,8 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = depths.removeFirst();
                     // Set up our depth texture
                     if (tex.getType() == Type.TwoDimensional) {
-                        gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
-                                GL.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                        gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D,
+                                tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else if (tex.getType() == Type.CubeMap) {
                         gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
                                 JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
@@ -229,8 +228,8 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     _usingDepthRB = false;
                 } else if (!_usingDepthRB) {
                     // setup our default depth render buffer if not already set
-                    gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
-                            GL.GL_RENDERBUFFER, _depthRBID);
+                    gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
+                            _depthRBID);
                     _usingDepthRB = true;
                 }
 
@@ -266,20 +265,18 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void setupForSingleTexDraw(final Texture tex) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
 
         if (tex.getTextureStoreFormat().isDepthFormat()) {
             // No color buffer
-            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_RENDERBUFFER,
-                    0);
+            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_RENDERBUFFER, 0);
 
             // Setup depth texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
-                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D,
-                        textureId, 0);
+                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_TEXTURE_2D, textureId, 0);
             } else if (tex.getType() == Type.CubeMap) {
                 gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
                         JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId, 0);
@@ -292,8 +289,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         } else {
             // Set color texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
-                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D,
-                        textureId, 0);
+                gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, textureId, 0);
             } else if (tex.getType() == Type.CubeMap) {
                 gl.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0,
                         JoglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId, 0);
@@ -302,8 +298,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             }
 
             // setup depth RB
-            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
-                    _depthRBID);
+            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, _depthRBID);
 
             setDrawBuffer(GL.GL_COLOR_ATTACHMENT0);
             setReadBuffer(GL.GL_COLOR_ATTACHMENT0);
@@ -314,19 +309,19 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     private void setReadBuffer(final int attachVal) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.getGL2GL3().glReadBuffer(attachVal);
     }
 
     private void setDrawBuffer(final int attachVal) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.getGL2GL3().glDrawBuffer(attachVal);
     }
 
     private void setDrawBuffers(final int maxEntry) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (maxEntry <= 1) {
             setDrawBuffer(maxEntry != 0 ? GL.GL_COLOR_ATTACHMENT0 : GL.GL_NONE);
@@ -340,7 +335,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void takedownForSingleTexDraw(final Texture tex) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
@@ -351,19 +346,19 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void setMSFBO() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, _msfboID);
     }
 
     @Override
     protected void blitMSFBO() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.glBindFramebuffer(GL2GL3.GL_READ_FRAMEBUFFER, _msfboID);
         gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, _fboID);
-        gl.getGL2GL3().glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL.GL_COLOR_BUFFER_BIT
-                | GL.GL_DEPTH_BUFFER_BIT, GL.GL_NEAREST);
+        gl.getGL2GL3().glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height,
+                GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT, GL.GL_NEAREST);
 
         gl.glBindFramebuffer(GL2GL3.GL_READ_FRAMEBUFFER, 0);
         gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, 0);
@@ -377,7 +372,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
      *            an id to use for log messages, particularly if there are any issues.
      */
     public static void checkFBOComplete(final int fboID) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final int status = gl.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER);
         switch (status) {
@@ -414,7 +409,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
             final int xoffset, final int yoffset) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         JoglTextureStateUtil.doTextureBind(tex, 0, true);
 
@@ -430,7 +425,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void clearBuffers(final int clear) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         gl.glDisable(GL.GL_SCISSOR_TEST);
         _parentRenderer.clearBuffers(clear);
@@ -438,7 +433,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void activate() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // Lazy init
         if (_fboID == 0) {
@@ -488,7 +483,8 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
                 // set up renderbuffer properties
                 gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _mscolorRBID);
-                gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, GL.GL_RGBA, _width, _height);
+                gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, GL.GL_RGBA, _width,
+                        _height);
 
                 gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _msdepthRBID);
                 gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, format, _width, _height);
@@ -496,10 +492,10 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, 0);
 
                 gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, _msfboID);
-                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0,
-                        GL.GL_RENDERBUFFER, _mscolorRBID);
-                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT,
-                        GL.GL_RENDERBUFFER, _msdepthRBID);
+                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_RENDERBUFFER,
+                        _mscolorRBID);
+                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
+                        _msdepthRBID);
 
                 // check for errors
                 checkFBOComplete(_msfboID);
@@ -536,7 +532,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void deactivate() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (_active == 1) {
             final ReadOnlyColorRGBA bgColor = _parentRenderer.getBackgroundColor();
@@ -552,7 +548,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     public void cleanup() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (_fboID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);

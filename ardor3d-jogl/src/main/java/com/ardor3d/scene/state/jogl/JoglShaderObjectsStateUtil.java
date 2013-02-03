@@ -19,8 +19,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL3;
-import javax.media.opengl.GL4;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -38,7 +37,7 @@ public abstract class JoglShaderObjectsStateUtil {
     private static final Logger logger = Logger.getLogger(JoglShaderObjectsStateUtil.class.getName());
 
     protected static void sendToGL(final GLSLShaderObjectsState state, final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state.getVertexShader() == null && state.getFragmentShader() == null) {
             logger.warning("Could not find shader resources!" + "(both inputbuffers are null)");
@@ -122,7 +121,8 @@ public abstract class JoglShaderObjectsStateUtil {
                 // Compile the geometry shader
                 final IntBuffer compiled = BufferUtils.createIntBuffer(1);
                 gl.getGL2().glCompileShaderARB(state._geometryShaderID);
-                gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
+                        compiled);
                 checkProgramError(compiled, state._geometryShaderID, state._geometryShaderName);
 
                 // Attach the program
@@ -132,7 +132,7 @@ public abstract class JoglShaderObjectsStateUtil {
                 state._geometryShaderID = -1;
             }
         }
-        
+
         if (caps.isTessellationShadersSupported()) {
             if (state.getTessellationControlShader() != null) {
                 if (state._tessellationControlShaderID != -1) {
@@ -145,19 +145,20 @@ public abstract class JoglShaderObjectsStateUtil {
                 final byte array[] = new byte[state.getTessellationControlShader().limit()];
                 state.getTessellationControlShader().rewind();
                 state.getTessellationControlShader().get(array);
-                gl.getGL2().glShaderSourceARB(state._tessellationControlShaderID, 1, new String[] { new String(array) },
-                        new int[] { array.length }, 0);
+                gl.getGL2().glShaderSourceARB(state._tessellationControlShaderID, 1,
+                        new String[] { new String(array) }, new int[] { array.length }, 0);
 
                 // Compile the tessellation control shader
                 final IntBuffer compiled = BufferUtils.createIntBuffer(1);
                 gl.getGL2().glCompileShaderARB(state._tessellationControlShaderID);
-                gl.getGL2().glGetObjectParameterivARB(state._tessellationControlShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                gl.getGL2().glGetObjectParameterivARB(state._tessellationControlShaderID,
+                        GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
                 checkProgramError(compiled, state._tessellationControlShaderID, state._tessellationControlShaderName);
 
                 // Attach the program
                 gl.getGL2().glAttachObjectARB(state._programID, state._tessellationControlShaderID);
             } else if (state._tessellationControlShaderID != -1) {
-            	removeTessControlShader(state);
+                removeTessControlShader(state);
                 state._tessellationControlShaderID = -1;
             }
             if (state.getTessellationEvaluationShader() != null) {
@@ -165,25 +166,27 @@ public abstract class JoglShaderObjectsStateUtil {
                     removeTessEvalShader(state);
                 }
 
-                state._tessellationEvaluationShaderID = gl.getGL2().glCreateShaderObjectARB(GL4.GL_TESS_CONTROL_SHADER);
+                state._tessellationEvaluationShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_TESS_CONTROL_SHADER);
 
                 // Create the sources
                 final byte array[] = new byte[state.getTessellationEvaluationShader().limit()];
                 state.getTessellationEvaluationShader().rewind();
                 state.getTessellationEvaluationShader().get(array);
-                gl.getGL2().glShaderSourceARB(state._tessellationEvaluationShaderID, 1, new String[] { new String(array) },
-                        new int[] { array.length }, 0);
+                gl.getGL2().glShaderSourceARB(state._tessellationEvaluationShaderID, 1,
+                        new String[] { new String(array) }, new int[] { array.length }, 0);
 
                 // Compile the tessellation control shader
                 final IntBuffer compiled = BufferUtils.createIntBuffer(1);
                 gl.getGL2().glCompileShaderARB(state._tessellationEvaluationShaderID);
-                gl.getGL2().glGetObjectParameterivARB(state._tessellationEvaluationShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
-                checkProgramError(compiled, state._tessellationEvaluationShaderID, state._tessellationEvaluationShaderName);
+                gl.getGL2().glGetObjectParameterivARB(state._tessellationEvaluationShaderID,
+                        GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                checkProgramError(compiled, state._tessellationEvaluationShaderID,
+                        state._tessellationEvaluationShaderName);
 
                 // Attach the program
                 gl.getGL2().glAttachObjectARB(state._programID, state._tessellationEvaluationShaderID);
             } else if (state._tessellationEvaluationShaderID != -1) {
-            	removeTessEvalShader(state);
+                removeTessEvalShader(state);
                 state._tessellationEvaluationShaderID = -1;
             }
         }
@@ -195,7 +198,7 @@ public abstract class JoglShaderObjectsStateUtil {
     }
 
     private static void checkLinkError(final int programId) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final IntBuffer compiled = BufferUtils.createIntBuffer(1);
         gl.getGL2().glGetObjectParameterivARB(programId, GL2ES2.GL_LINK_STATUS, compiled);
@@ -221,7 +224,7 @@ public abstract class JoglShaderObjectsStateUtil {
 
     /** Removes the fragment shader */
     private static void removeFragShader(final GLSLShaderObjectsState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state._fragmentShaderID != -1) {
             gl.getGL2().glDetachObjectARB(state._programID, state._fragmentShaderID);
@@ -231,7 +234,7 @@ public abstract class JoglShaderObjectsStateUtil {
 
     /** Removes the vertex shader */
     private static void removeVertShader(final GLSLShaderObjectsState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state._vertexShaderID != -1) {
             gl.getGL2().glDetachObjectARB(state._programID, state._vertexShaderID);
@@ -241,27 +244,27 @@ public abstract class JoglShaderObjectsStateUtil {
 
     /** Removes the geometry shader */
     private static void removeGeomShader(final GLSLShaderObjectsState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state._geometryShaderID != -1) {
             gl.getGL2().glDetachObjectARB(state._programID, state._geometryShaderID);
             gl.getGL2().glDeleteObjectARB(state._geometryShaderID);
         }
     }
-    
+
     /** Removes the tessellation control shader */
     private static void removeTessControlShader(final GLSLShaderObjectsState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state._tessellationControlShaderID != -1) {
             gl.getGL2().glDetachObjectARB(state._programID, state._tessellationControlShaderID);
             gl.getGL2().glDeleteObjectARB(state._tessellationControlShaderID);
         }
     }
-    
+
     /** Removes the tessellation evaluation shader */
     private static void removeTessEvalShader(final GLSLShaderObjectsState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (state._tessellationEvaluationShaderID != -1) {
             gl.getGL2().glDetachObjectARB(state._programID, state._tessellationEvaluationShaderID);
@@ -278,7 +281,7 @@ public abstract class JoglShaderObjectsStateUtil {
      *            shader's id
      */
     private static void checkProgramError(final IntBuffer compiled, final int id, final String shaderName) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (compiled.get(0) == GL.GL_FALSE) {
             final IntBuffer iVal = BufferUtils.createIntBuffer(1);
@@ -298,13 +301,13 @@ public abstract class JoglShaderObjectsStateUtil {
 
             logger.severe(out);
 
-            final String nameString = shaderName.equals("") ? "" : " [ " + shaderName + " ]"; 
+            final String nameString = shaderName.equals("") ? "" : " [ " + shaderName + " ]";
             throw new Ardor3dException("Error compiling GLSL shader " + nameString + ": " + out);
         }
     }
 
     public static void apply(final JoglRenderer renderer, final GLSLShaderObjectsState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 

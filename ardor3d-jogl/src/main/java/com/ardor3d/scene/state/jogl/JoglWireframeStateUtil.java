@@ -12,13 +12,13 @@ package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2GL3;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
-import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.record.WireframeStateRecord;
 
 public abstract class JoglWireframeStateUtil {
@@ -54,7 +54,7 @@ public abstract class JoglWireframeStateUtil {
     }
 
     private static void applyPolyMode(final int frontMode, final int backMode, final WireframeStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (record.isValid()) {
             if (frontMode == backMode && (record.frontMode != frontMode || record.backMode != backMode)) {
