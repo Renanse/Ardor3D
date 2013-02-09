@@ -80,7 +80,12 @@ public class LwjglContextCapabilities extends ContextCapabilities {
 
         // FBO
         _fboSupported = caps.GL_EXT_framebuffer_object;
+        System.err.println(caps.GL_EXT_framebuffer_multisample);
         if (_fboSupported) {
+
+            _supportsFBOMultisample = caps.GL_EXT_framebuffer_multisample;
+            _supportsFBOBlit = caps.GL_EXT_framebuffer_blit;
+
             if (caps.GL_ARB_draw_buffers) {
                 GL11.glGetInteger(EXTFramebufferObject.GL_MAX_COLOR_ATTACHMENTS_EXT, buf);
                 _maxFBOColorAttachments = buf.get(0);

@@ -43,6 +43,8 @@ public class ContextCapabilities {
     protected boolean _pbufferSupported = false;
 
     protected boolean _fboSupported = false;
+    protected boolean _supportsFBOMultisample = false;
+    protected boolean _supportsFBOBlit = false;
     protected int _maxFBOColorAttachments = 1;
     protected int _maxFBOSamples = 0;
 
@@ -224,6 +226,20 @@ public class ContextCapabilities {
      */
     public boolean isMultisampleSupported() {
         return _supportsMultisample;
+    }
+
+    /**
+     * @return true if we support fbo multisampling (antialiasing)
+     */
+    public boolean isFBOMultisampleSupported() {
+        return _supportsFBOMultisample;
+    }
+
+    /**
+     * @return true if we support fbo blitting
+     */
+    public boolean isFBOBlitSupported() {
+        return _supportsFBOBlit;
     }
 
     /**
