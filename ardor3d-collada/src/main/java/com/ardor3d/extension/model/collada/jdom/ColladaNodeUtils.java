@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
@@ -85,7 +85,7 @@ public class ColladaNodeUtils {
             // Load each sub node and attach
             final JointNode baseJointNode = new JointNode(null);
             _dataCache.setRootJointNode(baseJointNode);
-            for (final Element n : (List<Element>) visualScene.getChildren("node")) {
+            for (final Element n : visualScene.getChildren("node")) {
                 final Node subNode = buildNode(n, baseJointNode);
                 if (subNode != null) {
                     sceneRoot.attachChild(subNode);
@@ -163,7 +163,7 @@ public class ColladaNodeUtils {
     public AssetData parseAsset(final Element asset) {
         final AssetData assetData = new AssetData();
 
-        for (final Element child : (List<Element>) asset.getChildren()) {
+        for (final Element child : asset.getChildren()) {
             if ("contributor".equals(child.getName())) {
                 parseContributor(assetData, child);
             } else if ("created".equals(child.getName())) {
@@ -204,7 +204,7 @@ public class ColladaNodeUtils {
 
     @SuppressWarnings("unchecked")
     private void parseContributor(final AssetData assetData, final Element contributor) {
-        for (final Element child : (List<Element>) contributor.getChildren()) {
+        for (final Element child : contributor.getChildren()) {
             if ("author".equals(child.getName())) {
                 assetData.setAuthor(child.getText());
             } else if ("authoringTool".equals(child.getName())) {
@@ -273,7 +273,7 @@ public class ColladaNodeUtils {
         final Node node = new Node(nodeName);
 
         final List<Element> transforms = new ArrayList<Element>();
-        for (final Element child : (List<Element>) dNode.getChildren()) {
+        for (final Element child : dNode.getChildren()) {
             if (_dataCache.getTransformTypes().contains(child.getName())) {
                 transforms.add(child);
             }
@@ -290,7 +290,7 @@ public class ColladaNodeUtils {
         }
 
         // process any instance geometries
-        for (final Element instance_geometry : (List<Element>) dNode.getChildren("instance_geometry")) {
+        for (final Element instance_geometry : dNode.getChildren("instance_geometry")) {
             _colladaMaterialUtils.bindMaterials(instance_geometry.getChild("bind_material"));
 
             final Spatial mesh = _colladaMeshUtils.getGeometryMesh(instance_geometry);
@@ -302,12 +302,12 @@ public class ColladaNodeUtils {
         }
 
         // process any instance controllers
-        for (final Element instanceController : (List<Element>) dNode.getChildren("instance_controller")) {
+        for (final Element instanceController : dNode.getChildren("instance_controller")) {
             _dataCache.getControllers().add(new ControllerStore(node, instanceController));
         }
 
         // process any instance nodes
-        for (final Element in : (List<Element>) dNode.getChildren("instance_node")) {
+        for (final Element in : dNode.getChildren("instance_node")) {
             final Node subNode = getNode(in, jointNode);
             if (subNode != null) {
                 node.attachChild(subNode);
@@ -315,7 +315,7 @@ public class ColladaNodeUtils {
         }
 
         // process any concrete child nodes.
-        for (final Element n : (List<Element>) dNode.getChildren("node")) {
+        for (final Element n : dNode.getChildren("node")) {
             final Node subNode = buildNode(n, jointNode);
             if (subNode != null) {
                 node.attachChild(subNode);

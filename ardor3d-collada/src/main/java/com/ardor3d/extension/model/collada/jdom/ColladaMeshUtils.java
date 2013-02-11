@@ -13,10 +13,9 @@ package com.ardor3d.extension.model.collada.jdom;
 import java.nio.FloatBuffer;
 import java.util.EnumSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.Type;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
@@ -88,7 +87,7 @@ public class ColladaMeshUtils {
             // Create each as an Ardor3D Mesh, and attach to node
             boolean hasChild = false;
             if (cMesh.getChild("polygons") != null) {
-                for (final Element p : (List<Element>) cMesh.getChildren("polygons")) {
+                for (final Element p : cMesh.getChildren("polygons")) {
                     final Mesh child = buildMeshPolygons(colladaGeometry, p);
                     if (child != null) {
                         if (child.getName() == null) {
@@ -100,7 +99,7 @@ public class ColladaMeshUtils {
                 }
             }
             if (cMesh.getChild("polylist") != null) {
-                for (final Element p : (List<Element>) cMesh.getChildren("polylist")) {
+                for (final Element p : cMesh.getChildren("polylist")) {
                     final Mesh child = buildMeshPolylist(colladaGeometry, p);
                     if (child != null) {
                         if (child.getName() == null) {
@@ -112,7 +111,7 @@ public class ColladaMeshUtils {
                 }
             }
             if (cMesh.getChild("triangles") != null) {
-                for (final Element t : (List<Element>) cMesh.getChildren("triangles")) {
+                for (final Element t : cMesh.getChildren("triangles")) {
                     final Mesh child = buildMeshTriangles(colladaGeometry, t);
                     if (child != null) {
                         if (child.getName() == null) {
@@ -124,7 +123,7 @@ public class ColladaMeshUtils {
                 }
             }
             if (cMesh.getChild("lines") != null) {
-                for (final Element l : (List<Element>) cMesh.getChildren("lines")) {
+                for (final Element l : cMesh.getChildren("lines")) {
                     final Line child = buildMeshLines(colladaGeometry, l);
                     if (child != null) {
                         if (child.getName() == null) {
@@ -243,7 +242,7 @@ public class ColladaMeshUtils {
         // use interval & sum of sizes of p entries to determine buffer sizes.
         int numEntries = 0;
         int numIndices = 0;
-        for (final Element vals : (List<Element>) polys.getChildren("p")) {
+        for (final Element vals : polys.getChildren("p")) {
             final int length = _colladaDOMUtil.parseIntArray(vals).length;
             numEntries += length;
             numIndices += (length / interval - 2) * 3;
@@ -268,7 +267,7 @@ public class ColladaMeshUtils {
         // go through the polygon entries
         int firstIndex = 0, vecIndex;
         final int[] currentVal = new int[interval];
-        for (final Element dia : (List<Element>) polys.getChildren("p")) {
+        for (final Element dia : polys.getChildren("p")) {
             // for each p, iterate using max offset
             final int[] vals = _colladaDOMUtil.parseIntArray(dia);
 
@@ -528,13 +527,13 @@ public class ColladaMeshUtils {
     private int extractPipes(final Element inputsParent, final LinkedList<ColladaInputPipe> pipesStore) {
         int maxOffset = 0;
         int texCount = 0;
-        for (final Element input : (List<Element>) inputsParent.getChildren("input")) {
+        for (final Element input : inputsParent.getChildren("input")) {
             maxOffset = Math.max(maxOffset, _colladaDOMUtil.getAttributeIntValue(input, "offset", 0));
             try {
                 final Type type = Type.valueOf(input.getAttributeValue("semantic"));
                 if (type == Type.VERTEX) {
                     final Element vertexElement = _colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
-                    for (final Element vertexInput : (List<Element>) vertexElement.getChildren("input")) {
+                    for (final Element vertexInput : vertexElement.getChildren("input")) {
                         vertexInput.setAttribute("offset", input.getAttributeValue("offset"));
                         vertexInput.setAttribute("isVertexDefined", "true");
                         final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, vertexInput);

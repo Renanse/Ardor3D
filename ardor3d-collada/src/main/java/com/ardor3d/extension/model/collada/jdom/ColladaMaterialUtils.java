@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.MaterialInfo;
@@ -154,7 +154,7 @@ public class ColladaMaterialUtils {
                 /* Diffuse property */
                 property = blinnPhongLambert.getChild("diffuse");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
                         mState.setDiffuse(MaterialFace.FrontAndBack, color);
@@ -166,7 +166,7 @@ public class ColladaMaterialUtils {
                 /* Ambient property */
                 property = blinnPhongLambert.getChild("ambient");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
                         mState.setAmbient(MaterialFace.FrontAndBack, color);
@@ -177,7 +177,7 @@ public class ColladaMaterialUtils {
                 /* Transparent property */
                 property = blinnPhongLambert.getChild("transparent");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         transparent = _colladaDOMUtil.getColor(propertyValue.getText());
                         // TODO: use this
@@ -190,7 +190,7 @@ public class ColladaMaterialUtils {
                 /* Transparency property */
                 property = blinnPhongLambert.getChild("transparency");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("float".equals(propertyValue.getName())) {
                         transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
                         // TODO: use this
@@ -205,7 +205,7 @@ public class ColladaMaterialUtils {
                 /* Emission property */
                 property = blinnPhongLambert.getChild("emission");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         mState.setEmissive(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue.getText()));
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
@@ -215,7 +215,7 @@ public class ColladaMaterialUtils {
                 /* Specular property */
                 property = blinnPhongLambert.getChild("specular");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         mState.setSpecular(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue.getText()));
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
@@ -225,7 +225,7 @@ public class ColladaMaterialUtils {
                 /* Shininess property */
                 property = blinnPhongLambert.getChild("shininess");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("float".equals(propertyValue.getName())) {
                         float shininess = Float.parseFloat(propertyValue.getText().replace(",", "."));
                         if (shininess >= 0.0f && shininess <= 1.0f) {
@@ -248,7 +248,7 @@ public class ColladaMaterialUtils {
                 float reflectivity = 1.0f;
                 property = blinnPhongLambert.getChild("reflectivity");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("float".equals(propertyValue.getName())) {
                         reflectivity = Float.parseFloat(propertyValue.getText().replace(",", "."));
                     }
@@ -256,7 +256,7 @@ public class ColladaMaterialUtils {
                 /* Reflective property. Texture only */
                 property = blinnPhongLambert.getChild("reflective");
                 if (property != null) {
-                    final Element propertyValue = (Element) property.getChildren().get(0);
+                    final Element propertyValue = property.getChildren().get(0);
                     if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         final Texture reflectiveTexture = populateTextureState(mesh, propertyValue, effect,
                                 loadedTextures, mInfo, "reflective");
@@ -414,7 +414,7 @@ public class ColladaMaterialUtils {
         }
 
         if ("newparam".equals(node.getName())) {
-            node = (Element) node.getChildren().get(0);
+            node = node.getChildren().get(0);
         }
 
         Element sampler = null;
@@ -434,7 +434,7 @@ public class ColladaMaterialUtils {
         }
 
         if ("newparam".equals(node.getName())) {
-            node = (Element) node.getChildren().get(0);
+            node = node.getChildren().get(0);
         }
 
         if ("surface".equals(node.getName())) {
@@ -457,7 +457,7 @@ public class ColladaMaterialUtils {
                 // look for an init_from with lowest mip and use that. (usually 0)
 
                 // TODO: mip?
-                final Element lowest = (Element) surface.getChildren("init_from").get(0);
+                final Element lowest = surface.getChildren("init_from").get(0);
                 // Element lowest = null;
                 // for (final Element i : (List<Element>) surface.getChildren("init_from")) {
                 // if (lowest == null || lowest.getMip() > i.getMip()) {
@@ -541,8 +541,7 @@ public class ColladaMaterialUtils {
             return;
         }
 
-        for (final Element instance : (List<Element>) bindMaterial.getChild("technique_common").getChildren(
-                "instance_material")) {
+        for (final Element instance : bindMaterial.getChild("technique_common").getChildren("instance_material")) {
             final Element matNode = _colladaDOMUtil.findTargetWithId(instance.getAttributeValue("target"));
             if (matNode != null && "material".equals(matNode.getName())) {
                 _dataCache.bindMaterial(instance.getAttributeValue("symbol"), matNode);
@@ -559,8 +558,7 @@ public class ColladaMaterialUtils {
         if (bindMaterial == null || bindMaterial.getChildren().isEmpty()) {
             return;
         }
-        for (final Element instance : (List<Element>) bindMaterial.getChild("technique_common").getChildren(
-                "instance_material")) {
+        for (final Element instance : bindMaterial.getChild("technique_common").getChildren("instance_material")) {
             _dataCache.unbindMaterial(instance.getAttributeValue("symbol"));
         }
     }
