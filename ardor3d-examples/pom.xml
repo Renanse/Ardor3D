@@ -94,6 +94,7 @@
 				<executions>
 					<execution>
 						<id>unpacknatives</id>
+						<phase>generate-resources</phase>
 						<goals>
 							<goal>copy</goal>
 						</goals>
