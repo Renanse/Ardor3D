@@ -16,6 +16,8 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ARBMultisample;
+import org.lwjgl.opengl.EXTFramebufferBlit;
+import org.lwjgl.opengl.EXTFramebufferMultisample;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -36,7 +38,6 @@ import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRenderer;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -57,6 +58,8 @@ public class LwjglHeadlessCanvas {
     protected Camera _camera;
 
     protected int _fboID, _depthRBID, _colorRBID;
+    protected int _msfboID, _msdepthRBID, _mscolorRBID;
+    protected boolean _useMSAA = false;
     protected IntBuffer _data;
     protected Pbuffer _buff;
 
@@ -82,19 +85,11 @@ public class LwjglHeadlessCanvas {
         try {
             // Create a Pbuffer so we can have a valid gl context to work with
             final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(),
-                    _settings.getStencilBits()).withSamples(_settings.getSamples());
+                    _settings.getStencilBits());
             _buff = new Pbuffer(1, 1, format, null);
             _buff.makeCurrent();
         } catch (final LWJGLException ex) {
-            try {
-                // try again without samples
-                final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(),
-                        _settings.getStencilBits());
-                _buff = new Pbuffer(1, 1, format, null);
-                _buff.makeCurrent();
-            } catch (final LWJGLException ex2) {
-                ex2.printStackTrace();
-            }
+            ex.printStackTrace();
         }
 
         // Set up our Ardor3D context and capabilities objects
@@ -105,6 +100,10 @@ public class LwjglHeadlessCanvas {
             throw new Ardor3dException("Headless requires FBO support.");
         }
 
+        if (caps.isFBOMultisampleSupported() && caps.isFBOBlitSupported() && _settings.getSamples() > 0) {
+            _useMSAA = true;
+        }
+
         // Init our FBO.
         final IntBuffer buffer = BufferUtils.createIntBuffer(1);
         EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate id
@@ -113,12 +112,13 @@ public class LwjglHeadlessCanvas {
         _fboID = buffer.get(0);
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboID);
 
-        // initial our color renderbuffer
+        // initialize our color renderbuffer
         EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
         _colorRBID = buffer.get(0);
         EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _colorRBID);
         EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL11.GL_RGBA, width,
                 height);
+
         // Attach color renderbuffer to framebuffer
         EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                 EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, _colorRBID);
@@ -129,6 +129,7 @@ public class LwjglHeadlessCanvas {
         EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
         EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
                 GL11.GL_DEPTH_COMPONENT, width, height);
+
         // Attach depth renderbuffer to framebuffer
         EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                 EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
@@ -136,17 +137,53 @@ public class LwjglHeadlessCanvas {
         // Check FBO complete
         LwjglTextureRenderer.checkFBOComplete(_fboID);
 
+        // Now do it all again for multisample, if requested and supported
+        if (_useMSAA) {
+
+            // Init our ms FBO.
+            EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate id
+
+            // Bind the ms FBO
+            _msfboID = buffer.get(0);
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _msfboID);
+
+            // initialize our ms color renderbuffer
+            EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+            _mscolorRBID = buffer.get(0);
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _mscolorRBID);
+            EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                    _settings.getSamples(), GL11.GL_RGBA, width, height);
+
+            // Attach ms color renderbuffer to ms framebuffer
+            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
+                    EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                    _mscolorRBID);
+
+            // initialize our ms depth renderbuffer
+            EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+            _msdepthRBID = buffer.get(0);
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _msdepthRBID);
+            EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                    _settings.getSamples(), GL11.GL_DEPTH_COMPONENT, width, height);
+
+            // Attach ms depth renderbuffer to ms framebuffer
+            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
+                    EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                    _msdepthRBID);
+
+            // Check MS FBO complete
+            LwjglTextureRenderer.checkFBOComplete(_msfboID);
+
+            // enable multisample
+            GL11.glEnable(ARBMultisample.GL_MULTISAMPLE_ARB);
+        }
+
         // Setup our data buffer for storing rendered image data.
         _data = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
 
         // Add context to manager and set as active.
         ContextManager.addContext(this, currentContext);
         ContextManager.switchContext(this);
-
-        // Turn on multisample if requested...
-        if (_settings.getSamples() != 0 && caps.isMultisampleSupported()) {
-            GL11.glEnable(ARBMultisample.GL_MULTISAMPLE_ARB);
-        }
 
         // Setup a default bg color.
         _renderer.setBackgroundColor(ColorRGBA.BLACK);
@@ -163,17 +200,14 @@ public class LwjglHeadlessCanvas {
         final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
         _camera.setFrame(loc, left, up, dir);
 
-        if (Constants.useMultipleContexts) {
-            // release our FBO until used.
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
-        }
+        // release our FBO(s) until used.
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
     }
 
     public void draw() {
-        if (Constants.useMultipleContexts) {
-            // activate FBO
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboID);
-        }
+        // bind correct fbo
+        EXTFramebufferObject
+                .glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _useMSAA ? _msfboID : _fboID);
 
         // Make sure this OpenGL context is current.
         ContextManager.switchContext(this);
@@ -197,15 +231,25 @@ public class LwjglHeadlessCanvas {
         _scene.renderUnto(_renderer);
         _renderer.flushFrame(false);
 
+        // if we're multisampled, we need to blit to a non-multisampled fbo first
+        if (_useMSAA) {
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, _fboID);
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT, _msfboID);
+            EXTFramebufferBlit.glBlitFramebufferEXT(0, 0, _settings.getWidth(), _settings.getHeight(), 0, 0,
+                    _settings.getWidth(), _settings.getHeight(), GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT
+                            | GL11.GL_STENCIL_BUFFER_BIT, GL11.GL_NEAREST);
+
+            // get ready to read non-msaa fbo
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboID);
+        }
+
         // read data from our color buffer
         _data.rewind();
         GL11.glReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
         GL11.glReadPixels(0, 0, _settings.getWidth(), _settings.getHeight(), GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, _data);
 
-        if (Constants.useMultipleContexts) {
-            // release our FBO.
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
-        }
+        // release our FBO.
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
     }
 
     public void releaseContext() throws LWJGLException {

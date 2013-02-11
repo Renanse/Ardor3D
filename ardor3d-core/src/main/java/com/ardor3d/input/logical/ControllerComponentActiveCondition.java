@@ -34,17 +34,20 @@ public final class ControllerComponentActiveCondition implements Predicate<TwoIn
             return false;
         }
 
-        float prev, curr;
+        Float prev, curr;
         for (final String component : componentNames) {
             curr = currentStates.get(component);
-            if (curr != 0) {
+            if (curr == null) {
+                continue;
+            }
+            if (curr.floatValue() != 0) {
                 return true;
             }
 
             if (previousStates != null) {
                 prev = previousStates.get(component);
 
-                if (curr != prev) {
+                if (prev != null && curr.floatValue() != prev.floatValue()) {
                     return true;
                 }
             }

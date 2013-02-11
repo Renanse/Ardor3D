@@ -642,7 +642,8 @@ public class ExampleRunner extends JFrame {
                      * @see FileFilter
                      */
                     public boolean accept(final File pathname) {
-                        return (pathname.isDirectory() && !pathname.getName().startsWith("."))
+                        return (pathname.isDirectory() && (pathname.getName().length() == 0 || pathname.getName()
+                                .charAt(0) != '.'))
                                 || (pathname.getName().endsWith(".class") && pathname.getName().indexOf('$') < 0);
                     }
                 };
@@ -661,7 +662,7 @@ public class ExampleRunner extends JFrame {
             if (name.endsWith(".class") && name.indexOf('$') < 0) {
                 String classname = name.substring(0, name.length() - ".class".length());
 
-                if (classname.startsWith("/")) {
+                if (classname.length() > 0 && classname.charAt(0) == '/') {
                     classname = classname.substring(1);
                 }
                 classname = classname.replace('/', '.');

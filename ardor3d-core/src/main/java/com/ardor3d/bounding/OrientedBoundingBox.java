@@ -191,6 +191,32 @@ public class OrientedBoundingBox extends BoundingVolume {
         }
     }
 
+    @Override
+    public BoundingVolume asType(final Type newType) {
+        if (newType == null) {
+            return null;
+        }
+
+        switch (newType) {
+            case AABB: {
+                final BoundingBox box = new BoundingBox(_center, 0, 0, 0);
+                return box.merge(this);
+            }
+
+            case Sphere: {
+                final BoundingSphere sphere = new BoundingSphere(0, _center);
+                return sphere.merge(this);
+            }
+
+            case OBB: {
+                return this.clone(null);
+            }
+
+            default:
+                return null;
+        }
+    }
+
     private BoundingVolume mergeSphere(final BoundingSphere volume) {
         // check for infinite bounds to prevent NaN values
         if (Vector3.isInfinite(getExtent()) || Double.isInfinite(volume.getRadius())) {

@@ -51,12 +51,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>2.3.1</version>
+                    <version>2.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -119,14 +119,12 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.5</version>
-                <scope>test</scope>
+                <version>4.10</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymockclassextension</artifactId>
                 <version>2.4</version>
-                <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.jogamp.gluegen</groupId>
@@ -217,7 +215,7 @@
                                     <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
                                     </bottom>
                                     <links>
-                                        <link>http://java.sun.com/javase/6/docs/api</link>
+                                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
                                     </links>
                                     <linksource>true</linksource>
                                     <quiet>true</quiet>

@@ -151,7 +151,7 @@ public class ObjImporter {
                 }
 
                 // ignore comments. goto next line
-                if (line.startsWith("#")) {
+                if (line.length() > 0 && line.charAt(0) == '#') {
                     continue;
                 }
 
@@ -421,7 +421,7 @@ public class ObjImporter {
                 }
 
                 // ignore comments. goto next line
-                if (line.startsWith("#") || line.length() == 0) {
+                if (line.length() == 0 || line.charAt(0) == '#') {
                     continue;
                 }
 

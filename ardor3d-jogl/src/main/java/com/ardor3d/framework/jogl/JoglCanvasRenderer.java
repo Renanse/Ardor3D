@@ -18,7 +18,6 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLException;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -27,11 +26,11 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.util.Ardor3dException;
@@ -72,42 +71,45 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         int value = GLContext.CONTEXT_NOT_CURRENT;
         int attempt = 0;
         do {
-        	try {
-        		value = _context.makeCurrent();
-        	} catch(GLException gle) {
-        		gle.printStackTrace();
-        	} finally {
-        		attempt++;
-        		if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
+            try {
+                value = _context.makeCurrent();
+            } catch (final GLException gle) {
+                gle.printStackTrace();
+            } finally {
+                attempt++;
+                if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
                     // failed, throw exception
                     throw new Ardor3dException("Failed to claim OpenGL context.");
                 }
-        	}        	
-        	try {
-        		Thread.sleep(5);
-        	} catch (final InterruptedException e1) {
-        		e1.printStackTrace();
-        	}
-        }
-        while(value == GLContext.CONTEXT_NOT_CURRENT);
-        if (value == GLContext.CONTEXT_CURRENT_NEW) {
-            ContextManager.getCurrentContext().contextLost();
+            }
+            try {
+                Thread.sleep(5);
+            } catch (final InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        } while (value == GLContext.CONTEXT_NOT_CURRENT);
+        if (ContextManager.getCurrentContext() != null) {
+            if (value == GLContext.CONTEXT_CURRENT_NEW) {
+                ContextManager.getCurrentContext().contextLost();
 
-            // Whenever the context is created or replaced, the GL chain
-            // is lost. Debug will have to be added if desired.
-            _debugEnabled = false;
-        }
+                // Whenever the context is created or replaced, the GL chain
+                // is lost. Debug will have to be added if desired.
+                _debugEnabled = false;
+            }
 
-        ContextManager.switchContext(_context);
+            if (ContextManager.getContextForKey(_context) != null) {
+                ContextManager.switchContext(_context);
+            }
+        }
     }
 
     public void releaseCurrentContext() {
-        if (_context.equals(GLContext.getCurrent())) {            
+        if (_context.equals(GLContext.getCurrent())) {
             try {
-            	_context.release();
-        	} catch(GLException gle) {
-        		gle.printStackTrace();
-        	}
+                _context.release();
+            } catch (final GLException gle) {
+                gle.printStackTrace();
+            }
         }
     }
 
@@ -123,52 +125,53 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             _context = GLDrawableFactory.getFactory(GLProfile.getMaxFixedFunc(true)).createExternalGLContext();
         }
 
-        _context.makeCurrent();
+        makeCurrentContext();
 
         try {
 
-        	// Look up a shared context, if a shared JoglCanvasRenderer is given.
-        	RenderContext sharedContext = null;
-        	if (settings.getShareContext() != null) {
-        		sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
-        				.getContextKey());
-        	}
+            // Look up a shared context, if a shared JoglCanvasRenderer is given.
+            RenderContext sharedContext = null;
+            if (settings.getShareContext() != null) {
+                sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
+                        .getContextKey());
+            }
 
-        	final ContextCapabilities caps = createContextCapabilities();
-        	_currentContext = new RenderContext(_context, caps, sharedContext);
+            final ContextCapabilities caps = createContextCapabilities();
+            _currentContext = new RenderContext(_context, caps, sharedContext);
 
-        	ContextManager.addContext(_context, _currentContext);
-        	ContextManager.switchContext(_context);
+            ContextManager.addContext(_context, _currentContext);
+            ContextManager.switchContext(_context);
 
-        	_renderer = new JoglRenderer();
+            _renderer = new JoglRenderer();
 
-        	if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
-        		final GL gl = GLU.getCurrentGL();
-        		gl.glEnable(GL.GL_MULTISAMPLE);
-        	}
+            if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
+                final GL gl = GLContext.getCurrentGL();
+                gl.glEnable(GL.GL_MULTISAMPLE);
+            }
 
-        	_renderer.setBackgroundColor(ColorRGBA.BLACK);
+            _renderer.setBackgroundColor(ColorRGBA.BLACK);
 
-        	if (_camera == null) {
-        		/** Set up how our camera sees. */
-        		_camera = new Camera(settings.getWidth(), settings.getHeight());
-        		_camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1, 1000);
-        		_camera.setProjectionMode(ProjectionMode.Perspective);
+            if (_camera == null) {
+                /** Set up how our camera sees. */
+                _camera = new Camera(settings.getWidth(), settings.getHeight());
+                _camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1,
+                        1000);
+                _camera.setProjectionMode(ProjectionMode.Perspective);
 
-        		final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
-        		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-        		final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
-        		final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
-        		/** Move our camera to a correct place and orientation. */
-        		_camera.setFrame(loc, left, up, dir);
-        	} else {
-        		// use new width and height to set ratio.
-        		_camera.setFrustumPerspective(_camera.getFovY(),
-        				(float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(), _camera
-        				.getFrustumFar());
-        	}
+                final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
+                final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+                final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+                final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
+                /** Move our camera to a correct place and orientation. */
+                _camera.setFrame(loc, left, up, dir);
+            } else {
+                // use new width and height to set ratio.
+                _camera.setFrustumPerspective(_camera.getFovY(),
+                        (float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(),
+                        _camera.getFrustumFar());
+            }
         } finally {
-        	_context.release();
+            releaseCurrentContext();
         }
     }
 

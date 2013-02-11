@@ -2099,47 +2099,47 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     @Override
     public String toString() {
         final StringBuffer result = new StringBuffer("com.ardor3d.math.Matrix4\n[\n");
-        result.append(" ");
+        result.append(' ');
         result.append(_m00);
-        result.append(" ");
+        result.append(' ');
         result.append(_m01);
-        result.append(" ");
+        result.append(' ');
         result.append(_m02);
-        result.append(" ");
+        result.append(' ');
         result.append(_m03);
         result.append(" \n");
 
-        result.append(" ");
+        result.append(' ');
         result.append(_m10);
-        result.append(" ");
+        result.append(' ');
         result.append(_m11);
-        result.append(" ");
+        result.append(' ');
         result.append(_m12);
-        result.append(" ");
+        result.append(' ');
         result.append(_m13);
         result.append(" \n");
 
-        result.append(" ");
+        result.append(' ');
         result.append(_m20);
-        result.append(" ");
+        result.append(' ');
         result.append(_m21);
-        result.append(" ");
+        result.append(' ');
         result.append(_m22);
-        result.append(" ");
+        result.append(' ');
         result.append(_m23);
         result.append(" \n");
 
-        result.append(" ");
+        result.append(' ');
         result.append(_m30);
-        result.append(" ");
+        result.append(' ');
         result.append(_m31);
-        result.append(" ");
+        result.append(' ');
         result.append(_m32);
-        result.append(" ");
+        result.append(' ');
         result.append(_m33);
         result.append(" \n");
 
-        result.append("]");
+        result.append(']');
         return result.toString();
     }
 

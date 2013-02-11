@@ -54,7 +54,7 @@ public class GameTaskQueue {
      */
     public void setExecuteMultiple(final boolean executeMultiple) {
         _executeMultiple.set(executeMultiple);
-        if (executeMultiple == true) {
+        if (executeMultiple) {
             _executionTime = Integer.MAX_VALUE;
         }
     }
@@ -79,7 +79,7 @@ public class GameTaskQueue {
      * @return -1 if executeAll is false, else min time allocated for task execution per frame
      */
     public long getExecutionTime() {
-        if (_executeMultiple.get() == false) {
+        if (!_executeMultiple.get()) {
             return -1;
         }
         return _executionTime;

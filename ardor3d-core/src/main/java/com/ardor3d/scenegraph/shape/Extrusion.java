@@ -138,9 +138,9 @@ public class Extrusion extends Mesh {
 
         final int numIndices = (path.size() - 1) * 2 * shapeBuffer.limit();
         IndexBufferData<?> indices;
-        if (_meshData.getIndexBuffer() != null && _meshData.getIndexBuffer().limit() == numIndices) {
+        if (_meshData.getIndices() != null && _meshData.getIndices().limit() == numIndices) {
             indices = _meshData.getIndices();
-            indices.getBuffer().rewind();
+            indices.rewind();
         } else {
             indices = BufferUtils.createIndexBufferData(numIndices, numVertices - 1);
         }

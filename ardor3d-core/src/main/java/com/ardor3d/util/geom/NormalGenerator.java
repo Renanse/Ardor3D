@@ -723,7 +723,7 @@ public class NormalGenerator {
             for (int i = 0; i < 3; i++) {
                 final Edge edge = edges[i];
                 if (edge == null) {
-                    result.append("?");
+                    result.append('?');
                 } else {
                     if (edge.newI0 > -1) {
                         result.append(edge.newI0);
@@ -735,7 +735,7 @@ public class NormalGenerator {
                     result.append(", ");
                 }
             }
-            result.append(")");
+            result.append(')');
             return result.toString();
         }
     }

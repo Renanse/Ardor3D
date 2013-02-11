@@ -75,11 +75,11 @@ public class ControllerState {
 
         for (final String controllerStateKey : _controllerStates.keySet()) {
             final Map<String, Float> state = _controllerStates.get(controllerStateKey);
-            stateString.append("[").append(controllerStateKey);
+            stateString.append('[').append(controllerStateKey);
             for (final String stateKey : state.keySet()) {
-                stateString.append("[").append(stateKey).append(":").append(state.get(stateKey)).append("]");
+                stateString.append('[').append(stateKey).append(':').append(state.get(stateKey)).append(']');
             }
-            stateString.append("]");
+            stateString.append(']');
         }
 
         return stateString.toString();

@@ -1552,6 +1552,31 @@ public final class BufferUtils {
     }
 
     /**
+     * Create a new IndexBufferData large enough to fit the contents of the given array. The specific implementation
+     * will be chosen based on the max value you need to store in your buffer. If that value is less than 2^8, a
+     * ByteBufferData is used. If it is less than 2^16, a ShortBufferData is used. Otherwise an IntBufferData is used.
+     * 
+     * @param contents
+     *            an array of index values to store in your newly created IndexBufferData.
+     * @param maxValue
+     *            the largest value you will need to store in your buffer. Often this is equal to
+     *            ("size of vertex buffer" - 1).
+     * @return the new IndexBufferData
+     */
+    public static IndexBufferData<?> createIndexBufferData(final int[] contents, final int maxValue) {
+        final IndexBufferData<?> buffer;
+        if (maxValue < 256) { // 2^8
+            buffer = createIndexBufferData(contents.length, ByteBufferData.class);
+        } else if (maxValue < 65536) { // 2^16
+            buffer = createIndexBufferData(contents.length, ShortBufferData.class);
+        } else {
+            buffer = createIndexBufferData(contents.length, IntBufferData.class);
+        }
+        buffer.put(contents);
+        return buffer;
+    }
+
+    /**
      * Create a new IndexBufferData of the specified size and class.
      * 
      * @param size
@@ -1683,13 +1708,13 @@ public final class BufferUtils {
         if (store == null) {
             store = new StringBuilder();
         }
-        store.append("Existing buffers: ").append(bufs.size()).append("\n");
+        store.append("Existing buffers: ").append(bufs.size()).append('\n');
         store.append("(b: ").append(bBufs).append("  f: ").append(fBufs).append("  i: ").append(iBufs).append("  s: ")
-                .append(sBufs).append("  d: ").append(dBufs).append(")").append("\n");
+                .append(sBufs).append("  d: ").append(dBufs).append(')').append('\n');
         store.append("Total direct memory held: ").append(totalHeld / 1024).append("kb\n");
         store.append("(b: ").append(bBufsM / 1024).append("kb  f: ").append(fBufsM / 1024).append("kb  i: ")
                 .append(iBufsM / 1024).append("kb  s: ").append(sBufsM / 1024).append("kb  d: ").append(dBufsM / 1024)
-                .append("kb)").append("\n");
+                .append("kb)").append('\n');
         if (printStout) {
             System.out.println(store.toString());
         }

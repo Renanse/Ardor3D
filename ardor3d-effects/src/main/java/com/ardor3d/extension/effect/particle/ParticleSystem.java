@@ -46,8 +46,6 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class ParticleSystem extends Node {
     private static final Logger logger = Logger.getLogger(ParticleSystem.class.getName());
 
-    protected static final long serialVersionUID = 2L;
-
     public enum ParticleType {
         Quad, Triangle, Point, Line, GeomMesh;
     }
@@ -661,8 +659,8 @@ public abstract class ParticleSystem extends Node {
                 vertices[x] = new Vector3();
 
                 final int vertIndex = mData.getVertexIndex(index, x, 0);
-                BufferUtils.populateFromBuffer(vertices[x], mData.getVertexBuffer(),
-                        mData.getIndexBuffer() != null ? mData.getIndices().get(vertIndex) : vertIndex);
+                BufferUtils.populateFromBuffer(vertices[x], mData.getVertexBuffer(), mData.getIndices() != null ? mData
+                        .getIndices().get(vertIndex) : vertIndex);
             }
             Triangle t = p.getTriangleModel();
             if (t == null) {

@@ -14,8 +14,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.ardor3d.extension.terrain.util.Region;
-
 public class TestRegion {
     @Test
     public void testIntersects() throws Exception {

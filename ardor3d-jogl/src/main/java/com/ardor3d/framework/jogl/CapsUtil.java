@@ -19,6 +19,11 @@ import com.ardor3d.util.Ardor3dException;
 public class CapsUtil {
 
     public static GLCapabilities getCapsForSettings(final DisplaySettings settings) {
+        return getCapsForSettings(settings, true, false, false, false);
+    }
+
+    public static GLCapabilities getCapsForSettings(final DisplaySettings settings, final boolean onscreen,
+            final boolean bitmapRequested, final boolean pbufferRequested, final boolean fboRequested) {
 
         // Validate window dimensions.
         if (settings.getWidth() <= 0 || settings.getHeight() <= 0) {
@@ -40,6 +45,25 @@ public class CapsUtil {
         caps.setSampleBuffers(settings.getSamples() != 0);
         caps.setStereo(settings.isStereo());
         caps.setStencilBits(settings.getStencilBits());
+        switch (settings.getColorDepth()) {
+            case 32:
+            case 24:
+                caps.setRedBits(8);
+                caps.setBlueBits(8);
+                caps.setGreenBits(8);
+                break;
+            case 16:
+                caps.setRedBits(4);
+                caps.setBlueBits(4);
+                caps.setGreenBits(4);
+                break;
+        }
+        caps.setOnscreen(onscreen);
+        if (!onscreen) {
+            caps.setBitmap(bitmapRequested);
+            caps.setPBuffer(pbufferRequested);
+            caps.setFBO(fboRequested);
+        }
         return caps;
     }
 

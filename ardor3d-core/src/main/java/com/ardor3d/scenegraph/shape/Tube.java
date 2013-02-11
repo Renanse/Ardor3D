@@ -20,12 +20,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Tube extends Mesh {
 
-    private static final long serialVersionUID = 1L;
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
     private int _axisSamples;
     private int _radialSamples;
 
@@ -137,43 +131,43 @@ public class Tube extends Mesh {
         // outer cylinder
         for (int radialCount = 0; radialCount < _radialSamples + 1; radialCount++) {
             for (int axisCount = 0; axisCount < _axisSamples + 1; axisCount++) {
-                _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _outerRadius)).put(
-                        (float) (axisStep * axisCount - halfHeight)).put(
-                        (float) (sin[radialCount % _radialSamples] * _outerRadius));
+                _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _outerRadius))
+                        .put((float) (axisStep * axisCount - halfHeight))
+                        .put((float) (sin[radialCount % _radialSamples] * _outerRadius));
                 if (_viewInside) {
-                    _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
-                            (float) sin[radialCount % _radialSamples]);
+                    _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0)
+                            .put((float) sin[radialCount % _radialSamples]);
                 } else {
-                    _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
-                            (float) -sin[radialCount % _radialSamples]);
+                    _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0)
+                            .put((float) -sin[radialCount % _radialSamples]);
                 }
-                _meshData.getTextureCoords(0).getBuffer().put((float) (radialCount * inverseRadial)).put(
-                        (float) (axisTextureStep * axisCount));
+                _meshData.getTextureCoords(0).getBuffer().put((float) (radialCount * inverseRadial))
+                        .put((float) (axisTextureStep * axisCount));
             }
         }
         // inner cylinder
         for (int radialCount = 0; radialCount < _radialSamples + 1; radialCount++) {
             for (int axisCount = 0; axisCount < _axisSamples + 1; axisCount++) {
-                _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _innerRadius)).put(
-                        (float) (axisStep * axisCount - halfHeight)).put(
-                        (float) (sin[radialCount % _radialSamples] * _innerRadius));
+                _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _innerRadius))
+                        .put((float) (axisStep * axisCount - halfHeight))
+                        .put((float) (sin[radialCount % _radialSamples] * _innerRadius));
                 if (_viewInside) {
-                    _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
-                            (float) -sin[radialCount % _radialSamples]);
+                    _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0)
+                            .put((float) -sin[radialCount % _radialSamples]);
                 } else {
-                    _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
-                            (float) sin[radialCount % _radialSamples]);
+                    _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0)
+                            .put((float) sin[radialCount % _radialSamples]);
                 }
-                _meshData.getTextureCoords(0).getBuffer().put((float) (radialCount * inverseRadial)).put(
-                        (float) (axisTextureStep * axisCount));
+                _meshData.getTextureCoords(0).getBuffer().put((float) (radialCount * inverseRadial))
+                        .put((float) (axisTextureStep * axisCount));
             }
         }
         // bottom edge
         for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _outerRadius)).put((float) -halfHeight).put(
-                    (float) (sin[radialCount] * _outerRadius));
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) -halfHeight).put(
-                    (float) (sin[radialCount] * _innerRadius));
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _outerRadius)).put((float) -halfHeight)
+                    .put((float) (sin[radialCount] * _outerRadius));
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) -halfHeight)
+                    .put((float) (sin[radialCount] * _innerRadius));
             if (_viewInside) {
                 _meshData.getNormalBuffer().put(0).put(1).put(0);
                 _meshData.getNormalBuffer().put(0).put(1).put(0);
@@ -181,17 +175,17 @@ public class Tube extends Mesh {
                 _meshData.getNormalBuffer().put(0).put(-1).put(0);
                 _meshData.getNormalBuffer().put(0).put(-1).put(0);
             }
-            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount])).put(
-                    (float) (0.5 + 0.5 * sin[radialCount]));
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount]))
+                    .put((float) (0.5 + 0.5 * sin[radialCount]));
             _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount]))
                     .put((float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
         // top edge
         for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _outerRadius)).put((float) halfHeight).put(
-                    (float) (sin[radialCount] * _outerRadius));
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) halfHeight).put(
-                    (float) (sin[radialCount] * _innerRadius));
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _outerRadius)).put((float) halfHeight)
+                    .put((float) (sin[radialCount] * _outerRadius));
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) halfHeight)
+                    .put((float) (sin[radialCount] * _innerRadius));
             if (_viewInside) {
                 _meshData.getNormalBuffer().put(0).put(-1).put(0);
                 _meshData.getNormalBuffer().put(0).put(-1).put(0);
@@ -199,8 +193,8 @@ public class Tube extends Mesh {
                 _meshData.getNormalBuffer().put(0).put(1).put(0);
                 _meshData.getNormalBuffer().put(0).put(1).put(0);
             }
-            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount])).put(
-                    (float) (0.5 + 0.5 * sin[radialCount]));
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount]))
+                    .put((float) (0.5 + 0.5 * sin[radialCount]));
             _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount]))
                     .put((float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
@@ -208,7 +202,7 @@ public class Tube extends Mesh {
     }
 
     private void setIndexData() {
-        _meshData.getIndexBuffer().rewind();
+        _meshData.getIndices().rewind();
 
         final int outerCylinder = (_axisSamples + 1) * (_radialSamples + 1);
         final int bottomEdge = 2 * outerCylinder;

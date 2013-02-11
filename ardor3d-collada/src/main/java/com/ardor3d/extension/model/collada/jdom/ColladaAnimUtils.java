@@ -979,7 +979,7 @@ public class ColladaAnimUtils {
             String accessorString = targetString.substring(accessorIndex, targetString.length());
             accessorString = accessorString.replace(".", "");
 
-            if (accessorString.startsWith("(")) {
+            if (accessorString.length() > 0 && accessorString.charAt(0) == '(') {
                 int endPara = accessorString.indexOf(")");
                 final String indexXString = accessorString.substring(1, endPara);
                 target.accessorIndexX = Integer.parseInt(indexXString);
@@ -1104,46 +1104,46 @@ public class ColladaAnimUtils {
     private static void getElementString(final Element e, final StringBuilder str, final int depth, final int maxDepth,
             final boolean showDots) {
         addSpacing(str, depth);
-        str.append("<");
+        str.append('<');
         str.append(e.getName());
-        str.append(" ");
+        str.append(' ');
         final List<Attribute> attrs = e.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             final Attribute attr = attrs.get(i);
             str.append(attr.getName());
             str.append("=\"");
             str.append(attr.getValue());
-            str.append("\"");
+            str.append('"');
             if (i < attrs.size() - 1) {
-                str.append(" ");
+                str.append(' ');
             }
         }
         if (!e.getChildren().isEmpty() || !"".equals(e.getText())) {
-            str.append(">");
+            str.append('>');
             if (depth < maxDepth) {
-                str.append("\n");
-                for (final Element child : e.getChildren()) {
+                str.append('\n');
+                for (final Element child : (List<Element>) e.getChildren()) {
                     getElementString(child, str, depth + 1, maxDepth, showDots);
                 }
                 if (!"".equals(e.getText())) {
                     addSpacing(str, depth + 1);
                     str.append(e.getText());
-                    str.append("\n");
+                    str.append('\n');
                 }
             } else if (showDots) {
-                str.append("\n");
+                str.append('\n');
                 addSpacing(str, depth + 1);
                 str.append("...");
-                str.append("\n");
+                str.append('\n');
             }
             addSpacing(str, depth);
             str.append("</");
             str.append(e.getName());
-            str.append(">");
+            str.append('>');
         } else {
             str.append("/>");
         }
-        str.append("\n");
+        str.append('\n');
     }
 
     private static void addSpacing(final StringBuilder str, final int depth) {

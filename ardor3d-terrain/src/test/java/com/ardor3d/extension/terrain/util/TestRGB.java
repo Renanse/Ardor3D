@@ -12,8 +12,6 @@ package com.ardor3d.extension.terrain.util;
 
 import org.junit.Test;
 
-import com.ardor3d.extension.terrain.util.IntColorUtils;
-
 public class TestRGB {
     @Test
     public void testLerp() throws Exception {

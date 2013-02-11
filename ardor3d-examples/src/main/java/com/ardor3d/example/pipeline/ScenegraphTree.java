@@ -70,27 +70,27 @@ public class ScenegraphTree {
 
             str.append(spatial.getName());
             str.append(" - ");
-            str.append(spatial.getClass().getName()).append("\n");
+            str.append(spatial.getClass().getName()).append('\n');
 
             if (spatial instanceof Mesh) {
                 final Mesh mesh = (Mesh) spatial;
                 str.append("Primitives: ");
-                str.append(mesh.getMeshData().getTotalPrimitiveCount()).append("\n");
+                str.append(mesh.getMeshData().getTotalPrimitiveCount()).append('\n');
                 str.append("Index mode: ");
-                str.append(mesh.getMeshData().getIndexMode(0)).append("\n");
+                str.append(mesh.getMeshData().getIndexMode(0)).append('\n');
             }
 
-            str.append(spatial.getTransform()).append("\n");
+            str.append(spatial.getTransform()).append('\n');
             if (spatial.getWorldBound() != null) {
-                str.append(spatial.getWorldBound()).append("\n");
+                str.append(spatial.getWorldBound()).append('\n');
             }
 
-            str.append("\n");
+            str.append('\n');
             final SceneHints sceneHints = spatial.getSceneHints();
             str.append("Cull hint: ");
-            str.append(sceneHints.getCullHint()).append("\n");
+            str.append(sceneHints.getCullHint()).append('\n');
             str.append("Bucket: ");
-            str.append(sceneHints.getRenderBucketType()).append("\n");
+            str.append(sceneHints.getRenderBucketType()).append('\n');
 
             textArea.setText(str.toString());
         }

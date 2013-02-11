@@ -239,7 +239,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
 
         final StringBuilder format = new StringBuilder(decimals > 0 ? "0.0" : "0");
         for (int x = 1; x < decimals; x++) {
-            format.append("0");
+            format.append('0');
         }
 
         return new DecimalFormat(format.toString()).format(val) + post;

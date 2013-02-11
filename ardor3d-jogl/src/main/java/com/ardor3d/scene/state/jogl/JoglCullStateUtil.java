@@ -11,7 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -62,7 +62,7 @@ public abstract class JoglCullStateUtil {
     }
 
     private static void setCullEnabled(final boolean enable, final CullState state, final CullStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.enabled != enable) {
             if (enable) {
@@ -75,7 +75,7 @@ public abstract class JoglCullStateUtil {
     }
 
     private static void setCull(final int face, final CullState state, final CullStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.face != face) {
             gl.glCullFace(face);
@@ -85,7 +85,7 @@ public abstract class JoglCullStateUtil {
 
     private static void setGLPolygonWind(final PolygonWind windOrder, final CullState state,
             final CullStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || record.windOrder != windOrder) {
             switch (windOrder) {

@@ -1705,31 +1705,31 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     @Override
     public String toString() {
         final StringBuffer result = new StringBuffer("com.ardor3d.math.Matrix3\n[\n");
-        result.append(" ");
+        result.append(' ');
         result.append(_m00);
-        result.append(" ");
+        result.append(' ');
         result.append(_m01);
-        result.append(" ");
+        result.append(' ');
         result.append(_m02);
         result.append(" \n");
 
-        result.append(" ");
+        result.append(' ');
         result.append(_m10);
-        result.append(" ");
+        result.append(' ');
         result.append(_m11);
-        result.append(" ");
+        result.append(' ');
         result.append(_m12);
         result.append(" \n");
 
-        result.append(" ");
+        result.append(' ');
         result.append(_m20);
-        result.append(" ");
+        result.append(' ');
         result.append(_m21);
-        result.append(" ");
+        result.append(' ');
         result.append(_m22);
         result.append(" \n");
 
-        result.append("]");
+        result.append(']');
         return result.toString();
     }
 

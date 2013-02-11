@@ -86,7 +86,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         for (final byte b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(buf.length() - 1);
@@ -105,9 +105,9 @@ public class DOMOutputCapsule implements OutputCapsule {
         for (final byte[] bs : value) {
             for (final byte b : bs) {
                 buf.append(b);
-                buf.append(" ");
+                buf.append(' ');
             }
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last spaces
         buf.setLength(buf.length() - 2);
@@ -137,7 +137,7 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         for (final int b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(Math.max(0, buf.length() - 1));
@@ -180,7 +180,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         for (final float b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(buf.length() - 1);
@@ -203,7 +203,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         for (final float[] bs : value) {
             for (final float b : bs) {
                 buf.append(b);
-                buf.append(" ");
+                buf.append(' ');
             }
         }
         // remove last space
@@ -230,7 +230,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         for (final double b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(buf.length() - 1);
@@ -273,7 +273,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         for (final long b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(buf.length() - 1);
@@ -316,7 +316,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         for (final short b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(buf.length() - 1);
@@ -359,7 +359,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         for (final boolean b : value) {
             buf.append(b);
-            buf.append(" ");
+            buf.append(' ');
         }
         // remove last space
         buf.setLength(Math.max(0, buf.length() - 1));
@@ -439,7 +439,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         final StringBuilder buf = new StringBuilder();
         for (int i = value.nextSetBit(0); i >= 0; i = value.nextSetBit(i + 1)) {
             buf.append(i);
-            buf.append(" ");
+            buf.append(' ');
         }
         buf.setLength(Math.max(0, buf.length() - 1));
         _currentElement.setAttribute(name, buf.toString());
@@ -680,7 +680,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         value.rewind();
         while (value.hasRemaining()) {
             buf.append(value.get());
-            buf.append(" ");
+            buf.append(' ');
         }
         buf.setLength(Math.max(0, buf.length() - 1));
         value.position(pos);
@@ -703,7 +703,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         value.rewind();
         while (value.hasRemaining()) {
             buf.append(value.get());
-            buf.append(" ");
+            buf.append(' ');
         }
         buf.setLength(buf.length() - 1);
         value.position(pos);
@@ -726,7 +726,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         value.rewind();
         while (value.hasRemaining()) {
             buf.append(value.get());
-            buf.append(" ");
+            buf.append(' ');
         }
         buf.setLength(buf.length() - 1);
         value.position(pos);
@@ -749,7 +749,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         value.rewind();
         while (value.hasRemaining()) {
             buf.append(value.get());
-            buf.append(" ");
+            buf.append(' ');
         }
         buf.setLength(buf.length() - 1);
         value.position(pos);
