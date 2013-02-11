@@ -1,7 +1,7 @@
 
 package com.ardor3d.extension.model.collada.jdom.data;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import com.ardor3d.scenegraph.Node;
 
