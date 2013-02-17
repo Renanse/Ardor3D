@@ -22,6 +22,7 @@
         <module>ardor3d-ui</module>
         <module>ardor3d-terrain</module>
         <module>ardor3d-examples</module>
+        <module>ardor3d-distribution</module>
     </modules>
 
     <scm>
@@ -65,6 +66,14 @@
                     <configuration>
                         <argLine>-Xmx512m</argLine>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.4</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
