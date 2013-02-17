@@ -32,8 +32,8 @@
 				<dependencySets>
 					<dependencySet>
 						<excludes>
-							<exclude>*:lwjgl*natives-*</exclude>
-							<exclude>*:jinput*natives-*</exclude>
+							<exclude>*:lwjgl*:*:natives-*</exclude>
+							<exclude>*:jinput*:*:natives-*</exclude>
 						</excludes>
 					</dependencySet>
 				</dependencySets>

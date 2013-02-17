@@ -39,8 +39,8 @@
             <useProjectArtifact>false</useProjectArtifact>
             <useStrictFiltering>true</useStrictFiltering>
             <excludes>
-            	<exclude>*:lwjgl*natives-*</exclude>
-            	<exclude>*:jinput*natives-*</exclude>
+            	<exclude>*:lwjgl*:*:natives-*</exclude>
+            	<exclude>*:jinput*:*:natives-*</exclude>
             </excludes>
             <outputDirectory>lib</outputDirectory>
         </dependencySet>
