@@ -56,6 +56,7 @@
 						</goals>
 						<configuration>
 							<descriptors>
+								<descriptor>assembly-all.xml</descriptor>
 								<descriptor>assembly-jogl.xml</descriptor>
 								<descriptor>assembly-lwjgl.xml</descriptor>
 							</descriptors>
