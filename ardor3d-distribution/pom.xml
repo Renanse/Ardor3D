@@ -21,6 +21,26 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	
+	<!-- TODO adapt when switching to Sonatype OSS
+	 
+	When switching to Sonatype OSS, the parent pom will use Sonatype OSS repos
+	in its distributionManagement block. As the zips of this module shouldn't be deployed to 
+	Sonatype/Central but rather to Ardor3D's own repo, the repos have to be overridden here: 
+	
+    <distributionManagement>
+        <repository>
+            <id>Ardor3D-releases</id>
+            <name>Ardor3D releases</name>
+            <url>http://ardor3d.com:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>Ardor3D-snapshots</id>
+            <name>Ardor3D snapshots</name>
+            <url>http://ardor3d.com:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+	-->
 
 	<build>
 		<plugins>
@@ -43,7 +63,7 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
+			<plugin>
 				<groupId>com.googlecode.mavennatives</groupId>
 				<artifactId>maven-nativedependencies-plugin</artifactId>
 				<version>0.0.7</version>
@@ -55,6 +75,12 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
