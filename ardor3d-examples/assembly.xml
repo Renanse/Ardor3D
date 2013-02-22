@@ -30,15 +30,17 @@
             	<exclude>*nativewindow*</exclude>
             	<exclude>*newt*</exclude>
             	<exclude>*gluegen*</exclude>
+            	<exclude>META-INF/</exclude>
             </excludes>
         </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
+            <useStrictFiltering>true</useStrictFiltering>
             <excludes>
-            	<exclude>*:*:*:lwjgl*natives-*:*</exclude>
-            	<exclude>*:*:*:jinput*natives-*:*</exclude>
+            	<exclude>*:lwjgl*:*:natives-*</exclude>
+            	<exclude>*:jinput*:*:natives-*</exclude>
             </excludes>
             <outputDirectory>lib</outputDirectory>
         </dependencySet>
