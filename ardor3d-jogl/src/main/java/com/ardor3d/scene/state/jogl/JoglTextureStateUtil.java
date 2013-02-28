@@ -24,7 +24,6 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.gl2.GLUgl2;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -128,7 +127,7 @@ public class JoglTextureStateUtil {
         final Texture.Type type = texture.getType();
 
         final GL gl = GLContext.getCurrentGL();
-        final GLU glu = new GLUgl2();
+        final GLU glu = GLU.createGLU(gl);
 
         // bind our texture id to this unit.
         doTextureBind(texture, unit, false);
