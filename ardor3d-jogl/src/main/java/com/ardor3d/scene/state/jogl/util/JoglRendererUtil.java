@@ -25,7 +25,11 @@ public abstract class JoglRendererUtil {
         final GL gl = GLContext.getCurrentGL();
 
         if (!rendRecord.isMatrixValid() || rendRecord.getMatrixMode() != mode) {
-            gl.getGL2().glMatrixMode(mode);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glMatrixMode(mode);
+            } else {
+                // TODO use PMVMatrix
+            }
             rendRecord.setMatrixMode(mode);
             rendRecord.setMatrixValid(true);
         }

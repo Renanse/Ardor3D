@@ -248,15 +248,28 @@ public class JoglRenderer extends AbstractRenderer {
         // set up ortho mode
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
-        gl.getGL2().glPushMatrix();
-        gl.getGL2().glLoadIdentity();
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glPushMatrix();
+            gl.getGL2ES1().glLoadIdentity();
+        } else {
+            // TODO use PMVMatrix
+        }
+
         final Camera camera = Camera.getCurrentCamera();
         final double viewportWidth = camera.getWidth() * (camera.getViewPortRight() - camera.getViewPortLeft());
         final double viewportHeight = camera.getHeight() * (camera.getViewPortTop() - camera.getViewPortBottom());
-        gl.getGL2().glOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);
+        } else {
+            // TODO use PMVMatrix
+        }
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-        gl.getGL2().glPushMatrix();
-        gl.getGL2().glLoadIdentity();
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glPushMatrix();
+            gl.getGL2ES1().glLoadIdentity();
+        } else {
+            // TODO use PMVMatrix
+        }
         _inOrthoMode = true;
     }
 
@@ -270,9 +283,17 @@ public class JoglRenderer extends AbstractRenderer {
         // state
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
-        gl.getGL2().glPopMatrix();
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glPopMatrix();
+        } else {
+            // TODO use PMVMatrix
+        }
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-        gl.getGL2().glPopMatrix();
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glPopMatrix();
+        } else {
+            // TODO use PMVMatrix
+        }
         _inOrthoMode = false;
     }
 
@@ -405,10 +426,10 @@ public class JoglRenderer extends AbstractRenderer {
     public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
         final GL gl = GLContext.getCurrentGL();
         if (defaultColor != null) {
-            gl.getGL2().glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
+            gl.getGL2ES1().glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
                     defaultColor.getAlpha());
         } else {
-            gl.getGL2().glColor4f(1, 1, 1, 1);
+            gl.getGL2ES1().glColor4f(1, 1, 1, 1);
         }
     }
 
@@ -654,8 +675,12 @@ public class JoglRenderer extends AbstractRenderer {
 
                 final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
                 JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-                gl.getGL2().glPushMatrix();
-                gl.getGL2().glMultMatrixf(_transformBuffer);
+                if (gl.isGL2ES1()) {
+                    gl.getGL2ES1().glPushMatrix();
+                    gl.getGL2ES1().glMultMatrixf(_transformBuffer);
+                } else {
+                    // TODO use PMVMatrix
+                }
                 return true;
             }
         }
@@ -667,7 +692,11 @@ public class JoglRenderer extends AbstractRenderer {
 
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-        gl.getGL2().glPopMatrix();
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glPopMatrix();
+        } else {
+            // TODO use PMVMatrix
+        }
     }
 
     public void setupVertexData(final FloatBufferData vertexBufferData) {
@@ -680,7 +709,9 @@ public class JoglRenderer extends AbstractRenderer {
         } else {
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
             vertexBuffer.rewind();
-            gl.getGL2().glVertexPointer(vertexBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, vertexBuffer);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glVertexPointer(vertexBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, vertexBuffer);
+            }
         }
     }
 
@@ -694,7 +725,9 @@ public class JoglRenderer extends AbstractRenderer {
         } else {
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
             normalBuffer.rewind();
-            gl.getGL2().glNormalPointer(GL.GL_FLOAT, 0, normalBuffer);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, normalBuffer);
+            }
         }
     }
 
@@ -708,7 +741,9 @@ public class JoglRenderer extends AbstractRenderer {
         } else {
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
             colorBuffer.rewind();
-            gl.getGL2().glColorPointer(colorBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, colorBuffer);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glColorPointer(colorBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, colorBuffer);
+            }
         }
     }
 
@@ -722,7 +757,9 @@ public class JoglRenderer extends AbstractRenderer {
         } else {
             gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
             fogBuffer.rewind();
-            gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, fogBuffer);
+            if (gl.isGL2()) {
+                gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, fogBuffer);
+            }
         }
     }
 
@@ -775,7 +812,10 @@ public class JoglRenderer extends AbstractRenderer {
 
                     gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
                     textureBuffer.rewind();
-                    gl.getGL2().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, textureBuffer);
+                    if (gl.isGL2ES1()) {
+                        gl.getGL2ES1().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
+                                textureBuffer);
+                    }
                 }
             }
         }
@@ -931,7 +971,9 @@ public class JoglRenderer extends AbstractRenderer {
         if (vboID != 0) {
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.getGL2().glVertexPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glVertexPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
+            }
         } else {
             gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
         }
@@ -948,7 +990,9 @@ public class JoglRenderer extends AbstractRenderer {
         if (vboID != 0) {
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.getGL2().glNormalPointer(GL.GL_FLOAT, 0, 0);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, 0);
+            }
         } else {
             gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
         }
@@ -965,7 +1009,9 @@ public class JoglRenderer extends AbstractRenderer {
         if (vboID != 0) {
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.getGL2().glColorPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glColorPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
+            }
         } else {
             gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
         }
@@ -987,7 +1033,9 @@ public class JoglRenderer extends AbstractRenderer {
         if (vboID != 0) {
             gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, 0);
+            if (gl.isGL2()) {
+                gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, 0);
+            }
         } else {
             gl.getGL2GL3().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
         }
@@ -1046,7 +1094,9 @@ public class JoglRenderer extends AbstractRenderer {
                         JoglRendererUtil.setBoundVBO(rendRecord, vboID);
 
                         // send data
-                        gl.getGL2().glTexCoordPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
+                        if (gl.isGL2ES1()) {
+                            gl.getGL2ES1().glTexCoordPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
+                        }
                     }
                     // Not a good vbo, disable it.
                     else {
@@ -1095,7 +1145,9 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (normalCoords != null) {
             updateVBO(normalCoords, rendRecord, vboID, offsetBytes);
-            gl.getGL2().glNormalPointer(GL.GL_FLOAT, 0, offsetBytes);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, offsetBytes);
+            }
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
             offsetBytes += normalCoords.getBufferLimit() * 4;
         } else {
@@ -1104,7 +1156,9 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (colorCoords != null) {
             updateVBO(colorCoords, rendRecord, vboID, offsetBytes);
-            gl.getGL2().glColorPointer(colorCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glColorPointer(colorCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
+            }
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
             offsetBytes += colorCoords.getBufferLimit() * 4;
         } else {
@@ -1155,8 +1209,10 @@ public class JoglRenderer extends AbstractRenderer {
                         }
 
                         // send data
-                        gl.getGL2().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
-                                offsetBytes);
+                        if (gl.isGL2ES1()) {
+                            gl.getGL2ES1().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
+                                    offsetBytes);
+                        }
                         offsetBytes += textureBufferData.getBufferLimit() * 4;
                     }
                 }
@@ -1168,7 +1224,9 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (vertexCoords != null) {
             updateVBO(vertexCoords, rendRecord, vboID, offsetBytes);
-            gl.getGL2().glVertexPointer(vertexCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glVertexPointer(vertexCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
+            }
             gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
         } else {
             gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
@@ -1451,7 +1509,12 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     private void loadMatrix(final FloatBuffer matrix) {
-        GLContext.getCurrentGL().getGL2().glLoadMatrixf(matrix);
+        final GL gl = GLContext.getCurrentGL();
+        if (gl.isGL2ES1()) {
+            gl.getGL2ES1().glLoadMatrixf(matrix);
+        } else {
+            // TODO use PMVMatrix
+        }
     }
 
     public FloatBuffer getModelViewMatrix(final FloatBuffer store) {

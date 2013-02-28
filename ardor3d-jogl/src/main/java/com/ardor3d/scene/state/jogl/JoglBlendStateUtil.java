@@ -372,30 +372,42 @@ public abstract class JoglBlendStateUtil {
         if (record.isValid()) {
             if (enabled) {
                 if (!record.testEnabled) {
-                    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                    if (gl.isGL2ES1()) {
+                        gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                    }
                     record.testEnabled = true;
                 }
                 final int glFunc = getGLFuncValue(state.getTestFunction());
                 if (record.alphaFunc != glFunc || record.alphaRef != state.getReference()) {
-                    gl.getGL2().glAlphaFunc(glFunc, state.getReference());
+                    if (gl.isGL2ES1()) {
+                        gl.getGL2ES1().glAlphaFunc(glFunc, state.getReference());
+                    }
                     record.alphaFunc = glFunc;
                     record.alphaRef = state.getReference();
                 }
             } else if (record.testEnabled) {
-                gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                if (gl.isGL2ES1()) {
+                    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                }
                 record.testEnabled = false;
             }
 
         } else {
             if (enabled) {
-                gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                if (gl.isGL2ES1()) {
+                    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                }
                 record.testEnabled = true;
                 final int glFunc = getGLFuncValue(state.getTestFunction());
-                gl.getGL2().glAlphaFunc(glFunc, state.getReference());
+                if (gl.isGL2ES1()) {
+                    gl.getGL2ES1().glAlphaFunc(glFunc, state.getReference());
+                }
                 record.alphaFunc = glFunc;
                 record.alphaRef = state.getReference();
             } else {
-                gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                if (gl.isGL2ES1()) {
+                    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                }
                 record.testEnabled = false;
             }
         }

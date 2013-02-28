@@ -321,7 +321,14 @@ public abstract class JoglShaderUtil {
 
     public static void useShaderProgram(final int id, final ShaderObjectsStateRecord record) {
         if (record.shaderId != id) {
-            GLContext.getCurrentGL().getGL2().glUseProgramObjectARB(id);
+            final GL gl = GLContext.getCurrentGL();
+            if (gl.isGL2()) {
+                gl.getGL2().glUseProgramObjectARB(id);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glUseProgram(id);
+                }
+            }
             record.shaderId = id;
         }
     }
