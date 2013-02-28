@@ -54,6 +54,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private static final Logger logger = Logger.getLogger(JoglPbufferTextureRenderer.class.getName());
 
     /* Pbuffer instance */
+    // TODO use javax.media.opengl.GLOffscreenAutoDrawable
     private GLPbuffer _pbuffer;
 
     private GLContext _context;
