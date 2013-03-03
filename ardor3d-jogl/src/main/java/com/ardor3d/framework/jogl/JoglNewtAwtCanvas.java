@@ -10,15 +10,16 @@
 
 package com.ardor3d.framework.jogl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLRunnable;
+
+import javax.swing.SwingUtilities;
+
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
-
 
 public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWindowContainer {
 
@@ -28,12 +29,15 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
     private boolean _inited = false;
 
     private final DisplaySettings _settings;
-    
+
     private final JoglDrawerRunnable _drawerGLRunnable;
+
+    private final JoglNewtAwtInitializerRunnable _initializerRunnable;
 
     public JoglNewtAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
         super(GLWindow.create(CapsUtil.getCapsForSettings(settings)));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
+        _initializerRunnable = new JoglNewtAwtInitializerRunnable(this, settings);
         getNewtWindow().setUndecorated(true);
         _settings = settings;
         _canvasRenderer = canvasRenderer;
@@ -41,7 +45,7 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
         setFocusable(true);
         setSize(_settings.getWidth(), _settings.getHeight());
         setIgnoreRepaint(true);
-        getNewtWindow().setAutoSwapBufferMode(false);        
+        getNewtWindow().setAutoSwapBufferMode(false);
     }
 
     @MainThread
@@ -49,24 +53,35 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
         if (_inited) {
             return;
         }
-        
+
         // Make the window visible to realize the OpenGL surface.
-        setVisible(true);
+        // setVisible(true);
         // Request the focus here as it cannot work when the window is not visible
-        requestFocus();
+        // requestFocus();
         /**
-         * I do not understand why I cannot get the context earlier, I failed in 
-         * getting it from addNotify() and setVisible(true)
+         * I do not understand why I cannot get the context earlier, I failed in getting it from addNotify() and
+         * setVisible(true)
          * */
-        _canvasRenderer.setContext(getNewtWindow().getContext());
-        
-        getNewtWindow().invoke(true, new GLRunnable() {
-            @Override
-            public boolean run(GLAutoDrawable glAutoDrawable) {     
-                _canvasRenderer.init(_settings, true);// true - do swap in renderer.
-                return true;
+        /*
+         * _canvasRenderer.setContext(getNewtWindow().getContext());
+         * 
+         * getNewtWindow().invoke(true, new GLRunnable() {
+         * 
+         * @Override public boolean run(final GLAutoDrawable glAutoDrawable) { _canvasRenderer.init(_settings, true);//
+         * true - do swap in renderer. return true; } });
+         */
+        if (!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(_initializerRunnable);
+            } catch (final InterruptedException ex) {
+                ex.printStackTrace();
+            } catch (final InvocationTargetException ex) {
+                ex.printStackTrace();
             }
-        });
+        } else {
+            _initializerRunnable.run();
+        }
+
         _inited = true;
     }
 
@@ -86,7 +101,7 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }
-    
+
     @Override
     public GLWindow getNewtWindow() {
         return (GLWindow) getNEWTChild();
