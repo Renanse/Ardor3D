@@ -10,10 +10,10 @@
 
 package com.ardor3d.framework.jogl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 
-import javax.swing.SwingUtilities;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLRunnable;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
@@ -32,12 +32,9 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
 
     private final JoglDrawerRunnable _drawerGLRunnable;
 
-    private final JoglNewtAwtInitializerRunnable _initializerRunnable;
-
     public JoglNewtAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
         super(GLWindow.create(CapsUtil.getCapsForSettings(settings)));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
-        _initializerRunnable = new JoglNewtAwtInitializerRunnable(this, settings);
         getNewtWindow().setUndecorated(true);
         _settings = settings;
         _canvasRenderer = canvasRenderer;
@@ -55,32 +52,21 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
         }
 
         // Make the window visible to realize the OpenGL surface.
-        // setVisible(true);
+        setVisible(true);
         // Request the focus here as it cannot work when the window is not visible
-        // requestFocus();
+        requestFocus();
         /**
          * I do not understand why I cannot get the context earlier, I failed in getting it from addNotify() and
          * setVisible(true)
          * */
-        /*
-         * _canvasRenderer.setContext(getNewtWindow().getContext());
-         * 
-         * getNewtWindow().invoke(true, new GLRunnable() {
-         * 
-         * @Override public boolean run(final GLAutoDrawable glAutoDrawable) { _canvasRenderer.init(_settings, true);//
-         * true - do swap in renderer. return true; } });
-         */
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(_initializerRunnable);
-            } catch (final InterruptedException ex) {
-                ex.printStackTrace();
-            } catch (final InvocationTargetException ex) {
-                ex.printStackTrace();
+        _canvasRenderer.setContext(getNewtWindow().getContext());
+        getNewtWindow().invoke(true, new GLRunnable() {
+            @Override
+            public boolean run(final GLAutoDrawable glAutoDrawable) {
+                _canvasRenderer.init(_settings, true);// true - do swap in renderer.
+                return true;
             }
-        } else {
-            _initializerRunnable.run();
-        }
+        });
 
         _inited = true;
     }
