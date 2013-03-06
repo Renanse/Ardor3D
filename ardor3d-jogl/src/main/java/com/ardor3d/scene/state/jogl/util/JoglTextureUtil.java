@@ -230,6 +230,67 @@ public abstract class JoglTextureUtil {
         }
     }
 
+    public static PixelDataType getPixelDataType(final int glPixelDataType) {
+        switch (glPixelDataType) {
+            case GL.GL_BYTE:
+                return PixelDataType.Byte;
+            case GL.GL_FLOAT:
+                return PixelDataType.Float;
+            case GL.GL_HALF_FLOAT:
+                return PixelDataType.HalfFloat;
+            case GL.GL_SHORT:
+                return PixelDataType.Short;
+            case GL.GL_UNSIGNED_SHORT:
+                return PixelDataType.UnsignedShort;
+            case GL2ES2.GL_INT:
+                return PixelDataType.Int;
+            case GL.GL_UNSIGNED_INT:
+                return PixelDataType.UnsignedInt;
+            case GL.GL_UNSIGNED_BYTE:
+                return PixelDataType.UnsignedByte;
+            default:
+                throw new Error("Unhandled gl pixel data type: " + glPixelDataType);
+        }
+    }
+
+    public static ImageDataFormat getImageDataFormat(final int glPixelFormat) {
+        switch (glPixelFormat) {
+            case GL.GL_RGBA:
+                return ImageDataFormat.RGBA;
+            case GL.GL_RGB:
+                return ImageDataFormat.RGB;
+            case GL.GL_ALPHA:
+                return ImageDataFormat.Alpha;
+            case GL.GL_LUMINANCE:
+                return ImageDataFormat.Luminance;
+            case GL2.GL_INTENSITY:
+                return ImageDataFormat.Intensity;
+            case GL.GL_LUMINANCE_ALPHA:
+                return ImageDataFormat.LuminanceAlpha;
+            case GL2ES2.GL_DEPTH_COMPONENT:
+                return ImageDataFormat.Depth;
+            case GL2GL3.GL_BGR:
+                return ImageDataFormat.BGR;
+            case GL.GL_BGRA:
+                return ImageDataFormat.BGRA;
+            case GL2ES2.GL_RED:
+                return ImageDataFormat.Red;
+            case GL2GL3.GL_BLUE:
+                return ImageDataFormat.Blue;
+            case GL2GL3.GL_GREEN:
+                return ImageDataFormat.Green;
+            case GL2.GL_COLOR_INDEX:
+                return ImageDataFormat.ColorIndex;
+            case GL2ES2.GL_STENCIL_INDEX:
+                return ImageDataFormat.StencilIndex;
+            case GL2ES2.GL_RG:
+                return ImageDataFormat.RG;
+            default:
+                break;
+        }
+        throw new IllegalArgumentException("Incorrect gl pixel format set: " + glPixelFormat);
+    }
+
     public static int getGLPixelFormat(final ImageDataFormat format) {
         switch (format) {
             case RGBA:
@@ -260,6 +321,8 @@ public abstract class JoglTextureUtil {
                 return GL2.GL_COLOR_INDEX;
             case StencilIndex:
                 return GL2ES2.GL_STENCIL_INDEX;
+            case RG:
+                return GL2ES2.GL_RG;
             case PrecompressedDXT1:
                 break;
             case PrecompressedDXT1A:
@@ -271,8 +334,6 @@ public abstract class JoglTextureUtil {
             case PrecompressedLATC_L:
                 break;
             case PrecompressedLATC_LA:
-                break;
-            case RG:
                 break;
             default:
                 break;
