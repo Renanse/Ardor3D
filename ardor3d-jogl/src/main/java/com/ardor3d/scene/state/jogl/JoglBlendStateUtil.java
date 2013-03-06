@@ -128,8 +128,10 @@ public abstract class JoglBlendStateUtil {
             if (applyConstant && caps.isConstantBlendColorSupported()) {
                 final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
-                    gl.getGL2GL3().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
-                            constant.getAlpha());
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
+                                constant.getAlpha());
+                    }
                     record.blendColor.set(constant);
                 }
             }

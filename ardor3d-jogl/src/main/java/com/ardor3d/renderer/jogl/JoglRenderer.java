@@ -602,7 +602,7 @@ public class JoglRenderer extends AbstractRenderer {
                             GL.GL_UNSIGNED_BYTE, source);
                     break;
                 case ThreeDimensional:
-                    gl.getGL2GL3().glTexSubImage3D(GL2ES2.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ,
+                    gl.getGL2ES2().glTexSubImage3D(GL2ES2.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ,
                             dstWidth, dstHeight, dstDepth, pixelFormat, GL.GL_UNSIGNED_BYTE, source);
                     break;
                 case CubeMap:
@@ -705,9 +705,13 @@ public class JoglRenderer extends AbstractRenderer {
         final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
 
         if (vertexBuffer == null) {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            }
         } else {
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            }
             vertexBuffer.rewind();
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glVertexPointer(vertexBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, vertexBuffer);
@@ -721,9 +725,13 @@ public class JoglRenderer extends AbstractRenderer {
         final FloatBuffer normalBuffer = normalBufferData != null ? normalBufferData.getBuffer() : null;
 
         if (normalBuffer == null) {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            }
         } else {
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            }
             normalBuffer.rewind();
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, normalBuffer);
@@ -737,9 +745,13 @@ public class JoglRenderer extends AbstractRenderer {
         final FloatBuffer colorBuffer = colorBufferData != null ? colorBufferData.getBuffer() : null;
 
         if (colorBuffer == null) {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            }
         } else {
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            }
             colorBuffer.rewind();
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glColorPointer(colorBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, colorBuffer);
@@ -753,9 +765,13 @@ public class JoglRenderer extends AbstractRenderer {
         final FloatBuffer fogBuffer = fogBufferData != null ? fogBufferData.getBuffer() : null;
 
         if (fogBuffer == null) {
-            gl.getGL2GL3().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            }
         } else {
-            gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            }
             fogBuffer.rewind();
             if (gl.isGL2()) {
                 gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, fogBuffer);
@@ -792,7 +808,9 @@ public class JoglRenderer extends AbstractRenderer {
                         enabledTextures &= ~(2 << i);
 
                         // disable state
-                        gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                        if (gl.isGL2GL3()) {
+                            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                        }
 
                         continue;
                     }
@@ -801,7 +819,9 @@ public class JoglRenderer extends AbstractRenderer {
 
                     if (!valid || !wasOn) {
                         // enable state
-                        gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                        if (gl.isGL2GL3()) {
+                            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                        }
 
                         // enable bit in tracking int
                         enabledTextures |= (2 << i);
@@ -810,7 +830,9 @@ public class JoglRenderer extends AbstractRenderer {
                     final FloatBufferData textureBufferData = textureCoords.get(i);
                     final FloatBuffer textureBuffer = textureBufferData.getBuffer();
 
-                    gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                    if (gl.isGL2GL3()) {
+                        gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                    }
                     textureBuffer.rewind();
                     if (gl.isGL2ES1()) {
                         gl.getGL2ES1().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
@@ -842,8 +864,10 @@ public class JoglRenderer extends AbstractRenderer {
             if (primcount < 0) {
                 gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
             } else {
-                gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
-                        indices.getBuffer(), primcount);
+                if (gl.isGL2GL3()) {
+                    gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
+                            indices.getBuffer(), primcount);
+                }
             }
 
             if (Constants.stats) {
@@ -863,7 +887,10 @@ public class JoglRenderer extends AbstractRenderer {
                 if (primcount < 0) {
                     gl.glDrawElements(glIndexMode, count, type, indices.getBuffer());
                 } else {
-                    gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
+                    if (gl.isGL2GL3()) {
+                        gl.getGL2GL3()
+                                .glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
+                    }
                 }
 
                 if (Constants.stats) {
@@ -969,13 +996,17 @@ public class JoglRenderer extends AbstractRenderer {
         final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            }
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glVertexPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
             }
         } else {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            }
         }
     }
 
@@ -988,13 +1019,17 @@ public class JoglRenderer extends AbstractRenderer {
         final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            }
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, 0);
             }
         } else {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            }
         }
     }
 
@@ -1007,13 +1042,17 @@ public class JoglRenderer extends AbstractRenderer {
         final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            }
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glColorPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
             }
         } else {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            }
         }
     }
 
@@ -1031,13 +1070,17 @@ public class JoglRenderer extends AbstractRenderer {
         final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
-            gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            }
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
             if (gl.isGL2()) {
                 gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, 0);
             }
         } else {
-            gl.getGL2GL3().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
+            }
         }
     }
 
@@ -1069,7 +1112,9 @@ public class JoglRenderer extends AbstractRenderer {
                         enabledTextures &= ~(2 << i);
 
                         // disable state
-                        gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                        if (gl.isGL2GL3()) {
+                            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                        }
 
                         continue;
                     }
@@ -1087,7 +1132,9 @@ public class JoglRenderer extends AbstractRenderer {
                             enabledTextures |= (2 << i);
 
                             // enable state
-                            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            if (gl.isGL2GL3()) {
+                                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            }
                         }
 
                         // set our active vbo
@@ -1105,7 +1152,9 @@ public class JoglRenderer extends AbstractRenderer {
                             enabledTextures &= ~(2 << i);
 
                             // disable state
-                            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            if (gl.isGL2GL3()) {
+                                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            }
                         }
                     }
                 }
@@ -1148,10 +1197,14 @@ public class JoglRenderer extends AbstractRenderer {
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, offsetBytes);
             }
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            }
             offsetBytes += normalCoords.getBufferLimit() * 4;
         } else {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
+            }
         }
 
         if (colorCoords != null) {
@@ -1159,10 +1212,14 @@ public class JoglRenderer extends AbstractRenderer {
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glColorPointer(colorCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
             }
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            }
             offsetBytes += colorCoords.getBufferLimit() * 4;
         } else {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            }
         }
 
         if (textureCoords != null) {
@@ -1188,7 +1245,9 @@ public class JoglRenderer extends AbstractRenderer {
                             enabledTextures &= ~(2 << i);
 
                             // disable state
-                            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            if (gl.isGL2GL3()) {
+                                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            }
 
                             continue;
                         }
@@ -1205,7 +1264,9 @@ public class JoglRenderer extends AbstractRenderer {
                             enabledTextures |= (2 << i);
 
                             // enable state
-                            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            if (gl.isGL2GL3()) {
+                                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
+                            }
                         }
 
                         // send data
@@ -1227,9 +1288,13 @@ public class JoglRenderer extends AbstractRenderer {
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glVertexPointer(vertexCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
             }
-            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            }
         } else {
-            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+            }
         }
     }
 
@@ -1314,8 +1379,10 @@ public class JoglRenderer extends AbstractRenderer {
             if (primcount < 0) {
                 gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, 0);
             } else {
-                gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
-                        indices.getBuffer(), primcount);
+                if (gl.isGL2GL3()) {
+                    gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
+                            indices.getBuffer(), primcount);
+                }
             }
 
             if (Constants.stats) {
@@ -1339,7 +1406,10 @@ public class JoglRenderer extends AbstractRenderer {
                 } else {
                     final int previousPos = indices.getBuffer().position();
                     indices.getBuffer().position(offset * byteSize);
-                    gl.getGL2GL3().glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
+                    if (gl.isGL2GL3()) {
+                        gl.getGL2GL3()
+                                .glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
+                    }
                     indices.getBuffer().position(previousPos);
                 }
 
@@ -1366,7 +1436,9 @@ public class JoglRenderer extends AbstractRenderer {
             if (primcount < 0) {
                 gl.glDrawArrays(glIndexMode, 0, vertexBuffer.getTupleCount());
             } else {
-                gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, 0, vertexBuffer.getTupleCount(), primcount);
+                if (gl.isGL2GL3()) {
+                    gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, 0, vertexBuffer.getTupleCount(), primcount);
+                }
             }
 
             if (Constants.stats) {
@@ -1383,7 +1455,9 @@ public class JoglRenderer extends AbstractRenderer {
                 if (primcount < 0) {
                     gl.glDrawArrays(glIndexMode, offset, count);
                 } else {
-                    gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, offset, count, primcount);
+                    if (gl.isGL2GL3()) {
+                        gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, offset, count, primcount);
+                    }
                 }
 
                 if (Constants.stats) {
@@ -1588,7 +1662,10 @@ public class JoglRenderer extends AbstractRenderer {
                     break;
             }
 
-            GLContext.getCurrentGL().getGL2GL3().glDrawBuffer(buffer);
+            final GL gl = GLContext.getCurrentGL();
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glDrawBuffer(buffer);
+            }
             record.setDrawBufferTarget(target);
         }
     }
@@ -1648,21 +1725,29 @@ public class JoglRenderer extends AbstractRenderer {
         final GL gl = GLContext.getCurrentGL();
 
         // TODO: make this into a pointrecord call
-        gl.getGL2GL3().glPointSize(pointSize);
+        if (gl.isGL2GL3()) {
+            gl.getGL2GL3().glPointSize(pointSize);
+        }
         if (antialiased) {
-            gl.glEnable(GL2ES1.GL_POINT_SMOOTH);
-            gl.glHint(GL2ES1.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);
+            if (gl.isGL2ES1()) {
+                gl.glEnable(GL2ES1.GL_POINT_SMOOTH);
+                gl.glHint(GL2ES1.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);
+            }
         }
 
         if (isSprite && context.getCapabilities().isPointSpritesSupported()) {
-            gl.glEnable(GL2ES1.GL_POINT_SPRITE);
-            gl.getGL2ES1().glTexEnvi(GL2ES1.GL_POINT_SPRITE, GL2ES1.GL_COORD_REPLACE, GL.GL_TRUE);
+            if (gl.isGL2ES1()) {
+                gl.glEnable(GL2ES1.GL_POINT_SPRITE);
+                gl.getGL2ES1().glTexEnvi(GL2ES1.GL_POINT_SPRITE, GL2ES1.GL_COORD_REPLACE, GL.GL_TRUE);
+            }
         }
 
         if (useDistanceAttenuation && context.getCapabilities().isPointParametersSupported()) {
-            gl.getGL2GL3().glPointParameterfv(GL2ES1.GL_POINT_DISTANCE_ATTENUATION, attenuationCoefficients);
-            gl.getGL2GL3().glPointParameterf(GL2ES1.GL_POINT_SIZE_MIN, minPointSize);
-            gl.getGL2GL3().glPointParameterf(GL2ES1.GL_POINT_SIZE_MAX, maxPointSize);
+            if (gl.isGL2GL3()) {
+                gl.getGL2GL3().glPointParameterfv(GL2ES1.GL_POINT_DISTANCE_ATTENUATION, attenuationCoefficients);
+                gl.getGL2GL3().glPointParameterf(GL2ES1.GL_POINT_SIZE_MIN, minPointSize);
+                gl.getGL2GL3().glPointParameterf(GL2ES1.GL_POINT_SIZE_MAX, maxPointSize);
+            }
         }
     }
 
@@ -1753,7 +1838,8 @@ public class JoglRenderer extends AbstractRenderer {
      * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
      */
     public void endDisplayList() {
-        GLContext.getCurrentGL().getGL2().glEndList();
+        final GL gl = GLContext.getCurrentGL();
+        gl.getGL2().glEndList();
     }
 
     /**
@@ -1807,7 +1893,9 @@ public class JoglRenderer extends AbstractRenderer {
     public void checkAndSetTextureArrayUnit(final int unit, final GL gl, final RendererRecord record,
             final ContextCapabilities caps) {
         if (record.getCurrentTextureArraysUnit() != unit && caps.isMultitextureSupported()) {
-            gl.getGL2().glClientActiveTexture(GL.GL_TEXTURE0 + unit);
+            if (gl.isGL2ES1()) {
+                gl.getGL2ES1().glClientActiveTexture(GL.GL_TEXTURE0 + unit);
+            }
             record.setCurrentTextureArraysUnit(unit);
         }
     }

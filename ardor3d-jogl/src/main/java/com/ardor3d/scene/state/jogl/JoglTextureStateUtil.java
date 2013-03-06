@@ -562,11 +562,11 @@ public class JoglTextureStateUtil {
                                 final int depth = Math.max(1, image.getDepth() >> m);
                                 // already checked for support above...
                                 if (texture.getTextureStoreFormat().isCompressed()) {
-                                    gl.getGL2GL3().glCompressedTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
+                                    gl.getGL2ES2().glCompressedTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
                                             JoglTextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, depth, hasBorder ? 1 : 0, mipSizes[m], data);
                                 } else {
-                                    gl.getGL2GL3().glTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
+                                    gl.getGL2ES2().glTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
                                             JoglTextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, depth, hasBorder ? 1 : 0,
                                             JoglTextureUtil.getGLPixelFormat(image.getDataFormat()),
