@@ -126,12 +126,16 @@ public enum JoglNewtKey {
     Z(KeyEvent.VK_Z, Key.Z), //
     UNDEFINED(KeyEvent.VK_UNDEFINED, Key.UNKNOWN);
 
-    private final int _newtCode;
+    private final short _newtCode;
     private final Key _key;
 
     private JoglNewtKey(final short newtCode, final Key key) {
         _newtCode = newtCode;
         _key = key;
+    }
+
+    private JoglNewtKey(final int newtCode, final Key key) {
+        this((short) newtCode, key);
     }
 
     public static Key findByCode(final short newtCode) {
@@ -142,6 +146,10 @@ public enum JoglNewtKey {
         }
 
         return Key.UNKNOWN;
+    }
+
+    public static Key findByCode(final int newtCode) {
+        return findByCode((short) newtCode);
     }
 
     public int getNewtCode() {
