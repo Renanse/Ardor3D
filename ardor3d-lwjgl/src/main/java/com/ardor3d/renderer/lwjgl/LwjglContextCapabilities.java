@@ -80,7 +80,6 @@ public class LwjglContextCapabilities extends ContextCapabilities {
 
         // FBO
         _fboSupported = caps.GL_EXT_framebuffer_object;
-        System.err.println(caps.GL_EXT_framebuffer_multisample);
         if (_fboSupported) {
 
             _supportsFBOMultisample = caps.GL_EXT_framebuffer_multisample;
