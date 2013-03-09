@@ -68,7 +68,7 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
             }
         });
 
-        _inited = true;
+        _inited = getNewtWindow().isRealized();
     }
 
     public void draw(final CountDownLatch latch) {

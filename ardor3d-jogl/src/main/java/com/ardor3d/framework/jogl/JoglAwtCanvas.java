@@ -71,7 +71,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
             _initializerRunnable.run();
         }
 
-        _inited = true;
+        _inited = isRealized();
     }
 
     public void draw(final CountDownLatch latch) {

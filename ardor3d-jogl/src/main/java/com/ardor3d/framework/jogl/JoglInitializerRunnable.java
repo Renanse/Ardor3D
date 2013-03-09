@@ -29,14 +29,13 @@ public class JoglInitializerRunnable implements Runnable {
         _joglAwtCanvas.setVisible(true);
         // Force the realization
         _joglAwtCanvas.display();
-        if (!_joglAwtCanvas.getDelegatedDrawable().isRealized()) {
-            throw new RuntimeException("The heavyweight AWT drawable cannot be realized");
+        if (_joglAwtCanvas.getDelegatedDrawable().isRealized()) {
+            // Request the focus here as it cannot work when the window is not visible
+            _joglAwtCanvas.requestFocus();
+            // The OpenGL context has been created after the realization of the surface
+            _joglAwtCanvas.getCanvasRenderer().setContext(_joglAwtCanvas.getContext());
+            // As the canvas renderer knows the OpenGL context, it can be initialized
+            _joglAwtCanvas.getCanvasRenderer().init(_settings, true);
         }
-        // Request the focus here as it cannot work when the window is not visible
-        _joglAwtCanvas.requestFocus();
-        // The OpenGL context has been created after the realization of the surface
-        _joglAwtCanvas.getCanvasRenderer().setContext(_joglAwtCanvas.getContext());
-        // As the canvas renderer knows the OpenGL context, it can be initialized
-        _joglAwtCanvas.getCanvasRenderer().init(_settings, true);
     }
 }

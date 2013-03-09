@@ -179,7 +179,7 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
                 return true;
             }
         });
-        _inited = true;
+        _inited = _newtWindow.isRealized();
     }
 
     public void draw(final CountDownLatch latch) {
