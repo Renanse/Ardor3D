@@ -140,46 +140,48 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
             return;
         }
 
-        _newtWindow.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowDestroyNotify(final WindowEvent e) {
-                _isClosing = true;
-            }
-
-            // public void windowResized(final WindowEvent e) {
-            // _newtWindow.invoke(true, new GLRunnable() {
-            //
-            // @Override
-            // public boolean run(GLAutoDrawable glAutoDrawable) {
-            // _canvasRenderer._camera.resize(_newtWindow.getWidth(), _newtWindow.getHeight());
-            // _canvasRenderer._camera.setFrustumPerspective(_canvasRenderer._camera.getFovY(),
-            // (float) _newtWindow.getWidth() / (float) _newtWindow.getHeight(),
-            // _canvasRenderer._camera.getFrustumNear(),
-            // _canvasRenderer._camera.getFrustumFar());
-            // return true;
-            // }
-            // });
-            // }
-        });
-
         // Set the size very early to prevent the default one from being used (typically when exiting full screen mode)
         setSize(_settings.getWidth(), _settings.getHeight());
         // Make the window visible to realize the OpenGL surface.
         setVisible(true);
-        // Request the focus here as it cannot work when the window is not visible
-        _newtWindow.requestFocus();
-        applySettings();
+        if (_newtWindow.isRealized()) {
+            _newtWindow.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowDestroyNotify(final WindowEvent e) {
+                    _isClosing = true;
+                }
 
-        _canvasRenderer.setContext(getContext());
+                // public void windowResized(final WindowEvent e) {
+                // _newtWindow.invoke(true, new GLRunnable() {
+                //
+                // @Override
+                // public boolean run(GLAutoDrawable glAutoDrawable) {
+                // _canvasRenderer._camera.resize(_newtWindow.getWidth(), _newtWindow.getHeight());
+                // _canvasRenderer._camera.setFrustumPerspective(_canvasRenderer._camera.getFovY(),
+                // (float) _newtWindow.getWidth() / (float) _newtWindow.getHeight(),
+                // _canvasRenderer._camera.getFrustumNear(),
+                // _canvasRenderer._camera.getFrustumFar());
+                // return true;
+                // }
+                // });
+                // }
+            });
 
-        _newtWindow.invoke(true, new GLRunnable() {
-            @Override
-            public boolean run(final GLAutoDrawable glAutoDrawable) {
-                _canvasRenderer.init(_settings, true);// true - do swap in renderer.
-                return true;
-            }
-        });
-        _inited = _newtWindow.isRealized();
+            // Request the focus here as it cannot work when the window is not visible
+            _newtWindow.requestFocus();
+            applySettings();
+
+            _canvasRenderer.setContext(getContext());
+
+            _newtWindow.invoke(true, new GLRunnable() {
+                @Override
+                public boolean run(final GLAutoDrawable glAutoDrawable) {
+                    _canvasRenderer.init(_settings, true);// true - do swap in renderer.
+                    return true;
+                }
+            });
+            _inited = true;
+        }
     }
 
     public void draw(final CountDownLatch latch) {

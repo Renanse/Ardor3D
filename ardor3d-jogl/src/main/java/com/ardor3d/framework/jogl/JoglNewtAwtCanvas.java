@@ -53,22 +53,23 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
 
         // Make the window visible to realize the OpenGL surface.
         setVisible(true);
-        // Request the focus here as it cannot work when the window is not visible
-        requestFocus();
-        /**
-         * I do not understand why I cannot get the context earlier, I failed in getting it from addNotify() and
-         * setVisible(true)
-         * */
-        _canvasRenderer.setContext(getNewtWindow().getContext());
-        getNewtWindow().invoke(true, new GLRunnable() {
-            @Override
-            public boolean run(final GLAutoDrawable glAutoDrawable) {
-                _canvasRenderer.init(_settings, true);// true - do swap in renderer.
-                return true;
-            }
-        });
-
-        _inited = getNewtWindow().isRealized();
+        if (getNewtWindow().isRealized()) {
+            // Request the focus here as it cannot work when the window is not visible
+            requestFocus();
+            /**
+             * I do not understand why I cannot get the context earlier, I failed in getting it from addNotify() and
+             * setVisible(true)
+             * */
+            _canvasRenderer.setContext(getNewtWindow().getContext());
+            getNewtWindow().invoke(true, new GLRunnable() {
+                @Override
+                public boolean run(final GLAutoDrawable glAutoDrawable) {
+                    _canvasRenderer.init(_settings, true);// true - do swap in renderer.
+                    return true;
+                }
+            });
+            _inited = true;
+        }
     }
 
     public void draw(final CountDownLatch latch) {
