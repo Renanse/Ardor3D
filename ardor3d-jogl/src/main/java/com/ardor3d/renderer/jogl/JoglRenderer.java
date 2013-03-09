@@ -32,6 +32,7 @@ import javax.media.opengl.fixedfunc.GLPointerFunc;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
@@ -102,6 +103,7 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
+import com.jogamp.opengl.util.GLBuffers;
 
 /**
  * <code>JoglRenderer</code> provides an implementation of the <code>Renderer</code> interface using the JOGL API.
@@ -297,12 +299,25 @@ public class JoglRenderer extends AbstractRenderer {
         _inOrthoMode = false;
     }
 
-    public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final int x, final int y,
-            final int w, final int h) {
+    @Override
+    public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type,
+            final int x, final int y, final int w, final int h) {
         final GL gl = GLContext.getCurrentGL();
 
         final int pixFormat = JoglTextureUtil.getGLPixelFormat(format);
-        gl.glReadPixels(x, y, w, h, pixFormat, GL.GL_UNSIGNED_BYTE, store);
+        final int pixDataType = JoglTextureUtil.getGLPixelDataType(type);
+        // N.B: it expects depth = 1 & pack = true
+        gl.glReadPixels(x, y, w, h, pixFormat, pixDataType, store);
+    }
+
+    @Override
+    public int getExpectedBufferSizeToGrabScreenContents(final ImageDataFormat format, final PixelDataType type,
+            final int w, final int h) {
+        final GL gl = GLContext.getCurrentGL();
+        final int pixFormat = JoglTextureUtil.getGLPixelFormat(format);
+        final int pixDataType = JoglTextureUtil.getGLPixelDataType(type);
+        final int[] tmp = new int[1];
+        return GLBuffers.sizeof(gl, tmp, pixFormat, pixDataType, w, h, 1, true);
     }
 
     public void draw(final Spatial s) {

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
@@ -181,6 +182,25 @@ public interface Renderer {
      *            - height of block
      */
     void grabScreenContents(ByteBuffer store, ImageDataFormat format, int x, int y, int w, int h);
+
+    void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type,
+            final int x, final int y, final int w, final int h);
+
+    /**
+     * Gets the expected size (in bytes) of the buffer used to call <code>grabScreenContents</code>
+     * 
+     * @param format
+     *            the format to read in data for.
+     * @param type
+     *            the format to read in data for.
+     * @param w
+     *            - width of block
+     * @param h
+     *            - height of block
+     * @return the expected size (in bytes) of the buffer used to call <code>grabScreenContents</code>
+     */
+    int getExpectedBufferSizeToGrabScreenContents(final ImageDataFormat format, final PixelDataType type, final int w,
+            final int h);
 
     /**
      * <code>draw</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off

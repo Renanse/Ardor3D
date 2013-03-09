@@ -14,7 +14,6 @@ import java.nio.ByteBuffer;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.geom.BufferUtils;
@@ -29,7 +28,8 @@ public class ScreenExporter {
         final int width = camera.getWidth(), height = camera.getHeight();
 
         // prepare our data buffer
-        final int size = width * height * ImageUtils.getPixelByteSize(format, PixelDataType.UnsignedByte);
+        final int size = renderer.getExpectedBufferSizeToGrabScreenContents(format, PixelDataType.UnsignedByte, width,
+                height);
         if (_scratch.capacity() < size) {
             _scratch = BufferUtils.createByteBuffer(size);
         } else {
