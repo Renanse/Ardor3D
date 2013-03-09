@@ -186,6 +186,8 @@ public class JoglTextureStateUtil {
                 final int pixDataType = JoglTextureUtil.getGLPixelDataType(image.getDataType());
                 final int bpp = ImageUtils.getPixelByteSize(image.getDataFormat(), image.getDataType());
                 final ByteBuffer scaledImage = BufferUtils.createByteBuffer((w + 4) * h * bpp);
+                // ensure the buffer is ready for reading
+                image.getData(0).rewind();
                 final int error = glu.gluScaleImage(pixFormat, actualWidth, actualHeight, pixDataType,
                         image.getData(0), w, h, pixDataType, scaledImage);
                 if (error != 0) {
@@ -353,6 +355,7 @@ public class JoglTextureStateUtil {
                                     for (int x = 0; x < image.getData().size(); x++) {
                                         if (image.getData(x) != null) {
                                             data.put(image.getData(x));
+                                            image.getData(x).rewind();
                                         }
                                     }
                                     // ensure the buffer is ready for reading
