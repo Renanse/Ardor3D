@@ -242,6 +242,11 @@ public class ColladaImporter {
                 colladaAnimUtils.parseLibraryAnimations(collada);
             }
 
+            // reattach attachments to scene
+            if (scene != null) {
+                colladaNodeUtils.reattachAttachments(scene);
+            }
+
             // set our scene into storage
             colladaStorage.setScene(scene);
 
@@ -401,6 +406,8 @@ public class ColladaImporter {
 
                         return new Text("");
                     }
+                    default:
+                        break;
                 }
             } catch (final NoSuchElementException e) {
                 throw new ColladaException("Number of values in collada array does not match its count attribute: "

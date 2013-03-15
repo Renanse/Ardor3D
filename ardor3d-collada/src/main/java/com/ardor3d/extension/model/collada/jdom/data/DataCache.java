@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.jdom2.Element;
 import org.jdom2.xpath.XPath;
 
+import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
@@ -64,6 +65,7 @@ public class DataCache {
     private final Map<Skeleton, SkeletonPose> _skeletonPoseMapping;
     private final List<Skeleton> _skeletons;
     private final List<ControllerStore> _controllers;
+    private final Multimap<Joint, AttachmentPoint> _attachmentPoints = ArrayListMultimap.create();
 
     public DataCache() {
         _boundMaterials = Maps.newHashMap();
@@ -225,5 +227,13 @@ public class DataCache {
 
     public void setMeshVertMap(final Mesh geometry, final VertMap map) {
         _meshVertMap.put(geometry, map);
+    }
+
+    public void addAttachmentPoint(final Joint joint, final AttachmentPoint attach) {
+        _attachmentPoints.put(joint, attach);
+    }
+
+    public Multimap<Joint, AttachmentPoint> getAttachmentPoints() {
+        return _attachmentPoints;
     }
 }

@@ -29,6 +29,7 @@ import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 
+import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
@@ -310,6 +311,9 @@ public class ColladaAnimUtils {
                 skPose = new SkeletonPose(ourSkeleton);
                 _dataCache.getSkeletonPoseMapping().put(ourSkeleton, skPose);
 
+                // attach any attachment points found for the skeleton's joints
+                addAttachments(skPose);
+
                 // Skeleton's default to bind position, so update the global transforms.
                 skPose.updateTransforms();
             }
@@ -557,6 +561,18 @@ public class ColladaAnimUtils {
 
             // Add skin record to storage.
             _colladaStorage.getSkins().add(skinDataStore);
+        }
+    }
+
+    private void addAttachments(final SkeletonPose skPose) {
+        final Skeleton skeleton = skPose.getSkeleton();
+        for (final Joint joint : skeleton.getJoints()) {
+            if (_dataCache.getAttachmentPoints().containsKey(joint)) {
+                for (final AttachmentPoint point : _dataCache.getAttachmentPoints().get(joint)) {
+                    point.setJointIndex(joint.getIndex());
+                    skPose.addPoseListener(point);
+                }
+            }
         }
     }
 
