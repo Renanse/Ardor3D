@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.jdom.Element;
-import org.jdom.xpath.XPath;
+import org.jdom2.Element;
+import org.jdom2.xpath.XPath;
 
 import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.Joint;
