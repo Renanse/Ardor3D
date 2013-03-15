@@ -221,7 +221,7 @@ public class Capsule extends Mesh {
     }
 
     private void setIndexData() {
-        _meshData.getIndexBuffer().rewind();
+        _meshData.getIndices().rewind();
 
         // start with top of top dome.
         for (int samples = 1; samples <= radialSamples; samples++) {

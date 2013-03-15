@@ -126,7 +126,7 @@ public class ParticleMesh extends ParticleSystem {
                 if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
                     final MeshEmitter source = (MeshEmitter) getParticleEmitter();
                     final Mesh sourceMesh = source.getSource();
-                    final int index = sourceMesh.getMeshData().getIndexBuffer() != null ? sourceMesh.getMeshData()
+                    final int index = sourceMesh.getMeshData().getIndices() != null ? sourceMesh.getMeshData()
                             .getIndices().get(ind) : ind;
                     BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
                             index);

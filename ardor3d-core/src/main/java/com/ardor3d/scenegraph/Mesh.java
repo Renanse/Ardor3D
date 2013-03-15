@@ -336,7 +336,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         }
         renderer.setupVertexData(meshData.getVertexCoords());
 
-        if (meshData.getIndexBuffer() != null) {
+        if (meshData.getIndices() != null) {
             renderer.drawElements(meshData.getIndices(), meshData.getIndexLengths(), meshData.getIndexModes(),
                     primcount);
         } else {
@@ -390,7 +390,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             renderer.setupVertexDataVBO(meshData.getVertexCoords());
         }
 
-        if (meshData.getIndexBuffer() != null) {
+        if (meshData.getIndices() != null) {
             // TODO: Maybe ask for the IndexBuffer's dynamic/static type and fall back to arrays for indices?
             renderer.drawElementsVBO(meshData.getIndices(), meshData.getIndexLengths(), meshData.getIndexModes(),
                     primcount);

@@ -10,10 +10,12 @@
 
 package com.ardor3d.framework.jogl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLRunnable;
+
 import javax.media.opengl.awt.GLCanvas;
+import javax.swing.SwingUtilities;
+
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
@@ -21,7 +23,7 @@ import com.ardor3d.framework.DisplaySettings;
 /**
  * FIXME there is still a deadlock when using several instances of this class in the same container, see JOGL bug 572
  * Rather use JoglNewtAwtCanvas in this case.
- *
+ * 
  */
 public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
@@ -31,12 +33,15 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
     private boolean _inited = false;
 
     private final DisplaySettings _settings;
-    
+
     private final JoglDrawerRunnable _drawerGLRunnable;
+
+    private final JoglInitializerRunnable _initializerRunnable;
 
     public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
         super(CapsUtil.getCapsForSettings(settings));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
+        _initializerRunnable = new JoglInitializerRunnable(this, settings);
         _settings = settings;
         _canvasRenderer = canvasRenderer;
 
@@ -49,25 +54,23 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
     @MainThread
     public void init() {
-    	if (_inited) {
+        if (_inited) {
             return;
         }
-    	
-        // Make the window visible to realize the OpenGL surface.
-        setVisible(true);
-        
-        // Request the focus here as it cannot work when the window is not visible
-        requestFocus();
-        
-        _canvasRenderer.setContext(getContext());
-        
-        invoke(true, new GLRunnable() {
-            @Override
-            public boolean run(GLAutoDrawable glAutoDrawable) {     
-                _canvasRenderer.init(_settings, true);// true - do swap in renderer.
-                return true;
+
+        // Calling setVisible(true) on the GLCanvas not from the AWT-EDT can freeze the Intel GPU under Windows
+        if (!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(_initializerRunnable);
+            } catch (final InterruptedException ex) {
+                ex.printStackTrace();
+            } catch (final InvocationTargetException ex) {
+                ex.printStackTrace();
             }
-        });
+        } else {
+            _initializerRunnable.run();
+        }
+
         _inited = true;
     }
 
@@ -77,7 +80,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         }
 
         if (isShowing()) {
-        	invoke(true, _drawerGLRunnable);
+            invoke(true, _drawerGLRunnable);
         }
         if (latch != null) {
             latch.countDown();

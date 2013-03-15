@@ -13,7 +13,6 @@ package com.ardor3d.example.pipeline;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +24,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
@@ -177,20 +177,20 @@ public class ExportImportExample extends ExampleBase {
 
         meshData.setVertexBuffer(vertexBuffer);
 
-        final IntBuffer indexBuffer = BufferUtils.createIntBuffer(18);
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(18, vertexBuffer.capacity() - 1);
 
         // Strips
-        indexBuffer.put(0).put(3).put(1).put(2);
-        indexBuffer.put(4).put(7).put(5).put(6);
+        indices.put(0).put(3).put(1).put(2);
+        indices.put(4).put(7).put(5).put(6);
 
         // Quad
-        indexBuffer.put(8).put(9).put(10).put(11);
+        indices.put(8).put(9).put(10).put(11);
 
         // Triangles
-        indexBuffer.put(12).put(13).put(15);
-        indexBuffer.put(13).put(15).put(14);
+        indices.put(12).put(13).put(15);
+        indices.put(13).put(15).put(14);
 
-        meshData.setIndexBuffer(indexBuffer);
+        meshData.setIndices(indices);
 
         // Setting sub primitive data
         final int[] indexLengths = new int[] { 4, 4, 4, 6 };

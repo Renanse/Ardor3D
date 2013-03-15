@@ -10,7 +10,7 @@
 
 package com.ardor3d.extension.model.collada.jdom.plugin;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 public interface ColladaExtraPlugin {
 

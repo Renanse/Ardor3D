@@ -22,15 +22,17 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import org.jdom.Attribute;
-import org.jdom.DataConversionException;
-import org.jdom.DefaultJDOMFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Text;
-import org.jdom.input.SAXBuilder;
-import org.jdom.input.SAXHandler;
+import org.jdom2.Attribute;
+import org.jdom2.DataConversionException;
+import org.jdom2.DefaultJDOMFactory;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMFactory;
+import org.jdom2.Namespace;
+import org.jdom2.Text;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.SAXHandler;
+import org.jdom2.input.sax.SAXHandlerFactory;
 import org.xml.sax.SAXException;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
@@ -289,18 +291,18 @@ public class ColladaImporter {
      */
     private Element readCollada(final ResourceSource resource, final DataCache dataCache) {
         try {
-            final SAXBuilder builder = new SAXBuilder() {
+            final JDOMFactory jdomFac = new ArdorFactory(dataCache);
+            final SAXBuilder builder = new SAXBuilder(null, new SAXHandlerFactory() {
                 @Override
-                protected SAXHandler createContentHandler() {
-                    return new SAXHandler(new ArdorFactory(dataCache)) {
+                public SAXHandler createSAXHandler(final JDOMFactory factory) {
+                    return new SAXHandler(jdomFac) {
                         @Override
                         public void startPrefixMapping(final String prefix, final String uri) throws SAXException {
                             // Just kill what's usually done here...
                         }
-
                     };
                 }
-            };
+            }, jdomFac);
 
             final Document doc = builder.build(resource.openStream());
             final Element collada = doc.getRootElement();
@@ -335,7 +337,7 @@ public class ColladaImporter {
         }
 
         @Override
-        public Text text(final String text) {
+        public Text text(final int line, final int col, final String text) {
             try {
                 switch (bufferType) {
                     case Float: {
@@ -435,29 +437,29 @@ public class ColladaImporter {
         }
 
         @Override
-        public Element element(final String name, final Namespace namespace) {
-            currentElement = super.element(name);
+        public Element element(final int line, final int col, final String name, final Namespace namespace) {
+            currentElement = super.element(line, col, name);
             handleTypes(name);
             return currentElement;
         }
 
         @Override
-        public Element element(final String name, final String prefix, final String uri) {
-            currentElement = super.element(name);
+        public Element element(final int line, final int col, final String name, final String prefix, final String uri) {
+            currentElement = super.element(line, col, name);
             handleTypes(name);
             return currentElement;
         }
 
         @Override
-        public Element element(final String name, final String uri) {
-            currentElement = super.element(name);
+        public Element element(final int line, final int col, final String name, final String uri) {
+            currentElement = super.element(line, col, name);
             handleTypes(name);
             return currentElement;
         }
 
         @Override
-        public Element element(final String name) {
-            currentElement = super.element(name);
+        public Element element(final int line, final int col, final String name) {
+            currentElement = super.element(line, col, name);
             handleTypes(name);
             return currentElement;
         }

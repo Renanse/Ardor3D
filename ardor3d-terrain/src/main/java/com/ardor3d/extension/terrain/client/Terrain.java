@@ -278,7 +278,7 @@ public class Terrain extends Node implements Pickable {
                 for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
                     final ClipmapLevel clip = _clips.get(i);
 
-                    clip.getMeshData().getIndexBuffer().limit(clip.getMeshData().getIndexBuffer().capacity());
+                    clip.getMeshData().getIndices().limit(clip.getMeshData().getIndices().capacity());
                 }
 
                 _initialized = true;

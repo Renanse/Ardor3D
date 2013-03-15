@@ -13,7 +13,7 @@ package com.ardor3d.scene.state.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -30,7 +30,7 @@ import com.ardor3d.renderer.state.record.FogStateRecord;
 public abstract class JoglFogStateUtil {
 
     public static void apply(final JoglRenderer renderer, final FogState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
@@ -78,7 +78,7 @@ public abstract class JoglFogStateUtil {
     }
 
     private static void enableFog(final boolean enable, final FogStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (record.isValid()) {
             if (enable && !record.enabled) {
@@ -99,13 +99,13 @@ public abstract class JoglFogStateUtil {
     }
 
     private static void applyFogColor(final ReadOnlyColorRGBA color, final FogStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (!record.isValid() || !color.equals(record.fogColor)) {
             record.fogColor.set(color);
             record.colorBuff.clear();
-            record.colorBuff.put(record.fogColor.getRed()).put(record.fogColor.getGreen()).put(
-                    record.fogColor.getBlue()).put(record.fogColor.getAlpha());
+            record.colorBuff.put(record.fogColor.getRed()).put(record.fogColor.getGreen())
+                    .put(record.fogColor.getBlue()).put(record.fogColor.getAlpha());
             record.colorBuff.flip();
             gl.getGL2ES1().glFogfv(GL2ES1.GL_FOG_COLOR, record.colorBuff);
         }
@@ -113,7 +113,7 @@ public abstract class JoglFogStateUtil {
 
     private static void applyFogSource(final CoordinateSource source, final FogStateRecord record,
             final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (caps.isFogCoordinatesSupported()) {
             if (!record.isValid() || !source.equals(record.source)) {
@@ -127,7 +127,7 @@ public abstract class JoglFogStateUtil {
     }
 
     private static void applyFogMode(final DensityFunction densityFunction, final FogStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         int glMode = 0;
         switch (densityFunction) {
@@ -149,7 +149,7 @@ public abstract class JoglFogStateUtil {
     }
 
     private static void applyFogHint(final Quality quality, final FogStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         int glHint = 0;
         switch (quality) {

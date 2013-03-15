@@ -22,34 +22,13 @@
         <module>ardor3d-ui</module>
         <module>ardor3d-terrain</module>
         <module>ardor3d-examples</module>
+        <module>ardor3d-distribution</module>
     </modules>
 
     <scm>
         <connection>scm:git:https://github.com/Renanse/Ardor3D.git</connection>
     </scm>
   
-    <repositories>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2</url>
-            <layout>default</layout>
-        </repository>
-    <!-- Ardor3D internal repository -->
-        <repository>
-            <id>ardor3d</id>
-            <name>Ardor3D repository</name>
-            <url>http://ardor3d.com:8081/nexus/content/repositories/thirdparty</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>google-maven-repository</id>
-            <name>Google Maven Repository</name>
-            <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -89,6 +68,14 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.0</version>
                 </plugin>
@@ -124,7 +111,6 @@
     <properties>
         <lwjgl.version>2.8.4</lwjgl.version>
         <jogl.version>2.0-rc11</jogl.version>
-        <jdom.version>ardor3d-1.1.1</jdom.version>
         <swt.version>3650</swt.version>
         <osgi.project.version>0.9_SNAPSHOT</osgi.project.version>
     </properties>
@@ -169,26 +155,16 @@
 			    <artifactId>lwjgl_util</artifactId>
 			    <version>${lwjgl.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>net.java.games.input</groupId>
-                <artifactId>jinput</artifactId>
-                <version>ardor3d-20100503</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jdom</groupId>
-                <artifactId>jdom</artifactId>
-                <version>${jdom.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jdom</groupId>
-                <artifactId>jaxen</artifactId>
-                <version>${jdom.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jdom</groupId>
-                <artifactId>saxpath</artifactId>
-                <version>${jdom.version}</version>
-            </dependency>
+			<dependency>
+			    <groupId>org.jdom</groupId>
+			    <artifactId>jdom2</artifactId>
+			    <version>2.0.4</version>
+			</dependency>
+			<dependency>
+			    <groupId>jaxen</groupId>
+			    <artifactId>jaxen</artifactId>
+			    <version>1.1.4</version>
+			</dependency>
             <dependency>
                 <groupId>org.eclipse.swt</groupId>
                 <artifactId>swt</artifactId>

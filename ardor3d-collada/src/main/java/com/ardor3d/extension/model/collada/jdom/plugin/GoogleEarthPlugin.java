@@ -10,16 +10,14 @@
 
 package com.ardor3d.extension.model.collada.jdom.plugin;
 
-import java.util.List;
-
-import org.jdom.Attribute;
-import org.jdom.Element;
+import org.jdom2.Attribute;
+import org.jdom2.Element;
 
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.Mesh;
 
 public class GoogleEarthPlugin implements ColladaExtraPlugin {
-    @SuppressWarnings("unchecked")
+
     @Override
     public boolean processExtra(final Element extra, final Object[] params) {
         if (params.length > 0 && params[0] instanceof Mesh) {
@@ -29,7 +27,7 @@ public class GoogleEarthPlugin implements ColladaExtraPlugin {
             if (technique != null) {
                 final Attribute profile = technique.getAttribute("profile");
                 if (profile != null && "GOOGLEEARTH".equalsIgnoreCase(profile.getValue())) {
-                    for (final Element child : (List<Element>) technique.getChildren()) {
+                    for (final Element child : technique.getChildren()) {
                         // disable back face culling if it's been enabled.
                         if ("double_sided".equalsIgnoreCase(child.getName()) && "1".equals(child.getTextTrim())) {
                             final CullState cs = new CullState();

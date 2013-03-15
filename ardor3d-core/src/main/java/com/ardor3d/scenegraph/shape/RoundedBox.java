@@ -160,7 +160,7 @@ public class RoundedBox extends Mesh {
     }
 
     private void setIndexData() {
-        if (_meshData.getIndexBuffer() == null) {
+        if (_meshData.getIndices() == null) {
             final IndexBufferData<?> buff = BufferUtils.createIndexBufferData(180, 48 - 1);
             final int[] data = new int[] { 0, 4, 1, 1, 4, 5, 1, 5, 3, 3, 5, 7, 3, 7, 2, 2, 7, 6, 2, 6, 0, 0, 6, 4, 4,
                     6, 5, 5, 6, 7 };

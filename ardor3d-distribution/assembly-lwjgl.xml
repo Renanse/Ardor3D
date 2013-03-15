@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+
+	<id>lwjgl</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<moduleSets>
+		<moduleSet>
+			<useAllReactorProjects>true</useAllReactorProjects>
+
+			<includes>
+				<include>com.ardor3d:ardor3d-animation</include>
+				<include>com.ardor3d:ardor3d-awt</include>
+				<include>com.ardor3d:ardor3d-collada</include>
+				<include>com.ardor3d:ardor3d-core</include>
+				<include>com.ardor3d:ardor3d-effects</include>
+				<include>com.ardor3d:ardor3d-extras</include>
+				<include>com.ardor3d:ardor3d-lwjgl</include>
+				<include>com.ardor3d:ardor3d-math</include>
+				<include>com.ardor3d:ardor3d-savable</include>
+				<include>com.ardor3d:ardor3d-swt</include>
+				<include>com.ardor3d:ardor3d-terrain</include>
+				<include>com.ardor3d:ardor3d-ui</include>
+			</includes>
+
+			<binaries>
+				<unpack>false</unpack>
+				<dependencySets>
+					<dependencySet>
+						<excludes>
+							<exclude>*:lwjgl*:*:natives-*</exclude>
+							<exclude>*:jinput*:*:natives-*</exclude>
+						</excludes>
+					</dependencySet>
+				</dependencySets>
+			</binaries>
+		</moduleSet>
+	</moduleSets>
+
+	<fileSets>
+		<fileSet>
+			<directory>target/natives</directory>
+			<outputDirectory>natives</outputDirectory>
+			<!-- This is kind of a workaround. Ideally, we would tell the maven-nativedependencies-plugin 
+				to *not* unpack the jogl/gluegen native jars. Jogl has its own native library 
+				classloader which unpacks the jars. At the moment, there is no other choice 
+				if all platforms should be supported, because the filenames of the native 
+				libs are overlapping each other in jogl (e.g. for natives-linux-amd64 and 
+				natives-linux-i586). -->
+			<excludes>
+				<exclude>*jogl*</exclude>
+				<exclude>*nativewindow*</exclude>
+				<exclude>*newt*</exclude>
+				<exclude>*gluegen*</exclude>
+				<exclude>META-INF/</exclude>
+			</excludes>
+		</fileSet>
+	</fileSets>
+</assembly>

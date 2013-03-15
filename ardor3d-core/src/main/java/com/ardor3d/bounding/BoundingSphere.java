@@ -83,7 +83,7 @@ public class BoundingSphere extends BoundingVolume {
         transform.applyForward(_center, sphere._center);
 
         if (!transform.isRotationMatrix()) {
-            final Vector3 scale = new Vector3(1, 1, 1);
+            final Vector3 scale = _compVect3.set(1, 1, 1);
             transform.applyForwardVector(scale);
             sphere.setRadius(Math.abs(maxAxis(scale) * getRadius()) + radiusEpsilon - 1);
         } else {

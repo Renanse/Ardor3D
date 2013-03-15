@@ -12,10 +12,8 @@
     <name>Ardor 3D Examples</name>
 
     <properties>
-        <main.class>com.ardor3d.example.basic.BoxExample</main.class>
-        <jogl.native>${basedir}${file.separator}..${file.separator}ardor3d-jogl${file.separator}lib${file.separator}jogl${file.separator}native${file.separator}windows_i586</jogl.native>
-        <lwjgl.native>${basedir}${file.separator}..${file.separator}ardor3d-lwjgl${file.separator}target${file.separator}lib${file.separator}${lwjgl.classifier}${file.separator}lwjgl</lwjgl.native>
-        <library.path>${lwjgl.native}${path.separator}${jogl.native}</library.path>
+        <main.class>com.ardor3d.example.ExampleRunner</main.class>
+        <library.path>${basedir}${file.separator}target${file.separator}natives</library.path>
     </properties>
 
     <build>
@@ -26,7 +24,6 @@
                 <version>2.4</version>
                 <configuration>
                     <archive>
-			            <!-- TODO: find a good way of handling native libraries -->
                         <manifest>
                             <mainClass>${main.class}</mainClass>
                             <addClasspath>true</addClasspath>
@@ -52,7 +49,10 @@
                     </execution>
                 </executions>
             </plugin>
-      <!-- TODO: see execution comment above -->
+      <!-- Run example executable with goal exec:java and add
+           "-Djava.library.path=target/natives" to the VM arguments.
+           You probably have to execute the package goal once to generate the 
+           target/natives folder. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -60,20 +60,23 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>java</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
                     <systemProperties>
                         <systemProperty>
-                            <key>org.lwjgl.librarypath</key>
-                            <value>${lwjgl.native}</value>
+                        	<!-- 
+                        	Doesn't work, as this property can only be given when a new
+                        	jvm is forked. Instead, run goal "exec:java" with the vm arguments:
+                        	"-Djava.library.path=target/natives" -->
+                        	<key>java.library.path</key>
+                        	<value>target/natives</value>
                         </systemProperty>
                     </systemProperties>
-                    <mainClass>${main.class}</mainClass>
-                    <argument>-classpath</argument>
-                    <classpath />
+                    <!-- TODO Using ExampleRunner results in some resources problems  -->
+                    <mainClass>com.ardor3d.example.basic.BoxExample</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -84,6 +87,20 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            <plugin>
+				<groupId>com.googlecode.mavennatives</groupId>
+				<artifactId>maven-nativedependencies-plugin</artifactId>
+				<version>0.0.7</version>
+				<executions>
+					<execution>
+						<id>unpacknatives</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 
@@ -92,6 +109,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ardor3d-lwjgl</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <!-- because we use org.lwjgl.LWJGLException in LwjglSwtExample -->
+        <dependency>
+    		<groupId>org.lwjgl.lwjgl</groupId>
+    		<artifactId>lwjgl</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -134,110 +156,5 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-    <profiles>
-        <profile>
-            <id>linux-x86</id>
-            <activation>
-                <os>
-                    <arch>i386</arch>
-                    <name>linux</name>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>linux-x86</swt.classifier>
-                <lwjgl.classifier>linux</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux-x86_64</id>
-            <activation>
-                <os>
-                    <arch>amd64</arch>
-                    <name>Linux</name>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>linux-x86_64</swt.classifier>
-                <lwjgl.classifier>linux</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>solaris-sparc</id>
-            <activation>
-                <os>
-                    <arch>sparc</arch>
-                    <name>SunOS</name>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>solaris-sparc</swt.classifier>
-                <lwjgl.classifier>solaris</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>solaris-x86</id>
-            <activation>
-                <os>
-                    <arch>x86</arch>
-                    <name>SunOS</name>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>solaris-x86</swt.classifier>
-                <lwjgl.classifier>solaris</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>macosx-cocoa-64</id>
-            <activation>
-                <os>
-                    <arch>x86_64</arch>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>mac-x86_64</swt.classifier>
-                <lwjgl.classifier>mac</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>macosx-cocoa</id>
-            <activation>
-                <os>
-                    <arch>x86</arch>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>mac-x86</swt.classifier>
-                <lwjgl.classifier>mac</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>win32</id>
-            <activation>
-                <os>
-                    <arch>x86</arch>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>win32-x86</swt.classifier>
-                <lwjgl.classifier>windows</lwjgl.classifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>win64</id>
-            <activation>
-                <os>
-                    <arch>amd64</arch>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <swt.classifier>win32-x86_64</swt.classifier>
-                <lwjgl.classifier>windows</lwjgl.classifier>
-            </properties>
-        </profile>
-    </profiles>
+
 </project>

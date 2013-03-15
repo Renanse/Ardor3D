@@ -20,20 +20,6 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <plugin>
-				<groupId>com.googlecode.mavennatives</groupId>
-				<artifactId>maven-nativedependencies-plugin</artifactId>
-				<version>0.0.5</version>
-				<executions>
-					<execution>
-						<id>unpacknatives</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
         </plugins>
     </build>
     <dependencies>
@@ -49,10 +35,6 @@
         <dependency>
             <groupId>org.lwjgl.lwjgl</groupId>
             <artifactId>lwjgl_util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.games.input</groupId>
-            <artifactId>jinput</artifactId>
         </dependency>
     </dependencies>
 </project>

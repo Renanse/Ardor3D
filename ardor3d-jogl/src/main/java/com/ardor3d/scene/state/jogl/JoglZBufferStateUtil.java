@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLContext;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.ContextManager;
@@ -67,7 +68,7 @@ public abstract class JoglZBufferStateUtil {
     }
 
     private static void enableDepthTest(final boolean enable, final ZBufferStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (enable && (!record.depthTest || !record.isValid())) {
             gl.glEnable(GL.GL_DEPTH_TEST);

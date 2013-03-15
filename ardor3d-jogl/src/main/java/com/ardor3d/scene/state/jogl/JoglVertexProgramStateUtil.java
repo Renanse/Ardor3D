@@ -16,14 +16,14 @@ import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
-import com.ardor3d.renderer.state.VertexProgramState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.VertexProgramState;
 import com.ardor3d.renderer.state.record.VertexProgramStateRecord;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -35,7 +35,7 @@ public abstract class JoglVertexProgramStateUtil {
      * message.
      */
     private static void checkProgramError() {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         if (gl.glGetError() == GL.GL_INVALID_OPERATION) {
             // retrieve the error position
@@ -48,7 +48,7 @@ public abstract class JoglVertexProgramStateUtil {
     }
 
     private static int create(final ByteBuffer program) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
 
         final IntBuffer buf = BufferUtils.createIntBuffer(1);
 
@@ -58,9 +58,8 @@ public abstract class JoglVertexProgramStateUtil {
         final byte array[] = new byte[program.limit()];
         program.rewind();
         program.get(array);
-        gl.getGL2()
-                .glProgramStringARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, array.length, new String(
-                        array));
+        gl.getGL2().glProgramStringARB(GL2.GL_VERTEX_PROGRAM_ARB, GL2.GL_PROGRAM_FORMAT_ASCII_ARB, array.length,
+                new String(array));
 
         checkProgramError();
 
@@ -68,7 +67,7 @@ public abstract class JoglVertexProgramStateUtil {
     }
 
     public static void apply(final JoglRenderer renderer, final VertexProgramState state) {
-        final GL gl = GLU.getCurrentGL();
+        final GL gl = GLContext.getCurrentGL();
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 
@@ -97,10 +96,11 @@ public abstract class JoglVertexProgramStateUtil {
                     // load environmental parameters...
                     for (int i = 0; i < VertexProgramState._getEnvParameters().length; i++) {
                         if (VertexProgramState._getEnvParameters()[i] != null) {
-                            gl.getGL2().glProgramEnvParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i, VertexProgramState
-                                    ._getEnvParameters()[i][0], VertexProgramState._getEnvParameters()[i][1],
-                                    VertexProgramState._getEnvParameters()[i][2], VertexProgramState
-                                            ._getEnvParameters()[i][3]);
+                            gl.getGL2().glProgramEnvParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
+                                    VertexProgramState._getEnvParameters()[i][0],
+                                    VertexProgramState._getEnvParameters()[i][1],
+                                    VertexProgramState._getEnvParameters()[i][2],
+                                    VertexProgramState._getEnvParameters()[i][3]);
                         }
                     }
 
@@ -110,8 +110,8 @@ public abstract class JoglVertexProgramStateUtil {
                         for (int i = 0; i < state._getParameters().length; i++) {
                             if (state._getParameters()[i] != null) {
                                 gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
-                                        state._getParameters()[i][0], state._getParameters()[i][1], state
-                                                ._getParameters()[i][2], state._getParameters()[i][3]);
+                                        state._getParameters()[i][0], state._getParameters()[i][1],
+                                        state._getParameters()[i][2], state._getParameters()[i][3]);
                             }
                         }
                     }

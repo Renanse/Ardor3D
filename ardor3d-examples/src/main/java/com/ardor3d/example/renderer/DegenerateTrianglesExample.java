@@ -11,7 +11,6 @@
 package com.ardor3d.example.renderer;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -28,6 +27,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -128,7 +128,8 @@ public class DegenerateTrianglesExample extends ExampleBase {
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize);
         final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(totalSize);
 
-        final IntBuffer indexBuffer = BufferUtils.createIntBuffer((ySize - 1) * xSize * 2);
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData((ySize - 1) * xSize * 2,
+                vertexBuffer.capacity() - 1);
         final int[] indexLengths = new int[ySize - 1];
 
         for (int y = 0; y < ySize; y++) {
@@ -142,8 +143,8 @@ public class DegenerateTrianglesExample extends ExampleBase {
         for (int y = 0; y < ySize - 1; y++) {
             for (int x = 0; x < xSize; x++) {
                 final int index = y * xSize + x;
-                indexBuffer.put(index);
-                indexBuffer.put(index + xSize);
+                indices.put(index);
+                indices.put(index + xSize);
             }
             indexLengths[y] = xSize * 2;
         }
@@ -152,7 +153,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
         meshData.setNormalBuffer(normalBuffer);
         meshData.setTextureBuffer(textureBuffer, 0);
 
-        meshData.setIndexBuffer(indexBuffer);
+        meshData.setIndices(indices);
         meshData.setIndexLengths(indexLengths);
         meshData.setIndexMode(IndexMode.TriangleStrip);
 
@@ -167,7 +168,8 @@ public class DegenerateTrianglesExample extends ExampleBase {
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize);
         final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(totalSize);
 
-        final IntBuffer indexBuffer = BufferUtils.createIntBuffer((ySize - 1) * xSize * 2 + (ySize - 1) * 2);
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData((ySize - 1) * xSize * 2 + (ySize - 1) * 2,
+                vertexBuffer.capacity() - 1);
 
         for (int y = 0; y < ySize; y++) {
             for (int x = 0; x < xSize; x++) {
@@ -180,20 +182,20 @@ public class DegenerateTrianglesExample extends ExampleBase {
         for (int y = 0; y < ySize - 1; y++) {
             for (int x = 0; x < xSize; x++) {
                 final int index = y * xSize + x;
-                indexBuffer.put(index);
-                indexBuffer.put(index + xSize);
+                indices.put(index);
+                indices.put(index + xSize);
             }
 
             final int index = (y + 1) * xSize;
-            indexBuffer.put(index + xSize - 1);
-            indexBuffer.put(index);
+            indices.put(index + xSize - 1);
+            indices.put(index);
         }
 
         meshData.setVertexBuffer(vertexBuffer);
         meshData.setNormalBuffer(normalBuffer);
         meshData.setTextureBuffer(textureBuffer, 0);
 
-        meshData.setIndexBuffer(indexBuffer);
+        meshData.setIndices(indices);
         meshData.setIndexMode(IndexMode.TriangleStrip);
 
         return mesh;

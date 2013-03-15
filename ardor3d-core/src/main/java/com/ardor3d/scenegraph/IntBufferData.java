@@ -105,6 +105,16 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
     }
 
     @Override
+    public void put(final int[] array) {
+        _buffer.put(array);
+    }
+
+    @Override
+    public void put(final int[] array, final int offset, final int length) {
+        _buffer.put(array, offset, length);
+    }
+
+    @Override
     public int getByteCount() {
         return 4;
     }
