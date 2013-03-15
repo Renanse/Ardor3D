@@ -24,25 +24,28 @@ import java.util.logging.Logger;
  * <code>GameTask</code> is used in <code>GameTaskQueue</code> to manage tasks that have yet to be accomplished.
  */
 public class GameTask<V> implements Future<V> {
-    private static final Logger logger = Logger.getLogger(GameTask.class.getName());
+    protected static final Logger logger = Logger.getLogger(GameTask.class.getName());
 
-    private final Callable<V> callable;
+    protected final Callable<V> callable;
 
-    private V _result;
-    private ExecutionException _exception;
-    private boolean _cancelled, _finished;
-    private final ReentrantLock _stateLock = new ReentrantLock();
-    private final Condition _finishedCondition = _stateLock.newCondition();
+    protected V _result;
+    protected ExecutionException _exception;
+    protected boolean _cancelled, _finished;
+    protected final ReentrantLock _stateLock = new ReentrantLock();
+    protected final Condition _finishedCondition = _stateLock.newCondition();
 
     public GameTask(final Callable<V> callable) {
         this.callable = callable;
     }
 
+    /**
+     * @param mayInterruptIfRunning
+     *            ignored by this implementation.
+     */
     public boolean cancel(final boolean mayInterruptIfRunning) {
-        // TODO mayInterruptIfRunning was ignored in previous code, should this param be removed?
         _stateLock.lock();
         try {
-            if (_result != null) {
+            if (isDone()) {
                 return false;
             }
             _cancelled = true;
