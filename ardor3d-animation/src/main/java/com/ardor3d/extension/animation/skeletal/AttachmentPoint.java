@@ -22,7 +22,7 @@ import com.ardor3d.scenegraph.Spatial;
 public class AttachmentPoint implements PoseListener {
 
     /** The index of the joint we are listening to. */
-    private int _jointIndex;
+    private short _jointIndex;
 
     /** The spatial we are moving around. */
     private Spatial _attachment;
@@ -58,7 +58,7 @@ public class AttachmentPoint implements PoseListener {
      * @param offset
      *            an offset to add to the joint's transform before updating the attachment spatial.
      */
-    public AttachmentPoint(final String name, final int jointIndex, final Spatial attachment,
+    public AttachmentPoint(final String name, final short jointIndex, final Spatial attachment,
             final ReadOnlyTransform offset) {
         this(name);
         setJointIndex(jointIndex);
@@ -86,7 +86,7 @@ public class AttachmentPoint implements PoseListener {
         return _jointIndex;
     }
 
-    public void setJointIndex(final int jointIndex) {
+    public void setJointIndex(final short jointIndex) {
         _jointIndex = jointIndex;
     }
 

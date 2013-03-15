@@ -12,10 +12,12 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom.Element;
 
+import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
@@ -92,23 +94,21 @@ public class ColladaNodeUtils {
                 }
             }
 
-            // build a list of joints - one list per skeleton
-            final List<List<Joint>> jointCollection = Lists.newArrayList();
+            // build a list of joints - one list per skeleton - and build a skeleton for each joint list.
             for (final JointNode jointChildNode : _dataCache.getRootJointNode().getChildren()) {
                 final List<Joint> jointList = Lists.newArrayList();
                 buildJointLists(jointChildNode, jointList);
-                jointCollection.add(jointList);
-            }
-
-            // build a skeleton for each joint list.
-            for (final List<Joint> jointList : jointCollection) {
                 final Joint[] joints = jointList.toArray(new Joint[jointList.size()]);
                 final Skeleton skeleton = new Skeleton(joints[0].getName() + "_skeleton", joints);
-                logger.fine(skeleton.getName());
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("skeleton created: " + skeleton.getName());
+                }
                 for (final Joint joint : jointList) {
                     _dataCache.getJointSkeletonMapping().put(joint, skeleton);
-                    logger.fine("- Joint " + joint.getName() + " - index: " + joint.getIndex() + " parent index: "
-                            + joint.getParentIndex());
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("- Joint " + joint.getName() + " - index: " + joint.getIndex() + " parent index: "
+                                + joint.getParentIndex());
+                    }
                 }
                 _dataCache.addSkeleton(skeleton);
             }
@@ -242,10 +242,7 @@ public class ColladaNodeUtils {
      */
     @SuppressWarnings("unchecked")
     private Node buildNode(final Element dNode, JointNode jointNode) {
-        NodeType nodeType = NodeType.NODE;
-        if (dNode.getAttribute("type") != null) {
-            nodeType = Enum.valueOf(NodeType.class, dNode.getAttributeValue("type"));
-        }
+        final NodeType nodeType = getNodeType(dNode);
         final JointNode jointChildNode;
         if (nodeType == NodeType.JOINT) {
             String name = dNode.getAttributeValue("name");
@@ -311,6 +308,11 @@ public class ColladaNodeUtils {
             final Node subNode = getNode(in, jointNode);
             if (subNode != null) {
                 node.attachChild(subNode);
+                if (nodeType == NodeType.JOINT
+                        && getNodeType(_colladaDOMUtil.findTargetWithId(in.getAttributeValue("url"))) == NodeType.NODE) {
+                    // make attachment
+                    createJointAttachment(jointChildNode, node, subNode);
+                }
             }
         }
 
@@ -319,6 +321,10 @@ public class ColladaNodeUtils {
             final Node subNode = buildNode(n, jointNode);
             if (subNode != null) {
                 node.attachChild(subNode);
+                if (nodeType == NodeType.JOINT && getNodeType(n) == NodeType.NODE) {
+                    // make attachment
+                    createJointAttachment(jointChildNode, node, subNode);
+                }
             }
         }
 
@@ -326,6 +332,22 @@ public class ColladaNodeUtils {
         _dataCache.getElementSpatialMapping().put(dNode, node);
 
         return node;
+    }
+
+    protected void createJointAttachment(final JointNode jointChildNode, final Node node, final Node subNode) {
+        final AttachmentPoint attach = new AttachmentPoint("attach-" + node.getName(), (short) 0, subNode,
+                new Transform(subNode.getTransform()));
+        _dataCache.addAttachmentPoint(jointChildNode.getJoint(), attach);
+        // we will attach to scene instead.
+        subNode.removeFromParent();
+    }
+
+    private NodeType getNodeType(final Element dNode) {
+        if (dNode.getAttribute("type") != null) {
+            return Enum.valueOf(NodeType.class, dNode.getAttributeValue("type"));
+        } else {
+            return NodeType.NODE;
+        }
     }
 
     /**
@@ -374,5 +396,11 @@ public class ColladaNodeUtils {
             }
         }
         return new Transform().fromHomogeneousMatrix(finalMat);
+    }
+
+    public void reattachAttachments(final Node scene) {
+        for (final AttachmentPoint point : _dataCache.getAttachmentPoints().values()) {
+            scene.attachChild(point.getAttachment());
+        }
     }
 }
