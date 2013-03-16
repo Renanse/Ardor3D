@@ -516,4 +516,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
         iterations = capsule.readInt("iterations", 0);
         influences = capsule.readSavableList("influences", null);
     }
+
+    public void resetFlowCount() {
+        _releaseParticles = 0;
+    }
 }

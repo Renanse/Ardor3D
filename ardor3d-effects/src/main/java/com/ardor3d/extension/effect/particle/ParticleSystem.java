@@ -167,6 +167,7 @@ public abstract class ParticleSystem extends Node {
 
         if (_controller != null) {
             _controller.setActive(true);
+            _controller.resetFlowCount();
         }
     }
 
