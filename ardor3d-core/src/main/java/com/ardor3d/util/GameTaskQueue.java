@@ -100,6 +100,16 @@ public class GameTaskQueue {
     }
 
     /**
+     * Adds the given task to the internal queue to invoked.
+     * 
+     * @param <V>
+     * @param task
+     */
+    public <V> void enqueue(final GameTask<V> task) {
+        _queue.add(task);
+    }
+
+    /**
      * Execute the tasks from this queue. Note that depending on the queue type, tasks may expect to be run in a certain
      * context (for example, the Render queue expects to be run from the Thread owning a GL context.)
      */
