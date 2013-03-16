@@ -16,8 +16,8 @@ import java.util.List;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
@@ -204,6 +204,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
                         // Recreate the particle
                         p.recreateParticle(particles.getRandomLifeSpan());
                         p.setStatus(Particle.Status.Alive);
+                        // in case of ramp time 0 entries.
+                        p.updateAndCheck(0);
                         particles.initParticleLocation(i);
                         particles.resetParticleVelocity(i);
                         p.updateVerts(null);

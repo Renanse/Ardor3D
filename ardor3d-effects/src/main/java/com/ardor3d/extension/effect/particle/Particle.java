@@ -120,12 +120,7 @@ public class Particle implements Savable {
     public void recreateParticle(final double lifeSpan) {
         this.lifeSpan = lifeSpan;
 
-        final int verts = ParticleSystem.getVertsForParticleType(type);
         currColor.set(parent.getStartColor());
-        for (int x = 0; x < verts; x++) {
-            BufferUtils.setInBuffer(currColor, parent.getParticleGeometry().getMeshData().getColorBuffer(), startIndex
-                    + x);
-        }
         values[VAL_CURRENT_SIZE] = parent.getStartSize();
         currentAge = 0;
         values[VAL_CURRENT_MASS] = 1;
