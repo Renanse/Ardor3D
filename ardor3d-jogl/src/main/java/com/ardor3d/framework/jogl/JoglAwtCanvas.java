@@ -13,6 +13,8 @@ package com.ardor3d.framework.jogl;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLRunnable;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.SwingUtilities;
 
@@ -89,5 +91,15 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
+    }
+
+    public void setVSyncEnabled(final boolean enabled) {
+        invoke(true, new GLRunnable() {
+            @Override
+            public boolean run(final GLAutoDrawable glAutoDrawable) {
+                glAutoDrawable.getGL().setSwapInterval(enabled ? 1 : 0);
+                return false;
+            }
+        });
     }
 }

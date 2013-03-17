@@ -93,4 +93,14 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
     public GLWindow getNewtWindow() {
         return (GLWindow) getNEWTChild();
     }
+
+    public void setVSyncEnabled(final boolean enabled) {
+        getNewtWindow().invoke(true, new GLRunnable() {
+            @Override
+            public boolean run(final GLAutoDrawable glAutoDrawable) {
+                glAutoDrawable.getGL().setSwapInterval(enabled ? 1 : 0);
+                return false;
+            }
+        });
+    }
 }
