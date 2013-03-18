@@ -17,9 +17,11 @@ import java.awt.event.ComponentEvent;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 
+import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Scene;
+import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.jogl.JoglNewtAwtCanvas;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -48,6 +50,7 @@ import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -55,6 +58,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.ardor3d.util.stat.StatCollector;
 import com.jogamp.newt.ScreenMode;
 
 /**
@@ -79,7 +83,7 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
 
     protected final Timer _timer = new Timer();
     protected final Node _root = new Node();
-    protected FrameHandler frameHandler = new FrameHandler(_timer);
+    protected final FrameHandler frameHandler = new FrameHandler(_timer);
 
     @Override
     public void init() {
@@ -92,12 +96,6 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public final void addNotify() {
-                    super.addNotify();
-                    startJOGL();
-                }
-
-                @Override
                 public final void removeNotify() {
                     stopJOGL();
                     super.removeNotify();
@@ -105,7 +103,6 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
             };
             ;
             _glCanvas.setSize(getWidth(), getHeight());
-            add(_glCanvas, BorderLayout.CENTER);
             _glCanvas.setFocusable(true);
             _glCanvas.requestFocus();
             _glCanvas.setIgnoreRepaint(true);
@@ -126,7 +123,25 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
                 }
             });
             frameHandler.addCanvas(_glCanvas);
+            frameHandler.addUpdater(new Updater() {
 
+                @Override
+                @MainThread
+                public void update(final ReadOnlyTimer timer) {
+                    JoglBaseApplet.this.update();
+                }
+
+                @Override
+                @MainThread
+                public void init() {
+                    initInput();
+                    initBaseScene();
+                    initAppletScene();
+                }
+            });
+            add(_glCanvas, BorderLayout.CENTER);
+            setVisible(true);
+            startJOGL();
         } catch (final Exception e) {
             System.err.println(e);
             throw new RuntimeException("Unable to create display");
@@ -148,9 +163,6 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
             @Override
             public void run() {
                 _running = true;
-                initInput();
-                initBaseScene();
-                initAppletScene();
                 gameLoop();
             }
         };
@@ -168,32 +180,27 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
 
     protected void gameLoop() {
         while (_running) {
-            // update();
             frameHandler.updateFrame();
             Thread.yield();
         }
     }
 
-    protected void update() {
-        // _timer.update();
+    public void update() {
+        _timer.update();
 
         /** update stats, if enabled. */
-        /*
-         * if (Constants.stats) { StatCollector.update(); }
-         * 
-         * updateLogicalLayer(_timer);
-         */
+        if (Constants.stats) {
+            StatCollector.update();
+        }
+        updateLogicalLayer(_timer);
 
         // Execute updateQueue item
-        /*
-         * GameTaskQueueManager.getManager(_glCanvas.getCanvasRenderer().getRenderContext())
-         * .getQueue(GameTaskQueue.UPDATE).execute();
-         * 
-         * updateAppletScene(_timer);
-         */
+        GameTaskQueueManager.getManager(_glCanvas.getCanvasRenderer().getRenderContext())
+                .getQueue(GameTaskQueue.UPDATE).execute();
+        updateAppletScene(_timer);
 
         // Update controllers/render states/transforms/bounds for rootNode.
-        /* _root.updateGeometricState(_timer.getTimePerFrame(), true); */
+        _root.updateGeometricState(_timer.getTimePerFrame(), true);
     }
 
     protected void updateLogicalLayer(final ReadOnlyTimer timer) {
