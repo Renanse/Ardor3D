@@ -38,6 +38,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
+import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.util.Ardor3dException;
 
@@ -143,7 +144,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
 
             final ContextCapabilities caps = createContextCapabilities();
-            _currentContext = new RenderContext(_context, caps, sharedContext);
+            _currentContext = new JoglRenderContext(_context, caps, sharedContext);
 
             ContextManager.addContext(_context, _currentContext);
             ContextManager.switchContext(_context);

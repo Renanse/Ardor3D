@@ -279,7 +279,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
             final JoglContextCapabilities contextCaps = new JoglContextCapabilities(_pbuffer.getGL());
             ContextManager.addContext(_context,
-                    new RenderContext(_context, contextCaps, ContextManager.getCurrentContext()));
+                    new JoglRenderContext(_context, contextCaps, ContextManager.getCurrentContext()));
 
         } catch (final Exception e) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "initPbuffer()", "Exception", e);
