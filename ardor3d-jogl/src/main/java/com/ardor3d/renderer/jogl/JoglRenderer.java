@@ -52,6 +52,7 @@ import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
@@ -242,60 +243,38 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setOrtho() {
-        final GL gl = GLContext.getCurrentGL();
-
         if (_inOrthoMode) {
             throw new Ardor3dException("Already in Orthographic mode.");
         }
         // set up ortho mode
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glPushMatrix();
-            gl.getGL2ES1().glLoadIdentity();
-        } else {
-            // TODO use PMVMatrix
-        }
+        matRecord.getMatrixBackend().pushMatrix();
+        matRecord.getMatrixBackend().loadIdentity();
 
         final Camera camera = Camera.getCurrentCamera();
         final double viewportWidth = camera.getWidth() * (camera.getViewPortRight() - camera.getViewPortLeft());
         final double viewportHeight = camera.getHeight() * (camera.getViewPortTop() - camera.getViewPortBottom());
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);
-        } else {
-            // TODO use PMVMatrix
-        }
+        matRecord.getMatrixBackend().setOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glPushMatrix();
-            gl.getGL2ES1().glLoadIdentity();
-        } else {
-            // TODO use PMVMatrix
-        }
+        matRecord.getMatrixBackend().pushMatrix();
+        matRecord.getMatrixBackend().loadIdentity();
         _inOrthoMode = true;
     }
 
     public void unsetOrtho() {
-        final GL gl = GLContext.getCurrentGL();
-
         if (!_inOrthoMode) {
             throw new Ardor3dException("Not in Orthographic mode.");
         }
         // remove ortho mode, and go back to original
         // state
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glPopMatrix();
-        } else {
-            // TODO use PMVMatrix
-        }
+        matRecord.getMatrixBackend().popMatrix();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glPopMatrix();
-        } else {
-            // TODO use PMVMatrix
-        }
+        matRecord.getMatrixBackend().popMatrix();
         _inOrthoMode = false;
     }
 
@@ -681,21 +660,16 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public boolean doTransforms(final ReadOnlyTransform transform) {
-        final GL gl = GLContext.getCurrentGL();
-
         // set world matrix
         if (!transform.isIdentity()) {
             synchronized (_transformMatrix) {
                 transform.getGLApplyMatrix(_transformBuffer);
 
-                final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+                final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                        .getRendererRecord();
                 JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-                if (gl.isGL2ES1()) {
-                    gl.getGL2ES1().glPushMatrix();
-                    gl.getGL2ES1().glMultMatrixf(_transformBuffer);
-                } else {
-                    // TODO use PMVMatrix
-                }
+                matRecord.getMatrixBackend().pushMatrix();
+                matRecord.getMatrixBackend().multMatrix(_transformBuffer);
                 return true;
             }
         }
@@ -703,15 +677,10 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void undoTransforms(final ReadOnlyTransform transform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glPopMatrix();
-        } else {
-            // TODO use PMVMatrix
-        }
+        matRecord.getMatrixBackend().popMatrix();
     }
 
     public void setupVertexData(final FloatBufferData vertexBufferData) {
@@ -1584,26 +1553,25 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     public void setModelViewMatrix(final FloatBuffer matrix) {
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
 
         loadMatrix(matrix);
     }
 
     public void setProjectionMatrix(final FloatBuffer matrix) {
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
 
         loadMatrix(matrix);
     }
 
     private void loadMatrix(final FloatBuffer matrix) {
-        final GL gl = GLContext.getCurrentGL();
-        if (gl.isGL2ES1()) {
-            gl.getGL2ES1().glLoadMatrixf(matrix);
-        } else {
-            // TODO use PMVMatrix
-        }
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
+        matRecord.getMatrixBackend().loadMatrix(matrix);
     }
 
     public FloatBuffer getModelViewMatrix(final FloatBuffer store) {
@@ -1619,7 +1587,10 @@ public class JoglRenderer extends AbstractRenderer {
         if (result.remaining() < 16) {
             result = BufferUtils.createFloatBuffer(16);
         }
-        GLContext.getCurrentGL().glGetFloatv(matrixType, store);
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
+        matRecord.getMatrixBackend().getMatrix(matrixType, store);
+        // GLContext.getCurrentGL().glGetFloatv(matrixType, store);
         return result;
     }
 

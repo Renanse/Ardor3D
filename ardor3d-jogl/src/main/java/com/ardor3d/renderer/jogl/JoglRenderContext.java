@@ -12,7 +12,7 @@ package com.ardor3d.renderer.jogl;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.state.record.RendererRecord;
+import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 
 public class JoglRenderContext extends RenderContext {
 
@@ -25,11 +25,13 @@ public class JoglRenderContext extends RenderContext {
     }
 
     @Override
-    protected RendererRecord createRendererRecord() {
-        // TODO create a renderer record that performs glMatrixMode, glOrtho, glPushMatrix, glLoadMatrix, glPopMatrix,
-        // glMultMatrixf and glLoadMatrixf. Use PMVMatrix in a delegate
-        final RendererRecord rendererRecord = new RendererRecord();
+    protected JoglRendererRecord createRendererRecord() {
+        final JoglRendererRecord rendererRecord = new JoglRendererRecord();
         return rendererRecord;
     }
 
+    @Override
+    public JoglRendererRecord getRendererRecord() {
+        return (JoglRendererRecord) _rendererRecord;
+    }
 }

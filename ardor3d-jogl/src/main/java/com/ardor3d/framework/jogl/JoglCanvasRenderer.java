@@ -53,7 +53,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     protected JoglRenderer _renderer;
     protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
-    private RenderContext _currentContext;
+    private JoglRenderContext _currentContext;
 
     /**
      * <code>true</code> if debugging (checking for error codes on each GL call) is desired.
@@ -276,7 +276,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _camera = camera;
     }
 
-    public RenderContext getRenderContext() {
+    @Override
+    public JoglRenderContext getRenderContext() {
         return _currentContext;
     }
 
