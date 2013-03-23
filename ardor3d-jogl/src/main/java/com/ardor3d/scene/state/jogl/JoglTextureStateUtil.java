@@ -47,9 +47,9 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
+import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.state.record.TextureUnitRecord;
@@ -1146,7 +1146,8 @@ public class JoglTextureStateUtil {
         final boolean doTrans = !texture.getTextureMatrix().isIdentity();
 
         // Now do them.
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         if (doTrans) {
             checkAndSetUnit(unit, record, caps);
             JoglRendererUtil.switchMode(matRecord, GL.GL_TEXTURE);
