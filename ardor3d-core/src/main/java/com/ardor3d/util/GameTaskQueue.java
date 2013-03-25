@@ -10,8 +10,11 @@
 
 package com.ardor3d.util;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,6 +31,10 @@ import com.ardor3d.renderer.RendererCallable;
  */
 public class GameTaskQueue {
 
+    public interface ExecutionExceptionListener {
+        void executionException(ExecutionException e);
+    }
+
     public static final String RENDER = "render";
     public static final String UPDATE = "update";
 
@@ -36,6 +43,16 @@ public class GameTaskQueue {
 
     // Default execution time is 0, which means only 1 task will be executed at a time.
     private long _executionTime = 0;
+
+    private final List<ExecutionExceptionListener> _executionExceptionListeners = new LinkedList<ExecutionExceptionListener>();
+
+    public void addExecutionExceptionListener(final ExecutionExceptionListener l) {
+        _executionExceptionListeners.add(l);
+    }
+
+    public boolean removeExecutionExceptionListener(final ExecutionExceptionListener l) {
+        return _executionExceptionListeners.remove(l);
+    }
 
     /**
      * The state of this <code>GameTaskQueue</code> if it will execute all enqueued Callables on an execute invokation.
@@ -142,6 +159,14 @@ public class GameTaskQueue {
                 }
             }
             task.invoke();
+
+            final ExecutionException e = task.getExecutionException();
+            if (e != null) {
+                for (final ExecutionExceptionListener l : _executionExceptionListeners) {
+                    l.executionException(e);
+                }
+            }
+
             elapsedTime = System.currentTimeMillis() - beginTime;
         } while ((_executeMultiple.get()) && (elapsedTime < _executionTime) && ((task = _queue.poll()) != null));
     }

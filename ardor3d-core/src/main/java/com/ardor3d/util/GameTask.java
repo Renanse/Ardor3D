@@ -141,4 +141,13 @@ public class GameTask<V> implements Future<V> {
         }
     }
 
+    public ExecutionException getExecutionException() {
+        _stateLock.lock();
+        try {
+            return _exception;
+        } finally {
+            _stateLock.unlock();
+        }
+    }
+
 }
