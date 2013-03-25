@@ -100,7 +100,7 @@ public class GameTaskQueue {
     }
 
     /**
-     * Adds the given task to the internal queue to invoked.
+     * Adds the given task to the internal queue to be invoked later.
      * 
      * @param <V>
      * @param task

@@ -1340,9 +1340,7 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     public static int makeVBOId() {
-        final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
-        ARBBufferObject.glGenBuffersARB(idBuff);
-        return idBuff.get(0);
+        return ARBBufferObject.glGenBuffersARB();
     }
 
     public void unbindVBO() {
