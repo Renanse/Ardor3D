@@ -145,7 +145,7 @@ public class BoundingSphere extends BoundingVolume {
         for (int i = start; i < end; i++) {
             store = data.getPrimitiveVertices(indices[i], section, store);
             for (int j = 0; j < vertsPerPrimitive; j++) {
-                vertList[count++] = Vector3.fetchTempInstance().set(store[0]);
+                vertList[count++] = Vector3.fetchTempInstance().set(store[j]);
             }
         }
 
