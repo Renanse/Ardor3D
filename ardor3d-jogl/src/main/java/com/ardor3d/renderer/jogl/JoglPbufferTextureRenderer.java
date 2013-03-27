@@ -262,8 +262,9 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             }
 
             // Make our GLPbuffer...
-            final GLDrawableFactory fac = GLDrawableFactory.getFactory(GLProfile.getMaxFixedFunc(true));
-            final GLCapabilities caps = new GLCapabilities(GLProfile.getMaxFixedFunc(true));
+            final GLProfile profile = GLProfile.getMaximum(true);
+            final GLDrawableFactory fac = GLDrawableFactory.getFactory(profile);
+            final GLCapabilities caps = new GLCapabilities(profile);
             caps.setHardwareAccelerated(true);
             caps.setDoubleBuffered(true);
             caps.setAlphaBits(_settings.getAlphaBits());

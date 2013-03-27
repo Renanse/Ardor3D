@@ -36,7 +36,7 @@ public class CapsUtil {
             throw new Ardor3dException("Invalid pixel depth: " + settings.getColorDepth());
         }
 
-        final GLCapabilities caps = new GLCapabilities(GLProfile.getMaxFixedFunc(true));
+        final GLCapabilities caps = new GLCapabilities(GLProfile.getMaximum(true));
         caps.setHardwareAccelerated(true);
         caps.setDoubleBuffered(true);
         caps.setAlphaBits(settings.getAlphaBits());
