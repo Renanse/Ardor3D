@@ -24,7 +24,6 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.gl2.GLUgl2;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -48,9 +47,9 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
+import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.state.record.TextureUnitRecord;
@@ -128,7 +127,7 @@ public class JoglTextureStateUtil {
         final Texture.Type type = texture.getType();
 
         final GL gl = GLContext.getCurrentGL();
-        final GLU glu = new GLUgl2();
+        final GLU glu = GLU.createGLU(gl);
 
         // bind our texture id to this unit.
         doTextureBind(texture, unit, false);
@@ -187,6 +186,8 @@ public class JoglTextureStateUtil {
                 final int pixDataType = JoglTextureUtil.getGLPixelDataType(image.getDataType());
                 final int bpp = ImageUtils.getPixelByteSize(image.getDataFormat(), image.getDataType());
                 final ByteBuffer scaledImage = BufferUtils.createByteBuffer((w + 4) * h * bpp);
+                // ensure the buffer is ready for reading
+                image.getData(0).rewind();
                 final int error = glu.gluScaleImage(pixFormat, actualWidth, actualHeight, pixDataType,
                         image.getData(0), w, h, pixDataType, scaledImage);
                 if (error != 0) {
@@ -354,6 +355,7 @@ public class JoglTextureStateUtil {
                                     for (int x = 0; x < image.getData().size(); x++) {
                                         if (image.getData(x) != null) {
                                             data.put(image.getData(x));
+                                            image.getData(x).rewind();
                                         }
                                     }
                                     // ensure the buffer is ready for reading
@@ -563,11 +565,11 @@ public class JoglTextureStateUtil {
                                 final int depth = Math.max(1, image.getDepth() >> m);
                                 // already checked for support above...
                                 if (texture.getTextureStoreFormat().isCompressed()) {
-                                    gl.getGL2GL3().glCompressedTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
+                                    gl.getGL2ES2().glCompressedTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
                                             JoglTextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, depth, hasBorder ? 1 : 0, mipSizes[m], data);
                                 } else {
-                                    gl.getGL2GL3().glTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
+                                    gl.getGL2ES2().glTexImage3D(GL2ES2.GL_TEXTURE_3D, m,
                                             JoglTextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, depth, hasBorder ? 1 : 0,
                                             JoglTextureUtil.getGLPixelFormat(image.getDataFormat()),
@@ -1144,7 +1146,8 @@ public class JoglTextureStateUtil {
         final boolean doTrans = !texture.getTextureMatrix().isIdentity();
 
         // Now do them.
-        final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
+        final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
+                .getRendererRecord();
         if (doTrans) {
             checkAndSetUnit(unit, record, caps);
             JoglRendererUtil.switchMode(matRecord, GL.GL_TEXTURE);

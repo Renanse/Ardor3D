@@ -128,8 +128,10 @@ public abstract class JoglBlendStateUtil {
             if (applyConstant && caps.isConstantBlendColorSupported()) {
                 final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
-                    gl.getGL2GL3().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
-                            constant.getAlpha());
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
+                                constant.getAlpha());
+                    }
                     record.blendColor.set(constant);
                 }
             }
@@ -372,30 +374,42 @@ public abstract class JoglBlendStateUtil {
         if (record.isValid()) {
             if (enabled) {
                 if (!record.testEnabled) {
-                    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                    if (gl.isGL2ES1()) {
+                        gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                    }
                     record.testEnabled = true;
                 }
                 final int glFunc = getGLFuncValue(state.getTestFunction());
                 if (record.alphaFunc != glFunc || record.alphaRef != state.getReference()) {
-                    gl.getGL2().glAlphaFunc(glFunc, state.getReference());
+                    if (gl.isGL2ES1()) {
+                        gl.getGL2ES1().glAlphaFunc(glFunc, state.getReference());
+                    }
                     record.alphaFunc = glFunc;
                     record.alphaRef = state.getReference();
                 }
             } else if (record.testEnabled) {
-                gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                if (gl.isGL2ES1()) {
+                    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                }
                 record.testEnabled = false;
             }
 
         } else {
             if (enabled) {
-                gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                if (gl.isGL2ES1()) {
+                    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+                }
                 record.testEnabled = true;
                 final int glFunc = getGLFuncValue(state.getTestFunction());
-                gl.getGL2().glAlphaFunc(glFunc, state.getReference());
+                if (gl.isGL2ES1()) {
+                    gl.getGL2ES1().glAlphaFunc(glFunc, state.getReference());
+                }
                 record.alphaFunc = glFunc;
                 record.alphaRef = state.getReference();
             } else {
-                gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                if (gl.isGL2ES1()) {
+                    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+                }
                 record.testEnabled = false;
             }
         }

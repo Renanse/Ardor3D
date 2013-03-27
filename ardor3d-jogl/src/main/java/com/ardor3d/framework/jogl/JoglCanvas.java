@@ -27,10 +27,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
-import javax.media.opengl.GLRunnable;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -274,12 +272,6 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     }
 
     public void setVSyncEnabled(final boolean enabled) {
-        _glCanvas.invoke(true, new GLRunnable() {
-            @Override
-            public boolean run(GLAutoDrawable glAutoDrawable) {
-            	_glCanvas.getGL().setSwapInterval(enabled ? 1 : 0);
-                return false;
-            }
-        });
+        _glCanvas.setVSyncEnabled(enabled);
     }
 }

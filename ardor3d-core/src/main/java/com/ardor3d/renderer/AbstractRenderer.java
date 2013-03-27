@@ -10,15 +10,19 @@
 
 package com.ardor3d.renderer;
 
+import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.List;
 
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
+import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.Constants;
@@ -187,5 +191,18 @@ public abstract class AbstractRenderer implements Renderer {
 
     public void setRenderLogic(final RenderLogic renderLogic) {
         this.renderLogic = renderLogic;
+    }
+
+    @Override
+    public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final int x, final int y,
+            final int w, final int h) {
+        grabScreenContents(store, format, PixelDataType.UnsignedByte, x, y, w, h);
+    }
+
+    @Override
+    public int getExpectedBufferSizeToGrabScreenContents(final ImageDataFormat format, final PixelDataType type,
+            final int w, final int h) {
+        final int size = w * h * ImageUtils.getPixelByteSize(format, type);
+        return size;
     }
 }

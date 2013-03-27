@@ -13,6 +13,12 @@ package com.ardor3d.framework.jogl;
 import java.util.logging.Logger;
 
 import javax.media.opengl.DebugGL2;
+import javax.media.opengl.DebugGL3;
+import javax.media.opengl.DebugGL3bc;
+import javax.media.opengl.DebugGL4;
+import javax.media.opengl.DebugGL4bc;
+import javax.media.opengl.DebugGLES1;
+import javax.media.opengl.DebugGLES2;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
@@ -32,6 +38,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
+import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.util.Ardor3dException;
 
@@ -46,7 +53,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     protected JoglRenderer _renderer;
     protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
-    private RenderContext _currentContext;
+    private JoglRenderContext _currentContext;
 
     /**
      * <code>true</code> if debugging (checking for error codes on each GL call) is desired.
@@ -137,7 +144,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
 
             final ContextCapabilities caps = createContextCapabilities();
-            _currentContext = new RenderContext(_context, caps, sharedContext);
+            _currentContext = new JoglRenderContext(_context, caps, sharedContext);
 
             ContextManager.addContext(_context, _currentContext);
             ContextManager.switchContext(_context);
@@ -193,7 +200,37 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // Enable Debugging if requested.
         if (_useDebug != _debugEnabled) {
-            _context.setGL(new DebugGL2(_context.getGL().getGL2()));
+            if (_context.getGL().isGLES()) {
+                if (_context.getGL().isGLES1()) {
+                    _context.setGL(new DebugGLES1(_context.getGL().getGLES1()));
+                } else {
+                    if (_context.getGL().isGLES2()) {
+                        _context.setGL(new DebugGLES2(_context.getGL().getGLES2()));
+                    } else {
+                        // TODO ES3
+                    }
+                }
+            } else {
+                if (_context.getGL().isGL4bc()) {
+                    _context.setGL(new DebugGL4bc(_context.getGL().getGL4bc()));
+                } else {
+                    if (_context.getGL().isGL4()) {
+                        _context.setGL(new DebugGL4(_context.getGL().getGL4()));
+                    } else {
+                        if (_context.getGL().isGL3bc()) {
+                            _context.setGL(new DebugGL3bc(_context.getGL().getGL3bc()));
+                        } else {
+                            if (_context.getGL().isGL3()) {
+                                _context.setGL(new DebugGL3(_context.getGL().getGL3()));
+                            } else {
+                                if (_context.getGL().isGL2()) {
+                                    _context.setGL(new DebugGL2(_context.getGL().getGL2()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             _debugEnabled = true;
 
             LOGGER.info("DebugGL Enabled");
@@ -239,7 +276,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _camera = camera;
     }
 
-    public RenderContext getRenderContext() {
+    @Override
+    public JoglRenderContext getRenderContext() {
         return _currentContext;
     }
 

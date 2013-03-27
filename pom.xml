@@ -110,7 +110,7 @@
   <!-- these properties help simplify specifying some commonly occurring variables -->
     <properties>
         <lwjgl.version>2.8.4</lwjgl.version>
-        <jogl.version>2.0-rc11</jogl.version>
+        <jogl.version>2.0-rc11post06</jogl.version>
         <swt.version>3650</swt.version>
         <osgi.project.version>0.9_SNAPSHOT</osgi.project.version>
     </properties>

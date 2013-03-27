@@ -48,5 +48,10 @@
 	      <version>2.0-rc11</version>
 	    </dependency> -->
 	</dependencies>
+	<repositories>
+        <repository>
+            <id>jogamp</id>
+            <url>http://jogamp.org/deployment/maven</url>
+        </repository>
+    </repositories>
 </project>
-

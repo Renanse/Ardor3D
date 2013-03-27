@@ -10,9 +10,8 @@
 
 package com.ardor3d.input.jogl;
 
-import com.jogamp.newt.event.KeyEvent;
 import com.ardor3d.input.Key;
-
+import com.jogamp.newt.event.KeyEvent;
 
 public enum JoglNewtKey {
 
@@ -127,15 +126,19 @@ public enum JoglNewtKey {
     Z(KeyEvent.VK_Z, Key.Z), //
     UNDEFINED(KeyEvent.VK_UNDEFINED, Key.UNKNOWN);
 
-    private final int _newtCode;
+    private final short _newtCode;
     private final Key _key;
 
-    private JoglNewtKey(final int newtCode, final Key key) {
+    private JoglNewtKey(final short newtCode, final Key key) {
         _newtCode = newtCode;
         _key = key;
     }
 
-    public static Key findByCode(final int newtCode) {
+    private JoglNewtKey(final int newtCode, final Key key) {
+        this((short) newtCode, key);
+    }
+
+    public static Key findByCode(final short newtCode) {
         for (final JoglNewtKey ak : values()) {
             if (ak._newtCode == newtCode) {
                 return ak._key;
@@ -143,6 +146,10 @@ public enum JoglNewtKey {
         }
 
         return Key.UNKNOWN;
+    }
+
+    public static Key findByCode(final int newtCode) {
+        return findByCode((short) newtCode);
     }
 
     public int getNewtCode() {
