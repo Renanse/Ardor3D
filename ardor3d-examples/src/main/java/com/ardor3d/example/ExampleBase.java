@@ -26,8 +26,8 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.jogl.JoglCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.jogl.JoglNewtWindow;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.TextureStoreFormat;
@@ -38,11 +38,11 @@ import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.PhysicalLayer;
-import com.ardor3d.input.awt.AwtFocusWrapper;
-import com.ardor3d.input.awt.AwtKeyboardWrapper;
-import com.ardor3d.input.awt.AwtMouseManager;
-import com.ardor3d.input.awt.AwtMouseWrapper;
 import com.ardor3d.input.control.FirstPersonControl;
+import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
+import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
+import com.ardor3d.input.jogl.JoglNewtMouseManager;
+import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
@@ -367,11 +367,11 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         } else if (prefs.getRenderer().startsWith("JOGL")) {
             final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
-            example._canvas = new JoglCanvas(canvasRenderer, settings);
-            final JoglCanvas canvas = (JoglCanvas) example._canvas;
-            example._mouseManager = new AwtMouseManager(canvas);
-            example._physicalLayer = new PhysicalLayer(new AwtKeyboardWrapper(canvas), new AwtMouseWrapper(canvas,
-                    example._mouseManager), DummyControllerWrapper.INSTANCE, new AwtFocusWrapper(canvas));
+            example._canvas = new JoglNewtWindow(canvasRenderer, settings);
+            final JoglNewtWindow canvas = (JoglNewtWindow) example._canvas;
+            example._mouseManager = new JoglNewtMouseManager(canvas);
+            example._physicalLayer = new PhysicalLayer(new JoglNewtKeyboardWrapper(canvas), new JoglNewtMouseWrapper(
+                    canvas, example._mouseManager), DummyControllerWrapper.INSTANCE, new JoglNewtFocusWrapper(canvas));
             TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
         }
 

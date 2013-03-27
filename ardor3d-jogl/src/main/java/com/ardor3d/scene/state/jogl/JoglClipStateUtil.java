@@ -54,18 +54,25 @@ public abstract class JoglClipStateUtil {
 
         if (enable) {
             if (!record.isValid() || !record.planeEnabled[planeIndex]) {
-                gl.glEnable(GL2ES1.GL_CLIP_PLANE0 + planeIndex);
+                if (gl.isGL2ES1()) {
+                    gl.glEnable(GL2ES1.GL_CLIP_PLANE0 + planeIndex);
+                }
                 record.planeEnabled[planeIndex] = true;
             }
 
             record.buf.rewind();
             record.buf.put(state.getPlaneEquations(planeIndex));
             record.buf.flip();
-            gl.getGL2().glClipPlane(GL2ES1.GL_CLIP_PLANE0 + planeIndex, record.buf);
+            if (gl.isGL2ES1()) {
+                // TODO Shouldn't glClipPlane be in GL2ES1?
+                gl.getGL2().glClipPlane(GL2ES1.GL_CLIP_PLANE0 + planeIndex, record.buf);
+            }
 
         } else {
             if (!record.isValid() || record.planeEnabled[planeIndex]) {
-                gl.glDisable(GL2ES1.GL_CLIP_PLANE0 + planeIndex);
+                if (gl.isGL2ES1()) {
+                    gl.glDisable(GL2ES1.GL_CLIP_PLANE0 + planeIndex);
+                }
                 record.planeEnabled[planeIndex] = false;
             }
         }

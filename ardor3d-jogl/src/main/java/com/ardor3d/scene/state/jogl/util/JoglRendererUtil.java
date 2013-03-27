@@ -17,15 +17,14 @@ import javax.media.opengl.GLContext;
 
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyRectangle2;
+import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 
 public abstract class JoglRendererUtil {
 
-    public static void switchMode(final RendererRecord rendRecord, final int mode) {
-        final GL gl = GLContext.getCurrentGL();
-
+    public static void switchMode(final JoglRendererRecord rendRecord, final int mode) {
         if (!rendRecord.isMatrixValid() || rendRecord.getMatrixMode() != mode) {
-            gl.getGL2().glMatrixMode(mode);
+            rendRecord.getMatrixBackend().setMatrixMode(mode);
             rendRecord.setMatrixMode(mode);
             rendRecord.setMatrixValid(true);
         }

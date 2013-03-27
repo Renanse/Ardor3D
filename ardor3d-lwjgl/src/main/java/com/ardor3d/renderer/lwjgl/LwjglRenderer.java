@@ -32,6 +32,7 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.OpenGLException;
 
 import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
@@ -264,10 +265,11 @@ public class LwjglRenderer extends AbstractRenderer {
         _inOrthoMode = false;
     }
 
-    public void grabScreenContents(final ByteBuffer buff, final ImageDataFormat format, final int x, final int y,
-            final int w, final int h) {
+    public void grabScreenContents(final ByteBuffer buff, final ImageDataFormat format, final PixelDataType type,
+            final int x, final int y, final int w, final int h) {
         final int pixFormat = LwjglTextureUtil.getGLPixelFormat(format);
-        GL11.glReadPixels(x, y, w, h, pixFormat, GL11.GL_UNSIGNED_BYTE, buff);
+        final int pixDataType = LwjglTextureUtil.getGLPixelDataType(type);
+        GL11.glReadPixels(x, y, w, h, pixFormat, pixDataType, buff);
     }
 
     public void draw(final Spatial s) {

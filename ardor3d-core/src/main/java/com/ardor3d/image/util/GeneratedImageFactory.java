@@ -171,6 +171,7 @@ public abstract class GeneratedImageFactory {
             }
             final ByteBuffer dataBuf = BufferUtils.createByteBuffer(data.length);
             dataBuf.put(data);
+            dataBuf.rewind();
             dataList.add(dataBuf);
         }
 
@@ -216,11 +217,12 @@ public abstract class GeneratedImageFactory {
                 }
             }
             out.put(data);
+            out.rewind();
             dataList.add(out);
         }
 
-        return new Image(useAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB, PixelDataType.UnsignedByte, lumImage
-                .getWidth(), lumImage.getHeight(), dataList, null);
+        return new Image(useAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB, PixelDataType.UnsignedByte,
+                lumImage.getWidth(), lumImage.getHeight(), dataList, null);
     }
 
     /**

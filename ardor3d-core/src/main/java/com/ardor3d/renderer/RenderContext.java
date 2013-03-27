@@ -41,7 +41,7 @@ public class RenderContext {
             RenderState.StateType.class);
 
     protected final LineRecord _lineRecord = new LineRecord();
-    protected final RendererRecord _rendererRecord = new RendererRecord();
+    protected final RendererRecord _rendererRecord = createRendererRecord();
 
     /** Basically this object represents the sharable portion of a GL context... Textures, displayLists, etc. */
     protected final Object _glContextRep;
@@ -62,6 +62,11 @@ public class RenderContext {
         _capabilities = caps;
         setupRecords();
         _glContextRep = (shared == null) ? new Object() : shared._glContextRep;
+    }
+
+    protected RendererRecord createRendererRecord() {
+        final RendererRecord rendererRecord = new RendererRecord();
+        return rendererRecord;
     }
 
     protected void setupRecords() {

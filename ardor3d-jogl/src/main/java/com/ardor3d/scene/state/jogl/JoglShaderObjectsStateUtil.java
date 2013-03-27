@@ -46,31 +46,63 @@ public abstract class JoglShaderObjectsStateUtil {
         }
 
         if (state._programID == -1) {
-            state._programID = gl.getGL2().glCreateProgramObjectARB();
+            if (gl.isGL2()) {
+                state._programID = gl.getGL2().glCreateProgramObjectARB();
+            } else {
+                if (gl.isGL2ES2()) {
+                    state._programID = gl.getGL2ES2().glCreateProgram();
+                }
+            }
         }
 
         if (state.getVertexShader() != null) {
             if (state._vertexShaderID != -1) {
                 removeVertShader(state);
             }
-
-            state._vertexShaderID = gl.getGL2().glCreateShaderObjectARB(GL2ES2.GL_VERTEX_SHADER);
+            if (gl.isGL2()) {
+                state._vertexShaderID = gl.getGL2().glCreateShaderObjectARB(GL2ES2.GL_VERTEX_SHADER);
+            } else {
+                if (gl.isGL2ES2()) {
+                    state._vertexShaderID = gl.getGL2ES2().glCreateShader(GL2ES2.GL_VERTEX_SHADER);
+                }
+            }
 
             // Create the sources
             final byte array[] = new byte[state.getVertexShader().limit()];
             state.getVertexShader().rewind();
             state.getVertexShader().get(array);
-            gl.getGL2().glShaderSourceARB(state._vertexShaderID, 1, new String[] { new String(array) },
-                    new int[] { array.length }, 0);
+            if (gl.isGL2()) {
+                gl.getGL2().glShaderSourceARB(state._vertexShaderID, 1, new String[] { new String(array) },
+                        new int[] { array.length }, 0);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glShaderSource(state._vertexShaderID, 1, new String[] { new String(array) },
+                            new int[] { array.length }, 0);
+                }
+            }
 
             // Compile the vertex shader
             final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-            gl.getGL2().glCompileShaderARB(state._vertexShaderID);
-            gl.getGL2().glGetObjectParameterivARB(state._vertexShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+            if (gl.isGL2()) {
+                gl.getGL2().glCompileShaderARB(state._vertexShaderID);
+                gl.getGL2()
+                        .glGetObjectParameterivARB(state._vertexShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glCompileShader(state._vertexShaderID);
+                    gl.getGL2ES2().glGetShaderiv(state._vertexShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
+                }
+            }
             checkProgramError(compiled, state._vertexShaderID, state._vertexShaderName);
 
             // Attach the program
-            gl.getGL2().glAttachObjectARB(state._programID, state._vertexShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glAttachObjectARB(state._programID, state._vertexShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glAttachShader(state._programID, state._vertexShaderID);
+                }
+            }
         } else if (state._vertexShaderID != -1) {
             removeVertShader(state);
             state._vertexShaderID = -1;
@@ -81,23 +113,50 @@ public abstract class JoglShaderObjectsStateUtil {
                 removeFragShader(state);
             }
 
-            state._fragmentShaderID = gl.getGL2().glCreateShaderObjectARB(GL2ES2.GL_FRAGMENT_SHADER);
+            if (gl.isGL2()) {
+                state._fragmentShaderID = gl.getGL2().glCreateShaderObjectARB(GL2ES2.GL_FRAGMENT_SHADER);
+            } else {
+                if (gl.isGL2ES2()) {
+                    state._fragmentShaderID = gl.getGL2ES2().glCreateShader(GL2ES2.GL_FRAGMENT_SHADER);
+                }
+            }
 
             // Create the sources
             final byte array[] = new byte[state.getFragmentShader().limit()];
             state.getFragmentShader().rewind();
             state.getFragmentShader().get(array);
-            gl.getGL2().glShaderSourceARB(state._fragmentShaderID, 1, new String[] { new String(array) },
-                    new int[] { array.length }, 0);
+            if (gl.isGL2()) {
+                gl.getGL2().glShaderSourceARB(state._fragmentShaderID, 1, new String[] { new String(array) },
+                        new int[] { array.length }, 0);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glShaderSource(state._fragmentShaderID, 1, new String[] { new String(array) },
+                            new int[] { array.length }, 0);
+                }
+            }
 
             // Compile the fragment shader
             final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-            gl.getGL2().glCompileShaderARB(state._fragmentShaderID);
-            gl.getGL2().glGetObjectParameterivARB(state._fragmentShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+            if (gl.isGL2()) {
+                gl.getGL2().glCompileShaderARB(state._fragmentShaderID);
+                gl.getGL2().glGetObjectParameterivARB(state._fragmentShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
+                        compiled);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glCompileShader(state._fragmentShaderID);
+                    gl.getGL2ES2().glGetShaderiv(state._fragmentShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
+                }
+            }
             checkProgramError(compiled, state._fragmentShaderID, state._vertexShaderName);
 
             // Attach the program
-            gl.getGL2().glAttachObjectARB(state._programID, state._fragmentShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glAttachObjectARB(state._programID, state._fragmentShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glAttachShader(state._programID, state._fragmentShaderID);
+                }
+            }
         } else if (state._fragmentShaderID != -1) {
             removeFragShader(state);
             state._fragmentShaderID = -1;
@@ -109,24 +168,50 @@ public abstract class JoglShaderObjectsStateUtil {
                     removeGeomShader(state);
                 }
 
-                state._geometryShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_GEOMETRY_SHADER);
+                if (gl.isGL2()) {
+                    state._geometryShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_GEOMETRY_SHADER);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        state._geometryShaderID = gl.getGL2ES2().glCreateShader(GL3.GL_GEOMETRY_SHADER);
+                    }
+                }
 
                 // Create the sources
                 final byte array[] = new byte[state.getGeometryShader().limit()];
                 state.getGeometryShader().rewind();
                 state.getGeometryShader().get(array);
-                gl.getGL2().glShaderSourceARB(state._geometryShaderID, 1, new String[] { new String(array) },
-                        new int[] { array.length }, 0);
+                if (gl.isGL2()) {
+                    gl.getGL2().glShaderSourceARB(state._geometryShaderID, 1, new String[] { new String(array) },
+                            new int[] { array.length }, 0);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glShaderSource(state._geometryShaderID, 1, new String[] { new String(array) },
+                                new int[] { array.length }, 0);
+                    }
+                }
 
                 // Compile the geometry shader
                 final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-                gl.getGL2().glCompileShaderARB(state._geometryShaderID);
-                gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
-                        compiled);
+                if (gl.isGL2()) {
+                    gl.getGL2().glCompileShaderARB(state._geometryShaderID);
+                    gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
+                            compiled);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glCompileShader(state._geometryShaderID);
+                        gl.getGL2ES2().glGetShaderiv(state._geometryShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
+                    }
+                }
                 checkProgramError(compiled, state._geometryShaderID, state._geometryShaderName);
 
                 // Attach the program
-                gl.getGL2().glAttachObjectARB(state._programID, state._geometryShaderID);
+                if (gl.isGL2()) {
+                    gl.getGL2().glAttachObjectARB(state._programID, state._geometryShaderID);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glAttachShader(state._programID, state._geometryShaderID);
+                    }
+                }
             } else if (state._geometryShaderID != -1) {
                 removeGeomShader(state);
                 state._geometryShaderID = -1;
@@ -139,24 +224,52 @@ public abstract class JoglShaderObjectsStateUtil {
                     removeTessControlShader(state);
                 }
 
-                state._tessellationControlShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_TESS_CONTROL_SHADER);
+                if (gl.isGL2()) {
+                    state._tessellationControlShaderID = gl.getGL2()
+                            .glCreateShaderObjectARB(GL3.GL_TESS_CONTROL_SHADER);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        state._tessellationControlShaderID = gl.getGL2ES2().glCreateShader(GL3.GL_TESS_CONTROL_SHADER);
+                    }
+                }
 
                 // Create the sources
                 final byte array[] = new byte[state.getTessellationControlShader().limit()];
                 state.getTessellationControlShader().rewind();
                 state.getTessellationControlShader().get(array);
-                gl.getGL2().glShaderSourceARB(state._tessellationControlShaderID, 1,
-                        new String[] { new String(array) }, new int[] { array.length }, 0);
+                if (gl.isGL2()) {
+                    gl.getGL2().glShaderSourceARB(state._tessellationControlShaderID, 1,
+                            new String[] { new String(array) }, new int[] { array.length }, 0);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glShaderSource(state._tessellationControlShaderID, 1,
+                                new String[] { new String(array) }, new int[] { array.length }, 0);
+                    }
+                }
 
                 // Compile the tessellation control shader
                 final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-                gl.getGL2().glCompileShaderARB(state._tessellationControlShaderID);
-                gl.getGL2().glGetObjectParameterivARB(state._tessellationControlShaderID,
-                        GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                if (gl.isGL2()) {
+                    gl.getGL2().glCompileShaderARB(state._tessellationControlShaderID);
+                    gl.getGL2().glGetObjectParameterivARB(state._tessellationControlShaderID,
+                            GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glCompileShader(state._tessellationControlShaderID);
+                        gl.getGL2ES2().glGetShaderiv(state._tessellationControlShaderID, GL2ES2.GL_COMPILE_STATUS,
+                                compiled);
+                    }
+                }
                 checkProgramError(compiled, state._tessellationControlShaderID, state._tessellationControlShaderName);
 
                 // Attach the program
-                gl.getGL2().glAttachObjectARB(state._programID, state._tessellationControlShaderID);
+                if (gl.isGL2()) {
+                    gl.getGL2().glAttachObjectARB(state._programID, state._tessellationControlShaderID);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glAttachShader(state._programID, state._tessellationControlShaderID);
+                    }
+                }
             } else if (state._tessellationControlShaderID != -1) {
                 removeTessControlShader(state);
                 state._tessellationControlShaderID = -1;
@@ -166,32 +279,67 @@ public abstract class JoglShaderObjectsStateUtil {
                     removeTessEvalShader(state);
                 }
 
-                state._tessellationEvaluationShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_TESS_CONTROL_SHADER);
+                if (gl.isGL2()) {
+                    state._tessellationEvaluationShaderID = gl.getGL2().glCreateShaderObjectARB(
+                            GL3.GL_TESS_CONTROL_SHADER);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        state._tessellationEvaluationShaderID = gl.getGL2ES2().glCreateShader(
+                                GL3.GL_TESS_CONTROL_SHADER);
+                    }
+                }
 
                 // Create the sources
                 final byte array[] = new byte[state.getTessellationEvaluationShader().limit()];
                 state.getTessellationEvaluationShader().rewind();
                 state.getTessellationEvaluationShader().get(array);
-                gl.getGL2().glShaderSourceARB(state._tessellationEvaluationShaderID, 1,
-                        new String[] { new String(array) }, new int[] { array.length }, 0);
+                if (gl.isGL2()) {
+                    gl.getGL2().glShaderSourceARB(state._tessellationEvaluationShaderID, 1,
+                            new String[] { new String(array) }, new int[] { array.length }, 0);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glShaderSource(state._tessellationEvaluationShaderID, 1,
+                                new String[] { new String(array) }, new int[] { array.length }, 0);
+                    }
+                }
 
                 // Compile the tessellation control shader
                 final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-                gl.getGL2().glCompileShaderARB(state._tessellationEvaluationShaderID);
-                gl.getGL2().glGetObjectParameterivARB(state._tessellationEvaluationShaderID,
-                        GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                if (gl.isGL2()) {
+                    gl.getGL2().glCompileShaderARB(state._tessellationEvaluationShaderID);
+                    gl.getGL2().glGetObjectParameterivARB(state._tessellationEvaluationShaderID,
+                            GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glCompileShader(state._tessellationEvaluationShaderID);
+                        gl.getGL2ES2().glGetShaderiv(state._tessellationEvaluationShaderID, GL2ES2.GL_COMPILE_STATUS,
+                                compiled);
+                    }
+                }
                 checkProgramError(compiled, state._tessellationEvaluationShaderID,
                         state._tessellationEvaluationShaderName);
 
                 // Attach the program
-                gl.getGL2().glAttachObjectARB(state._programID, state._tessellationEvaluationShaderID);
+                if (gl.isGL2()) {
+                    gl.getGL2().glAttachObjectARB(state._programID, state._tessellationEvaluationShaderID);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glAttachShader(state._programID, state._tessellationEvaluationShaderID);
+                    }
+                }
             } else if (state._tessellationEvaluationShaderID != -1) {
                 removeTessEvalShader(state);
                 state._tessellationEvaluationShaderID = -1;
             }
         }
 
-        gl.getGL2().glLinkProgramARB(state._programID);
+        if (gl.isGL2()) {
+            gl.getGL2().glLinkProgramARB(state._programID);
+        } else {
+            if (gl.isGL2ES2()) {
+                gl.getGL2ES2().glLinkProgram(state._programID);
+            }
+        }
         checkLinkError(state._programID);
         state.setNeedsRefresh(true);
         state._needSendShader = false;
@@ -201,15 +349,32 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-        gl.getGL2().glGetObjectParameterivARB(programId, GL2ES2.GL_LINK_STATUS, compiled);
+        if (gl.isGL2()) {
+            gl.getGL2().glGetObjectParameterivARB(programId, GL2ES2.GL_LINK_STATUS, compiled);
+        } else {
+            if (gl.isGL2ES2()) {
+                gl.getGL2ES2().glGetProgramiv(programId, GL2ES2.GL_LINK_STATUS, compiled);
+            }
+        }
         if (compiled.get(0) == GL.GL_FALSE) {
-            gl.getGL2().glGetObjectParameterivARB(programId, GL2ES2.GL_INFO_LOG_LENGTH, compiled);
+            if (gl.isGL2()) {
+                gl.getGL2().glGetObjectParameterivARB(programId, GL2ES2.GL_INFO_LOG_LENGTH, compiled);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glGetProgramiv(programId, GL2ES2.GL_INFO_LOG_LENGTH, compiled);
+                }
+            }
             final int length = compiled.get(0);
             String out = null;
             if (length > 0) {
                 final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
-
-                gl.getGL2().glGetInfoLogARB(programId, infoLog.limit(), compiled, infoLog);
+                if (gl.isGL2()) {
+                    gl.getGL2().glGetInfoLogARB(programId, infoLog.limit(), compiled, infoLog);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glGetProgramInfoLog(programId, length, null, infoLog);
+                    }
+                }
 
                 final byte[] infoBytes = new byte[length];
                 infoLog.get(infoBytes);
@@ -227,8 +392,15 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         if (state._fragmentShaderID != -1) {
-            gl.getGL2().glDetachObjectARB(state._programID, state._fragmentShaderID);
-            gl.getGL2().glDeleteObjectARB(state._fragmentShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glDetachObjectARB(state._programID, state._fragmentShaderID);
+                gl.getGL2().glDeleteObjectARB(state._fragmentShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glDetachShader(state._programID, state._fragmentShaderID);
+                    gl.getGL2ES2().glDeleteShader(state._fragmentShaderID);
+                }
+            }
         }
     }
 
@@ -237,8 +409,15 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         if (state._vertexShaderID != -1) {
-            gl.getGL2().glDetachObjectARB(state._programID, state._vertexShaderID);
-            gl.getGL2().glDeleteObjectARB(state._vertexShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glDetachObjectARB(state._programID, state._vertexShaderID);
+                gl.getGL2().glDeleteObjectARB(state._vertexShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glDetachShader(state._programID, state._vertexShaderID);
+                    gl.getGL2ES2().glDeleteShader(state._vertexShaderID);
+                }
+            }
         }
     }
 
@@ -247,8 +426,15 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         if (state._geometryShaderID != -1) {
-            gl.getGL2().glDetachObjectARB(state._programID, state._geometryShaderID);
-            gl.getGL2().glDeleteObjectARB(state._geometryShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glDetachObjectARB(state._programID, state._geometryShaderID);
+                gl.getGL2().glDeleteObjectARB(state._geometryShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glDetachShader(state._programID, state._geometryShaderID);
+                    gl.getGL2ES2().glDeleteShader(state._geometryShaderID);
+                }
+            }
         }
     }
 
@@ -257,8 +443,15 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         if (state._tessellationControlShaderID != -1) {
-            gl.getGL2().glDetachObjectARB(state._programID, state._tessellationControlShaderID);
-            gl.getGL2().glDeleteObjectARB(state._tessellationControlShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glDetachObjectARB(state._programID, state._tessellationControlShaderID);
+                gl.getGL2().glDeleteObjectARB(state._tessellationControlShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glDetachShader(state._programID, state._tessellationControlShaderID);
+                    gl.getGL2ES2().glDeleteShader(state._tessellationControlShaderID);
+                }
+            }
         }
     }
 
@@ -267,8 +460,15 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         if (state._tessellationEvaluationShaderID != -1) {
-            gl.getGL2().glDetachObjectARB(state._programID, state._tessellationEvaluationShaderID);
-            gl.getGL2().glDeleteObjectARB(state._tessellationEvaluationShaderID);
+            if (gl.isGL2()) {
+                gl.getGL2().glDetachObjectARB(state._programID, state._tessellationEvaluationShaderID);
+                gl.getGL2().glDeleteObjectARB(state._tessellationEvaluationShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glDetachShader(state._programID, state._tessellationEvaluationShaderID);
+                    gl.getGL2ES2().glDeleteShader(state._tessellationEvaluationShaderID);
+                }
+            }
         }
     }
 
@@ -285,14 +485,25 @@ public abstract class JoglShaderObjectsStateUtil {
 
         if (compiled.get(0) == GL.GL_FALSE) {
             final IntBuffer iVal = BufferUtils.createIntBuffer(1);
-            gl.getGL2().glGetObjectParameterivARB(id, GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB, iVal);
+            if (gl.isGL2()) {
+                gl.getGL2().glGetObjectParameterivARB(id, GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB, iVal);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glGetProgramiv(id, GL2ES2.GL_INFO_LOG_LENGTH, compiled);
+                }
+            }
             final int length = iVal.get(0);
             String out = null;
 
             if (length > 0) {
                 final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
-
-                gl.getGL2().glGetInfoLogARB(id, infoLog.limit(), iVal, infoLog);
+                if (gl.isGL2()) {
+                    gl.getGL2().glGetInfoLogARB(id, infoLog.limit(), iVal, infoLog);
+                } else {
+                    if (gl.isGL2ES2()) {
+                        gl.getGL2ES2().glGetProgramInfoLog(id, length, null, infoLog);
+                    }
+                }
 
                 final byte[] infoBytes = new byte[length];
                 infoLog.get(infoBytes);
@@ -374,10 +585,22 @@ public abstract class JoglShaderObjectsStateUtil {
             for (int i = 0, maxI = record.enabledAttributes.size(); i < maxI; i++) {
                 final ShaderVariable var = record.enabledAttributes.get(i);
                 if (var.getSize() == 1) {
-                    gl.getGL2().glDisableVertexAttribArrayARB(var.variableID);
+                    if (gl.isGL2()) {
+                        gl.getGL2().glDisableVertexAttribArrayARB(var.variableID);
+                    } else {
+                        if (gl.isGL2ES2()) {
+                            gl.getGL2ES2().glDisableVertexAttribArray(var.variableID);
+                        }
+                    }
                 } else {
                     for (int j = 0, maxJ = var.getSize(); j < maxJ; j++) {
-                        gl.getGL2().glDisableVertexAttribArrayARB(var.variableID + j);
+                        if (gl.isGL2()) {
+                            gl.getGL2().glDisableVertexAttribArrayARB(var.variableID + j);
+                        } else {
+                            if (gl.isGL2ES2()) {
+                                gl.getGL2ES2().glDisableVertexAttribArray(var.variableID + j);
+                            }
+                        }
                     }
                 }
             }
