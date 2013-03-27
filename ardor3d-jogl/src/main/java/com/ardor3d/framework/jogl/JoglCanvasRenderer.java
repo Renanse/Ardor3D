@@ -129,7 +129,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
         if (_context == null) {
-            _context = GLDrawableFactory.getFactory(GLProfile.getMaxFixedFunc(true)).createExternalGLContext();
+            _context = GLDrawableFactory.getFactory(GLProfile.getMaximum(true)).createExternalGLContext();
         }
 
         makeCurrentContext();
