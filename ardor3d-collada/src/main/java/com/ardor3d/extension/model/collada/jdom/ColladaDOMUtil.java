@@ -110,6 +110,9 @@ public class ColladaDOMUtil {
     }
 
     private String parseUrl(String baseUrl) {
+        if ("#".equals(baseUrl)) {
+            return "";
+        }
         if (baseUrl.length() > 1 && baseUrl.charAt(0) == '#') {
             baseUrl = baseUrl.substring(1);
         }
