@@ -51,7 +51,7 @@ public class JoglImageLoader implements ImageLoader {
 
     @Override
     public Image load(final InputStream is, final boolean flipped) throws IOException {
-        final TextureData textureData = TextureIO.newTextureData(GLProfile.getDefault(), is, true, null);
+        final TextureData textureData = TextureIO.newTextureData(GLProfile.getMaximum(true), is, true, null);
         final Buffer textureDataBuffer = textureData.getBuffer();
         final Image ardorImage = new Image();
 
