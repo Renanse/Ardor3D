@@ -43,6 +43,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
         _supportsVBO = gl.isExtensionAvailable("GL_ARB_vertex_buffer_object");
         _supportsGL1_2 = gl.isExtensionAvailable("GL_VERSION_1_2");
         _supportsMultisample = gl.isExtensionAvailable("GL_ARB_multisample");
+        _supportsDoubleCoefficientsInClipPlaneEquation = !gl.isGLES1();
 
         _supportsConstantColor = _supportsEq = gl.isExtensionAvailable("GL_ARB_imaging");
         _supportsSeparateFunc = gl.isExtensionAvailable("GL_EXT_blend_func_separate");
