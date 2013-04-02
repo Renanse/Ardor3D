@@ -16,6 +16,8 @@ public class ContextCapabilities {
     protected boolean _supportsGL1_2 = false;
     protected boolean _supportsMultisample = false;
 
+    protected boolean _supportsDoubleCoefficientsInClipPlaneEquation = false;
+
     protected boolean _supportsConstantColor = false;
     protected boolean _supportsEq = false;
     protected boolean _supportsSeparateEq = false;
@@ -186,6 +188,7 @@ public class ContextCapabilities {
         _supportsMirrorEdgeClamp = source._supportsMirrorEdgeClamp;
         _supportsMirroredRepeat = source._supportsMirroredRepeat;
         _supportsMultisample = source._supportsMultisample;
+        _supportsDoubleCoefficientsInClipPlaneEquation = source._supportsDoubleCoefficientsInClipPlaneEquation;
         _supportsMultiTexture = source._supportsMultiTexture;
         _supportsNonPowerTwo = source._supportsNonPowerTwo;
         _supportsPointParameters = source._supportsPointParameters;
@@ -226,6 +229,13 @@ public class ContextCapabilities {
      */
     public boolean isMultisampleSupported() {
         return _supportsMultisample;
+    }
+
+    /**
+     * @return true if double coefficients are supported in clip plane equation
+     */
+    public boolean areDoubleCoefficientsInClipPlaneEquationSupported() {
+        return _supportsDoubleCoefficientsInClipPlaneEquation;
     }
 
     /**

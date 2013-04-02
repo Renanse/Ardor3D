@@ -10,6 +10,8 @@
 
 package com.ardor3d.scene.state.lwjgl;
 
+import java.nio.DoubleBuffer;
+
 import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -54,9 +56,9 @@ public abstract class LwjglClipStateUtil {
             }
 
             record.buf.rewind();
-            record.buf.put(state.getPlaneEquations(planeIndex));
+            ((DoubleBuffer) record.buf).put(state.getPlaneEquations(planeIndex));
             record.buf.flip();
-            GL11.glClipPlane(GL11.GL_CLIP_PLANE0 + planeIndex, record.buf);
+            GL11.glClipPlane(GL11.GL_CLIP_PLANE0 + planeIndex, (DoubleBuffer) record.buf);
 
         } else {
             if (!record.isValid() || record.planeEnabled[planeIndex]) {
