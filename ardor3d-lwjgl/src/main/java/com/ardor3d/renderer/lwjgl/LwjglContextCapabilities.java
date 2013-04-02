@@ -38,6 +38,7 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         _supportsVBO = caps.GL_ARB_vertex_buffer_object;
         _supportsGL1_2 = caps.OpenGL12;
         _supportsMultisample = caps.GL_ARB_multisample;
+        _supportsDoubleCoefficientsInClipPlaneEquation = true;
 
         _supportsConstantColor = _supportsEq = caps.GL_ARB_imaging;
         _supportsSeparateFunc = caps.GL_EXT_blend_func_separate;

@@ -10,6 +10,9 @@
 
 package com.ardor3d.scene.state.jogl;
 
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GLContext;
@@ -59,13 +62,21 @@ public abstract class JoglClipStateUtil {
                 }
                 record.planeEnabled[planeIndex] = true;
             }
-
-            record.buf.rewind();
-            record.buf.put(state.getPlaneEquations(planeIndex));
-            record.buf.flip();
             if (gl.isGL2ES1()) {
-                // TODO Shouldn't glClipPlane be in GL2ES1?
-                gl.getGL2().glClipPlane(GL2ES1.GL_CLIP_PLANE0 + planeIndex, record.buf);
+                record.buf.rewind();
+                if (gl.isGLES1()) {
+                    for (final double planeEqCoeff : state.getPlaneEquations(planeIndex)) {
+                        ((FloatBuffer) record.buf).put((float) planeEqCoeff);
+                    }
+                    gl.getGLES1().glClipPlanef(GL2ES1.GL_CLIP_PLANE0 + planeIndex, (FloatBuffer) record.buf);
+                } else {
+                    ((DoubleBuffer) record.buf).put(state.getPlaneEquations(planeIndex));
+                    gl.getGL2().glClipPlane(GL2ES1.GL_CLIP_PLANE0 + planeIndex, (DoubleBuffer) record.buf);
+                }
+                record.buf.flip();
+            } else {
+                // TODO use this suggestion but take into account the good reference frame:
+                // http://stackoverflow.com/a/13705204
             }
 
         } else {
