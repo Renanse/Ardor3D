@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util;
+package com.ardor3d.image.util.awt;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -27,6 +27,8 @@ import javax.imageio.ImageIO;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
+import com.ardor3d.image.util.ImageLoader;
+import com.ardor3d.image.util.ImageLoaderUtil;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;

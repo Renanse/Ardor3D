@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util;
+package com.ardor3d.image.util.awt;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -101,9 +101,7 @@ public class ScreenShotImageExporter implements ScreenExportable {
             // save our successful file to be accessed as desired.
             _lastFile = out;
         } catch (final IOException e) {
-            logger
-                    .logp(Level.WARNING, getClass().getName(), "export(ByteBuffer, int, int)", e.getLocalizedMessage(),
-                            e);
+            logger.logp(Level.WARNING, getClass().getName(), "export(ByteBuffer, int, int)", e.getLocalizedMessage(), e);
         }
     }
 
