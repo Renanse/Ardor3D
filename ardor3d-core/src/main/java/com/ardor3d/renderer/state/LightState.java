@@ -18,6 +18,7 @@ import java.util.Stack;
 import com.ardor3d.light.Light;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.LightStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Mesh;
@@ -391,7 +392,7 @@ public class LightState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
         return new LightStateRecord();
     }
 }

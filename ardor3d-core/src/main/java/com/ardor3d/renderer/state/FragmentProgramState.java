@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.FragmentProgramStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.util.export.InputCapsule;
@@ -225,7 +226,7 @@ public class FragmentProgramState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
         return new FragmentProgramStateRecord();
     }
 }

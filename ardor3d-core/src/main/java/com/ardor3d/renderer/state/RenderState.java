@@ -17,6 +17,7 @@ import java.util.Stack;
 
 import com.ardor3d.math.ObjectPool;
 import com.ardor3d.math.Poolable;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Constants;
@@ -207,7 +208,7 @@ public abstract class RenderState implements Savable {
         return this.getClass();
     }
 
-    public abstract StateRecord createStateRecord();
+    public abstract StateRecord createStateRecord(final ContextCapabilities caps);
 
     /**
      * @return true if we should apply this state even if we think it is the current state of its type in the current

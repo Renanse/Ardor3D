@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scenegraph.Spatial;
@@ -309,7 +310,7 @@ public class TextureState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
         return new TextureStateRecord();
     }
 
