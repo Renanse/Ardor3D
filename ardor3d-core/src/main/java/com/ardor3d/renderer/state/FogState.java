@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.FogStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.util.export.InputCapsule;
@@ -218,7 +219,7 @@ public class FogState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
         return new FogStateRecord();
     }
 

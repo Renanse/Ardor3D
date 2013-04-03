@@ -1327,7 +1327,7 @@ public class GLSLShaderObjectsState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
         return new ShaderObjectsStateRecord();
     }
 }

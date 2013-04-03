@@ -71,7 +71,7 @@ public class RenderContext {
 
     protected void setupRecords() {
         for (final RenderState.StateType type : RenderState.StateType.values()) {
-            _stateRecords.put(type, RenderState.createState(type).createStateRecord());
+            _stateRecords.put(type, RenderState.createState(type).createStateRecord(_capabilities));
         }
     }
 

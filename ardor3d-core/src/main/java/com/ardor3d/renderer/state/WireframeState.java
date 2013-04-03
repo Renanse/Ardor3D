@@ -12,6 +12,7 @@ package com.ardor3d.renderer.state;
 
 import java.io.IOException;
 
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.WireframeStateRecord;
 import com.ardor3d.util.export.InputCapsule;
@@ -131,7 +132,7 @@ public class WireframeState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
         return new WireframeStateRecord();
     }
 }
