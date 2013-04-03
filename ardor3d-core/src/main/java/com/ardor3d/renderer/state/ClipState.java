@@ -12,6 +12,7 @@ package com.ardor3d.renderer.state;
 
 import java.io.IOException;
 
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.ClipStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.util.export.InputCapsule;
@@ -119,7 +120,7 @@ public class ClipState extends RenderState {
     }
 
     @Override
-    public StateRecord createStateRecord() {
-        return new ClipStateRecord();
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
+        return new ClipStateRecord(caps);
     }
 }

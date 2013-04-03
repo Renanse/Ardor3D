@@ -14,8 +14,6 @@ import java.nio.Buffer;
 import java.util.Arrays;
 
 import com.ardor3d.renderer.ContextCapabilities;
-import com.ardor3d.renderer.ContextManager;
-import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -24,10 +22,8 @@ public class ClipStateRecord extends StateRecord {
     public final boolean[] planeEnabled;
     public final Buffer buf;
 
-    public ClipStateRecord() {
+    public ClipStateRecord(final ContextCapabilities caps) {
         planeEnabled = new boolean[ClipState.MAX_CLIP_PLANES];
-        final RenderContext context = ContextManager.getCurrentContext();
-        final ContextCapabilities caps = context.getCapabilities();
         if (caps.areDoubleCoefficientsInClipPlaneEquationSupported()) {
             buf = BufferUtils.createDoubleBuffer(4);
         } else {
