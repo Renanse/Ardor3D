@@ -11,18 +11,7 @@
     <artifactId>ardor3d-swt</artifactId>
     <packaging>bundle</packaging>
     <name>Ardor 3D SWT</name>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -42,7 +31,7 @@
 	
 	
     <repositories>
-		<!-- The current version of swt isn't on central yet. -->
+        <!-- The current version of swt isn't on central yet. -->
         <repository>
             <id>ardor3d</id>
             <url>http://ardor3d.com:8081/nexus/content/groups/public</url>
@@ -65,6 +54,7 @@
                 <swt.classifier>linux-x86</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>linux-x86_64</id>
             <activation>
@@ -77,6 +67,7 @@
                 <swt.classifier>linux-x86_64</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>solaris-sparc</id>
             <activation>
@@ -89,6 +80,7 @@
                 <swt.classifier>solaris-sparc</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>solaris-x86</id>
             <activation>
@@ -101,6 +93,7 @@
                 <swt.classifier>solaris-x86</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>macosx-cocoa-64</id>
             <activation>
@@ -113,6 +106,7 @@
                 <swt.classifier>mac-x86_64</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>macosx-cocoa</id>
             <activation>
@@ -125,6 +119,7 @@
                 <swt.classifier>mac-x86</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>win32</id>
             <activation>
@@ -137,6 +132,7 @@
                 <swt.classifier>win32-x86</swt.classifier>
             </properties>
         </profile>
+    
         <profile>
             <id>win64</id>
             <activation>
@@ -150,4 +146,5 @@
             </properties>
         </profile>
     </profiles>
+  
 </project>

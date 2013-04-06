@@ -21,7 +21,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -32,7 +31,9 @@
                     </archive>
                 </configuration>
             </plugin>
+      
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
@@ -49,14 +50,14 @@
                     </execution>
                 </executions>
             </plugin>
-      <!-- Run example executable with goal exec:java and add
-           "-Djava.library.path=target/natives" to the VM arguments.
-           You probably have to execute the package goal once to generate the 
-           target/natives folder. -->
+      
+            <!-- Run example executable with goal exec:java and add
+            "-Djava.library.path=target/natives" to the VM arguments.
+            You probably have to execute the package goal once to generate the 
+            target/natives folder. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -67,40 +68,32 @@
                 <configuration>
                     <systemProperties>
                         <systemProperty>
-                        	<!-- 
-                        	Doesn't work, as this property can only be given when a new
-                        	jvm is forked. Instead, run goal "exec:java" with the vm arguments:
-                        	"-Djava.library.path=target/natives" -->
-                        	<key>java.library.path</key>
-                        	<value>target/natives</value>
+                            <!-- 
+                            Doesn't work, as this property can only be given when a new
+                            jvm is forked. Instead, run goal "exec:java" with the vm arguments:
+                            "-Djava.library.path=target/natives" -->
+                            <key>java.library.path</key>
+                            <value>target/natives</value>
                         </systemProperty>
                     </systemProperties>
                     <!-- TODO Using ExampleRunner results in some resources problems  -->
                     <mainClass>com.ardor3d.example.basic.BoxExample</mainClass>
                 </configuration>
             </plugin>
+      
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
+                <groupId>com.googlecode.mavennatives</groupId>
+                <artifactId>maven-nativedependencies-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpacknatives</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-            <plugin>
-				<groupId>com.googlecode.mavennatives</groupId>
-				<artifactId>maven-nativedependencies-plugin</artifactId>
-				<version>0.0.7</version>
-				<executions>
-					<execution>
-						<id>unpacknatives</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
         </plugins>
     </build>
 
@@ -112,8 +105,8 @@
         </dependency>
         <!-- because we use org.lwjgl.LWJGLException in LwjglSwtExample -->
         <dependency>
-    		<groupId>org.lwjgl.lwjgl</groupId>
-    		<artifactId>lwjgl</artifactId>
+            <groupId>org.lwjgl.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
