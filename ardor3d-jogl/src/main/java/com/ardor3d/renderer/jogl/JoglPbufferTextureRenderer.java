@@ -24,6 +24,7 @@ import javax.media.opengl.GLProfile;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
+import com.ardor3d.framework.jogl.CapsUtil;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
 import com.ardor3d.renderer.AbstractPbufferTextureRenderer;
@@ -262,7 +263,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             }
 
             // Make our GLPbuffer...
-            final GLProfile profile = GLProfile.getMaximum(true);
+            final GLProfile profile = CapsUtil.getProfile();
             final GLDrawableFactory fac = GLDrawableFactory.getFactory(profile);
             final GLCapabilities caps = new GLCapabilities(profile);
             caps.setHardwareAccelerated(true);

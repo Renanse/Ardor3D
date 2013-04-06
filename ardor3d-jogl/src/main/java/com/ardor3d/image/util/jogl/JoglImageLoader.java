@@ -20,8 +20,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
-import javax.media.opengl.GLProfile;
-
+import com.ardor3d.framework.jogl.CapsUtil;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageLoader;
@@ -55,30 +54,32 @@ public class JoglImageLoader implements ImageLoader {
 
     @Override
     public Image load(final InputStream is, final boolean flipped) throws IOException {
-        final TextureData textureData = TextureIO.newTextureData(GLProfile.getMaximum(true), is, true, null);
+        final TextureData textureData = TextureIO.newTextureData(CapsUtil.getProfile(), is, true, null);
         final Buffer textureDataBuffer = textureData.getBuffer();
         final Image ardorImage = new Image();
-
-        int dataSize = textureDataBuffer.capacity();
+        final int elementSize;
         if (textureDataBuffer instanceof ShortBuffer) {
-            dataSize *= Buffers.SIZEOF_SHORT;
+            elementSize = Buffers.SIZEOF_SHORT;
         } else {
             if (textureDataBuffer instanceof IntBuffer) {
-                dataSize *= Buffers.SIZEOF_INT;
+                elementSize = Buffers.SIZEOF_INT;
             } else {
                 if (textureDataBuffer instanceof LongBuffer) {
-                    dataSize *= Buffers.SIZEOF_LONG;
+                    elementSize = Buffers.SIZEOF_LONG;
                 } else {
                     if (textureDataBuffer instanceof FloatBuffer) {
-                        dataSize *= Buffers.SIZEOF_FLOAT;
+                        elementSize = Buffers.SIZEOF_FLOAT;
                     } else {
                         if (textureDataBuffer instanceof DoubleBuffer) {
-                            dataSize *= Buffers.SIZEOF_DOUBLE;
+                            elementSize = Buffers.SIZEOF_DOUBLE;
+                        } else {
+                            elementSize = 1;
                         }
                     }
                 }
             }
         }
+        final int dataSize = textureDataBuffer.capacity() * elementSize;
         final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(dataSize) : Buffers
                 .newDirectByteBuffer(dataSize);
         if (textureDataBuffer instanceof ShortBuffer) {
@@ -122,7 +123,16 @@ public class JoglImageLoader implements ImageLoader {
         scratch.rewind();
         textureDataBuffer.rewind();
         if (flipped) {
-
+            // FIXME
+            /*
+             * final int width = textureData.getWidth(); final int height = textureData.getHeight(); final int
+             * dataLineSize = elementSize * width; final byte[] buf0 = new byte[dataLineSize], buf1 = new
+             * byte[dataLineSize]; for (int lineIndex = 0; lineIndex < height / 2; lineIndex++) { final int
+             * line0DataIndex = lineIndex * dataLineSize; final int line1DataIndex = (height - lineIndex - 1) *
+             * dataLineSize; scratch.position(line0DataIndex); scratch.get(buf0); scratch.position(line1DataIndex);
+             * scratch.get(buf1); scratch.position(line0DataIndex); scratch.put(buf1); scratch.position(line1DataIndex);
+             * scratch.put(buf0); } scratch.rewind();
+             */
         }
         ardorImage.setWidth(textureData.getWidth());
         ardorImage.setHeight(textureData.getHeight());
