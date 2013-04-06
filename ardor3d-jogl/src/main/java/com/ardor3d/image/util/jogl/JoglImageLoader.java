@@ -25,6 +25,7 @@ import javax.media.opengl.GLProfile;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageLoader;
+import com.ardor3d.image.util.ImageLoaderUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.util.geom.BufferUtils;
 import com.jogamp.common.nio.Buffers;
@@ -37,15 +38,18 @@ public class JoglImageLoader implements ImageLoader {
 
     private static boolean createOnHeap = false;
 
-    private static final String[] supportedFormats = new String[] { TextureIO.DDS, TextureIO.GIF, TextureIO.JPG,
-            TextureIO.JPG, TextureIO.PAM, TextureIO.PNG, TextureIO.PNG, TextureIO.PPM, TextureIO.SGI, TextureIO.TGA,
-            TextureIO.TIFF };
+    private static final String[] supportedFormats = new String[] { "." + TextureIO.DDS.toUpperCase(),
+            "." + TextureIO.GIF.toUpperCase(), "." + TextureIO.JPG.toUpperCase(), "." + TextureIO.PAM.toUpperCase(),
+            "." + TextureIO.PNG.toUpperCase(), "." + TextureIO.PPM.toUpperCase(), "." + TextureIO.SGI.toUpperCase(),
+            "." + TextureIO.TGA.toUpperCase(), "." + TextureIO.TIFF.toUpperCase() };
 
     public static String[] getSupportedFormats() {
         return supportedFormats;
     }
 
-    public static void registerLoader() {}
+    public static void registerLoader() {
+        ImageLoaderUtil.registerHandler(new JoglImageLoader(), supportedFormats);
+    }
 
     public JoglImageLoader() {}
 
@@ -117,6 +121,9 @@ public class JoglImageLoader implements ImageLoader {
         }
         scratch.rewind();
         textureDataBuffer.rewind();
+        if (flipped) {
+
+        }
         ardorImage.setWidth(textureData.getWidth());
         ardorImage.setHeight(textureData.getHeight());
         ardorImage.setData(scratch);
