@@ -23,7 +23,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLException;
-import javax.media.opengl.GLProfile;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -129,7 +128,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
         if (_context == null) {
-            _context = GLDrawableFactory.getFactory(GLProfile.getMaximum(true)).createExternalGLContext();
+            _context = GLDrawableFactory.getFactory(CapsUtil.getProfile()).createExternalGLContext();
         }
 
         makeCurrentContext();

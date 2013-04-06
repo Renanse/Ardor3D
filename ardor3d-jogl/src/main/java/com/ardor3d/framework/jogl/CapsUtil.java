@@ -18,6 +18,19 @@ import com.ardor3d.util.Ardor3dException;
 
 public class CapsUtil {
 
+    public static GLProfile getProfile() {
+        // tries to get the most capable profile, programmable or fixed, desktop or embedded, forward or backward
+        // compatible
+        GLProfile profile = GLProfile.getMaximum(true);
+        final boolean isForwardCompatible = (!profile.isGL4() && profile.isGL3() && !profile.isGL3bc())
+                || (profile.isGL4() && !profile.isGL4bc());
+        if (isForwardCompatible) {
+            // Ardor3D doesn't support forward compatible yet
+            profile = GLProfile.getMaxFixedFunc(true);
+        }
+        return profile;
+    }
+
     public static GLCapabilities getCapsForSettings(final DisplaySettings settings) {
         return getCapsForSettings(settings, true, false, false, false);
     }
@@ -36,7 +49,7 @@ public class CapsUtil {
             throw new Ardor3dException("Invalid pixel depth: " + settings.getColorDepth());
         }
 
-        final GLCapabilities caps = new GLCapabilities(GLProfile.getMaximum(true));
+        final GLCapabilities caps = new GLCapabilities(getProfile());
         caps.setHardwareAccelerated(true);
         caps.setDoubleBuffered(true);
         caps.setAlphaBits(settings.getAlphaBits());
