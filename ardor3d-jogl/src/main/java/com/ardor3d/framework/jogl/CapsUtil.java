@@ -19,7 +19,16 @@ import com.ardor3d.util.Ardor3dException;
 public class CapsUtil {
 
     public static GLProfile getProfile() {
-        return GLProfile.getMaximum(true);
+        // tries to get the most capable profile, programmable or fixed, desktop or embedded, forward or backward
+        // compatible
+        GLProfile profile = GLProfile.getMaximum(true);
+        final boolean isForwardCompatible = (!profile.isGL4() && profile.isGL3() && !profile.isGL3bc())
+                || (profile.isGL4() && !profile.isGL4bc());
+        if (isForwardCompatible) {
+            // Ardor3D doesn't support forward compatible yet
+            profile = GLProfile.getMaxFixedFunc(true);
+        }
+        return profile;
     }
 
     public static GLCapabilities getCapsForSettings(final DisplaySettings settings) {
