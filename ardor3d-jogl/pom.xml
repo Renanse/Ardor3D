@@ -1,57 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.ardor3d</groupId>
-    <artifactId>ardor3d</artifactId>
-    <relativePath>../pom.xml</relativePath>
-    <version>0.9-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.ardor3d</groupId>
+        <artifactId>ardor3d</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>ardor3d-jogl</artifactId>
-  <packaging>bundle</packaging>
-  <name>Ardor 3D JOGL</name>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
-	    <dependency>
-	      <groupId>${project.groupId}</groupId>
-	      <artifactId>ardor3d-core</artifactId>
-	      <version>${project.version}</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.jogamp.gluegen</groupId>
-	      <artifactId>gluegen-rt-main</artifactId>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.jogamp.jogl</groupId>
-	      <artifactId>jogl-all-main</artifactId>
-	    </dependency>
-	    <!-- 
-	    <dependency>
-	      <groupId>org.jogamp.joal</groupId>
-	      <artifactId>joal-main</artifactId>
-	      <version>2.0-rc11</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.jogamp.jocl</groupId>
-	      <artifactId>jocl-main</artifactId>
-	      <version>2.0-rc11</version>
-	    </dependency> -->
-	</dependencies>
-	<repositories>
+    <artifactId>ardor3d-jogl</artifactId>
+    <packaging>bundle</packaging>
+    <name>Ardor 3D JOGL</name>
+  
+    <repositories>
         <repository>
             <id>jogamp</id>
             <url>http://jogamp.org/deployment/maven</url>
         </repository>
     </repositories>
+  
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+        </dependency>
+        <!--dependency>
+          <groupId>org.jogamp.joal</groupId>
+          <artifactId>joal-main</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.jogamp.jocl</groupId>
+          <artifactId>jocl-main</artifactId>
+        </dependency-->
+    </dependencies>
+
 </project>
