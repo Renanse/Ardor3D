@@ -14,17 +14,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
-import javax.media.opengl.GLProfile;
-
+import com.ardor3d.framework.jogl.CapsUtil;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageLoader;
+import com.ardor3d.image.util.ImageLoaderUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.util.geom.BufferUtils;
 import com.jogamp.common.nio.Buffers;
@@ -33,96 +34,170 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 public class JoglImageLoader implements ImageLoader {
 
-    // private static final Logger logger = Logger.getLogger(JoglImageLoader.class.getName());
-
     private static boolean createOnHeap = false;
 
-    private static final String[] supportedFormats = new String[] { TextureIO.DDS, TextureIO.GIF, TextureIO.JPG,
-            TextureIO.JPG, TextureIO.PAM, TextureIO.PNG, TextureIO.PNG, TextureIO.PPM, TextureIO.SGI, TextureIO.TGA,
-            TextureIO.TIFF };
+    private enum TYPE {
+        BYTE, SHORT, CHAR, INT, FLOAT, LONG, DOUBLE
+    };
+
+    private static final String[] supportedFormats = new String[] { "." + TextureIO.DDS.toUpperCase(),
+            "." + TextureIO.GIF.toUpperCase(), "." + TextureIO.JPG.toUpperCase(), "." + TextureIO.PAM.toUpperCase(),
+            "." + TextureIO.PNG.toUpperCase(), "." + TextureIO.PPM.toUpperCase(), "." + TextureIO.SGI.toUpperCase(),
+            "." + TextureIO.TGA.toUpperCase(), "." + TextureIO.TIFF.toUpperCase() };
 
     public static String[] getSupportedFormats() {
         return supportedFormats;
     }
 
-    public static void registerLoader() {}
+    public static void registerLoader() {
+        ImageLoaderUtil.registerHandler(new JoglImageLoader(), supportedFormats);
+    }
 
     public JoglImageLoader() {}
 
     @Override
     public Image load(final InputStream is, final boolean flipped) throws IOException {
-        final TextureData textureData = TextureIO.newTextureData(GLProfile.getMaximum(true), is, true, null);
+        final TextureData textureData = TextureIO.newTextureData(CapsUtil.getProfile(), is, true, null);
         final Buffer textureDataBuffer = textureData.getBuffer();
         final Image ardorImage = new Image();
-
-        int dataSize = textureDataBuffer.capacity();
-        if (textureDataBuffer instanceof ShortBuffer) {
-            dataSize *= Buffers.SIZEOF_SHORT;
+        final TYPE bufferDataType;
+        if (textureDataBuffer instanceof ByteBuffer) {
+            bufferDataType = TYPE.BYTE;
         } else {
-            if (textureDataBuffer instanceof IntBuffer) {
-                dataSize *= Buffers.SIZEOF_INT;
+            if (textureDataBuffer instanceof ShortBuffer) {
+                bufferDataType = TYPE.SHORT;
             } else {
-                if (textureDataBuffer instanceof LongBuffer) {
-                    dataSize *= Buffers.SIZEOF_LONG;
+                if (textureDataBuffer instanceof CharBuffer) {
+                    bufferDataType = TYPE.CHAR;
                 } else {
-                    if (textureDataBuffer instanceof FloatBuffer) {
-                        dataSize *= Buffers.SIZEOF_FLOAT;
+                    if (textureDataBuffer instanceof IntBuffer) {
+                        bufferDataType = TYPE.INT;
                     } else {
-                        if (textureDataBuffer instanceof DoubleBuffer) {
-                            dataSize *= Buffers.SIZEOF_DOUBLE;
-                        }
-                    }
-                }
-            }
-        }
-        final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(dataSize) : Buffers
-                .newDirectByteBuffer(dataSize);
-        if (textureDataBuffer instanceof ShortBuffer) {
-            final ShortBuffer shortTextureDataBuffer = (ShortBuffer) textureDataBuffer;
-            while (textureDataBuffer.hasRemaining()) {
-                scratch.putShort(shortTextureDataBuffer.get());
-            }
-        } else {
-            if (textureDataBuffer instanceof IntBuffer) {
-                final IntBuffer intTextureDataBuffer = (IntBuffer) textureDataBuffer;
-                while (textureDataBuffer.hasRemaining()) {
-                    scratch.putInt(intTextureDataBuffer.get());
-                }
-            } else {
-                if (textureDataBuffer instanceof LongBuffer) {
-                    final LongBuffer longTextureDataBuffer = (LongBuffer) textureDataBuffer;
-                    while (textureDataBuffer.hasRemaining()) {
-                        scratch.putLong(longTextureDataBuffer.get());
-                    }
-                } else {
-                    if (textureDataBuffer instanceof FloatBuffer) {
-                        final FloatBuffer floatTextureDataBuffer = (FloatBuffer) textureDataBuffer;
-                        while (textureDataBuffer.hasRemaining()) {
-                            scratch.putFloat(floatTextureDataBuffer.get());
-                        }
-                    } else {
-                        if (textureDataBuffer instanceof DoubleBuffer) {
-                            final DoubleBuffer doubleTextureDataBuffer = (DoubleBuffer) textureDataBuffer;
-                            while (textureDataBuffer.hasRemaining()) {
-                                scratch.putDouble(doubleTextureDataBuffer.get());
-                            }
+                        if (textureDataBuffer instanceof FloatBuffer) {
+                            bufferDataType = TYPE.FLOAT;
                         } else {
-                            if (textureDataBuffer instanceof ByteBuffer) {
-                                scratch.put((ByteBuffer) textureDataBuffer);
+                            if (textureDataBuffer instanceof LongBuffer) {
+                                bufferDataType = TYPE.LONG;
+                            } else {
+                                if (textureDataBuffer instanceof DoubleBuffer) {
+                                    bufferDataType = TYPE.DOUBLE;
+                                } else {
+                                    bufferDataType = null;
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        scratch.rewind();
-        textureDataBuffer.rewind();
-        ardorImage.setWidth(textureData.getWidth());
-        ardorImage.setHeight(textureData.getHeight());
-        ardorImage.setData(scratch);
-        ardorImage.setDataFormat(JoglTextureUtil.getImageDataFormat(textureData.getPixelFormat()));
-        // ardorImage.setDataType(JoglTextureUtil.getPixelDataType(textureData.getPixelType()));
-        ardorImage.setDataType(PixelDataType.UnsignedByte);
-        return ardorImage;
+        if (bufferDataType == null) {
+            throw new UnsupportedOperationException("Unknown buffer type " + textureDataBuffer.getClass().getName());
+        } else {
+            final int pixelComponentSize;
+            switch (bufferDataType) {
+                case BYTE:
+                    pixelComponentSize = Buffers.SIZEOF_BYTE;
+                    break;
+                case SHORT:
+                    pixelComponentSize = Buffers.SIZEOF_SHORT;
+                    break;
+                case CHAR:
+                    pixelComponentSize = Buffers.SIZEOF_CHAR;
+                    break;
+                case INT:
+                    pixelComponentSize = Buffers.SIZEOF_INT;
+                    break;
+                case FLOAT:
+                    pixelComponentSize = Buffers.SIZEOF_FLOAT;
+                    break;
+                case LONG:
+                    pixelComponentSize = Buffers.SIZEOF_LONG;
+                    break;
+                case DOUBLE:
+                    pixelComponentSize = Buffers.SIZEOF_DOUBLE;
+                    break;
+                default:
+                    // it should never happen
+                    pixelComponentSize = 0;
+            }
+            final int dataSize = textureDataBuffer.capacity() * pixelComponentSize;
+            final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(dataSize) : Buffers
+                    .newDirectByteBuffer(dataSize);
+            if (flipped) {
+                final int bytesPerPixel = dataSize / (textureData.getWidth() * textureData.getHeight());
+                while (scratch.hasRemaining()) {
+                    final int srcPixelIndex = scratch.position() / bytesPerPixel;
+                    final int srcPixelComponentOffset = scratch.position() - (srcPixelIndex * bytesPerPixel);
+                    // final int srcElementIndex = srcPixelIndex * bytesPerPixel + srcPixelComponentOffset;
+                    final int srcColumnIndex = srcPixelIndex % textureData.getWidth();
+                    final int scrRowIndex = (srcPixelIndex - srcColumnIndex) / textureData.getHeight();
+                    final int dstColumnIndex = srcColumnIndex;
+                    final int dstRowIndex = (textureData.getHeight() - 1) - scrRowIndex;
+                    final int dstPixelIndex = dstRowIndex * textureData.getWidth() + dstColumnIndex;
+                    final int dstPixelComponentOffset = srcPixelComponentOffset;
+                    final int dstElementIndex = dstPixelIndex * bytesPerPixel + dstPixelComponentOffset;
+                    switch (bufferDataType) {
+                        case BYTE:
+                            scratch.put(((ByteBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        case SHORT:
+                            scratch.putShort(((ShortBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        case CHAR:
+                            scratch.putChar(((CharBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        case INT:
+                            scratch.putInt(((IntBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        case FLOAT:
+                            scratch.putFloat(((FloatBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        case LONG:
+                            scratch.putLong(((LongBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        case DOUBLE:
+                            scratch.putDouble(((DoubleBuffer) textureDataBuffer).get(dstElementIndex));
+                            break;
+                        default:
+                            // it should never happen
+                    }
+                }
+
+            } else {
+                switch (bufferDataType) {
+                    case BYTE:
+                        scratch.put((ByteBuffer) textureDataBuffer);
+                        break;
+                    case SHORT:
+                        scratch.asShortBuffer().put((ShortBuffer) textureDataBuffer);
+                        break;
+                    case CHAR:
+                        scratch.asCharBuffer().put((CharBuffer) textureDataBuffer);
+                        break;
+                    case INT:
+                        scratch.asIntBuffer().put((IntBuffer) textureDataBuffer);
+                        break;
+                    case FLOAT:
+                        scratch.asFloatBuffer().put((FloatBuffer) textureDataBuffer);
+                    case LONG:
+                        scratch.asLongBuffer().put((LongBuffer) textureDataBuffer);
+                        break;
+                    case DOUBLE:
+                        scratch.asDoubleBuffer().put((DoubleBuffer) textureDataBuffer);
+                        break;
+                    default:
+                        // it should never happen
+                }
+            }
+            scratch.rewind();
+            textureDataBuffer.rewind();
+            ardorImage.setWidth(textureData.getWidth());
+            ardorImage.setHeight(textureData.getHeight());
+            ardorImage.setData(scratch);
+            ardorImage.setDataFormat(JoglTextureUtil.getImageDataFormat(textureData.getPixelFormat()));
+            // ardorImage.setDataType(JoglTextureUtil.getPixelDataType(textureData.getPixelType()));
+            ardorImage.setDataType(PixelDataType.UnsignedByte);
+            return ardorImage;
+        }
     }
 }
