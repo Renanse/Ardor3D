@@ -68,12 +68,13 @@ public abstract class JoglClipStateUtil {
                     for (final double planeEqCoeff : state.getPlaneEquations(planeIndex)) {
                         ((FloatBuffer) record.buf).put((float) planeEqCoeff);
                     }
+                    record.buf.flip();
                     gl.getGLES1().glClipPlanef(GL2ES1.GL_CLIP_PLANE0 + planeIndex, (FloatBuffer) record.buf);
                 } else {
                     ((DoubleBuffer) record.buf).put(state.getPlaneEquations(planeIndex));
+                    record.buf.flip();
                     gl.getGL2().glClipPlane(GL2ES1.GL_CLIP_PLANE0 + planeIndex, (DoubleBuffer) record.buf);
                 }
-                record.buf.flip();
             } else {
                 // TODO use this suggestion but take into account the good reference frame:
                 // http://stackoverflow.com/a/13705204
