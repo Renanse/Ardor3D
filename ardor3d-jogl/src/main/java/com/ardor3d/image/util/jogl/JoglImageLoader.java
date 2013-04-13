@@ -37,7 +37,14 @@ public class JoglImageLoader implements ImageLoader {
     private static boolean createOnHeap = false;
 
     private enum TYPE {
-        BYTE, SHORT, CHAR, INT, FLOAT, LONG, DOUBLE
+        BYTE(ByteBuffer.class), SHORT(ShortBuffer.class), CHAR(CharBuffer.class), INT(IntBuffer.class), FLOAT(
+                FloatBuffer.class), LONG(LongBuffer.class), DOUBLE(DoubleBuffer.class);
+
+        private final Class<? extends Buffer> bufferClass;
+
+        private TYPE(final Class<? extends Buffer> bufferClass) {
+            this.bufferClass = bufferClass;
+        }
     };
 
     private static final String[] supportedFormats = new String[] { "." + TextureIO.DDS.toUpperCase(),
@@ -60,137 +67,19 @@ public class JoglImageLoader implements ImageLoader {
         final TextureData textureData = TextureIO.newTextureData(CapsUtil.getProfile(), is, true, null);
         final Buffer textureDataBuffer = textureData.getBuffer();
         final Image ardorImage = new Image();
-        final TYPE bufferDataType;
-        if (textureDataBuffer instanceof ByteBuffer) {
-            bufferDataType = TYPE.BYTE;
-        } else {
-            if (textureDataBuffer instanceof ShortBuffer) {
-                bufferDataType = TYPE.SHORT;
-            } else {
-                if (textureDataBuffer instanceof CharBuffer) {
-                    bufferDataType = TYPE.CHAR;
-                } else {
-                    if (textureDataBuffer instanceof IntBuffer) {
-                        bufferDataType = TYPE.INT;
-                    } else {
-                        if (textureDataBuffer instanceof FloatBuffer) {
-                            bufferDataType = TYPE.FLOAT;
-                        } else {
-                            if (textureDataBuffer instanceof LongBuffer) {
-                                bufferDataType = TYPE.LONG;
-                            } else {
-                                if (textureDataBuffer instanceof DoubleBuffer) {
-                                    bufferDataType = TYPE.DOUBLE;
-                                } else {
-                                    bufferDataType = null;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        final TYPE bufferDataType = getBufferDataType(textureDataBuffer);
         if (bufferDataType == null) {
             throw new UnsupportedOperationException("Unknown buffer type " + textureDataBuffer.getClass().getName());
         } else {
-            final int pixelComponentSize;
-            switch (bufferDataType) {
-                case BYTE:
-                    pixelComponentSize = Buffers.SIZEOF_BYTE;
-                    break;
-                case SHORT:
-                    pixelComponentSize = Buffers.SIZEOF_SHORT;
-                    break;
-                case CHAR:
-                    pixelComponentSize = Buffers.SIZEOF_CHAR;
-                    break;
-                case INT:
-                    pixelComponentSize = Buffers.SIZEOF_INT;
-                    break;
-                case FLOAT:
-                    pixelComponentSize = Buffers.SIZEOF_FLOAT;
-                    break;
-                case LONG:
-                    pixelComponentSize = Buffers.SIZEOF_LONG;
-                    break;
-                case DOUBLE:
-                    pixelComponentSize = Buffers.SIZEOF_DOUBLE;
-                    break;
-                default:
-                    // it should never happen
-                    pixelComponentSize = 0;
-            }
-            final int dataSize = textureDataBuffer.capacity() * pixelComponentSize;
-            final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(dataSize) : Buffers
-                    .newDirectByteBuffer(dataSize);
+            final int dataSizeInBytes = textureDataBuffer.capacity() * Buffers.sizeOfBufferElem(textureDataBuffer);
+            final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(dataSizeInBytes) : Buffers
+                    .newDirectByteBuffer(dataSizeInBytes);
             if (flipped) {
-                final int bytesPerPixel = dataSize / (textureData.getWidth() * textureData.getHeight());
-                while (scratch.hasRemaining()) {
-                    final int srcPixelIndex = scratch.position() / bytesPerPixel;
-                    final int srcPixelComponentOffset = scratch.position() - (srcPixelIndex * bytesPerPixel);
-                    // final int srcElementIndex = srcPixelIndex * bytesPerPixel + srcPixelComponentOffset;
-                    final int srcColumnIndex = srcPixelIndex % textureData.getWidth();
-                    final int scrRowIndex = (srcPixelIndex - srcColumnIndex) / textureData.getHeight();
-                    final int dstColumnIndex = srcColumnIndex;
-                    final int dstRowIndex = (textureData.getHeight() - 1) - scrRowIndex;
-                    final int dstPixelIndex = dstRowIndex * textureData.getWidth() + dstColumnIndex;
-                    final int dstPixelComponentOffset = srcPixelComponentOffset;
-                    final int dstElementIndex = dstPixelIndex * bytesPerPixel + dstPixelComponentOffset;
-                    switch (bufferDataType) {
-                        case BYTE:
-                            scratch.put(((ByteBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        case SHORT:
-                            scratch.putShort(((ShortBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        case CHAR:
-                            scratch.putChar(((CharBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        case INT:
-                            scratch.putInt(((IntBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        case FLOAT:
-                            scratch.putFloat(((FloatBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        case LONG:
-                            scratch.putLong(((LongBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        case DOUBLE:
-                            scratch.putDouble(((DoubleBuffer) textureDataBuffer).get(dstElementIndex));
-                            break;
-                        default:
-                            // it should never happen
-                    }
-                }
-
+                flipImageData(textureDataBuffer, scratch, dataSizeInBytes, bufferDataType, textureData.getWidth(),
+                        textureData.getHeight());
             } else {
-                switch (bufferDataType) {
-                    case BYTE:
-                        scratch.put((ByteBuffer) textureDataBuffer);
-                        break;
-                    case SHORT:
-                        scratch.asShortBuffer().put((ShortBuffer) textureDataBuffer);
-                        break;
-                    case CHAR:
-                        scratch.asCharBuffer().put((CharBuffer) textureDataBuffer);
-                        break;
-                    case INT:
-                        scratch.asIntBuffer().put((IntBuffer) textureDataBuffer);
-                        break;
-                    case FLOAT:
-                        scratch.asFloatBuffer().put((FloatBuffer) textureDataBuffer);
-                    case LONG:
-                        scratch.asLongBuffer().put((LongBuffer) textureDataBuffer);
-                        break;
-                    case DOUBLE:
-                        scratch.asDoubleBuffer().put((DoubleBuffer) textureDataBuffer);
-                        break;
-                    default:
-                        // it should never happen
-                }
+                copyImageData(textureDataBuffer, scratch, bufferDataType);
             }
-            scratch.rewind();
-            textureDataBuffer.rewind();
             ardorImage.setWidth(textureData.getWidth());
             ardorImage.setHeight(textureData.getHeight());
             ardorImage.setData(scratch);
@@ -199,5 +88,148 @@ public class JoglImageLoader implements ImageLoader {
             ardorImage.setDataType(PixelDataType.UnsignedByte);
             return ardorImage;
         }
+    }
+
+    private TYPE getBufferDataType(final Buffer buffer) {
+        TYPE bufferDataType = null;
+        for (final TYPE type : TYPE.values()) {
+            if (type.bufferClass.isAssignableFrom(buffer.getClass())) {
+                bufferDataType = type;
+                break;
+            }
+        }
+        return bufferDataType;
+    }
+
+    protected void copyImageData(final Buffer src, final ByteBuffer dest, final TYPE bufferDataType) {
+        final int srcPos = src.position();
+        final int destPos = dest.position();
+        switch (bufferDataType) {
+            case BYTE:
+                dest.put((ByteBuffer) src);
+                break;
+            case SHORT:
+                dest.asShortBuffer().put((ShortBuffer) src);
+                break;
+            case CHAR:
+                dest.asCharBuffer().put((CharBuffer) src);
+                break;
+            case INT:
+                dest.asIntBuffer().put((IntBuffer) src);
+                break;
+            case FLOAT:
+                dest.asFloatBuffer().put((FloatBuffer) src);
+            case LONG:
+                dest.asLongBuffer().put((LongBuffer) src);
+                break;
+            case DOUBLE:
+                dest.asDoubleBuffer().put((DoubleBuffer) src);
+                break;
+            default:
+                // it should never happen
+        }
+        src.position(srcPos);
+        dest.position(destPos);
+    }
+
+    protected void flipImageData(final Buffer src, final ByteBuffer dest, final int dataSizeInBytes,
+            final TYPE bufferDataType, final int width, final int height) {
+        final int srcPos = src.position();
+        final int destPos = dest.position();
+        final int bytesPerPixel = dataSizeInBytes / (width * height);
+        final int bytesPerElement = Buffers.sizeOfBufferElem(src);
+        final int elementsPerPixel = bytesPerPixel / bytesPerElement;
+        final int elementsPerLine = width * elementsPerPixel;
+        final int bytesPerLine = bytesPerPixel * width;// width = pixels per line
+        byte[] byteBuf = null;
+        short[] shortBuf = null;
+        char[] charBuf = null;
+        int[] intBuf = null;
+        float[] floatBuf = null;
+        long[] longBuf = null;
+        double[] doubleBuf = null;
+        switch (bufferDataType) {
+            case BYTE:
+                byteBuf = new byte[elementsPerLine];
+                break;
+            case SHORT:
+                shortBuf = new short[elementsPerLine];
+                break;
+            case CHAR:
+                charBuf = new char[elementsPerLine];
+                break;
+            case INT:
+                intBuf = new int[elementsPerLine];
+                break;
+            case FLOAT:
+                floatBuf = new float[elementsPerLine];
+                break;
+            case LONG:
+                longBuf = new long[elementsPerLine];
+                break;
+            case DOUBLE:
+                doubleBuf = new double[elementsPerLine];
+                break;
+            default:
+                // it should never happen
+        }
+        while (dest.hasRemaining()) {
+            final int srcFirstPixelIndex = dest.position() / bytesPerPixel;
+            final int srcFirstPixelComponentOffset = dest.position() - (srcFirstPixelIndex * bytesPerPixel);
+            final int srcFirstColumnIndex = srcFirstPixelIndex % width;
+            final int scrFirstRowIndex = (srcFirstPixelIndex - srcFirstColumnIndex) / height;
+            final int dstFirstColumnIndex = srcFirstColumnIndex;
+            final int dstFirstRowIndex = (height - 1) - scrFirstRowIndex;
+            final int dstFirstPixelIndex = dstFirstRowIndex * width + dstFirstColumnIndex;
+            final int dstFirstPixelComponentOffset = srcFirstPixelComponentOffset;
+            final int dstFirstElementIndex = dstFirstPixelIndex * bytesPerPixel + dstFirstPixelComponentOffset;
+            switch (bufferDataType) {
+                case BYTE:
+                    ((ByteBuffer) src).position(dstFirstElementIndex);
+                    ((ByteBuffer) src).get(byteBuf);
+                    dest.put(byteBuf);
+                    break;
+                case SHORT:
+                    ((ShortBuffer) src).position(dstFirstElementIndex);
+                    ((ShortBuffer) src).get(shortBuf);
+                    dest.asShortBuffer().put(shortBuf);
+                    dest.position(dest.position() + bytesPerLine);
+                    break;
+                case CHAR:
+                    ((CharBuffer) src).position(dstFirstElementIndex);
+                    ((CharBuffer) src).get(charBuf);
+                    dest.asCharBuffer().put(charBuf);
+                    dest.position(dest.position() + bytesPerLine);
+                    break;
+                case INT:
+                    ((IntBuffer) src).position(dstFirstElementIndex);
+                    ((IntBuffer) src).get(intBuf);
+                    dest.asIntBuffer().put(intBuf);
+                    dest.position(dest.position() + bytesPerLine);
+                    break;
+                case FLOAT:
+                    ((FloatBuffer) src).position(dstFirstElementIndex);
+                    ((FloatBuffer) src).get(floatBuf);
+                    dest.asFloatBuffer().put(floatBuf);
+                    dest.position(dest.position() + bytesPerLine);
+                    break;
+                case LONG:
+                    ((LongBuffer) src).position(dstFirstElementIndex);
+                    ((LongBuffer) src).get(longBuf);
+                    dest.asLongBuffer().put(longBuf);
+                    dest.position(dest.position() + bytesPerLine);
+                    break;
+                case DOUBLE:
+                    ((DoubleBuffer) src).position(dstFirstElementIndex);
+                    ((DoubleBuffer) src).get(doubleBuf);
+                    dest.asDoubleBuffer().put(doubleBuf);
+                    dest.position(dest.position() + bytesPerLine);
+                    break;
+                default:
+                    // it should never happen
+            }
+        }
+        src.position(srcPos);
+        dest.position(destPos);
     }
 }
