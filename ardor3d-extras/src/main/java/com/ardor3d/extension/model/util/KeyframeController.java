@@ -533,8 +533,15 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
         }
 
         if (_updateBounding) {
-            _morphMesh.updateModelBound();
+            updateBounding();
         }
+    }
+
+    /**
+     * Updates the bounding volume of the morph mesh
+     */
+    protected void updateBounding() {
+        _morphMesh.updateModelBound();
     }
 
     /**
