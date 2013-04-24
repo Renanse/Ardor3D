@@ -213,18 +213,18 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * This function will do a smooth translation between a keframe's current look, to the look directly at
-     * newTimeToReach. It takes translationLen time (in sec) to do that translation, and once translated will animate
-     * like normal between newBeginTime and newEndTime <br>
+     * newTimeToReach. It takes translationLen time (in seconds) to do that translation, and once translated will
+     * animate like normal between newBeginTime and newEndTime <br>
      * <br>
-     * This would be usefull for example when a figure stops running and tries to raise an arm. Instead of "teleporting"
-     * to the raise-arm animation begining, a smooth translation can occur.
+     * This would be useful for example when a figure stops running and tries to raise an arm. Instead of "teleporting"
+     * to the raise-arm animation beginning, a smooth translation can occur.
      * 
      * @param newTimeToReach
      *            The time to reach.
      * @param translationLen
      *            How long it takes
      * @param newBeginTime
-     *            The new cycle begining time
+     *            The new cycle beginning time
      * @param newEndTime
      *            The new cycle ending time.
      */
@@ -434,17 +434,23 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
         findFrame();
         _before = _keyframes.get(_curFrame);
         // Change this bit so the next frame we're heading towards isn't always going
-        // to be one frame ahead since now we coule be animating from the last to first
+        // to be one frame ahead since now we could be animating from the last to first
         // frames.
         // after = keyframes.get(curFrame + 1));
         _after = _keyframes.get(_nextFrame);
 
-        double delta = (_curTime - _before._time) / (_after._time - _before._time);
+        final double localMinTime = Math.min(_before._time, _after._time);
+        final double localMaxTime = Math.max(_before._time, _after._time);
+        final double clampedCurTime = Math.max(localMinTime, Math.min(_curTime, localMaxTime));
+        final double delta;
 
-        // If we doing that wrapping bit then delta should be caculated based
+        // If we doing that wrapping bit then delta should be calculated based
         // on the time before the start of the animation we are.
         if (_nextFrame < _curFrame) {
-            delta = blendTime - (getMinTime() - _curTime);
+            delta = blendTime - (getMinTime() - clampedCurTime);
+        } else {
+            // general case
+            delta = (clampedCurTime - _before._time) / (_after._time - _before._time);
         }
 
         final Mesh oldShape = _before._newShape;
