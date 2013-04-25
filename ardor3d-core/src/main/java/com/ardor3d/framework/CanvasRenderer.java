@@ -60,6 +60,13 @@ public interface CanvasRenderer {
     void setScene(Scene scene);
 
     /**
+     * Creates a new renderer for this canvas renderer
+     * 
+     * @return a new renderer
+     */
+    Renderer createRenderer();
+
+    /**
      * Returns the renderer being used by this canvas renderer.
      * 
      * @return the renderer used by this canvas renderer
