@@ -22,11 +22,11 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.util.Ardor3dException;
@@ -67,6 +67,11 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         return new LwjglContextCapabilities(GLContext.getCapabilities());
     }
 
+    @Override
+    public LwjglRenderer createRenderer() {
+        return new LwjglRenderer();
+    }
+
     @MainThread
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
@@ -93,7 +98,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         ContextManager.addContext(this, _currentContext);
         ContextManager.switchContext(this);
 
-        _renderer = new LwjglRenderer();
+        _renderer = createRenderer();
 
         if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
             GL11.glEnable(ARBMultisample.GL_MULTISAMPLE_ARB);
@@ -116,8 +121,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         } else {
             // use new width and height to set ratio.
             _camera.setFrustumPerspective(_camera.getFovY(),
-                    (float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(), _camera
-                            .getFrustumFar());
+                    (float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(),
+                    _camera.getFrustumFar());
         }
     }
 
