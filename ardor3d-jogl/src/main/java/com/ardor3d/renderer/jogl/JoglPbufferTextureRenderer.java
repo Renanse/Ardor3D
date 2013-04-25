@@ -19,7 +19,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
-import javax.media.opengl.GLPbuffer;
+import javax.media.opengl.GLOffscreenAutoDrawable;
 import javax.media.opengl.GLProfile;
 
 import com.ardor3d.framework.DisplaySettings;
@@ -48,15 +48,15 @@ import com.ardor3d.util.geom.BufferUtils;
  * This class is used by Ardor3D's JOGL implementation to render textures. Users should <b>not </b> create this class
  * directly.
  * </p>
+ * N.B: This class can't work without a complete implementation of GLOffscreenAutoDrawable.PBuffer, which is currently
+ * missing from JOGL
  * 
  * @see TextureRendererFactory
  */
 public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private static final Logger logger = Logger.getLogger(JoglPbufferTextureRenderer.class.getName());
 
-    /* Pbuffer instance */
-    // TODO use javax.media.opengl.GLOffscreenAutoDrawable
-    private GLPbuffer _pbuffer;
+    private GLOffscreenAutoDrawable offscreenDrawable;
 
     private GLContext _context;
 
@@ -127,13 +127,13 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
             final Texture tex, final int clear) {
         try {
-            if (_pbuffer == null) {
+            if (offscreenDrawable == null) {
                 initPbuffer();
             }
 
             if (_useDirectRender && !tex.getTextureStoreFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
-                _pbuffer.releaseTexture();
+                releaseTexture();
                 activate();
                 switchCameraIn(clear);
 
@@ -146,7 +146,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 deactivate();
                 switchCameraOut();
                 JoglTextureStateUtil.doTextureBind(tex, 0, true);
-                _pbuffer.bindTexture();
+                bindTexture();
             } else {
                 // render and copy to a texture
                 activate();
@@ -172,6 +172,15 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         }
     }
 
+    private void bindTexture() {
+        // FIXME The class PBuffer is going to be removed from JOGL very soon and GLOffscreenAutoDrawable.PBuffer is not
+        // yet ready
+    }
+
+    private void releaseTexture() {
+        // FIXME
+    }
+
     public void render(final Spatial spat, final List<Texture> texs, final int clear) {
         render(null, spat, null, texs, clear);
     }
@@ -187,7 +196,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
             final List<Texture> texs, final int clear) {
         try {
-            if (_pbuffer == null) {
+            if (offscreenDrawable == null) {
                 initPbuffer();
             }
 
@@ -196,7 +205,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 JoglTextureStateUtil.doTextureBind(texs.get(0), 0, true);
                 activate();
                 switchCameraIn(clear);
-                _pbuffer.releaseTexture();
+                releaseTexture();
 
                 if (toDrawA != null) {
                     doDraw(toDrawA);
@@ -209,7 +218,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 switchCameraOut();
 
                 deactivate();
-                _pbuffer.bindTexture();
+                bindTexture();
             } else {
                 // render and copy to a texture
                 activate();
@@ -255,11 +264,11 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private void initPbuffer() {
 
         try {
-            if (_pbuffer != null) {
+            if (offscreenDrawable != null) {
                 _context.destroy();
-                _pbuffer.destroy();
+                offscreenDrawable.destroy();
                 giveBackContext();
-                ContextManager.removeContext(_pbuffer);
+                ContextManager.removeContext(offscreenDrawable.getContext());
             }
 
             // Make our GLPbuffer...
@@ -274,12 +283,14 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             caps.setSampleBuffers(_settings.getSamples() != 0);
             caps.setStencilBits(_settings.getStencilBits());
             caps.setDoubleBuffered(false);
-            _pbuffer = fac.createGLPbuffer(null, caps, null, _width, _height, _parentContext);
-            _context = _pbuffer.getContext();
+            caps.setOnscreen(false);
+            caps.setPBuffer(true);
+            offscreenDrawable = fac.createOffscreenAutoDrawable(null, caps, null, _width, _height, _parentContext);
+            _context = offscreenDrawable.getContext();
 
             _context.makeCurrent();
 
-            final JoglContextCapabilities contextCaps = new JoglContextCapabilities(_pbuffer.getGL());
+            final JoglContextCapabilities contextCaps = new JoglContextCapabilities(offscreenDrawable.getGL());
             ContextManager.addContext(_context,
                     new JoglRenderContext(_context, contextCaps, ContextManager.getCurrentContext()));
 
@@ -301,8 +312,8 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         try {
             activate();
 
-            _width = _pbuffer.getWidth();
-            _height = _pbuffer.getHeight();
+            _width = offscreenDrawable.getWidth();
+            _height = offscreenDrawable.getHeight();
 
             deactivate();
         } catch (final Exception e) {
@@ -345,17 +356,17 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     }
 
     public void cleanup() {
-        ContextManager.removeContext(_pbuffer);
-        _pbuffer.destroy();
+        ContextManager.removeContext(offscreenDrawable.getContext());
+        offscreenDrawable.destroy();
     }
 
     public void setMultipleTargets(final boolean force) {
         if (force) {
             logger.fine("Copy Texture Pbuffer used!");
             _useDirectRender = false;
-            if (_pbuffer != null) {
+            if (offscreenDrawable != null) {
                 giveBackContext();
-                ContextManager.removeContext(_pbuffer);
+                ContextManager.removeContext(offscreenDrawable.getContext());
             }
         } else {
             // XXX: Is this WGL specific query right?
