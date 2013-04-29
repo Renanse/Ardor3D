@@ -12,6 +12,7 @@ package com.ardor3d.input.jogl;
 
 import java.util.EnumSet;
 import java.util.LinkedList;
+
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.framework.jogl.NewtWindowContainer;
 import com.ardor3d.input.Key;
@@ -21,12 +22,11 @@ import com.ardor3d.input.KeyboardWrapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
-import com.jogamp.newt.event.InputEvent;
 import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.NEWTEvent;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.opengl.GLWindow;
-
 
 public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
@@ -49,8 +49,10 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     public void init() {
         _newtWindow.addKeyListener(this);
         _newtWindow.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowLostFocus(final WindowEvent e) {}
 
+            @Override
             public void windowGainedFocus(final WindowEvent e) {
                 _pressedList.clear();
             }
@@ -67,7 +69,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     public synchronized void keyTyped(final com.jogamp.newt.event.KeyEvent e) {
         if (_consumeEvents) {
-        	e.setAttachment(InputEvent.consumedTag);
+            e.setAttachment(NEWTEvent.consumedTag);
             // ignore this event
         }
     }
@@ -79,7 +81,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
             _pressedList.add(pressed);
         }
         if (_consumeEvents) {
-            e.setAttachment(InputEvent.consumedTag);
+            e.setAttachment(NEWTEvent.consumedTag);
             // ignore this event
         }
     }
@@ -89,7 +91,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
         _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
         _pressedList.remove(released);
         if (_consumeEvents) {
-            e.setAttachment(InputEvent.consumedTag);
+            e.setAttachment(NEWTEvent.consumedTag);
             // ignore this event
         }
     }
@@ -102,7 +104,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
      * @return an Ardor3D Key, to be forwarded to the Predicate/Trigger system.
      */
     public synchronized Key fromKeyEventToKey(final com.jogamp.newt.event.KeyEvent e) {
-        return JoglNewtKey.findByCode(e.getKeyCode());
+        return JoglNewtKey.findByCode(e.getKeySymbol());
     }
 
     private class JoglNewtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
@@ -112,7 +114,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
                 if (_upcomingEvents.isEmpty()) {
                     return endOfData();
                 }
-                
+
                 return _upcomingEvents.poll();
             }
         }
