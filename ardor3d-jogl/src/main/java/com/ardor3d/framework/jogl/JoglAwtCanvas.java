@@ -41,7 +41,12 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
     private final JoglInitializerRunnable _initializerRunnable;
 
     public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
-        super(CapsUtil.getCapsForSettings(settings));
+        this(settings, canvasRenderer, new CapsUtil());
+    }
+
+    public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer,
+            final CapsUtil capsUtil) {
+        super(capsUtil.getCapsForSettings(settings));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
         _initializerRunnable = new JoglInitializerRunnable(this, settings);
         _settings = settings;

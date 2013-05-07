@@ -51,7 +51,13 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
     public JoglNewtWindow(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings,
             final boolean onscreen, final boolean bitmapRequested, final boolean pbufferRequested,
             final boolean fboRequested) {
-        _newtWindow = GLWindow.create(CapsUtil.getCapsForSettings(settings, onscreen, bitmapRequested,
+        this(canvasRenderer, settings, onscreen, bitmapRequested, pbufferRequested, fboRequested, new CapsUtil());
+    }
+
+    public JoglNewtWindow(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings,
+            final boolean onscreen, final boolean bitmapRequested, final boolean pbufferRequested,
+            final boolean fboRequested, final CapsUtil capsUtil) {
+        _newtWindow = GLWindow.create(capsUtil.getCapsForSettings(settings, onscreen, bitmapRequested,
                 pbufferRequested, fboRequested));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
         _settings = settings;

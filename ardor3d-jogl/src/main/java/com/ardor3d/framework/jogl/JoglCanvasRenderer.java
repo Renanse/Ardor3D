@@ -64,13 +64,16 @@ public class JoglCanvasRenderer implements CanvasRenderer {
      */
     private boolean _debugEnabled = false;
 
+    protected CapsUtil _capsUtil;
+
     public JoglCanvasRenderer(final Scene scene) {
-        this(scene, false);
+        this(scene, false, new CapsUtil());
     }
 
-    public JoglCanvasRenderer(final Scene scene, final boolean useDebug) {
+    public JoglCanvasRenderer(final Scene scene, final boolean useDebug, final CapsUtil capsUtil) {
         _scene = scene;
         _useDebug = useDebug;
+        _capsUtil = capsUtil;
     }
 
     public void makeCurrentContext() throws Ardor3dException {
@@ -133,7 +136,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
         if (_context == null) {
-            _context = GLDrawableFactory.getFactory(CapsUtil.getProfile()).createExternalGLContext();
+            _context = GLDrawableFactory.getFactory(_capsUtil.getProfile()).createExternalGLContext();
         }
 
         makeCurrentContext();
