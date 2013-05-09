@@ -22,15 +22,15 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
-import com.jogamp.newt.Screen;
-import com.jogamp.newt.ScreenMode;
+import com.jogamp.newt.MonitorDevice;
+import com.jogamp.newt.MonitorMode;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.event.WindowListener;
 import com.jogamp.newt.opengl.GLWindow;
-import com.jogamp.newt.util.ScreenModeUtil;
+import com.jogamp.newt.util.MonitorModeUtil;
 
 public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
 
@@ -77,18 +77,18 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
          * current resolution
          */
         if (_settings.isFullScreen()) {
-            final Screen screen = _newtWindow.getScreen();
-            List<ScreenMode> screenModes = screen.getScreenModes();
+            final MonitorDevice monitor = _newtWindow.getMainMonitor();
+            List<MonitorMode> monitorModes = monitor.getSupportedModes();
             // the resolution is provided by the user
             final Dimension dimension = new Dimension(_settings.getWidth(), _settings.getHeight());
-            screenModes = ScreenModeUtil.filterByResolution(screenModes, dimension);
-            screenModes = ScreenModeUtil.getHighestAvailableBpp(screenModes);
+            monitorModes = MonitorModeUtil.filterByResolution(monitorModes, dimension);
+            monitorModes = MonitorModeUtil.getHighestAvailableBpp(monitorModes);
             if (_settings.getFrequency() > 0) {
-                screenModes = ScreenModeUtil.filterByRate(screenModes, _settings.getFrequency());
+                monitorModes = MonitorModeUtil.filterByRate(monitorModes, _settings.getFrequency());
             } else {
-                screenModes = ScreenModeUtil.getHighestAvailableRate(screenModes);
+                monitorModes = MonitorModeUtil.getHighestAvailableRate(monitorModes);
             }
-            screen.setCurrentScreenMode(screenModes.get(0));
+            monitor.setCurrentMode(monitorModes.get(0));
         }
     }
 

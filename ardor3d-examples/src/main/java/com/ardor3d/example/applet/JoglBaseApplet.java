@@ -17,6 +17,8 @@ import java.awt.event.ComponentEvent;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 
+import javax.media.nativewindow.util.DimensionImmutable;
+
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -59,7 +61,6 @@ import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.stat.StatCollector;
-import com.jogamp.newt.ScreenMode;
 
 /**
  * An example base class for ardor3d/jogl applets. This is not meant to be a "best-practices" applet, just a rough demo
@@ -226,14 +227,12 @@ public abstract class JoglBaseApplet extends Applet implements Scene {
                 _glCanvas.getNewtWindow().setFullscreen(!_glCanvas.getNewtWindow().isFullscreen());
                 final Camera cam = _glCanvas.getCanvasRenderer().getCamera();
                 if (_glCanvas.getNewtWindow().isFullscreen()) {
-                    final ScreenMode mode = _glCanvas.getNewtWindow().getScreen().getCurrentScreenMode();
-                    cam.resize(mode.getMonitorMode().getScreenSizeMM().getWidth(), mode.getMonitorMode()
-                            .getScreenSizeMM().getHeight());
-                    cam.setFrustumPerspective(cam.getFovY(), mode.getMonitorMode().getScreenSizeMM().getWidth()
-                            / (float) mode.getMonitorMode().getScreenSizeMM().getHeight(), cam.getFrustumNear(),
+                    final DimensionImmutable screenSizeMM = _glCanvas.getNewtWindow().getMainMonitor().getSizeMM();
+                    cam.resize(screenSizeMM.getWidth(), screenSizeMM.getHeight());
+                    cam.setFrustumPerspective(cam.getFovY(),
+                            screenSizeMM.getWidth() / (float) screenSizeMM.getHeight(), cam.getFrustumNear(),
                             cam.getFrustumFar());
-                    appletResized(mode.getMonitorMode().getScreenSizeMM().getWidth(), mode.getMonitorMode()
-                            .getScreenSizeMM().getHeight());
+                    appletResized(screenSizeMM.getWidth(), screenSizeMM.getHeight());
                 } else {
                     cam.resize(getWidth(), getHeight());
                     cam.setFrustumPerspective(cam.getFovY(), getWidth() / (float) getHeight(), cam.getFrustumNear(),
