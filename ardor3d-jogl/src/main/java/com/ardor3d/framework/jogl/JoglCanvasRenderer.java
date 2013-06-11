@@ -40,6 +40,7 @@ import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.util.Ardor3dException;
+import com.jogamp.newt.Display;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
 
@@ -53,6 +54,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
     private JoglRenderContext _currentContext;
+
+    private Display _display = null; // null = default display
 
     /**
      * <code>true</code> if debugging (checking for error codes on each GL call) is desired.
@@ -129,11 +132,15 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         return new JoglRenderer();
     }
 
+    public void setDisplay(final Display display) {
+        _display = display;
+    }
+
     @MainThread
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
         if (_context == null) {
-            _context = GLDrawableFactory.getFactory(CapsUtil.getProfile()).createExternalGLContext();
+            _context = GLDrawableFactory.getFactory(CapsUtil.getProfile(_display)).createExternalGLContext();
         }
 
         makeCurrentContext();

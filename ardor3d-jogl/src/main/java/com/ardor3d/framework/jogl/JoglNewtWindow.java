@@ -56,6 +56,10 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
         this(canvasRenderer, settings, onscreen, bitmapRequested, pbufferRequested, fboRequested, null);
     }
 
+    /**
+     * @param displayConnection
+     *            e.g. :0.0 on Linux, or null for default display
+     */
     public JoglNewtWindow(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings,
             final boolean onscreen, final boolean bitmapRequested, final boolean pbufferRequested,
             final boolean fboRequested, final String displayConnection) {
@@ -63,8 +67,10 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
         final Display display = NewtFactory.createDisplay(displayConnection);
         final Screen screen = NewtFactory.createScreen(display, 0);
 
-        _newtWindow = GLWindow.create(screen,
-                CapsUtil.getCapsForSettings(settings, onscreen, bitmapRequested, pbufferRequested, fboRequested));
+        canvasRenderer.setDisplay(display);
+
+        _newtWindow = GLWindow.create(screen, CapsUtil.getCapsForSettings(display, settings, onscreen, bitmapRequested,
+                pbufferRequested, fboRequested));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
         _settings = settings;
         _canvasRenderer = canvasRenderer;
