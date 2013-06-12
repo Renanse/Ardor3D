@@ -10,33 +10,58 @@
 
 package com.ardor3d.framework.jogl;
 
+import javax.media.nativewindow.AbstractGraphicsDevice;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.util.Ardor3dException;
+import com.jogamp.newt.Display;
 
 public class CapsUtil {
 
+    /**
+     * Profile for the default display.
+     */
     public static GLProfile getProfile() {
+        return getProfile(null);
+    }
+
+    public static GLProfile getProfile(final Display display) {
         // tries to get the most capable profile, programmable or fixed, desktop or embedded, forward or backward
         // compatible
-        GLProfile profile = GLProfile.getMaximum(true);
+        final AbstractGraphicsDevice device = display == null ? null : display.getGraphicsDevice();
+        GLProfile profile = device == null ? GLProfile.getMaximum(true) : GLProfile.getMaximum(device, true);
         final boolean isForwardCompatible = (!profile.isGL4() && profile.isGL3() && !profile.isGL3bc())
                 || (profile.isGL4() && !profile.isGL4bc());
         if (isForwardCompatible) {
             // Ardor3D doesn't support forward compatible yet
-            profile = GLProfile.getMaxFixedFunc(true);
+            profile = device == null ? GLProfile.getMaxFixedFunc(true) : GLProfile.getMaxFixedFunc(device, true);
         }
         return profile;
     }
 
+    /**
+     * Capabilities for the default display.
+     */
     public static GLCapabilities getCapsForSettings(final DisplaySettings settings) {
         return getCapsForSettings(settings, true, false, false, false);
     }
 
+    /**
+     * Capabilities for the default display with support for offscreen rendering.
+     */
     public static GLCapabilities getCapsForSettings(final DisplaySettings settings, final boolean onscreen,
             final boolean bitmapRequested, final boolean pbufferRequested, final boolean fboRequested) {
+        return getCapsForSettings(null, settings, onscreen, bitmapRequested, pbufferRequested, fboRequested);
+    }
+
+    /**
+     * Capabilities for the specified display with support for offscreen rendering.
+     */
+    public static GLCapabilities getCapsForSettings(final Display display, final DisplaySettings settings,
+            final boolean onscreen, final boolean bitmapRequested, final boolean pbufferRequested,
+            final boolean fboRequested) {
 
         // Validate window dimensions.
         if (settings.getWidth() <= 0 || settings.getHeight() <= 0) {
@@ -49,7 +74,7 @@ public class CapsUtil {
             throw new Ardor3dException("Invalid pixel depth: " + settings.getColorDepth());
         }
 
-        final GLCapabilities caps = new GLCapabilities(getProfile());
+        final GLCapabilities caps = new GLCapabilities(getProfile(display));
         caps.setHardwareAccelerated(true);
         caps.setDoubleBuffered(true);
         caps.setAlphaBits(settings.getAlphaBits());

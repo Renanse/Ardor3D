@@ -22,6 +22,8 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
+import com.jogamp.newt.Display;
+import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
 import com.jogamp.newt.ScreenMode;
 import com.jogamp.newt.event.KeyListener;
@@ -51,7 +53,24 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
     public JoglNewtWindow(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings,
             final boolean onscreen, final boolean bitmapRequested, final boolean pbufferRequested,
             final boolean fboRequested) {
-        _newtWindow = GLWindow.create(CapsUtil.getCapsForSettings(settings, onscreen, bitmapRequested,
+        this(canvasRenderer, settings, onscreen, bitmapRequested, pbufferRequested, fboRequested, null);
+    }
+
+    /**
+     * @param displayConnection
+     *            e.g. :0.0 on Linux, or null for default display
+     */
+    public JoglNewtWindow(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings,
+            final boolean onscreen, final boolean bitmapRequested, final boolean pbufferRequested,
+            final boolean fboRequested, final String displayConnection) {
+
+        final Display display = NewtFactory.createDisplay(displayConnection);
+        display.createNative();
+        final Screen screen = NewtFactory.createScreen(display, 0);
+
+        canvasRenderer.setDisplay(display);
+
+        _newtWindow = GLWindow.create(screen, CapsUtil.getCapsForSettings(display, settings, onscreen, bitmapRequested,
                 pbufferRequested, fboRequested));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
         _settings = settings;
