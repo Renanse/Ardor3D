@@ -65,6 +65,7 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
             final boolean fboRequested, final String displayConnection) {
 
         final Display display = NewtFactory.createDisplay(displayConnection);
+        display.createNative();
         final Screen screen = NewtFactory.createScreen(display, 0);
 
         canvasRenderer.setDisplay(display);
