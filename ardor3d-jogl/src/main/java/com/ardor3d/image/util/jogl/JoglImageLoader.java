@@ -34,7 +34,9 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 public class JoglImageLoader implements ImageLoader {
 
-    private static boolean createOnHeap = false;
+    public static boolean createOnHeap = false;
+
+    protected CapsUtil _capsUtil;
 
     private enum TYPE {
         BYTE(ByteBuffer.class), SHORT(ShortBuffer.class), CHAR(CharBuffer.class), INT(IntBuffer.class), FLOAT(
@@ -60,11 +62,13 @@ public class JoglImageLoader implements ImageLoader {
         ImageLoaderUtil.registerHandler(new JoglImageLoader(), supportedFormats);
     }
 
-    public JoglImageLoader() {}
+    public JoglImageLoader() {
+        _capsUtil = new CapsUtil();
+    }
 
     @Override
     public Image load(final InputStream is, final boolean flipped) throws IOException {
-        final TextureData textureData = TextureIO.newTextureData(CapsUtil.getProfile(), is, true, null);
+        final TextureData textureData = TextureIO.newTextureData(_capsUtil.getProfile(), is, true, null);
         final Buffer textureDataBuffer = textureData.getBuffer();
         final Image ardorImage = new Image();
         final TYPE bufferDataType = getBufferDataType(textureDataBuffer);

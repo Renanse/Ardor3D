@@ -33,7 +33,12 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
     private final JoglDrawerRunnable _drawerGLRunnable;
 
     public JoglNewtAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
-        super(GLWindow.create(CapsUtil.getCapsForSettings(settings)));
+        this(settings, canvasRenderer, new CapsUtil());
+    }
+
+    public JoglNewtAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer,
+            final CapsUtil capsUtil) {
+        super(GLWindow.create(capsUtil.getCapsForSettings(settings)));
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
         getNewtWindow().setUndecorated(true);
         _settings = settings;
