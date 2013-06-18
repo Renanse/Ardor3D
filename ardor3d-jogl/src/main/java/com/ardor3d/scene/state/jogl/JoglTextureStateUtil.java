@@ -21,6 +21,7 @@ import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLContext;
+import javax.media.opengl.GLDrawable;
 import javax.media.opengl.GLException;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
@@ -61,6 +62,7 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
+import com.jogamp.newt.opengl.GLWindow;
 
 public class JoglTextureStateUtil {
     private static final Logger logger = Logger.getLogger(JoglTextureStateUtil.class.getName());
@@ -674,8 +676,12 @@ public class JoglTextureStateUtil {
                         continue;
                     }
                 } else {
+                    final GLDrawable drawable = GLContext.getCurrent().getGLDrawable();
+                    // forces the rebinding when the drawable is offscreen
+                    final boolean onscreen = !(drawable instanceof GLWindow)
+                            || ((GLWindow) drawable).getChosenCapabilities().isOnscreen();
                     // texture already exists in OpenGL, just bind it if needed
-                    if (!unitRecord.isValid() || unitRecord.boundTexture != textureId) {
+                    if (!unitRecord.isValid() || unitRecord.boundTexture != textureId || !onscreen) {
                         checkAndSetUnit(i, record, caps);
                         gl.glBindTexture(getGLType(type), textureId);
                         if (Constants.stats) {
