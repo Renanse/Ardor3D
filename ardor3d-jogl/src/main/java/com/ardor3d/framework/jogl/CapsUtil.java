@@ -18,7 +18,7 @@ import com.ardor3d.util.Ardor3dException;
 
 public class CapsUtil {
 
-    public static GLProfile getProfile() {
+    public GLProfile getProfile() {
         // tries to get the most capable profile, programmable or fixed, desktop or embedded, forward or backward
         // compatible
         GLProfile profile = GLProfile.getMaximum(true);
@@ -31,11 +31,11 @@ public class CapsUtil {
         return profile;
     }
 
-    public static GLCapabilities getCapsForSettings(final DisplaySettings settings) {
+    public GLCapabilities getCapsForSettings(final DisplaySettings settings) {
         return getCapsForSettings(settings, true, false, false, false);
     }
 
-    public static GLCapabilities getCapsForSettings(final DisplaySettings settings, final boolean onscreen,
+    public GLCapabilities getCapsForSettings(final DisplaySettings settings, final boolean onscreen,
             final boolean bitmapRequested, final boolean pbufferRequested, final boolean fboRequested) {
 
         // Validate window dimensions.
