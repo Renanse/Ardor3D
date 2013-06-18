@@ -30,9 +30,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
-import com.jogamp.newt.event.InputEvent;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
+import com.jogamp.newt.event.NEWTEvent;
 import com.jogamp.newt.opengl.GLWindow;
 
 public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
@@ -104,7 +104,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
         initState(me);
         if (_consumeEvents) {
-            me.setAttachment(InputEvent.consumedTag);
+            me.setAttachment(NEWTEvent.consumedTag);
         }
 
         final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
@@ -118,7 +118,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     public synchronized void mouseReleased(final MouseEvent me) {
         initState(me);
         if (_consumeEvents) {
-            me.setAttachment(InputEvent.consumedTag);
+            me.setAttachment(NEWTEvent.consumedTag);
         }
 
         final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
@@ -151,7 +151,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
         // check that we have a valid _lastState
         initState(me);
         if (_consumeEvents) {
-            me.setAttachment(InputEvent.consumedTag);
+            me.setAttachment(NEWTEvent.consumedTag);
         }
 
         // remember our current ardor3d position
@@ -206,7 +206,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
         addNewState(me, _lastState.getButtonStates(), null);
         if (_consumeEvents) {
-            me.setAttachment(InputEvent.consumedTag);
+            me.setAttachment(NEWTEvent.consumedTag);
         }
     }
 
@@ -262,6 +262,24 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
                 break;
             case MouseEvent.BUTTON3:
                 button = MouseButton.RIGHT;
+                break;
+            case MouseEvent.BUTTON4:
+                button = MouseButton.FOUR;
+                break;
+            case MouseEvent.BUTTON5:
+                button = MouseButton.FIVE;
+                break;
+            case MouseEvent.BUTTON6:
+                button = MouseButton.SIX;
+                break;
+            case MouseEvent.BUTTON7:
+                button = MouseButton.SEVEN;
+                break;
+            case MouseEvent.BUTTON8:
+                button = MouseButton.EIGHT;
+                break;
+            case MouseEvent.BUTTON9:
+                button = MouseButton.NINE;
                 break;
             default:
                 throw new RuntimeException("unknown button: " + me.getButton());
