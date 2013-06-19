@@ -62,7 +62,6 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
-import com.jogamp.newt.opengl.GLWindow;
 
 public class JoglTextureStateUtil {
     private static final Logger logger = Logger.getLogger(JoglTextureStateUtil.class.getName());
@@ -677,11 +676,10 @@ public class JoglTextureStateUtil {
                     }
                 } else {
                     final GLDrawable drawable = GLContext.getCurrent().getGLDrawable();
-                    // forces the rebinding when the drawable is offscreen
-                    final boolean onscreen = !(drawable instanceof GLWindow)
-                            || ((GLWindow) drawable).getChosenCapabilities().isOnscreen();
+                    // forces the rebinding when the drawable uses a frame buffer object
+                    final boolean fbo = drawable.getChosenGLCapabilities().isFBO();
                     // texture already exists in OpenGL, just bind it if needed
-                    if (!unitRecord.isValid() || unitRecord.boundTexture != textureId || !onscreen) {
+                    if (!unitRecord.isValid() || unitRecord.boundTexture != textureId || fbo) {
                         checkAndSetUnit(i, record, caps);
                         gl.glBindTexture(getGLType(type), textureId);
                         if (Constants.stats) {
