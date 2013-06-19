@@ -15,7 +15,7 @@ import java.util.EnumMap;
 import com.google.common.collect.Maps;
 
 public enum MouseButton {
-    LEFT, RIGHT, MIDDLE;
+    LEFT, RIGHT, MIDDLE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE;
 
     public static EnumMap<MouseButton, ButtonState> makeMap(final ButtonState left, final ButtonState right,
             final ButtonState middle) {

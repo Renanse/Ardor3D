@@ -21,6 +21,7 @@ import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLContext;
+import javax.media.opengl.GLDrawable;
 import javax.media.opengl.GLException;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
@@ -674,8 +675,11 @@ public class JoglTextureStateUtil {
                         continue;
                     }
                 } else {
+                    final GLDrawable drawable = GLContext.getCurrent().getGLDrawable();
+                    // forces the rebinding when the drawable uses a frame buffer object
+                    final boolean fbo = drawable.getChosenGLCapabilities().isFBO();
                     // texture already exists in OpenGL, just bind it if needed
-                    if (!unitRecord.isValid() || unitRecord.boundTexture != textureId) {
+                    if (!unitRecord.isValid() || unitRecord.boundTexture != textureId || fbo) {
                         checkAndSetUnit(i, record, caps);
                         gl.glBindTexture(getGLType(type), textureId);
                         if (Constants.stats) {
