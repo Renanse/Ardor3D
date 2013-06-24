@@ -76,7 +76,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
         _geometryShader4Supported = gl.isExtensionAvailable("GL_ARB_geometry_shader4") && _glslSupported;
 
         _geometryInstancingSupported = gl.isExtensionAvailable("GL_EXT_draw_instanced")
-                || gl.isExtensionAvailable("GL_VERSION_3_0");
+                || gl.isExtensionAvailable("GL_VERSION_3_1");
 
         _tessellationShadersSupported = gl.isExtensionAvailable("GL_ARB_tessellation_shader") && _glslSupported;
 

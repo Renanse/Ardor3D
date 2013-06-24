@@ -69,7 +69,7 @@ public class LwjglContextCapabilities extends ContextCapabilities {
 
         _geometryShader4Supported = caps.GL_ARB_geometry_shader4 && _glslSupported;
 
-        _geometryInstancingSupported = caps.GL_EXT_draw_instanced || caps.OpenGL30;
+        _geometryInstancingSupported = caps.GL_EXT_draw_instanced || caps.OpenGL31;
 
         if (_glslSupported) {
             GL11.glGetInteger(ARBVertexShader.GL_MAX_VERTEX_ATTRIBS_ARB, buf);
