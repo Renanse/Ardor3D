@@ -22,13 +22,13 @@ import com.ardor3d.input.KeyboardWrapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
-import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.KeyAdapter;
 import com.jogamp.newt.event.NEWTEvent;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.opengl.GLWindow;
 
-public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
+public class JoglNewtKeyboardWrapper extends KeyAdapter implements KeyboardWrapper {
 
     @GuardedBy("this")
     protected final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<KeyEvent>();
@@ -67,13 +67,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
         return _currentIterator;
     }
 
-    public synchronized void keyTyped(final com.jogamp.newt.event.KeyEvent e) {
-        if (_consumeEvents) {
-            e.setAttachment(NEWTEvent.consumedTag);
-            // ignore this event
-        }
-    }
-
+    @Override
     public synchronized void keyPressed(final com.jogamp.newt.event.KeyEvent e) {
         final Key pressed = fromKeyEventToKey(e);
         if (!_pressedList.contains(pressed)) {
@@ -86,6 +80,7 @@ public class JoglNewtKeyboardWrapper implements KeyboardWrapper, KeyListener {
         }
     }
 
+    @Override
     public synchronized void keyReleased(final com.jogamp.newt.event.KeyEvent e) {
         final Key released = fromKeyEventToKey(e);
         _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
