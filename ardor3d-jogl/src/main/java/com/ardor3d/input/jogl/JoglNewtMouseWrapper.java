@@ -219,7 +219,8 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
         final MouseState newState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent),
-                getDY(mouseEvent), (int) mouseEvent.getWheelRotation(), enumMap, clicks);
+                getDY(mouseEvent), (int) (mouseEvent.isShiftDown() ? mouseEvent.getRotation()[0]
+                        : mouseEvent.getRotation()[1]), enumMap, clicks);
 
         synchronized (JoglNewtMouseWrapper.this) {
             _upcomingEvents.add(newState);
