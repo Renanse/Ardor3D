@@ -31,26 +31,7 @@
                     </archive>
                 </configuration>
             </plugin>
-      
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>bundle-project-sources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-      
+            
             <!-- Run example executable with goal exec:java and add
             "-Djava.library.path=target/natives" to the VM arguments.
             You probably have to execute the package goal once to generate the 
@@ -96,6 +77,34 @@
             </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>hudson</id>
+            <build>
+                <plugins>
+		            <plugin>
+		                <groupId>org.apache.maven.plugins</groupId>
+		                <artifactId>maven-assembly-plugin</artifactId>
+		                <executions>
+		                    <execution>
+		                        <id>bundle-project-sources</id>
+		                        <phase>package</phase>
+		                        <goals>
+		                            <goal>single</goal>
+		                        </goals>
+		                        <configuration>
+		                            <descriptors>
+		                                <descriptor>assembly.xml</descriptor>
+		                            </descriptors>
+		                        </configuration>
+		                    </execution>
+		                </executions>
+		            </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
