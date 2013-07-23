@@ -3,7 +3,7 @@
     <groupId>com.ardor3d</groupId>
     <artifactId>ardor3d</artifactId>
     <packaging>pom</packaging>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9</version>
     
     <name>Ardor 3D</name>
     <description>A free, open source 3D graphics engine written in Java</description>
@@ -22,7 +22,8 @@
         <connection>scm:git:git://github.com/Renanse/Ardor3D.git</connection>
         <developerConnection>scm:git:git@github.com:Renanse/Ardor3D.git</developerConnection>
         <url>https://github.com/Renanse/Ardor3D</url>
-    </scm>
+      <tag>v0.9</tag>
+  </scm>
     
     <developers>
         <developer>
