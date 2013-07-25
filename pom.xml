@@ -3,8 +3,40 @@
     <groupId>com.ardor3d</groupId>
     <artifactId>ardor3d</artifactId>
     <packaging>pom</packaging>
-    <version>0.9-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
+    
     <name>Ardor 3D</name>
+    <description>A free, open source 3D graphics engine written in Java</description>
+    <url>http://www.ardor3d.com</url>
+    <inceptionYear>2008</inceptionYear>
+	
+    <licenses>
+        <license>
+            <name>zlib/libpng License</name>
+            <url>http://opensource.org/licenses/Zlib</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+	
+    <scm>
+        <connection>scm:git:git://github.com/Renanse/Ardor3D.git</connection>
+        <developerConnection>scm:git:git@github.com:Renanse/Ardor3D.git</developerConnection>
+        <url>https://github.com/Renanse/Ardor3D</url>
+    </scm>
+    
+    <developers>
+        <developer>
+            <id>renanse</id>
+            <name>Joshua Slack</name>
+            <email>renanse@gmail.com</email>
+        </developer>
+    </developers>
+    
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <modules>
         <module>ardor3d-savable</module>
@@ -21,13 +53,8 @@
         <module>ardor3d-ui</module>
         <module>ardor3d-terrain</module>
         <module>ardor3d-examples</module>
-        <module>ardor3d-distribution</module>
     </modules>
-
-    <scm>
-        <connection>scm:git:https://github.com/Renanse/Ardor3D.git</connection>
-    </scm>
-  
+ 
     <reporting>
         <plugins>
             <plugin>
@@ -50,27 +77,14 @@
             </plugin>
         </plugins>
     </reporting>
-  
-    <distributionManagement>
-        <repository>
-            <id>Ardor3D-releases</id>
-            <name>Ardor3D releases</name>
-            <url>http://ardor3d.com:8081/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>Ardor3D-snapshots</id>
-            <name>Ardor3D snapshots</name>
-            <url>http://ardor3d.com:8081/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-  
+   
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.0</version>
+                    <version>3.1</version>
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
@@ -92,6 +106,23 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9.1</version>
+                    <configuration>
+                        <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
+                        </bottom>
+                        <links>
+                            <link>http://docs.oracle.com/javase/6/docs/api/</link>
+                        </links>
+                        <linksource>true</linksource>
+                        <quiet>true</quiet>
+                        <show>private</show>
+                        <sourcepath>${basedir}${path.separator}src${path.separator}main${path.separator}java</sourcepath>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.4</version>
                 </plugin>
@@ -104,6 +135,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.4.1</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <tagNameFormat>v@{project.version}</tagNameFormat>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -172,7 +207,6 @@
         <jogamp.version>2.0.2-rc12</jogamp.version>
         <lwjgl.version>2.8.4</lwjgl.version>
         <swt.version>3650</swt.version>
-        <osgi.project.version>0.9_SNAPSHOT</osgi.project.version>
     </properties>
 
     <!-- The dependencyManagement section should specify all versions of artifacts used in sub -->
@@ -255,6 +289,21 @@
         <!-- This profile activated by specifying -Phudson on command line -->
         <profile>
             <id>hudson</id>
+            <modules>
+                <module>ardor3d-distribution</module>
+            </modules>
+		    <distributionManagement>
+		        <repository>
+		            <id>Ardor3D-releases</id>
+		            <name>Ardor3D releases</name>
+		            <url>http://ardor3d.com:8081/nexus/content/repositories/releases</url>
+		        </repository>
+		        <snapshotRepository>
+		            <id>Ardor3D-snapshots</id>
+		            <name>Ardor3D snapshots</name>
+		            <url>http://ardor3d.com:8081/nexus/content/repositories/snapshots</url>
+		        </snapshotRepository>
+		    </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -292,18 +341,6 @@
                                     <goal>jar</goal>
                                     <goal>aggregate</goal>
                                 </goals>
-                                <configuration>
-                                    <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
-                                    </bottom>
-                                    <links>
-                                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
-                                    </links>
-                                    <linksource>true</linksource>
-                                    <quiet>true</quiet>
-                                    <show>private</show>
-                                    <sourcepath>${basedir}${path.separator}src${path.separator}main${path.separator}java</sourcepath>
-                                    <encoding>UTF-8</encoding>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -315,27 +352,6 @@
                                 <phase>package</phase>
                                 <goals>
                                     <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <manifestLocation>target/classes/META-INF</manifestLocation>
-                            <instructions>
-                                <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                                <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
-                            </instructions>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>bundle-manifest</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>manifest</goal>
                                 </goals>
                             </execution>
                         </executions>
