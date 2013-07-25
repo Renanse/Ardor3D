@@ -56,13 +56,12 @@
         <module>ardor3d-distribution</module>
     </modules>
  
-    <!-- NOTE: Due to http://jira.codehaus.org/browse/MJAVADOC-116
-           to generate the 'site' one first has to do 'mvn install'
-           and after that 'mvn site'! 'mvn install site' is not possible atm.
-     -->
     <reporting>
         <plugins>
             <plugin>
+                <!-- NOTE: At least 'compile' has to be done before
+                     running findbugs! (see http://stackoverflow.com/a/8939723/60982)
+                -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>2.5.2</version>
@@ -79,6 +78,10 @@
                 </configuration>
             </plugin>
             <plugin>
+			    <!-- NOTE: Due to http://jira.codehaus.org/browse/MJAVADOC-116
+			         to generate the aggregated javadoc one first has to do 'mvn install'
+			         and after that 'mvn site'! 'mvn install site' is not possible atm.
+			    -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
