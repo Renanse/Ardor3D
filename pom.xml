@@ -53,11 +53,15 @@
         <module>ardor3d-ui</module>
         <module>ardor3d-terrain</module>
         <module>ardor3d-examples</module>
+        <module>ardor3d-distribution</module>
     </modules>
  
     <reporting>
         <plugins>
             <plugin>
+                <!-- NOTE: At least 'compile' has to be done before
+                     running findbugs! (see http://stackoverflow.com/a/8939723/60982)
+                -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>2.5.2</version>
@@ -71,9 +75,33 @@
                 <version>2.5.2</version>
             </plugin>
             <plugin>
+			    <!-- NOTE: Due to http://jira.codehaus.org/browse/MJAVADOC-116
+			         to generate the aggregated javadoc one first has to do 'mvn install'
+			         and after that 'mvn site'! 'mvn install site' is not possible atm.
+			    -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.9.1</version>
+                <configuration>
+                    <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
+                    </bottom>
+                    <links>
+                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
+                    </links>
+                    <linksource>true</linksource>
+                    <quiet>true</quiet>
+                    <show>private</show>
+                    <sourcepath>${basedir}${path.separator}src${path.separator}main${path.separator}java</sourcepath>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+		        <reportSets>
+		          <reportSet>
+		            <id>aggregate</id>
+		            <reports>
+		              <report>aggregate</report>
+		            </reports>
+		          </reportSet>
+		        </reportSets>
             </plugin>
         </plugins>
     </reporting>
@@ -106,8 +134,14 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9.1</version>
+                    <!-- duplicated because of http://jira.codehaus.org/browse/MSITE-523 -->
                     <configuration>
                         <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
                         </bottom>
@@ -154,16 +188,6 @@
                     <version>1.2.1</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>2.5.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>2.5.2</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.3.7</version>
@@ -184,6 +208,17 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -289,9 +324,6 @@
         <!-- This profile activated by specifying -Phudson on command line -->
         <profile>
             <id>hudson</id>
-            <modules>
-                <module>ardor3d-distribution</module>
-            </modules>
 		    <distributionManagement>
 		        <repository>
 		            <id>Ardor3D-releases</id>
@@ -314,68 +346,6 @@
                             <showWarnings>true</showWarnings>
                         </configuration>
                     </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                        <configuration>
-                            <formats>
-                                <format>xml</format>
-                            </formats>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>cobertura</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                    <goal>aggregate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-            
-                    <!-- http://mojo.codehaus.org/findbugs-maven-plugin/usage.html -->
-                    <!-- It would be great to execute the check goal as part of the hudson build, but it is -->
-                    <!-- only available via a snapshot version, so I don't want to use that. / Petter 090211 -->
-                    <!-- plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <executions>
-                      <execution>
-                        <id>findbugs-check</id>
-                        <phase>package</phase>
-                        <goals>
-                          <goal>check</goal>
-                        </goals>
-                      </execution>
-                    </executions>
-                      <configuration>
-                        <threshold>Normal</threshold>
-                      </configuration>
-                    </plugin -->
                 </plugins>
             </build>
         </profile>
