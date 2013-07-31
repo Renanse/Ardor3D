@@ -19,6 +19,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL3;
+import javax.media.opengl.GL4;
 import javax.media.opengl.GLContext;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -226,10 +227,10 @@ public abstract class JoglShaderObjectsStateUtil {
 
                 if (gl.isGL2()) {
                     state._tessellationControlShaderID = gl.getGL2()
-                            .glCreateShaderObjectARB(GL3.GL_TESS_CONTROL_SHADER);
+                            .glCreateShaderObjectARB(GL4.GL_TESS_CONTROL_SHADER);
                 } else {
                     if (gl.isGL2ES2()) {
-                        state._tessellationControlShaderID = gl.getGL2ES2().glCreateShader(GL3.GL_TESS_CONTROL_SHADER);
+                        state._tessellationControlShaderID = gl.getGL2ES2().glCreateShader(GL4.GL_TESS_CONTROL_SHADER);
                     }
                 }
 
@@ -281,11 +282,11 @@ public abstract class JoglShaderObjectsStateUtil {
 
                 if (gl.isGL2()) {
                     state._tessellationEvaluationShaderID = gl.getGL2().glCreateShaderObjectARB(
-                            GL3.GL_TESS_CONTROL_SHADER);
+                            GL4.GL_TESS_CONTROL_SHADER);
                 } else {
                     if (gl.isGL2ES2()) {
                         state._tessellationEvaluationShaderID = gl.getGL2ES2().glCreateShader(
-                                GL3.GL_TESS_CONTROL_SHADER);
+                                GL4.GL_TESS_CONTROL_SHADER);
                     }
                 }
 
