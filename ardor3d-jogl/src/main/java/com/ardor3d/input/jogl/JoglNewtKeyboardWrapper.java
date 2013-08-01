@@ -40,9 +40,12 @@ public class JoglNewtKeyboardWrapper extends KeyAdapter implements KeyboardWrapp
 
     protected boolean _consumeEvents = false;
 
+    protected boolean _skipAutoRepeatEvents = false;
+
     protected final EnumSet<Key> _pressedList = EnumSet.noneOf(Key.class);
 
     public JoglNewtKeyboardWrapper(final NewtWindowContainer newtWindowContainer) {
+        super();
         _newtWindow = Preconditions.checkNotNull(newtWindowContainer.getNewtWindow(), "newtWindow");
     }
 
@@ -69,25 +72,29 @@ public class JoglNewtKeyboardWrapper extends KeyAdapter implements KeyboardWrapp
 
     @Override
     public synchronized void keyPressed(final com.jogamp.newt.event.KeyEvent e) {
-        final Key pressed = fromKeyEventToKey(e);
-        if (!_pressedList.contains(pressed)) {
-            _upcomingEvents.add(new KeyEvent(pressed, KeyState.DOWN, e.getKeyChar()));
-            _pressedList.add(pressed);
-        }
-        if (_consumeEvents) {
-            e.setAttachment(NEWTEvent.consumedTag);
-            // ignore this event
+        if (!_skipAutoRepeatEvents || !e.isAutoRepeat()) {
+            final Key pressed = fromKeyEventToKey(e);
+            if (!_pressedList.contains(pressed)) {
+                _upcomingEvents.add(new KeyEvent(pressed, KeyState.DOWN, e.getKeyChar()));
+                _pressedList.add(pressed);
+            }
+            if (_consumeEvents) {
+                e.setAttachment(NEWTEvent.consumedTag);
+                // ignore this event
+            }
         }
     }
 
     @Override
     public synchronized void keyReleased(final com.jogamp.newt.event.KeyEvent e) {
-        final Key released = fromKeyEventToKey(e);
-        _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
-        _pressedList.remove(released);
-        if (_consumeEvents) {
-            e.setAttachment(NEWTEvent.consumedTag);
-            // ignore this event
+        if (!_skipAutoRepeatEvents || !e.isAutoRepeat()) {
+            final Key released = fromKeyEventToKey(e);
+            _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
+            _pressedList.remove(released);
+            if (_consumeEvents) {
+                e.setAttachment(NEWTEvent.consumedTag);
+                // ignore this event
+            }
         }
     }
 
@@ -121,5 +128,13 @@ public class JoglNewtKeyboardWrapper extends KeyAdapter implements KeyboardWrapp
 
     public void setConsumeEvents(final boolean consumeEvents) {
         _consumeEvents = consumeEvents;
+    }
+
+    public boolean isSkipAutoRepeatEvents() {
+        return _skipAutoRepeatEvents;
+    }
+
+    public void setSkipAutoRepeatEvents(final boolean skipAutoRepeatEvents) {
+        _skipAutoRepeatEvents = skipAutoRepeatEvents;
     }
 }

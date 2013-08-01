@@ -52,6 +52,8 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     protected boolean _consumeEvents = false;
 
+    protected boolean _skipAutoRepeatEvents = false;
+
     protected final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
     protected final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     protected final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
@@ -95,47 +97,52 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     @Override
     public synchronized void mousePressed(final MouseEvent me) {
-        final MouseButton b = getButtonForEvent(me);
-        if (_clickArmed.contains(b)) {
-            _clicks.setCount(b, 0);
+        if (!_skipAutoRepeatEvents || !me.isAutoRepeat()) {
+            final MouseButton b = getButtonForEvent(me);
+            if (_clickArmed.contains(b)) {
+                _clicks.setCount(b, 0);
+            }
+            _clickArmed.add(b);
+            _lastClickTime.put(b, System.currentTimeMillis());
+
+            initState(me);
+            if (_consumeEvents) {
+                me.setAttachment(NEWTEvent.consumedTag);
+            }
+
+            final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
+
+            setStateForButton(me, buttons, ButtonState.DOWN);
+
+            addNewState(me, buttons, null);
         }
-        _clickArmed.add(b);
-        _lastClickTime.put(b, System.currentTimeMillis());
-
-        initState(me);
-        if (_consumeEvents) {
-            me.setAttachment(NEWTEvent.consumedTag);
-        }
-
-        final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
-
-        setStateForButton(me, buttons, ButtonState.DOWN);
-
-        addNewState(me, buttons, null);
     }
 
     @Override
     public synchronized void mouseReleased(final MouseEvent me) {
-        initState(me);
-        if (_consumeEvents) {
-            me.setAttachment(NEWTEvent.consumedTag);
+        if (!_skipAutoRepeatEvents || !me.isAutoRepeat()) {
+            initState(me);
+            if (_consumeEvents) {
+                me.setAttachment(NEWTEvent.consumedTag);
+            }
+
+            final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
+
+            setStateForButton(me, buttons, ButtonState.UP);
+
+            final MouseButton b = getButtonForEvent(me);
+            if (_clickArmed.contains(b)
+                    && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
+                _clicks.add(b); // increment count of clicks for button b.
+                // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
+                addNewState(me, buttons, EnumMultiset.create(_clicks));
+            } else {
+                _clicks.setCount(b, 0); // clear click count for button b.
+            }
+            _clickArmed.remove(b);
+
+            addNewState(me, buttons, null);
         }
-
-        final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
-
-        setStateForButton(me, buttons, ButtonState.UP);
-
-        final MouseButton b = getButtonForEvent(me);
-        if (_clickArmed.contains(b) && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
-            _clicks.add(b); // increment count of clicks for button b.
-            // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
-            addNewState(me, buttons, EnumMultiset.create(_clicks));
-        } else {
-            _clicks.setCount(b, 0); // clear click count for button b.
-        }
-        _clickArmed.remove(b);
-
-        addNewState(me, buttons, null);
     }
 
     @Override
@@ -325,5 +332,13 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     public void setConsumeEvents(final boolean consumeEvents) {
         _consumeEvents = consumeEvents;
+    }
+
+    public boolean isSkipAutoRepeatEvents() {
+        return _skipAutoRepeatEvents;
+    }
+
+    public void setSkipAutoRepeatEvents(final boolean skipAutoRepeatEvents) {
+        _skipAutoRepeatEvents = skipAutoRepeatEvents;
     }
 }
