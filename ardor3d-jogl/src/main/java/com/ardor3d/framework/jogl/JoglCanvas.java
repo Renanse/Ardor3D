@@ -63,30 +63,31 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     }
 
     @Override
-    public void addKeyListener(final KeyListener l) {
+    public synchronized void addKeyListener(final KeyListener l) {
         _glCanvas.addKeyListener(l);
     }
 
     @Override
-    public void addMouseListener(final MouseListener l) {
+    public synchronized void addMouseListener(final MouseListener l) {
         _glCanvas.addMouseListener(l);
     }
 
     @Override
-    public void addMouseMotionListener(final MouseMotionListener l) {
+    public synchronized void addMouseMotionListener(final MouseMotionListener l) {
         _glCanvas.addMouseMotionListener(l);
     }
 
     @Override
-    public void addMouseWheelListener(final MouseWheelListener l) {
+    public synchronized void addMouseWheelListener(final MouseWheelListener l) {
         _glCanvas.addMouseWheelListener(l);
     }
 
     @Override
-    public void addFocusListener(final FocusListener l) {
+    public synchronized void addFocusListener(final FocusListener l) {
         _glCanvas.addFocusListener(l);
     }
 
+    @Override
     @MainThread
     public void init() {
         privateInit();
@@ -226,6 +227,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         _inited = true;
     }
 
+    @Override
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
             privateInit();
@@ -234,10 +236,12 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         _glCanvas.draw(latch);
     }
 
+    @Override
     public CanvasRenderer getCanvasRenderer() {
         return _glCanvas.getCanvasRenderer();
     }
 
+    @Override
     public void close() {
         try {
             if (GLContext.getCurrent() != null) {
@@ -259,18 +263,22 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         return hasFocus();
     }
 
+    @Override
     public boolean isClosing() {
         return _isClosing;
     }
 
+    @Override
     public void moveWindowTo(final int locX, final int locY) {
         setLocation(locX, locY);
     }
 
+    @Override
     public void setIcon(final Image[] iconImages) {
         // FIXME not implemented
     }
 
+    @Override
     public void setVSyncEnabled(final boolean enabled) {
         _glCanvas.setVSyncEnabled(enabled);
     }

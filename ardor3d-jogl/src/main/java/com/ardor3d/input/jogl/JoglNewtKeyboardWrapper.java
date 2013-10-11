@@ -49,6 +49,7 @@ public class JoglNewtKeyboardWrapper extends KeyAdapter implements KeyboardWrapp
         _newtWindow = Preconditions.checkNotNull(newtWindowContainer.getNewtWindow(), "newtWindow");
     }
 
+    @Override
     public void init() {
         _newtWindow.addKeyListener(this);
         _newtWindow.addWindowListener(new WindowAdapter() {
@@ -62,6 +63,7 @@ public class JoglNewtKeyboardWrapper extends KeyAdapter implements KeyboardWrapp
         });
     }
 
+    @Override
     public synchronized PeekingIterator<KeyEvent> getEvents() {
         if (_currentIterator == null || !_currentIterator.hasNext()) {
             _currentIterator = new JoglNewtKeyboardIterator();

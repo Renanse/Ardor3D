@@ -59,6 +59,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         setAutoSwapBufferMode(false);
     }
 
+    @Override
     @MainThread
     public void init() {
         if (_inited) {
@@ -81,6 +82,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         _inited = isRealized();
     }
 
+    @Override
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
             init();
@@ -94,6 +96,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         }
     }
 
+    @Override
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }

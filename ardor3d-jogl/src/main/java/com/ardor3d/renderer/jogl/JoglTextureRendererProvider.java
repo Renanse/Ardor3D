@@ -22,21 +22,24 @@ public class JoglTextureRendererProvider implements TextureRendererProvider {
 
     private static final Logger logger = Logger.getLogger(JoglTextureRendererProvider.class.getName());
 
+    @Override
     public TextureRenderer createTextureRenderer(final int width, final int height, final Renderer renderer,
             final ContextCapabilities caps) {
         return createTextureRenderer(width, height, 0, 0, renderer, caps);
     }
 
+    @Override
     public TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits,
             final int samples, final Renderer renderer, final ContextCapabilities caps) {
         return createTextureRenderer(new DisplaySettings(width, height, depthBits, samples), false, renderer, caps);
     }
 
+    @Override
     public TextureRenderer createTextureRenderer(final DisplaySettings settings, final boolean forcePbuffer,
             final Renderer renderer, final ContextCapabilities caps) {
         if (!forcePbuffer && caps.isFBOSupported()) {
-            return new JoglTextureRenderer(settings.getWidth(), settings.getHeight(), settings.getDepthBits(), settings
-                    .getSamples(), renderer, caps);
+            return new JoglTextureRenderer(settings.getWidth(), settings.getHeight(), settings.getDepthBits(),
+                    settings.getSamples(), renderer, caps);
         } else if (caps.isPbufferSupported()) {
             return new JoglPbufferTextureRenderer(settings, renderer, caps);
         } else {

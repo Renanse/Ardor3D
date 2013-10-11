@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2ES2;
+import javax.media.opengl.GL2ES3;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLContext;
 
@@ -41,7 +42,6 @@ import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <p>
@@ -57,19 +57,13 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     public JoglTextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
         super(width, height, depthBits, samples, parentRenderer, caps);
-
-        if (caps.getMaxFBOColorAttachments() > 1) {
-            _attachBuffer = BufferUtils.createIntBuffer(caps.getMaxFBOColorAttachments());
-            for (int i = 0; i < caps.getMaxFBOColorAttachments(); i++) {
-                _attachBuffer.put(GL.GL_COLOR_ATTACHMENT0 + i);
-            }
-        }
     }
 
     /**
      * <code>setupTexture</code> initializes a new Texture object for use with TextureRenderer. Generates a valid OpenGL
      * texture id for this texture and initializes the data type for the texture.
      */
+    @Override
     public void setupTexture(final Texture tex) {
         if (tex.getType() != Type.TwoDimensional && tex.getType() != Type.CubeMap) {
             throw new IllegalArgumentException("Texture type not supported: " + tex.getType());
@@ -77,7 +71,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
         final GL gl = GLContext.getCurrentGL();
 
-        final RenderContext context = ContextManager.getCurrentContext();
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
         // check if we are already setup... if so, throw error.
@@ -88,7 +82,8 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         // Create the texture
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
+        final IntBuffer ibuf = context.getDirectNioBuffersSet().getSingleIntBuffer();
+        ibuf.clear();
         gl.glGenTextures(ibuf.limit(), ibuf); // TODO Check <size>
         final int textureId = ibuf.get(0);
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
@@ -122,10 +117,12 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
     }
 
+    @Override
     public void render(final Spatial spat, final List<Texture> texs, final int clear) {
         render(null, spat, null, texs, clear);
     }
 
+    @Override
     public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
         render(spat, null, null, texs, clear);
     }
@@ -326,8 +323,22 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         if (maxEntry <= 1) {
             setDrawBuffer(maxEntry != 0 ? GL.GL_COLOR_ATTACHMENT0 : GL.GL_NONE);
         } else {
+            // We should only get to this point if maxDrawBuffers > 1
+            if (_attachBuffer == null) {
+                final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+                final ContextCapabilities caps = context.getCapabilities();
+                _attachBuffer = context.getDirectNioBuffersSet().getFboColorAttachmentBuffer();
+                _attachBuffer.rewind();
+                final int maxDrawBuffers = caps.getMaxFBOColorAttachments();
+                _attachBuffer.limit(maxDrawBuffers);
+                for (int i = 0; i < maxDrawBuffers; i++) {
+                    _attachBuffer.put(GL.GL_COLOR_ATTACHMENT0 + i);
+                }
+                _attachBuffer.rewind();
+            }
+
             // We should only get to this point if we support ARBDrawBuffers.
-            _attachBuffer.clear();
+            _attachBuffer.rewind();
             _attachBuffer.limit(maxEntry);
             gl.getGL2GL3().glDrawBuffers(_attachBuffer.limit(), _attachBuffer); // TODO Check <size>
         }
@@ -348,20 +359,20 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     protected void setMSFBO() {
         final GL gl = GLContext.getCurrentGL();
 
-        gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, _msfboID);
+        gl.glBindFramebuffer(GL2ES3.GL_DRAW_FRAMEBUFFER, _msfboID);
     }
 
     @Override
     protected void blitMSFBO() {
         final GL gl = GLContext.getCurrentGL();
 
-        gl.glBindFramebuffer(GL2GL3.GL_READ_FRAMEBUFFER, _msfboID);
-        gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, _fboID);
+        gl.glBindFramebuffer(GL2ES3.GL_READ_FRAMEBUFFER, _msfboID);
+        gl.glBindFramebuffer(GL2ES3.GL_DRAW_FRAMEBUFFER, _fboID);
         gl.getGL2GL3().glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height,
                 GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT, GL.GL_NEAREST);
 
-        gl.glBindFramebuffer(GL2GL3.GL_READ_FRAMEBUFFER, 0);
-        gl.glBindFramebuffer(GL2GL3.GL_DRAW_FRAMEBUFFER, 0);
+        gl.glBindFramebuffer(GL2ES3.GL_READ_FRAMEBUFFER, 0);
+        gl.glBindFramebuffer(GL2ES3.GL_DRAW_FRAMEBUFFER, 0);
         gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
     }
 
@@ -399,7 +410,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             case GL.GL_FRAMEBUFFER_UNSUPPORTED:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
-            case GL2GL3.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            case GL2ES3.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT exception.");
             default:
@@ -407,6 +418,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         }
     }
 
+    @Override
     public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
             final int xoffset, final int yoffset) {
         final GL gl = GLContext.getCurrentGL();
@@ -437,7 +449,9 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
         // Lazy init
         if (_fboID == 0) {
-            final IntBuffer buffer = BufferUtils.createIntBuffer(1);
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer buffer = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            buffer.clear();
 
             // Create our texture binding FBO
             gl.glGenFramebuffers(1, buffer); // generate id
@@ -547,18 +561,23 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         _active--;
     }
 
+    @Override
     public void cleanup() {
         final GL gl = GLContext.getCurrentGL();
 
         if (_fboID != 0) {
-            final IntBuffer id = BufferUtils.createIntBuffer(1);
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer id = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            id.clear();
             id.put(_fboID);
             id.rewind();
             gl.glDeleteFramebuffers(id.limit(), id);
         }
 
         if (_depthRBID != 0) {
-            final IntBuffer id = BufferUtils.createIntBuffer(1);
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer id = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            id.clear();
             id.put(_depthRBID);
             id.rewind();
             gl.glDeleteRenderbuffers(id.limit(), id);

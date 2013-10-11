@@ -25,6 +25,7 @@ import javax.media.opengl.GLContext;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -83,7 +84,9 @@ public abstract class JoglShaderObjectsStateUtil {
             }
 
             // Compile the vertex shader
-            final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            compiled.clear();
             if (gl.isGL2()) {
                 gl.getGL2().glCompileShaderARB(state._vertexShaderID);
                 gl.getGL2()
@@ -94,7 +97,7 @@ public abstract class JoglShaderObjectsStateUtil {
                     gl.getGL2ES2().glGetShaderiv(state._vertexShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
                 }
             }
-            checkProgramError(compiled, state._vertexShaderID, state._vertexShaderName);
+            checkProgramError(compiled.get(0), state._vertexShaderID, state._vertexShaderName);
 
             // Attach the program
             if (gl.isGL2()) {
@@ -137,7 +140,9 @@ public abstract class JoglShaderObjectsStateUtil {
             }
 
             // Compile the fragment shader
-            final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            compiled.clear();
             if (gl.isGL2()) {
                 gl.getGL2().glCompileShaderARB(state._fragmentShaderID);
                 gl.getGL2().glGetObjectParameterivARB(state._fragmentShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
@@ -148,7 +153,7 @@ public abstract class JoglShaderObjectsStateUtil {
                     gl.getGL2ES2().glGetShaderiv(state._fragmentShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
                 }
             }
-            checkProgramError(compiled, state._fragmentShaderID, state._vertexShaderName);
+            checkProgramError(compiled.get(0), state._fragmentShaderID, state._vertexShaderName);
 
             // Attach the program
             if (gl.isGL2()) {
@@ -192,7 +197,9 @@ public abstract class JoglShaderObjectsStateUtil {
                 }
 
                 // Compile the geometry shader
-                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+                final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+                compiled.clear();
                 if (gl.isGL2()) {
                     gl.getGL2().glCompileShaderARB(state._geometryShaderID);
                     gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
@@ -203,7 +210,7 @@ public abstract class JoglShaderObjectsStateUtil {
                         gl.getGL2ES2().glGetShaderiv(state._geometryShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
                     }
                 }
-                checkProgramError(compiled, state._geometryShaderID, state._geometryShaderName);
+                checkProgramError(compiled.get(0), state._geometryShaderID, state._geometryShaderName);
 
                 // Attach the program
                 if (gl.isGL2()) {
@@ -249,7 +256,9 @@ public abstract class JoglShaderObjectsStateUtil {
                 }
 
                 // Compile the tessellation control shader
-                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+                final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+                compiled.clear();
                 if (gl.isGL2()) {
                     gl.getGL2().glCompileShaderARB(state._tessellationControlShaderID);
                     gl.getGL2().glGetObjectParameterivARB(state._tessellationControlShaderID,
@@ -261,7 +270,8 @@ public abstract class JoglShaderObjectsStateUtil {
                                 compiled);
                     }
                 }
-                checkProgramError(compiled, state._tessellationControlShaderID, state._tessellationControlShaderName);
+                checkProgramError(compiled.get(0), state._tessellationControlShaderID,
+                        state._tessellationControlShaderName);
 
                 // Attach the program
                 if (gl.isGL2()) {
@@ -305,7 +315,9 @@ public abstract class JoglShaderObjectsStateUtil {
                 }
 
                 // Compile the tessellation control shader
-                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+                final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+                compiled.clear();
                 if (gl.isGL2()) {
                     gl.getGL2().glCompileShaderARB(state._tessellationEvaluationShaderID);
                     gl.getGL2().glGetObjectParameterivARB(state._tessellationEvaluationShaderID,
@@ -317,7 +329,7 @@ public abstract class JoglShaderObjectsStateUtil {
                                 compiled);
                     }
                 }
-                checkProgramError(compiled, state._tessellationEvaluationShaderID,
+                checkProgramError(compiled.get(0), state._tessellationEvaluationShaderID,
                         state._tessellationEvaluationShaderName);
 
                 // Attach the program
@@ -349,7 +361,9 @@ public abstract class JoglShaderObjectsStateUtil {
     private static void checkLinkError(final int programId) {
         final GL gl = GLContext.getCurrentGL();
 
-        final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+        final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+        compiled.clear();
         if (gl.isGL2()) {
             gl.getGL2().glGetObjectParameterivARB(programId, GL2ES2.GL_LINK_STATUS, compiled);
         } else {
@@ -368,12 +382,19 @@ public abstract class JoglShaderObjectsStateUtil {
             final int length = compiled.get(0);
             String out = null;
             if (length > 0) {
-                final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
+                final ByteBuffer infoLogBuf = context.getDirectNioBuffersSet().getInfoLogBuffer();
+                final ByteBuffer infoLog;
+                if (length <= infoLogBuf.capacity()) {
+                    infoLog = infoLogBuf;
+                    infoLogBuf.rewind().limit(length);
+                } else {
+                    infoLog = BufferUtils.createByteBuffer(length);
+                }
                 if (gl.isGL2()) {
                     gl.getGL2().glGetInfoLogARB(programId, infoLog.limit(), compiled, infoLog);
                 } else {
                     if (gl.isGL2ES2()) {
-                        gl.getGL2ES2().glGetProgramInfoLog(programId, length, null, infoLog);
+                        gl.getGL2ES2().glGetProgramInfoLog(programId, infoLog.limit(), compiled, infoLog);
                     }
                 }
 
@@ -476,33 +497,42 @@ public abstract class JoglShaderObjectsStateUtil {
     /**
      * Check for program errors. If an error is detected, program exits.
      * 
-     * @param compiled
+     * @param compilerState
      *            the compiler state for a given shader
      * @param id
      *            shader's id
      */
-    private static void checkProgramError(final IntBuffer compiled, final int id, final String shaderName) {
+    private static void checkProgramError(final int compilerState, final int id, final String shaderName) {
         final GL gl = GLContext.getCurrentGL();
 
-        if (compiled.get(0) == GL.GL_FALSE) {
-            final IntBuffer iVal = BufferUtils.createIntBuffer(1);
+        if (compilerState == GL.GL_FALSE) {
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer iVal = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            iVal.clear();
             if (gl.isGL2()) {
                 gl.getGL2().glGetObjectParameterivARB(id, GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB, iVal);
             } else {
                 if (gl.isGL2ES2()) {
-                    gl.getGL2ES2().glGetProgramiv(id, GL2ES2.GL_INFO_LOG_LENGTH, compiled);
+                    gl.getGL2ES2().glGetProgramiv(id, GL2ES2.GL_INFO_LOG_LENGTH, iVal);
                 }
             }
             final int length = iVal.get(0);
             String out = null;
 
             if (length > 0) {
-                final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
+                final ByteBuffer infoLogBuf = context.getDirectNioBuffersSet().getInfoLogBuffer();
+                final ByteBuffer infoLog;
+                if (length <= infoLogBuf.capacity()) {
+                    infoLog = infoLogBuf;
+                    infoLogBuf.rewind().limit(length);
+                } else {
+                    infoLog = BufferUtils.createByteBuffer(length);
+                }
                 if (gl.isGL2()) {
                     gl.getGL2().glGetInfoLogARB(id, infoLog.limit(), iVal, infoLog);
                 } else {
                     if (gl.isGL2ES2()) {
-                        gl.getGL2ES2().glGetProgramInfoLog(id, length, null, infoLog);
+                        gl.getGL2ES2().glGetProgramInfoLog(id, infoLog.limit(), iVal, infoLog);
                     }
                 }
 
