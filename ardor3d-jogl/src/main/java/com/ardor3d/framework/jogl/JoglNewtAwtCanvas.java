@@ -50,6 +50,7 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
         getNewtWindow().setAutoSwapBufferMode(false);
     }
 
+    @Override
     @MainThread
     public void init() {
         if (_inited) {
@@ -77,6 +78,7 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
         }
     }
 
+    @Override
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
             init();
@@ -90,6 +92,7 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
         }
     }
 
+    @Override
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }

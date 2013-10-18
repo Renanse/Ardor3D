@@ -140,6 +140,7 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
         _newtWindow.setAutoSwapBufferMode(autoSwapBufferModeEnabled);
     }
 
+    @Override
     @MainThread
     public void init() {
         if (_inited) {
@@ -190,6 +191,7 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
         }
     }
 
+    @Override
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
             init();
@@ -203,6 +205,7 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
         }
     }
 
+    @Override
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }

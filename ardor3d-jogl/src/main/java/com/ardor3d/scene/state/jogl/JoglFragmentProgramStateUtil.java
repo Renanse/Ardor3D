@@ -21,11 +21,11 @@ import javax.media.opengl.GLContext;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.renderer.state.FragmentProgramState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.FragmentProgramStateRecord;
-import com.ardor3d.util.geom.BufferUtils;
 
 public final class JoglFragmentProgramStateUtil {
     private static final Logger logger = Logger.getLogger(JoglFragmentProgramStateUtil.class.getName());
@@ -39,7 +39,9 @@ public final class JoglFragmentProgramStateUtil {
 
         if (gl.glGetError() == GL.GL_INVALID_OPERATION) {
             // retrieve the error position
-            final IntBuffer errorloc = BufferUtils.createIntBuffer(16);
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer errorloc = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            errorloc.clear();
             gl.glGetIntegerv(GL2.GL_PROGRAM_ERROR_POSITION_ARB, errorloc); // TODO Check for integer
 
             logger.severe("Error " + gl.glGetString(GL2.GL_PROGRAM_ERROR_STRING_ARB) + " in fragment program on line "
@@ -50,7 +52,9 @@ public final class JoglFragmentProgramStateUtil {
     private static int create(final ByteBuffer program) {
         final GL gl = GLContext.getCurrentGL();
 
-        final IntBuffer buf = BufferUtils.createIntBuffer(1);
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+        final IntBuffer buf = context.getDirectNioBuffersSet().getSingleIntBuffer();
+        buf.clear();
 
         gl.getGL2().glGenProgramsARB(buf.limit(), buf); // TODO Check <size>
         gl.getGL2().glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, buf.get(0));

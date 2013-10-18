@@ -13,21 +13,31 @@ package com.ardor3d.renderer.jogl;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
+import com.ardor3d.util.geom.jogl.DirectNioBuffersSet;
 
 public class JoglRenderContext extends RenderContext {
 
-    public JoglRenderContext(final Object key, final ContextCapabilities caps) {
-        this(key, caps, null);
+    private final DirectNioBuffersSet _directNioBuffersSet;
+
+    public JoglRenderContext(final Object key, final ContextCapabilities caps,
+            final DirectNioBuffersSet directNioBuffersSet) {
+        this(key, caps, null, directNioBuffersSet);
     }
 
-    public JoglRenderContext(final Object key, final ContextCapabilities caps, final RenderContext shared) {
+    public JoglRenderContext(final Object key, final ContextCapabilities caps, final RenderContext shared,
+            final DirectNioBuffersSet directNioBuffersSet) {
         super(key, caps, shared);
+        _directNioBuffersSet = directNioBuffersSet;
     }
 
     @Override
     protected JoglRendererRecord createRendererRecord() {
         final JoglRendererRecord rendererRecord = new JoglRendererRecord();
         return rendererRecord;
+    }
+
+    public DirectNioBuffersSet getDirectNioBuffersSet() {
+        return _directNioBuffersSet;
     }
 
     @Override

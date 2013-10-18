@@ -17,28 +17,29 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
-import javax.media.opengl.GL2GL3;
+import javax.media.opengl.GL2ES3;
 import javax.media.opengl.GLAutoDrawable;
 
 import com.ardor3d.renderer.ContextCapabilities;
-import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.geom.jogl.DirectNioBuffersSet;
 
 public class JoglContextCapabilities extends ContextCapabilities {
 
-    public JoglContextCapabilities(final GLAutoDrawable autodrawable) {
-        init(autodrawable.getGL());
+    public JoglContextCapabilities(final GLAutoDrawable autodrawable, final DirectNioBuffersSet directNioBuffersSet) {
+        init(autodrawable.getGL(), directNioBuffersSet);
     }
 
-    public JoglContextCapabilities(final GL gl) {
-        init(gl);
+    public JoglContextCapabilities(final GL gl, final DirectNioBuffersSet directNioBuffersSet) {
+        init(gl, directNioBuffersSet);
     }
 
     public JoglContextCapabilities(final ContextCapabilities caps) {
         super(caps);
     }
 
-    public void init(final GL gl) {
-        final IntBuffer buf = BufferUtils.createIntBuffer(16);
+    public void init(final GL gl, final DirectNioBuffersSet directNioBuffersSet) {
+        final IntBuffer buf = directNioBuffersSet.getSingleIntBuffer();
+        buf.clear();
 
         _supportsVBO = gl.isExtensionAvailable("GL_ARB_vertex_buffer_object");
         _supportsGL1_2 = gl.isExtensionAvailable("GL_VERSION_1_2");
@@ -60,7 +61,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
 
         _supportsTextureLodBias = gl.isExtensionAvailable("GL_EXT_texture_lod_bias");
         if (_supportsTextureLodBias) {
-            gl.glGetIntegerv(GL2GL3.GL_MAX_TEXTURE_LOD_BIAS, buf);
+            gl.glGetIntegerv(GL2ES3.GL_MAX_TEXTURE_LOD_BIAS, buf);
             _maxTextureLodBias = buf.get(0);
         } else {
             _maxTextureLodBias = 0f;
@@ -105,7 +106,7 @@ public class JoglContextCapabilities extends ContextCapabilities {
             // Max multisample samples.
             if (gl.isExtensionAvailable("GL_EXT_framebuffer_multisample")
                     && gl.isExtensionAvailable("GL_EXT_framebuffer_blit")) {
-                gl.glGetIntegerv(GL2GL3.GL_MAX_SAMPLES, buf);
+                gl.glGetIntegerv(GL2ES3.GL_MAX_SAMPLES, buf);
                 _maxFBOSamples = buf.get(0);
             } else {
                 _maxFBOSamples = 0;
@@ -200,8 +201,8 @@ public class JoglContextCapabilities extends ContextCapabilities {
         _supportsAniso = gl.isExtensionAvailable("GL_EXT_texture_filter_anisotropic");
 
         if (_supportsAniso) {
-            final FloatBuffer max_a = BufferUtils.createFloatBuffer(1);
-            max_a.rewind();
+            final FloatBuffer max_a = directNioBuffersSet.getSingleFloatBuffer();
+            max_a.clear();
 
             // Grab the maximum anisotropic filter.
             gl.glGetFloatv(GL.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, max_a);

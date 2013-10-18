@@ -41,7 +41,7 @@ import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
-import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.geom.jogl.DirectNioBuffersSet;
 
 /**
  * <p>
@@ -65,6 +65,8 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     // HACK: needed to get the parent context in here somehow...
     public static GLContext _parentContext;
 
+    protected DirectNioBuffersSet _directNioBuffersSet;
+
     public JoglPbufferTextureRenderer(final DisplaySettings settings, final Renderer parentRenderer,
             final ContextCapabilities caps) {
         super(settings, parentRenderer, caps);
@@ -76,6 +78,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
      * <code>setupTexture</code> initializes a new Texture object for use with TextureRenderer. Generates a valid gl
      * texture id for this texture and inits the data type for the texture.
      */
+    @Override
     public void setupTexture(final Texture tex) {
         if (tex.getType() != Type.TwoDimensional) {
             throw new IllegalArgumentException("Unsupported type: " + tex.getType());
@@ -93,7 +96,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         }
 
         // Create the texture
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
+        final IntBuffer ibuf = _directNioBuffersSet.getSingleIntBuffer();
         gl.glGenTextures(1, ibuf);
         final int textureId = ibuf.get(0);
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
@@ -115,14 +118,17 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         logger.fine("setup pbuffer tex" + textureId + ": " + _width + "," + _height);
     }
 
+    @Override
     public void render(final Spatial spat, final Texture tex, final int clear) {
         render(null, spat, null, tex, clear);
     }
 
+    @Override
     public void render(final List<? extends Spatial> spat, final Texture tex, final int clear) {
         render(spat, null, null, tex, clear);
     }
 
+    @Override
     public void render(final Scene scene, final Texture tex, final int clear) {
         render(null, null, scene, tex, clear);
     }
@@ -184,14 +190,17 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         // FIXME
     }
 
+    @Override
     public void render(final Spatial spat, final List<Texture> texs, final int clear) {
         render(null, spat, null, texs, clear);
     }
 
+    @Override
     public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
         render(spat, null, null, texs, clear);
     }
 
+    @Override
     public void render(final Scene scene, final List<Texture> texs, final int clear) {
         render(null, null, scene, texs, clear);
     }
@@ -247,6 +256,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         }
     }
 
+    @Override
     public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
             final int xoffset, final int yoffset) {
         final GL gl = GLContext.getCurrentGL();
@@ -293,9 +303,15 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
             _context.makeCurrent();
 
-            final JoglContextCapabilities contextCaps = new JoglContextCapabilities(_offscreenDrawable.getGL());
+            if (_directNioBuffersSet == null) {
+                _directNioBuffersSet = new DirectNioBuffersSet();
+            }
+
+            final JoglContextCapabilities contextCaps = new JoglContextCapabilities(_offscreenDrawable.getGL(),
+                    _directNioBuffersSet);
             ContextManager.addContext(_context,
-                    new JoglRenderContext(_context, contextCaps, ContextManager.getCurrentContext()));
+                    new JoglRenderContext(_context, contextCaps, ContextManager.getCurrentContext(),
+                            _directNioBuffersSet));
 
         } catch (final Exception e) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "initPbuffer()", "Exception", e);
@@ -358,11 +374,13 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         ContextManager.switchContext(_oldContext.getContextKey());
     }
 
+    @Override
     public void cleanup() {
         ContextManager.removeContext(_offscreenDrawable.getContext());
         _offscreenDrawable.destroy();
     }
 
+    @Override
     public void setMultipleTargets(final boolean force) {
         if (force) {
             logger.fine("Copy Texture Pbuffer used!");

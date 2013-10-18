@@ -19,6 +19,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
+import javax.media.opengl.GL2ES3;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawable;
@@ -47,6 +48,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -72,7 +74,7 @@ public class JoglTextureStateUtil {
         }
 
         final GL gl = GLContext.getCurrentGL();
-        final RenderContext context = ContextManager.getCurrentContext();
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
         if (context == null) {
             logger.warning("RenderContext is null for texture: " + texture);
             return;
@@ -104,7 +106,7 @@ public class JoglTextureStateUtil {
             }
         }
 
-        final IntBuffer id = BufferUtils.createIntBuffer(1);
+        final IntBuffer id = context.getDirectNioBuffersSet().getSingleIntBuffer();
         id.clear();
         gl.glGenTextures(id.limit(), id);
         final int textureId = id.get(0);
@@ -420,7 +422,7 @@ public class JoglTextureStateUtil {
                 }
 
                 if (texture.getTextureMaxLevel() >= 0) {
-                    gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2GL3.GL_TEXTURE_MAX_LEVEL, texture.getTextureMaxLevel());
+                    gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2ES3.GL_TEXTURE_MAX_LEVEL, texture.getTextureMaxLevel());
                 }
             } else {
                 // Here we handle textures that are either compressed or have predefined mipmaps.
@@ -436,20 +438,22 @@ public class JoglTextureStateUtil {
                             int max = 1;
 
                             if (mipSizes == null) {
-                                mipSizes = new int[] { data.capacity() };
+                                mipSizes = new int[] { data == null ? 0 : data.capacity() };
                             } else if (texture.getMinificationFilter().usesMipMapLevels()) {
                                 max = mipSizes.length;
                             }
 
                             // set max mip level
-                            gl.glTexParameteri(getGLCubeMapFace(face), GL2GL3.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            gl.glTexParameteri(getGLCubeMapFace(face), GL2ES3.GL_TEXTURE_MAX_LEVEL, max - 1);
 
                             for (int m = 0; m < max; m++) {
                                 final int width = Math.max(1, image.getWidth() >> m);
                                 final int height = Math.max(1, image.getHeight() >> m);
 
-                                data.position(pos);
-                                data.limit(pos + mipSizes[m]);
+                                if (data != null) {
+                                    data.position(pos);
+                                    data.limit(pos + mipSizes[m]);
+                                }
 
                                 if (texture.getTextureStoreFormat().isCompressed()) {
                                     gl.glCompressedTexImage2D(getGLCubeMapFace(face), m,
@@ -483,13 +487,13 @@ public class JoglTextureStateUtil {
                     // Set max mip level
                     switch (type) {
                         case TwoDimensional:
-                            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2GL3.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL2ES3.GL_TEXTURE_MAX_LEVEL, max - 1);
                             break;
                         case ThreeDimensional:
-                            gl.glTexParameteri(GL2ES2.GL_TEXTURE_3D, GL2GL3.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            gl.glTexParameteri(GL2ES2.GL_TEXTURE_3D, GL2ES3.GL_TEXTURE_MAX_LEVEL, max - 1);
                             break;
                         case OneDimensional:
-                            gl.glTexParameteri(GL2GL3.GL_TEXTURE_1D, GL2GL3.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            gl.glTexParameteri(GL2GL3.GL_TEXTURE_1D, GL2ES3.GL_TEXTURE_MAX_LEVEL, max - 1);
                             break;
                         case CubeMap:
                             break;
@@ -1617,7 +1621,7 @@ public class JoglTextureStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
-        final RenderContext context = ContextManager.getCurrentContext();
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
 
         final Integer id = texture.getTextureIdForContextAsInteger(context.getGlContextRep());
@@ -1626,7 +1630,7 @@ public class JoglTextureStateUtil {
             return;
         }
 
-        final IntBuffer idBuffer = BufferUtils.createIntBuffer(1);
+        final IntBuffer idBuffer = context.getDirectNioBuffersSet().getSingleIntBuffer();
         idBuffer.clear();
         idBuffer.put(id.intValue());
         idBuffer.rewind();
@@ -1639,21 +1643,29 @@ public class JoglTextureStateUtil {
         final GL gl = GLContext.getCurrentGL();
 
         // ask for the current state record
-        final RenderContext context = ContextManager.getCurrentContext();
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
 
-        final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
-        idBuffer.clear();
+        final IntBuffer texIdsBuffer = context.getDirectNioBuffersSet().getTextureIdsBuffer();
+        texIdsBuffer.clear();
         for (final Integer i : ids) {
+            if (!texIdsBuffer.hasRemaining()) {
+                texIdsBuffer.flip();
+                if (texIdsBuffer.remaining() > 0) {
+                    gl.glDeleteTextures(texIdsBuffer.remaining(), texIdsBuffer);
+                }
+                texIdsBuffer.clear();
+            }
             if (i != null) {
-                idBuffer.put(i);
+                texIdsBuffer.put(i);
                 record.removeTextureRecord(i);
             }
         }
-        idBuffer.flip();
-        if (idBuffer.remaining() > 0) {
-            gl.glDeleteTextures(idBuffer.remaining(), idBuffer);
+        texIdsBuffer.flip();
+        if (texIdsBuffer.remaining() > 0) {
+            gl.glDeleteTextures(texIdsBuffer.remaining(), texIdsBuffer);
         }
+        texIdsBuffer.clear();
     }
 
     /**

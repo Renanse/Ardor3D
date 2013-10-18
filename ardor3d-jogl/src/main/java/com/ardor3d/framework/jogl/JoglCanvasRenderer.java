@@ -40,6 +40,7 @@ import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderContext;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.geom.jogl.DirectNioBuffersSet;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
 
@@ -66,6 +67,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     protected CapsUtil _capsUtil;
 
+    protected DirectNioBuffersSet _directNioBuffersSet;
+
     public JoglCanvasRenderer(final Scene scene) {
         this(scene, false, new CapsUtil());
     }
@@ -76,6 +79,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _capsUtil = capsUtil;
     }
 
+    @Override
     public void makeCurrentContext() throws Ardor3dException {
         int value = GLContext.CONTEXT_NOT_CURRENT;
         int attempt = 0;
@@ -112,6 +116,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         }
     }
 
+    @Override
     public void releaseCurrentContext() {
         if (_context.equals(GLContext.getCurrent())) {
             try {
@@ -123,8 +128,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     }
 
     @MainThread
-    protected ContextCapabilities createContextCapabilities() {
-        return new JoglContextCapabilities(_context.getGL());
+    protected JoglContextCapabilities createContextCapabilities() {
+        return new JoglContextCapabilities(_context.getGL(), _directNioBuffersSet);
     }
 
     @Override
@@ -132,6 +137,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         return new JoglRenderer();
     }
 
+    @Override
     @MainThread
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
@@ -140,6 +146,10 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         }
 
         makeCurrentContext();
+
+        if (_directNioBuffersSet == null) {
+            _directNioBuffersSet = new DirectNioBuffersSet();
+        }
 
         try {
 
@@ -151,7 +161,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
 
             final ContextCapabilities caps = createContextCapabilities();
-            _currentContext = new JoglRenderContext(_context, caps, sharedContext);
+            _currentContext = new JoglRenderContext(_context, caps, sharedContext, _directNioBuffersSet);
 
             ContextManager.addContext(_context, _currentContext);
             ContextManager.switchContext(_context);
@@ -199,6 +209,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     public int MAX_CONTEXT_GRAB_ATTEMPTS = 10;
 
+    @Override
     @MainThread
     public boolean draw() {
 
@@ -263,22 +274,27 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         return drew;
     }
 
+    @Override
     public Camera getCamera() {
         return _camera;
     }
 
+    @Override
     public Scene getScene() {
         return _scene;
     }
 
+    @Override
     public void setScene(final Scene scene) {
         _scene = scene;
     }
 
+    @Override
     public Renderer getRenderer() {
         return _renderer;
     }
 
+    @Override
     public void setCamera(final Camera camera) {
         _camera = camera;
     }
@@ -288,10 +304,12 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         return _currentContext;
     }
 
+    @Override
     public int getFrameClear() {
         return _frameClear;
     }
 
+    @Override
     public void setFrameClear(final int buffers) {
         _frameClear = buffers;
     }
