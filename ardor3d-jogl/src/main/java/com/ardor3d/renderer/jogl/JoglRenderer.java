@@ -892,12 +892,15 @@ public class JoglRenderer extends AbstractRenderer {
 
             indices.position(0);
 
-            if (gl.isGL2()) {
-                if (primcount < 0) {
-                    gl.getGL2().glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
-                } else {
+            if (primcount < 0) {
+                if (gl.isGL2ES1()) {
+                    gl.getGL2ES1().glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
+                }
+            } else {
+                if (gl.isGL2()) {
                     gl.getGL2().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
                             indices.getBuffer(), primcount);
+
                 }
             }
 
@@ -917,7 +920,7 @@ public class JoglRenderer extends AbstractRenderer {
 
                 if (gl.isGL2()) {
                     if (primcount < 0) {
-                        gl.getGL2().glDrawElements(glIndexMode, count, type, indices.getBuffer());
+                        gl.getGL2ES1().glDrawElements(glIndexMode, count, type, indices.getBuffer());
                     } else {
                         gl.getGL2().glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
                     }
