@@ -12,12 +12,12 @@
     <name>Ardor 3D JOGL</name>
   
     <!-- This repository should be used only for unreleased development versions, typically all release candidates and post builds -->
-    <!--<repositories>
+    <repositories>
         <repository>
             <id>jogamp</id>
             <url>http://jogamp.org/deployment/maven</url>
         </repository>
-    </repositories>-->
+    </repositories>
   
     <dependencies>
         <dependency>
