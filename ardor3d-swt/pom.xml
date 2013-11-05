@@ -33,12 +33,9 @@
     <repositories>
         <!-- The current version of swt isn't on central yet. -->
         <repository>
-            <id>ardor3d</id>
-            <url>http://ardor3d.com:8081/nexus/content/groups/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+        	<id>swt-repo</id>
+        	<url>https://swt-repo.googlecode.com/svn/repo/</url>
+    	</repository>
     </repositories>
 
     <profiles>
