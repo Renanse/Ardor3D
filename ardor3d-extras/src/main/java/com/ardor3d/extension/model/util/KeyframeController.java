@@ -15,6 +15,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -176,7 +178,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
     /**
      * Tells the controller to change its morphMesh to shape at time seconds. Time must be >=0 and shape must be
      * non-null and shape must have the same number of vertexes as the current shape. If not, then nothing happens. It
-     * is also required that setMorphingMesh(TriMesh) is called before setKeyframe. It is assumed that shape.indices ==
+     * is also required that setMorphingMesh(Mesh) is called before setKeyframe. It is assumed that shape.indices ==
      * morphMesh.indices, otherwise morphing may look funny
      * 
      * @param time
@@ -511,9 +513,23 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
             newcolors.rewind(); // reset to start
         }
 
+        final Vector3 trOldverts = new Vector3();
+        final Vector3 trNewverts = new Vector3();
+        final ReadOnlyTransform oldtransform = oldShape.getTransform();
+        final ReadOnlyTransform newtransform = newShape.getTransform();
         for (int i = 0; i < vertQuantity; i++) {
             for (int x = 0; x < 3; x++) {
-                verts.put(i * 3 + x, (float) ((1f - delta) * oldverts.get(i * 3 + x) + delta * newverts.get(i * 3 + x)));
+                trOldverts.setValue(x, oldverts.get(i * 3 + x));
+                trNewverts.setValue(x, newverts.get(i * 3 + x));
+            }
+            if (oldtransform != null) {
+                oldtransform.applyForward(trOldverts);
+            }
+            if (newtransform != null) {
+                newtransform.applyForward(trNewverts);
+            }
+            for (int x = 0; x < 3; x++) {
+                verts.put(i * 3 + x, (float) ((1f - delta) * trOldverts.getValue(x) + delta * trNewverts.getValue(x)));
             }
 
             if (norms != null && oldnorms != null && newnorms != null) {
@@ -724,16 +740,19 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
             this._newShape = shape;
         }
 
+        @Override
         public void read(final InputCapsule capsule) throws IOException {
             _time = capsule.readDouble("time", 0);
             _newShape = (Mesh) capsule.readSavable("newShape", null);
         }
 
+        @Override
         public void write(final OutputCapsule capsule) throws IOException {
             capsule.write(_time, "time", 0);
             capsule.write(_newShape, "newShape", null);
         }
 
+        @Override
         public Class<?> getClassTag() {
             return this.getClass();
         }
