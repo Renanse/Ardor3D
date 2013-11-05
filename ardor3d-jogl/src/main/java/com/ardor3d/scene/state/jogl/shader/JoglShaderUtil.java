@@ -363,7 +363,7 @@ public abstract class JoglShaderUtil {
             variable.data.getBuffer().rewind();
             GLContext
                     .getCurrentGL()
-                    .getGL2ES2()
+                    .getGL2()
                     .glVertexAttribPointer(variable.variableID, variable.size, GL.GL_FLOAT, variable.normalized,
                             variable.stride, variable.data.getBuffer());
         }
@@ -387,8 +387,8 @@ public abstract class JoglShaderUtil {
             } else {
                 variable.data.getBuffer().limit(pos + length - 1);
                 variable.data.getBuffer().position(pos);
-                gl.getGL2ES2().glVertexAttribPointer(variable.variableID + i, size, GL.GL_FLOAT, variable.normalized,
-                        0, variable.data.getBuffer());
+                gl.getGL2().glVertexAttribPointer(variable.variableID + i, size, GL.GL_FLOAT, variable.normalized, 0,
+                        variable.data.getBuffer());
             }
         }
     }
@@ -410,7 +410,7 @@ public abstract class JoglShaderUtil {
             variable.data.getBuffer().rewind();
             GLContext
                     .getCurrentGL()
-                    .getGL2ES2()
+                    .getGL2()
                     .glVertexAttribPointer(variable.variableID, variable.size,
                             variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride,
                             variable.data.getBuffer());
@@ -434,7 +434,7 @@ public abstract class JoglShaderUtil {
             variable.data.getBuffer().rewind();
             GLContext
                     .getCurrentGL()
-                    .getGL2ES2()
+                    .getGL2()
                     .glVertexAttribPointer(variable.variableID, variable.size,
                             variable.unsigned ? GL.GL_UNSIGNED_INT : GL2ES2.GL_INT, variable.normalized,
                             variable.stride, variable.data.getBuffer());
@@ -458,7 +458,7 @@ public abstract class JoglShaderUtil {
             variable.data.getBuffer().rewind();
             GLContext
                     .getCurrentGL()
-                    .getGL2ES2()
+                    .getGL2()
                     .glVertexAttribPointer(variable.variableID, variable.size,
                             variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized,
                             variable.stride, variable.data.getBuffer());
