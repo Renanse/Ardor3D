@@ -310,7 +310,6 @@
                 <groupId>org.eclipse.swt</groupId>
                 <artifactId>swt</artifactId>
                 <version>${swt.version}</version>
-                <classifier>${swt.classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
