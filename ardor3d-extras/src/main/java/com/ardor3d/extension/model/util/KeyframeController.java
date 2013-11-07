@@ -513,25 +513,33 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
             newcolors.rewind(); // reset to start
         }
 
-        final Vector3 trOldverts = new Vector3();
-        final Vector3 trNewverts = new Vector3();
         final ReadOnlyTransform oldtransform = oldShape.getTransform();
         final ReadOnlyTransform newtransform = newShape.getTransform();
-        for (int i = 0; i < vertQuantity; i++) {
-            for (int x = 0; x < 3; x++) {
-                trOldverts.setValue(x, oldverts.get(i * 3 + x));
-                trNewverts.setValue(x, newverts.get(i * 3 + x));
-            }
-            if (oldtransform != null) {
+        if (!oldtransform.isIdentity() || !newtransform.isIdentity()) {
+            final Vector3 trOldverts = new Vector3();
+            final Vector3 trNewverts = new Vector3();
+            for (int i = 0; i < vertQuantity; i++) {
+                for (int x = 0; x < 3; x++) {
+                    trOldverts.setValue(x, oldverts.get(i * 3 + x));
+                    trNewverts.setValue(x, newverts.get(i * 3 + x));
+                }
                 oldtransform.applyForward(trOldverts);
-            }
-            if (newtransform != null) {
                 newtransform.applyForward(trNewverts);
+                for (int x = 0; x < 3; x++) {
+                    verts.put(i * 3 + x,
+                            (float) ((1f - delta) * trOldverts.getValue(x) + delta * trNewverts.getValue(x)));
+                }
             }
-            for (int x = 0; x < 3; x++) {
-                verts.put(i * 3 + x, (float) ((1f - delta) * trOldverts.getValue(x) + delta * trNewverts.getValue(x)));
+        } else {
+            for (int i = 0; i < vertQuantity; i++) {
+                for (int x = 0; x < 3; x++) {
+                    verts.put(i * 3 + x,
+                            (float) ((1f - delta) * oldverts.get(i * 3 + x) + delta * newverts.get(i * 3 + x)));
+                }
             }
+        }
 
+        for (int i = 0; i < vertQuantity; i++) {
             if (norms != null && oldnorms != null && newnorms != null) {
                 for (int x = 0; x < 3; x++) {
                     norms.put(i * 3 + x,
