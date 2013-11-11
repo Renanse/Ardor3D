@@ -241,7 +241,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jogamp.version>2.1.2</jogamp.version>
         <lwjgl.version>2.8.4</lwjgl.version>
-        <swt.version>3650</swt.version>
+        <swt.version>3.8</swt.version>
     </properties>
 
     <!-- The dependencyManagement section should specify all versions of artifacts used in sub -->
@@ -310,7 +310,6 @@
                 <groupId>org.eclipse.swt</groupId>
                 <artifactId>swt</artifactId>
                 <version>${swt.version}</version>
-                <classifier>${swt.classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
