@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
@@ -848,6 +849,51 @@ public class MeshData implements Savable {
     }
 
     /**
+     * Gets the texture coordinates of the primitive.
+     * 
+     * @param primitiveIndex
+     *            the primitive index
+     * @param section
+     *            the section
+     * @param textureIndex
+     *            the texture index
+     * @param store
+     *            the store
+     * 
+     * @return the texture coordinates of the primitive
+     */
+    public Vector2[] getPrimitiveTextureCoords(final int primitiveIndex, final int section, final int textureIndex,
+            final Vector2[] store) {
+        Vector2[] result = null;
+        if (getTextureBuffer(textureIndex) != null) {
+            final int count = getPrimitiveCount(section);
+            if (primitiveIndex >= count || primitiveIndex < 0) {
+                throw new IndexOutOfBoundsException("Invalid primitiveIndex '" + primitiveIndex + "'.  Count is "
+                        + count);
+            }
+            final IndexMode mode = getIndexMode(section);
+            final int rSize = mode.getVertexCount();
+            result = store;
+            if (result == null || result.length < rSize) {
+                result = new Vector2[rSize];
+            }
+            for (int i = 0; i < rSize; i++) {
+                if (result[i] == null) {
+                    result[i] = new Vector2();
+                }
+                if (getIndexBuffer() != null) {// indexed geometry
+                    BufferUtils.populateFromBuffer(result[i], getTextureBuffer(textureIndex),
+                            getIndices().get(getVertexIndex(primitiveIndex, i, section)));
+                } else {// non-indexed geometry
+                    BufferUtils.populateFromBuffer(result[i], getTextureBuffer(textureIndex),
+                            getVertexIndex(primitiveIndex, i, section));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Gets the vertex index.
      * 
      * @param primitiveIndex
@@ -1212,10 +1258,12 @@ public class MeshData implements Savable {
     // Methods for Savable
     // /////////////////
 
+    @Override
     public Class<? extends MeshData> getClassTag() {
         return this.getClass();
     }
 
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_vertexCount, "vertexCount", 0);
         capsule.write(_vertexCoords, "vertexBuffer", null);
@@ -1230,6 +1278,7 @@ public class MeshData implements Savable {
         capsule.write(_indexModes, "indexModes");
     }
 
+    @Override
     public void read(final InputCapsule capsule) throws IOException {
         _vertexCount = capsule.readInt("vertexCount", 0);
         _vertexCoords = (FloatBufferData) capsule.readSavable("vertexBuffer", null);
