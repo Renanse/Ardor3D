@@ -16,11 +16,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.model.util.KeyframeController;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
@@ -163,34 +167,47 @@ public class ObjExporter {
                 if (firstFiles) {
                     mtlPw.println("# Ardor3D 1.0 MTL file");
                 }
-                if (mesh.getLocalRenderState(StateType.Material) != null) {
-                    // TODO
+                final ObjMaterial currentMtl = new ObjMaterial(null);
+                final MaterialState mtlState = (MaterialState) mesh.getLocalRenderState(StateType.Material);
+                if (mtlState != null) {
+                    final ReadOnlyColorRGBA ambientColor = mtlState.getAmbient();
+                    if (ambientColor != null) {
+                        currentMtl.d = ambientColor.getAlpha();
+                        currentMtl.Ka = new float[] { ambientColor.getRed(), ambientColor.getGreen(),
+                                ambientColor.getBlue(), ambientColor.getAlpha() };
+                    }
+                    final ReadOnlyColorRGBA diffuseColor = mtlState.getDiffuse();
+                    if (diffuseColor != null) {
+                        currentMtl.Kd = new float[] { diffuseColor.getRed(), diffuseColor.getGreen(),
+                                diffuseColor.getBlue(), diffuseColor.getAlpha() };
+                    }
+                    final ReadOnlyColorRGBA specularColor = mtlState.getSpecular();
+                    if (specularColor != null) {
+                        currentMtl.Ks = new float[] { specularColor.getRed(), specularColor.getGreen(),
+                                specularColor.getBlue(), specularColor.getAlpha() };
+                    }
+                    currentMtl.Ns = mtlState.getShininess();
                 }
-                if (mesh.getLocalRenderState(StateType.Blend) != null) {
-                    // TODO
-                }
-                final String currentTextureName;
                 if (customTextureName == null) {
-                    currentTextureName = getLocalMeshTextureName(mesh);
+                    currentMtl.textureName = getLocalMeshTextureName(mesh);
                 } else {
-                    currentTextureName = customTextureName;
+                    currentMtl.textureName = customTextureName;
                 }
-
-                final int currentIllumination;
                 if (mesh.getSceneHints().getLightCombineMode() == LightCombineMode.Off) {
                     // Color on and Ambient off
-                    currentIllumination = 0;
+                    currentMtl.illumType = 0;
                 } else {
                     // Color on and Ambient on
-                    currentIllumination = 1;
+                    currentMtl.illumType = 1;
                 }
                 ObjMaterial sameObjMtl = null;
                 if (materialList != null && !materialList.isEmpty()) {
                     for (final ObjMaterial mtl : materialList) {
-                        // TODO support more parameters
-                        if (mtl.illumType == currentIllumination
-                                && (currentTextureName == null && mtl.textureName == null || currentTextureName != null
-                                        && mtl.textureName != null && currentTextureName.equals(mtl.textureName))) {
+                        if (mtl.illumType == currentMtl.illumType && mtl.Ns == currentMtl.Ns
+                                && mtl.forceBlend == currentMtl.forceBlend && mtl.d == currentMtl.d
+                                && Arrays.equals(mtl.Ka, currentMtl.Ka) && Arrays.equals(mtl.Kd, currentMtl.Kd)
+                                && Arrays.equals(mtl.Ks, currentMtl.Ks)
+                                && Objects.equals(mtl.textureName, currentMtl.textureName)) {
                             sameObjMtl = mtl;
                             break;
                         }
@@ -202,15 +219,42 @@ public class ObjExporter {
                             + (materialList == null ? 1 : materialList.size() + 1);
                     if (materialList != null) {
                         final ObjMaterial mtl = new ObjMaterial(mtlName);
-                        mtl.illumType = currentIllumination;
-                        mtl.textureName = currentTextureName;
+                        mtl.illumType = currentMtl.illumType;
+                        mtl.textureName = currentMtl.textureName;
                         materialList.add(mtl);
                     }
                     mtlPw.println("newmtl " + mtlName);
-                    if (currentTextureName != null) {
-                        mtlPw.println("map_Kd " + currentTextureName);
+                    if (currentMtl.Ns != -1) {
+                        mtlPw.println("Ns " + currentMtl.Ns);
                     }
-                    mtlPw.println("illum " + currentIllumination);
+                    if (currentMtl.Ka != null) {
+                        mtlPw.print("Ka");
+                        for (final float KaCoef : currentMtl.Ka) {
+                            mtlPw.print(" " + KaCoef);
+                        }
+                        mtlPw.println();
+                    }
+                    if (currentMtl.Kd != null) {
+                        mtlPw.print("Kd");
+                        for (final float KdCoef : currentMtl.Kd) {
+                            mtlPw.print(" " + KdCoef);
+                        }
+                        mtlPw.println();
+                    }
+                    if (currentMtl.Ks != null) {
+                        mtlPw.print("Ks");
+                        for (final float KsCoef : currentMtl.Ks) {
+                            mtlPw.print(" " + KsCoef);
+                        }
+                        mtlPw.println();
+                    }
+                    if (currentMtl.d != -1) {
+                        mtlPw.println("d " + currentMtl.d);
+                    }
+                    mtlPw.println("illum " + currentMtl.illumType);
+                    if (currentMtl.textureName != null) {
+                        mtlPw.println("map_Kd " + currentMtl.textureName);
+                    }
                 } else {
                     mtlName = sameObjMtl.getName();
                 }
