@@ -27,10 +27,12 @@ import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.util.TextureKey;
 
 /**
  * WaveFront OBJ exporter. It supports only the meshes. Several meshes can be exported into the same OBJ file. Only a
- * few kinds of primitives are supported
+ * few kinds of primitives are supported. N.B: If the texture is flipped in Ardor3D, you will have to flip it manually
+ * when loading the resulting OBJ file.
  * 
  * @author Julien Gouesse
  */
@@ -83,30 +85,32 @@ public class ObjExporter {
      */
     public void save(final List<Mesh> meshList, final File objFile, final File mtlFile, final String customTextureName)
             throws IOException {
-        int firstVertexIndex = 0;
-        boolean firstFiles = true;
-        final List<ObjMaterial> materialList = new ArrayList<ObjMaterial>();
-        for (final Mesh mesh : meshList) {
-            if (mesh != null) {
-                if (mesh.getControllerCount() == 0 || !(mesh.getController(0) instanceof KeyframeController)) {
-                    save(mesh, objFile, mtlFile, !firstFiles, firstVertexIndex, firstFiles, materialList,
-                            customTextureName);
-                    firstFiles = false;
-                    firstVertexIndex += mesh.getMeshData().getVertexCount();
-                } else {
-                    final KeyframeController<?> controller = (KeyframeController<?>) mesh.getController(0);
-                    final ArrayList<Mesh> subMeshList = new ArrayList<Mesh>();
-                    for (final KeyframeController.PointInTime pit : controller._keyframes) {
-                        if (pit != null && pit._newShape != null) {
-                            subMeshList.add(pit._newShape);
-                        }
-                    }
-                    final String textureName = getLocalMeshTextureName(mesh);
-                    for (final Mesh submesh : subMeshList) {
-                        save(submesh, objFile, mtlFile, !firstFiles, firstVertexIndex, firstFiles, materialList,
-                                textureName);
+        if (!meshList.isEmpty()) {
+            int firstVertexIndex = 0;
+            boolean firstFiles = true;
+            final List<ObjMaterial> materialList = new ArrayList<ObjMaterial>();
+            for (final Mesh mesh : meshList) {
+                if (mesh != null) {
+                    if (mesh.getControllerCount() == 0 || !(mesh.getController(0) instanceof KeyframeController)) {
+                        save(mesh, objFile, mtlFile, !firstFiles, firstVertexIndex, firstFiles, materialList,
+                                customTextureName);
                         firstFiles = false;
-                        firstVertexIndex += submesh.getMeshData().getVertexCount();
+                        firstVertexIndex += mesh.getMeshData().getVertexCount();
+                    } else {
+                        final KeyframeController<?> controller = (KeyframeController<?>) mesh.getController(0);
+                        final ArrayList<Mesh> subMeshList = new ArrayList<Mesh>();
+                        for (final KeyframeController.PointInTime pit : controller._keyframes) {
+                            if (pit != null && pit._newShape != null) {
+                                subMeshList.add(pit._newShape);
+                            }
+                        }
+                        final String textureName = getLocalMeshTextureName(mesh);
+                        for (final Mesh submesh : subMeshList) {
+                            save(submesh, objFile, mtlFile, !firstFiles, firstVertexIndex, firstFiles, materialList,
+                                    textureName);
+                            firstFiles = false;
+                            firstVertexIndex += submesh.getMeshData().getVertexCount();
+                        }
                     }
                 }
             }
@@ -264,19 +268,8 @@ public class ObjExporter {
                     case Triangles:
                     case TriangleStrip:
                     case Quads:
-                    case QuadStrip:
                         for (int primIndex = 0, primCount = meshData.getPrimitiveCount(sectionIndex); primIndex < primCount; primIndex++) {
                             meshData.getPrimitiveIndices(primIndex, sectionIndex, indices);
-                            // FIXME it should be done in MeshData.getVertexIndex() to preserve the order of the
-                            // vertices
-                            if (indexMode == IndexMode.TriangleStrip && primIndex % 2 == 1) {
-                                // swaps the first index and the second index
-                                final int tmp = indices[0];
-                                indices[0] = indices[1];
-                                indices[1] = tmp;
-                            }
-                            objPw.println("# section index: " + sectionIndex + " primitive index: " + primIndex
-                                    + " primitive count: " + primCount + " mode: " + indexMode);
                             objPw.print("f");
                             for (int vertexIndex = 0; vertexIndex < indices.length; vertexIndex++) {
                                 // indices start at 1 in the WaveFront OBJ format whereas indices start at 0 in
@@ -319,7 +312,8 @@ public class ObjExporter {
         if (mesh.getLocalRenderState(StateType.Texture) != null) {
             final TextureState textureState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
             if (textureState.isEnabled() && textureState.getTexture() != null) {
-                final String tmpTextureName = textureState.getTexture().getTextureKey().getSource().getName();
+                final TextureKey tKey = textureState.getTexture().getTextureKey();
+                final String tmpTextureName = tKey.getSource().getName();
                 final int lastIndexOfUnixPathSeparator = tmpTextureName.lastIndexOf('/');
                 final int lastIndexOfWindowsPathSeparator = tmpTextureName.lastIndexOf('\\');
                 if (lastIndexOfUnixPathSeparator != -1) {
@@ -330,6 +324,13 @@ public class ObjExporter {
                     } else {
                         textureName = tmpTextureName;
                     }
+                }
+                if (tKey.isFlipped()) {
+                    ObjExporter.logger.warning("The texture " + tmpTextureName
+                            + " will have to be flipped manually when loading this OBJ file");
+                } else {
+                    ObjExporter.logger.warning("The texture " + tmpTextureName
+                            + " might need to be flipped manually when loading this OBJ file");
                 }
             } else {
                 textureName = null;

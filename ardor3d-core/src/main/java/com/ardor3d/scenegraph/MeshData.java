@@ -918,12 +918,12 @@ public class MeshData implements Savable {
                 index += (primitiveIndex * 3) + point;
                 break;
             case TriangleStrip:
-                // XXX: Do we need to flip point 0 and 1 on odd primitiveIndex values?
-                // if (point < 2 && primitiveIndex % 2 == 1) {
-                // index += primitiveIndex + (point == 0 ? 1 : 0);
-                // } else {
-                index += primitiveIndex + point;
-                // }
+                // XXX: we need to flip point 0 and 1 on odd primitiveIndex values
+                if (point < 2 && primitiveIndex % 2 == 1) {
+                    index += primitiveIndex + (point == 0 ? 1 : 0);
+                } else {
+                    index += primitiveIndex + point;
+                }
                 break;
             case TriangleFan:
                 if (point == 0) {
