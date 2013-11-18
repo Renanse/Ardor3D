@@ -42,6 +42,7 @@ import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.plugin.ColladaExtraPlugin;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.geom.GeometryTool;
 import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 import com.ardor3d.util.resource.RelativeResourceLocator;
 import com.ardor3d.util.resource.ResourceLocator;
@@ -203,6 +204,21 @@ public class ColladaImporter {
      *             if the resource can not be loaded for some reason.
      */
     public ColladaStorage load(final ResourceSource resource) throws IOException {
+        return load(resource, new GeometryTool());
+    }
+
+    /**
+     * Reads a Collada file from the given resource and returns it as a ColladaStorage object.
+     * 
+     * @param resource
+     *            the name of the resource to find.
+     * @param geometryTool
+     *            the geometry tool used to minimize the vertex count.
+     * @return a ColladaStorage data object containing the Collada scene and other useful elements.
+     * @throws IOException
+     *             if the resource can not be loaded for some reason.
+     */
+    public ColladaStorage load(final ResourceSource resource, final GeometryTool geometryTool) throws IOException {
         final ColladaStorage colladaStorage = new ColladaStorage();
         final DataCache dataCache = new DataCache();
         if (_externalJointMapping != null) {
@@ -211,7 +227,7 @@ public class ColladaImporter {
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
         final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(this, dataCache, colladaDOMUtil);
         final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils,
-                _optimizeMeshes, _optimizeSettings);
+                _optimizeMeshes, _optimizeSettings, geometryTool);
         final ColladaAnimUtils colladaAnimUtils = new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil,
                 colladaMeshUtils);
         final ColladaNodeUtils colladaNodeUtils = new ColladaNodeUtils(dataCache, colladaDOMUtil, colladaMaterialUtils,

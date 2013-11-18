@@ -29,7 +29,7 @@ import com.google.common.collect.Maps;
  * Note: Does not work with geometry using texcoords other than 2d coords. <br>
  * TODO: Consider adding an option for "close enough" vertex matches... ie, smaller than X distance apart.<br>
  */
-public abstract class GeometryTool {
+public class GeometryTool {
     private static final Logger logger = Logger.getLogger(GeometryTool.class.getName());
 
     /**
@@ -46,6 +46,10 @@ public abstract class GeometryTool {
         Group;
     }
 
+    public GeometryTool() {
+        super();
+    }
+
     /**
      * Attempt to collapse duplicate vertex data in a given mesh. Vertices are considered duplicate if they occupy the
      * same place in space and match the supplied conditions. All vertices in the mesh are considered part of the same
@@ -57,7 +61,7 @@ public abstract class GeometryTool {
      *            our match conditions.
      * @return a mapping of old vertex positions to their new positions.
      */
-    public static VertMap minimizeVerts(final Mesh mesh, final EnumSet<MatchCondition> conditions) {
+    public VertMap minimizeVerts(final Mesh mesh, final EnumSet<MatchCondition> conditions) {
         final VertGroupData groupData = new VertGroupData();
         groupData.setGroupConditions(VertGroupData.DEFAULT_GROUP, conditions);
         return minimizeVerts(mesh, groupData);
@@ -73,7 +77,7 @@ public abstract class GeometryTool {
      *            grouping data for the vertices in this mesh.
      * @return a mapping of old vertex positions to their new positions.
      */
-    public static VertMap minimizeVerts(final Mesh mesh, final VertGroupData groupData) {
+    public VertMap minimizeVerts(final Mesh mesh, final VertGroupData groupData) {
         final long start = System.currentTimeMillis();
 
         int vertCount = -1;
@@ -205,7 +209,7 @@ public abstract class GeometryTool {
         return result;
     }
 
-    private static Vector2[] getTexs(final Vector2[][] tex, final int i) {
+    private Vector2[] getTexs(final Vector2[][] tex, final int i) {
         final Vector2[] res = new Vector2[tex.length];
         for (int x = 0; x < tex.length; x++) {
             if (tex[x] != null) {
@@ -215,7 +219,7 @@ public abstract class GeometryTool {
         return res;
     }
 
-    public static void trimEmptyBranches(final Spatial spatial) {
+    public void trimEmptyBranches(final Spatial spatial) {
         if (spatial instanceof Node) {
             final Node node = (Node) spatial;
             for (int i = node.getNumberOfChildren(); --i >= 0;) {
