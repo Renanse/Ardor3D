@@ -21,6 +21,7 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.geom.GeometryTool;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
@@ -130,8 +131,21 @@ public class ObjImporter {
      * @return an ObjGeometryStore data object containing the scene and other useful elements.
      */
     public ObjGeometryStore load(final ResourceSource resource) {
+        return load(resource, new GeometryTool());
+    }
+
+    /**
+     * Reads a Wavefront OBJ file from the given resource
+     * 
+     * @param resource
+     *            the name of the resource to find.
+     * @param geometryTool
+     *            the geometry tool used to minimize the vertex count.
+     * @return an ObjGeometryStore data object containing the scene and other useful elements.
+     */
+    public ObjGeometryStore load(final ResourceSource resource, final GeometryTool geometryTool) {
         try {
-            final ObjGeometryStore store = new ObjGeometryStore();
+            final ObjGeometryStore store = new ObjGeometryStore(geometryTool);
             long currentSmoothGroup = -1;
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()));

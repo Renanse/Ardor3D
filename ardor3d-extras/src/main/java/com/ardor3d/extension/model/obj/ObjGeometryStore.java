@@ -58,6 +58,17 @@ public class ObjGeometryStore {
     private final Map<String, ObjMaterial> materialLibrary = Maps.newHashMap();
     private final Map<Spatial, String> _materialMap = Maps.newHashMap();
 
+    private final GeometryTool _geometryTool;
+
+    public ObjGeometryStore() {
+        this(new GeometryTool());
+    }
+
+    public ObjGeometryStore(final GeometryTool geometryTool) {
+        super();
+        _geometryTool = geometryTool;
+    }
+
     public Map<String, ObjMaterial> getMaterialLibrary() {
         return materialLibrary;
     }
@@ -188,7 +199,7 @@ public class ObjGeometryStore {
             }
             points.getMeshData().setIndices(indexBuffer);
 
-            GeometryTool.minimizeVerts(points, EnumSet.noneOf(MatchCondition.class));
+            _geometryTool.minimizeVerts(points, EnumSet.noneOf(MatchCondition.class));
 
             applyCurrentMaterial(points);
             mapToGroups(points);
@@ -236,7 +247,7 @@ public class ObjGeometryStore {
                 }
                 line.getMeshData().setIndexLengths(lengths);
             }
-            GeometryTool.minimizeVerts(line, EnumSet.of(MatchCondition.UVs));
+            _geometryTool.minimizeVerts(line, EnumSet.of(MatchCondition.UVs));
 
             applyCurrentMaterial(line);
             mapToGroups(line);
@@ -315,7 +326,7 @@ public class ObjGeometryStore {
             groupData.setVertGroups(vertGroups);
             groupData.setGroupConditions(VertGroupData.DEFAULT_GROUP,
                     EnumSet.of(MatchCondition.Normal, MatchCondition.UVs));
-            GeometryTool.minimizeVerts(mesh, groupData);
+            _geometryTool.minimizeVerts(mesh, groupData);
 
             applyCurrentMaterial(mesh);
             mapToGroups(mesh);

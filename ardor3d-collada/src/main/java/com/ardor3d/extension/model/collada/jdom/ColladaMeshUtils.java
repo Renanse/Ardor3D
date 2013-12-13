@@ -43,15 +43,23 @@ public class ColladaMeshUtils {
     private final ColladaMaterialUtils _colladaMaterialUtils;
     private final boolean _optimizeMeshes;
     private final EnumSet<MatchCondition> _optimizeSettings;
+    private final GeometryTool _geometryTool;
 
     public ColladaMeshUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
             final ColladaMaterialUtils colladaMaterialUtils, final boolean optimizeMeshes,
             final EnumSet<MatchCondition> optimizeSettings) {
+        this(dataCache, colladaDOMUtil, colladaMaterialUtils, optimizeMeshes, optimizeSettings, new GeometryTool());
+    }
+
+    public ColladaMeshUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
+            final ColladaMaterialUtils colladaMaterialUtils, final boolean optimizeMeshes,
+            final EnumSet<MatchCondition> optimizeSettings, final GeometryTool geometryTool) {
         _dataCache = dataCache;
         _colladaDOMUtil = colladaDOMUtil;
         _colladaMaterialUtils = colladaMaterialUtils;
         _optimizeMeshes = optimizeMeshes;
         _optimizeSettings = EnumSet.copyOf(optimizeSettings);
+        _geometryTool = geometryTool;
     }
 
     /**
@@ -77,7 +85,6 @@ public class ColladaMeshUtils {
      * @param colladaGeometry
      * @return a Node containing all of the Ardor3D meshes we've parsed from this geometry element.
      */
-    @SuppressWarnings("unchecked")
     public Node buildMesh(final Element colladaGeometry) {
         if (colladaGeometry.getChild("mesh") != null) {
             final Element cMesh = colladaGeometry.getChild("mesh");
@@ -213,7 +220,7 @@ public class ColladaMeshUtils {
         _dataCache.getVertMappings().put(colladaGeometry, mvp);
 
         if (_optimizeMeshes) {
-            final VertMap map = GeometryTool.minimizeVerts(points, _optimizeSettings);
+            final VertMap map = _geometryTool.minimizeVerts(points, _optimizeSettings);
             _dataCache.setMeshVertMap(points, map);
         }
 
@@ -224,7 +231,6 @@ public class ColladaMeshUtils {
         return points;
     }
 
-    @SuppressWarnings("unchecked")
     public Mesh buildMeshPolygons(final Element colladaGeometry, final Element polys) {
         if (polys == null || polys.getChild("input") == null) {
             return null;
@@ -309,7 +315,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = GeometryTool.minimizeVerts(polyMesh, _optimizeSettings);
+            final VertMap map = _geometryTool.minimizeVerts(polyMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(polyMesh, map);
         }
 
@@ -401,7 +407,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = GeometryTool.minimizeVerts(polyMesh, _optimizeSettings);
+            final VertMap map = _geometryTool.minimizeVerts(polyMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(polyMesh, map);
         }
 
@@ -455,7 +461,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = GeometryTool.minimizeVerts(triMesh, _optimizeSettings);
+            final VertMap map = _geometryTool.minimizeVerts(triMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(triMesh, map);
         }
 
@@ -506,7 +512,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = GeometryTool.minimizeVerts(lineMesh, _optimizeSettings);
+            final VertMap map = _geometryTool.minimizeVerts(lineMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(lineMesh, map);
         }
 
@@ -523,7 +529,6 @@ public class ColladaMeshUtils {
      *            the store for our pipes
      * @return the max offset of our pipes.
      */
-    @SuppressWarnings("unchecked")
     private int extractPipes(final Element inputsParent, final LinkedList<ColladaInputPipe> pipesStore) {
         int maxOffset = 0;
         int texCount = 0;
