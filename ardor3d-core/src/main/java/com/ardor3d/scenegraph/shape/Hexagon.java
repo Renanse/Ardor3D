@@ -36,7 +36,7 @@ public class Hexagon extends Mesh {
      * user must move and rotate for positioning.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param sideLength
      *            The length of all the sides of the triangles
      */
@@ -58,9 +58,9 @@ public class Hexagon extends Mesh {
     }
 
     /**
-     * Vertexes are set up like this: 0__1 / \ / \ 5/__\6/__\2 \ / \ / \ /___\ / 4 3 All lines on this diagram are
+     * Vertices are set up like this: 0__1 / \ / \ 5/__\6/__\2 \ / \ / \ /___\ / 4 3 All lines on this diagram are
      * sideLength long. Therefore, the width of the hexagon is sideLength * 2, and the height is 2 * the height of one
-     * equalateral triangle with all side = sideLength which is .866
+     * equilateral triangle with all side = sideLength which is .866
      */
     private void setVertexData() {
         _meshData.getVertexBuffer().put(-(_sideLength / 2)).put(_sideLength * 0.866f).put(0.0f);

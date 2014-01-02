@@ -62,7 +62,7 @@ public class Point extends Mesh {
      * the vertex array. If this is null an exception is thrown.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
      *            the vertices or points.
      * @param normal
@@ -85,7 +85,7 @@ public class Point extends Mesh {
      * the vertex array. If this is null an exception is thrown.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
      *            the vertices or points.
      * @param normal

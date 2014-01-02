@@ -36,11 +36,11 @@ public class StripBox extends Mesh {
     }
 
     /**
-     * Constructor instantiates a new <code>StripBox</code> object. Center and vertice information must be supplied
+     * Constructor instantiates a new <code>StripBox</code> object. Center and vertex information must be supplied
      * later.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      */
     public StripBox(final String name) {
         super(name);

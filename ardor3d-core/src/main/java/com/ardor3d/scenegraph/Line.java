@@ -51,7 +51,7 @@ public class Line extends Mesh {
      * the vertex list. If vertices are null an exception will be thrown.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
      *            the vertices that make up the lines.
      * @param normal
@@ -73,7 +73,7 @@ public class Line extends Mesh {
      * the vertex list. If vertices are null an exception will be thrown.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
      *            the vertices that make up the lines.
      * @param normal
