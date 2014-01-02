@@ -36,7 +36,7 @@ public class CameraNode extends Node {
      * Constructor instantiates a new <code>CameraNode</code> object setting the camera to use for the frame reference.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param camera
      *            the camera this node controls.
      */

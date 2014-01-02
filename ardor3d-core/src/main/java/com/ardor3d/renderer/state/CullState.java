@@ -20,8 +20,8 @@ import com.ardor3d.util.export.OutputCapsule;
 
 /**
  * <code>CullState</code> determines which side of a model will be visible when it is rendered. By default, both sides
- * are visible. Define front as the side that traces its vertexes counter clockwise and back as the side that traces its
- * vertexes clockwise, a side (front or back) can be culled, or not shown when the model is rendered. Instead, the side
+ * are visible. Define front as the side that traces its vertices counter clockwise and back as the side that traces its
+ * vertices clockwise, a side (front or back) can be culled, or not shown when the model is rendered. Instead, the side
  * will be transparent. <br>
  * <b>NOTE:</b> Any object that is placed in the transparent queue with two sided transparency will not use the
  * cullstate that is attached to it. Instead, using the CullStates necessary for rendering two sided transparency.

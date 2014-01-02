@@ -21,7 +21,7 @@ public class TriangleTriangleIntersect {
     public static final double EPSILON = 1e-12;
 
     /**
-     * This method tests for the intersection between two triangles defined by their vertexes. Converted to java from C
+     * This method tests for the intersection between two triangles defined by their vertices. Converted to java from C
      * code found at http://jgt.akpeters.com/papers/Moller97/
      * 
      * @param v0

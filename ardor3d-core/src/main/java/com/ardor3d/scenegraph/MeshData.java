@@ -431,10 +431,10 @@ public class MeshData implements Savable {
     }
 
     /**
-     * Sets the interleaved buffer.
+     * Sets the interleaved data.
      * 
-     * @param interleavedBuffer
-     *            the interleaved buffer
+     * @param interleavedData
+     *            the interleaved data
      */
     public void setInterleavedData(final FloatBufferData interleavedData) {
         _interleaved = interleavedData;
