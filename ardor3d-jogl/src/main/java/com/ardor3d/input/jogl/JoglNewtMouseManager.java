@@ -10,27 +10,52 @@
 
 package com.ardor3d.input.jogl;
 
+import java.nio.ByteBuffer;
+
+import javax.media.nativewindow.util.Dimension;
+import javax.media.nativewindow.util.DimensionImmutable;
+import javax.media.nativewindow.util.PixelFormat;
+import javax.media.nativewindow.util.PixelRectangle;
+
 import com.ardor3d.framework.jogl.NewtWindowContainer;
+import com.ardor3d.image.Image;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseManager;
+import com.jogamp.newt.Display.PointerIcon;
 import com.jogamp.newt.opengl.GLWindow;
 
-
-public class JoglNewtMouseManager implements MouseManager{
+public class JoglNewtMouseManager implements MouseManager {
 
     /** our current grabbed state */
     private GrabbedState _grabbedState;
-    
-    private GLWindow _newtWindow;
-    
+
+    private final GLWindow _newtWindow;
+
+    private PointerIcon _previousPointerIcon;
+
     public JoglNewtMouseManager(final NewtWindowContainer newtWindowContainer) {
         _newtWindow = newtWindowContainer.getNewtWindow();
     }
 
     @Override
-    public void setCursor(MouseCursor cursor) {
-        //FIXME not supported by NEWT
+    public void setCursor(final MouseCursor cursor) {
+        final Image image = cursor.getImage();
+        final DimensionImmutable size = new Dimension(image.getWidth(), image.getHeight());
+        final ByteBuffer pixels = image.getData(0);
+
+        PixelFormat pixFormat = null;
+        for (final PixelFormat pf : PixelFormat.values()) {
+            if (pf.componentCount == image.getDataFormat().getComponents()
+                    && pf.bitsPerPixel == image.getDataType().getBytesPerPixel(pf.componentCount) * 8) {
+                pixFormat = pf;
+                break;
+            }
+        }
+
+        final PixelRectangle.GenericPixelRect rec = new PixelRectangle.GenericPixelRect(pixFormat, size, 0, false,
+                pixels);
+        _newtWindow.getScreen().getDisplay().createPointerIcon(rec, cursor.getHotspotX(), cursor.getHotspotY());
     }
 
     @Override
@@ -39,23 +64,22 @@ public class JoglNewtMouseManager implements MouseManager{
     }
 
     @Override
-    public void setGrabbed(GrabbedState grabbedState) {
+    public void setGrabbed(final GrabbedState grabbedState) {
         // check if we should be here.
         if (_grabbedState == grabbedState) {
             return;
         }
-        
+
         // remember our grabbed state mode.
         _grabbedState = grabbedState;
         if (grabbedState == GrabbedState.GRABBED) {
-            //FIXME remember our old cursor
-            
+            // remember our old cursor
+            _previousPointerIcon = _newtWindow.getPointerIcon();
             // set our cursor to be invisible
             _newtWindow.setPointerVisible(false);
-        }
-        else {
-            //FIXME restore our old cursor
-        
+        } else {
+            // restore our old cursor
+            _newtWindow.setPointerIcon(_previousPointerIcon);
             // set our cursor to be visible
             _newtWindow.setPointerVisible(true);
         }
