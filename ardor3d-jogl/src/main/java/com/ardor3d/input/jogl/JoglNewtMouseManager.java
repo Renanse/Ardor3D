@@ -47,7 +47,7 @@ public class JoglNewtMouseManager implements MouseManager {
         PixelFormat pixFormat = null;
         for (final PixelFormat pf : PixelFormat.values()) {
             if (pf.componentCount == image.getDataFormat().getComponents()
-                    && pf.bitsPerPixel == image.getDataType().getBytesPerPixel(pf.componentCount) * 8) {
+                    && pf.bytesPerPixel() == image.getDataType().getBytesPerPixel(pf.componentCount)) {
                 pixFormat = pf;
                 break;
             }
