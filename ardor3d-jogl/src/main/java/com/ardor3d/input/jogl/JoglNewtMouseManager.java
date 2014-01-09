@@ -58,7 +58,7 @@ public class JoglNewtMouseManager implements MouseManager {
             }
         }
 
-        final PixelRectangle.GenericPixelRect rec = new PixelRectangle.GenericPixelRect(pixFormat, size, 0, false,
+        final PixelRectangle.GenericPixelRect rec = new PixelRectangle.GenericPixelRect(pixFormat, size, 0, true,
                 pixels);
         final PointerIcon joglCursor = _newtWindow.getScreen().getDisplay()
                 .createPointerIcon(rec, cursor.getHotspotX(), cursor.getHotspotY());
