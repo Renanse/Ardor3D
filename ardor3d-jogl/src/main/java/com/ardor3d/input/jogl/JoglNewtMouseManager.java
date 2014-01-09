@@ -40,6 +40,11 @@ public class JoglNewtMouseManager implements MouseManager {
 
     @Override
     public void setCursor(final MouseCursor cursor) {
+        final PointerIcon joglCursor = createJoglCursor(cursor);
+        _newtWindow.setPointerIcon(joglCursor);
+    }
+
+    private PointerIcon createJoglCursor(final MouseCursor cursor) {
         final Image image = cursor.getImage();
         final DimensionImmutable size = new Dimension(image.getWidth(), image.getHeight());
         final ByteBuffer pixels = image.getData(0);
@@ -55,7 +60,9 @@ public class JoglNewtMouseManager implements MouseManager {
 
         final PixelRectangle.GenericPixelRect rec = new PixelRectangle.GenericPixelRect(pixFormat, size, 0, false,
                 pixels);
-        _newtWindow.getScreen().getDisplay().createPointerIcon(rec, cursor.getHotspotX(), cursor.getHotspotY());
+        final PointerIcon joglCursor = _newtWindow.getScreen().getDisplay()
+                .createPointerIcon(rec, cursor.getHotspotX(), cursor.getHotspotY());
+        return joglCursor;
     }
 
     @Override
