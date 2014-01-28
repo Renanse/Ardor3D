@@ -11,11 +11,16 @@
     <packaging>bundle</packaging>
     <name>Ardor 3D JOGL</name>
   
-    <!-- This repository should be used only for unreleased development versions, typically all release candidates and post builds -->
     <repositories>
+        <!-- This repository should be used only for unreleased development versions, typically all release candidates and post builds -->
         <repository>
             <id>jogamp</id>
             <url>http://jogamp.org/deployment/maven</url>
+        </repository>
+        <!-- The current version of swt isn't on central yet. -->
+        <repository>
+            <id>swt-repo</id>
+            <url>https://swt-repo.googlecode.com/svn/repo/</url>
         </repository>
     </repositories>
   
@@ -41,6 +46,117 @@
           <groupId>org.jogamp.jocl</groupId>
           <artifactId>jocl-main</artifactId>
         </dependency-->
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>${swt.artifactId}</artifactId>
+            <version>${swt.version}</version>
+        </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>linux-x86</id>
+            <activation>
+                <os>
+                    <arch>i386</arch>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.linux.x86</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>linux-x86_64</id>
+            <activation>
+                <os>
+                    <arch>amd64</arch>
+                    <name>Linux</name>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>solaris-sparc</id>
+            <activation>
+                <os>
+                    <arch>sparc</arch>
+                    <name>SunOS</name>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.solaris.sparc</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>solaris-x86</id>
+            <activation>
+                <os>
+                    <arch>x86</arch>
+                    <name>SunOS</name>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.gtk.solaris.x86</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>macosx-cocoa-64</id>
+            <activation>
+                <os>
+                    <arch>x86_64</arch>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>macosx-cocoa</id>
+            <activation>
+                <os>
+                    <arch>x86</arch>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.cocoa.macosx</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>win32</id>
+            <activation>
+                <os>
+                    <arch>x86</arch>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.win32.win32.x86</swt.artifactId>
+            </properties>
+        </profile>
+    
+        <profile>
+            <id>win64</id>
+            <activation>
+                <os>
+                    <arch>amd64</arch>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
