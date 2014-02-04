@@ -36,10 +36,11 @@ import org.eclipse.swt.widgets.TabItem;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
+import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.swt.SwtCanvas;
-import com.ardor3d.image.util.awt.AWTImageLoader;
+import com.ardor3d.framework.jogl.JoglSwtCanvas;
+import com.ardor3d.image.util.jogl.JoglImageLoader;
 import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
@@ -107,8 +108,10 @@ public class JoglSwtExample {
         fileItem.setMenu(submenu);
         final MenuItem item = new MenuItem(submenu, SWT.PUSH);
         item.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(final Event e) {
                 Display.getDefault().asyncExec(new Runnable() {
+                    @Override
                     public void run() {
                         addNewCanvas(tabFolder, scene, frameWork, logicalLayer);
                     }
@@ -118,7 +121,7 @@ public class JoglSwtExample {
         item.setText("Add &3d Canvas");
         item.setAccelerator(SWT.MOD1 + '3');
 
-        AWTImageLoader.registerLoader();
+        JoglImageLoader.registerLoader();
 
         try {
             final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
@@ -177,30 +180,29 @@ public class JoglSwtExample {
 
         canvasParent.layout();
 
-        final SwtCanvas canvas1 = new SwtCanvas(topLeft, SWT.NONE, data);
+        final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
+
         final JoglCanvasRenderer canvasRenderer1 = new JoglCanvasRenderer(scene);
-        canvas1.setCanvasRenderer(canvasRenderer1);
+        final JoglSwtCanvas canvas1 = new JoglSwtCanvas(settings, canvasRenderer1, topLeft, SWT.NONE);
         frameWork.addCanvas(canvas1);
         canvas1.addControlListener(newResizeHandler(canvas1, canvasRenderer1));
-        canvas1.setFocus();
 
-        final SwtCanvas canvas2 = new SwtCanvas(bottomLeft, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer2 = new JoglCanvasRenderer(scene);
-        canvas2.setCanvasRenderer(canvasRenderer2);
+        final JoglSwtCanvas canvas2 = new JoglSwtCanvas(settings, canvasRenderer2, bottomLeft, SWT.NONE);
         frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, canvasRenderer2));
 
-        final SwtCanvas canvas3 = new SwtCanvas(topRight, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer3 = new JoglCanvasRenderer(scene);
-        canvas3.setCanvasRenderer(canvasRenderer3);
+        final JoglSwtCanvas canvas3 = new JoglSwtCanvas(settings, canvasRenderer3, topRight, SWT.NONE);
         frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, canvasRenderer3));
 
-        final SwtCanvas canvas4 = new SwtCanvas(bottomRight, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer4 = new JoglCanvasRenderer(scene);
-        canvas4.setCanvasRenderer(canvasRenderer4);
+        final JoglSwtCanvas canvas4 = new JoglSwtCanvas(settings, canvasRenderer4, bottomRight, SWT.NONE);
         frameWork.addCanvas(canvas4);
         canvas4.addControlListener(newResizeHandler(canvas4, canvasRenderer4));
+
+        canvas1.setFocus();
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas1);
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
@@ -213,6 +215,7 @@ public class JoglSwtExample {
         logicalLayer.registerInput(canvas1, pl);
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != canvas1) {
                     return;
@@ -228,6 +231,7 @@ public class JoglSwtExample {
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != canvas1) {
                     return;
@@ -237,6 +241,7 @@ public class JoglSwtExample {
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != canvas1) {
                     return;
@@ -247,10 +252,10 @@ public class JoglSwtExample {
             }
         }));
 
-        final AWTImageLoader awtImageLoader = new AWTImageLoader();
+        final JoglImageLoader joglImageLoader = new JoglImageLoader();
         try {
-            _cursor1 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
-            _cursor2 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/movedata.gif");
+            _cursor1 = createMouseCursor(joglImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
+            _cursor2 = createMouseCursor(joglImageLoader, "com/ardor3d/example/media/input/movedata.gif");
         } catch (final IOException ioe) {
             ioe.printStackTrace();
         }
@@ -258,18 +263,20 @@ public class JoglSwtExample {
         _showCursor1.put(canvas1, true);
     }
 
-    private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
+    private static MouseCursor createMouseCursor(final JoglImageLoader joglImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(
+        final com.ardor3d.image.Image image = joglImageLoader.load(
                 ResourceLocatorTool.getClassPathResourceAsStream(JoglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
-    static ControlListener newResizeHandler(final SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
+    static ControlListener newResizeHandler(final JoglSwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
         final ControlListener retVal = new ControlListener() {
+            @Override
             public void controlMoved(final ControlEvent e) {}
 
+            @Override
             public void controlResized(final ControlEvent event) {
                 final Rectangle size = swtCanvas.getClientArea();
                 if ((size.width == 0) && (size.height == 0)) {
@@ -292,6 +299,7 @@ public class JoglSwtExample {
     private static class MyExit implements Exit {
         private volatile boolean exit = false;
 
+        @Override
         public void exit() {
             exit = true;
         }

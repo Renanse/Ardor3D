@@ -170,6 +170,7 @@ public class JoglAwtExample {
         logicalLayer.registerInput(theCanvas, pl);
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
@@ -185,6 +186,7 @@ public class JoglAwtExample {
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
@@ -201,6 +203,7 @@ public class JoglAwtExample {
     private static class MyExit implements Exit {
         private volatile boolean exit = false;
 
+        @Override
         public void exit() {
             exit = true;
         }

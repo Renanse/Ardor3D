@@ -36,17 +36,19 @@ public final class ExampleScene implements Scene {
         return root;
     }
 
+    @Override
     @MainThread
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
-        GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.RENDER).execute(
-                renderer);
+        GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.RENDER)
+                .execute(renderer);
         ContextGarbageCollector.doRuntimeCleanup(renderer);
 
         renderer.draw(root);
         return true;
     }
 
+    @Override
     public PickResults doPick(final Ray3 pickRay) {
         // does nothing.
         return null;

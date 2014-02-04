@@ -29,15 +29,15 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.jogl.JoglNewtAwtCanvas;
-import com.ardor3d.image.util.awt.AWTImageLoader;
+import com.ardor3d.image.util.jogl.JoglImageLoader;
 import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
-import com.ardor3d.input.awt.AwtFocusWrapper;
-import com.ardor3d.input.awt.AwtKeyboardWrapper;
-import com.ardor3d.input.awt.AwtMouseManager;
-import com.ardor3d.input.awt.AwtMouseWrapper;
+import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
+import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
+import com.ardor3d.input.jogl.JoglNewtMouseManager;
+import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -49,7 +49,8 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
- * This examples demonstrates how to render OpenGL (via JOGL) on a AWT canvas.
+ * This examples demonstrates how to render OpenGL (via JOGL) on a NEWT AWT canvas. FIXME update the thumbnail and the
+ * description
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglAwtExample", //
 thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglAwtExample.jpg", //
@@ -78,7 +79,7 @@ public class JoglNewtAwtExample {
         frameWork.addUpdater(game1);
         frameWork.addUpdater(game2);
 
-        final JFrame frame = new JFrame("AWT Example");
+        final JFrame frame = new JFrame("NEWT AWT Example");
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
@@ -88,7 +89,7 @@ public class JoglNewtAwtExample {
 
         frame.setLayout(new GridLayout(2, 3));
 
-        AWTImageLoader.registerLoader();
+        JoglImageLoader.registerLoader();
 
         try {
             final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
@@ -98,9 +99,9 @@ public class JoglNewtAwtExample {
             ex.printStackTrace();
         }
 
-        final AWTImageLoader awtImageLoader = new AWTImageLoader();
-        _cursor1 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
-        _cursor2 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/movedata.gif");
+        final JoglImageLoader joglImageLoader = new JoglImageLoader();
+        _cursor1 = createMouseCursor(joglImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
+        _cursor2 = createMouseCursor(joglImageLoader, "com/ardor3d/example/media/input/movedata.gif");
 
         addCanvas(frame, scene1, logicalLayer, frameWork);
         frame.add(new JLabel(
@@ -138,9 +139,9 @@ public class JoglNewtAwtExample {
         System.exit(0);
     }
 
-    private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
+    private static MouseCursor createMouseCursor(final JoglImageLoader joglImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(
+        final com.ardor3d.image.Image image = joglImageLoader.load(
                 ResourceLocatorTool.getClassPathResourceAsStream(JoglNewtAwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
@@ -160,10 +161,10 @@ public class JoglNewtAwtExample {
         theCanvas.setSize(new Dimension(400, 300));
         theCanvas.setVisible(true);
 
-        final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(theCanvas);
-        final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(theCanvas);
-        final AwtMouseManager mouseManager = new AwtMouseManager(theCanvas);
-        final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(theCanvas, mouseManager);
+        final JoglNewtKeyboardWrapper keyboardWrapper = new JoglNewtKeyboardWrapper(theCanvas);
+        final JoglNewtFocusWrapper focusWrapper = new JoglNewtFocusWrapper(theCanvas);
+        final JoglNewtMouseManager mouseManager = new JoglNewtMouseManager(theCanvas);
+        final JoglNewtMouseWrapper mouseWrapper = new JoglNewtMouseWrapper(theCanvas, mouseManager);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);
@@ -171,6 +172,7 @@ public class JoglNewtAwtExample {
         logicalLayer.registerInput(theCanvas, pl);
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
@@ -186,6 +188,7 @@ public class JoglNewtAwtExample {
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
@@ -202,6 +205,7 @@ public class JoglNewtAwtExample {
     private static class MyExit implements Exit {
         private volatile boolean exit = false;
 
+        @Override
         public void exit() {
             exit = true;
         }
