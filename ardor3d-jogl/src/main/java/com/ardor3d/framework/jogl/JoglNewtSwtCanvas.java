@@ -23,6 +23,11 @@ import com.ardor3d.framework.DisplaySettings;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.newt.swt.NewtCanvasSWT;
 
+/**
+ * Ardor3D JOGL SWT lightweight canvas, SWT control for the OpenGL rendering of Ardor3D with JOGL that supports both
+ * NEWT and SWT input systems directly and their abstractions in Ardor3D (com.ardor3d.input.jogl and
+ * com.ardor3d.input.swt)
+ */
 public class JoglNewtSwtCanvas extends NewtCanvasSWT implements Canvas, NewtWindowContainer {
 
     private final JoglCanvasRenderer _canvasRenderer;

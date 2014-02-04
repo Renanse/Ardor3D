@@ -275,7 +275,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     @Override
     public void setIcon(final Image[] iconImages) {
-        // FIXME not implemented
+        // not implemented, not supported by AWT anyway
     }
 
     @Override
