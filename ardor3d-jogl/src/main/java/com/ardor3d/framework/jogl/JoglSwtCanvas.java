@@ -1,38 +1,33 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2014 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it
+ * Ardor3D is free software: you can redistribute it and/or modify it 
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.framework.jogl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLRunnable;
-import javax.media.opengl.awt.GLCanvas;
-import javax.swing.SwingUtilities;
+
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
+import com.jogamp.opengl.swt.GLCanvas;
 
 /**
- * Ardor3D JOGL AWT heavyweight canvas, AWT component for the OpenGL rendering of Ardor3D with JOGL that supports the
- * AWT input system directly and its abstraction in Ardor3D (com.ardor3d.input.awt)
- * 
- * FIXME there is still a deadlock when using several instances of this class in the same container, see JOGL bug 572
- * Rather use JoglNewtAwtCanvas in this case.
- * 
+ * Ardor3D JOGL SWT heavyweight canvas, SWT control for the OpenGL rendering of Ardor3D with JOGL that supports the SWT
+ * input system directly and its abstraction in Ardor3D (com.ardor3d.input.swt)
  */
-public class JoglAwtCanvas extends GLCanvas implements Canvas {
-
-    private static final long serialVersionUID = 1L;
+public class JoglSwtCanvas extends GLCanvas implements Canvas {
 
     private final JoglCanvasRenderer _canvasRenderer;
     private boolean _inited = false;
@@ -41,24 +36,23 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
     private final JoglDrawerRunnable _drawerGLRunnable;
 
-    private final JoglAwtInitializerRunnable _initializerRunnable;
+    private final JoglSwtInitializerRunnable _initializerRunnable;
 
-    public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
-        this(settings, canvasRenderer, new CapsUtil());
+    public JoglSwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer,
+            final Composite composite, final int style) {
+        this(settings, canvasRenderer, new CapsUtil(), composite, style);
     }
 
-    public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer,
-            final CapsUtil capsUtil) {
-        super(capsUtil.getCapsForSettings(settings));
+    public JoglSwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer,
+            final CapsUtil capsUtil, final Composite composite, final int style) {
+        super(composite, style, capsUtil.getCapsForSettings(settings), null);
         _drawerGLRunnable = new JoglDrawerRunnable(canvasRenderer);
-        _initializerRunnable = new JoglAwtInitializerRunnable(this, settings);
+        _initializerRunnable = new JoglSwtInitializerRunnable(this, settings);
         _settings = settings;
         _canvasRenderer = canvasRenderer;
 
-        setFocusable(true);
-        requestFocus();
+        setFocus();
         setSize(_settings.getWidth(), _settings.getHeight());
-        setIgnoreRepaint(true);
         setAutoSwapBufferMode(false);
     }
 
@@ -69,15 +63,9 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
             return;
         }
 
-        // Calling setVisible(true) on the GLCanvas not from the AWT-EDT can freeze the Intel GPU under Windows
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(_initializerRunnable);
-            } catch (final InterruptedException ex) {
-                ex.printStackTrace();
-            } catch (final InvocationTargetException ex) {
-                ex.printStackTrace();
-            }
+        // if we aren't on SWT user interface thread
+        if (Display.getCurrent() == null) {
+            Display.getDefault().syncExec(_initializerRunnable);
         } else {
             _initializerRunnable.run();
         }
@@ -91,7 +79,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
             init();
         }
 
-        if (isShowing()) {
+        if (isVisible()) {
             invoke(true, _drawerGLRunnable);
         }
         if (latch != null) {
@@ -113,4 +101,5 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
             }
         });
     }
+
 }

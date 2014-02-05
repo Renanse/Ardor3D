@@ -36,7 +36,7 @@ public class JoglImageLoader implements ImageLoader {
 
     public static boolean createOnHeap = false;
 
-    protected CapsUtil _capsUtil;
+    protected final CapsUtil _capsUtil;
 
     private enum TYPE {
         BYTE(ByteBuffer.class), SHORT(ShortBuffer.class), CHAR(CharBuffer.class), INT(IntBuffer.class), FLOAT(
@@ -49,26 +49,32 @@ public class JoglImageLoader implements ImageLoader {
         }
     };
 
-    private static final String[] supportedFormats = new String[] { "." + TextureIO.DDS.toUpperCase(),
+    private static final String[] _supportedFormats = new String[] { "." + TextureIO.DDS.toUpperCase(),
             "." + TextureIO.GIF.toUpperCase(), "." + TextureIO.JPG.toUpperCase(), "." + TextureIO.PAM.toUpperCase(),
             "." + TextureIO.PNG.toUpperCase(), "." + TextureIO.PPM.toUpperCase(), "." + TextureIO.SGI.toUpperCase(),
             "." + TextureIO.TGA.toUpperCase(), "." + TextureIO.TIFF.toUpperCase() };
 
     public static String[] getSupportedFormats() {
-        return supportedFormats;
+        return _supportedFormats;
     }
 
     public static void registerLoader() {
-        ImageLoaderUtil.registerHandler(new JoglImageLoader(), supportedFormats);
+        registerLoader(new JoglImageLoader(), _supportedFormats);
+    }
+
+    public static void registerLoader(final JoglImageLoader joglImageLoader, final String[] supportedFormats) {
+        ImageLoaderUtil.registerHandler(joglImageLoader, supportedFormats);
     }
 
     public JoglImageLoader() {
-        _capsUtil = new CapsUtil();
+        this(new CapsUtil());
     }
 
-    @Override
-    public Image load(final InputStream is, final boolean flipped) throws IOException {
-        final TextureData textureData = TextureIO.newTextureData(_capsUtil.getProfile(), is, true, null);
+    public JoglImageLoader(final CapsUtil capsUtil) {
+        _capsUtil = capsUtil;
+    }
+
+    public Image makeArdor3dImage(final TextureData textureData, final boolean flipped) {
         final Buffer textureDataBuffer = textureData.getBuffer();
         final Image ardorImage = new Image();
         final TYPE bufferDataType = getBufferDataType(textureDataBuffer);
@@ -92,6 +98,15 @@ public class JoglImageLoader implements ImageLoader {
             ardorImage.setDataType(PixelDataType.UnsignedByte);
             return ardorImage;
         }
+    }
+
+    @Override
+    public Image load(final InputStream is, final boolean flipped) throws IOException {
+        final TextureData textureData = TextureIO.newTextureData(_capsUtil.getProfile(), is, true, null);
+        if (textureData == null) {
+            return null;
+        }
+        return makeArdor3dImage(textureData, flipped);
     }
 
     private TYPE getBufferDataType(final Buffer buffer) {

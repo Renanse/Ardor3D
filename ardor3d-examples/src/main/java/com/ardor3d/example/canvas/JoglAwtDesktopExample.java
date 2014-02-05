@@ -129,8 +129,8 @@ public class JoglAwtDesktopExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(ResourceLocatorTool.getClassPathResourceAsStream(
-                JoglAwtDesktopExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = awtImageLoader.load(
+                ResourceLocatorTool.getClassPathResourceAsStream(JoglAwtDesktopExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
@@ -159,6 +159,7 @@ public class JoglAwtDesktopExample {
         logicalLayer.registerInput(theCanvas, pl);
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
@@ -174,6 +175,7 @@ public class JoglAwtDesktopExample {
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
+            @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
@@ -190,8 +192,8 @@ public class JoglAwtDesktopExample {
                 final Camera cam = theCanvas.getCanvasRenderer().getCamera();
                 if (cam != null) {
                     cam.resize(theCanvas.getWidth(), theCanvas.getHeight());
-                    cam.setFrustumPerspective(cam.getFovY(), theCanvas.getWidth() / (float) theCanvas.getHeight(), cam
-                            .getFrustumNear(), cam.getFrustumFar());
+                    cam.setFrustumPerspective(cam.getFovY(), theCanvas.getWidth() / (float) theCanvas.getHeight(),
+                            cam.getFrustumNear(), cam.getFrustumFar());
                 }
             }
         });
@@ -205,6 +207,7 @@ public class JoglAwtDesktopExample {
     private static class MyExit implements Exit {
         private volatile boolean exit = false;
 
+        @Override
         public void exit() {
             exit = true;
         }

@@ -22,7 +22,6 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -39,41 +38,42 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.jogl.JoglSwtCanvas;
+import com.ardor3d.framework.jogl.JoglNewtSwtCanvas;
 import com.ardor3d.image.util.jogl.JoglImageLoader;
 import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
+import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
+import com.ardor3d.input.jogl.JoglNewtMouseManager;
+import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.input.swt.SwtFocusWrapper;
-import com.ardor3d.input.swt.SwtKeyboardWrapper;
-import com.ardor3d.input.swt.SwtMouseManager;
-import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
- * This examples demonstrates how to render OpenGL (via JOGL) in a SWT canvas.
+ * This examples demonstrates how to render OpenGL (via JOGL) in a NEWT SWT canvas. FIXME update the thumbnail and the
+ * description
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglSwtExample", //
 thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
 maxHeapMemory = 64)
-public class JoglSwtExample {
+public class JoglNewtSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
 
     static Map<Canvas, Boolean> _showCursor1 = new HashMap<Canvas, Boolean>();
 
-    private static final Logger logger = Logger.getLogger(JoglSwtExample.class.toString());
+    private static final Logger logger = Logger.getLogger(JoglNewtSwtExample.class.toString());
     private static int i = 0;
 
     public static void main(final String[] args) {
@@ -125,7 +125,7 @@ public class JoglSwtExample {
 
         try {
             final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    JoglSwtExample.class, "com/ardor3d/example/media/"));
+                    JoglNewtSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -160,10 +160,6 @@ public class JoglSwtExample {
         canvasParent.setLayout(new FillLayout());
         item.setControl(canvasParent);
 
-        final GLData data = new GLData();
-        data.depthSize = 8;
-        data.doubleBuffer = true;
-
         final SashForm splitter = new SashForm(canvasParent, SWT.HORIZONTAL);
 
         final SashForm splitterLeft = new SashForm(splitter, SWT.VERTICAL);
@@ -183,31 +179,31 @@ public class JoglSwtExample {
         final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
 
         final JoglCanvasRenderer canvasRenderer1 = new JoglCanvasRenderer(scene);
-        final JoglSwtCanvas canvas1 = new JoglSwtCanvas(settings, canvasRenderer1, topLeft, SWT.NONE);
+        final JoglNewtSwtCanvas canvas1 = new JoglNewtSwtCanvas(settings, canvasRenderer1, topLeft, SWT.NONE);
         frameWork.addCanvas(canvas1);
         canvas1.addControlListener(newResizeHandler(canvas1, canvasRenderer1));
 
         final JoglCanvasRenderer canvasRenderer2 = new JoglCanvasRenderer(scene);
-        final JoglSwtCanvas canvas2 = new JoglSwtCanvas(settings, canvasRenderer2, bottomLeft, SWT.NONE);
+        final JoglNewtSwtCanvas canvas2 = new JoglNewtSwtCanvas(settings, canvasRenderer2, bottomLeft, SWT.NONE);
         frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, canvasRenderer2));
 
         final JoglCanvasRenderer canvasRenderer3 = new JoglCanvasRenderer(scene);
-        final JoglSwtCanvas canvas3 = new JoglSwtCanvas(settings, canvasRenderer3, topRight, SWT.NONE);
+        final JoglNewtSwtCanvas canvas3 = new JoglNewtSwtCanvas(settings, canvasRenderer3, topRight, SWT.NONE);
         frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, canvasRenderer3));
 
         final JoglCanvasRenderer canvasRenderer4 = new JoglCanvasRenderer(scene);
-        final JoglSwtCanvas canvas4 = new JoglSwtCanvas(settings, canvasRenderer4, bottomRight, SWT.NONE);
+        final JoglNewtSwtCanvas canvas4 = new JoglNewtSwtCanvas(settings, canvasRenderer4, bottomRight, SWT.NONE);
         frameWork.addCanvas(canvas4);
         canvas4.addControlListener(newResizeHandler(canvas4, canvasRenderer4));
 
         canvas1.setFocus();
 
-        final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas1);
-        final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
-        final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas1);
-        final SwtMouseManager mouseManager = new SwtMouseManager(canvas1);
+        final JoglNewtKeyboardWrapper keyboardWrapper = new JoglNewtKeyboardWrapper(canvas1);
+        final JoglNewtFocusWrapper focusWrapper = new JoglNewtFocusWrapper(canvas1);
+        final JoglNewtMouseManager mouseManager = new JoglNewtMouseManager(canvas1);
+        final JoglNewtMouseWrapper mouseWrapper = new JoglNewtMouseWrapper(canvas1, mouseManager);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);
@@ -266,12 +262,12 @@ public class JoglSwtExample {
     private static MouseCursor createMouseCursor(final JoglImageLoader joglImageLoader, final String resourceName)
             throws IOException {
         final com.ardor3d.image.Image image = joglImageLoader.load(
-                ResourceLocatorTool.getClassPathResourceAsStream(JoglSwtExample.class, resourceName), false);
+                ResourceLocatorTool.getClassPathResourceAsStream(JoglNewtSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
-    static ControlListener newResizeHandler(final JoglSwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
+    static ControlListener newResizeHandler(final JoglNewtSwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
         final ControlListener retVal = new ControlListener() {
             @Override
             public void controlMoved(final ControlEvent e) {}

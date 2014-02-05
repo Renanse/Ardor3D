@@ -32,6 +32,11 @@ import com.jogamp.newt.event.WindowListener;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.newt.util.MonitorModeUtil;
 
+/**
+ * Ardor3D NEWT lightweight window, NEWT "top level" component for the OpenGL rendering of Ardor3D with JOGL that
+ * supports the NEWT input system directly and its abstraction in Ardor3D (com.ardor3d.input.jogl). This is the fastest
+ * and the most cross-platform, reliable, memory-efficient and complete "surface" of the JogAmp backend
+ */
 public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
 
     private final JoglCanvasRenderer _canvasRenderer;
@@ -243,7 +248,8 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
 
     @Override
     public void setIcon(final Image[] iconImages) {
-        // FIXME not supported by NEWT
+        // FIXME supported by NEWT but not yet implemented, use System.setProperty("newt.window.icons",
+        // "my-path-to-my-icon-file/icon.png");
     }
 
     @Override

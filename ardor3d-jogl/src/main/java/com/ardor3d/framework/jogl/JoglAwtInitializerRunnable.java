@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2014 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -12,13 +12,13 @@ package com.ardor3d.framework.jogl;
 
 import com.ardor3d.framework.DisplaySettings;
 
-public class JoglInitializerRunnable implements Runnable {
+public class JoglAwtInitializerRunnable implements Runnable {
 
     private final JoglAwtCanvas _joglAwtCanvas;
 
     private final DisplaySettings _settings;
 
-    public JoglInitializerRunnable(final JoglAwtCanvas joglAwtCanvas, final DisplaySettings settings) {
+    public JoglAwtInitializerRunnable(final JoglAwtCanvas joglAwtCanvas, final DisplaySettings settings) {
         _joglAwtCanvas = joglAwtCanvas;
         _settings = settings;
     }
