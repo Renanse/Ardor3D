@@ -180,6 +180,22 @@ public class ColladaImporter {
      *             if the resource can not be located or loaded for some reason.
      */
     public ColladaStorage load(final String resource) throws IOException {
+        return load(resource, new GeometryTool());
+    }
+
+    /**
+     * Reads a Collada file from the given resource and returns it as a ColladaStorage object.
+     * 
+     * @param resource
+     *            the name of the resource to find. ResourceLocatorTool will be used with TYPE_MODEL to find the
+     *            resource.
+     * @param geometryTool
+     *            the geometry tool used to minimize the vertex count.
+     * @return a ColladaStorage data object containing the Collada scene and other useful elements.
+     * @throws IOException
+     *             if the resource can not be located or loaded for some reason.
+     */
+    public ColladaStorage load(final String resource, final GeometryTool geometryTool) throws IOException {
         final ResourceSource source;
         if (_modelLocator == null) {
             source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
@@ -191,7 +207,7 @@ public class ColladaImporter {
             throw new IOException("Unable to locate '" + resource + "'");
         }
 
-        return load(source);
+        return load(source, geometryTool);
     }
 
     /**

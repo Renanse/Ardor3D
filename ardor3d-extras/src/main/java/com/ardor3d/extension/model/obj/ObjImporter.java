@@ -109,6 +109,19 @@ public class ObjImporter {
      * @return an ObjGeometryStore data object containing the scene and other useful elements.
      */
     public ObjGeometryStore load(final String resource) {
+        return load(resource, new GeometryTool());
+    }
+
+    /**
+     * Reads a Wavefront OBJ file from the given resource
+     * 
+     * @param resource
+     *            the name of the resource to find.
+     * @param geometryTool
+     *            the geometry tool used to minimize the vertex count.
+     * @return an ObjGeometryStore data object containing the scene and other useful elements.
+     */
+    public ObjGeometryStore load(final String resource, final GeometryTool geometryTool) {
         final ResourceSource source;
         if (_modelLocator == null) {
             source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
@@ -120,7 +133,7 @@ public class ObjImporter {
             throw new Error("Unable to locate '" + resource + "'");
         }
 
-        return load(source);
+        return load(source, geometryTool);
     }
 
     /**
