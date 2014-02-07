@@ -33,7 +33,10 @@ final class Md3Header {
     final int _numSurface;
     /** Number of Skin objects, unused */
     final int _numSkins;
-    /** Relative offset from start of MD3 object where Frame objects start. The Frame objects are written sequentially, that is, when you read one Frame object, you do not need to seek() for the next object. */
+    /**
+     * Relative offset from start of MD3 object where Frame objects start. The Frame objects are written sequentially,
+     * that is, when you read one Frame object, you do not need to seek() for the next object.
+     */
     final int _offsetFrame;
     /** Relative offset from start of MD3 where Tag objects start. Similarly written sequentially. */
     final int _offsetTag;
@@ -45,6 +48,7 @@ final class Md3Header {
     Md3Header(final int magic, final int version, final String name, final int flags, final int numFrames,
             final int numTags, final int numSurface, final int numSkins, final int offsetFrame, final int offsetTag,
             final int offsetSurface, final int offsetEnd) {
+        super();
         _magic = magic;
         _version = version;
         _name = name;
