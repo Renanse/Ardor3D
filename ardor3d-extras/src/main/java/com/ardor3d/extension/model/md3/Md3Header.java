@@ -30,7 +30,7 @@ final class Md3Header {
      */
     final int _numTags;
     /** Number of Surface objects, with a maximum of MD3_MAX_SURFACES. Current value of MD3_MAX_SURFACES is 32. */
-    final int _numSurface;
+    final int _numSurfaces;
     /** Number of Skin objects, unused */
     final int _numSkins;
     /**
@@ -46,7 +46,7 @@ final class Md3Header {
     final int _offsetEnd;
 
     Md3Header(final int magic, final int version, final String name, final int flags, final int numFrames,
-            final int numTags, final int numSurface, final int numSkins, final int offsetFrame, final int offsetTag,
+            final int numTags, final int numSurfaces, final int numSkins, final int offsetFrame, final int offsetTag,
             final int offsetSurface, final int offsetEnd) {
         super();
         _magic = magic;
@@ -55,7 +55,7 @@ final class Md3Header {
         _flags = flags;
         _numFrames = numFrames;
         _numTags = numTags;
-        _numSurface = numSurface;
+        _numSurfaces = numSurfaces;
         _numSkins = numSkins;
         _offsetFrame = offsetFrame;
         _offsetTag = offsetTag;
