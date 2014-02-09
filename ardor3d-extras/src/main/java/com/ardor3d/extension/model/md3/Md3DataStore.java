@@ -12,31 +12,24 @@ package com.ardor3d.extension.model.md3;
 
 import java.util.List;
 
-import com.ardor3d.extension.model.util.KeyframeController;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.google.common.collect.Lists;
 
 public class Md3DataStore {
 
-    private final Mesh _mainMesh;
-    private final KeyframeController<Mesh> _controller;
+    private final Node _mainNode;
 
     private final List<String> _frameNames = Lists.newArrayList();
 
     private final List<String> _skinNames = Lists.newArrayList();
 
-    public Md3DataStore(final Mesh mainMesh, final KeyframeController<Mesh> controller) {
+    public Md3DataStore(final Node mainNode) {
         super();
-        _mainMesh = mainMesh;
-        _controller = controller;
+        _mainNode = mainNode;
     }
 
-    public Mesh getScene() {
-        return _mainMesh;
-    }
-
-    public KeyframeController<Mesh> getController() {
-        return _controller;
+    public Node getScene() {
+        return _mainNode;
     }
 
     public List<String> getFrameNames() {

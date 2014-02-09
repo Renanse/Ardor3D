@@ -12,11 +12,15 @@ package com.ardor3d.extension.model.md3;
 
 import java.io.InputStream;
 
+import com.ardor3d.extension.model.util.KeyframeController;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.LittleEndianRandomAccessDataInput;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceSource;
 
 public class Md3Importer {
@@ -126,25 +130,40 @@ public class Md3Importer {
                 }
             }
 
+            final Node node = new Node(header._name);
             for (int i = 0; i < header._numSurfaces; i++) {
                 final Md3Surface surface = surfaces[i];
-
+                final KeyframeController<Mesh> controller = new KeyframeController<Mesh>();
+                final Mesh morphingMesh = new Mesh(surface._name);
+                morphingMesh.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(surface._triIndexes));
+                morphingMesh.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(surface._verts[0]));
+                morphingMesh.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(surface._norms[0]));
+                morphingMesh.getMeshData().setTextureBuffer(BufferUtils.createFloatBuffer(surface._texCoords), 0);
+                node.attachChild(morphingMesh);
+                controller.setMorphingMesh(morphingMesh);
                 for (int j = 0; j < surface._numFrames; j++) {
                     final Md3Frame frame = frames[j];
-
+                    final Mesh mesh = new Mesh(frame._name);
+                    mesh.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(surface._verts[j]));
+                    mesh.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(surface._norms[j]));
+                    controller.setKeyframe(j, mesh);
                 }
-                // TODO
+                morphingMesh.addController(controller);
+                // TODO should I add a controller into the node?
             }
 
             // Make a store object to return
-            final Md3DataStore store = new Md3DataStore(/* mesh, controller */null, null);
+            final Md3DataStore store = new Md3DataStore(node);
 
             // store names
             for (final Md3Frame frame : frames) {
                 store.getFrameNames().add(frame._name);
             }
 
-            // TODO look for the textures filenames in the .skin files
+            /**
+             * TODO there is one .skin file per MD3 file, it contains at most one line per surface (?) with the name and
+             * the texture filename (.jpg or .tga) and a tag per attachment to another MD3 file
+             */
 
             return store;
         } catch (final Exception e) {
