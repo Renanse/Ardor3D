@@ -21,11 +21,44 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.LittleEndianRandomAccessDataInput;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.resource.ResourceLocator;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
+/**
+ * http://education.mit.edu/starlogo-tng/shapes-tutorial/shapetutorial.html
+ */
 public class Md3Importer {
 
     private static final float XYZ_SCALE = 1.0f / 64;
+
+    private ResourceLocator _modelLocator;
+
+    public void setModelLocator(final ResourceLocator locator) {
+        _modelLocator = locator;
+    }
+
+    /**
+     * Reads a MD3 file from the given resource
+     * 
+     * @param resource
+     *            the name of the resource to find.
+     * @return an ObjGeometryStore data object containing the scene and other useful elements.
+     */
+    public Md3DataStore load(final String resource) {
+        final ResourceSource source;
+        if (_modelLocator == null) {
+            source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
+        } else {
+            source = _modelLocator.locateResource(resource);
+        }
+
+        if (source == null) {
+            throw new Error("Unable to locate '" + resource + "'");
+        }
+
+        return load(source);
+    }
 
     /**
      * Reads an MD3 file from the given resource
@@ -111,7 +144,7 @@ public class Md3Importer {
                 }
                 // Parse out texture coordinates
                 bis.seek(surfaceStart + surfaces[i]._offsetTexCoords);
-                for (final int j = 0; j < surfaces[i]._texCoords.length; i++) {
+                for (int j = 0; j < surfaces[i]._texCoords.length; j++) {
                     surfaces[i]._texCoords[j] = new Vector2(bis.readFloat(), bis.readFloat());
                 }
                 // Parse out vertices
@@ -159,6 +192,9 @@ public class Md3Importer {
             for (final Md3Frame frame : frames) {
                 store.getFrameNames().add(frame._name);
             }
+
+            // TODO load the animation configuration file (animation.cfg): [sex f/m][first frame, num frames, looping
+            // frames, frames per second]
 
             /**
              * TODO there is one .skin file per MD3 file, it contains at most one line per surface (?) with the name and
