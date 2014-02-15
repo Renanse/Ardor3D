@@ -65,18 +65,47 @@ public class JoglCanvasRenderer implements CanvasRenderer {
      */
     private boolean _debugEnabled = false;
 
+    /**
+     * <code>true</code> if we try to drop and reclaim the context on each frame.
+     */
+    private final boolean _contextDropAndReclaimOnDrawEnabled;
+
     protected CapsUtil _capsUtil;
 
     protected DirectNioBuffersSet _directNioBuffersSet;
 
+    /**
+     * Default constructor, with debug disabled, using the default utility for the capabilities and with context drop
+     * and reclaim on draw disabled
+     * 
+     * @param scene
+     *            data related to the scene (cannot be null)
+     */
     public JoglCanvasRenderer(final Scene scene) {
-        this(scene, false, new CapsUtil());
+        this(scene, false, new CapsUtil(), false);
     }
 
-    public JoglCanvasRenderer(final Scene scene, final boolean useDebug, final CapsUtil capsUtil) {
+    /**
+     * Main constructor
+     * 
+     * @param scene
+     *            data related to the scene
+     * @param useDebug
+     *            <code>true</code> if debugging is currently enabled for this GLContext
+     * @param capsUtil
+     *            utility to manage the capabilities (cannot be null)
+     * @param contextDropAndReclaimOnDrawEnabled
+     *            <code>true</code> if we try to drop and reclaim the context on each frame. It should be set to
+     *            <code>false</code> for better performance in the general case. It should be set to <code>true</code>
+     *            if and only if the OpenGL context is made current on a thread which is not the default rendering
+     *            thread of the canvas.
+     */
+    public JoglCanvasRenderer(final Scene scene, final boolean useDebug, final CapsUtil capsUtil,
+            final boolean contextDropAndReclaimOnDrawEnabled) {
         _scene = scene;
         _useDebug = useDebug;
         _capsUtil = capsUtil;
+        _contextDropAndReclaimOnDrawEnabled = contextDropAndReclaimOnDrawEnabled;
     }
 
     @Override
@@ -218,7 +247,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public boolean draw() {
 
         // set up context for rendering this canvas
-        makeCurrentContext();
+        if (_contextDropAndReclaimOnDrawEnabled) {
+            makeCurrentContext();
+        }
 
         // Enable Debugging if requested.
         if (_useDebug != _debugEnabled) {
@@ -272,7 +303,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // release the context if we're done (swapped and all)
         if (_doSwap) {
-            releaseCurrentContext();
+            if (_contextDropAndReclaimOnDrawEnabled) {
+                releaseCurrentContext();
+            }
         }
 
         return drew;
