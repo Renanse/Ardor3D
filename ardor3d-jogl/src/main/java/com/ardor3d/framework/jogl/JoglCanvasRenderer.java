@@ -82,25 +82,29 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     @Override
     public void makeCurrentContext() throws Ardor3dException {
         int value = GLContext.CONTEXT_NOT_CURRENT;
-        int attempt = 0;
-        do {
+        for (int attempt = 0;;) {
             try {
                 value = _context.makeCurrent();
             } catch (final GLException gle) {
                 gle.printStackTrace();
             } finally {
                 attempt++;
+            }
+            if (value == GLContext.CONTEXT_NOT_CURRENT) {
                 if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
                     // failed, throw exception
                     throw new Ardor3dException("Failed to claim OpenGL context.");
+                } else {
+                    try {
+                        Thread.sleep(5);
+                    } catch (final InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
+            } else {
+                break;
             }
-            try {
-                Thread.sleep(5);
-            } catch (final InterruptedException e1) {
-                e1.printStackTrace();
-            }
-        } while (value == GLContext.CONTEXT_NOT_CURRENT);
+        }
         if (ContextManager.getCurrentContext() != null) {
             if (value == GLContext.CONTEXT_CURRENT_NEW) {
                 ContextManager.getCurrentContext().contextLost();
