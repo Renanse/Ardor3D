@@ -18,7 +18,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.model.util.KeyframeController;
@@ -207,7 +206,8 @@ public class ObjExporter {
                                 && mtl.forceBlend == currentMtl.forceBlend && mtl.d == currentMtl.d
                                 && Arrays.equals(mtl.Ka, currentMtl.Ka) && Arrays.equals(mtl.Kd, currentMtl.Kd)
                                 && Arrays.equals(mtl.Ks, currentMtl.Ks)
-                                && Objects.equals(mtl.textureName, currentMtl.textureName)) {
+                                //&& Objects.equals(mtl.textureName, currentMtl.textureName)) {
+                                && mtl.textureName.equals(currentMtl.textureName)) {
                             sameObjMtl = mtl;
                             break;
                         }
