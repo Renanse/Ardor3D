@@ -12,17 +12,11 @@ package com.ardor3d.framework.jogl;
 
 import java.util.logging.Logger;
 
-import javax.media.opengl.DebugGL2;
-import javax.media.opengl.DebugGL3;
-import javax.media.opengl.DebugGL3bc;
-import javax.media.opengl.DebugGL4;
-import javax.media.opengl.DebugGL4bc;
-import javax.media.opengl.DebugGLES1;
-import javax.media.opengl.DebugGLES2;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
 import javax.media.opengl.GLException;
+import javax.media.opengl.GLPipelineFactory;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -65,42 +59,75 @@ public class JoglCanvasRenderer implements CanvasRenderer {
      */
     private boolean _debugEnabled = false;
 
+    /**
+     * <code>true</code> if we try to drop and reclaim the context on each frame.
+     */
+    private final boolean _contextDropAndReclaimOnDrawEnabled;
+
     protected CapsUtil _capsUtil;
 
     protected DirectNioBuffersSet _directNioBuffersSet;
 
+    /**
+     * Default constructor, with debug disabled, using the default utility for the capabilities and with context drop
+     * and reclaim on draw disabled
+     * 
+     * @param scene
+     *            data related to the scene (cannot be null)
+     */
     public JoglCanvasRenderer(final Scene scene) {
-        this(scene, false, new CapsUtil());
+        this(scene, false, new CapsUtil(), false);
     }
 
-    public JoglCanvasRenderer(final Scene scene, final boolean useDebug, final CapsUtil capsUtil) {
+    /**
+     * Main constructor
+     * 
+     * @param scene
+     *            data related to the scene
+     * @param useDebug
+     *            <code>true</code> if debugging is currently enabled for this GLContext
+     * @param capsUtil
+     *            utility to manage the capabilities (cannot be null)
+     * @param contextDropAndReclaimOnDrawEnabled
+     *            <code>true</code> if we try to drop and reclaim the context on each frame. It should be set to
+     *            <code>false</code> for better performance in the general case. It should be set to <code>true</code>
+     *            if and only if the OpenGL context is made current on a thread which is not the default rendering
+     *            thread of the canvas.
+     */
+    public JoglCanvasRenderer(final Scene scene, final boolean useDebug, final CapsUtil capsUtil,
+            final boolean contextDropAndReclaimOnDrawEnabled) {
         _scene = scene;
         _useDebug = useDebug;
         _capsUtil = capsUtil;
+        _contextDropAndReclaimOnDrawEnabled = contextDropAndReclaimOnDrawEnabled;
     }
 
     @Override
     public void makeCurrentContext() throws Ardor3dException {
         int value = GLContext.CONTEXT_NOT_CURRENT;
-        int attempt = 0;
-        do {
+        for (int attempt = 0;;) {
             try {
                 value = _context.makeCurrent();
             } catch (final GLException gle) {
                 gle.printStackTrace();
             } finally {
                 attempt++;
+            }
+            if (value == GLContext.CONTEXT_NOT_CURRENT) {
                 if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
                     // failed, throw exception
                     throw new Ardor3dException("Failed to claim OpenGL context.");
+                } else {
+                    try {
+                        Thread.sleep(5);
+                    } catch (final InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
+            } else {
+                break;
             }
-            try {
-                Thread.sleep(5);
-            } catch (final InterruptedException e1) {
-                e1.printStackTrace();
-            }
-        } while (value == GLContext.CONTEXT_NOT_CURRENT);
+        }
         if (ContextManager.getCurrentContext() != null) {
             if (value == GLContext.CONTEXT_CURRENT_NEW) {
                 ContextManager.getCurrentContext().contextLost();
@@ -214,41 +241,13 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public boolean draw() {
 
         // set up context for rendering this canvas
-        makeCurrentContext();
+        if (_contextDropAndReclaimOnDrawEnabled) {
+            makeCurrentContext();
+        }
 
         // Enable Debugging if requested.
         if (_useDebug != _debugEnabled) {
-            if (_context.getGL().isGLES()) {
-                if (_context.getGL().isGLES1()) {
-                    _context.setGL(new DebugGLES1(_context.getGL().getGLES1()));
-                } else {
-                    if (_context.getGL().isGLES2()) {
-                        _context.setGL(new DebugGLES2(_context.getGL().getGLES2()));
-                    } else {
-                        // TODO ES3
-                    }
-                }
-            } else {
-                if (_context.getGL().isGL4bc()) {
-                    _context.setGL(new DebugGL4bc(_context.getGL().getGL4bc()));
-                } else {
-                    if (_context.getGL().isGL4()) {
-                        _context.setGL(new DebugGL4(_context.getGL().getGL4()));
-                    } else {
-                        if (_context.getGL().isGL3bc()) {
-                            _context.setGL(new DebugGL3bc(_context.getGL().getGL3bc()));
-                        } else {
-                            if (_context.getGL().isGL3()) {
-                                _context.setGL(new DebugGL3(_context.getGL().getGL3()));
-                            } else {
-                                if (_context.getGL().isGL2()) {
-                                    _context.setGL(new DebugGL2(_context.getGL().getGL2()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            _context.setGL(GLPipelineFactory.create("javax.media.opengl.Debug", null, _context.getGL(), null));
             _debugEnabled = true;
 
             LOGGER.info("DebugGL Enabled");
@@ -268,7 +267,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // release the context if we're done (swapped and all)
         if (_doSwap) {
-            releaseCurrentContext();
+            if (_contextDropAndReclaimOnDrawEnabled) {
+                releaseCurrentContext();
+            }
         }
 
         return drew;

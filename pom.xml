@@ -244,7 +244,7 @@
     <!-- these properties help simplify specifying some commonly occurring variables -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jogamp.version>2.1.4-rc-20140126</jogamp.version>
+        <jogamp.version>2.1.4</jogamp.version>
         <lwjgl.version>2.8.4</lwjgl.version>
         <swt.version>4.3</swt.version>
     </properties>

@@ -152,12 +152,14 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             cr.makeCurrentContext();
             quit(cr.getRenderer());
             cr.releaseCurrentContext();
-            if (QUIT_VM_ON_EXIT) {
-                System.exit(0);
-            }
         } catch (final Throwable t) {
             System.err.println("Throwable caught in MainThread - exiting");
             t.printStackTrace(System.err);
+        } finally {
+            // quit even though the cleanup has just failed
+            if (QUIT_VM_ON_EXIT) {
+                System.exit(0);
+            }
         }
     }
 

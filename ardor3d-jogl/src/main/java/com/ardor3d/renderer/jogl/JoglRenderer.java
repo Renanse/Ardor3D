@@ -223,11 +223,8 @@ public class JoglRenderer extends AbstractRenderer {
 
     @Override
     public void flushFrame(final boolean doSwap) {
-        final GL gl = GLContext.getCurrentGL();
-
         renderBuckets();
 
-        gl.glFlush();
         if (doSwap) {
 
             doApplyState(defaultStateList.get(RenderState.StateType.ColorMask));
@@ -241,6 +238,11 @@ public class JoglRenderer extends AbstractRenderer {
             if (Constants.stats) {
                 StatCollector.endStat(StatType.STAT_DISPLAYSWAP_TIMER);
             }
+        } else {
+            // this call is not necessary just before swapBuffers(), see:
+            // http://www.opengl.org/wiki/Common_Mistakes#glFinish_and_glFlush
+            final GL gl = GLContext.getCurrentGL();
+            gl.glFlush();
         }
 
         if (Constants.stats) {
