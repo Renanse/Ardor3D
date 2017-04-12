@@ -296,14 +296,21 @@ public class TerrainGridCache implements TerrainCache, Runnable {
         int tileX = MathUtils.floor((float) x / tileSize);
         int tileY = MathUtils.floor((float) z / tileSize);
         final CacheData tileData;
-        final int cacheMin = -cacheSize / 2, cacheMax = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
-        if (tileX < cacheMin || tileX > cacheMax || tileY < cacheMin || tileY > cacheMax) {
-            tileData = null;
-        } else {
-            tileX = MathUtils.moduloPositive(tileX, cacheSize);
-            tileY = MathUtils.moduloPositive(tileY, cacheSize);
-            tileData = cache[tileX][tileY];
-        }
+        // mallan - 2016-01-26: this conditional will ALWAYS fail once view has
+        // moved outside the origin cache bounds (tileX,tileY are source tile coordinates,
+        // cacheSize are desintation tile coordinates). The moduloPositive does what we need,
+        // this conditional breaks the terrain.
+        // final int cacheMin = -cacheSize / 2, cacheMax = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
+        // if (tileX < cacheMin || tileX > cacheMax || tileY < cacheMin || tileY > cacheMax) {
+        // tileData = null;
+        // } else {
+        // tileX = MathUtils.moduloPositive(tileX, cacheSize);
+        // tileY = MathUtils.moduloPositive(tileY, cacheSize);
+        // tileData = cache[tileX][tileY];
+        // }
+        tileX = MathUtils.moduloPositive(tileX, cacheSize);
+        tileY = MathUtils.moduloPositive(tileY, cacheSize);
+        tileData = cache[tileX][tileY];
 
         if (tileData == null || !tileData.isValid) {
             if (parentCache != null) {
