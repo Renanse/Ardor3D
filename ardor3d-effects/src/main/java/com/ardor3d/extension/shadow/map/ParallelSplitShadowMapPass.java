@@ -11,6 +11,7 @@
 package com.ardor3d.extension.shadow.map;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.logging.Level;
@@ -68,6 +69,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.geom.BufferUtils;
@@ -98,7 +100,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** The textures storing the shadow maps. */
     private Texture2D _shadowMapTexture[];
 
-    /** The list of occluding nodes. */
+    /** The list of occluding nodes - filled from ShadowCasterManager. */
     private final List<Spatial> _occluderNodes = Lists.newArrayList();
 
     /** Extra bounds receivers, when rendering shadows other ways than through overlay */
@@ -123,6 +125,9 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /** The state applying the depth offset for the shadow. */
     private final OffsetState _shadowOffsetState;
+
+    /** Apply offset during render pass to avoid z fighting in shadow overlay */
+    private final OffsetState _shadowPassOffsetState;
 
     /**
      * The blending to both discard the fragments that have been determined to be free of shadows and to blend into the
@@ -258,8 +263,14 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowOffsetState = new OffsetState();
         _shadowOffsetState.setEnabled(true);
         _shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        _shadowOffsetState.setFactor(1.1f);
-        _shadowOffsetState.setUnits(4.0f);
+        _shadowOffsetState.setFactor(1.0f);
+        _shadowOffsetState.setUnits(1.0f);
+
+        _shadowPassOffsetState = new OffsetState();
+        _shadowPassOffsetState.setEnabled(true);
+        _shadowPassOffsetState.setTypeEnabled(OffsetType.Fill, true);
+        _shadowPassOffsetState.setFactor(-1.0f);
+        _shadowPassOffsetState.setUnits(4.0f);
 
         _flat = new ShadingState();
         _flat.setShadingMode(ShadingMode.Flat);
@@ -274,28 +285,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _discardShadowFragments.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
 
         _shadowTextureState = new TextureState();
-    }
-
-    /**
-     * Add a spatial that will occlude light and hence cast a shadow.
-     * 
-     * @param occluder
-     *            The spatial to add as an occluder
-     */
-    public void addOccluder(final Spatial occluder) {
-        if (!_occluderNodes.contains(occluder)) {
-            _occluderNodes.add(occluder);
-        }
-    }
-
-    /**
-     * Remove a spatial from the list of occluders.
-     * 
-     * @param occluder
-     *            The spatial to remove from the occluderlist
-     */
-    public void removeOccluder(final Spatial occluder) {
-        _occluderNodes.remove(occluder);
     }
 
     /**
@@ -734,6 +723,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         _context.pushEnforcedStates();
         _context.enforceState(_shadowTextureState);
         _context.enforceState(_discardShadowFragments);
+        _context.enforceState(_shadowPassOffsetState);
 
         if (_pssmShader != null && _context.getCapabilities().isGLSLSupported()) {
             GLSLShaderObjectsState currentShader = _drawShaderDebug ? _pssmDebugShader : _pssmShader;
@@ -811,6 +801,13 @@ public class ParallelSplitShadowMapPass extends Pass {
         if (!_useSceneTexturing) {
             Mesh.RENDER_VERTEX_ONLY = true;
         }
+        _occluderNodes.clear();
+        for (final WeakReference<Spatial> ref : ShadowCasterManager.INSTANCE.getSpatialRefs()) {
+            final Spatial spat = ref.get();
+            if (spat != null) {
+                _occluderNodes.add(spat);
+            }
+        }
         _shadowMapRenderer.render(_occluderNodes, _shadowMapTexture[index], Renderer.BUFFER_COLOR_AND_DEPTH);
         if (!_useSceneTexturing) {
             Mesh.RENDER_VERTEX_ONLY = false;
@@ -851,6 +848,14 @@ public class ParallelSplitShadowMapPass extends Pass {
     }
 
     /**
+     *
+     * @return the offset state used when drawing the shadow overlay pass.
+     */
+    public OffsetState getShadowPassOffsetState() {
+        return _shadowPassOffsetState;
+    }
+
+    /**
      * Update receiver bounds.
      */
     private void updateReceiverBounds() {
@@ -859,7 +864,8 @@ public class ParallelSplitShadowMapPass extends Pass {
 
         for (int i = 0, cSize = _boundsReceiver.size(); i < cSize; i++) {
             final Spatial child = _boundsReceiver.get(i);
-            if (child != null && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
+            if (child != null && child.getSceneHints().getCullHint() != CullHint.Always
+                    && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
                 if (firstRun) {
                     _receiverBounds.setCenter(child.getWorldBound().getCenter());
                     _receiverBounds.setXExtent(0);
@@ -874,7 +880,8 @@ public class ParallelSplitShadowMapPass extends Pass {
 
         for (int i = 0, cSize = _spatials.size(); i < cSize; i++) {
             final Spatial child = _spatials.get(i);
-            if (child != null && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
+            if (child != null && child.getSceneHints().getCullHint() != CullHint.Always
+                    && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
                 if (firstRun) {
                     _receiverBounds.setCenter(child.getWorldBound().getCenter());
                     _receiverBounds.setXExtent(0);
