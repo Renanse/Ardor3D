@@ -45,11 +45,12 @@ import com.ardor3d.util.geom.BufferUtils;
 public class MoveMultiPlanarWidget extends AbstractInteractWidget {
     public static double MIN_SCALE = 0.000001;
 
-    public MoveMultiPlanarWidget() {
-        this(0.5);
+    public MoveMultiPlanarWidget(final IFilterList filterList) {
+        this(filterList, 0.5);
     }
 
-    public MoveMultiPlanarWidget(final double extent) {
+    public MoveMultiPlanarWidget(final IFilterList filterList, final double extent) {
+        super(filterList);
         _handle = new Node("moveHandle");
 
         final BlendState blend = new BlendState();

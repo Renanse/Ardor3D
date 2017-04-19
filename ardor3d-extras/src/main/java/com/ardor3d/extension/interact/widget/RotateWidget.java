@@ -50,7 +50,8 @@ public class RotateWidget extends AbstractInteractWidget {
     protected InteractRing _yRing = null;
     protected InteractRing _zRing = null;
 
-    public RotateWidget() {
+    public RotateWidget(final IFilterList filterList) {
+        super(filterList);
         _handle = new Node("rotationHandle");
 
         final BlendState blend = new BlendState();

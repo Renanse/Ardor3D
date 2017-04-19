@@ -42,8 +42,8 @@ public class MinMaxScaleFilter implements UpdateFilter {
     }
 
     @Override
-    public void beginDrag(final InteractManager manager) {}
+    public void beginDrag(final InteractManager manager) { /**/}
 
     @Override
-    public void endDrag(final InteractManager manager) {}
+    public void endDrag(final InteractManager manager) { /**/}
 }

@@ -18,6 +18,7 @@ import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.AllowScaleFilter;
 import com.ardor3d.extension.interact.filter.MinMaxScaleFilter;
 import com.ardor3d.extension.interact.filter.PlaneBoundaryFilter;
+import com.ardor3d.extension.interact.widget.BasicFilterList;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
 import com.ardor3d.extension.interact.widget.MoveWidget;
 import com.ardor3d.extension.interact.widget.RotateWidget;
@@ -160,16 +161,18 @@ public class InteractExample extends ExampleBase {
         manager = new InteractManager();
         manager.setupInput(_canvas, _physicalLayer, _logicalLayer);
 
+        final BasicFilterList filterList = new BasicFilterList();
+
         // add some widgets.
-        rotateWidget = new RotateWidget().withXAxis().withYAxis().withZAxis();
+        rotateWidget = new RotateWidget(filterList).withXAxis().withYAxis().withZAxis();
         rotateWidget.setTexture((Texture2D) TextureManager.load("images/tick.png",
                 Texture.MinificationFilter.Trilinear, true));
         manager.addWidget(rotateWidget);
 
-        scaleWidget = new SimpleScaleWidget().withArrow(Vector3.UNIT_Y);
+        scaleWidget = new SimpleScaleWidget(filterList).withArrow(Vector3.UNIT_Y);
         manager.addWidget(scaleWidget);
 
-        moveWidget = new MoveWidget().withXAxis().withYAxis().withZAxis();
+        moveWidget = new MoveWidget(filterList).withXAxis().withYAxis().withZAxis();
         manager.addWidget(moveWidget);
 
         // set the default as current

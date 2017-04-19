@@ -31,6 +31,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.google.common.collect.Maps;
 
 public class CompoundInteractWidget extends AbstractInteractWidget {
+
     private static final String MOVE_KEY = "Move";
     private static final String ROTATE_KEY = "Rotate";
     private static final String MOVE_PLANAR_KEY = "MovePlanar";
@@ -45,6 +46,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
     protected InteractMatrix _interactMatrix;
 
     public CompoundInteractWidget() {
+        super(new BasicFilterList());
         _handle = new Node("handleRoot");
     }
 
@@ -177,7 +179,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MoveMultiPlanarWidget();
+        widget = new MoveMultiPlanarWidget(_filters);
         _widgets.put(CompoundInteractWidget.MOVE_MULTIPLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -191,7 +193,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MoveMultiPlanarWidget(extent);
+        widget = new MoveMultiPlanarWidget(_filters, extent);
         _widgets.put(CompoundInteractWidget.MOVE_MULTIPLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -204,7 +206,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MovePlanarWidget().withPlane(plane).withDefaultHandle(.5, .25, color);
+        widget = new MovePlanarWidget(_filters).withPlane(plane).withDefaultHandle(.5, .25, color);
         _widgets.put(CompoundInteractWidget.MOVE_PLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -218,7 +220,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MovePlanarWidget().withPlane(plane).withDefaultHandle(radius, height, color);
+        widget = new MovePlanarWidget(_filters).withPlane(plane).withDefaultHandle(radius, height, color);
         _widgets.put(CompoundInteractWidget.MOVE_PLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -228,7 +230,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
     private MoveWidget verifyMoveWidget() {
         MoveWidget moveWidget = (MoveWidget) _widgets.get(CompoundInteractWidget.MOVE_KEY);
         if (moveWidget == null) {
-            moveWidget = new MoveWidget();
+            moveWidget = new MoveWidget(_filters);
             _widgets.put(CompoundInteractWidget.MOVE_KEY, moveWidget);
             _handle.attachChild(moveWidget.getHandle());
         }
@@ -238,7 +240,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
     private RotateWidget verifyRotateWidget() {
         RotateWidget rotateWidget = (RotateWidget) _widgets.get(CompoundInteractWidget.ROTATE_KEY);
         if (rotateWidget == null) {
-            rotateWidget = new RotateWidget();
+            rotateWidget = new RotateWidget(_filters);
             _widgets.put(CompoundInteractWidget.ROTATE_KEY, rotateWidget);
             _handle.attachChild(rotateWidget.getHandle());
         }

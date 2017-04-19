@@ -51,7 +51,8 @@ public class MoveWidget extends AbstractInteractWidget {
 
     protected InteractMatrix _interactMatrix = InteractMatrix.World;
 
-    public MoveWidget() {
+    public MoveWidget(final IFilterList filterList) {
+        super(filterList);
         _handle = new Node("moveHandle");
 
         final BlendState blend = new BlendState();

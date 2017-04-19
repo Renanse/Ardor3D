@@ -38,7 +38,9 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
 
     protected ReadOnlyVector3 _arrowDirection;
 
-    public SimpleScaleWidget() {}
+    public SimpleScaleWidget(final IFilterList filterList) {
+        super(filterList);
+    }
 
     public SimpleScaleWidget withArrow(final ReadOnlyVector3 arrowDirection) {
         return withArrow(arrowDirection, new ColorRGBA(1.0f, 0.0f, 0.0f, 0.4f), 0, 0);

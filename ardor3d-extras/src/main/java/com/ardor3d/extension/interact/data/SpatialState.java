@@ -17,6 +17,13 @@ public class SpatialState {
 
     protected Transform _transform = new Transform();
 
+    public SpatialState() {}
+
+    /** copy constructor */
+    public SpatialState(final SpatialState toCopy) {
+        _transform.set(toCopy._transform);
+    }
+
     public Transform getTransform() {
         return _transform;
     }

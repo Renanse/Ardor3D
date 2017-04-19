@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.interact.widget;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
@@ -27,7 +26,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.google.common.collect.Lists;
 
 public abstract class AbstractInteractWidget {
 
@@ -48,13 +46,12 @@ public abstract class AbstractInteractWidget {
 
     protected InteractMatrix _interactMatrix = InteractMatrix.World;
 
-    /**
-     * List of filters to modify state after applying input.
-     */
-    protected List<UpdateFilter> _filters = Lists.newArrayList();
+    /** List of filters to modify state after applying input. */
+    protected IFilterList _filters;
 
-    public AbstractInteractWidget() {
+    public AbstractInteractWidget(final IFilterList filterList) {
         _results.setCheckDistance(true);
+        _filters = filterList;
     }
 
     /**
@@ -73,38 +70,31 @@ public abstract class AbstractInteractWidget {
      *            our interact manager.
      */
     public void processInput(final Canvas source, final TwoInputStates inputStates, final AtomicBoolean inputConsumed,
-            final InteractManager manager) {}
+            final InteractManager manager) { /**/}
 
     protected void applyFilters(final InteractManager manager) {
-        // apply any filters to our state
-        for (final UpdateFilter filter : _filters) {
-            filter.applyFilter(manager);
-        }
+        _filters.applyFilters(manager);
     }
 
     public void beginDrag(final InteractManager manager) {
         _dragging = true;
-        for (final UpdateFilter filter : _filters) {
-            filter.beginDrag(manager);
-        }
+        _filters.beginDrag(manager);
     }
 
     public void endDrag(final InteractManager manager) {
         _dragging = false;
-        for (final UpdateFilter filter : _filters) {
-            filter.endDrag(manager);
-        }
+        _filters.endDrag(manager);
     }
 
     public void update(final ReadOnlyTimer timer, final InteractManager manager) {
         _handle.updateGeometricState(timer.getTimePerFrame());
     }
 
-    public void render(final Renderer renderer, final InteractManager manager) {}
+    public void render(final Renderer renderer, final InteractManager manager) { /**/}
 
-    public void targetChanged(final InteractManager manager) {}
+    public void targetChanged(final InteractManager manager) { /**/}
 
-    public void targetDataUpdated(final InteractManager manager) {}
+    public void targetDataUpdated(final InteractManager manager) { /**/}
 
     public void receivedControl(final InteractManager manager) {
         if (_dragging) {
@@ -112,7 +102,7 @@ public abstract class AbstractInteractWidget {
         }
     }
 
-    public void lostControl(final InteractManager manager) {}
+    public void lostControl(final InteractManager manager) { /**/}
 
     public boolean isActiveInputOnly() {
         return _activeInputOnly;

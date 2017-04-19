@@ -43,7 +43,8 @@ public class MovePlanarWidget extends AbstractInteractWidget {
         XY, XZ, YZ
     }
 
-    public MovePlanarWidget() {
+    public MovePlanarWidget(final IFilterList filterList) {
+        super(filterList);
         _handle = new Node("moveHandle");
 
         final BlendState blend = new BlendState();
