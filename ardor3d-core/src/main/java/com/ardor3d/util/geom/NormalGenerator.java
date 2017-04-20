@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -80,7 +80,7 @@ public class NormalGenerator {
 
     /**
      * Generates the normals for one Mesh, using the specified crease angle.
-     * 
+     *
      * @param mesh
      *            The Mesh to generate the normals for
      * @param creaseAngle
@@ -97,7 +97,7 @@ public class NormalGenerator {
 
     /**
      * Generates the normals for one Mesh, using the crease angle stored in the field <code>creaseAngle</code>
-     * 
+     *
      * @param mesh
      *            The Mesh to generate the normals for
      */
@@ -237,9 +237,7 @@ public class NormalGenerator {
         // Apply the buffers to the mesh
         mesh.getMeshData().setVertexBuffer(vertices);
         mesh.getMeshData().setNormalBuffer(normals);
-        if (colors != null) {
-            mesh.getMeshData().setColorBuffer(colors);
-        }
+        mesh.getMeshData().setColorBuffer(colors);
         mesh.getMeshData().getTextureCoords().clear();
         if (texCoords != null) {
             mesh.getMeshData().setTextureBuffer(texCoords, 0);
@@ -321,7 +319,7 @@ public class NormalGenerator {
      * Finds one triangle connected to the split mesh currently being assembled over an edge whose angle does not exceed
      * the creaseAngle. The Triangle is inserted into destTris and the list edges is updated with the edges of the
      * triangle accordingly.
-     * 
+     *
      * @return The triangle, if one was found, or <code>null</code> otherwise
      */
     private Triangle insertTriangle() {
@@ -354,9 +352,7 @@ public class NormalGenerator {
             // Connect the triangle to the split mesh
             triIt.remove();
             _destTris.addLast(result);
-            borderEdge.connected = result;
             final Edge resultEdge = result.edges[connected];
-            resultEdge.connected = borderEdge.parent;
             edgeIt.remove();
             edgeIt.add(result.edges[(connected + 1) % 3]);
             edgeIt.add(result.edges[(connected + 2) % 3]);
@@ -386,7 +382,7 @@ public class NormalGenerator {
      * Connects the remaining edges of the given triangle to the split mesh currently being assembled, if possible. The
      * respective edges are removed from the border, and if the crease angle at this additional connection is exceeded,
      * the vertices at this link are duplicated.
-     * 
+     *
      * @param triangle
      *            The triangle being connected to the split mesh
      * @param i
@@ -431,7 +427,7 @@ public class NormalGenerator {
 
     /**
      * Checks if the transition between the tqo given triangles should be smooth, according to the creaseAngle.
-     * 
+     *
      * @param tri1
      *            The first triangle
      * @param tri2
@@ -446,7 +442,7 @@ public class NormalGenerator {
     /**
      * Copies the vertex, color and texCoord at the given index in each of the source lists (if not null) and adds it to
      * the end of the list.
-     * 
+     *
      * @param index
      *            The index to copy the value in each list from
      */
@@ -542,7 +538,7 @@ public class NormalGenerator {
     /**
      * If the triangle contains the given index, it is replaced with the replacement index, unless it is already
      * overridden with a newIndex (newI0, newI1).
-     * 
+     *
      * @param tri
      *            The triangle
      * @param index
@@ -661,7 +657,7 @@ public class NormalGenerator {
     /**
      * A helper class for the normal generator. Stores one triangle, consisting of 3 edges, and the normal for the
      * triangle.
-     * 
+     *
      * @author M. Sattler
      */
     private class Triangle {
@@ -670,11 +666,9 @@ public class NormalGenerator {
 
         public Vector3 normal = new Vector3(0, 0, 0);
 
-        public Triangle() {}
-
         /**
          * Creates the triangle.
-         * 
+         *
          * @param i0
          *            The index of vertex 0 in the triangle
          * @param i1
@@ -690,7 +684,7 @@ public class NormalGenerator {
 
         /**
          * Computes the normal from the three vertices in the given array that are indexed by the edges.
-         * 
+         *
          * @param verts
          *            The array containing the vertices
          */
@@ -703,27 +697,13 @@ public class NormalGenerator {
             normal.set(_compVect0.crossLocal(_compVect1)).normalizeLocal();
         }
 
-        /**
-         * @param edge
-         *            An Edge to get the index of
-         * @return The index of the edge in the triangle, or -1, if it is not contained in the triangle
-         */
-        public int indexOf(final Edge edge) {
-            for (int i = 0; i < 3; i++) {
-                if (edges[i] == edge) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         @Override
         public String toString() {
             final StringBuilder result = new StringBuilder("Triangle (");
             for (int i = 0; i < 3; i++) {
                 final Edge edge = edges[i];
                 if (edge == null) {
-                    result.append('?');
+                    result.append("?");
                 } else {
                     if (edge.newI0 > -1) {
                         result.append(edge.newI0);
@@ -735,7 +715,7 @@ public class NormalGenerator {
                     result.append(", ");
                 }
             }
-            result.append(')');
+            result.append(")");
             return result.toString();
         }
     }
@@ -743,7 +723,7 @@ public class NormalGenerator {
     /**
      * Another helper class for the normal generator. Stores one edge in the mesh, consisting of two vertex indices, the
      * triangle the edge belongs to, and, if applicable, another triangle the edge is connected to.
-     * 
+     *
      * @author M. Sattler
      */
     private class Edge {
@@ -759,14 +739,9 @@ public class NormalGenerator {
         // The Triangle containing this Edge
         public Triangle parent;
 
-        // A Triangle this Edge is connected to, or null, if it is not connected
-        public Triangle connected;
-
-        public Edge() {}
-
         /**
          * Creates this edge.
-         * 
+         *
          * @param parent
          *            The Triangle containing this Edge
          * @param i0
@@ -782,7 +757,7 @@ public class NormalGenerator {
 
         /**
          * Checks if this edge is connected to another one.
-         * 
+         *
          * @param other
          *            The other edge
          * @return <code>true</code>, if the indices in this edge and the other one are identical, but in inverse order

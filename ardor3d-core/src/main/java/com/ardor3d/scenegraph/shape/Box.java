@@ -25,7 +25,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * <code>Box</code> is an axis-aligned rectangular prism defined by a center point and x, y, and z extents from that
  * center (essentially radii.)
  */
-public class Box extends Mesh {
+public class Box extends Mesh implements Cloneable {
 
     private double _xExtent, _yExtent, _zExtent;
 
@@ -271,7 +271,7 @@ public class Box extends Mesh {
      * box.
      */
     private void setIndexData() {
-        if (_meshData.getIndices() == null) {
+        if (_meshData.getIndexBuffer() == null) {
             final byte[] indices = { 2, 1, 0, 3, 2, 0, 6, 5, 4, 7, 6, 4, 10, 9, 8, 11, 10, 8, 14, 13, 12, 15, 14, 12,
                     18, 17, 16, 19, 18, 16, 22, 21, 20, 23, 22, 20 };
             final ByteBuffer buf = BufferUtils.createByteBuffer(indices.length);
