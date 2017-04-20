@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -24,16 +24,20 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
 /**
- * <code>BillboardNode</code> defines a node that always orients towards the camera. However, it does not tilt up/down
- * as the camera rises. This keep geometry from appearing to fall over if the camera rises or lowers.
- * <code>BillboardNode</code> is useful to contain a single quad that has a image applied to it for lowest detail
- * models. This quad, with the texture, will appear to be a full model at great distances, and save on rendering and
- * memory. It is important to note that for AXIAL mode, the billboards orientation will always be up (0,1,0). This means
- * that a "standard" ardor3d camera with up (0,1,0) is the only camera setting compatible with AXIAL mode.
+ * <p>
+ * <code>BillboardNode</code> defines a node that will attempt to orient itself in relation to the current camera. The
+ * way it does this depends on the alignment type set via {@link #setAlignment(BillboardAlignment)}.
+ * </p>
+ * <p>
+ * <code>BillboardNode</code> is often a useful way fake complex distant geometry using a single quad that has an image
+ * applied to it. This quad, with the texture, will appear to be a full model at great distances, and save on rendering
+ * and memory.
+ * </p>
+ * <p>
+ * It is also worth noting that you can use any geometry with this node, not just quads.
+ * </p>
  */
 public class BillboardNode extends Node {
-
-    private double _lastTime;
 
     private final Matrix3 _orient = new Matrix3(Matrix3.IDENTITY);
 
@@ -41,17 +45,52 @@ public class BillboardNode extends Node {
 
     private final Vector3 _left = new Vector3(Vector3.ZERO);
 
+    // Used to denote whether our billboard updates should also request bounds updates.
+    private boolean _updateBounds = true;
+
+    /**
+     * Method of alignment to use. See individual enum values for details.
+     */
     public enum BillboardAlignment {
-        ScreenAligned, CameraAligned, AxialY, AxialZ
+        /**
+         * Do not change the node's rotation. Useful for situations where you can not remove a billboard node from a
+         * hierarchy, but do not want the rotation to change.
+         */
+        None,
+
+        /**
+         * Rotate the billboard so it points directly opposite the direction the camera's facing.
+         */
+        ScreenAligned,
+
+        /**
+         * Rotate the billboard so it points directly towards the camera's direction.
+         */
+        CameraAligned,
+
+        /**
+         * Rotate the billboard to face in the camera's direction by rotating around the X axis.
+         */
+        AxialX,
+
+        /**
+         * Rotate the billboard to face in the camera's direction by rotating around the Y axis.
+         */
+        AxialY,
+
+        /**
+         * Rotate the billboard to face in the camera's direction by rotating around the Z axis.
+         */
+        AxialZ
     }
 
     private BillboardAlignment _alignment;
 
-    public BillboardNode() {}
+    public BillboardNode() { /**/}
 
     /**
      * Constructor instantiates a new <code>BillboardNode</code>. The name of the node is supplied during construction.
-     * 
+     *
      * @param name
      *            the name of the node.
      */
@@ -60,15 +99,9 @@ public class BillboardNode extends Node {
         _alignment = BillboardAlignment.ScreenAligned;
     }
 
-    @Override
-    public void updateWorldTransform(final boolean recurse) {
-        _lastTime = 0; // time
-        super.updateWorldTransform(recurse);
-    }
-
     /**
      * <code>draw</code> updates the billboards orientation then renders the billboard's children.
-     * 
+     *
      * @param r
      *            the renderer used to draw.
      * @see com.ardor3d.scenegraph.Spatial#draw(com.ardor3d.renderer.Renderer)
@@ -81,10 +114,30 @@ public class BillboardNode extends Node {
     }
 
     /**
-     * rotate the billboard based on the type set
-     * 
-     * @param cam
-     *            Camera
+     * Normally a billboard triggers transform and bounds updates on its children. Setting this to false will only
+     * trigger dirty flags for transform, potentially saving some expensive bounds calculations if those are deemed
+     * unnecessary (for example, when using sphere bounds and quad billboards. Setting to false may cause odd culling
+     * behavior.
+     *
+     * @param doUpdate
+     *            true (the default) if we should request bounds updates for children, false if not.
+     */
+    public void setUpdateBounds(final boolean doUpdate) {
+        _updateBounds = doUpdate;
+    }
+
+    /**
+     * @return true if bounds are dirtied for children each frame.
+     * @see #setUpdateBounds(boolean)
+     */
+    public boolean isUpdateBounds() {
+        return _updateBounds;
+    }
+
+    /**
+     * Rotate the billboard based on the type set and the currently set camera.
+     *
+     * @see Camera#getCurrentCamera()
      */
     public void rotateBillboard() {
         // get the scale, translation and rotation of the node in world space
@@ -97,11 +150,17 @@ public class BillboardNode extends Node {
             case CameraAligned:
                 rotateCameraAligned();
                 break;
+            case AxialX:
+                rotateAxial(Vector3.UNIT_X);
+                break;
             case AxialY:
-                rotateAxial(new Vector3(Vector3.UNIT_Y));
+                rotateAxial(Vector3.UNIT_Y);
                 break;
             case AxialZ:
-                rotateAxial(new Vector3(Vector3.UNIT_Z));
+                rotateAxial(Vector3.UNIT_Z);
+                break;
+            case None:
+                // nothing to do here.
                 break;
         }
 
@@ -109,80 +168,51 @@ public class BillboardNode extends Node {
             return;
         }
 
-        propagateDirtyDown(ON_DIRTY_TRANSFORM);
+        if (_updateBounds) {
+            propagateDirtyDown(ON_DIRTY_TRANSFORM);
+        } else {
+            propagateDirtyDown(ON_DIRTY_TRANSFORM_ONLY);
+        }
+
         for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
             final Spatial child = getChild(i);
             if (child != null) {
-                child.updateGeometricState(_lastTime, false);
+                child.updateGeometricState(0, false);
             }
         }
     }
 
     /**
      * Aligns this Billboard Node so that it points to the camera position.
-     * 
-     * @param camera
-     *            Camera
      */
     private void rotateCameraAligned() {
         final Camera camera = Camera.getCurrentCamera();
-        _look.set(camera.getLocation()).subtractLocal(_worldTransform.getTranslation());
-        // coopt left for our own purposes.
-        final Vector3 xzp = _left;
-        // The xzp vector is the projection of the look vector on the xz plane
-        xzp.set(_look.getX(), 0, _look.getZ());
-
-        // check for undefined rotation...
-        if (xzp.equals(Vector3.ZERO)) {
-            return;
-        }
-
-        _look.normalizeLocal();
-        xzp.normalizeLocal();
-        final double cosp = _look.dot(xzp);
-
-        // compute the local orientation matrix for the billboard
-        _orient.setValue(0, 0, xzp.getZ());
-        _orient.setValue(0, 1, xzp.getX() * -_look.getY());
-        _orient.setValue(0, 2, xzp.getX() * cosp);
-        _orient.setValue(1, 0, 0);
-        _orient.setValue(1, 1, cosp);
-        _orient.setValue(1, 2, _look.getY());
-        _orient.setValue(2, 0, -xzp.getX());
-        _orient.setValue(2, 1, xzp.getZ() * -_look.getY());
-        _orient.setValue(2, 2, xzp.getZ() * cosp);
-
-        // The billboard must be oriented to face the camera before it is
-        // transformed into the world.
-        final Matrix3 mat = Matrix3.fetchTempInstance().set(_worldTransform.getMatrix()).multiplyLocal(_orient);
-        _worldTransform.setRotation(mat);
-        Matrix3.releaseTempInstance(mat);
+        _look.set(camera.getLocation()).subtractLocal(_worldTransform.getTranslation()).normalizeLocal();
+        _left.set(camera.getUp()).crossLocal(_look);
+        final Vector3 up = Vector3.fetchTempInstance();
+        up.set(_look).crossLocal(_left);
+        _orient.fromAxes(_left, up, _look);
+        _worldTransform.setRotation(_orient);
+        Vector3.releaseTempInstance(up);
     }
 
     /**
      * Rotate the billboard so it points directly opposite the direction the camera's facing
-     * 
-     * @param camera
-     *            Camera
      */
     private void rotateScreenAligned() {
         final Camera camera = Camera.getCurrentCamera();
-        // coopt diff for our in direction:
         _look.set(camera.getDirection()).negateLocal();
-        // coopt loc for our left direction:
         _left.set(camera.getLeft()).negateLocal();
         _orient.fromAxes(_left, camera.getUp(), _look);
         _worldTransform.setRotation(_orient);
     }
 
     /**
-     * Rotate the billboard towards the camera, but keeping a given axis fixed.
-     * 
-     * @param camera
-     *            Camera
+     * Rotate the billboard towards the current camera, but keeping a given axis fixed.
      */
-    private void rotateAxial(final Vector3 axis) {
+    private void rotateAxial(final ReadOnlyVector3 axis) {
         final Camera camera = Camera.getCurrentCamera();
+
         // Compute the additional rotation required for the billboard to face
         // the camera. To do this, the camera must be inverse-transformed into
         // the model space of the billboard.
@@ -232,6 +262,22 @@ public class BillboardNode extends Node {
             _orient.setValue(2, 0, 0);
             _orient.setValue(2, 1, 0);
             _orient.setValue(2, 2, 1);
+        } else if (axis.getX() == 1) {
+            _left.setX(0.0);
+            _left.setY(_left.getY() * invLength);
+            _left.setZ(_left.getZ() * invLength);
+            _left.normalizeLocal();
+
+            // compute the local orientation matrix for the billboard
+            _orient.setValue(0, 0, 1);
+            _orient.setValue(0, 1, 0);
+            _orient.setValue(0, 2, 0);
+            _orient.setValue(1, 0, 0);
+            _orient.setValue(1, 1, _left.getZ());
+            _orient.setValue(1, 2, _left.getY());
+            _orient.setValue(2, 0, 0);
+            _orient.setValue(2, 1, -_left.getY());
+            _orient.setValue(2, 2, _left.getZ());
         }
 
         // The billboard must be oriented to face the camera before it is
@@ -242,9 +288,9 @@ public class BillboardNode extends Node {
     }
 
     /**
-     * Returns the alignment this BillboardNode is set too.
-     * 
-     * @return The alignment of rotation, ScreenAligned, CameraAligned, AxialY or AxialZ.
+     * Returns the alignment this BillboardNode is set to.
+     *
+     * @return The alignment of rotation.
      */
     public BillboardAlignment getAlignment() {
         return _alignment;
@@ -256,6 +302,7 @@ public class BillboardNode extends Node {
      */
     public void setAlignment(final BillboardAlignment alignment) {
         _alignment = alignment;
+        _worldTransform.setRotation(Matrix3.IDENTITY);
     }
 
     @Override
@@ -265,6 +312,7 @@ public class BillboardNode extends Node {
         capsule.write(_look, "look", new Vector3(Vector3.ZERO));
         capsule.write(_left, "left", new Vector3(Vector3.ZERO));
         capsule.write(_alignment, "alignment", BillboardAlignment.ScreenAligned);
+        capsule.write(_updateBounds, "updateBounds", true);
     }
 
     @Override
@@ -274,5 +322,6 @@ public class BillboardNode extends Node {
         _look.set((Vector3) capsule.readSavable("look", new Vector3(Vector3.ZERO)));
         _left.set((Vector3) capsule.readSavable("left", new Vector3(Vector3.ZERO)));
         _alignment = capsule.readEnum("alignment", BillboardAlignment.class, BillboardAlignment.ScreenAligned);
+        _updateBounds = capsule.readBoolean("updateBounds", true);
     }
 }

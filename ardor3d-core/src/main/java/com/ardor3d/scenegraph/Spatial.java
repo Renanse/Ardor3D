@@ -106,6 +106,7 @@ public abstract class Spatial implements Savable, Hintable {
     /** The default delegate reference to use if none provided. */
     private static final Object defaultDelegateRef = new Object();
 
+    protected static final EnumSet<DirtyType> ON_DIRTY_TRANSFORM_ONLY = EnumSet.of(DirtyType.Transform);
     protected static final EnumSet<DirtyType> ON_DIRTY_TRANSFORM = EnumSet.of(DirtyType.Bounding, DirtyType.Transform);
     protected static final EnumSet<DirtyType> ON_DIRTY_RENDERSTATE = EnumSet.of(DirtyType.RenderState);
     protected static final EnumSet<DirtyType> ON_DIRTY_BOUNDING = EnumSet.of(DirtyType.Bounding);

@@ -24,6 +24,7 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.extension.BillboardNode;
@@ -36,27 +37,29 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * Illustrates the BillboardNode class; which defines a node that always orients towards the camera.
+ * Illustrates the BillboardNode class - but using a Z-up camera.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.BillboardNodeExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_BillboardNodeExample.jpg", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.BillboardNodeZExample", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_BillboardNodeZExample.jpg", //
 maxHeapMemory = 64)
-public class BillboardNodeExample extends ExampleBase {
+public class BillboardNodeZExample extends ExampleBase {
 
     private static final int BB_SPACING = 10;
 
-    private static final BillboardAlignment StartingAlignment = BillboardAlignment.AxialY;
+    private static final BillboardAlignment StartingAlignment = BillboardAlignment.AxialZ;
 
     private BasicText text;
 
     private OrbitCamControl control;
 
     public static void main(final String[] args) {
-        start(BillboardNodeExample.class);
+        start(BillboardNodeZExample.class);
     }
 
-    public BillboardNodeExample() {
+    public BillboardNodeZExample() {
         super();
+        _worldUp = new Vector3(Vector3.UNIT_Z);
+
     }
 
     @Override
@@ -74,6 +77,7 @@ public class BillboardNodeExample extends ExampleBase {
 
         // add Orbit handler - set it up to control the main camera
         control = new OrbitCamControl(_canvas.getCanvasRenderer().getCamera(), _root);
+        control.setWorldUpVec(_worldUp);
         control.setupMouseTriggers(_logicalLayer, true);
         control.setSphereCoords(25, MathUtils.HALF_PI, 0);
         control.setZoomSpeed(.25);
@@ -81,13 +85,16 @@ public class BillboardNodeExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("BillboardNode - Example");
+        _canvas.setTitle("BillboardNodeZ - Example");
 
         text = BasicText.createDefaultTextLabel("Text", "[SPACE] " + StartingAlignment);
         text.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         text.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         text.setTranslation(new Vector3(5, 20, 0));
         _root.attachChild(text);
+
+        final Camera cam = _canvas.getCanvasRenderer().getCamera();
+        cam.setAxes(new Vector3(Vector3.UNIT_X), _worldUp, Vector3.UNIT_Y);
 
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
@@ -98,7 +105,7 @@ public class BillboardNodeExample extends ExampleBase {
 
         final BillboardNode[] billboards = new BillboardNode[3];
         for (int i = 0; i < billboards.length; i++) {
-            final Box box = new Box("box-" + i, Vector3.ZERO, 2.5, 2.5, 0.1);
+            final Box box = new Box("box-" + i, Vector3.ZERO, 2.5, 0.1, 2.5);
             final BillboardNode bbn = billboards[i] = new BillboardNode("bbn-" + i);
             bbn.setAlignment(StartingAlignment);
             bbn.setTranslation((i - (billboards.length / 2)) * BB_SPACING, 0, 0);
@@ -125,6 +132,6 @@ public class BillboardNodeExample extends ExampleBase {
             }
         }));
 
-        _root.attachChild(new Box("ground", new Vector3(0, -2.5, 0), 100, 0.1, 100));
+        _root.attachChild(new Box("ground", new Vector3(0, 0, -2.5), 100, 100, 0.1));
     }
 }
