@@ -242,6 +242,9 @@ public class DefaultLatinTextFieldKeyHandler implements UIKeyHandler {
                 _textField.fireComponentDirty();
                 return true;
             }
+                    default:
+                        // not special, ignore
+                        break;
         }
 
         if (_textField.isEditable()) {

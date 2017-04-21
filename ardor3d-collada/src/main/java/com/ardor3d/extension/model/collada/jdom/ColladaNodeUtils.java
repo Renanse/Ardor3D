@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -59,12 +59,11 @@ public class ColladaNodeUtils {
 
     /**
      * Retrieves the scene and returns it as an Ardor3D Node.
-     * 
+     *
      * @param colladaRoot
      *            The collada root element
      * @return Scene as an Node or null if not found
      */
-    @SuppressWarnings("unchecked")
     public Node getVisualScene(final Element colladaRoot) {
         if (colladaRoot.getChild("scene") == null) {
             logger.warning("No scene found in collada file!");
@@ -155,11 +154,10 @@ public class ColladaNodeUtils {
 
     /**
      * Parse an asset element into an AssetData object.
-     * 
+     *
      * @param asset
      * @return
      */
-    @SuppressWarnings("unchecked")
     public AssetData parseAsset(final Element asset) {
         final AssetData assetData = new AssetData();
 
@@ -202,7 +200,6 @@ public class ColladaNodeUtils {
         return assetData;
     }
 
-    @SuppressWarnings("unchecked")
     private void parseContributor(final AssetData assetData, final Element contributor) {
         for (final Element child : contributor.getChildren()) {
             if ("author".equals(child.getName())) {
@@ -236,11 +233,10 @@ public class ColladaNodeUtils {
 
     /**
      * Recursively parse the node hierarcy.
-     * 
+     *
      * @param dNode
      * @return a new Ardor3D node, created from the given <node> element
      */
-    @SuppressWarnings("unchecked")
     private Node buildNode(final Element dNode, JointNode jointNode) {
         final NodeType nodeType = getNodeType(dNode);
         final JointNode jointChildNode;
@@ -352,7 +348,7 @@ public class ColladaNodeUtils {
 
     /**
      * Combines a list of transform elements into an Ardor3D Transform object.
-     * 
+     *
      * @param transforms
      *            List of transform elements
      * @return an Ardor3D Transform object

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -77,7 +77,6 @@ public class ColladaInputPipe {
         float_param, bool_param, int_param, name_param, idref_param
     }
 
-    @SuppressWarnings("unchecked")
     public ColladaInputPipe(final ColladaDOMUtil colladaDOMUtil, final Element input) {
         // Setup our type
         try {
@@ -201,10 +200,10 @@ public class ColladaInputPipe {
                 _buffer = BufferUtils.createFloatBuffer(size);
                 meshData.setTangentCoords(new FloatBufferData(_buffer, _paramCount));
                 break;
-            // case TEXBINORMAL:
-            // _buffer = BufferUtils.createFloatBuffer(size);
-            // meshData.setTangentBuffer(_buffer);
-            // break;
+                // case TEXBINORMAL:
+                // _buffer = BufferUtils.createFloatBuffer(size);
+                // meshData.setTangentBuffer(_buffer);
+                // break;
             default:
         }
     }

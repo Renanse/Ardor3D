@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -51,6 +51,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.RGBA16F;
                     case Float:
                         return TextureStoreFormat.RGBA32F;
+                    default:
+                        break;
                 }
                 break;
             case BGR:
@@ -71,6 +73,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.RGB16F;
                     case Float:
                         return TextureStoreFormat.RGB32F;
+                    default:
+                        break;
                 }
                 break;
             case RG:
@@ -92,6 +96,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.RG16F;
                     case Float:
                         return TextureStoreFormat.RG32F;
+                    default:
+                        break;
                 }
                 break;
             case Luminance:
@@ -111,6 +117,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.Luminance16F;
                     case Float:
                         return TextureStoreFormat.Luminance32F;
+                    default:
+                        break;
                 }
                 break;
             case LuminanceAlpha:
@@ -131,6 +139,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.LuminanceAlpha16F;
                     case Float:
                         return TextureStoreFormat.LuminanceAlpha32F;
+                    default:
+                        break;
                 }
                 break;
             case Alpha:
@@ -147,6 +157,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.Alpha16F;
                     case Float:
                         return TextureStoreFormat.Alpha32F;
+                    default:
+                        break;
                 }
                 break;
             case Red:
@@ -168,6 +180,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.R16F;
                     case Float:
                         return TextureStoreFormat.R32F;
+                    default:
+                        break;
                 }
                 break;
             case Intensity:
@@ -187,6 +201,8 @@ public abstract class ImageUtils {
                         return TextureStoreFormat.Intensity16F;
                     case Float:
                         return TextureStoreFormat.Intensity32F;
+                    default:
+                        break;
                 }
                 break;
             case Depth:

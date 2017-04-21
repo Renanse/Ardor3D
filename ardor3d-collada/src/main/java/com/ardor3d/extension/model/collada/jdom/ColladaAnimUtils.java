@@ -90,7 +90,7 @@ public class ColladaAnimUtils {
 
     /**
      * Retrieve a name to use for the skin node based on the element names.
-     * 
+     *
      * @param ic
      *            instance_controller element.
      * @param controller
@@ -101,17 +101,17 @@ public class ColladaAnimUtils {
     private String getSkinStoreName(final Element ic, final Element controller) {
         final String controllerName = controller.getAttributeValue("name", (String) null) != null ? controller
                 .getAttributeValue("name", (String) null) : controller.getAttributeValue("id", (String) null);
-        final String instanceControllerName = ic.getAttributeValue("name", (String) null) != null ? ic
-                .getAttributeValue("name", (String) null) : ic.getAttributeValue("sid", (String) null);
-        final String storeName = (controllerName != null ? controllerName : "")
-                + (controllerName != null && instanceControllerName != null ? " : " : "")
-                + (instanceControllerName != null ? instanceControllerName : "");
-        return storeName;
+                final String instanceControllerName = ic.getAttributeValue("name", (String) null) != null ? ic
+                        .getAttributeValue("name", (String) null) : ic.getAttributeValue("sid", (String) null);
+                        final String storeName = (controllerName != null ? controllerName : "")
+                                + (controllerName != null && instanceControllerName != null ? " : " : "")
+                                + (instanceControllerName != null ? instanceControllerName : "");
+                        return storeName;
     }
 
     /**
      * Copy the render states from our source Spatial to the destination Spatial. Does not recurse.
-     * 
+     *
      * @param source
      * @param target
      */
@@ -124,7 +124,7 @@ public class ColladaAnimUtils {
 
     /**
      * Clone the given MeshData object via deep copy using the Ardor3D BinaryExporter and BinaryImporter.
-     * 
+     *
      * @param meshData
      *            the source to clone.
      * @return the clone.
@@ -144,7 +144,7 @@ public class ColladaAnimUtils {
 
     /**
      * Builds data based on an instance controller element.
-     * 
+     *
      * @param node
      *            Ardor3D parent Node
      * @param instanceController
@@ -171,7 +171,7 @@ public class ColladaAnimUtils {
 
     /**
      * Construct skin mesh(es) from the skin element and attach them (under a single new Node) to the given parent Node.
-     * 
+     *
      * @param ardorParentNode
      *            Ardor3D Node to attach our skin node to.
      * @param instanceController
@@ -181,7 +181,6 @@ public class ColladaAnimUtils {
      * @param skin
      *            our <skin> element.
      */
-    @SuppressWarnings("unchecked")
     private void buildSkinMeshes(final Node ardorParentNode, final Element instanceController,
             final Element controller, final Element skin) {
         final String skinSource = skin.getAttributeValue("source");
@@ -579,10 +578,10 @@ public class ColladaAnimUtils {
     /**
      * Construct morph mesh(es) from the <morph> element and attach them (under a single new Node) to the given parent
      * Node.
-     * 
+     *
      * Note: This method current does not do anything but attach the referenced mesh since Ardor3D does not yet support
      * morph target animation.
-     * 
+     *
      * @param ardorParentNode
      *            Ardor3D Node to attach our morph mesh to.
      * @param controller
@@ -616,7 +615,7 @@ public class ColladaAnimUtils {
 
     /**
      * Parse all animations in library_animations
-     * 
+     *
      * @param colladaRoot
      */
     public void parseLibraryAnimations(final Element colladaRoot) {
@@ -643,10 +642,9 @@ public class ColladaAnimUtils {
 
     /**
      * Merge all animation channels into Ardor jointchannels
-     * 
+     *
      * @param entry
      */
-    @SuppressWarnings("unchecked")
     private void buildAnimations(final Element parentElement, final Collection<TargetChannel> targetList) {
 
         final List<Element> elementTransforms = new ArrayList<Element>();
@@ -831,12 +829,11 @@ public class ColladaAnimUtils {
 
     /**
      * Gather up all animation channels based on what nodes they affect.
-     * 
+     *
      * @param channelMap
      * @param animationRoot
      * @param animationItemRoot
      */
-    @SuppressWarnings("unchecked")
     private void parseAnimations(final Multimap<Element, TargetChannel> channelMap, final Element animationRoot,
             final AnimationItem animationItemRoot) {
         if (animationRoot.getChild("animation") != null) {
@@ -889,7 +886,7 @@ public class ColladaAnimUtils {
 
     /**
      * Find a target node based on collada target format.
-     * 
+     *
      * @param target
      * @return
      */
@@ -954,7 +951,7 @@ public class ColladaAnimUtils {
 
     /**
      * Break up a target uri string into id, sids and accessors
-     * 
+     *
      * @param targetString
      * @return
      */
@@ -1019,7 +1016,7 @@ public class ColladaAnimUtils {
 
     /**
      * Convert a list of collada elements into a list of TransformElements
-     * 
+     *
      * @param transforms
      * @return
      */
@@ -1051,7 +1048,7 @@ public class ColladaAnimUtils {
 
     /**
      * Bake a list of TransformElements into an Ardor3D Transform object.
-     * 
+     *
      * @param transforms
      * @return
      */
@@ -1101,7 +1098,7 @@ public class ColladaAnimUtils {
 
     /**
      * Util for making a readable string out of a xml element hierarchy
-     * 
+     *
      * @param e
      * @param maxDepth
      * @return
@@ -1116,7 +1113,6 @@ public class ColladaAnimUtils {
         return str.toString();
     }
 
-    @SuppressWarnings("unchecked")
     private static void getElementString(final Element e, final StringBuilder str, final int depth, final int maxDepth,
             final boolean showDots) {
         addSpacing(str, depth);
@@ -1138,7 +1134,7 @@ public class ColladaAnimUtils {
             str.append('>');
             if (depth < maxDepth) {
                 str.append('\n');
-                for (final Element child : (List<Element>) e.getChildren()) {
+                for (final Element child : e.getChildren()) {
                     getElementString(child, str, depth + 1, maxDepth, showDots);
                 }
                 if (!"".equals(e.getText())) {
@@ -1184,7 +1180,7 @@ public class ColladaAnimUtils {
                 return "Target [accessorType=" + accessorType + ", id=" + id + ", sids=" + sids + "]";
             }
             return "Target [accessorType=" + accessorType + ", accessorIndexX=" + accessorIndexX + ", accessorIndexY="
-                    + accessorIndexY + ", id=" + id + ", sids=" + sids + "]";
+            + accessorIndexY + ", id=" + id + ", sids=" + sids + "]";
         }
     }
 }

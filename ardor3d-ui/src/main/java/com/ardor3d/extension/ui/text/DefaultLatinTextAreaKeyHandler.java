@@ -243,6 +243,9 @@ public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
                 _textArea.fireComponentDirty();
                 return true;
             }
+                    default:
+                        // not special, ignore
+                        break;
         }
 
         if (_textArea.isEditable()) {

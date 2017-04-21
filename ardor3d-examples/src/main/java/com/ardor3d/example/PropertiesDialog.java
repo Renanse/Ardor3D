@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -70,15 +70,15 @@ public final class PropertiesDialog extends JDialog {
     // UI components
     private JCheckBox fullscreenBox = null;
 
-    private JComboBox displayResCombo = null;
+    private JComboBox<String> displayResCombo = null;
 
-    private JComboBox samplesCombo = null;
+    private JComboBox<String> samplesCombo = null;
 
-    private JComboBox colorDepthCombo = null;
+    private JComboBox<String> colorDepthCombo = null;
 
-    private JComboBox displayFreqCombo = null;
+    private JComboBox<String> displayFreqCombo = null;
 
-    private JComboBox rendererCombo = null;
+    private JComboBox<String> rendererCombo = null;
 
     private JLabel icon = null;
 
@@ -89,7 +89,7 @@ public final class PropertiesDialog extends JDialog {
     /**
      * Constructor for the <code>PropertiesDialog</code>. Creates a properties dialog initialized for the primary
      * display.
-     * 
+     *
      * @param source
      *            the <code>GameSettings</code> object to use for working with the properties file.
      * @param imageFile
@@ -105,7 +105,7 @@ public final class PropertiesDialog extends JDialog {
     /**
      * Constructor for the <code>PropertiesDialog</code>. Creates a properties dialog initialized for the primary
      * display.
-     * 
+     *
      * @param source
      *            the <code>GameSettings</code> object to use for working with the properties file.
      * @param imageFile
@@ -121,7 +121,7 @@ public final class PropertiesDialog extends JDialog {
     /**
      * Constructor for the <code>PropertiesDialog</code>. Creates a properties dialog initialized for the primary
      * display.
-     * 
+     *
      * @param source
      *            the <code>GameSettings</code> object to use for working with the properties file.
      * @param imageFile
@@ -138,7 +138,7 @@ public final class PropertiesDialog extends JDialog {
     /**
      * Constructor for the <code>PropertiesDialog</code>. Creates a properties dialog initialized for the primary
      * display.
-     * 
+     *
      * @param source
      *            the <code>GameSettings</code> object to use for working with the properties file.
      * @param imageFile
@@ -172,7 +172,7 @@ public final class PropertiesDialog extends JDialog {
 
     /**
      * <code>setImage</code> sets the background image of the dialog.
-     * 
+     *
      * @param image
      *            <code>String</code> representing the image file.
      */
@@ -188,7 +188,7 @@ public final class PropertiesDialog extends JDialog {
 
     /**
      * <code>setImage</code> sets the background image of this dialog.
-     * 
+     *
      * @param image
      *            <code>URL</code> pointing to the image file.
      */
@@ -266,9 +266,9 @@ public final class PropertiesDialog extends JDialog {
         displayResCombo.addKeyListener(aListener);
         samplesCombo = setUpSamplesChooser();
         samplesCombo.addKeyListener(aListener);
-        colorDepthCombo = new JComboBox();
+        colorDepthCombo = new JComboBox<String>();
         colorDepthCombo.addKeyListener(aListener);
-        displayFreqCombo = new JComboBox();
+        displayFreqCombo = new JComboBox<String>();
         displayFreqCombo.addKeyListener(aListener);
         fullscreenBox = new JCheckBox("Fullscreen?");
         fullscreenBox.setSelected(source.isFullscreen());
@@ -330,7 +330,7 @@ public final class PropertiesDialog extends JDialog {
     /**
      * <code>verifyAndSaveCurrentSelection</code> first verifies that the display mode is valid for this system, and
      * then saves the current selection as a properties.cfg file.
-     * 
+     *
      * @return if the selection is valid
      */
     private boolean verifyAndSaveCurrentSelection() {
@@ -405,12 +405,12 @@ public final class PropertiesDialog extends JDialog {
     /**
      * <code>setUpChooser</code> retrieves all available display modes and places them in a <code>JComboBox</code>. The
      * resolution specified by GameSettings is used as the default value.
-     * 
+     *
      * @return the combo box of display modes.
      */
-    private JComboBox setUpResolutionChooser() {
+    private JComboBox<String> setUpResolutionChooser() {
         final String[] res = getResolutions(modes);
-        final JComboBox resolutionBox = new JComboBox(res);
+        final JComboBox<String> resolutionBox = new JComboBox<String>(res);
 
         resolutionBox.setSelectedItem(source.getWidth() + " x " + source.getHeight());
         resolutionBox.addActionListener(new ActionListener() {
@@ -425,11 +425,11 @@ public final class PropertiesDialog extends JDialog {
     /**
      * <code>setUpRendererChooser</code> sets the list of available renderers. The renderer specified by GameSettings is
      * used as the default value.
-     * 
+     *
      * @return the list of renderers.
      */
-    private JComboBox setUpRendererChooser() {
-        final JComboBox nameBox = new JComboBox(new String[] { "LWJGL 2.8.4", "JOGL 2.0rc11" });
+    private JComboBox<String> setUpRendererChooser() {
+        final JComboBox<String> nameBox = new JComboBox<String>(new String[] { "LWJGL 2.8.4", "JOGL 2.0rc11" });
         final String old = source.getRenderer();
         if (old != null) {
             if (old.startsWith("LWJGL")) {
@@ -441,8 +441,8 @@ public final class PropertiesDialog extends JDialog {
         return nameBox;
     }
 
-    private JComboBox setUpSamplesChooser() {
-        final JComboBox nameBox = new JComboBox(samples);
+    private JComboBox<String> setUpSamplesChooser() {
+        final JComboBox<String> nameBox = new JComboBox<String>(samples);
         nameBox.setSelectedItem(source.getRenderer());
         return nameBox;
     }
@@ -468,11 +468,11 @@ public final class PropertiesDialog extends JDialog {
 
         // grab available depths
         final String[] depths = getDepths(resolution, modes);
-        colorDepthCombo.setModel(new DefaultComboBoxModel(depths));
+        colorDepthCombo.setModel(new DefaultComboBoxModel<String>(depths));
         colorDepthCombo.setSelectedItem(colorDepth);
         // grab available frequencies
         final String[] freqs = getFrequencies(resolution, modes);
-        displayFreqCombo.setModel(new DefaultComboBoxModel(freqs));
+        displayFreqCombo.setModel(new DefaultComboBoxModel<String>(freqs));
         // Try to reset freq
         displayFreqCombo.setSelectedItem(displayFreq);
     }
@@ -484,12 +484,12 @@ public final class PropertiesDialog extends JDialog {
      */
     private void updateResolutionChoices() {
         if (!fullscreenBox.isSelected()) {
-            displayResCombo.setModel(new DefaultComboBoxModel(windowedResolutions));
-            colorDepthCombo.setModel(new DefaultComboBoxModel(new String[] { "24 bpp", "16 bpp" }));
-            displayFreqCombo.setModel(new DefaultComboBoxModel(new String[] { "n/a" }));
+            displayResCombo.setModel(new DefaultComboBoxModel<String>(windowedResolutions));
+            colorDepthCombo.setModel(new DefaultComboBoxModel<String>(new String[] { "24 bpp", "16 bpp" }));
+            displayFreqCombo.setModel(new DefaultComboBoxModel<String>(new String[] { "n/a" }));
             displayFreqCombo.setEnabled(false);
         } else {
-            displayResCombo.setModel(new DefaultComboBoxModel(getResolutions(modes)));
+            displayResCombo.setModel(new DefaultComboBoxModel<String>(getResolutions(modes)));
             displayFreqCombo.setEnabled(true);
             updateDisplayChoices();
         }
@@ -502,7 +502,7 @@ public final class PropertiesDialog extends JDialog {
 
     /**
      * Utility method for converting a String denoting a file into a URL.
-     * 
+     *
      * @return a URL pointing to the file or null
      */
     private static URL getURL(final String file) {

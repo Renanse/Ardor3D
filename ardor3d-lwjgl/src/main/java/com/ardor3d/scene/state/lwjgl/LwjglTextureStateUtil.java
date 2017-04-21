@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -476,6 +476,9 @@ public abstract class LwjglTextureStateUtil {
                             break;
                         case OneDimensional:
                             GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL12.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                        case CubeMap:
+                            // handled above
                             break;
                     }
 
@@ -1323,7 +1326,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the filter settings of this particular texture have been changed and apply as needed.
-     * 
+     *
      * @param texture
      *            our texture object
      * @param texRecord
@@ -1365,7 +1368,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the filter settings of this particular texture have been changed and apply as needed.
-     * 
+     *
      * @param texture
      *            our texture object
      * @param texRecord
@@ -1406,7 +1409,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the wrap mode of this particular texture has been changed and apply as needed.
-     * 
+     *
      * @param texture
      *            our texture object
      * @param texRecord
@@ -1443,7 +1446,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the wrap mode of this particular texture has been changed and apply as needed.
-     * 
+     *
      * @param texture
      *            our texture object
      * @param texRecord
@@ -1463,7 +1466,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the wrap mode of this particular texture has been changed and apply as needed.
-     * 
+     *
      * @param texture
      *            our texture object
      * @param texRecord
@@ -1485,7 +1488,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the wrap mode of this particular texture has been changed and apply as needed.
-     * 
+     *
      * @param texture
      *            our texture object
      * @param texRecord
@@ -1512,7 +1515,7 @@ public abstract class LwjglTextureStateUtil {
 
     /**
      * Check if the wrap mode of this particular texture has been changed and apply as needed.
-     * 
+     *
      * @param cubeMap
      *            our texture object
      * @param texRecord

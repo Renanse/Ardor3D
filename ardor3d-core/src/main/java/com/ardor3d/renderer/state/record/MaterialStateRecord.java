@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -153,6 +153,8 @@ public class MaterialStateRecord extends StateRecord {
                 case Specular:
                     frontSpecular.set(-1, -1, -1, -1);
                     break;
+                case None:
+                    break;
             }
         }
         if (face == MaterialFace.Back || face == MaterialFace.FrontAndBack) {
@@ -172,6 +174,8 @@ public class MaterialStateRecord extends StateRecord {
                     break;
                 case Specular:
                     backSpecular.set(-1, -1, -1, -1);
+                    break;
+                case None:
                     break;
             }
         }

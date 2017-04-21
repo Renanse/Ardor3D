@@ -42,6 +42,9 @@ public class CacheFunctionUtil {
                                 tileSize);
                         return;
                     }
+                default:
+                    System.err.println("CacheFunctionUtil.applyFunction: Unhandled format: " + format);
+                    break;
             }
         } else {
             function.doConversion(sourceData, store, destX, destY, dataSize, tileSize);

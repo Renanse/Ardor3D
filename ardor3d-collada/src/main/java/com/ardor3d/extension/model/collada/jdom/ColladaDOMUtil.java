@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -46,7 +46,7 @@ public class ColladaDOMUtil {
 
     /**
      * Find element with specific id
-     * 
+     *
      * @param baseUrl
      *            url specifying target id
      * @return element with specific id or null if not found
@@ -57,7 +57,7 @@ public class ColladaDOMUtil {
 
     /**
      * Find element with specific sid
-     * 
+     *
      * @param baseUrl
      *            url specifying target sid
      * @return element with specific id or null if not found
@@ -68,7 +68,7 @@ public class ColladaDOMUtil {
 
     /**
      * Select nodes through an XPath query and return all hits as a List
-     * 
+     *
      * @param element
      *            root element to start search on
      * @param query
@@ -89,7 +89,7 @@ public class ColladaDOMUtil {
 
     /**
      * Select nodes through an XPath query and returns the first hit
-     * 
+     *
      * @param element
      *            root element to start search on
      * @param query
@@ -121,7 +121,7 @@ public class ColladaDOMUtil {
 
     /**
      * Compiles and return an XPath expression. Expressions are cached.
-     * 
+     *
      * @param query
      *            XPath query to compile
      * @return new XPath expression object
@@ -146,7 +146,7 @@ public class ColladaDOMUtil {
 
     /**
      * Parses the text under a node and returns it as a float array.
-     * 
+     *
      * @param node
      *            node to parse content from
      * @return parsed float array
@@ -176,7 +176,7 @@ public class ColladaDOMUtil {
 
     /**
      * Parses the text under a node and returns it as a double array.
-     * 
+     *
      * @param node
      *            node to parse content from
      * @return parsed double array
@@ -206,7 +206,7 @@ public class ColladaDOMUtil {
 
     /**
      * Parses the text under a node and returns it as an int array.
-     * 
+     *
      * @param node
      *            node to parse content from
      * @return parsed int array
@@ -236,7 +236,7 @@ public class ColladaDOMUtil {
 
     /**
      * Parses the text under a node and returns it as a boolean array.
-     * 
+     *
      * @param node
      *            node to parse content from
      * @return parsed boolean array
@@ -266,7 +266,7 @@ public class ColladaDOMUtil {
 
     /**
      * Parses the text under a node and returns it as a string array.
-     * 
+     *
      * @param node
      *            node to parse content from
      * @return parsed string array
@@ -292,14 +292,13 @@ public class ColladaDOMUtil {
 
     /**
      * Strips the namespace from all nodes in a tree.
-     * 
+     *
      * @param rootElement
      *            Root of strip operation
      */
     public void stripNamespace(final Element rootElement) {
         rootElement.setNamespace(null);
 
-        @SuppressWarnings("unchecked")
         final List<Element> children = rootElement.getChildren();
         final Iterator<Element> i = children.iterator();
         while (i.hasNext()) {
@@ -310,7 +309,7 @@ public class ColladaDOMUtil {
 
     /**
      * Parse an int value in an attribute.
-     * 
+     *
      * @param input
      *            Element containing the attribute
      * @param attributeName
@@ -331,7 +330,7 @@ public class ColladaDOMUtil {
 
     /**
      * Convert a Collada color description into an Ardor3D ColorRGBA
-     * 
+     *
      * @param colorDescription
      *            Collada color description
      * @return Ardor3d ColorRGBA
@@ -358,11 +357,10 @@ public class ColladaDOMUtil {
 
     /**
      * Find Element with semantic POSITION under an element with inputs
-     * 
+     *
      * @param v
      * @return
      */
-    @SuppressWarnings("unchecked")
     public Element getPositionSource(final Element v) {
         for (final Element input : v.getChildren("input")) {
             if ("POSITION".equals(input.getAttributeValue("semantic"))) {
