@@ -120,8 +120,16 @@ public class BMText extends Mesh {
      * Alignment of the text block from the pivot point
      */
     public enum Align {
-        North(-0.5f, 0.0f), NorthWest(0.0f, 0.0f), NorthEast(-1.0f, 0.0f), Center(-0.5f, -0.5f), West(0.0f, -0.5f), East(
-                -1.0f, -0.5f), South(-0.5f, -1.0f), SouthWest(0.0f, -1.0f), SouthEast(-1.0f, -1.0f);
+        North(-0.5f, 0.0f), //
+        NorthWest(0.0f, 0.0f), //
+        NorthEast(-1.0f, 0.0f), //
+        Center(-0.5f, -0.5f), //
+        West(0.0f, -0.5f), //
+        East(-1.0f, -0.5f), //
+        South(-0.5f, -1.0f), //
+        SouthWest(0.0f, -1.0f), //
+        SouthEast(-1.0f, -1.0f);
+
         public final float horizontal;
         public final float vertical;
 

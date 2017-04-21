@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -87,7 +87,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /**
      * Constructs a new <code>Mesh</code> with a given name.
-     * 
+     *
      * @param name
      *            the name of the mesh. This is required for identification purposes.
      */
@@ -97,7 +97,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /**
      * Retrieves the mesh data object used by this mesh.
-     * 
+     *
      * @return the mesh data object
      */
     public MeshData getMeshData() {
@@ -106,7 +106,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /**
      * Sets the mesh data object for this mesh.
-     * 
+     *
      * @param meshData
      *            the mesh data object
      */
@@ -118,7 +118,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /**
      * Retrieves the local bounding volume for this mesh.
-     * 
+     *
      * @param store
      *            the bounding volume
      */
@@ -128,7 +128,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /**
      * Retrieves a copy of the local bounding volume for this mesh.
-     * 
+     *
      * @param store
      *            the bounding volume
      */
@@ -142,7 +142,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * Sets the local bounding volume for this mesh to the given bounds, updated to fit the vertices of this Mesh. Marks
      * the spatial as having dirty world bounds.
-     * 
+     *
      * @param modelBound
      *            the bounding volume - only type is used, actual values are replaced.
      */
@@ -154,7 +154,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
      * Sets the local bounding volume for this mesh to the given bounding volume. If autoCompute is true (default, if
      * not given) then we will modify the given modelBound to fit the current vertices of this mesh. This will also mark
      * the spatial as having dirty world bounds.
-     * 
+     *
      * @param modelBound
      *            the bounding volume
      * @param autoCompute
@@ -193,7 +193,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * translates/rotates and scales the vectors of this Mesh to world coordinates based on its world settings. The
      * results are stored in the given FloatBuffer. If given FloatBuffer is null, one is created.
-     * 
+     *
      * @param store
      *            the FloatBuffer to store the results in, or null if you want one created.
      * @return store or new FloatBuffer if store == null.
@@ -217,7 +217,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * rotates the normals of this Mesh to world normals based on its world settings. The results are stored in the
      * given FloatBuffer. If given FloatBuffer is null, one is created.
-     * 
+     *
      * @param store
      *            the FloatBuffer to store the results in, or null if you want one created.
      * @return store or new FloatBuffer if store == null.
@@ -423,7 +423,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public void draw(final Renderer r) {
@@ -461,7 +461,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /**
      * <code>setDefaultColor</code> sets the color to be used if no per vertex color buffer is set.
-     * 
+     *
      * @param color
      */
     public void setDefaultColor(final ReadOnlyColorRGBA color) {
@@ -469,7 +469,19 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     }
 
     /**
-     * 
+     * <code>setDefaultColor</code> sets the color to be used if no per vertex color buffer is set.
+     *
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
+    public void setDefaultColor(final float r, final float g, final float b, final float a) {
+        _defaultColor.set(r, g, b, a);
+    }
+
+    /**
+     *
      * @param store
      * @return
      */
@@ -490,7 +502,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * <code>setSolidColor</code> sets the color array of this geometry to a single color. For greater efficiency, try
      * setting the the ColorBuffer to null and using DefaultColor instead.
-     * 
+     *
      * @param color
      *            the color to set.
      */
@@ -652,7 +664,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * Let this mesh know we want to change its indices to the provided new order. Override this to provide extra
      * functionality for sub types as needed.
-     * 
+     *
      * @param newIndices
      *            the IntBufferData to switch to.
      * @param modes
@@ -669,7 +681,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * Swap around the order of the vertex data in this Mesh. This is usually called by a tool that has attempted to
      * determine a more optimal order for vertex data.
-     * 
+     *
      * @param newVertexOrder
      *            a mapping to the desired new order, where the current location of a vertex is the index into this
      *            array and the value at that location in the array is the new location to store the vertex data.
@@ -681,7 +693,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     /**
      * Swap around the order of the vertex data in the given MeshData. Override to provide specific behavior to the Mesh
      * object.
-     * 
+     *
      * @param newVertexOrder
      *            a mapping to the desired new order, where the current location of a vertex is the index into this
      *            array and the value at that location in the array is the new location to store the vertex data.
