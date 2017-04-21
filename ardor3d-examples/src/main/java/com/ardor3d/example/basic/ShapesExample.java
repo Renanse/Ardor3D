@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -30,12 +30,14 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -65,6 +67,7 @@ import com.ardor3d.scenegraph.shape.StripBox;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.scenegraph.shape.Tube;
+import com.ardor3d.ui.text.BMTextBackground;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
@@ -79,6 +82,7 @@ public class ShapesExample extends ExampleBase {
     private int wrapCount;
     private int index;
     private BasicText _text;
+    private Node _textNode;
     private PickResults _pickResults;
     private Spatial _picked = null;
     private SpatialController<Spatial> _pickedControl;
@@ -130,11 +134,7 @@ public class ShapesExample extends ExampleBase {
         _pickResults = new BoundingPickResults();
         _pickResults.setCheckDistance(true);
 
-        // Set up our pick label
-        _text = BasicText.createDefaultTextLabel("", "pick");
-        _text.setTranslation(10, 10, 0);
-        _text.getSceneHints().setCullHint(CullHint.Always);
-        _root.attachChild(_text);
+        setupText();
 
         // Set up picked pulse
         _pickedControl = new SpatialController<Spatial>() {
@@ -161,6 +161,35 @@ public class ShapesExample extends ExampleBase {
         };
     }
 
+    private void setupText() {
+        // Set up our pick label
+        _textNode = new Node("textNode");
+        _textNode.setTranslation(20, 20, 0);
+        _textNode.getSceneHints().setCullHint(CullHint.Always);
+        _root.attachChild(_textNode);
+
+        _text = BasicText.createDefaultTextLabel("", "pick");
+        _text.getSceneHints().setOrthoOrder(0);
+        _textNode.attachChild(_text);
+
+        final Texture border = TextureManager.load("images/border.png", Texture.MinificationFilter.Trilinear, true);
+
+        final BMTextBackground outerBorder = new BMTextBackground("bg1", _text, border);
+        outerBorder.setTexBorderOffsets(0.2f);
+        outerBorder.setContentPadding(10);
+        outerBorder.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        outerBorder.getSceneHints().setOrthoOrder(2);
+        outerBorder.setBackgroundColor(ColorRGBA.LIGHT_GRAY);
+        _textNode.attachChild(outerBorder);
+
+        final BMTextBackground innerBG = new BMTextBackground("bg2", _text, border);
+        innerBG.setTexBorderOffsets(0.2f);
+        innerBG.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        innerBG.getSceneHints().setOrthoOrder(1);
+        innerBG.setBackgroundColor(ColorRGBA.BLUE);
+        _textNode.attachChild(innerBG);
+    }
+
     @Override
     protected void registerInputTriggers() {
         super.registerInputTriggers();
@@ -183,7 +212,7 @@ public class ShapesExample extends ExampleBase {
 
                 if (_pickResults.getNumber() > 0) {
                     // picked something, show label.
-                    _text.getSceneHints().setCullHint(CullHint.Never);
+                    _textNode.getSceneHints().setCullHint(CullHint.Never);
 
                     // set our text to the name of the ancestor of this object that is right under the _root node.
                     final PickData pick = _pickResults.getPickData(0);
@@ -198,7 +227,7 @@ public class ShapesExample extends ExampleBase {
                     }
                 } else {
                     // No pick, clear label.
-                    _text.getSceneHints().setCullHint(CullHint.Always);
+                    _textNode.getSceneHints().setCullHint(CullHint.Always);
                     _text.setText("");
 
                     clearPicked();
