@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -19,6 +19,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -47,9 +48,12 @@ public class BasicText extends BMText {
 
     protected BasicText() {}
 
+    public BasicText(final String name, final String text, final BMFont font) {
+        this(name, text, font, font.getSize());
+    }
+
     public BasicText(final String name, final String text, final BMFont font, final double fontSize) {
         super(name, text, font);
-        getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         setFontScale(fontSize);
         setAutoFade(AutoFade.Off);
         setAutoScale(AutoScale.Off);
@@ -74,8 +78,11 @@ public class BasicText extends BMText {
         blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         setRenderState(blend);
 
+        getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        getSceneHints().setCullHint(CullHint.Never);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+
         updateModelBound();
     }
 
