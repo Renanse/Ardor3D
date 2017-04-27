@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -25,11 +25,11 @@ import com.google.common.collect.Maps;
 
 /**
  * This tool assists in reducing geometry information.<br>
- * 
+ *
  * Note: Does not work with geometry using texcoords other than 2d coords. <br>
  * TODO: Consider adding an option for "close enough" vertex matches... ie, smaller than X distance apart.<br>
  */
-public class GeometryTool {
+public final class GeometryTool {
     private static final Logger logger = Logger.getLogger(GeometryTool.class.getName());
 
     /**
@@ -46,7 +46,7 @@ public class GeometryTool {
         Group;
     }
 
-    public GeometryTool() {
+    private GeometryTool() {
         super();
     }
 
@@ -54,14 +54,14 @@ public class GeometryTool {
      * Attempt to collapse duplicate vertex data in a given mesh. Vertices are considered duplicate if they occupy the
      * same place in space and match the supplied conditions. All vertices in the mesh are considered part of the same
      * vertex "group".
-     * 
+     *
      * @param mesh
      *            the mesh to reduce
      * @param conditions
      *            our match conditions.
      * @return a mapping of old vertex positions to their new positions.
      */
-    public VertMap minimizeVerts(final Mesh mesh, final EnumSet<MatchCondition> conditions) {
+    public static VertMap minimizeVerts(final Mesh mesh, final EnumSet<MatchCondition> conditions) {
         final VertGroupData groupData = new VertGroupData();
         groupData.setGroupConditions(VertGroupData.DEFAULT_GROUP, conditions);
         return minimizeVerts(mesh, groupData);
@@ -70,14 +70,14 @@ public class GeometryTool {
     /**
      * Attempt to collapse duplicate vertex data in a given mesh. Vertices are consider duplicate if they occupy the
      * same place in space and match the supplied conditions. The conditions are supplied per vertex group.
-     * 
+     *
      * @param mesh
      *            the mesh to reduce
      * @param groupData
      *            grouping data for the vertices in this mesh.
      * @return a mapping of old vertex positions to their new positions.
      */
-    public VertMap minimizeVerts(final Mesh mesh, final VertGroupData groupData) {
+    public static VertMap minimizeVerts(final Mesh mesh, final VertGroupData groupData) {
         final long start = System.currentTimeMillis();
 
         int vertCount = -1;
@@ -209,7 +209,7 @@ public class GeometryTool {
         return result;
     }
 
-    private Vector2[] getTexs(final Vector2[][] tex, final int i) {
+    private static Vector2[] getTexs(final Vector2[][] tex, final int i) {
         final Vector2[] res = new Vector2[tex.length];
         for (int x = 0; x < tex.length; x++) {
             if (tex[x] != null) {
@@ -219,7 +219,7 @@ public class GeometryTool {
         return res;
     }
 
-    public void trimEmptyBranches(final Spatial spatial) {
+    public static void trimEmptyBranches(final Spatial spatial) {
         if (spatial instanceof Node) {
             final Node node = (Node) spatial;
             for (int i = node.getNumberOfChildren(); --i >= 0;) {

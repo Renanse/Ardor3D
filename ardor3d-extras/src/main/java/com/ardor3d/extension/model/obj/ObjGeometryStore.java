@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -58,15 +58,8 @@ public class ObjGeometryStore {
     private final Map<String, ObjMaterial> materialLibrary = Maps.newHashMap();
     private final Map<Spatial, String> _materialMap = Maps.newHashMap();
 
-    private final GeometryTool _geometryTool;
-
     public ObjGeometryStore() {
-        this(new GeometryTool());
-    }
-
-    public ObjGeometryStore(final GeometryTool geometryTool) {
         super();
-        _geometryTool = geometryTool;
     }
 
     public Map<String, ObjMaterial> getMaterialLibrary() {
@@ -199,7 +192,7 @@ public class ObjGeometryStore {
             }
             points.getMeshData().setIndices(indexBuffer);
 
-            _geometryTool.minimizeVerts(points, EnumSet.noneOf(MatchCondition.class));
+            GeometryTool.minimizeVerts(points, EnumSet.noneOf(MatchCondition.class));
 
             applyCurrentMaterial(points);
             mapToGroups(points);
@@ -247,7 +240,7 @@ public class ObjGeometryStore {
                 }
                 line.getMeshData().setIndexLengths(lengths);
             }
-            _geometryTool.minimizeVerts(line, EnumSet.of(MatchCondition.UVs));
+            GeometryTool.minimizeVerts(line, EnumSet.of(MatchCondition.UVs));
 
             applyCurrentMaterial(line);
             mapToGroups(line);
@@ -326,7 +319,7 @@ public class ObjGeometryStore {
             groupData.setVertGroups(vertGroups);
             groupData.setGroupConditions(VertGroupData.DEFAULT_GROUP,
                     EnumSet.of(MatchCondition.Normal, MatchCondition.UVs));
-            _geometryTool.minimizeVerts(mesh, groupData);
+            GeometryTool.minimizeVerts(mesh, groupData);
 
             applyCurrentMaterial(mesh);
             mapToGroups(mesh);

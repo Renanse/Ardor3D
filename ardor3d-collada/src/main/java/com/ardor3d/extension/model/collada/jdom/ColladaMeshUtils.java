@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -43,28 +43,20 @@ public class ColladaMeshUtils {
     private final ColladaMaterialUtils _colladaMaterialUtils;
     private final boolean _optimizeMeshes;
     private final EnumSet<MatchCondition> _optimizeSettings;
-    private final GeometryTool _geometryTool;
 
     public ColladaMeshUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
             final ColladaMaterialUtils colladaMaterialUtils, final boolean optimizeMeshes,
             final EnumSet<MatchCondition> optimizeSettings) {
-        this(dataCache, colladaDOMUtil, colladaMaterialUtils, optimizeMeshes, optimizeSettings, new GeometryTool());
-    }
-
-    public ColladaMeshUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
-            final ColladaMaterialUtils colladaMaterialUtils, final boolean optimizeMeshes,
-            final EnumSet<MatchCondition> optimizeSettings, final GeometryTool geometryTool) {
         _dataCache = dataCache;
         _colladaDOMUtil = colladaDOMUtil;
         _colladaMaterialUtils = colladaMaterialUtils;
         _optimizeMeshes = optimizeMeshes;
         _optimizeSettings = EnumSet.copyOf(optimizeSettings);
-        _geometryTool = geometryTool;
     }
 
     /**
      * Builds geometry from an instance_geometry element.
-     * 
+     *
      * @param instanceGeometry
      * @return our Spatial
      */
@@ -81,7 +73,7 @@ public class ColladaMeshUtils {
      * Builds a mesh from a Collada geometry element. Currently supported mesh types: mesh, polygons, polylist,
      * triangles, lines. Not supported yet: linestrips, trifans, tristrips. If no meshtype is found, a pointcloud is
      * built.
-     * 
+     *
      * @param colladaGeometry
      * @return a Node containing all of the Ardor3D meshes we've parsed from this geometry element.
      */
@@ -220,7 +212,7 @@ public class ColladaMeshUtils {
         _dataCache.getVertMappings().put(colladaGeometry, mvp);
 
         if (_optimizeMeshes) {
-            final VertMap map = _geometryTool.minimizeVerts(points, _optimizeSettings);
+            final VertMap map = GeometryTool.minimizeVerts(points, _optimizeSettings);
             _dataCache.setMeshVertMap(points, map);
         }
 
@@ -315,7 +307,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = _geometryTool.minimizeVerts(polyMesh, _optimizeSettings);
+            final VertMap map = GeometryTool.minimizeVerts(polyMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(polyMesh, map);
         }
 
@@ -407,7 +399,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = _geometryTool.minimizeVerts(polyMesh, _optimizeSettings);
+            final VertMap map = GeometryTool.minimizeVerts(polyMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(polyMesh, map);
         }
 
@@ -461,7 +453,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = _geometryTool.minimizeVerts(triMesh, _optimizeSettings);
+            final VertMap map = GeometryTool.minimizeVerts(triMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(triMesh, map);
         }
 
@@ -512,7 +504,7 @@ public class ColladaMeshUtils {
         }
 
         if (_optimizeMeshes) {
-            final VertMap map = _geometryTool.minimizeVerts(lineMesh, _optimizeSettings);
+            final VertMap map = GeometryTool.minimizeVerts(lineMesh, _optimizeSettings);
             _dataCache.setMeshVertMap(lineMesh, map);
         }
 
@@ -523,7 +515,7 @@ public class ColladaMeshUtils {
 
     /**
      * Extract our pipes from the given parent element.
-     * 
+     *
      * @param inputsParent
      * @param pipesStore
      *            the store for our pipes
@@ -564,7 +556,7 @@ public class ColladaMeshUtils {
 
     /**
      * Push the values at the given indices of currentVal onto the buffers defined in pipes.
-     * 
+     *
      * @param pipes
      * @param currentVal
      * @return the vertex index referenced in the given indices based on the pipes. Integer.MIN_VALUE is returned if no
@@ -586,7 +578,7 @@ public class ColladaMeshUtils {
     /**
      * Extract name from xml element, some exporters don't support 'name' attribute, so we better use the material
      * instead of a generic name.
-     * 
+     *
      * @param element
      * @return value from 'name' or 'material' attribute
      */
