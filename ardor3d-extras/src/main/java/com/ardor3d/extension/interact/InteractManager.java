@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -141,7 +141,7 @@ public class InteractManager {
     /**
      * Convenience method for setting up the manager's connection to the Ardor3D input system, along with a forwarding
      * address for input events that the manager does not care about.
-     * 
+     *
      * @param canvas
      *            the canvas to register with
      * @param physicalLayer
@@ -205,7 +205,13 @@ public class InteractManager {
     }
 
     public void setActiveWidget(final AbstractInteractWidget widget) {
+        if (_activeWidget != null) {
+            _activeWidget.lostControl(this);
+        }
         _activeWidget = widget;
+        if (_activeWidget != null) {
+            _activeWidget.receivedControl(this);
+        }
     }
 
     public AbstractInteractWidget getActiveWidget() {
