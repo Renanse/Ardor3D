@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.extension.ui.util.TransformedSubTex;
 import com.ardor3d.math.ColorRGBA;
@@ -38,7 +39,7 @@ public class MultiImageBackdrop extends SolidBackdrop {
 
     /**
      * Construct this back drop, using the given backdrop color.
-     * 
+     *
      * @param backDropColor
      *            the color of the backdrop
      */
@@ -73,9 +74,11 @@ public class MultiImageBackdrop extends SolidBackdrop {
         for (final TransformedSubTex entry : _images) {
 
             MultiImageBackdrop.getDimensions(entry, comp, bgwidth, bgheight, store);
+            final Insets margin = comp.getMargin() != null ? comp.getMargin() : Insets.EMPTY;
+            final Insets border = comp.getBorder() != null ? comp.getBorder() : Insets.EMPTY;
 
-            store[0] += comp.getMargin().getLeft() + comp.getBorder().getLeft();
-            store[1] += comp.getMargin().getBottom() + comp.getBorder().getBottom();
+            store[0] += margin.getLeft() + border.getLeft();
+            store[1] += margin.getBottom() + border.getBottom();
 
             SubTexUtil.drawTransformedSubTex(renderer, entry, (int) Math.round(store[0]), (int) Math.round(store[1]),
                     entry.getWidth(), entry.getHeight(), false, comp.getWorldTransform());

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,7 @@
 package com.ardor3d.extension.ui.backdrop;
 
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
@@ -44,7 +45,7 @@ public class GradientBackdrop extends UIBackdrop {
 
     /**
      * Construct this back drop, using the given corner colors.
-     * 
+     *
      * @param topLeft
      * @param topRight
      * @param bottomLeft
@@ -96,8 +97,9 @@ public class GradientBackdrop extends UIBackdrop {
         final float pAlpha = UIComponent.getCurrentOpacity();
 
         final Vector3 v = Vector3.fetchTempInstance();
-        v.set(comp.getMargin().getLeft() + comp.getBorder().getLeft(), comp.getMargin().getBottom()
-                + comp.getBorder().getBottom(), 0);
+        final Insets margin = comp.getMargin() != null ? comp.getMargin() : Insets.EMPTY;
+        final Insets border = comp.getBorder() != null ? comp.getBorder() : Insets.EMPTY;
+        v.set(margin.getLeft() + border.getLeft(), margin.getBottom() + border.getBottom(), 0);
 
         final Transform t = Transform.fetchTempInstance();
         t.set(comp.getWorldTransform());

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.math.ColorRGBA;
@@ -52,7 +53,7 @@ public class ImageBackdrop extends SolidBackdrop {
 
     /**
      * Construct this back drop, using the given image.
-     * 
+     *
      * @param image
      */
     public ImageBackdrop(final SubTex image) {
@@ -62,7 +63,7 @@ public class ImageBackdrop extends SolidBackdrop {
 
     /**
      * Construct this back drop, using the given image and color.
-     * 
+     *
      * @param image
      *            the image to draw
      * @param color
@@ -83,8 +84,11 @@ public class ImageBackdrop extends SolidBackdrop {
         final double width = _dims[2];
         final double height = _dims[3];
 
-        x += comp.getMargin().getLeft() + comp.getBorder().getLeft();
-        y += comp.getMargin().getBottom() + comp.getBorder().getBottom();
+        final Insets margin = comp.getMargin() != null ? comp.getMargin() : Insets.EMPTY;
+        final Insets border = comp.getBorder() != null ? comp.getBorder() : Insets.EMPTY;
+
+        x += margin.getLeft() + border.getLeft();
+        y += margin.getBottom() + border.getBottom();
 
         SubTexUtil.drawSubTex(renderer, _image, x, y, width, height, comp.getWorldTransform(), getTintColor());
     }
@@ -185,7 +189,7 @@ public class ImageBackdrop extends SolidBackdrop {
 
     /**
      * Sets a color to use for tinting the backdrop.
-     * 
+     *
      * @param color
      */
     public void setTintColor(final ReadOnlyColorRGBA color) {

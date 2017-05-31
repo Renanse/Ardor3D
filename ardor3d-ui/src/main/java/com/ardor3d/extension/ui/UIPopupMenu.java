@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2008-2012 Ardor Labs, Inc.
- * 
+ *
  * This file is part of Ardor3D.
- * 
+ *
  * Ardor3D is free software: you can redistribute it and/or modify it under the terms of its license which may be found
  * in the accompanying LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,7 @@ package com.ardor3d.extension.ui;
 import java.util.EnumSet;
 
 import com.ardor3d.extension.ui.layout.RowLayout;
+import com.ardor3d.extension.ui.util.Insets;
 
 /**
  * A special frame meant to display menu items.
@@ -34,7 +35,8 @@ public class UIPopupMenu extends UIFrame {
         if (x + width > displayW) {
             setHudX(displayW - width);
         } else {
-            setHudX(x - getBorder().getLeft());
+            final Insets border = getBorder() != null ? getBorder() : Insets.EMPTY;
+            setHudX(x - border.getLeft());
         }
         y = y - height;
         if (y < 0) {

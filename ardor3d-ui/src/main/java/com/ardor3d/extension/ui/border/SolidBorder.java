@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,7 @@
 package com.ardor3d.extension.ui.border;
 
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
@@ -47,7 +48,7 @@ public class SolidBorder extends UIBorder {
 
     /**
      * Construct a border with the given thicknesses. Uses the default colors.
-     * 
+     *
      * @param top
      * @param left
      * @param bottom
@@ -59,7 +60,7 @@ public class SolidBorder extends UIBorder {
 
     /**
      * Construct a border with the given thicknesses and colors
-     * 
+     *
      * @param top
      * @param left
      * @param bottom
@@ -113,7 +114,7 @@ public class SolidBorder extends UIBorder {
 
     /**
      * Sets all of the border colors to the given color.
-     * 
+     *
      * @param solidColor
      *            new color for all borders
      */
@@ -131,7 +132,8 @@ public class SolidBorder extends UIBorder {
         final float pAlpha = UIComponent.getCurrentOpacity();
 
         final Vector3 v = Vector3.fetchTempInstance();
-        v.set(comp.getMargin().getLeft(), comp.getMargin().getBottom(), 0);
+        final Insets margin = comp.getMargin() != null ? comp.getMargin() : Insets.EMPTY;
+        v.set(margin.getLeft(), margin.getBottom(), 0);
 
         final Transform t = Transform.fetchTempInstance();
         t.set(comp.getWorldTransform());

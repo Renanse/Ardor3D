@@ -38,6 +38,11 @@ public class SpatialState {
         _userData = userData;
     }
 
+    public void copyState(final Spatial source) {
+        _transform.set(source.getTransform());
+        _userData = source.getUserData();
+    }
+
     public void applyState(final Spatial target) {
         target.setTransform(_transform);
         target.setUserData(_userData);
