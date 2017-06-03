@@ -61,7 +61,7 @@ public class InteractManager {
     /**
      * Spatial state tracking.
      */
-    protected SpatialState _state = new SpatialState();
+    protected final SpatialState _state;
 
     /**
      * List of filters to modify state prior to applying to a Spatial target.
@@ -69,6 +69,12 @@ public class InteractManager {
     protected List<UpdateFilter> _filters = Lists.newArrayList();
 
     public InteractManager() {
+        _state = new SpatialState();
+        setupLogicalLayer();
+    }
+
+    public InteractManager(final SpatialState stateTracking) {
+        _state = stateTracking;
         setupLogicalLayer();
     }
 
