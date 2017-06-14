@@ -15,6 +15,7 @@ import java.io.IOException;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
@@ -40,6 +41,7 @@ import com.ardor3d.util.export.OutputCapsule;
 public class BillboardNode extends Node {
 
     private final Matrix3 _orient = new Matrix3(Matrix3.IDENTITY);
+    private Matrix3 _localRot = null;
 
     private final Vector3 _look = new Vector3(Vector3.ZERO);
 
@@ -134,6 +136,14 @@ public class BillboardNode extends Node {
         return _updateBounds;
     }
 
+    public void setLocalRotation(Matrix3 rot) {
+        _localRot = rot;
+    }
+
+    public ReadOnlyMatrix3 getLocalRotation() {
+        return _localRot;
+    }
+
     /**
      * Rotate the billboard based on the type set and the currently set camera.
      *
@@ -160,7 +170,7 @@ public class BillboardNode extends Node {
                 rotateAxial(Vector3.UNIT_Z);
                 break;
             case None:
-                // nothing to do here.
+                rotateNone();
                 break;
         }
 
@@ -182,6 +192,14 @@ public class BillboardNode extends Node {
         }
     }
 
+    private void rotateNone() {
+        if(_localRot != null) {
+            _orient.set(getRotation());
+            _orient.multiplyLocal(_localRot);
+            _worldTransform.setRotation(_orient);
+        }
+    }
+
     /**
      * Aligns this Billboard Node so that it points to the camera position.
      */
@@ -192,6 +210,8 @@ public class BillboardNode extends Node {
         final Vector3 up = Vector3.fetchTempInstance();
         up.set(_look).crossLocal(_left);
         _orient.fromAxes(_left, up, _look);
+        if(_localRot != null)
+            _orient.multiplyLocal(_localRot);
         _worldTransform.setRotation(_orient);
         Vector3.releaseTempInstance(up);
     }
@@ -204,6 +224,8 @@ public class BillboardNode extends Node {
         _look.set(camera.getDirection()).negateLocal();
         _left.set(camera.getLeft()).negateLocal();
         _orient.fromAxes(_left, camera.getUp(), _look);
+        if(_localRot != null)
+            _orient.multiplyLocal(_localRot);
         _worldTransform.setRotation(_orient);
     }
 
@@ -253,11 +275,11 @@ public class BillboardNode extends Node {
             _left.normalizeLocal();
 
             // compute the local orientation matrix for the billboard
-            _orient.setValue(0, 0, _left.getY());
-            _orient.setValue(0, 1, _left.getX());
+            _orient.setValue(0, 0, -_left.getY());
+            _orient.setValue(0, 1, -_left.getX());
             _orient.setValue(0, 2, 0);
-            _orient.setValue(1, 0, -_left.getX());
-            _orient.setValue(1, 1, _left.getY());
+            _orient.setValue(1, 0, _left.getX());
+            _orient.setValue(1, 1, -_left.getY());
             _orient.setValue(1, 2, 0);
             _orient.setValue(2, 0, 0);
             _orient.setValue(2, 1, 0);
@@ -282,6 +304,8 @@ public class BillboardNode extends Node {
 
         // The billboard must be oriented to face the camera before it is
         // transformed into the world.
+        if(_localRot != null)
+            _orient.multiplyLocal(_localRot);
         worldMatrix.multiplyLocal(_orient);
         _worldTransform.setRotation(worldMatrix);
         Matrix3.releaseTempInstance(worldMatrix);
