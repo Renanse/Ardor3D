@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,6 +16,7 @@ import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UILabel;
+import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIPopupMenu;
@@ -40,6 +41,8 @@ public abstract class Skin {
             applyToCheckBox((UICheckBox) component);
         } else if (component instanceof UIRadioButton) {
             applyToRadioButton((UIRadioButton) component);
+        } else if (component instanceof UIMenuItem) {
+            applyToMenuItem((UIMenuItem) component);
         } else if (component instanceof UIButton) {
             applyToButton((UIButton) component);
         }
@@ -89,6 +92,8 @@ public abstract class Skin {
     protected abstract void applyToCheckBox(UICheckBox component);
 
     protected abstract void applyToRadioButton(UIRadioButton component);
+
+    protected abstract void applyToMenuItem(UIMenuItem component);
 
     protected abstract void applyToButton(UIButton component);
 

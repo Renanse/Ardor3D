@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -23,16 +23,27 @@ public class UIMenuItem extends UIButton {
     }
 
     public UIMenuItem(final String text, final SubTex icon) {
+        this(text, icon, true, null);
+    }
+
+    public UIMenuItem(final String text, final SubTex icon, final boolean closeMenuOnSelect,
+            final ActionListener listener) {
         super(text, icon);
 
+        if (listener != null) {
+            addActionListener(listener);
+        }
+
         // Close menus when a menu item is clicked
-        addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                final UIHud hud = getHud();
-                if (hud != null) {
-                    hud.closePopupMenus();
+        if (closeMenuOnSelect) {
+            addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent event) {
+                    final UIHud hud = getHud();
+                    if (hud != null) {
+                        hud.closePopupMenus();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }
