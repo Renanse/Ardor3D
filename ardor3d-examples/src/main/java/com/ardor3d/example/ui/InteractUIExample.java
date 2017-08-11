@@ -32,7 +32,9 @@ import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
+import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
+import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
 import com.ardor3d.extension.ui.border.EmptyBorder;
@@ -47,6 +49,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -306,9 +309,72 @@ public class InteractUIExample extends ExampleBase {
                         manager.setActiveWidget(pulseWidget);
                     }
                 }));
+        manager.getLogicalLayer().registerTrigger(
+                new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+                    @Override
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        showMenu();
+                    }
+                }));
+        manager.getLogicalLayer().registerTrigger(
+                new InputTrigger(new KeyReleasedCondition(Key.SPACE), new TriggerAction() {
+                    @Override
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        hideMenu();
+                    }
+                }));
 
         // add some filters
         manager.addFilter(new PlaneBoundaryFilter(new Plane(Vector3.UNIT_Y, 0)));
+    }
+
+    UIPopupMenu menu;
+
+    protected void showMenu() {
+        if (menu == null) {
+            menu = new UIPopupMenu();
+            menu.addItem(new UIMenuItem("Add Node After", null, true, new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent event) {
+                    final Spatial spat = manager.getSpatialTarget();
+                    if (spat == null) {
+                        return;
+                    }
+                    createMarkerAfter(spat);
+                }
+            }));
+            menu.addItem(new UIMenuItem("Delete Node", null, true, new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent event) {
+                    final Spatial spat = manager.getSpatialTarget();
+                    if (spat == null) {
+                        return;
+                    }
+                    removeMarker(spat);
+                }
+            }));
+            menu.updateMinimumSizeFromContents();
+            menu.pack();
+            menu.layout();
+        }
+
+        hud.closePopupMenus();
+
+        final Spatial spat = manager.getSpatialTarget();
+        if (spat == null) {
+            return;
+        }
+
+        hud.showSubPopupMenu(menu);
+
+        tempVec.zero();
+        tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
+        tempVec.setZ(0);
+        menu.showAt((int) tempVec.getX(), (int) tempVec.getY());
+    }
+
+    protected void hideMenu() {
+        hud.closePopupMenus();
     }
 
     @Override
