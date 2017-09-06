@@ -102,7 +102,7 @@ public class ShapesExample extends ExampleBase {
         addMesh(new Capsule("Capsule", 5, 5, 5, 2, 5));
         addMesh(new Cone("Cone", 8, 8, 2, 4));
         addMesh(new Cylinder("Cylinder", 8, 8, 2, 4));
-        addMesh(new Disk("Disk", 8, 8, 3));
+        addMesh(new Disk("Disk", 2, 36, 3, 0.5));
         addMesh(new Dodecahedron("Dodecahedron", 3));
         addMesh(new Dome("Dome", 8, 8, 3));
         addMesh(new Hexagon("Hexagon", 3));
