@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -37,8 +37,29 @@ public class SubTex {
     private ColorRGBA _tint = null;
 
     /**
+     * The number of pixels of the inside-top of this subtex that is considered a border. Used by some UIBorders and
+     * UIBackdrops in 9-slicing.
+     */
+    private int _borderTop;
+    /**
+     * The number of pixels of the inside-left of this subtex that is considered a border. Used by some UIBorders and
+     * UIBackdrops in 9-slicing.
+     */
+    private int _borderLeft;
+    /**
+     * The number of pixels of the inside-bottom of this subtex that is considered a border. Used by some UIBorders and
+     * UIBackdrops in 9-slicing.
+     */
+    private int _borderBottom;
+    /**
+     * The number of pixels of the inside-right of this subtex that is considered a border. Used by some UIBorders and
+     * UIBackdrops in 9-slicing.
+     */
+    private int _borderRight;
+
+    /**
      * Construct a new SubTex that covers the entire width and height of the supplied Texture.
-     * 
+     *
      * @param texture
      *            the base texture. Must already have a supplied image with a valid width and height.
      */
@@ -48,7 +69,7 @@ public class SubTex {
 
     /**
      * Construct a new SubTex using the specified dimensions and location.
-     * 
+     *
      * @param texture
      *            the master texture we are a part of
      * @param x
@@ -66,6 +87,42 @@ public class SubTex {
         _y = y;
         _width = width;
         _height = height;
+    }
+
+    /**
+     * Construct a new SubTex using the specified dimensions and location.
+     *
+     * @param texture
+     *            the master texture we are a part of
+     * @param x
+     *            the x location, in pixels, of our upper left corner.
+     * @param y
+     *            the y location, in pixels, of our upper left corner.
+     * @param width
+     *            the width, in pixels, of our part of the texture.
+     * @param height
+     *            the height, in pixels, of our part of the texture.
+     * @param borderTop
+     *            border, in pixels, of top.
+     * @param borderLeft
+     *            border, in pixels, of left.
+     * @param borderBottom
+     *            border, in pixels, of bottom.
+     * @param borderRight
+     *            border, in pixels, of right.
+     */
+    public SubTex(final Texture texture, final int x, final int y, final int width, final int height,
+            final int borderTop, final int borderLeft, final int borderBottom, final int borderRight) {
+        _texture = texture;
+        _x = x;
+        _y = y;
+        _width = width;
+        _height = height;
+
+        _borderTop = borderTop;
+        _borderLeft = borderLeft;
+        _borderBottom = borderBottom;
+        _borderRight = borderRight;
     }
 
     public Texture getTexture() {
@@ -92,8 +149,31 @@ public class SubTex {
         return _tint;
     }
 
+    public int getBorderTop() {
+        return _borderTop;
+    }
+
+    public int getBorderLeft() {
+        return _borderLeft;
+    }
+
+    public int getBorderBottom() {
+        return _borderBottom;
+    }
+
+    public int getBorderRight() {
+        return _borderRight;
+    }
+
+    public void setBorders(final int top, final int left, final int bottom, final int right) {
+        _borderTop = top;
+        _borderLeft = left;
+        _borderBottom = bottom;
+        _borderRight = right;
+    }
+
     /**
-     * 
+     *
      * @param color
      *            a color to blend our texture with when rendering SubTex objects. The default is null (which is
      *            interpreted as pure white and gives an unaltered version of the texture.)
@@ -110,7 +190,8 @@ public class SubTex {
 
     @Override
     public String toString() {
-        return "SubTex of " + _texture + ": " + _x + ", " + _y + " dims: " + _width + ", " + _height;
+        return String.format("SubTex of %0$s: %1$d, %2$d  dims: %3$dx%4$d  tint: %5$s  border: %6$d,%7$d,%8$d,%9$d",
+                _texture, _x, _y, _width, _height, _tint, _borderTop, _borderLeft, _borderBottom, _borderRight);
     }
 
     public void setHeight(final int height) {

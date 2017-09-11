@@ -107,14 +107,17 @@ public class GenericSkin extends Skin {
 
         final SubTex defaultTex = new SubTex(_sharedTex, 51 - leftE, 11 - topE, 26 + leftE + rightE, 10 + topE
                 + bottomE);
-        final UIBorder defaultBorder = new ImageBorder(defaultTex, topE, leftE, bottomE, rightE);
+        defaultTex.setBorders(topE, leftE, bottomE, rightE);
+        final UIBorder defaultBorder = new ImageBorder(defaultTex);
 
         final SubTex overTex = new SubTex(_sharedTex, 51 - leftE, 33 - topE, 26 + leftE + rightE, 10 + topE + bottomE);
-        final UIBorder overBorder = new ImageBorder(overTex, topE, leftE, bottomE, rightE);
+        overTex.setBorders(topE, leftE, bottomE, rightE);
+        final UIBorder overBorder = new ImageBorder(overTex);
 
         final SubTex pressedTex = new SubTex(_sharedTex, 51 - leftE, 55 - topE, 26 + leftE + rightE, 10 + topE
                 + bottomE);
-        final UIBorder pressedBorder = new ImageBorder(pressedTex, topE, leftE, bottomE, rightE);
+        pressedTex.setBorders(topE, leftE, bottomE, rightE);
+        final UIBorder pressedBorder = new ImageBorder(pressedTex);
 
         final ColorRGBA upTop = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
         final ColorRGBA upBottom = new ColorRGBA(200 / 255f, 200 / 255f, 200 / 255f, 1);
@@ -172,14 +175,14 @@ public class GenericSkin extends Skin {
         component.setPadding(new Insets(2, 14, 2, 14));
 
         // State values...
-        final SubTex defaultTex = new SubTex(_sharedTex, 47, 7, 34, 18);
-        final UIBorder defaultBorder = new ImageBorder(defaultTex, 4, 4, 4, 4);
+        final SubTex defaultTex = new SubTex(_sharedTex, 47, 7, 34, 18, 4, 4, 4, 4);
+        final UIBorder defaultBorder = new ImageBorder(defaultTex);
 
-        final SubTex overTex = new SubTex(_sharedTex, 47, 29, 34, 18);
-        final UIBorder overBorder = new ImageBorder(overTex, 4, 4, 4, 4);
+        final SubTex overTex = new SubTex(_sharedTex, 47, 29, 34, 18, 4, 4, 4, 4);
+        final UIBorder overBorder = new ImageBorder(overTex);
 
-        final SubTex pressedTex = new SubTex(_sharedTex, 47, 51, 34, 18);
-        final UIBorder pressedBorder = new ImageBorder(pressedTex, 4, 4, 4, 4);
+        final SubTex pressedTex = new SubTex(_sharedTex, 47, 51, 34, 18, 4, 4, 4, 4);
+        final UIBorder pressedBorder = new ImageBorder(pressedTex);
 
         final ColorRGBA upTop = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
         final ColorRGBA upBottom = new ColorRGBA(200 / 255f, 200 / 255f, 200 / 255f, 1);
@@ -281,8 +284,8 @@ public class GenericSkin extends Skin {
             if (titleBar != null && titleBar.getParent() == component) {
                 titleBar.setMargin(new Insets(0, 0, 0, 0));
                 titleBar.setPadding(new Insets(0, 0, 0, 0));
-                final SubTex borderTex = new SubTex(_sharedTex, 4, 5, 32, 13);
-                final UIBorder border = new ImageBorder(borderTex, 6, 6, 1, 6);
+                final SubTex borderTex = new SubTex(_sharedTex, 4, 5, 32, 13, 6, 6, 1, 6);
+                final UIBorder border = new ImageBorder(borderTex);
                 titleBar.setBorder(border);
                 final ColorRGBA top = new ColorRGBA(203 / 255f, 203 / 255f, 203 / 255f, 1);
                 final ColorRGBA bottom = new ColorRGBA(208 / 255f, 208 / 255f, 208 / 255f, 1);
@@ -384,8 +387,8 @@ public class GenericSkin extends Skin {
             base.setMargin(new Insets(0, 0, 0, 0));
             base.setPadding(new Insets(0, 0, 0, 0));
 
-            final SubTex borderTex = new SubTex(_sharedTex, 4, 17, 32, 36);
-            final UIBorder border = new ImageBorder(borderTex, 0, 6, 7, 6);
+            final SubTex borderTex = new SubTex(_sharedTex, 4, 17, 32, 36, 0, 6, 7, 6);
+            final UIBorder border = new ImageBorder(borderTex);
             base.setBorder(border);
             final ColorRGBA top = new ColorRGBA(210 / 255f, 210 / 255f, 210 / 255f, 1);
             final ColorRGBA bottom = new ColorRGBA(244 / 255f, 244 / 255f, 244 / 255f, 1);
@@ -563,13 +566,13 @@ public class GenericSkin extends Skin {
 
         final UIPanel back = component.getBackPanel();
         if (component.getOrientation() == Orientation.Horizontal) {
-            final SubTex borderTex = new SubTex(_sharedTex, 7, 79, 30, 17);
-            final UIBorder border = new ImageBorder(borderTex, 6, 4, 4, 4);
+            final SubTex borderTex = new SubTex(_sharedTex, 7, 79, 30, 17, 6, 4, 4, 4);
+            final UIBorder border = new ImageBorder(borderTex);
             back.setBorder(border);
             back.setMinimumContentSize(1, 7);
         } else {
-            final SubTex borderTex = new SubTex(_sharedTex, 67, 91, 18, 29);
-            final UIBorder border = new ImageBorder(borderTex, 6, 5, 4, 5);
+            final SubTex borderTex = new SubTex(_sharedTex, 67, 91, 18, 29, 6, 5, 4, 5);
+            final UIBorder border = new ImageBorder(borderTex);
             back.setBorder(border);
             back.setMinimumContentSize(8, 1);
         }
@@ -592,8 +595,8 @@ public class GenericSkin extends Skin {
 
         // value label
         {
-            final SubTex borderTex = new SubTex(_sharedTex, 155, 7, 21, 18);
-            final UIBorder labelBorder = new ImageBorder(borderTex, 4, 4, 4, 1);
+            final SubTex borderTex = new SubTex(_sharedTex, 155, 7, 21, 18, 4, 4, 4, 1);
+            final UIBorder labelBorder = new ImageBorder(borderTex);
 
             final UILabel label = component.getValueLabel();
             label.setBackdrop(upBack);
@@ -604,8 +607,8 @@ public class GenericSkin extends Skin {
 
         // drop down button
         {
-            final SubTex borderTex = new SubTex(_sharedTex, 177, 7, 12, 18);
-            final UIBorder buttonBorder = new ImageBorder(borderTex, 4, 1, 4, 4);
+            final SubTex borderTex = new SubTex(_sharedTex, 177, 7, 12, 18, 4, 1, 4, 4);
+            final UIBorder buttonBorder = new ImageBorder(borderTex);
 
             final UIButton button = component.getOpenButton();
             button.setButtonText("");
