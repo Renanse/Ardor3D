@@ -19,6 +19,8 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPasswordField;
+import com.ardor3d.extension.ui.UIPieMenu;
+import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
@@ -41,6 +43,8 @@ public abstract class Skin {
             applyToCheckBox((UICheckBox) component);
         } else if (component instanceof UIRadioButton) {
             applyToRadioButton((UIRadioButton) component);
+        } else if (component instanceof UIPieMenuItem) {
+            applyToPieMenuItem((UIPieMenuItem) component);
         } else if (component instanceof UIMenuItem) {
             applyToMenuItem((UIMenuItem) component);
         } else if (component instanceof UIButton) {
@@ -68,6 +72,8 @@ public abstract class Skin {
             applyToComboBox((UIComboBox) component);
         } else if (component instanceof UIScrollBar) {
             applyToScrollBar((UIScrollBar) component);
+        } else if (component instanceof UIPieMenu) {
+            applyToPieMenu((UIPieMenu) component);
         } else if (component instanceof UIPanel) {
             applyToPanel((UIPanel) component);
         }
@@ -95,6 +101,8 @@ public abstract class Skin {
 
     protected abstract void applyToMenuItem(UIMenuItem component);
 
+    protected abstract void applyToPieMenuItem(UIPieMenuItem component);
+
     protected abstract void applyToButton(UIButton component);
 
     protected abstract void applyToLabel(UILabel component);
@@ -104,6 +112,8 @@ public abstract class Skin {
     protected abstract void applyToPasswordField(UIPasswordField component);
 
     protected abstract void applyToTextArea(UITextArea component);
+
+    protected abstract void applyToPieMenu(UIPieMenu component);
 
     protected abstract void applyToPanel(UIPanel component);
 

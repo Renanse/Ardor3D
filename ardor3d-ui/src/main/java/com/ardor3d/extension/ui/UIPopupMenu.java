@@ -17,7 +17,7 @@ import com.ardor3d.extension.ui.util.Insets;
 /**
  * A special frame meant to display menu items.
  */
-public class UIPopupMenu extends UIFrame {
+public class UIPopupMenu extends UIFrame implements IPopOver {
 
     public UIPopupMenu() {
         super(null, EnumSet.noneOf(UIFrame.FrameButtons.class));
@@ -25,6 +25,7 @@ public class UIPopupMenu extends UIFrame {
         applySkin();
     }
 
+    @Override
     public void showAt(final int x, int y) {
         final int width = getLocalComponentWidth();
         final int height = getLocalComponentHeight();
@@ -49,6 +50,7 @@ public class UIPopupMenu extends UIFrame {
         updateGeometricState(0, true);
     }
 
+    @Override
     public void setHud(final UIHud hud) {
         _parent = hud;
         attachedToHud();

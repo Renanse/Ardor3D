@@ -23,6 +23,8 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPasswordField;
+import com.ardor3d.extension.ui.UIPieMenu;
+import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
@@ -37,7 +39,9 @@ import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.extension.ui.UITooltip;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
 import com.ardor3d.extension.ui.backdrop.GradientBackdrop;
+import com.ardor3d.extension.ui.backdrop.ImageArcBackdrop;
 import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
+import com.ardor3d.extension.ui.backdrop.SolidArcBackdrop;
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.backdrop.UIBackdrop;
 import com.ardor3d.extension.ui.border.EmptyBorder;
@@ -47,6 +51,7 @@ import com.ardor3d.extension.ui.border.UIBorder;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.skin.Skin;
 import com.ardor3d.extension.ui.skin.SkinningTask;
+import com.ardor3d.extension.ui.text.StyleConstants;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.extension.ui.util.SubTex;
@@ -312,7 +317,7 @@ public class GenericSkin extends Skin {
                         closeButton.updateMinimumSizeFromContents();
                         closeButton.compact();
                         closeButton
-                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
+                        .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                     }
                 }
 
@@ -480,6 +485,37 @@ public class GenericSkin extends Skin {
                 state.setForegroundColor(ColorRGBA.BLACK);
             }
         }
+
+    }
+
+    @Override
+    protected void applyToPieMenu(final UIPieMenu component) {
+        final UIBackdrop pieBack = new SolidArcBackdrop(new ColorRGBA(.9f, .9f, .9f, .8f));
+        component.setBackdrop(pieBack);
+    }
+
+    @Override
+    protected void applyToPieMenuItem(final UIPieMenuItem component) {
+        final EmptyBorder itemBorder = new EmptyBorder();
+        final SubTex bgImage = new SubTex(_sharedTex, 10, 102, 7, 45, 4, 4, 3, 0);
+        final UIBackdrop overBackdrop = new ImageArcBackdrop(bgImage, new ColorRGBA(.9f, .9f, .9f, 1f));
+        final UIBackdrop pieBack = new ImageArcBackdrop(bgImage, new ColorRGBA(.9f, .9f, .9f, .8f));
+        component.setBackdrop(pieBack);
+        component.setBorder(itemBorder);
+        component.addFontStyle(StyleConstants.KEY_BOLD, Boolean.TRUE);
+        component.setMargin(new Insets(0, 0, 0, 0));
+        component.setPadding(new Insets(0, 2, 0, 2));
+        component.setForegroundColor(ColorRGBA.BLACK);
+        component.setAlignment(Alignment.LEFT);
+        for (final UIState state : component.getStates()) {
+            state.setBorder(null);
+            state.setBackdrop(pieBack);
+            state.setForegroundColor(ColorRGBA.BLACK);
+        }
+
+        final LabelState over = component.getMouseOverState();
+        over.setForegroundColor(ColorRGBA.BLACK);
+        over.setBackdrop(overBackdrop);
 
     }
 

@@ -32,9 +32,9 @@ import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
-import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
-import com.ardor3d.extension.ui.UIPopupMenu;
+import com.ardor3d.extension.ui.UIPieMenu;
+import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
 import com.ardor3d.extension.ui.border.EmptyBorder;
@@ -328,12 +328,12 @@ public class InteractUIExample extends ExampleBase {
         manager.addFilter(new PlaneBoundaryFilter(new Plane(Vector3.UNIT_Y, 0)));
     }
 
-    UIPopupMenu menu;
+    UIPieMenu menu;
 
     protected void showMenu() {
         if (menu == null) {
-            menu = new UIPopupMenu();
-            menu.addItem(new UIMenuItem("Add Node After", null, true, new ActionListener() {
+            menu = new UIPieMenu(hud);
+            menu.addItem(new UIPieMenuItem("Add Node After", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {
                     final Spatial spat = manager.getSpatialTarget();
@@ -343,7 +343,23 @@ public class InteractUIExample extends ExampleBase {
                     createMarkerAfter(spat);
                 }
             }));
-            menu.addItem(new UIMenuItem("Delete Node", null, true, new ActionListener() {
+            menu.addItem(new UIPieMenuItem("Delete Node 1", null, true, new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent event) {
+                    final Spatial spat = manager.getSpatialTarget();
+                    if (spat == null) {
+                        return;
+                    }
+                    removeMarker(spat);
+                }
+            }));
+            menu.setCenterItem(new UIPieMenuItem("Cancel", null, true, new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent event) {
+                    return;
+                }
+            }));
+            menu.addItem(new UIPieMenuItem("Delete Node 2", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {
                     final Spatial spat = manager.getSpatialTarget();
@@ -354,7 +370,6 @@ public class InteractUIExample extends ExampleBase {
                 }
             }));
             menu.updateMinimumSizeFromContents();
-            menu.pack();
             menu.layout();
         }
 
