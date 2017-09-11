@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,6 +21,8 @@ import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.GameTaskQueueManager;
 
 /**
@@ -64,7 +66,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Construct a new UIFrame with the given title and default buttons (CLOSE).
-     * 
+     *
      * @param title
      *            the text to display on the title bar of this frame
      */
@@ -74,7 +76,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Construct a new UIFrame with the given title and button.
-     * 
+     *
      * @param title
      *            the text to display on the title bar of this frame
      * @param buttons
@@ -201,7 +203,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Remove this frame from the hud it is attached to.
-     * 
+     *
      * @throws IllegalStateException
      *             if frame is not currently attached to a hud.
      */
@@ -220,13 +222,24 @@ public class UIFrame extends UIContainer {
         // clear any resources for standin
         clearStandin();
 
+        // clean up any state
+        acceptVisitor(new Visitor() {
+            @Override
+            public void visit(final Spatial spatial) {
+                if (spatial instanceof StateBasedUIComponent) {
+                    final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
+                    comp.switchState(comp.getDefaultState());
+                }
+            }
+        }, true);
+
         hud.remove(this);
         _parent = null;
     }
 
     /**
      * Centers this frame on the location of the given component.
-     * 
+     *
      * @param comp
      *            the component to center on.
      */
@@ -243,7 +256,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Centers this frame on the view of the camera
-     * 
+     *
      * @param cam
      *            the camera to center on.
      */
@@ -287,7 +300,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Replaces the content panel of this frame with a new one.
-     * 
+     *
      * @param panel
      *            the new content panel.
      */
@@ -311,7 +324,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Sets the title of this frame
-     * 
+     *
      * @param title
      *            the new title
      */
@@ -349,7 +362,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Resize the frame to fit its content panel to the given dimensions
-     * 
+     *
      * @param contentWidth
      *            our desired content panel width
      * @param contentHeight
@@ -391,7 +404,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Recursive convenience method for locating the first UIFrame above a given component.
-     * 
+     *
      * @param component
      *            the component to look above.
      * @return the first UIFrame found above the given component, or null if none.
@@ -408,7 +421,7 @@ public class UIFrame extends UIContainer {
 
     /**
      * Set a new drag listener on this frame.
-     * 
+     *
      * @param listener
      *            the drag listener. Must not be null.
      */

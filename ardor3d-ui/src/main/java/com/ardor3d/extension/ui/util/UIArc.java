@@ -46,12 +46,12 @@ public class UIArc extends Mesh {
         super(name);
 
         _sampleRate = sampleRate;
-        resetGeometry(0, MathUtils.PI, radius, innerRadius, null);
+        resetGeometry(0, MathUtils.PI, radius, innerRadius, null, true);
         getMeshData().setIndexMode(IndexMode.Triangles);
     }
 
     public void resetGeometry(final double startAngle, final double arcLength, final double radius,
-            final double innerRadius, final SubTex subTex) {
+            final double innerRadius, final SubTex subTex, final boolean ignoreArcEdges) {
         _radius = radius;
         _innerRadius = innerRadius;
         _arcLength = arcLength;
@@ -100,6 +100,11 @@ public class UIArc extends Mesh {
             leftOffTx = leftBrd / (float) image.getWidth();
             bottomOffTx = bottomBrd / (float) image.getHeight();
             rightOffTx = rightBrd / (float) image.getWidth();
+
+            if (ignoreArcEdges) {
+                leftBrd = 0;
+                rightBrd = 0;
+            }
         }
 
         /***** VERT DATA *****/

@@ -317,7 +317,7 @@ public class GenericSkin extends Skin {
                         closeButton.updateMinimumSizeFromContents();
                         closeButton.compact();
                         closeButton
-                        .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
+                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                     }
                 }
 
@@ -490,7 +490,7 @@ public class GenericSkin extends Skin {
 
     @Override
     protected void applyToPieMenu(final UIPieMenu component) {
-        final UIBackdrop pieBack = new SolidArcBackdrop(new ColorRGBA(.9f, .9f, .9f, .8f));
+        final UIBackdrop pieBack = new SolidArcBackdrop(new ColorRGBA(.9f, .9f, .9f, .6f));
         component.setBackdrop(pieBack);
     }
 

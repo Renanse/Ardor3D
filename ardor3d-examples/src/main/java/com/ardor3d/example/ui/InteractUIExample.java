@@ -332,7 +332,7 @@ public class InteractUIExample extends ExampleBase {
 
     protected void showMenu() {
         if (menu == null) {
-            menu = new UIPieMenu(hud);
+            menu = new UIPieMenu(hud, 100);
             menu.addItem(new UIPieMenuItem("Add Node After", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {

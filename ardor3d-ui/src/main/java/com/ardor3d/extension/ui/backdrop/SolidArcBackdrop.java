@@ -101,6 +101,7 @@ public class SolidArcBackdrop extends UIBackdrop {
         Transform.releaseTempInstance(t);
 
         double size = 0, inner = 0, angle = 0, length = MathUtils.TWO_PI;
+        boolean ignoreArcEdges = true;
         if (comp instanceof UIPieMenu) {
             final UIPieMenu pie = (UIPieMenu) comp;
             size = pie.getOuterRadius();
@@ -110,20 +111,18 @@ public class SolidArcBackdrop extends UIBackdrop {
             final UIPieMenu pie = (UIPieMenu) comp.getParent();
             if (pie.getCenterItem() == item) {
                 size = pie.getInnerRadius();
-                inner = 0;
-                angle = 0;
-                length = MathUtils.TWO_PI;
             } else {
                 size = pie.getOuterRadius();
                 inner = pie.getInnerRadius();
                 length = pie.getCurrentArcLength();
                 angle = pie.getSliceIndex(item) * length - length / 2;
+                ignoreArcEdges = false;
             }
         } else {
             size = Math.max(UIBackdrop.getBackdropWidth(comp), UIBackdrop.getBackdropHeight(comp)) / 2;
         }
 
-        arc.resetGeometry(angle, length, size, inner, sub);
+        arc.resetGeometry(angle, length, size, inner, sub, ignoreArcEdges);
         arc.render(renderer);
 
         _color.setAlpha(oldA);

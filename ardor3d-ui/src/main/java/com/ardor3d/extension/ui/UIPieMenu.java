@@ -16,6 +16,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.visitor.Visitor;
 import com.google.common.collect.Lists;
 
 /**
@@ -34,6 +35,10 @@ public class UIPieMenu extends UIContainer implements IPopOver {
 
     public UIPieMenu(final UIHud hud) {
         this(hud, UIPieMenu.DEFAULT_INNER_RADIUS, Math.min(hud.getWidth() / 2, hud.getHeight() / 2));
+    }
+
+    public UIPieMenu(final UIHud hud, final int innerRadius) {
+        this(hud, innerRadius, Math.min(hud.getWidth() / 2, hud.getHeight() / 2));
     }
 
     public UIPieMenu(final UIHud hud, final int innerRadius, final int outerRadius) {
@@ -223,6 +228,17 @@ public class UIPieMenu extends UIContainer implements IPopOver {
 
         // clear any resources for standin
         clearStandin();
+
+        // clean up any state
+        acceptVisitor(new Visitor() {
+            @Override
+            public void visit(final Spatial spatial) {
+                if (spatial instanceof StateBasedUIComponent) {
+                    final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
+                    comp.switchState(comp.getDefaultState());
+                }
+            }
+        }, true);
 
         hud.remove(this);
         _parent = null;
