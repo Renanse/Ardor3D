@@ -1,0 +1,5 @@
+
+description = 'Ardor 3D Skinning and Animation System'
+dependencies {
+  compile project(':ardor3d-core')
+}

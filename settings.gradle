@@ -1,0 +1,32 @@
+rootProject.name = 'ardor3d'
+include ':ardor3d-savable'
+include ':ardor3d-math'
+include ':ardor3d-core'
+include ':ardor3d-jogl'
+include ':ardor3d-lwjgl'
+include ':ardor3d-swt'
+include ':ardor3d-awt'
+include ':ardor3d-extras'
+include ':ardor3d-effects'
+include ':ardor3d-collada'
+include ':ardor3d-animation'
+include ':ardor3d-ui'
+include ':ardor3d-terrain'
+include ':ardor3d-examples'
+include ':distribution'
+
+project(':ardor3d-savable').projectDir = "$rootDir/ardor3d-savable" as File
+project(':ardor3d-math').projectDir = "$rootDir/ardor3d-math" as File
+project(':ardor3d-core').projectDir = "$rootDir/ardor3d-core" as File
+project(':ardor3d-jogl').projectDir = "$rootDir/ardor3d-jogl" as File
+project(':ardor3d-lwjgl').projectDir = "$rootDir/ardor3d-lwjgl" as File
+project(':ardor3d-swt').projectDir = "$rootDir/ardor3d-swt" as File
+project(':ardor3d-awt').projectDir = "$rootDir/ardor3d-awt" as File
+project(':ardor3d-extras').projectDir = "$rootDir/ardor3d-extras" as File
+project(':ardor3d-effects').projectDir = "$rootDir/ardor3d-effects" as File
+project(':ardor3d-collada').projectDir = "$rootDir/ardor3d-collada" as File
+project(':ardor3d-animation').projectDir = "$rootDir/ardor3d-animation" as File
+project(':ardor3d-ui').projectDir = "$rootDir/ardor3d-ui" as File
+project(':ardor3d-terrain').projectDir = "$rootDir/ardor3d-terrain" as File
+project(':ardor3d-examples').projectDir = "$rootDir/ardor3d-examples" as File
+project(':distribution').projectDir = "$rootDir/ardor3d-distribution" as File

@@ -1,0 +1,5 @@
+
+description = 'Ardor 3D UI'
+dependencies {
+  compile project(':ardor3d-core')
+}

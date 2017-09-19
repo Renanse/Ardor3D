@@ -1,0 +1,39 @@
+allprojects  {
+  apply plugin: 'maven'
+
+  group = 'com.ardor3d'
+version = '1.0-SNAPSHOT'
+}
+
+subprojects {
+  apply plugin: 'java'
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
+  tasks.withType(JavaCompile) {
+  	options.encoding = 'UTF-8'
+  }
+
+  task packageSources(type: Jar) {
+classifier = 'sources'
+from sourceSets.main.allSource
+
+}
+artifacts.archives packageSources
+  repositories {
+    mavenLocal()
+    
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://jogamp.org/deployment/maven" }
+    maven { url "https://swt-repo.googlecode.com/svn/repo/" }
+  }
+
+  configurations.all {
+}
+  dependencies {
+    testCompile group: 'junit', name: 'junit', version:'4.10'
+    testCompile group: 'org.easymock', name: 'easymockclassextension', version:'2.4'
+}
+
+  
+}
