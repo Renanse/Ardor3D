@@ -26,4 +26,6 @@ public interface IPopOver {
 
     public abstract void close();
 
+    public abstract boolean isAttachedToHUD();
+
 }

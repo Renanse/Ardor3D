@@ -14,7 +14,7 @@ import java.util.List;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
-import com.ardor3d.math.Vector2;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.google.common.collect.Lists;
@@ -27,7 +27,7 @@ public class UIPieMenu extends UIContainer implements IPopOver {
     public static final int DEFAULT_INNER_RADIUS = 50;
 
     private int _innerRadius, _outerRadius;
-    private double _radians = 1.0;
+    private double _sliceRadians = 1.0, _totalArcLength = MathUtils.TWO_PI, _startAngle = 0.0;
 
     private boolean _menuDirty = true;
 
@@ -47,11 +47,12 @@ public class UIPieMenu extends UIContainer implements IPopOver {
         _outerRadius = outerRadius;
         setHud(hud);
         applySkin();
+        setDoClip(false);
     }
 
     @Override
     public void showAt(final int x, final int y) {
-        setHudXY(x - _outerRadius, y - _outerRadius);
+        setHudXY(x, y);
         updateGeometricState(0, true);
     }
 
@@ -79,8 +80,26 @@ public class UIPieMenu extends UIContainer implements IPopOver {
         _outerRadius = radius;
     }
 
-    public double getCurrentArcLength() {
-        return _radians;
+    public double getTotalArcLength() {
+        return _totalArcLength;
+    }
+
+    public void setTotalArcLength(final double radians) {
+        _menuDirty = true;
+        _totalArcLength = radians;
+    }
+
+    public double getStartAngle() {
+        return _startAngle;
+    }
+
+    public void setStartAngle(final double radians) {
+        _menuDirty = true;
+        _startAngle = radians;
+    }
+
+    public double getSliceRadians() {
+        return _sliceRadians;
     }
 
     public void addItem(final UIPieMenuItem item) {
@@ -119,27 +138,28 @@ public class UIPieMenu extends UIContainer implements IPopOver {
 
     @Override
     public UIComponent getUIComponent(final int hudX, final int hudY) {
-        final Vector2 vec = new Vector2(hudX - getHudX() - _outerRadius, hudY - _outerRadius);
+        final Vector3 vec = new Vector3(hudX - getHudX(), hudY - getHudY(), 0);
 
         // check we are inside the pie
         final double distSq = vec.lengthSquared();
         if (distSq < _innerRadius * _innerRadius) {
-            return _center != null ? _center : this;
+            return _center;
         }
         if (distSq > _outerRadius * _outerRadius) {
-            return this;
+            return null;
         }
 
         vec.normalizeLocal();
 
-        double r = Math.atan2(1, 0) - Math.atan2(vec.getY(), vec.getX());
+        getRotation().applyPre(vec, vec);
 
-        r += _radians / 2;
+        double r = MathUtils.HALF_PI - Math.atan2(vec.getY(), vec.getX()) - _startAngle;
+
         if (r < 0) {
             r += MathUtils.TWO_PI;
         }
 
-        int index = (int) (r / _radians);
+        int index = (int) (r / _sliceRadians);
         for (int i = 0; i < getNumberOfChildren(); i++) {
             final Spatial s = getChild(i);
             if (s == _center) {
@@ -152,7 +172,7 @@ public class UIPieMenu extends UIContainer implements IPopOver {
                 index--;
             }
         }
-        return this;
+        return null;
     }
 
     @Override
@@ -177,7 +197,7 @@ public class UIPieMenu extends UIContainer implements IPopOver {
                 comp.fitComponentIn(minRect.getWidth(), minRect.getHeight());
                 if (comp == _center) {
                     final Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
-                    comp.setLocalXY(_outerRadius - rect.getWidth() / 2, _outerRadius - rect.getHeight() / 2);
+                    comp.setLocalXY(-rect.getWidth() / 2, -rect.getHeight() / 2);
                     continue;
                 }
                 comps.add(comp);
@@ -191,9 +211,9 @@ public class UIPieMenu extends UIContainer implements IPopOver {
         }
 
         // Figure out slice size
-        _radians = MathUtils.TWO_PI / Math.max(2, comps.size());
+        _sliceRadians = _totalArcLength / comps.size();
         final int radius = (_innerRadius + _outerRadius) / 2;
-        double position = 0;
+        double position = _startAngle + _sliceRadians / 2.0;
         for (int i = 0, maxI = comps.size(); i < maxI; i++) {
             final UIComponent comp = comps.get(i);
 
@@ -201,10 +221,10 @@ public class UIPieMenu extends UIContainer implements IPopOver {
             final int x = (int) MathUtils.round(radius * MathUtils.sin(position));
             final int y = (int) MathUtils.round(radius * MathUtils.cos(position));
 
-            comp.setLocalXY(_outerRadius + x - rect.getWidth() / 2, _outerRadius + y - rect.getHeight() / 2);
+            comp.setLocalXY(x - rect.getWidth() / 2, y - rect.getHeight() / 2);
 
             // step forward
-            position += _radians;
+            position += _sliceRadians;
         }
 
         Rectangle2.releaseTempInstance(storeA);

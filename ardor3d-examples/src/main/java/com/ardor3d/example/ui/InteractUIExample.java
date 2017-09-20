@@ -49,6 +49,7 @@ import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
@@ -141,6 +142,12 @@ public class InteractUIExample extends ExampleBase {
                 manager.fireTargetDataUpdated();
             }
         });
+
+        // disable auto-repeat in jogl, if we're using that, so that spacebar can be held down
+        if (_physicalLayer.getKeyboardWrapper() instanceof JoglNewtKeyboardWrapper) {
+            final JoglNewtKeyboardWrapper key = (JoglNewtKeyboardWrapper) _physicalLayer.getKeyboardWrapper();
+            key.setSkipAutoRepeatEvents(true);
+        }
     }
 
     private void addFloor() {
@@ -340,8 +347,24 @@ public class InteractUIExample extends ExampleBase {
 
     protected void showMenu() {
         if (menu == null) {
-            menu = new UIPieMenu(hud, 100);
-            menu.addItem(new UIPieMenuItem("Add Node After", null, true, new ActionListener() {
+            menu = new UIPieMenu(hud, 70, 200);
+            menu.setTotalArcLength(MathUtils.PI);
+            menu.setStartAngle(-90 * MathUtils.DEG_TO_RAD);
+            // menu.setRotation(new Matrix3().fromAngleAxis(MathUtils.DEG_TO_RAD * 60, Vector3.UNIT_Z));
+
+            final UIPieMenu addPie = new UIPieMenu(hud);
+            menu.addItem(new UIPieMenuItem("Add Node...", null, addPie, 100));
+            addPie.addItem(new UIPieMenuItem("Before", null, true, new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent event) {
+                    final Spatial spat = manager.getSpatialTarget();
+                    if (spat == null) {
+                        return;
+                    }
+                    createMarkerBefore(spat);
+                }
+            }));
+            addPie.addItem(new UIPieMenuItem("After", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {
                     final Spatial spat = manager.getSpatialTarget();
@@ -351,7 +374,9 @@ public class InteractUIExample extends ExampleBase {
                     createMarkerAfter(spat);
                 }
             }));
-            menu.addItem(new UIPieMenuItem("Delete Node 1", null, true, new ActionListener() {
+
+            final UIPieMenu remPie = new UIPieMenu(hud);
+            remPie.addItem(new UIPieMenuItem("Node", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {
                     final Spatial spat = manager.getSpatialTarget();
@@ -361,20 +386,22 @@ public class InteractUIExample extends ExampleBase {
                     removeMarker(spat);
                 }
             }));
+            menu.addItem(new UIPieMenuItem("Delete...", null, remPie, 100));
+
             menu.setCenterItem(new UIPieMenuItem("Cancel", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {
                     return;
                 }
             }));
-            menu.addItem(new UIPieMenuItem("Delete Node 2", null, true, new ActionListener() {
+
+            menu.addItem(new UIPieMenuItem("Reset Node", null, true, new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent event) {
                     final Spatial spat = manager.getSpatialTarget();
                     if (spat == null) {
                         return;
                     }
-                    removeMarker(spat);
                 }
             }));
             menu.updateMinimumSizeFromContents();
@@ -394,6 +421,8 @@ public class InteractUIExample extends ExampleBase {
         tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
         tempVec.setZ(0);
         menu.showAt((int) tempVec.getX(), (int) tempVec.getY());
+        _mouseManager.setPosition((int) tempVec.getX(), (int) tempVec.getY() + 1);
+        _mouseManager.setPosition((int) tempVec.getX(), (int) tempVec.getY());
     }
 
     protected void hideMenu() {
