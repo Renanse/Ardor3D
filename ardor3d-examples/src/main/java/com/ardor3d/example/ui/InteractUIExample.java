@@ -18,6 +18,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
+import com.ardor3d.extension.interact.InteractManager.UpdateLogic;
 import com.ardor3d.extension.interact.data.SpatialState;
 import com.ardor3d.extension.interact.filter.PlaneBoundaryFilter;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
@@ -133,6 +134,13 @@ public class InteractUIExample extends ExampleBase {
         // create a few way-markers to start things off
         initPath();
 
+        manager.addUpdateLogic(new UpdateLogic() {
+
+            @Override
+            public void update(final double time, final InteractManager manager) {
+                manager.fireTargetDataUpdated();
+            }
+        });
     }
 
     private void addFloor() {

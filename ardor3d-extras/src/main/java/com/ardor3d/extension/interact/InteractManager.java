@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.interact;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -68,6 +69,9 @@ public class InteractManager {
      */
     protected List<UpdateFilter> _filters = Lists.newArrayList();
 
+    /** ArrayList of update logic for this manager. */
+    protected List<UpdateLogic> _updateLogic;
+
     public InteractManager() {
         _state = new SpatialState();
         setupLogicalLayer();
@@ -79,6 +83,7 @@ public class InteractManager {
     }
 
     public void update(final ReadOnlyTimer timer) {
+        runUpdateLogic(timer.getTimePerFrame());
         for (final AbstractInteractWidget widget : _widgets) {
             if (!widget.isActiveUpdateOnly() || widget == _activeWidget) {
                 widget.update(timer, this);
@@ -251,4 +256,70 @@ public class InteractManager {
         return _state;
     }
 
+    public interface UpdateLogic {
+        public void update(double time, InteractManager manager);
+    }
+
+    public void addUpdateLogic(final UpdateLogic logic) {
+        if (_updateLogic == null) {
+            _updateLogic = new ArrayList<UpdateLogic>(1);
+        }
+        _updateLogic.add(logic);
+    }
+
+    public boolean removeUpdateLogic(final UpdateLogic logic) {
+        if (_updateLogic == null) {
+            return false;
+        }
+        return _updateLogic.remove(logic);
+    }
+
+    public UpdateLogic removeUpdateLogic(final int index) {
+        if (_updateLogic == null) {
+            return null;
+        }
+        return _updateLogic.remove(index);
+    }
+
+    public void clearUpdateLogic() {
+        if (_updateLogic != null) {
+            _updateLogic.clear();
+        }
+    }
+
+    public UpdateLogic getUpdateLogic(final int i) {
+        if (_updateLogic == null) {
+            _updateLogic = new ArrayList<UpdateLogic>(1);
+        }
+        return _updateLogic.get(i);
+    }
+
+    public List<UpdateLogic> getUpdateLogic() {
+        if (_updateLogic == null) {
+            _updateLogic = new ArrayList<UpdateLogic>(1);
+        }
+        return _updateLogic;
+    }
+
+    public int getUpdateLogicCount() {
+        if (_updateLogic == null) {
+            return 0;
+        }
+        return _updateLogic.size();
+    }
+
+    public void runUpdateLogic(final double time) {
+        if (_updateLogic != null) {
+            for (int i = 0, gSize = _updateLogic.size(); i < gSize; i++) {
+                try {
+                    final UpdateLogic logic = _updateLogic.get(i);
+                    if (logic != null) {
+                        logic.update(time, this);
+                    }
+                } catch (final IndexOutOfBoundsException e) {
+                    break;
+                }
+            }
+        }
+    }
 }

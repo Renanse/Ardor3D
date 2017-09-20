@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -108,6 +108,9 @@ public class MovePlanarWidget extends AbstractInteractWidget {
             _handle.setScale(1.0);
             _handle.setRotation(Matrix3.IDENTITY);
         } else {
+            _handle.setScale(Math.max(MoveWidget.MIN_SCALE, target.getWorldBound().getRadius()
+                    + target.getWorldTranslation().subtract(target.getWorldBound().getCenter(), _calcVec3A).length()));
+
             // update scale of widget using bounding radius
             target.updateGeometricState(0);
 
