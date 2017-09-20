@@ -62,7 +62,7 @@ public final class PropertiesDialog extends JDialog {
     private DisplayMode[] modes = null;
 
     // Array of windowed resolutions
-    private final String[] windowedResolutions = { "640 x 480", "800 x 600", "1024 x 768", "1152 x 864" };
+    private final String[] windowedResolutions = { "640 x 480", "800 x 600", "1024 x 768", "1152 x 864", "1920 x 1080" };
 
     // Array of possible samples
     private final String[] samples = { "0 samples", "1 samples", "2 samples", "4 samples", "8 samples" };
