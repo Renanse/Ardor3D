@@ -2,6 +2,6 @@
 description = 'Ardor 3D LWJGL'
 dependencies {
   compile project(':ardor3d-core')
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version:'2.8.4'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version:'2.8.4'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version:'2.9.3'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version:'2.9.3'
 }

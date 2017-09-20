@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -46,7 +46,7 @@ public abstract class LwjglTextureUtil {
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
-        // first some frequently used formats
+            // first some frequently used formats
             case RGBA8:
                 return GL11.GL_RGBA8;
             case RGB8:
@@ -381,7 +381,7 @@ public abstract class LwjglTextureUtil {
             case R32I:
             case R32UI:
             case CompressedRed:
-                return ARBTextureRg.GL_RED;
+                return GL11.GL_RED;
             case RG8:
             case RG16:
             case RG16F:
