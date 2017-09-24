@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -30,7 +30,7 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
- * Illustrates how to display and move GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.
+ * Illustrates how to display and move GUI primitives (e.g. RadioButton, Label, TabbedPane) on a canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.RotatingUIExample", //
 thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_RotatingUIExample.jpg", //

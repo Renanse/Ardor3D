@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2017 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -76,6 +76,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
@@ -359,6 +360,10 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         // get our framework
         if (prefs.getRenderer().startsWith("LWJGL")) {
+            try {
+                SharedLibraryLoader.load(true);
+            } catch (Exception e) {e.printStackTrace();}
+            
             final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
             example._canvas = new LwjglCanvas(settings, canvasRenderer);
             example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
