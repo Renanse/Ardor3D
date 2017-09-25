@@ -46,4 +46,28 @@ public class UIMenuItem extends UIButton {
             });
         }
     }
+
+    public UIMenuItem(final String text, final SubTex icon, final UIPopupMenu subMenu) {
+        this(text, icon, false, null);
+        addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                showSubMenu(subMenu);
+            }
+        });
+    }
+
+    protected void showSubMenu(final UIPopupMenu subMenu) {
+        final UIHud hud = getHud();
+        if (hud == null) {
+            return;
+        }
+
+        hud.closePopupMenusAfter(getParent());
+        subMenu.updateMinimumSizeFromContents();
+        subMenu.layout();
+
+        hud.showSubPopupMenu(subMenu);
+        subMenu.showAt(getHudX() + getLocalComponentWidth() - 5, getHudY() + getLocalComponentHeight());
+    }
+
 }

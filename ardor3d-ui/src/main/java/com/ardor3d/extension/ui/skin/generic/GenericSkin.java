@@ -317,7 +317,7 @@ public class GenericSkin extends Skin {
                         closeButton.updateMinimumSizeFromContents();
                         closeButton.compact();
                         closeButton
-                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
+                        .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                     }
                 }
 
@@ -618,9 +618,18 @@ public class GenericSkin extends Skin {
 
     @Override
     protected void applyToPopupMenu(final UIPopupMenu component) {
-        component.getTitleBar().removeFromParent();
-        component.getStatusBar().removeFromParent();
-        applyToFrame(component);
+        component.setOpacity(1.0f);
+
+        component.setMargin(new Insets(0, 0, 0, 0));
+        component.setPadding(new Insets(0, 0, 0, 0));
+
+        final SubTex borderTex = new SubTex(_sharedTex, 4, 17, 32, 36, 0, 6, 7, 6);
+        final UIBorder border = new ImageBorder(borderTex);
+        component.setBorder(border);
+        final ColorRGBA top = new ColorRGBA(210 / 255f, 210 / 255f, 210 / 255f, 1);
+        final ColorRGBA bottom = new ColorRGBA(244 / 255f, 244 / 255f, 244 / 255f, 1);
+        final GradientBackdrop grad = new GradientBackdrop(top, top, bottom, bottom);
+        component.setBackdrop(grad);
     }
 
     @Override

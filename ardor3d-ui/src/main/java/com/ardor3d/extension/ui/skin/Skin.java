@@ -65,7 +65,7 @@ public abstract class Skin {
             applyToTextArea((UITextArea) component);
         }
 
-        // 4. PANEL TYPES
+        // 4. PANEL / CONTAINER TYPES
         else if (component instanceof UIProgressBar) {
             applyToProgressBar((UIProgressBar) component);
         } else if (component instanceof UIComboBox) {
@@ -74,6 +74,8 @@ public abstract class Skin {
             applyToScrollBar((UIScrollBar) component);
         } else if (component instanceof UIPieMenu) {
             applyToPieMenu((UIPieMenu) component);
+        } else if (component instanceof UIPopupMenu) {
+            applyToPopupMenu((UIPopupMenu) component);
         } else if (component instanceof UIPanel) {
             applyToPanel((UIPanel) component);
         }
@@ -81,8 +83,6 @@ public abstract class Skin {
         // 5. FRAME TYPES
         else if (component instanceof UITooltip) {
             applyToTooltip((UITooltip) component);
-        } else if (component instanceof UIPopupMenu) {
-            applyToPopupMenu((UIPopupMenu) component);
         } else if (component instanceof UIFrame) {
             applyToFrame((UIFrame) component);
         }

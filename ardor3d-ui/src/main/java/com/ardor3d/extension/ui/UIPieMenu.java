@@ -16,13 +16,12 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 import com.google.common.collect.Lists;
 
 /**
  * A special frame meant to display menu items.
  */
-public class UIPieMenu extends UIContainer implements IPopOver {
+public class UIPieMenu extends UIPopupMenu implements IPopOver {
 
     public static final int DEFAULT_INNER_RADIUS = 50;
 
@@ -102,14 +101,16 @@ public class UIPieMenu extends UIContainer implements IPopOver {
         return _sliceRadians;
     }
 
-    public void addItem(final UIPieMenuItem item) {
+    @Override
+    public void addItem(final UIMenuItem item) {
         _menuDirty = true;
-        add(item);
+        super.addItem(item);
     }
 
-    public void removeItem(final UIPieMenuItem item) {
+    @Override
+    public void removeItem(final UIMenuItem item) {
         _menuDirty = true;
-        remove(item);
+        super.removeItem(item);
     }
 
     public UIPieMenuItem getCenterItem() {
@@ -131,6 +132,7 @@ public class UIPieMenu extends UIContainer implements IPopOver {
         setCenterItem(null);
     }
 
+    @Override
     public void clearItems() {
         _menuDirty = true;
         removeAllComponents();
@@ -234,34 +236,6 @@ public class UIPieMenu extends UIContainer implements IPopOver {
     @Override
     public void updateMinimumSizeFromContents() {
         setMinimumContentSize(_outerRadius * 2, _outerRadius * 2);
-    }
-
-    @Override
-    public void close() {
-        final UIHud hud = getHud();
-        if (hud == null) {
-            throw new IllegalStateException("UIPieMenu is not attached to a hud.");
-        }
-
-        // Close any open tooltip
-        hud.getTooltip().setVisible(false);
-
-        // clear any resources for standin
-        clearStandin();
-
-        // clean up any state
-        acceptVisitor(new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                if (spatial instanceof StateBasedUIComponent) {
-                    final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
-                    comp.switchState(comp.getDefaultState());
-                }
-            }
-        }, true);
-
-        hud.remove(this);
-        _parent = null;
     }
 
     public int getSliceIndex(final UIPieMenuItem item) {

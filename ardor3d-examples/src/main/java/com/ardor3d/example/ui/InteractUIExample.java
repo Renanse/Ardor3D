@@ -421,8 +421,10 @@ public class InteractUIExample extends ExampleBase {
         tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
         tempVec.setZ(0);
         menu.showAt((int) tempVec.getX(), (int) tempVec.getY());
-        _mouseManager.setPosition((int) tempVec.getX(), (int) tempVec.getY() + 1);
         _mouseManager.setPosition((int) tempVec.getX(), (int) tempVec.getY());
+        if (menu.getCenterItem() != null) {
+            menu.getCenterItem().mouseEntered((int) tempVec.getX(), (int) tempVec.getY(), null);
+        }
     }
 
     protected void hideMenu() {
