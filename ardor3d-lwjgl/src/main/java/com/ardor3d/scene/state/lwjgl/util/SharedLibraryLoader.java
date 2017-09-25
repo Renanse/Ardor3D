@@ -4,7 +4,7 @@ package com.ardor3d.scene.state.lwjgl.util;
 /**
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -22,7 +22,7 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/** 
+/**
  * Loads shared libraries from JAR files. Call {@link SharedLibraryLoader#load() to load the
  * required LWJGL native shared libraries. (Used and relicensed for Ardor3D by written permission of mzechner.)
  *
@@ -93,11 +93,17 @@ public class SharedLibraryLoader {
                     loader.extractFile(SharedLibraryLoader.is64Bit ? "OpenAL64.dll" : "OpenAL32.dll",
                             nativesDir.getName());
                 }
+                loader.extractFile(SharedLibraryLoader.is64Bit ? "jinput-raw_64.dll" : "jinput-raw.dll",
+                        nativesDir.getName());
+                loader.extractFile(SharedLibraryLoader.is64Bit ? "jinput-dx8_64.dll" : "jinput-dx8.dll",
+                        nativesDir.getName());
+                loader.extractFile("jinput-wintab.dll", nativesDir.getName());
             } else if (SharedLibraryLoader.isMac) {
                 nativesDir = loader.extractFile("liblwjgl.dylib", null).getParentFile();
                 if (!disableOpenAL) {
                     loader.extractFile("libopenal.dylib", nativesDir.getName());
                 }
+                loader.extractFile("libjinput-osx.jnilib", nativesDir.getName());
             } else if (SharedLibraryLoader.isLinux) {
                 nativesDir = loader.extractFile(SharedLibraryLoader.is64Bit ? "liblwjgl64.so" : "liblwjgl.so", null)
                         .getParentFile();
@@ -105,11 +111,14 @@ public class SharedLibraryLoader {
                     loader.extractFile(SharedLibraryLoader.is64Bit ? "libopenal64.so" : "libopenal.so",
                             nativesDir.getName());
                 }
+                loader.extractFile(SharedLibraryLoader.is64Bit ? "libjinput-linux64.so" : "libjinput-linux.so",
+                        nativesDir.getName());
             }
         } catch (final Throwable ex) {
             throw new RuntimeException("Unable to extract LWJGL natives.", ex);
         }
         System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
+        System.setProperty("net.java.games.input.librarypath", nativesDir.getAbsolutePath());
         load = false;
     }
 
