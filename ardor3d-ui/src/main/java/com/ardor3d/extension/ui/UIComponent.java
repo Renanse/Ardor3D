@@ -816,6 +816,20 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      */
     public void detachedFromHud() {}
 
+    public void centerOn(final UIHud hud) {
+        final int centerX = hud.getWidth() / 2;
+        final int centerY = hud.getHeight() / 2;
+
+        setHudXY(centerX - getLocalComponentWidth() / 2, centerY - getLocalComponentHeight() / 2);
+    }
+
+    public void centerOn(final UIComponent comp) {
+        final int centerX = comp.getHudX() + comp.getLocalComponentWidth() / 2;
+        final int centerY = comp.getHudY() + comp.getLocalComponentHeight() / 2;
+
+        setHudXY(centerX - getLocalComponentWidth() / 2, centerY - getLocalComponentHeight() / 2);
+    }
+
     /**
      * @return current screen x coordinate of this component's origin (usually its lower left corner.)
      */

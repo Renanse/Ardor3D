@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -34,13 +34,13 @@ public class Texture2D extends Texture {
 
     /**
      * <code>setWrap</code> sets the wrap mode of this texture for a particular axis.
-     * 
+     *
      * @param axis
      *            the texture axis to define a wrapmode on.
      * @param mode
      *            the wrap mode for the given axis of the texture.
      * @throws IllegalArgumentException
-     *             if axis or mode are null
+     *             if axis or mode are null or invalid
      */
     @Override
     public void setWrap(final WrapAxis axis, final WrapMode mode) {
@@ -56,12 +56,15 @@ public class Texture2D extends Texture {
             case T:
                 _wrapT = mode;
                 break;
+            case R:
+            default:
+                throw new IllegalArgumentException("invalid WrapAxis: " + axis);
         }
     }
 
     /**
      * <code>setWrap</code> sets the wrap mode of this texture for all axis.
-     * 
+     *
      * @param mode
      *            the wrap mode for the given axis of the texture.
      * @throws IllegalArgumentException
@@ -78,7 +81,7 @@ public class Texture2D extends Texture {
 
     /**
      * <code>getWrap</code> returns the wrap mode for a given coordinate axis on this texture.
-     * 
+     *
      * @param axis
      *            the axis to return for
      * @return the wrap mode of the texture.
@@ -92,8 +95,10 @@ public class Texture2D extends Texture {
                 return _wrapS;
             case T:
                 return _wrapT;
+            case R:
+            default:
+                throw new IllegalArgumentException("invalid WrapAxis: " + axis);
         }
-        throw new IllegalArgumentException("invalid WrapAxis: " + axis);
     }
 
     @Override

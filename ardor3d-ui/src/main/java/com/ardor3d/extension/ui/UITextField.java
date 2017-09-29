@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,8 +16,8 @@ import java.util.List;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.text.DefaultLatinTextFieldKeyHandler;
-import com.ardor3d.extension.ui.text.UIKeyHandler;
 import com.ardor3d.extension.ui.text.TextSelection.SelectionState;
+import com.ardor3d.extension.ui.text.UIKeyHandler;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
@@ -91,7 +91,7 @@ public class UITextField extends AbstractUITextEntryComponent {
 
     /**
      * Add the specified listener to this button's list of listeners notified when pressed.
-     * 
+     *
      * @param listener
      */
     public void addActionListener(final ActionListener listener) {
@@ -100,7 +100,7 @@ public class UITextField extends AbstractUITextEntryComponent {
 
     /**
      * Remove the given listener from the notification list.
-     * 
+     *
      * @param listener
      */
     public boolean removeActionListener(final ActionListener listener) {
@@ -108,7 +108,7 @@ public class UITextField extends AbstractUITextEntryComponent {
     }
 
     /**
-     * Removes all of this button's listeners from notification list.
+     * Removes all of this field's listeners from notification list.
      */
     public void removeAllListeners() {
         _listeners.clear();
@@ -184,7 +184,7 @@ public class UITextField extends AbstractUITextEntryComponent {
         if (isEditable() && getCurrentState().equals(_writingState) && getCaret().isShowing()) {
             getCaret().draw(r, this,
                     _uiText != null ? _uiText.getLineHeight(getCaretPosition()) : UIComponent.getDefaultFontSize(), x,
-                    y);
+                            y);
         }
     }
 
@@ -206,12 +206,12 @@ public class UITextField extends AbstractUITextEntryComponent {
 
         @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
-        // TODO: set cursor to text entry
+            // TODO: set cursor to text entry
         }
 
         @Override
         public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
-        // TODO: set cursor to default
+            // TODO: set cursor to default
         }
 
         @Override

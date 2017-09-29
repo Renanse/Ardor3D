@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -43,7 +43,7 @@ public class UISlider extends UIContainer {
 
     /**
      * create a slider widget with a default range of [0,100]. Initial value is 50.
-     * 
+     *
      * @param orientation
      *            the orientation of the slider (Orientation.Horizontal or Orientation.Vertical)
      */
@@ -53,7 +53,7 @@ public class UISlider extends UIContainer {
 
     /**
      * create a slider widget with a default range of [minValue,maxOffset] and the given initialValue.
-     * 
+     *
      * @param orientation
      *            the orientation of the slider (Orientation.Horizontal or Orientation.Vertical)
      * @param minValue
@@ -150,7 +150,7 @@ public class UISlider extends UIContainer {
 
     /**
      * Set the value on this slider
-     * 
+     *
      * @param value
      *            the new value. Clamps between min and max values.
      */
@@ -164,9 +164,10 @@ public class UISlider extends UIContainer {
      */
     private void updateKnob() {
         if ((float) (_model.getMaxValue() - _model.getMinValue()) != 0) {
-            _knob.setPosition(_model.getCurrentValue() / (float) (_model.getMaxValue() - _model.getMinValue()));
+            _knob.setPosition((_model.getCurrentValue() - _model.getMinValue())
+                    / (float) (_model.getMaxValue() - _model.getMinValue()));
         } else {
-            _knob.setPosition(_model.getMinValue());
+            _knob.setPosition(0);
         }
     }
 
@@ -196,7 +197,7 @@ public class UISlider extends UIContainer {
 
     /**
      * Add the specified listener to this slider's list of listeners notified when it has changed.
-     * 
+     *
      * @param listener
      *            the listener to add
      */
@@ -206,7 +207,7 @@ public class UISlider extends UIContainer {
 
     /**
      * Remove a listener from this slider's list of listeners.
-     * 
+     *
      * @param listener
      *            the listener to remove
      * @return true if the listener was removed.
@@ -220,7 +221,8 @@ public class UISlider extends UIContainer {
      */
     void knobReleased() {
         if (_snapToValues) {
-            setValue(Math.round(_knob.getPosition() * (_model.getMaxValue() - _model.getMinValue())));
+            setValue(Math.round(_knob.getPosition() * (_model.getMaxValue() - _model.getMinValue()))
+                    + _model.getMinValue());
         }
     }
 

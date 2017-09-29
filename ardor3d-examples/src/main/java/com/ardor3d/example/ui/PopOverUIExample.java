@@ -10,18 +10,27 @@
 
 package com.ardor3d.example.ui;
 
+import java.util.EnumSet;
+
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UIMenuItem;
+import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPieMenu;
 import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UIPopupMenu;
+import com.ardor3d.extension.ui.UISlider;
+import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
+import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
@@ -50,6 +59,7 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
     private static final String[] COLORS = new String[] { "Red", "White", "Blue", "Black" };
     private static final String[] SPINS = new String[] { "None", "Around X", "Around Y", "Around Z" };
     private static final String[] TEXS = new String[] { "None", "Logo", "Ball", "Clock" };
+    private static final String[] SCALE = new String[] { "Scale..." };
 
     UIHud hud;
     private Box box;
@@ -121,6 +131,9 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
             case "Texture":
                 setTexture(src.getText());
                 return;
+            case "Scale":
+                showScaleDialog();
+                return;
         }
     }
 
@@ -142,6 +155,8 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         texMenu.setMinimumContentSize(minWidth, 5);
         menu.addItem(new UIMenuItem("Set Texture...", null, texMenu));
         AddMenuItems(texMenu, "Texture", false, TEXS);
+
+        AddMenuItems(menu, "Scale", false, SCALE);
 
         menu.updateMinimumSizeFromContents();
         menu.layout();
@@ -166,6 +181,8 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         final UIPieMenu texMenu = new UIPieMenu(hud);
         menu.addItem(new UIPieMenuItem("Set Texture...", null, texMenu, 100));
         AddMenuItems(texMenu, "Texture", true, TEXS);
+
+        AddMenuItems(menu, "Scale", true, SCALE);
 
         menu.setCenterItem(new UIPieMenuItem("Cancel", null, true, null));
 
@@ -267,6 +284,35 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         ts.setTexture(tex);
         box.setRenderState(ts);
         box.updateWorldRenderStates(true);
+    }
+
+    private void showScaleDialog() {
+        final UIFrame scaleDialog = new UIFrame("Set Scale...", EnumSet.of(FrameButtons.CLOSE));
+        scaleDialog.setResizeable(false);
+        final UIPanel contentPanel = scaleDialog.getContentPanel();
+        contentPanel.setLayout(new RowLayout(true, false, false));
+
+        final UISlider scaleSlider = new UISlider(Orientation.Horizontal, 1, 20, (int) (box.getScale().getX() * 10));
+        scaleSlider.setMinimumContentWidth(200);
+        contentPanel.add(scaleSlider);
+
+        final UITextField scaleTextField = new UITextField();
+        scaleTextField.setEditable(false);
+        scaleTextField.setText("1.0");
+        scaleTextField.setMinimumContentWidth(30);
+        contentPanel.add(scaleTextField);
+
+        scaleSlider.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                box.setScale(scaleSlider.getValue() / 10.0);
+                scaleTextField.setText(String.format("%.1f", box.getScale().getX()));
+            }
+        });
+
+        hud.add(scaleDialog);
+        scaleDialog.pack(235, 80);
+        scaleDialog.centerOn(hud);
     }
 
     @Override

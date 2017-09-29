@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -109,7 +109,7 @@ import com.jogamp.opengl.util.GLBuffers;
 
 /**
  * <code>JoglRenderer</code> provides an implementation of the <code>Renderer</code> interface using the JOGL API.
- * 
+ *
  * @see com.ardor3d.renderer.Renderer
  */
 public class JoglRenderer extends AbstractRenderer {
@@ -856,7 +856,6 @@ public class JoglRenderer extends AbstractRenderer {
                         enabledTextures |= (2 << i);
                     }
 
-                    @SuppressWarnings("null")
                     final FloatBufferData textureBufferData = textureCoords.get(i);
                     final FloatBuffer textureBuffer = textureBufferData.getBuffer();
 
@@ -1160,7 +1159,6 @@ public class JoglRenderer extends AbstractRenderer {
                     checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                     // grab a vboID and make sure it exists and is up to date.
-                    @SuppressWarnings("null")
                     final FloatBufferData data = textureCoords.get(i);
                     final int vboID = setupVBO(data, context);
 
@@ -1338,7 +1336,6 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    @SuppressWarnings("null")
     private void initializeInterleavedVBO(final RenderContext context, final FloatBufferData interleaved,
             final FloatBufferData vertexCoords, final FloatBufferData normalCoords, final FloatBufferData colorCoords,
             final List<FloatBufferData> textureCoords, final int bufferSize) {
@@ -1879,7 +1876,7 @@ public class JoglRenderer extends AbstractRenderer {
     /**
      * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
      * list until {@link #endDisplayList()} is called.
-     * 
+     *
      * @return id of new display list
      */
     @Override

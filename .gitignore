@@ -4,3 +4,4 @@ target/
 .project
 .classpath
 .gradle/
+*/build/*

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,7 @@
 package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.event.DragListener;
+import com.ardor3d.extension.ui.model.SliderModel;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.MathUtils;
@@ -34,7 +35,7 @@ public class UISliderKnob extends UIContainer {
 
     /**
      * Construct a new knob for the given slider.
-     * 
+     *
      * @param slider
      *            the parent slider.
      */
@@ -66,7 +67,7 @@ public class UISliderKnob extends UIContainer {
 
     /**
      * Sets the current position of the knob handle
-     * 
+     *
      * @param newPosition
      *            the new position as a percent [0.0, 1.0]
      */
@@ -222,9 +223,9 @@ public class UISliderKnob extends UIContainer {
             setPosition(position);
 
             // set the value on the slider's model directly to avoid circular looping logic.
-            _parentSlider.getModel().setCurrentValue(
-                    Math.round(getPosition()
-                            * (_parentSlider.getModel().getMaxValue() - _parentSlider.getModel().getMinValue())),
+            final SliderModel model = _parentSlider.getModel();
+            model.setCurrentValue(
+                    Math.round(getPosition() * (model.getMaxValue() - model.getMinValue())) + model.getMinValue(),
                     _parentSlider);
         }
 
