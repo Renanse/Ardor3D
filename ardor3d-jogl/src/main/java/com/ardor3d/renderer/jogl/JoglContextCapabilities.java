@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -125,6 +125,15 @@ public class JoglContextCapabilities extends ContextCapabilities {
         // max texture size.
         gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, buf);
         _maxTextureSize = buf.get(0);
+
+        // max texture size.
+        gl.glGetIntegerv(GL.GL_MAX_RENDERBUFFER_SIZE, buf);
+        _maxRenderBufferSize = buf.get(0);
+
+        // max viewport size.
+        gl.glGetIntegerv(GL.GL_MAX_VIEWPORT_DIMS, buf);
+        _maxViewportWidth = buf.get(0);
+        _maxViewportHeight = buf.get(1);
 
         // Check for support of multitextures.
         _supportsMultiTexture = gl.isExtensionAvailable("GL_ARB_multitexture");
