@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -17,11 +17,11 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.layout.UILayout;
 import com.ardor3d.extension.ui.util.UIQuad;
-import com.ardor3d.image.Texture2D;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Rectangle2;
@@ -33,10 +33,10 @@ import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -49,6 +49,7 @@ import com.ardor3d.scenegraph.hint.TextureCombineMode;
  */
 public abstract class UIContainer extends UIComponent {
     private static final Logger _logger = Logger.getLogger(UIContainer.class.getName());
+    public static int STANDIN_TEXTURE_SIZE = 4096;
 
     /** Layout responsible for managing the size and position of this container's contents. */
     private UILayout _layout = new RowLayout(true);
@@ -87,7 +88,7 @@ public abstract class UIContainer extends UIComponent {
 
     /**
      * Checks to see if a given UIComponent is in this container.
-     * 
+     *
      * @param component
      *            the component to look for
      * @return true if the given component is in this container.
@@ -98,7 +99,7 @@ public abstract class UIContainer extends UIComponent {
 
     /**
      * Checks to see if a given UIComponent is in this container or (if instructed) its subcontainers.
-     * 
+     *
      * @param component
      *            the component to look for
      * @param recurse
@@ -121,7 +122,7 @@ public abstract class UIContainer extends UIComponent {
 
     /**
      * Add a component to this container.
-     * 
+     *
      * @param component
      *            the component to add
      */
@@ -137,7 +138,7 @@ public abstract class UIContainer extends UIComponent {
 
     /**
      * Remove a component from this container.
-     * 
+     *
      * @param component
      *            the component to remove
      */
@@ -152,7 +153,7 @@ public abstract class UIContainer extends UIComponent {
     /**
      * Removes all UI components from this container. If other types of Spatials are attached to this container, they
      * are ignored.
-     * 
+     *
      * @param comp
      *            the component to remove
      */
@@ -438,16 +439,19 @@ public abstract class UIContainer extends UIComponent {
 
     /**
      * Build our standin quad and (as necessary) a texture renderer.
-     * 
+     *
      * @param renderer
      *            the renderer to use if we need to generate a texture renderer
      */
     private void buildStandin(final Renderer renderer) {
         // Check for and create a texture renderer if none exists yet.
         if (UIContainer._textureRenderer == null) {
-            final Camera cam = Camera.getCurrentCamera();
-            UIContainer._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth(), cam
-                    .getHeight(), renderer, ContextManager.getCurrentContext().getCapabilities());
+            final int maxRBS = ContextManager.getCurrentContext().getCapabilities().getMaxRenderBufferSize();
+            final int size = maxRBS > 0 ? Math.min(UIContainer.STANDIN_TEXTURE_SIZE, maxRBS)
+                    : UIContainer.STANDIN_TEXTURE_SIZE;
+            System.out.println("size: " + size);
+            UIContainer._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(size, size, renderer,
+                    ContextManager.getCurrentContext().getCapabilities());
             if (UIContainer._textureRenderer != null) {
                 UIContainer._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 1f, 0f, 0f));
                 UIContainer._textureRenderer.setMultipleTargets(true);
@@ -548,7 +552,7 @@ public abstract class UIContainer extends UIComponent {
     }
 
     /**
-     * 
+     *
      * @param doClip
      *            true (default) if we want this container to clip the drawing of its contents to the dimensions of its
      *            content area.
@@ -575,7 +579,7 @@ public abstract class UIContainer extends UIComponent {
     }
 
     /**
-     * 
+     *
      * @return true if we should use a cached texture copy to draw this container.
      * @see #setUseStandin(boolean)
      */
@@ -592,7 +596,7 @@ public abstract class UIContainer extends UIComponent {
 
     /**
      * Set the minification filter for the standin.
-     * 
+     *
      * @param filter
      */
     public void setMinificationFilter(final MinificationFilter filter) {
