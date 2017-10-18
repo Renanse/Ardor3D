@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,12 +13,12 @@ package com.ardor3d.extension.ui;
 import java.util.Map;
 
 import com.ardor3d.extension.ui.text.RenderedText;
+import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
 import com.ardor3d.extension.ui.text.StyleConstants;
 import com.ardor3d.extension.ui.text.TextCaret;
 import com.ardor3d.extension.ui.text.TextFactory;
 import com.ardor3d.extension.ui.text.TextSelection;
 import com.ardor3d.extension.ui.text.UIKeyHandler;
-import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
@@ -83,7 +83,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
 
     /**
      * Set the text for this component. Also updates the minimum size of the component.
-     * 
+     *
      * @param text
      *            the new text
      */
@@ -130,7 +130,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
     /**
      * Set the position of the text caret as an index to the current set text string. If the specified position is after
      * the last possible index, it is set to the last possible index.
-     * 
+     *
      * @param index
      *            the new position
      */
@@ -212,7 +212,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
             }
         }
 
-        setMinimumContentSize(width, height);
+        setLayoutMinimumContentSize(width, height);
         fireComponentDirty();
     }
 
@@ -238,12 +238,12 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
 
         @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
-        // CursorUtil.getCursorFactory().getTextCursor().setActive();
+            // CursorUtil.getCursorFactory().getTextCursor().setActive();
         }
 
         @Override
         public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
-        // CursorUtil.getCursorFactory().getDefaultCursor().setActive();
+            // CursorUtil.getCursorFactory().getDefaultCursor().setActive();
         }
     }
 }

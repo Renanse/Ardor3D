@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,7 +20,7 @@ import com.ardor3d.scenegraph.Spatial;
 /**
  * This layout places components on the edges or in the center of a container, depending on the value of the layout data
  * object they hold. The behavior is meant to be similar to awt's {@link java.awt.BorderLayout BorderLayout}.
- * 
+ *
  * @see BorderLayoutData
  */
 public class BorderLayout extends UILayout {
@@ -102,9 +102,8 @@ public class BorderLayout extends UILayout {
                         comp.setLocalXY(-store.getX(), heightSouth - store.getY());
                         break;
                     case CENTER:
-                        comp.fitComponentIn(container.getContentWidth() - widthEast - widthWest, container
-                                .getContentHeight()
-                                - heightSouth - heightNorth);
+                        comp.fitComponentIn(container.getContentWidth() - widthEast - widthWest,
+                                container.getContentHeight() - heightSouth - heightNorth);
                         comp.getRelativeComponentBounds(store);
                         comp.setLocalXY(widthWest - store.getX(), heightSouth - store.getY());
                 }
@@ -114,8 +113,8 @@ public class BorderLayout extends UILayout {
 
     @Override
     public void updateMinimumSizeFromContents(final UIContainer container) {
-        container.setMinimumContentSize(getMinimumWidth(container.getChildren()), getMinimumHeight(container
-                .getChildren()));
+        container.setLayoutMinimumContentSize(getMinimumWidth(container.getChildren()),
+                getMinimumHeight(container.getChildren()));
     }
 
     private int getMinimumHeight(final List<Spatial> content) {

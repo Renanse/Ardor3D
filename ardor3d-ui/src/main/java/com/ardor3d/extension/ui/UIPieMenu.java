@@ -235,7 +235,7 @@ public class UIPieMenu extends UIPopupMenu implements IPopOver {
 
     @Override
     public void updateMinimumSizeFromContents() {
-        setMinimumContentSize(_outerRadius * 2, _outerRadius * 2);
+        setLayoutMinimumContentSize(_outerRadius * 2, _outerRadius * 2);
     }
 
     public int getSliceIndex(final UIPieMenuItem item) {

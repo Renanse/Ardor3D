@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -27,7 +27,7 @@ import com.ardor3d.scenegraph.Spatial;
  * content plus some inter-cell spacing. The components should be added from top to down and left to right. Set the
  * layout data of the last component in a row to wrap, e.g. by setLayoutData(GridLayoutData.Wrap); You can specify a
  * horizontal span bigger than one to specify that a component should use multiple cells in the current row.
- * 
+ *
  * XXX: Note that this class does not currently support layout of rotated components.
  */
 public class GridLayout extends UILayout {
@@ -55,7 +55,7 @@ public class GridLayout extends UILayout {
     /**
      * Create a GridLayout with the specified parameters and a vertical alignment to top and no distribution of vertical
      * space.
-     * 
+     *
      * @param interCellSpacingHorizontal
      * @param interCellSpacingVertical
      * @param leftMargin
@@ -72,7 +72,7 @@ public class GridLayout extends UILayout {
     /**
      * Create a Gridlayout with the specified parameters. If vertical space is distributed the vertical alignment does
      * not matter.
-     * 
+     *
      * @param interCellSpacingHorizontal
      * @param interCellSpacingVertical
      * @param leftMargin
@@ -90,7 +90,7 @@ public class GridLayout extends UILayout {
     /**
      * Create a GridLayout with the specified parameters. Any additional vertical space won't be distributed between
      * rows.
-     * 
+     *
      * @param interCellSpacingHorizontal
      * @param interCellSpacingVertical
      * @param leftMargin
@@ -109,7 +109,7 @@ public class GridLayout extends UILayout {
     /**
      * Create a GridLayout with the specified parameters. Note that the vertical alignment does not matter if you choose
      * to distribute any additional space between rows.
-     * 
+     *
      * @param interCellSpacingHorizontal
      * @param interCellSpacingVertical
      * @param leftMargin
@@ -169,7 +169,7 @@ public class GridLayout extends UILayout {
     public void updateMinimumSizeFromContents(final UIContainer container) {
         rebuildGrid(container);
         grid.updateMinimalSize();
-        container.setMinimumContentSize(grid.minWidth, grid.minHeight);
+        container.setLayoutMinimumContentSize(grid.minWidth, grid.minHeight);
     }
 
     private void rebuildGrid(final UIContainer container) {

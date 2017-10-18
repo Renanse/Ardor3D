@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -32,20 +32,20 @@ import com.google.common.collect.Maps;
  * <p>
  * As an example, the following would setup labelA in the top left corner of the container, 5 pixels from the top and 5
  * pixels from the bottom. Directly below that (5 pixels from the bottom of labelA) is labelB, left aligned to labelA:
- * 
+ *
  * <pre>
  * UIContainer container;
  * UILabel labelA, labelB
- * 
+ *
  * ...
- * 
+ *
  * container.setLayout(new AnchorLayout());
  * labelA.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, container, Alignment.TOP_LEFT, 5, -5));
  * labelB.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, labelA, Alignment.BOTTOM_LEFT, 0, -5));
  * </pre>
- * 
+ *
  * </p>
- * 
+ *
  * @see AnchorLayoutData
  */
 public class AnchorLayout extends UILayout {
@@ -116,7 +116,7 @@ public class AnchorLayout extends UILayout {
     @Override
     public void updateMinimumSizeFromContents(final UIContainer container) {
         layoutContents(container);
-        container.setMinimumContentSize(_maxX - _minX, _maxY - _minY);
+        container.setLayoutMinimumContentSize(_maxX - _minX, _maxY - _minY);
     }
 
     private void visit(final UIComponent toVisit) {

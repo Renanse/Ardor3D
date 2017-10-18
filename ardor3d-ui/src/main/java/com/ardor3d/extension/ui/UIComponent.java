@@ -54,6 +54,8 @@ import com.google.common.collect.Maps;
  * TODO: alert/dirty needed for font style changes.
  */
 public abstract class UIComponent extends Node implements UIKeyHandler {
+    private static final int DEFAULT_MAX_CONTENT_SIZE = 10000;
+
     /** If true, use opacity settings to blend the components. Default is false. */
     private static boolean _useTransparency = false;
 
@@ -63,9 +65,11 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /** The internal contents portion of this component. */
     private final Dimension _contentsSize = new Dimension(10, 10);
     /** The absolute minimum size of the internal contents portion of this component. */
-    private final Dimension _minimumContentsSize = new Dimension(10, 10);
+    private final Dimension _layoutMinimumContentsSize = new Dimension(0, 0);
+    /** The absolute minimum size of the internal contents portion of this component. */
+    private final Dimension _minimumContentsSize = new Dimension(-1, -1);
     /** The absolute maximum size of the internal contents portion of this component. */
-    private final Dimension _maximumContentsSize = new Dimension(10000, 10000);
+    private final Dimension _maximumContentsSize = new Dimension(-1, -1);
     /** A spacing between the component's border and its inner content area. */
     private Insets _padding = new Insets(0, 0, 0, 0);
     /** A border around this component. */
@@ -388,32 +392,50 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
         setLocalComponentHeight(height);
     }
 
+    protected int getMinimumContentWidth() {
+        return _minimumContentsSize.getWidth() > 0 ? _minimumContentsSize.getWidth() : _layoutMinimumContentsSize
+                .getWidth();
+    }
+
+    protected int getMinimumContentHeight() {
+        return _minimumContentsSize.getHeight() > 0 ? _minimumContentsSize.getHeight() : _layoutMinimumContentsSize
+                .getHeight();
+    }
+
     /**
      * @return the width contained in _minimumContentsSize + the margin, border and padding values for left and right.
      */
     public int getMinimumLocalComponentWidth() {
-        return _minimumContentsSize.getWidth() + getTotalLeft() + getTotalRight();
+        return getMinimumContentWidth() + getTotalLeft() + getTotalRight();
     }
 
     /**
      * @return the height contained in _minimumContentsSize + the margin, border and padding values for top and bottom.
      */
     public int getMinimumLocalComponentHeight() {
-        return _minimumContentsSize.getHeight() + getTotalTop() + getTotalBottom();
+        return getMinimumContentHeight() + getTotalTop() + getTotalBottom();
+    }
+
+    protected int getMaximumContentWidth() {
+        return _maximumContentsSize.getWidth() > 0 ? _maximumContentsSize.getWidth() : UIComponent.DEFAULT_MAX_CONTENT_SIZE;
+    }
+
+    protected int getMaximumContentHeight() {
+        return _maximumContentsSize.getHeight() > 0 ? _maximumContentsSize.getHeight() : UIComponent.DEFAULT_MAX_CONTENT_SIZE;
     }
 
     /**
      * @return the width contained in _maximumContentsSize + the margin, border and padding values for left and right.
      */
     public int getMaximumLocalComponentWidth() {
-        return _maximumContentsSize.getWidth() + getTotalLeft() + getTotalRight();
+        return getMaximumContentWidth() + getTotalLeft() + getTotalRight();
     }
 
     /**
      * @return the height contained in _maximumContentsSize + the margin, border and padding values for top and bottom.
      */
     public int getMaximumLocalComponentHeight() {
-        return _maximumContentsSize.getHeight() + getTotalTop() + getTotalBottom();
+        return getMaximumContentHeight() + getTotalTop() + getTotalBottom();
     }
 
     /**
@@ -427,12 +449,6 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     public void setContentSize(final int width, final int height) {
         setContentWidth(width);
         setContentHeight(height);
-        if (_maximumContentsSize.getWidth() < width) {
-            _maximumContentsSize.setWidth(width);
-        }
-        if (_maximumContentsSize.getHeight() < height) {
-            _maximumContentsSize.setHeight(height);
-        }
     }
 
     /**
@@ -443,8 +459,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *            the new height
      */
     public void setContentHeight(final int height) {
-        _contentsSize.setHeight(MathUtils.clamp(height, _minimumContentsSize.getHeight(),
-                _maximumContentsSize.getHeight()));
+        _contentsSize.setHeight(MathUtils.clamp(height, getMinimumContentHeight(), getMaximumContentHeight()));
     }
 
     /**
@@ -455,8 +470,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *            the new width
      */
     public void setContentWidth(final int width) {
-        _contentsSize
-                .setWidth(MathUtils.clamp(width, _minimumContentsSize.getWidth(), _maximumContentsSize.getWidth()));
+        _contentsSize.setWidth(MathUtils.clamp(width, getMinimumContentWidth(), getMaximumContentWidth()));
     }
 
     /**
@@ -493,6 +507,11 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
         return _contentsSize.getHeight();
     }
 
+    public void clearMaximumContentSize() {
+        _maximumContentsSize.set(-1, -1);
+        validateContentSize();
+    }
+
     /**
      * Sets the maximum content size of this component to the values given.
      *
@@ -520,6 +539,22 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      */
     public void setMaximumContentHeight(final int height) {
         _maximumContentsSize.setHeight(height);
+        validateContentSize();
+    }
+
+    /**
+     * Sets the minimum content size of this component to the values given.
+     *
+     * @param width
+     * @param height
+     */
+    public void setLayoutMinimumContentSize(final int width, final int height) {
+        _layoutMinimumContentsSize.set(width, height);
+        validateContentSize();
+    }
+
+    public void clearMinimumContentSize() {
+        _minimumContentsSize.set(-1, -1);
         validateContentSize();
     }
 
@@ -574,10 +609,9 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      * Ensures content size is between min and max.
      */
     protected void validateContentSize() {
-        final int width = MathUtils.clamp(_contentsSize.getWidth(), _minimumContentsSize.getWidth(),
-                _maximumContentsSize.getWidth());
-        final int height = MathUtils.clamp(_contentsSize.getHeight(), _minimumContentsSize.getHeight(),
-                _maximumContentsSize.getHeight());
+        final int width = MathUtils.clamp(_contentsSize.getWidth(), getMinimumContentWidth(), getMaximumContentWidth());
+        final int height = MathUtils.clamp(_contentsSize.getHeight(), getMinimumContentHeight(),
+                getMaximumContentHeight());
         _contentsSize.set(width, height);
     }
 
@@ -586,7 +620,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      * (if component is set to allow such resizing.)
      */
     public void compact() {
-        setContentSize(_minimumContentsSize.getWidth(), _minimumContentsSize.getHeight());
+        setContentSize(getMinimumContentWidth(), getMinimumContentHeight());
     }
 
     /**

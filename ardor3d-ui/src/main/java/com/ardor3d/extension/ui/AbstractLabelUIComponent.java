@@ -64,7 +64,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             height = Math.max(_iconDimensions.getHeight(), height);
         }
 
-        setMinimumContentSize(width, height);
+        setLayoutMinimumContentSize(width, height);
         if (getContentWidth() < width) {
             setContentWidth(width);
         }

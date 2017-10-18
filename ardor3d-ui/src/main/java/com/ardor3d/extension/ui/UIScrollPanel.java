@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -70,7 +70,7 @@ public class UIScrollPanel extends UIPanel {
     protected void drawComponent(final Renderer renderer) {
         _clipRectangleStore.set(getHudX() + getTotalLeft(),
                 getHudY() + getTotalBottom() + horizontalScrollBar.getContentHeight(), getContentWidth()
-                        - verticalScrollBar.getContentWidth(),
+                - verticalScrollBar.getContentWidth(),
                 getContentHeight() - horizontalScrollBar.getContentHeight());
         renderer.pushClip(_clipRectangleStore);
 
@@ -89,8 +89,8 @@ public class UIScrollPanel extends UIPanel {
     @Override
     public void updateMinimumSizeFromContents() {
         super.updateMinimumSizeFromContents();
-        setMinimumContentSize(verticalScrollBar.getLocalComponentWidth() + 1, horizontalScrollBar
-                .getLocalComponentHeight() + 1);
+        setLayoutMinimumContentSize(verticalScrollBar.getLocalComponentWidth() + 1,
+                horizontalScrollBar.getLocalComponentHeight() + 1);
         updateScrollBarSliders();
     }
 

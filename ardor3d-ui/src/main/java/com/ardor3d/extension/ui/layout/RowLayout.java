@@ -224,7 +224,7 @@ public class RowLayout extends UILayout {
                 }
             }
         }
-        container.setMinimumContentSize(minW, minH);
+        container.setLayoutMinimumContentSize(minW, minH);
     }
 
     private int getSumOfAllHeights(final List<Spatial> content) {
