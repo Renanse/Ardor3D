@@ -63,7 +63,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     private static float _currentOpacity = 1f;
 
     /** The internal contents portion of this component. */
-    private final Dimension _contentsSize = new Dimension(10, 10);
+    private final Dimension _contentsSize = new Dimension(0, 0);
     /** The absolute minimum size of the internal contents portion of this component. */
     private final Dimension _layoutMinimumContentsSize = new Dimension(0, 0);
     /** The absolute minimum size of the internal contents portion of this component. */

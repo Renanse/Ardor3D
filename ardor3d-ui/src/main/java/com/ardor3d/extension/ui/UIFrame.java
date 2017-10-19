@@ -356,7 +356,7 @@ public class UIFrame extends UIContainer {
      * Resize the frame to fit the minimum size of its content panel.
      */
     public void pack() {
-        _contentPanel.updateMinimumSizeFromContents();
+        updateMinimumSizeFromContents();
         pack(_contentPanel.getMinimumLocalComponentWidth(), _contentPanel.getMinimumLocalComponentHeight());
     }
 

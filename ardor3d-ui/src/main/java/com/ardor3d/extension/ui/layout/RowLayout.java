@@ -205,6 +205,7 @@ public class RowLayout extends UILayout {
 
             // compute the min width and height of the container
             final Rectangle2 store = new Rectangle2();
+            int spaces = -1;
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;
@@ -221,6 +222,15 @@ public class RowLayout extends UILayout {
                         minW = rect.getWidth();
                     }
                     minH += rect.getHeight();
+                }
+                spaces++;
+            }
+
+            if (spaces > 0) {
+                if (_horizontal) {
+                    minW += _spacing * spaces;
+                } else {
+                    minH += _spacing * spaces;
                 }
             }
         }
