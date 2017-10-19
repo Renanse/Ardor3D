@@ -202,7 +202,7 @@ public class SimpleUIExample extends ExampleBase {
 
         final ActionListener actionListener = new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                applyChat(historyArea, chatField);
+                applyChat(historyArea, chatField, scrollArea);
             }
         };
         chatButton.addActionListener(actionListener);
@@ -217,11 +217,12 @@ public class SimpleUIExample extends ExampleBase {
         return chatPanel;
     }
 
-    private void applyChat(final UITextArea historyArea, final UITextField chatField) {
+    private void applyChat(final UITextArea historyArea, final UITextField chatField, final UIScrollPanel scrollArea) {
         final String text = chatField.getText();
         if (text.length() > 0) {
             historyArea.setText(historyArea.getText() + "\n" + text);
             chatField.setText("");
+            scrollArea.layout();
         }
     }
 
