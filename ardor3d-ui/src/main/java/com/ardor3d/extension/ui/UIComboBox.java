@@ -61,6 +61,11 @@ public class UIComboBox extends UIPanel {
                 _openButton.doClick();
                 return true;
             }
+
+            @Override
+            public boolean mousePressed(final MouseButton button, final InputState state) {
+                return true;
+            }
         };
         _valueLabel.setLayoutData(BorderLayoutData.CENTER);
         add(_valueLabel);
