@@ -21,6 +21,7 @@ import javax.media.opengl.GL2ES3;
 import javax.media.opengl.GLAutoDrawable;
 
 import com.ardor3d.renderer.ContextCapabilities;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.jogl.DirectNioBuffersSet;
 
 public class JoglContextCapabilities extends ContextCapabilities {
@@ -131,9 +132,10 @@ public class JoglContextCapabilities extends ContextCapabilities {
         _maxRenderBufferSize = buf.get(0);
 
         // max viewport size.
-        gl.glGetIntegerv(GL.GL_MAX_VIEWPORT_DIMS, buf);
-        _maxViewportWidth = buf.get(0);
-        _maxViewportHeight = buf.get(1);
+        final IntBuffer dimsBuf = BufferUtils.createIntBuffer(2);
+        gl.glGetIntegerv(GL.GL_MAX_VIEWPORT_DIMS, dimsBuf);
+        _maxViewportWidth = dimsBuf.get(0);
+        _maxViewportHeight = dimsBuf.get(1);
 
         // Check for support of multitextures.
         _supportsMultiTexture = gl.isExtensionAvailable("GL_ARB_multitexture");
