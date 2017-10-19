@@ -78,12 +78,12 @@ public abstract class Skin {
             applyToPopupMenu((UIPopupMenu) component);
         } else if (component instanceof UIPanel) {
             applyToPanel((UIPanel) component);
+        } else if (component instanceof UITooltip) {
+            applyToTooltip((UITooltip) component);
         }
 
         // 5. FRAME TYPES
-        else if (component instanceof UITooltip) {
-            applyToTooltip((UITooltip) component);
-        } else if (component instanceof UIFrame) {
+        else if (component instanceof UIFrame) {
             applyToFrame((UIFrame) component);
         }
 

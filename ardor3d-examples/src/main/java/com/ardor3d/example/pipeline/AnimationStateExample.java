@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -140,14 +140,13 @@ public class AnimationStateExample extends ExampleBase {
     }
 
     private void createHUD() {
-        hud = new UIHud();
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud = new UIHud(_canvas);
+        hud.setupInput(_physicalLayer, _logicalLayer);
         hud.setMouseManager(_mouseManager);
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5,
-                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5, hud.getHeight() - 5 - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -179,7 +178,7 @@ public class AnimationStateExample extends ExampleBase {
 
         punchButton = new UIButton("PUNCH!");
         punchButton
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
+        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
         punchButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 manager.findAnimationLayer("punch").setCurrentState("punch_right", true);
@@ -206,7 +205,7 @@ public class AnimationStateExample extends ExampleBase {
 
         stopButton = new UIButton("Stop");
         stopButton
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
+        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 manager.stop();
@@ -217,7 +216,7 @@ public class AnimationStateExample extends ExampleBase {
 
         final UICheckBox resetAnimCheck = new UICheckBox("Reset Animation On Stop");
         resetAnimCheck
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, stopButton, Alignment.BOTTOM_LEFT, 0, -5));
+        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, stopButton, Alignment.BOTTOM_LEFT, 0, -5));
         resetAnimCheck.setSelected(false);
         resetAnimCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -289,8 +288,6 @@ public class AnimationStateExample extends ExampleBase {
         });
         basePanel.add(boneLabelCheck);
 
-        optionsFrame.updateMinimumSizeFromContents();
-        optionsFrame.layout();
         optionsFrame.pack();
 
         optionsFrame.setUseStandin(true);

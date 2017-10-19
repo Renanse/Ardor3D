@@ -26,19 +26,16 @@ import com.ardor3d.extension.interact.widget.BasicFilterList;
 import com.ardor3d.extension.interact.widget.IFilterList;
 import com.ardor3d.extension.interact.widget.MovePlanarWidget;
 import com.ardor3d.extension.interact.widget.MovePlanarWidget.MovePlane;
-import com.ardor3d.extension.ui.FloatingUIContainer;
 import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIContainer;
-import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPieMenu;
 import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
-import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.event.SelectionListener;
@@ -87,7 +84,7 @@ thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractUIExample
 maxHeapMemory = 64)
 public class InteractUIExample extends ExampleBase {
 
-    final UIHud hud = new UIHud();
+    private UIHud hud;
     private InteractManager manager;
     private MovePlanarWidget moveWidget;
     private InsertMarkerUIWidget insertWidget;
@@ -121,6 +118,7 @@ public class InteractUIExample extends ExampleBase {
     @Override
     protected void initExample() {
         _canvas.setTitle("Interact Example");
+        hud = new UIHud(_canvas);
 
         final Camera camera = _canvas.getCanvasRenderer().getCamera();
         camera.setLocation(15, 11, -9);
@@ -273,7 +271,7 @@ public class InteractUIExample extends ExampleBase {
         manager = new InteractManager(new MarkerState());
         manager.setupInput(_canvas, _physicalLayer, _logicalLayer);
 
-        hud.setupInput(_canvas, _physicalLayer, manager.getLogicalLayer());
+        hud.setupInput(_physicalLayer, manager.getLogicalLayer());
         hud.setMouseManager(_mouseManager);
 
         final BasicFilterList filterList = new BasicFilterList();
@@ -447,7 +445,7 @@ public class InteractUIExample extends ExampleBase {
 
     class InsertMarkerUIWidget extends AbstractInteractWidget {
 
-        UIFrame popupFrame;
+        UIPanel uiPanel;
 
         public InsertMarkerUIWidget(final IFilterList filterList) {
             super(filterList);
@@ -495,16 +493,11 @@ public class InteractUIExample extends ExampleBase {
                 }
             });
 
-            popupFrame = new FloatingUIContainer();
-            popupFrame.getContentPanel().add(centerPanel);
-            popupFrame.getBasePanel().setBackdrop(new EmptyBackdrop());
-            popupFrame.getBasePanel().setBorder(new EmptyBorder());
+            uiPanel = new UIPanel();
+            uiPanel.add(centerPanel);
+            uiPanel.pack();
 
-            popupFrame.updateMinimumSizeFromContents();
-            popupFrame.layout();
-            popupFrame.pack();
-
-            _handle = popupFrame;
+            _handle = uiPanel;
         }
 
         private void AddButton(final UIContainer parent, final String label, final ActionListener actionListener) {
@@ -527,7 +520,7 @@ public class InteractUIExample extends ExampleBase {
             tempVec.zero();
             tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
             tempVec.setZ(0);
-            tempVec.subtractLocal(popupFrame.getContentWidth() / 2, -10, 0);
+            tempVec.subtractLocal(uiPanel.getContentWidth() / 2, -10, 0);
             _handle.setTranslation(tempVec);
             _handle.updateWorldTransform(true);
         }
@@ -537,14 +530,14 @@ public class InteractUIExample extends ExampleBase {
             super.receivedControl(manager);
             final Spatial spat = manager.getSpatialTarget();
             if (spat != null) {
-                hud.add(popupFrame);
+                hud.add(uiPanel);
             }
         }
 
         @Override
         public void lostControl(final InteractManager manager) {
             super.lostControl(manager);
-            hud.remove(popupFrame);
+            hud.remove(uiPanel);
         }
 
         @Override
@@ -553,9 +546,9 @@ public class InteractUIExample extends ExampleBase {
             if (manager.getActiveWidget() == this) {
                 final Spatial spat = manager.getSpatialTarget();
                 if (spat == null) {
-                    hud.remove(popupFrame);
+                    hud.remove(uiPanel);
                 } else {
-                    hud.add(popupFrame);
+                    hud.add(uiPanel);
                 }
             }
         }
@@ -563,7 +556,7 @@ public class InteractUIExample extends ExampleBase {
 
     class ColorSelectUIWidget extends AbstractInteractWidget {
 
-        UIFrame popupFrame;
+        UIPanel uiPanel;
         ColorRGBA unconsumedColor;
 
         public ColorSelectUIWidget(final IFilterList filterList) {
@@ -574,13 +567,13 @@ public class InteractUIExample extends ExampleBase {
 
         private void createFrame() {
 
-            final UIPanel centerPanel = new UIPanel(null);
+            final UIPanel centerPanel = new UIPanel();
             centerPanel.setBackdrop(new EmptyBackdrop());
             centerPanel.setLayoutData(BorderLayoutData.CENTER);
 
             final UIComboBox combo = new UIComboBox(new DefaultComboBoxModel("White", "Black", "Red", "Green", "Blue",
                     "Yellow", "Magenta", "Cyan"));
-            combo.setLocalComponentWidth(100);
+            combo.setMinimumContentWidth(100);
             combo.addSelectionListener(new SelectionListener<UIComboBox>() {
                 @Override
                 public void selectionChanged(final UIComboBox component, final Object newValue) {
@@ -598,16 +591,11 @@ public class InteractUIExample extends ExampleBase {
             });
             centerPanel.add(combo);
 
-            popupFrame = new FloatingUIContainer();
-            popupFrame.getContentPanel().add(centerPanel);
-            popupFrame.getBasePanel().setBackdrop(new EmptyBackdrop());
-            popupFrame.getBasePanel().setBorder(null);
+            uiPanel = new UIPanel();
+            uiPanel.add(centerPanel);
+            uiPanel.pack();
 
-            popupFrame.updateMinimumSizeFromContents();
-            popupFrame.layout();
-            popupFrame.pack();
-
-            _handle = popupFrame;
+            _handle = uiPanel;
         }
 
         @Override
@@ -620,7 +608,7 @@ public class InteractUIExample extends ExampleBase {
             tempVec.zero();
             tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
             tempVec.setZ(0);
-            tempVec.subtractLocal(popupFrame.getContentWidth() / 2, -20, 0);
+            tempVec.subtractLocal(uiPanel.getContentWidth() / 2, -20, 0);
             _handle.setTranslation(tempVec);
             _handle.updateWorldTransform(true);
         }
@@ -630,14 +618,14 @@ public class InteractUIExample extends ExampleBase {
             super.receivedControl(manager);
             final Spatial spat = manager.getSpatialTarget();
             if (spat != null) {
-                hud.add(popupFrame);
+                hud.add(uiPanel);
             }
         }
 
         @Override
         public void lostControl(final InteractManager manager) {
             super.lostControl(manager);
-            hud.remove(popupFrame);
+            hud.remove(uiPanel);
         }
 
         @Override
@@ -657,9 +645,9 @@ public class InteractUIExample extends ExampleBase {
             if (manager.getActiveWidget() == this) {
                 final Spatial spat = manager.getSpatialTarget();
                 if (spat == null) {
-                    hud.remove(popupFrame);
+                    hud.remove(uiPanel);
                 } else {
-                    hud.add(popupFrame);
+                    hud.add(uiPanel);
                 }
             }
         }
@@ -667,7 +655,7 @@ public class InteractUIExample extends ExampleBase {
 
     class PulseControlUIWidget extends AbstractInteractWidget {
 
-        UIFrame popupFrame;
+        UIPanel uiPanel;
         Double unconsumedPulse;
 
         public PulseControlUIWidget(final IFilterList filterList) {
@@ -678,7 +666,7 @@ public class InteractUIExample extends ExampleBase {
 
         private void createFrame() {
 
-            final UIPanel centerPanel = new UIPanel(null);
+            final UIPanel centerPanel = new UIPanel();
             centerPanel.setBackdrop(new EmptyBackdrop());
             centerPanel.setLayoutData(BorderLayoutData.CENTER);
 
@@ -694,19 +682,14 @@ public class InteractUIExample extends ExampleBase {
                     }
                 }
             });
-            slider.setLocalComponentWidth(100);
+            slider.setMinimumContentWidth(100);
             centerPanel.add(slider);
 
-            popupFrame = new FloatingUIContainer();
-            popupFrame.getContentPanel().add(centerPanel);
-            popupFrame.getBasePanel().setBackdrop(new EmptyBackdrop());
-            popupFrame.getBasePanel().setBorder(null);
+            uiPanel = new UIPanel();
+            uiPanel.add(centerPanel);
+            uiPanel.pack();
 
-            popupFrame.updateMinimumSizeFromContents();
-            popupFrame.layout();
-            popupFrame.pack();
-
-            _handle = popupFrame;
+            _handle = uiPanel;
         }
 
         @Override
@@ -719,7 +702,7 @@ public class InteractUIExample extends ExampleBase {
             tempVec.zero();
             tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
             tempVec.setZ(0);
-            tempVec.subtractLocal(popupFrame.getContentWidth() / 2, -20, 0);
+            tempVec.subtractLocal(uiPanel.getContentWidth() / 2, -20, 0);
             _handle.setTranslation(tempVec);
             _handle.updateWorldTransform(true);
         }
@@ -729,14 +712,14 @@ public class InteractUIExample extends ExampleBase {
             super.receivedControl(manager);
             final Spatial spat = manager.getSpatialTarget();
             if (spat != null) {
-                hud.add(popupFrame);
+                hud.add(uiPanel);
             }
         }
 
         @Override
         public void lostControl(final InteractManager manager) {
             super.lostControl(manager);
-            hud.remove(popupFrame);
+            hud.remove(uiPanel);
         }
 
         @Override
@@ -756,9 +739,9 @@ public class InteractUIExample extends ExampleBase {
             if (manager.getActiveWidget() == this) {
                 final Spatial spat = manager.getSpatialTarget();
                 if (spat == null) {
-                    hud.remove(popupFrame);
+                    hud.remove(uiPanel);
                 } else {
-                    hud.add(popupFrame);
+                    hud.add(uiPanel);
                 }
             }
         }

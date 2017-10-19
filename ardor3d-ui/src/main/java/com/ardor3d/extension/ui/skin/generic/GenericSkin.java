@@ -314,8 +314,7 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         closeButton.refreshState();
-                        closeButton.updateMinimumSizeFromContents();
-                        closeButton.compact();
+                        closeButton.pack();
                         closeButton
                         .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                     }
@@ -335,8 +334,7 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         minimizeButton.refreshState();
-                        minimizeButton.updateMinimumSizeFromContents();
-                        minimizeButton.compact();
+                        minimizeButton.pack();
                         minimizeButton.setMaximumContentSize(minimizeButton.getContentWidth(),
                                 minimizeButton.getContentHeight());
                     }
@@ -356,8 +354,7 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         expandButton.refreshState();
-                        expandButton.updateMinimumSizeFromContents();
-                        expandButton.compact();
+                        expandButton.pack();
                         expandButton.setMaximumContentSize(expandButton.getContentWidth(),
                                 expandButton.getContentHeight());
                     }
@@ -377,8 +374,7 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         helpButton.refreshState();
-                        helpButton.updateMinimumSizeFromContents();
-                        helpButton.compact();
+                        helpButton.pack();
                         helpButton.setMaximumContentSize(helpButton.getContentWidth(), helpButton.getContentHeight());
                     }
                 }

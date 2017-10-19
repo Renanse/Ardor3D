@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -132,14 +132,13 @@ public class ColladaExample extends ExampleBase {
         _root.attachChild(t1);
         _root.getSceneHints().setCullHint(CullHint.Never);
 
-        hud = new UIHud();
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud = new UIHud(_canvas);
+        hud.setupInput(_physicalLayer, _logicalLayer);
         hud.setMouseManager(_mouseManager);
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5,
-                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5, hud.getHeight() - 5 - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -166,7 +165,7 @@ public class ColladaExample extends ExampleBase {
 
         final UICheckBox skinCheck = new UICheckBox("Show skin mesh");
         skinCheck
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, loadSceneButton, Alignment.BOTTOM_LEFT, 0, -5));
+        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, loadSceneButton, Alignment.BOTTOM_LEFT, 0, -5));
         skinCheck.setSelected(true);
         skinCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -198,8 +197,6 @@ public class ColladaExample extends ExampleBase {
         });
         basePanel.add(boneLabelCheck);
 
-        optionsFrame.updateMinimumSizeFromContents();
-        optionsFrame.layout();
         optionsFrame.pack();
 
         optionsFrame.setUseStandin(true);

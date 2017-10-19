@@ -19,8 +19,6 @@ import com.ardor3d.extension.ui.event.FrameDragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Rectangle2;
-import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -30,11 +28,6 @@ import com.ardor3d.util.GameTaskQueueManager;
  * resized. Frames can also have their opacity individually assigned which will affect all elements drawn within them.
  */
 public class UIFrame extends UIContainer {
-    /** Minimum height we'll allow during manual resize */
-    public static int MIN_FRAME_HEIGHT = 60;
-    /** Minimum width we'll allow during manual resize */
-    public static int MIN_FRAME_WIDTH = 100;
-
     /** The main panel containing the contents panel and status bar of the frame. */
     private final UIPanel _basePanel;
     /** The panel meant to hold the contents of the frame. */
@@ -238,39 +231,6 @@ public class UIFrame extends UIContainer {
     }
 
     /**
-     * Centers this frame on the location of the given component.
-     *
-     * @param comp
-     *            the component to center on.
-     */
-    public void setLocationRelativeTo(final UIComponent comp) {
-        final Rectangle2 rectA = comp.getRelativeComponentBounds(null);
-        final Rectangle2 rectB = getRelativeComponentBounds(null);
-        int x = (rectA.getWidth() - rectB.getWidth()) / 2;
-        int y = (rectA.getHeight() - rectB.getHeight()) / 2;
-        x += comp.getHudX() - rectA.getX() + rectB.getX();
-        y += comp.getHudY() - rectA.getY() + rectB.getY();
-        setHudXY(x, y);
-        updateGeometricState(0);
-    }
-
-    /**
-     * Centers this frame on the view of the camera
-     *
-     * @param cam
-     *            the camera to center on.
-     */
-    public void setLocationRelativeTo(final Camera cam) {
-        final Rectangle2 rectA = getRelativeComponentBounds(null);
-        int x = (cam.getWidth() - rectA.getWidth()) / 2;
-        int y = (cam.getHeight() - rectA.getHeight()) / 2;
-        x -= rectA.getX();
-        y -= rectA.getY();
-        setHudXY(x, y);
-        updateGeometricState(0);
-    }
-
-    /**
      * @return this frame's title bar
      */
     public UIFrameBar getTitleBar() {
@@ -352,26 +312,14 @@ public class UIFrame extends UIContainer {
         }
     }
 
-    /**
-     * Resize the frame to fit the minimum size of its content panel.
-     */
+    @Override
     public void pack() {
         updateMinimumSizeFromContents();
-        pack(_contentPanel.getMinimumLocalComponentWidth(), _contentPanel.getMinimumLocalComponentHeight());
-    }
-
-    /**
-     * Resize the frame to fit its content panel to the given dimensions
-     *
-     * @param contentWidth
-     *            our desired content panel width
-     * @param contentHeight
-     *            our desired content panel height
-     */
-    public void pack(final int contentWidth, final int contentHeight) {
         // grab the desired width and height of the frame.
-        final int width = contentWidth + _basePanel.getTotalLeft() + _basePanel.getTotalRight();
-        int height = contentHeight + _basePanel.getTotalTop() + _basePanel.getTotalBottom();
+        final int width = _contentPanel.getMinimumLocalComponentWidth() + _basePanel.getTotalLeft()
+                + _basePanel.getTotalRight();
+        int height = _contentPanel.getMinimumLocalComponentHeight() + _basePanel.getTotalTop()
+                + _basePanel.getTotalBottom();
 
         // add in our frame chrome, if it is enabled.
         if (isDecorated()) {
@@ -379,7 +327,7 @@ public class UIFrame extends UIContainer {
         }
 
         // Set our size, obeying min sizes.
-        setLocalComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
+        setLocalComponentSize(width, height);
 
         // Layout the panel
         layout();

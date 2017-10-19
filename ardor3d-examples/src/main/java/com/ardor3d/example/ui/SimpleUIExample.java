@@ -125,13 +125,10 @@ public class SimpleUIExample extends ExampleBase {
 
         frame = new UIFrame("UI Sample");
         frame.setContentPanel(pane);
-        frame.updateMinimumSizeFromContents();
-        frame.layout();
         frame.pack();
 
         frame.setUseStandin(true);
         frame.setOpacity(1f);
-        frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
 
         // Uncomment #1...
@@ -152,10 +149,12 @@ public class SimpleUIExample extends ExampleBase {
         // }
         // });
 
-        hud = new UIHud();
+        hud = new UIHud(_canvas);
         hud.add(frame);
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud.setupInput(_physicalLayer, _logicalLayer);
         hud.setMouseManager(_mouseManager);
+
+        frame.centerOn(hud);
     }
 
     private UIPanel makeLoginPanel() {

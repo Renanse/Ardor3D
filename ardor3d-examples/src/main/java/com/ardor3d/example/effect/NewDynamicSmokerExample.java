@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -236,8 +236,8 @@ public class NewDynamicSmokerExample extends ExampleBase {
 
     private void addUI() {
         // setup hud
-        hud = new UIHud();
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud = new UIHud(_canvas);
+        hud.setupInput(_physicalLayer, _logicalLayer);
         hud.setMouseManager(_mouseManager);
 
         final UIFrame frame = new UIFrame("Controls", EnumSet.noneOf(FrameButtons.class));
@@ -307,9 +307,8 @@ public class NewDynamicSmokerExample extends ExampleBase {
 
         frame.setContentPanel(panel);
         frame.pack();
-        final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        frame.setLocalXY(cam.getWidth() - frame.getLocalComponentWidth(),
-                cam.getHeight() - frame.getLocalComponentHeight());
+        frame.setLocalXY(hud.getWidth() - frame.getLocalComponentWidth(),
+                hud.getHeight() - frame.getLocalComponentHeight());
         hud.add(frame);
     }
 }

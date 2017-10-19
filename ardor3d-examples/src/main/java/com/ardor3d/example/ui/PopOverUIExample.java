@@ -38,7 +38,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -87,15 +86,14 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         setTexture("Logo");
         setSpin("Around Y");
 
-        hud = new UIHud();
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud = new UIHud(_canvas);
+        hud.setupInput(_physicalLayer, _logicalLayer);
         hud.setMouseManager(_mouseManager);
-        final Camera cam = _canvas.getCanvasRenderer().getCamera();
 
         final UIButton dropButton = new UIButton("Drop Menu");
         dropButton.setPadding(new Insets(6, 15, 6, 15));
-        dropButton.setHudXY(cam.getWidth() / 10 - dropButton.getLocalComponentWidth() / 2,
-                cam.getHeight() - dropButton.getLocalComponentHeight() - 5);
+        dropButton.setHudXY(hud.getWidth() / 10 - dropButton.getLocalComponentWidth() / 2,
+                hud.getHeight() - dropButton.getLocalComponentHeight() - 5);
         dropButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
@@ -106,12 +104,12 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
 
         final UIButton pieButton = new UIButton("Pie Menu");
         pieButton.setPadding(new Insets(6, 15, 6, 15));
-        pieButton.setHudXY(9 * cam.getWidth() / 10 - pieButton.getLocalComponentWidth() / 2, cam.getHeight()
+        pieButton.setHudXY(9 * hud.getWidth() / 10 - pieButton.getLocalComponentWidth() / 2, hud.getHeight()
                 - pieButton.getLocalComponentHeight() - 5);
         pieButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                showPieMenu(cam.getWidth() / 2, cam.getHeight() / 2);
+                showPieMenu(hud.getWidth() / 2, hud.getHeight() / 2);
             }
         });
         hud.add(pieButton);
@@ -290,7 +288,10 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         final UIFrame scaleDialog = new UIFrame("Set Scale...", EnumSet.of(FrameButtons.CLOSE));
         scaleDialog.setResizeable(false);
         final UIPanel contentPanel = scaleDialog.getContentPanel();
-        contentPanel.setLayout(new RowLayout(true, false, false));
+        final RowLayout layout = new RowLayout(true, false, false);
+        layout.setSpacing(4);
+        contentPanel.setLayout(layout);
+        contentPanel.setMargin(new Insets(0, 5, 0, 5));
 
         final UISlider scaleSlider = new UISlider(Orientation.Horizontal, 1, 20, (int) (box.getScale().getX() * 10));
         scaleSlider.setMinimumContentWidth(200);
@@ -311,7 +312,7 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         });
 
         hud.add(scaleDialog);
-        scaleDialog.pack(235, 80);
+        scaleDialog.pack();
         scaleDialog.centerOn(hud);
     }
 

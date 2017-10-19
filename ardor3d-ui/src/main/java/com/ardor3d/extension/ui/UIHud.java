@@ -36,7 +36,6 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -121,11 +120,14 @@ public class UIHud extends Node {
      */
     private final List<IPopOver> _popovers = Lists.newArrayList();
 
+    private final Canvas _canvas;
+
     /**
-     * Construct a new UIHud
+     * Construct a new UIHud for a given canvas
      */
-    public UIHud() {
+    public UIHud(final Canvas canvas) {
         setName("UIHud");
+        _canvas = canvas;
 
         getSceneHints().setCullHint(CullHint.Never);
         getSceneHints().setRenderBucketType(RenderBucketType.Skip);
@@ -483,9 +485,9 @@ public class UIHud extends Node {
      * @param forwardTo
      *            a LogicalLayer to send unconsumed (by the UI) input events to.
      */
-    public void setupInput(final Canvas canvas, final PhysicalLayer physicalLayer, final LogicalLayer forwardTo) {
+    public void setupInput(final PhysicalLayer physicalLayer, final LogicalLayer forwardTo) {
         // Set up this logical layer to listen for events from the given canvas and PhysicalLayer
-        _logicalLayer.registerInput(canvas, physicalLayer);
+        _logicalLayer.registerInput(_canvas, physicalLayer);
 
         // Set up forwarding for events not consumed.
         if (forwardTo != null) {
@@ -604,7 +606,6 @@ public class UIHud extends Node {
             final MouseState previousMState = inputStates.getPrevious().getMouseState();
             final MouseState currentMState = current.getMouseState();
             if (previousMState != currentMState) {
-
                 // Check for presses.
                 if (currentMState.hasButtonState(ButtonState.DOWN)) {
                     final EnumSet<MouseButton> pressed = currentMState.getButtonsPressedSince(previousMState);
@@ -842,21 +843,11 @@ public class UIHud extends Node {
     }
 
     public int getWidth() {
-        final Camera cam = Camera.getCurrentCamera();
-        if (cam != null) {
-            return cam.getWidth();
-        } else {
-            return 1;
-        }
+        return _canvas.getCanvasRenderer().getCamera().getWidth();
     }
 
     public int getHeight() {
-        final Camera cam = Camera.getCurrentCamera();
-        if (cam != null) {
-            return cam.getHeight();
-        } else {
-            return 1;
-        }
+        return _canvas.getCanvasRenderer().getCamera().getHeight();
     }
 
     public void closePopupMenus() {

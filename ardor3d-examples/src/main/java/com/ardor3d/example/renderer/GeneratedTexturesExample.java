@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -144,8 +144,8 @@ public class GeneratedTexturesExample extends ExampleBase {
         padding = wside / 10;
 
         // Set up hud
-        hud = new UIHud();
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud = new UIHud(_canvas);
+        hud.setupInput(_physicalLayer, _logicalLayer);
 
         // Set up the frames
         for (int i = 0; i < views.length; i++) {
@@ -246,8 +246,7 @@ public class GeneratedTexturesExample extends ExampleBase {
             zoomed = null;
         }
 
-        final int endY = 0, endX = (_canvas.getCanvasRenderer().getCamera().getWidth() - _canvas.getCanvasRenderer()
-                .getCamera().getHeight()) / 2;
+        final int endY = 0, endX = (hud.getWidth() - hud.getHeight()) / 2;
 
         // add an animator to do the zoom
         uiPanel.addController(new SpatialController<UIPanel>() {
@@ -270,12 +269,12 @@ public class GeneratedTexturesExample extends ExampleBase {
 
                 // use an scurve to smoothly zoom
                 final float sCurve = MathUtils.scurve5(ratio);
-                final float size = sCurve * (_canvas.getCanvasRenderer().getCamera().getHeight() - hside) + hside;
+                final float size = sCurve * (hud.getHeight() - hside) + hside;
                 parent.setLocalComponentSize((int) (size * hside / wside), (int) size);
 
                 // use an scurve to smoothly shift origin
-                parent.setHudXY(Math.round(MathUtils.lerp(sCurve, originX, endX)), Math.round(MathUtils.lerp(sCurve,
-                        originY, endY)));
+                parent.setHudXY(Math.round(MathUtils.lerp(sCurve, originX, endX)),
+                        Math.round(MathUtils.lerp(sCurve, originY, endY)));
 
                 parent.layout();
             }
@@ -414,8 +413,8 @@ public class GeneratedTexturesExample extends ExampleBase {
         final Function3D combinedWood = Functions.add(baseWood, woodGrain);
         final Function3D perturbedWood = new TurbulenceFunction3D(combinedWood, 1 / 256.0, 4, 4.0);
         final Function3D translatedWood = Functions.translateInput(perturbedWood, 0, 0, 1.5);
-        final Function3D rotatedWood = Functions.rotateInput(translatedWood, new Matrix3().fromAngles(
-                MathUtils.DEG_TO_RAD * 6, 0, 0));
+        final Function3D rotatedWood = Functions.rotateInput(translatedWood,
+                new Matrix3().fromAngles(MathUtils.DEG_TO_RAD * 6, 0, 0));
         final Function3D finalWood = new TurbulenceFunction3D(rotatedWood, 1 / 512.0, 2, 2.0);
 
         final ReadOnlyColorRGBA[] woodColors = new ReadOnlyColorRGBA[256];
@@ -442,8 +441,8 @@ public class GeneratedTexturesExample extends ExampleBase {
         // Build up our function
         final Function3D primaryJade = new RidgeFunction3D(Functions.simplexNoise(), 6, 2.0, 2.207);
         final Function3D baseSecondaryJade = new CylinderFunction3D(2);
-        final Function3D rotatedBaseSecondaryJade = Functions.rotateInput(baseSecondaryJade, new Matrix3().fromAngles(
-                0, MathUtils.DEG_TO_RAD * 65, MathUtils.DEG_TO_RAD * 85));
+        final Function3D rotatedBaseSecondaryJade = Functions.rotateInput(baseSecondaryJade,
+                new Matrix3().fromAngles(0, MathUtils.DEG_TO_RAD * 65, MathUtils.DEG_TO_RAD * 85));
         final Function3D perturbedBaseSecondaryJade = new TurbulenceFunction3D(rotatedBaseSecondaryJade, 1.0 / 4.0, 4,
                 4.0);
         final Function3D secondaryJade = Functions.scaleBias(perturbedBaseSecondaryJade, .25, 0);

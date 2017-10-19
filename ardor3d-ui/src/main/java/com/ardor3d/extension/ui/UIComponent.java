@@ -417,11 +417,13 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     }
 
     protected int getMaximumContentWidth() {
-        return _maximumContentsSize.getWidth() > 0 ? _maximumContentsSize.getWidth() : UIComponent.DEFAULT_MAX_CONTENT_SIZE;
+        return _maximumContentsSize.getWidth() > 0 ? _maximumContentsSize.getWidth()
+                : UIComponent.DEFAULT_MAX_CONTENT_SIZE;
     }
 
     protected int getMaximumContentHeight() {
-        return _maximumContentsSize.getHeight() > 0 ? _maximumContentsSize.getHeight() : UIComponent.DEFAULT_MAX_CONTENT_SIZE;
+        return _maximumContentsSize.getHeight() > 0 ? _maximumContentsSize.getHeight()
+                : UIComponent.DEFAULT_MAX_CONTENT_SIZE;
     }
 
     /**
@@ -621,6 +623,15 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      */
     public void compact() {
         setContentSize(getMinimumContentWidth(), getMinimumContentHeight());
+    }
+
+    /**
+     * Resize the container to fit the minimum size of its content panel.
+     */
+    public void pack() {
+        updateMinimumSizeFromContents();
+        setContentSize(getMinimumContentWidth(), getMinimumContentHeight());
+        layout();
     }
 
     /**
@@ -850,18 +861,35 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      */
     public void detachedFromHud() {}
 
+    /**
+     * Centers this frame on the view of the camera
+     *
+     * @param cam
+     *            the camera to center on.
+     */
     public void centerOn(final UIHud hud) {
-        final int centerX = hud.getWidth() / 2;
-        final int centerY = hud.getHeight() / 2;
-
-        setHudXY(centerX - getLocalComponentWidth() / 2, centerY - getLocalComponentHeight() / 2);
+        final Rectangle2 rectA = getRelativeComponentBounds(null);
+        int x = (hud.getWidth() - rectA.getWidth()) / 2;
+        int y = (hud.getHeight() - rectA.getHeight()) / 2;
+        x -= rectA.getX();
+        y -= rectA.getY();
+        setHudXY(x, y);
     }
 
+    /**
+     * Centers this component on the location of the given component.
+     *
+     * @param comp
+     *            the component to center on.
+     */
     public void centerOn(final UIComponent comp) {
-        final int centerX = comp.getHudX() + comp.getLocalComponentWidth() / 2;
-        final int centerY = comp.getHudY() + comp.getLocalComponentHeight() / 2;
-
-        setHudXY(centerX - getLocalComponentWidth() / 2, centerY - getLocalComponentHeight() / 2);
+        final Rectangle2 rectA = comp.getRelativeComponentBounds(null);
+        final Rectangle2 rectB = getRelativeComponentBounds(null);
+        int x = (rectA.getWidth() - rectB.getWidth()) / 2;
+        int y = (rectA.getHeight() - rectB.getHeight()) / 2;
+        x += comp.getHudX() - rectA.getX() + rectB.getX();
+        y += comp.getHudY() - rectA.getY() + rectB.getY();
+        setHudXY(x, y);
     }
 
     /**
@@ -1397,10 +1425,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
 
                     // set contents and size
                     ttip.getLabel().setText(getTooltipText());
-                    ttip.updateMinimumSizeFromContents();
-                    ttip.getLabel().compact();
-                    ttip.compact();
-                    ttip.layout();
+                    ttip.pack();
 
                     // set position based on CURRENT mouse location.
                     int x = hud.getLastMouseX();

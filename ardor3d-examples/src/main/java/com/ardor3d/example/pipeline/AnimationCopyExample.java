@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -145,24 +145,23 @@ public class AnimationCopyExample extends ExampleBase {
     }
 
     private void createHUD() {
-        hud = new UIHud();
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud = new UIHud(_canvas);
+        hud.setupInput(_physicalLayer, _logicalLayer);
         hud.setMouseManager(_mouseManager);
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5,
-                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5, hud.getHeight() - 5 - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
         final UIFrame optionsFrame = new UIFrame("Controls", EnumSet.noneOf(FrameButtons.class));
 
-        final UIPanel basePanel = optionsFrame.getContentPanel();
-        basePanel.setLayout(new AnchorLayout());
+        final UIPanel panel = optionsFrame.getContentPanel();
+        panel.setLayout(new AnchorLayout());
 
         runWalkButton = new UIButton("Start running...");
-        runWalkButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, basePanel, Alignment.TOP_LEFT, 5, -5));
+        runWalkButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, panel, Alignment.TOP_LEFT, 5, -5));
         runWalkButton.addActionListener(new ActionListener() {
             boolean walk = true;
 
@@ -180,7 +179,7 @@ public class AnimationCopyExample extends ExampleBase {
                 }
             }
         });
-        basePanel.add(runWalkButton);
+        panel.add(runWalkButton);
 
         punchButton = new UIButton("PUNCH!");
         punchButton
@@ -191,7 +190,7 @@ public class AnimationCopyExample extends ExampleBase {
                 punchButton.setEnabled(false);
             }
         });
-        basePanel.add(punchButton);
+        panel.add(punchButton);
 
         headCheck = new UICheckBox("Procedurally turn head");
         headCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, punchButton, Alignment.BOTTOM_LEFT, 0, -5));
@@ -202,7 +201,7 @@ public class AnimationCopyExample extends ExampleBase {
                 manager.getValuesStore().put("head_blend", headCheck.isSelected() ? 1.0 : 0.0);
             }
         });
-        basePanel.add(headCheck);
+        panel.add(headCheck);
 
         final UICheckBox gpuSkinningCheck = new UICheckBox("Use GPU skinning");
         gpuSkinningCheck
@@ -228,7 +227,7 @@ public class AnimationCopyExample extends ExampleBase {
                 }, true);
             }
         });
-        basePanel.add(gpuSkinningCheck);
+        panel.add(gpuSkinningCheck);
 
         final UICheckBox vboCheck = new UICheckBox("Use VBO");
         vboCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
@@ -239,7 +238,7 @@ public class AnimationCopyExample extends ExampleBase {
                 gpuShader.setUseAttributeVBO(vboCheck.isSelected());
             }
         });
-        basePanel.add(vboCheck);
+        panel.add(vboCheck);
 
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
@@ -252,7 +251,7 @@ public class AnimationCopyExample extends ExampleBase {
                 boneLabelCheck.setEnabled(showSkeleton);
             }
         });
-        basePanel.add(skeletonCheck);
+        panel.add(skeletonCheck);
 
         boneLabelCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skeletonCheck, Alignment.BOTTOM_LEFT, 0,
                 -5));
@@ -264,10 +263,8 @@ public class AnimationCopyExample extends ExampleBase {
                 showJointLabels = boneLabelCheck.isSelected();
             }
         });
-        basePanel.add(boneLabelCheck);
+        panel.add(boneLabelCheck);
 
-        optionsFrame.updateMinimumSizeFromContents();
-        optionsFrame.layout();
         optionsFrame.pack();
 
         optionsFrame.setUseStandin(true);

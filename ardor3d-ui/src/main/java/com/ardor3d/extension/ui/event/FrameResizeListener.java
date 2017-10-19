@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -65,10 +65,6 @@ public final class FrameResizeListener implements DragListener {
 
         // Set the new width to the initial width + the change in mouse x position.
         int newWidth = _initialLocalComponentWidth + x - _initialX;
-        if (newWidth < UIFrame.MIN_FRAME_WIDTH) {
-            // don't let us get smaller than min size
-            newWidth = UIFrame.MIN_FRAME_WIDTH;
-        }
         if (newWidth < frame.getMinimumLocalComponentWidth()) {
             // don't let us get smaller than frame min size
             newWidth = frame.getMinimumLocalComponentWidth();
@@ -80,10 +76,6 @@ public final class FrameResizeListener implements DragListener {
 
         // Set the new height to the initial height + the change in mouse y position.
         int newHeight = _initialLocalComponentHeight - (y - _initialY);
-        if (newHeight < UIFrame.MIN_FRAME_HEIGHT) {
-            // don't let us get smaller than absolute min size
-            newHeight = UIFrame.MIN_FRAME_HEIGHT;
-        }
         if (newHeight < frame.getMinimumLocalComponentHeight()) {
             // don't let us get smaller than frame min size
             newHeight = frame.getMinimumLocalComponentHeight();

@@ -52,13 +52,10 @@ public class RotatingUIExample extends ExampleBase {
 
         final UIFrame frame = new UIFrame("Sample");
         frame.setContentPanel(panel);
-        frame.updateMinimumSizeFromContents();
-        frame.layout();
-        frame.pack(300, 200);
+        frame.pack();
 
         frame.setUseStandin(false);
         frame.setOpacity(1f);
-        frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
 
         final Matrix3 rotate = new Matrix3();
@@ -66,11 +63,11 @@ public class RotatingUIExample extends ExampleBase {
         rotate.fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, axis);
         frame.setRotation(rotate);
 
-        hud = new UIHud();
+        hud = new UIHud(_canvas);
         hud.add(frame);
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud.setupInput(_physicalLayer, _logicalLayer);
 
-        frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
+        frame.centerOn(hud);
     }
 
     private UIPanel makePanel() {
@@ -104,6 +101,8 @@ public class RotatingUIExample extends ExampleBase {
             }
         });
         rotatingLabel.setLayoutData(BorderLayoutData.NORTH);
+
+        panel.setMinimumContentSize(300, 200);
 
         return panel;
     }
