@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -171,7 +171,7 @@ public enum TextFactory {
 
                 // check max height is valid
                 if (maxLineHeight == 0) {
-                    maxLineHeight = (int) Math.round(scale * font.getFontHeight());
+                    maxLineHeight = (int) Math.round(scale * font.getFontSize());
                 }
 
                 // add current max height to heights
@@ -229,14 +229,14 @@ public enum TextFactory {
             }
 
             // check against max line height
-            maxLineHeight = Math.max((int) Math.round(scale * font.getFontHeight()), maxLineHeight);
+            maxLineHeight = Math.max((int) Math.round(scale * font.getFontSize()), maxLineHeight);
 
             // add a pointer to it for the associated texture
             descIndices.put(font.getFontTexture(), descs.size() - 1);
 
             // store our xOffset and line height
             descXStarts.add(xOffset);
-            fontHeights.add((int) Math.round(scale * font.getFontHeight()));
+            fontHeights.add((int) Math.round(scale * font.getFontSize()));
 
             // move forward for next char
             xOffset += (int) Math.round(scale * desc.getXAdvance());
