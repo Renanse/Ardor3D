@@ -1,3 +1,6 @@
+// load our helper functions first...
+try{ load("nashorn:mozilla_compat.js"); } catch(e){}
+
 importPackage(Packages.com.ardor3d.extension.animation.skeletal);
 importPackage(Packages.com.ardor3d.extension.animation.skeletal.blendtree);
 importPackage(Packages.com.ardor3d.extension.animation.skeletal.clip);
