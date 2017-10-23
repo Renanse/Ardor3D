@@ -52,6 +52,7 @@ import com.google.common.collect.Lists;
  * are handled through this class.
  */
 public class UIHud extends Node {
+
     private static final Logger _logger = Logger.getLogger(UIHud.class.getName());
 
     public static int MOUSE_CLICK_SENSITIVITY = 5;
@@ -121,6 +122,10 @@ public class UIHud extends Node {
     private final List<IPopOver> _popovers = Lists.newArrayList();
 
     private final Canvas _canvas;
+
+    private UIInputPostHook _postKeyboardHook;
+
+    private UIInputPostHook _postMouseHook;
 
     /**
      * Construct a new UIHud for a given canvas
@@ -585,6 +590,13 @@ public class UIHud extends Node {
             }
         }
 
+        // Post hook, if we have one
+        {
+            if (_postKeyboardHook != null) {
+                consumed |= _postKeyboardHook.process(consumed, this, inputStates);
+            }
+        }
+
         return consumed;
 
     }
@@ -634,6 +646,13 @@ public class UIHud extends Node {
                 // Check for wheel change
                 if (currentMState.getDwheel() != 0) {
                     consumed |= fireMouseWheelMoved(currentMState.getDwheel(), current);
+                }
+            }
+
+            // Post hook, if we have one
+            {
+                if (_postMouseHook != null) {
+                    consumed |= _postMouseHook.process(consumed, this, inputStates);
                 }
             }
         }
@@ -887,5 +906,29 @@ public class UIHud extends Node {
         _popovers.remove(pop);
         _popovers.add(pop);
         pop.setHud(this);
+    }
+
+    public UIInputPostHook getPostKeyboardHook() {
+        return _postKeyboardHook;
+    }
+
+    public void setPostKeyboardHook(final UIInputPostHook postKeyboardHook) {
+        _postKeyboardHook = postKeyboardHook;
+    }
+
+    public UIInputPostHook getPostMouseHook() {
+        return _postMouseHook;
+    }
+
+    public void setPostMouseHook(final UIInputPostHook postMouseHook) {
+        _postMouseHook = postMouseHook;
+    }
+
+    public Canvas getCanvas() {
+        return _canvas;
+    }
+
+    public interface UIInputPostHook {
+        boolean process(boolean consumed, UIHud source, TwoInputStates inputStates);
     }
 }
