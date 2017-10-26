@@ -157,9 +157,8 @@ public class UIPieMenu extends UIPopupMenu implements IPopOver {
 
         double r = MathUtils.HALF_PI - Math.atan2(vec.getY(), vec.getX()) - _startAngle;
 
-        if (r < 0) {
-            r += MathUtils.TWO_PI;
-        }
+        // move into range [0, 2pi]
+        r = (r % MathUtils.TWO_PI + MathUtils.TWO_PI) % MathUtils.TWO_PI;
 
         int index = (int) (r / _sliceRadians);
         for (int i = 0; i < getNumberOfChildren(); i++) {

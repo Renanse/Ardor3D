@@ -503,6 +503,8 @@ public class UIHud extends Node {
                         final TwoInputStates states, final double tpf) {
                     super.checkAndPerformTriggers(triggers, source, states, tpf);
 
+                    final InputState prev = states.getPrevious();
+                    final InputState curr = states.getCurrent();
                     if (!_mouseInputConsumed) {
                         if (!_keyInputConsumed) {
                             // nothing consumed
@@ -510,18 +512,18 @@ public class UIHud extends Node {
                                     .checkAndPerformTriggers(forwardTo.getTriggers(), source, states, tpf);
                         } else {
                             // only key state consumed
-                            final TwoInputStates forwardingState = new TwoInputStates(states.getPrevious(),
-                                    new InputState(KeyboardState.NOTHING, states.getCurrent().getMouseState(), states
-                                            .getCurrent().getControllerState()));
+                            final TwoInputStates forwardingState = new TwoInputStates(
+                                    new InputState(KeyboardState.NOTHING, prev.getMouseState(), prev.getControllerState()),
+                                    new InputState(KeyboardState.NOTHING, curr.getMouseState(), curr.getControllerState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         }
                     } else {
                         if (!_keyInputConsumed) {
                             // only mouse consumed
-                            final TwoInputStates forwardingState = new TwoInputStates(states.getPrevious(),
-                                    new InputState(states.getCurrent().getKeyboardState(), MouseState.NOTHING, states
-                                            .getCurrent().getControllerState()));
+                            final TwoInputStates forwardingState = new TwoInputStates(
+                                    new InputState(prev.getKeyboardState(), MouseState.NOTHING, prev.getControllerState()),
+                                    new InputState(curr.getKeyboardState(), MouseState.NOTHING, curr.getControllerState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         } else {
