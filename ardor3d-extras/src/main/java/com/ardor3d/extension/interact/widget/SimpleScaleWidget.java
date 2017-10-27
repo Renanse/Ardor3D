@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -85,11 +85,11 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
     @Override
     public void targetDataUpdated(final InteractManager manager) {
         final Spatial target = manager.getSpatialTarget();
-        if (target == null) {
-            _handle.setScale(1.0);
-        } else {
-            _handle.setScale(Math.max(SimpleScaleWidget.MIN_SCALE, target.getWorldBound().getRadius()));
+        if (target != null) {
+            target.updateGeometricState(0);
         }
+
+        _handle.setScale(calculateHandleScale(manager));
     }
 
     @Override

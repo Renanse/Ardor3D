@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -98,11 +98,6 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
         if (_dragging) {
             endDrag(manager);
         }
-        final Spatial target = manager.getSpatialTarget();
-        if (target != null) {
-            _handle.setScale(Math.max(MoveMultiPlanarWidget.MIN_SCALE, target.getWorldBound().getRadius()
-                    + target.getWorldTranslation().subtract(target.getWorldBound().getCenter(), _calcVec3A).length()));
-        }
         targetDataUpdated(manager);
     }
 
@@ -110,10 +105,8 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
     public void targetDataUpdated(final InteractManager manager) {
         final Spatial target = manager.getSpatialTarget();
         if (target == null) {
-            _handle.setScale(1.0);
             _handle.setRotation(Matrix3.IDENTITY);
         } else {
-            // update scale of widget using bounding radius
             target.updateGeometricState(0);
 
             // update arrow rotations from target
@@ -123,6 +116,8 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
                 _handle.setRotation(Matrix3.IDENTITY);
             }
         }
+
+        _handle.setScale(calculateHandleScale(manager));
     }
 
     @Override

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -68,7 +68,7 @@ public class RotateWidget extends AbstractInteractWidget {
 
     /**
      * Call this after creating the rings you want to use.
-     * 
+     *
      * @param texture
      * @return
      */
@@ -173,10 +173,8 @@ public class RotateWidget extends AbstractInteractWidget {
     public void targetDataUpdated(final InteractManager manager) {
         final Spatial target = manager.getSpatialTarget();
         if (target == null) {
-            _handle.setScale(1.0);
             setRingRotations(Matrix3.IDENTITY);
         } else {
-            // update scale of widget using bounding radius
             target.updateGeometricState(0);
 
             // update ring rotations from target
@@ -189,6 +187,8 @@ public class RotateWidget extends AbstractInteractWidget {
                 }
             }
         }
+
+        _handle.setScale(calculateHandleScale(manager));
     }
 
     @Override

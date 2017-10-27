@@ -136,11 +136,6 @@ public class MoveWidget extends AbstractInteractWidget {
         if (_dragging) {
             endDrag(manager);
         }
-        final Spatial target = manager.getSpatialTarget();
-        if (target != null) {
-            _handle.setScale(Math.max(MoveWidget.MIN_SCALE, target.getWorldBound().getRadius()
-                    + target.getWorldTranslation().subtract(target.getWorldBound().getCenter(), _calcVec3A).length()));
-        }
         targetDataUpdated(manager);
     }
 
@@ -148,13 +143,8 @@ public class MoveWidget extends AbstractInteractWidget {
     public void targetDataUpdated(final InteractManager manager) {
         final Spatial target = manager.getSpatialTarget();
         if (target == null) {
-            _handle.setScale(1.0);
             _handle.setRotation(Matrix3.IDENTITY);
         } else {
-            _handle.setScale(Math.max(MoveWidget.MIN_SCALE, target.getWorldBound().getRadius()
-                    + target.getWorldTranslation().subtract(target.getWorldBound().getCenter(), _calcVec3A).length()));
-
-            // update scale of widget using bounding radius
             target.updateGeometricState(0);
 
             // update arrow rotations from target
@@ -164,6 +154,8 @@ public class MoveWidget extends AbstractInteractWidget {
                 _handle.setRotation(Matrix3.IDENTITY);
             }
         }
+
+        _handle.setScale(calculateHandleScale(manager));
     }
 
     @Override

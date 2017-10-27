@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,7 @@ package com.ardor3d.extension.interact.widget;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.UpdateFilter;
 import com.ardor3d.framework.Canvas;
@@ -22,9 +23,11 @@ import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.ReadOnlyTimer;
 
 public abstract class AbstractInteractWidget {
@@ -57,7 +60,7 @@ public abstract class AbstractInteractWidget {
     /**
      * Use the given inputstates to determine if and how to activate this widget. If the widget uses the given input,
      * inputConsumed should be set to "true" and applyFilters should be called by this method.
-     * 
+     *
      * @param source
      *            the canvas that is our input source.
      * @param inputStates
@@ -88,6 +91,18 @@ public abstract class AbstractInteractWidget {
 
     public void update(final ReadOnlyTimer timer, final InteractManager manager) {
         _handle.updateGeometricState(timer.getTimePerFrame());
+    }
+
+    protected double calculateHandleScale(final InteractManager manager) {
+        final Spatial target = manager.getSpatialTarget();
+        if (target != null && target.getWorldBound() != null) {
+            final BoundingVolume bound = target.getWorldBound();
+            final ReadOnlyVector3 trans = target.getWorldTranslation();
+            return Math.max(MoveWidget.MIN_SCALE, bound.getRadius()
+                    + trans.subtract(bound.getCenter(), _calcVec3A).length());
+        }
+
+        return 1.0;
     }
 
     public void render(final Renderer renderer, final InteractManager manager) { /**/}
