@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
@@ -34,7 +33,9 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Arrow;
 
 public class SimpleScaleWidget extends AbstractInteractWidget {
-    public static double MIN_SCALE = 0.000001;
+
+    public static double DEFAULT_SCALE = 1.0;
+    public static double MOUSEOVER_SCALE = 1.1;
 
     protected ReadOnlyVector3 _arrowDirection;
 
@@ -75,14 +76,6 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
     }
 
     @Override
-    public void targetChanged(final InteractManager manager) {
-        if (_dragging) {
-            endDrag(manager);
-        }
-        targetDataUpdated(manager);
-    }
-
-    @Override
     public void targetDataUpdated(final InteractManager manager) {
         final Spatial target = manager.getSpatialTarget();
         if (target != null) {
@@ -90,6 +83,12 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
         }
 
         _handle.setScale(calculateHandleScale(manager));
+    }
+
+    @Override
+    protected double calculateHandleScale(final InteractManager manager) {
+        return super.calculateHandleScale(manager)
+                * (_mouseOver ? SimpleScaleWidget.MOUSEOVER_SCALE : SimpleScaleWidget.DEFAULT_SCALE);
     }
 
     @Override
@@ -108,47 +107,21 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
     @Override
     public void processInput(final Canvas source, final TwoInputStates inputStates, final AtomicBoolean inputConsumed,
             final InteractManager manager) {
-        // Make sure we have something to modify
-        if (manager.getSpatialTarget() == null) {
-            return;
-        }
-
-        // Make sure we are dragging.
-        final MouseState current = inputStates.getCurrent().getMouseState();
-        final MouseState previous = inputStates.getPrevious().getMouseState();
-        if (current.getButtonState(_dragButton) != ButtonState.DOWN) {
-            if (_dragging) {
-                endDrag(manager);
-            }
-            return;
-        }
-        // if we're already dragging, make sure we only act on drags that started with a positive pick.
-        else if (!current.getButtonsPressedSince(previous).contains(_dragButton) && !_dragging) {
-            return;
-        }
 
         final Camera camera = source.getCanvasRenderer().getCamera();
-        final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
-        // Make sure we are dragging over the arrow
-        if (!_dragging) {
-            findPick(oldMouse, camera);
-            final Vector3 lastPick = getLastPick();
-            if (lastPick == null) {
-                return;
-            } else {
-                beginDrag(manager);
-            }
-        }
+        final MouseState current = inputStates.getCurrent().getMouseState();
+        final MouseState previous = inputStates.getPrevious().getMouseState();
 
-        // we've established that our mouse is being held down, and started over our arrow. So consume.
-        inputConsumed.set(true);
+        // first process mouse over state
+        checkMouseOver(camera, current, manager);
 
-        // check if we've moved at all
-        if (current == previous || current.getDx() == 0 && current.getDy() == 0) {
+        // Now check drag status
+        if (!checkShouldDrag(camera, current, previous, inputConsumed, manager)) {
             return;
         }
 
         // act on drag
+        final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
         final double scale = getNewScale(oldMouse, current, camera, manager);
 
         // Set new scale on spatial state
