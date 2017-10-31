@@ -88,7 +88,7 @@ public abstract class AbstractInteractWidget {
         _filters.applyFilters(manager);
     }
 
-    protected void checkMouseOver(final Camera camera, final MouseState current, final InteractManager manager) {
+    public void checkMouseOver(final Camera camera, final MouseState current, final InteractManager manager) {
         // If we are dragging, we're in mouseOver state.
         if (_dragging) {
             if (!_mouseOver) {
@@ -131,7 +131,7 @@ public abstract class AbstractInteractWidget {
         targetDataUpdated(manager);
     }
 
-    protected boolean checkShouldDrag(final Camera camera, final MouseState current, final MouseState previous,
+    public boolean checkShouldDrag(final Camera camera, final MouseState current, final MouseState previous,
             final AtomicBoolean inputConsumed, final InteractManager manager) {
         // Make sure we have something to modify
         if (manager.getSpatialTarget() == null) {
