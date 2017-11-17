@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -54,6 +54,7 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.swt.SwtFocusWrapper;
+import com.ardor3d.input.swt.SwtGestureWrapper;
 import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
@@ -222,9 +223,11 @@ public class LwjglSwtExample {
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
         final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas1);
         final SwtMouseManager mouseManager = new SwtMouseManager(canvas1);
+        final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas1);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
-        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);
+        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, gestureWrapper,
+                focusWrapper);
 
         logicalLayer.registerInput(canvas1, pl);
 

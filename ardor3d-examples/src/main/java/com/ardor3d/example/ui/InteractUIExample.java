@@ -18,7 +18,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
-import com.ardor3d.extension.interact.InteractManager.UpdateLogic;
 import com.ardor3d.extension.interact.data.SpatialState;
 import com.ardor3d.extension.interact.filter.PlaneBoundaryFilter;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
@@ -133,13 +132,13 @@ public class InteractUIExample extends ExampleBase {
         // create a few way-markers to start things off
         initPath();
 
-        manager.addUpdateLogic(new UpdateLogic() {
-
-            @Override
-            public void update(final double time, final InteractManager manager) {
-                manager.fireTargetDataUpdated();
-            }
-        });
+        // manager.addUpdateLogic(new UpdateLogic() {
+        //
+        // @Override
+        // public void update(final double time, final InteractManager manager) {
+        // manager.fireTargetDataUpdated();
+        // }
+        // });
 
         // disable auto-repeat in jogl, if we're using that, so that spacebar can be held down
         if (_physicalLayer.getKeyboardWrapper() instanceof JoglNewtKeyboardWrapper) {

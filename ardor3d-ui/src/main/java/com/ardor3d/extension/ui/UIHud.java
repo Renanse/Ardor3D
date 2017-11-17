@@ -509,21 +509,23 @@ public class UIHud extends Node {
                         if (!_keyInputConsumed) {
                             // nothing consumed
                             forwardTo.getApplier()
-                                    .checkAndPerformTriggers(forwardTo.getTriggers(), source, states, tpf);
+                            .checkAndPerformTriggers(forwardTo.getTriggers(), source, states, tpf);
                         } else {
                             // only key state consumed
-                            final TwoInputStates forwardingState = new TwoInputStates(
-                                    new InputState(KeyboardState.NOTHING, prev.getMouseState(), prev.getControllerState()),
-                                    new InputState(KeyboardState.NOTHING, curr.getMouseState(), curr.getControllerState()));
+                            final TwoInputStates forwardingState = new TwoInputStates(new InputState(
+                                    KeyboardState.NOTHING, prev.getMouseState(), prev.getControllerState(), prev
+                                            .getGestureState()), new InputState(KeyboardState.NOTHING, curr
+                                    .getMouseState(), curr.getControllerState(), prev.getGestureState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         }
                     } else {
                         if (!_keyInputConsumed) {
                             // only mouse consumed
-                            final TwoInputStates forwardingState = new TwoInputStates(
-                                    new InputState(prev.getKeyboardState(), MouseState.NOTHING, prev.getControllerState()),
-                                    new InputState(curr.getKeyboardState(), MouseState.NOTHING, curr.getControllerState()));
+                            final TwoInputStates forwardingState = new TwoInputStates(new InputState(prev
+                                    .getKeyboardState(), MouseState.NOTHING, prev.getControllerState(), prev
+                                    .getGestureState()), new InputState(curr.getKeyboardState(), MouseState.NOTHING,
+                                    curr.getControllerState(), prev.getGestureState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         } else {
