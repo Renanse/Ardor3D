@@ -59,9 +59,11 @@ import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.google.common.base.Predicate;
 
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
@@ -79,6 +81,12 @@ public class LwjglSwtExample {
     private static int i = 0;
 
     public static void main(final String[] args) {
+        try {
+            SharedLibraryLoader.load(true);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
         System.setProperty("ardor3d.useMultipleContexts", "true");
 
         final Timer timer = new Timer();
@@ -263,6 +271,16 @@ public class LwjglSwtExample {
 
                 mouseManager.setGrabbed(mouseManager.getGrabbed() == GrabbedState.NOT_GRABBED ? GrabbedState.GRABBED
                         : GrabbedState.NOT_GRABBED);
+            }
+        }));
+
+        logicalLayer.registerTrigger(new InputTrigger(new Predicate<TwoInputStates>() {
+            public boolean apply(final TwoInputStates arg0) {
+                return !arg0.getCurrent().getGestureState().getEvents().isEmpty();
+            }
+        }, new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                System.err.println(inputStates.getCurrent().getGestureState().getEvents().get(0).getClass().getName());
             }
         }));
 

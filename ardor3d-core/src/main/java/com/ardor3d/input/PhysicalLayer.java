@@ -172,6 +172,8 @@ public class PhysicalLayer {
             while (eventIterator.hasNext()) {
                 _currentGestureState.addEvent(eventIterator.next());
             }
+        } else {
+            _currentGestureState = GestureState.NOTHING;
         }
     }
 
