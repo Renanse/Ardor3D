@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.gestures;
+package com.ardor3d.input.gesture.event;
 
 import java.text.MessageFormat;
 
@@ -20,12 +20,12 @@ public class PanGestureEvent extends AbstractGestureEvent {
     protected final int _xDirection;
     protected final int _yDirection;
 
-    public PanGestureEvent(final int xDirection, final int yDirection) {
-        this(System.nanoTime(), xDirection, yDirection);
+    public PanGestureEvent(final boolean startOfGesture, final int xDirection, final int yDirection) {
+        this(System.nanoTime(), startOfGesture, xDirection, yDirection);
     }
 
-    public PanGestureEvent(final long nanos, final int xDirection, final int yDirection) {
-        super(nanos);
+    public PanGestureEvent(final long nanos, final boolean startOfGesture, final int xDirection, final int yDirection) {
+        super(nanos, startOfGesture);
         _xDirection = xDirection;
         _yDirection = yDirection;
     }

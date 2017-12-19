@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -101,7 +101,7 @@ public final class TriggerConditions {
     }
 
     /**
-     * @return a condition that is always false.
+     * @return a condition that is true only every throttleTime seconds.
      */
     public static Predicate<TwoInputStates> passedThrottle(final double throttleTime, final Timer timer) {
         return new Predicate<TwoInputStates>() {

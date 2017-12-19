@@ -45,12 +45,17 @@ import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.gesture.event.LongPressGestureEvent;
+import com.ardor3d.input.gesture.event.RotateGestureEvent;
 import com.ardor3d.input.logical.DummyControllerWrapper;
+import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonLongPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.swt.SwtFocusWrapper;
@@ -58,19 +63,22 @@ import com.ardor3d.input.swt.SwtGestureWrapper;
 import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
+import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglSwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
+        maxHeapMemory = 64)
 public class LwjglSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -79,6 +87,7 @@ public class LwjglSwtExample {
 
     private static final Logger logger = Logger.getLogger(LwjglSwtExample.class.toString());
     private static int i = 0;
+    private static RotatingCubeGame game;
 
     public static void main(final String[] args) {
         try {
@@ -95,7 +104,7 @@ public class LwjglSwtExample {
 
         final MyExit exit = new MyExit();
         final ExampleScene scene = new ExampleScene();
-        final RotatingCubeGame game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
+        game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
 
         frameWork.addUpdater(game);
 
@@ -132,8 +141,8 @@ public class LwjglSwtExample {
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    LwjglSwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(LwjglSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -231,7 +240,7 @@ public class LwjglSwtExample {
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
         final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas1);
         final SwtMouseManager mouseManager = new SwtMouseManager(canvas1);
-        final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas1);
+        final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas1, mouseWrapper, true);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, gestureWrapper,
@@ -274,15 +283,31 @@ public class LwjglSwtExample {
             }
         }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new Predicate<TwoInputStates>() {
-            public boolean apply(final TwoInputStates arg0) {
-                return !arg0.getCurrent().getGestureState().getEvents().isEmpty();
-            }
-        }, new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                System.err.println(inputStates.getCurrent().getGestureState().getEvents().get(0).getClass().getName());
-            }
-        }));
+        final Matrix4 matrix = new Matrix4(Matrix4.IDENTITY);
+        final Matrix4 rotate = new Matrix4(Matrix4.IDENTITY);
+        final Matrix4 pivot = new Matrix4(Matrix4.IDENTITY).applyTranslationPost(-0.5, -0.5, 0);
+        final Matrix4 pivotInv = new Matrix4(Matrix4.IDENTITY).applyTranslationPost(0.5, 0.5, 0);
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(RotateGestureEvent.class), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        final RotateGestureEvent gesture = inputStates.getCurrent().getGestureState()
+                                .first(RotateGestureEvent.class);
+                        rotate.applyRotationZ(-gesture.getDeltaRadians());
+                        final TextureState ts = (TextureState) game.getBox().getLocalRenderState(StateType.Texture);
+                        pivotInv.multiply(rotate, null).multiply(pivot, matrix).transposeLocal();
+                        ts.getTexture().setTextureMatrix(matrix);
+                    }
+                }));
+
+        logicalLayer.registerTrigger(
+                new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(MouseButton.LEFT, 500, 5),
+                        new GestureEventCondition(LongPressGestureEvent.class)), new TriggerAction() {
+                            @Override
+                            public void perform(final Canvas source, final TwoInputStates inputStates,
+                                    final double tpf) {
+                                game.toggleRotation();
+                            }
+                        }));
 
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
         try {
@@ -311,8 +336,8 @@ public class LwjglSwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(
-                ResourceLocatorTool.getClassPathResourceAsStream(LwjglSwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = awtImageLoader
+                .load(ResourceLocatorTool.getClassPathResourceAsStream(LwjglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

@@ -13,7 +13,7 @@ package com.ardor3d.input;
 import java.text.MessageFormat;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.gestures.GestureState;
+import com.ardor3d.input.gesture.GestureState;
 
 /**
  * The total input state of the devices that are being handled.

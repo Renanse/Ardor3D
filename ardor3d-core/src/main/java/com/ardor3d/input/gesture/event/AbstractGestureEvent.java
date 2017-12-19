@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.gestures;
+package com.ardor3d.input.gesture.event;
 
 import com.ardor3d.annotation.Immutable;
 
@@ -16,12 +16,18 @@ import com.ardor3d.annotation.Immutable;
 public abstract class AbstractGestureEvent {
 
     private final long _nanos;
+    private final boolean _startOfGesture;
 
-    public AbstractGestureEvent(final long nanos) {
+    public AbstractGestureEvent(final long nanos, final boolean startOfGesture) {
         _nanos = nanos;
+        _startOfGesture = startOfGesture;
     }
 
     public long getNanos() {
         return _nanos;
+    }
+
+    public boolean isStartOfGesture() {
+        return _startOfGesture;
     }
 }

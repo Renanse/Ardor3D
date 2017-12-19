@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.gestures;
+package com.ardor3d.input.gesture.event;
 
 import java.text.MessageFormat;
 
@@ -19,12 +19,12 @@ public class PinchGestureEvent extends AbstractGestureEvent {
 
     protected final double _scale;
 
-    public PinchGestureEvent(final double scale) {
-        this(System.nanoTime(), scale);
+    public PinchGestureEvent(final boolean startOfGesture, final double scale) {
+        this(System.nanoTime(), startOfGesture, scale);
     }
 
-    public PinchGestureEvent(final long nanos, final double scale) {
-        super(nanos);
+    public PinchGestureEvent(final long nanos, final boolean startOfGesture, final double scale) {
+        super(nanos, startOfGesture);
         _scale = scale;
     }
 

@@ -25,8 +25,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ardor3d.input.gestures.AbstractGestureEvent;
-import com.ardor3d.input.gestures.GestureWrapper;
+import com.ardor3d.input.gesture.GestureWrapper;
+import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;

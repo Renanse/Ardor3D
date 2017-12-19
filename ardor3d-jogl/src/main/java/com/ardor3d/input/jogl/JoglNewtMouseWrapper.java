@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -51,6 +51,7 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     protected final MouseManager _manager;
 
     protected boolean _consumeEvents = false;
+    protected boolean _ignoreInput;
 
     protected boolean _skipAutoRepeatEvents = false;
 
@@ -97,6 +98,10 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     @Override
     public synchronized void mousePressed(final MouseEvent me) {
+        if (_ignoreInput) {
+            return;
+        }
+
         if (!_skipAutoRepeatEvents || !me.isAutoRepeat()) {
             final MouseButton b = getButtonForEvent(me);
             if (_clickArmed.contains(b)) {
@@ -120,6 +125,10 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     @Override
     public synchronized void mouseReleased(final MouseEvent me) {
+        if (_ignoreInput) {
+            return;
+        }
+
         if (!_skipAutoRepeatEvents || !me.isAutoRepeat()) {
             initState(me);
             if (_consumeEvents) {
@@ -147,11 +156,16 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     @Override
     public synchronized void mouseDragged(final MouseEvent me) {
+        // forward to mouseMoved.
         mouseMoved(me);
     }
 
     @Override
     public synchronized void mouseMoved(final MouseEvent me) {
+        if (_ignoreInput) {
+            return;
+        }
+
         _clickArmed.clear();
         _clicks.clear();
 
@@ -209,6 +223,10 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     @Override
     public void mouseWheelMoved(final MouseEvent me) {
+        if (_ignoreInput) {
+            return;
+        }
+
         initState(me);
 
         addNewState(me, _lastState.getButtonStates(), null);
@@ -226,8 +244,9 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
     private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
         final MouseState newState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent),
-                getDY(mouseEvent), (int) (mouseEvent.isShiftDown() ? mouseEvent.getRotation()[0]
-                        : mouseEvent.getRotation()[1]), enumMap, clicks);
+                getDY(mouseEvent),
+                (int) (mouseEvent.isShiftDown() ? mouseEvent.getRotation()[0] : mouseEvent.getRotation()[1]), enumMap,
+                clicks);
 
         synchronized (JoglNewtMouseWrapper.this) {
             _upcomingEvents.add(newState);
@@ -340,5 +359,15 @@ public class JoglNewtMouseWrapper implements MouseWrapper, MouseListener {
 
     public void setSkipAutoRepeatEvents(final boolean skipAutoRepeatEvents) {
         _skipAutoRepeatEvents = skipAutoRepeatEvents;
+    }
+
+    @Override
+    public void setIgnoreInput(final boolean ignore) {
+        _ignoreInput = ignore;
+    }
+
+    @Override
+    public boolean isIgnoreInput() {
+        return _ignoreInput;
     }
 }

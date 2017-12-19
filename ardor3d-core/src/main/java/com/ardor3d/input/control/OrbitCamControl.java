@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,8 @@ package com.ardor3d.input.control;
 
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.MouseState;
+import com.ardor3d.input.gesture.event.PinchGestureEvent;
+import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseWheelMovedCondition;
@@ -38,13 +40,13 @@ import com.google.common.base.Predicates;
  * Example: Creates a new control, adds mouse triggers to a Logical Layer, and sets the default location (15 units away,
  * 0 degrees ascent, 0 degrees azimuth).
  * </p>
- * 
+ *
  * <pre>
  * // ... in init
  * control = new OrbitCamControl(myCamera, targetLocation);
  * control.setupMouseTriggers(myLogicalLayer, true);
  * control.setSphereCoords(15, 0, 0);
- * 
+ *
  * // ...in update loop
  * control.update(timer.getTimePerFrame());
  * </pre>
@@ -73,6 +75,7 @@ public class OrbitCamControl {
     protected boolean _invertedX = false;
     protected boolean _invertedY = false;
     protected boolean _invertedWheel = true;
+    protected boolean _updateCameraFromInput = false;
 
     protected double _zoomSpeed = 0.01;
     protected double _baseDistance = 15;
@@ -94,7 +97,7 @@ public class OrbitCamControl {
 
     /**
      * Construct a new orbit controller
-     * 
+     *
      * @param cam
      *            the camera to control
      * @param target
@@ -104,11 +107,23 @@ public class OrbitCamControl {
         _camera = cam;
         _targetType = TargetType.Point;
         _lookAtPoint.set(target);
+        _updateCameraFromInput = _camera == null;
+    }
+
+    /**
+     * Construct a new orbit controller. The camera controlled will be based on the source canvas the input is triggered
+     * from.
+     *
+     * @param target
+     *            a world location to lock our sights on.
+     */
+    public OrbitCamControl(final ReadOnlyVector3 target) {
+        this(null, target);
     }
 
     /**
      * Construct a new orbit controller
-     * 
+     *
      * @param cam
      *            the camera to control
      * @param target
@@ -118,6 +133,17 @@ public class OrbitCamControl {
         _camera = cam;
         _targetType = TargetType.Spatial;
         _lookAtSpatial = target;
+        _updateCameraFromInput = _camera == null;
+    }
+
+    /**
+     * Construct a new orbit controller. The camera controlled will be based on the source canvas the input is triggered
+     *
+     * @param target
+     *            a spatial whose world location we'll lock our sights on.
+     */
+    public OrbitCamControl(final Spatial target) {
+        this(null, target);
     }
 
     public Camera getCamera() {
@@ -126,6 +152,7 @@ public class OrbitCamControl {
 
     public void setCamera(final Camera camera) {
         _camera = camera;
+        _updateCameraFromInput = _camera == null;
     }
 
     public ReadOnlyVector3 getWorldUpVec() {
@@ -167,7 +194,7 @@ public class OrbitCamControl {
 
     /**
      * Sets a specific world location for the camera to point at and circle around.
-     * 
+     *
      * @param point
      */
     public void setLookAtPoint(final Vector3 point) {
@@ -182,7 +209,7 @@ public class OrbitCamControl {
 
     /**
      * Sets a spatial to look at. We'll use the world transform of the spatial, so its transform needs to be up to date.
-     * 
+     *
      * @param spatial
      */
     public void setLookAtSpatial(final Spatial spatial) {
@@ -274,6 +301,15 @@ public class OrbitCamControl {
         makeDirty();
     }
 
+    public boolean isUpdateCameraFromInput() {
+        return _updateCameraFromInput;
+    }
+
+    public void setUpdateCameraFromInput(final boolean updateCameraFromInput) {
+        _updateCameraFromInput = updateCameraFromInput;
+        makeDirty();
+    }
+
     protected void updateTargetPos() {
         if (_targetType == TargetType.Spatial) {
             final double x = _lookAtPoint.getX();
@@ -292,7 +328,7 @@ public class OrbitCamControl {
 
     /**
      * Zoom camera in/out from the target point.
-     * 
+     *
      * @param percent
      *            a value applied to the baseDistance to determine how far in/out to zoom. Inverted if
      *            {@link #isInvertedWheel()} is true.
@@ -304,7 +340,7 @@ public class OrbitCamControl {
     }
 
     /**
-     * 
+     *
      * @param xDif
      *            a value applied to the azimuth value of our spherical coordinates. Inverted if {@link #isInvertedX()}
      *            is true.
@@ -324,7 +360,7 @@ public class OrbitCamControl {
 
     /**
      * Update the position of the Camera controlled by this object.
-     * 
+     *
      * @param time
      *            a delta time, in seconds. Not used currently, but might be useful for doing "ease-in" of camera
      *            movements.
@@ -341,16 +377,17 @@ public class OrbitCamControl {
             MathUtils.sphericalToCartesianZ(_sphereCoords, _camPosition);
         }
 
-        _camera.setLocation(_camPosition.addLocal(_lookAtPoint));
-
-        _camera.lookAt(_lookAtPoint, _worldUpVec);
+        if (_camera != null) {
+            _camera.setLocation(_camPosition.addLocal(_lookAtPoint));
+            _camera.lookAt(_lookAtPoint, _worldUpVec);
+        }
         _dirty = false;
     }
 
     public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
         // Mouse look
-        final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
-                .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
+        final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(),
+                Predicates.or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
         final Predicate<TwoInputStates> scrollWheelMoved = new MouseWheelMovedCondition();
         final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
         final TriggerAction mouseAction = new TriggerAction() {
@@ -371,12 +408,41 @@ public class OrbitCamControl {
                 if (mouse.getDwheel() != 0) {
                     zoom(_zoomSpeed * mouse.getDwheel());
                 }
+
+                if (_updateCameraFromInput) {
+                    _camera = source.getCanvasRenderer().getCamera();
+                }
             }
         };
 
-        final Predicate<TwoInputStates> predicate = Predicates.or(scrollWheelMoved, dragOnly ? dragged
-                : TriggerConditions.mouseMoved());
+        final Predicate<TwoInputStates> predicate = Predicates.or(scrollWheelMoved,
+                dragOnly ? dragged : TriggerConditions.mouseMoved());
         _mouseTrigger = new InputTrigger(predicate, mouseAction);
         layer.registerTrigger(_mouseTrigger);
+    }
+
+    public void setupGestureTriggers(final LogicalLayer layer) {
+        // pinch - zoom
+        layer.registerTrigger(new InputTrigger(new GestureEventCondition(PinchGestureEvent.class), new TriggerAction() {
+            double initialZoom = 1.0;
+
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final PinchGestureEvent event = inputStates.getCurrent().getGestureState()
+                        .first(PinchGestureEvent.class);
+
+                if (event.isStartOfGesture()) {
+                    initialZoom = _sphereCoords.getX();
+                }
+                if (event.getScale() != 0.0) {
+                    _sphereCoords.setX(MathUtils.clamp((1.0 / event.getScale()) * initialZoom, _minZoomDistance,
+                            _maxZoomDistance));
+                    makeDirty();
+                }
+
+                if (_updateCameraFromInput) {
+                    _camera = source.getCanvasRenderer().getCamera();
+                }
+            }
+        }));
     }
 }

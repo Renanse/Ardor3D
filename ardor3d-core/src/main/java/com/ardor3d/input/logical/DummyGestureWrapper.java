@@ -10,8 +10,8 @@
 
 package com.ardor3d.input.logical;
 
-import com.ardor3d.input.gestures.AbstractGestureEvent;
-import com.ardor3d.input.gestures.GestureWrapper;
+import com.ardor3d.input.gesture.GestureWrapper;
+import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.google.common.collect.PeekingIterator;
 
 public class DummyGestureWrapper implements GestureWrapper {

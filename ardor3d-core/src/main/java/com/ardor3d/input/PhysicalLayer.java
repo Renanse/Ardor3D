@@ -18,9 +18,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.ardor3d.input.gestures.AbstractGestureEvent;
-import com.ardor3d.input.gestures.GestureState;
-import com.ardor3d.input.gestures.GestureWrapper;
+import com.ardor3d.input.gesture.GestureState;
+import com.ardor3d.input.gesture.GestureWrapper;
+import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.DummyFocusWrapper;
 import com.ardor3d.input.logical.DummyGestureWrapper;

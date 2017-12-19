@@ -79,6 +79,11 @@ public final class MouseButtonLongPressedCondition implements Predicate<TwoInput
             return false;
         }
 
+        if (mouseState.getButtonsPressedSince(previousState.getMouseState()).size() > 0) {
+            _armed = false;
+            return false;
+        }
+
         final float dx = _armedX - mouseState.getX();
         final float dy = _armedY - mouseState.getY();
         // we must be armed, so check if we should still be armed... Button should be down and we should not have

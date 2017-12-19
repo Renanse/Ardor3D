@@ -33,7 +33,7 @@ import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
-import com.ardor3d.input.gestures.GestureState;
+import com.ardor3d.input.gesture.GestureState;
 import com.google.common.base.Predicate;
 
 /**

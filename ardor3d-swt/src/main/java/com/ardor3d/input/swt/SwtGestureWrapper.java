@@ -11,48 +11,85 @@
 package com.ardor3d.input.swt;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.GestureEvent;
-import org.eclipse.swt.events.GestureListener;
+import org.eclipse.swt.events.TouchEvent;
+import org.eclipse.swt.events.TouchListener;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Touch;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.ThreadSafe;
-import com.ardor3d.input.gestures.AbstractGestureEvent;
-import com.ardor3d.input.gestures.GestureWrapper;
-import com.ardor3d.input.gestures.PanGestureEvent;
-import com.ardor3d.input.gestures.PinchGestureEvent;
-import com.ardor3d.input.gestures.RotateGestureEvent;
-import com.ardor3d.input.gestures.SwipeGestureEvent;
+import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.gesture.GestureWrapper;
+import com.ardor3d.input.gesture.event.AbstractGestureEvent;
+import com.ardor3d.input.gesture.touch.AbstractTouchInterpreter;
+import com.ardor3d.input.gesture.touch.InterpreterUtils;
+import com.ardor3d.input.gesture.touch.LongPressInterpreter;
+import com.ardor3d.input.gesture.touch.PinchInterpreter;
+import com.ardor3d.input.gesture.touch.RotateInterpreter;
+import com.ardor3d.input.gesture.touch.TouchHistory;
+import com.ardor3d.input.gesture.touch.TouchStatus;
 import com.ardor3d.math.MathUtils;
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
 
 /**
  * A gesture wrapper for use with SWT.
  */
 @ThreadSafe
-public class SwtGestureWrapper implements GestureWrapper, GestureListener {
+public class SwtGestureWrapper implements GestureWrapper, TouchListener {
     @GuardedBy("this")
     private final LinkedList<AbstractGestureEvent> _upcomingEvents = new LinkedList<AbstractGestureEvent>();
-
-    private final Control _control;
 
     @GuardedBy("this")
     private SwtGestureIterator _currentIterator = null;
 
+    @GuardedBy("this")
+    private final List<AbstractTouchInterpreter> _touchInterpreters = Lists.newArrayList();
+
+    @GuardedBy("this")
+    private final List<TouchHistory> _touchHistories = Lists.newArrayList();
+
+    private final Control _control;
+    private final MouseWrapper _mouse;
+
+    private final Predicate<TouchHistory> _cleanupTest = new Predicate<TouchHistory>() {
+        @Override
+        public boolean test(final TouchHistory t) {
+            return t.currState == TouchStatus.Up || t.currState == TouchStatus.Unknown;
+        }
+    };
+
     public SwtGestureWrapper(final Control control) {
+        this(control, null, true);
+    }
+
+    public SwtGestureWrapper(final Control control, final MouseWrapper mouse, final boolean addDefaultInterpreters) {
         _control = control;
+        _mouse = mouse;
+
+        if (addDefaultInterpreters) {
+
+            _touchInterpreters.add(new RotateInterpreter(10 * MathUtils.DEG_TO_RAD));
+            _touchInterpreters.add(new PinchInterpreter(40));
+            _touchInterpreters.add(new LongPressInterpreter());
+        }
     }
 
     @Override
     public void init() {
-        _control.addGestureListener(this);
+        _control.setTouchEnabled(true);
+        _control.addTouchListener(this);
     }
 
     @Override
     public PeekingIterator<AbstractGestureEvent> getEvents() {
+        updateInterpreters();
+
         if (_currentIterator == null || !_currentIterator.hasNext()) {
             _currentIterator = new SwtGestureIterator();
         }
@@ -61,25 +98,109 @@ public class SwtGestureWrapper implements GestureWrapper, GestureListener {
     }
 
     @Override
-    public synchronized void gesture(final GestureEvent e) {
-        switch (e.detail) {
-            case SWT.GESTURE_MAGNIFY:
-                _upcomingEvents.add(new PinchGestureEvent(e.magnification));
-                break;
-            case SWT.GESTURE_ROTATE:
-                _upcomingEvents.add(new RotateGestureEvent(e.rotation * MathUtils.DEG_TO_RAD));
-                break;
-            case SWT.GESTURE_PAN:
-                _upcomingEvents.add(new PanGestureEvent(e.xDirection, e.yDirection));
-                break;
-            case SWT.GESTURE_SWIPE:
-                _upcomingEvents.add(new SwipeGestureEvent(e.xDirection, e.yDirection));
-                break;
+    public void touch(final TouchEvent e) {
+        // update our tracking of touches
+        updateTouchHistory(e);
+
+        // now, offer our tracking info to any registered gesture processors
+        synchronized (SwtGestureWrapper.this) {
+            InterpreterUtils.processTouchHistories(_touchHistories, _touchInterpreters, _upcomingEvents);
+        }
+
+        // enable or disable mouse/pointer events based on the events we generated
+        updateMouseTracking();
+
+        // clean up old touches - it appears SWT keeps creating new ids
+        _touchHistories.removeIf(_cleanupTest);
+    }
+
+    private void updateInterpreters() {
+        synchronized (SwtGestureWrapper.this) {
+            for (int i = 0, maxI = _touchInterpreters.size(); i < maxI; i++) {
+                final AbstractGestureEvent event = _touchInterpreters.get(i).update();
+                if (event != null) {
+                    _upcomingEvents.add(event);
+                }
+            }
         }
     }
 
-    private class SwtGestureIterator extends AbstractIterator<AbstractGestureEvent> implements
-    PeekingIterator<AbstractGestureEvent> {
+    private void updateTouchHistory(final TouchEvent e) {
+        synchronized (SwtGestureWrapper.this) {
+            for (int i = 0; i < e.touches.length; i++) {
+                final Touch t = e.touches[i];
+                final String touchId = getId(t);
+                final TouchStatus state = getTouchStatus(t);
+                final TouchHistory history = getTouchHistory(touchId);
+
+                if (state == TouchStatus.Down && history != null) {
+                    // something was not cleaned up properly, so invalidate this touch
+                    resetTouchHistory();
+                    return;
+                }
+
+                if (state != TouchStatus.Down && history == null) {
+                    // we SHOULD have history, but we don't.
+                    resetTouchHistory();
+                    return;
+                }
+
+                if (state == TouchStatus.Down) {
+                    // Add new history
+                    _touchHistories.add(new TouchHistory(touchId, t.x, t.y, state));
+                } else {
+                    // update existing
+                    history.update(t.x, t.y, state);
+                }
+            }
+        }
+    }
+
+    private void updateMouseTracking() {
+        if (_mouse != null) {
+            _mouse.setIgnoreInput(!_upcomingEvents.isEmpty());
+        }
+    }
+
+    private void resetTouchHistory() {
+        synchronized (SwtGestureWrapper.this) {
+            System.err.println("clear history");
+            _touchHistories.clear();
+        }
+    }
+
+    private TouchHistory getTouchHistory(final String touchId) {
+        synchronized (SwtGestureWrapper.this) {
+            for (int i = 0, maxI = _touchHistories.size(); i < maxI; i++) {
+                final TouchHistory info = _touchHistories.get(i);
+                if (info.id.equals(touchId)) {
+                    return info;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getId(final Touch t) {
+        return Long.toString(t.id);
+    }
+
+    private TouchStatus getTouchStatus(final Touch t) {
+        if (t != null) {
+            switch (t.state) {
+                case SWT.TOUCHSTATE_DOWN:
+                    return TouchStatus.Down;
+                case SWT.TOUCHSTATE_UP:
+                    return TouchStatus.Up;
+                case SWT.TOUCHSTATE_MOVE:
+                    return TouchStatus.Moved;
+            }
+        }
+        return TouchStatus.Unknown;
+    }
+
+    private class SwtGestureIterator extends AbstractIterator<AbstractGestureEvent>
+            implements PeekingIterator<AbstractGestureEvent> {
         @Override
         protected AbstractGestureEvent computeNext() {
             synchronized (SwtGestureWrapper.this) {

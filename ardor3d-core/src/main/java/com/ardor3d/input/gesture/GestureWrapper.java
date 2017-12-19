@@ -8,8 +8,9 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.gestures;
+package com.ardor3d.input.gesture;
 
+import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.google.common.collect.PeekingIterator;
 
 public interface GestureWrapper {

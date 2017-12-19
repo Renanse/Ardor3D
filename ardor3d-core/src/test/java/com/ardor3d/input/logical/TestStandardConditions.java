@@ -26,7 +26,7 @@ import com.ardor3d.input.KeyEvent;
 import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
-import com.ardor3d.input.gestures.GestureState;
+import com.ardor3d.input.gesture.GestureState;
 
 public class TestStandardConditions {
     final KeyboardState ks = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);

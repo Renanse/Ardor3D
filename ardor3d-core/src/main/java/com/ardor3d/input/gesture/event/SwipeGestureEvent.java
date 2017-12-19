@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.gestures;
+package com.ardor3d.input.gesture.event;
 
 import java.text.MessageFormat;
 
@@ -17,12 +17,13 @@ import com.ardor3d.annotation.Immutable;
 @Immutable
 public class SwipeGestureEvent extends PanGestureEvent {
 
-    public SwipeGestureEvent(final int xDirection, final int yDirection) {
-        this(System.nanoTime(), xDirection, yDirection);
+    public SwipeGestureEvent(final boolean startOfGesture, final int xDirection, final int yDirection) {
+        this(System.nanoTime(), startOfGesture, xDirection, yDirection);
     }
 
-    public SwipeGestureEvent(final long nanos, final int xDirection, final int yDirection) {
-        super(nanos, xDirection, yDirection);
+    public SwipeGestureEvent(final long nanos, final boolean startOfGesture, final int xDirection,
+            final int yDirection) {
+        super(nanos, startOfGesture, xDirection, yDirection);
     }
 
     @Override
