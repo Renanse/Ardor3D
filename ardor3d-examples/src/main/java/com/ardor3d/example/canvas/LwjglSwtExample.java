@@ -50,6 +50,7 @@ import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.gesture.event.LongPressGestureEvent;
 import com.ardor3d.input.gesture.event.RotateGestureEvent;
+import com.ardor3d.input.gesture.event.SwipeGestureEvent;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
@@ -290,12 +291,21 @@ public class LwjglSwtExample {
         logicalLayer.registerTrigger(
                 new InputTrigger(new GestureEventCondition(RotateGestureEvent.class), new TriggerAction() {
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        final RotateGestureEvent gesture = inputStates.getCurrent().getGestureState()
+                        final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(RotateGestureEvent.class);
-                        rotate.applyRotationZ(-gesture.getDeltaRadians());
+                        rotate.applyRotationZ(-event.getDeltaRadians());
                         final TextureState ts = (TextureState) game.getBox().getLocalRenderState(StateType.Texture);
                         pivotInv.multiply(rotate, null).multiply(pivot, matrix).transposeLocal();
                         ts.getTexture().setTextureMatrix(matrix);
+                    }
+                }));
+
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
+                                .first(SwipeGestureEvent.class);
+                        System.err.println(event);
                     }
                 }));
 

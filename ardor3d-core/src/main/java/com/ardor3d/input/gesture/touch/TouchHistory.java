@@ -30,6 +30,7 @@ public class TouchHistory {
         prevX = currX = this.initialX = initialX;
         prevY = currY = this.initialY = initialY;
         prevState = currState = state;
+        initialTime = System.currentTimeMillis();
     }
 
     public void update(final int posX, final int posY, final TouchStatus state) {
@@ -41,6 +42,9 @@ public class TouchHistory {
 
         prevState = currState;
         currState = state;
+
+        prevTime = currTime;
+        currTime = System.currentTimeMillis();
     }
 
     public double distanceTo(final TouchHistory other) {

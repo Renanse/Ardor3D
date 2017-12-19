@@ -28,8 +28,10 @@ import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.gesture.touch.AbstractTouchInterpreter;
 import com.ardor3d.input.gesture.touch.InterpreterUtils;
 import com.ardor3d.input.gesture.touch.LongPressInterpreter;
+import com.ardor3d.input.gesture.touch.PanInterpreter;
 import com.ardor3d.input.gesture.touch.PinchInterpreter;
 import com.ardor3d.input.gesture.touch.RotateInterpreter;
+import com.ardor3d.input.gesture.touch.SwipeInterpreter;
 import com.ardor3d.input.gesture.touch.TouchHistory;
 import com.ardor3d.input.gesture.touch.TouchStatus;
 import com.ardor3d.math.MathUtils;
@@ -73,10 +75,11 @@ public class SwtGestureWrapper implements GestureWrapper, TouchListener {
         _mouse = mouse;
 
         if (addDefaultInterpreters) {
-
-            _touchInterpreters.add(new RotateInterpreter(10 * MathUtils.DEG_TO_RAD));
-            _touchInterpreters.add(new PinchInterpreter(40));
-            _touchInterpreters.add(new LongPressInterpreter());
+            addTouchInterpreter(new RotateInterpreter(10 * MathUtils.DEG_TO_RAD));
+            addTouchInterpreter(new PinchInterpreter(40));
+            addTouchInterpreter(new PanInterpreter(2));
+            addTouchInterpreter(new SwipeInterpreter(2, 1.2, 100L));
+            addTouchInterpreter(new LongPressInterpreter());
         }
     }
 
@@ -84,6 +87,18 @@ public class SwtGestureWrapper implements GestureWrapper, TouchListener {
     public void init() {
         _control.setTouchEnabled(true);
         _control.addTouchListener(this);
+    }
+
+    public void addTouchInterpreter(final AbstractTouchInterpreter interpreter) {
+        _touchInterpreters.add(interpreter);
+    }
+
+    public void removeTouchInterpreter(final AbstractTouchInterpreter interpreter) {
+        _touchInterpreters.remove(interpreter);
+    }
+
+    public void clearInterpreters() {
+        _touchInterpreters.clear();
     }
 
     @Override

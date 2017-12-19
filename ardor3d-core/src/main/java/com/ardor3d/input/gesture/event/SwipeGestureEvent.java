@@ -17,18 +17,18 @@ import com.ardor3d.annotation.Immutable;
 @Immutable
 public class SwipeGestureEvent extends PanGestureEvent {
 
-    public SwipeGestureEvent(final boolean startOfGesture, final int xDirection, final int yDirection) {
-        this(System.nanoTime(), startOfGesture, xDirection, yDirection);
+    public SwipeGestureEvent(final int touches, final int xDirection, final int yDirection) {
+        this(System.nanoTime(), touches, xDirection, yDirection);
     }
 
-    public SwipeGestureEvent(final long nanos, final boolean startOfGesture, final int xDirection,
-            final int yDirection) {
-        super(nanos, startOfGesture, xDirection, yDirection);
+    public SwipeGestureEvent(final long nanos, final int touches, final int xDirection, final int yDirection) {
+        super(nanos, false, touches, xDirection, yDirection);
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format("SwipeGestureEvent:  x: {0}  y: {1}", _xDirection, _yDirection);
+        return MessageFormat.format("SwipeGestureEvent:  touches: {0}  x: {1}  y: {2}", _touches, _xDirection,
+                _yDirection);
     }
 
 }

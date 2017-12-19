@@ -17,17 +17,25 @@ import com.ardor3d.annotation.Immutable;
 @Immutable
 public class PanGestureEvent extends AbstractGestureEvent {
 
+    protected final int _touches;
     protected final int _xDirection;
     protected final int _yDirection;
 
-    public PanGestureEvent(final boolean startOfGesture, final int xDirection, final int yDirection) {
-        this(System.nanoTime(), startOfGesture, xDirection, yDirection);
+    public PanGestureEvent(final boolean startOfGesture, final int touches, final int xDirection,
+            final int yDirection) {
+        this(System.nanoTime(), startOfGesture, touches, xDirection, yDirection);
     }
 
-    public PanGestureEvent(final long nanos, final boolean startOfGesture, final int xDirection, final int yDirection) {
+    public PanGestureEvent(final long nanos, final boolean startOfGesture, final int touches, final int xDirection,
+            final int yDirection) {
         super(nanos, startOfGesture);
+        _touches = touches;
         _xDirection = xDirection;
         _yDirection = yDirection;
+    }
+
+    public int getTouches() {
+        return _touches;
     }
 
     public int getXDirection() {
@@ -40,7 +48,8 @@ public class PanGestureEvent extends AbstractGestureEvent {
 
     @Override
     public String toString() {
-        return MessageFormat.format("PanGestureEvent:  x: {0}  y: {1}", _xDirection, _yDirection);
+        return MessageFormat.format("PanGestureEvent:  touches: {0}  x: {1}  y: {2}", _touches, _xDirection,
+                _yDirection);
     }
 
 }
