@@ -11,8 +11,10 @@
 package com.ardor3d.example.canvas;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
@@ -45,8 +47,8 @@ import com.ardor3d.util.TextureManager;
 
 public class RotatingCubeGame implements Updater {
     // private final Canvas view;
-    private final ExampleScene scene;
-    private final Exit exit;
+    private final BasicScene scene;
+    private final AtomicBoolean exit;
     private final LogicalLayer logicalLayer;
     private final Key toggleRotationKey;
 
@@ -60,7 +62,7 @@ public class RotatingCubeGame implements Updater {
     private boolean rotationEnabled = true;
     private boolean inited;
 
-    public RotatingCubeGame(final ExampleScene scene, final Exit exit, final LogicalLayer logicalLayer,
+    public RotatingCubeGame(final BasicScene scene, final AtomicBoolean exit, final LogicalLayer logicalLayer,
             final Key toggleRotationKey) {
         this.scene = scene;
         this.exit = exit;
@@ -137,7 +139,7 @@ public class RotatingCubeGame implements Updater {
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                exit.exit();
+                exit.set(true);
             }
         }));
 

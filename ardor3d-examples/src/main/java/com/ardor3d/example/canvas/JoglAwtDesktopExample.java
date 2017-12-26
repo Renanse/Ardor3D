@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -26,6 +27,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPopupMenu;
 
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -55,8 +57,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * This examples demonstrates how to render OpenGL (via JOGL) inside JDesktop internal frames.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglAwtDesktopExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglAwtDesktopExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglAwtDesktopExample.jpg", //
+        maxHeapMemory = 64)
 public class JoglAwtDesktopExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -70,13 +72,13 @@ public class JoglAwtDesktopExample {
         final Timer timer = new Timer();
         final FrameHandler frameWork = new FrameHandler(timer);
 
-        final MyExit exit = new MyExit();
+        final AtomicBoolean exit = new AtomicBoolean(false);
         final LogicalLayer logicalLayer = new LogicalLayer();
 
-        final ExampleScene scene1 = new ExampleScene();
+        final BasicScene scene1 = new BasicScene();
         final RotatingCubeGame game1 = new RotatingCubeGame(scene1, exit, logicalLayer, Key.T);
 
-        final ExampleScene scene2 = new ExampleScene();
+        final BasicScene scene2 = new BasicScene();
         final RotatingCubeGame game2 = new RotatingCubeGame(scene2, exit, logicalLayer, Key.G);
 
         frameWork.addUpdater(game1);
@@ -89,15 +91,15 @@ public class JoglAwtDesktopExample {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                exit.exit();
+                exit.set(true);
             }
         });
 
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    JoglAwtDesktopExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool
+                    .getClassPathResource(JoglAwtDesktopExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -118,7 +120,7 @@ public class JoglAwtDesktopExample {
         game1.init();
         game2.init();
 
-        while (!exit.isExit()) {
+        while (!exit.get()) {
             frameWork.updateFrame();
             Thread.yield();
         }
@@ -135,8 +137,8 @@ public class JoglAwtDesktopExample {
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
-    private static void addCanvas(final JDesktopPane desktop, final ExampleScene scene,
-            final LogicalLayer logicalLayer, final FrameHandler frameWork, final int index) throws Exception {
+    private static void addCanvas(final JDesktopPane desktop, final BasicScene scene, final LogicalLayer logicalLayer,
+            final FrameHandler frameWork, final int index) throws Exception {
         final JInternalFrame frame = new JInternalFrame(String.valueOf(index), true, true, true, true);
         final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(scene);
 
@@ -202,18 +204,5 @@ public class JoglAwtDesktopExample {
         frame.pack();
         frame.setVisible(true);
         desktop.add(frame);
-    }
-
-    private static class MyExit implements Exit {
-        private volatile boolean exit = false;
-
-        @Override
-        public void exit() {
-            exit = true;
-        }
-
-        public boolean isExit() {
-            return exit;
-        }
     }
 }

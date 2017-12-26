@@ -42,22 +42,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private RenderContext _currentContext;
     private LwjglCanvasCallback _canvasCallback;
 
-    // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
-    // and since it is at the moment more work than it is worth to get it ready. Later on, when
-    // we have solved some more fundamental problems, it is probably time to revisit this.
-
-    // ensure availability of LWJGL natives
-    // {
-    // final String[] libraryPaths = LwjglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
-    // .getProperty("os.arch"));
-    //
-    // try {
-    // NativeLoader.makeLibrariesAvailable(libraryPaths);
-    // } catch (final Exception e) {
-    // ; // ignore
-    // }
-    // }
-
     public LwjglCanvasRenderer(final Scene scene) {
         _scene = scene;
     }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -33,6 +34,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -65,8 +67,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * description
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglSwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
+        maxHeapMemory = 64)
 public class JoglNewtSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -83,8 +85,8 @@ public class JoglNewtSwtExample {
         final FrameHandler frameWork = new FrameHandler(timer);
         final LogicalLayer logicalLayer = new LogicalLayer();
 
-        final MyExit exit = new MyExit();
-        final ExampleScene scene = new ExampleScene();
+        final AtomicBoolean exit = new AtomicBoolean(false);
+        final BasicScene scene = new BasicScene();
         final RotatingCubeGame game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
 
         frameWork.addUpdater(game);
@@ -124,8 +126,8 @@ public class JoglNewtSwtExample {
         JoglImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    JoglNewtSwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(JoglNewtSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -137,7 +139,7 @@ public class JoglNewtSwtExample {
 
         game.init();
 
-        while (!shell.isDisposed() && !exit.isExit()) {
+        while (!shell.isDisposed() && !exit.get()) {
             display.readAndDispatch();
             frameWork.updateFrame();
             Thread.yield();
@@ -147,7 +149,7 @@ public class JoglNewtSwtExample {
         System.exit(0);
     }
 
-    private static void addNewCanvas(final TabFolder tabFolder, final ExampleScene scene, final FrameHandler frameWork,
+    private static void addNewCanvas(final TabFolder tabFolder, final BasicScene scene, final FrameHandler frameWork,
             final LogicalLayer logicalLayer) {
         i++;
         logger.info("Adding canvas");
@@ -261,8 +263,8 @@ public class JoglNewtSwtExample {
 
     private static MouseCursor createMouseCursor(final JoglImageLoader joglImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = joglImageLoader.load(
-                ResourceLocatorTool.getClassPathResourceAsStream(JoglNewtSwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = joglImageLoader
+                .load(ResourceLocatorTool.getClassPathResourceAsStream(JoglNewtSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
@@ -290,18 +292,5 @@ public class JoglNewtSwtExample {
             }
         };
         return retVal;
-    }
-
-    private static class MyExit implements Exit {
-        private volatile boolean exit = false;
-
-        @Override
-        public void exit() {
-            exit = true;
-        }
-
-        public boolean isExit() {
-            return exit;
-        }
     }
 }

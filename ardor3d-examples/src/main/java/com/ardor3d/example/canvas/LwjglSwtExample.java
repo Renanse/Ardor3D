@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,6 +36,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.lwjgl.LWJGLException;
 
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
@@ -103,8 +105,8 @@ public class LwjglSwtExample {
         final FrameHandler frameWork = new FrameHandler(timer);
         final LogicalLayer logicalLayer = new LogicalLayer();
 
-        final MyExit exit = new MyExit();
-        final ExampleScene scene = new ExampleScene();
+        final AtomicBoolean exit = new AtomicBoolean(false);
+        final BasicScene scene = new BasicScene();
         game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
 
         frameWork.addUpdater(game);
@@ -156,7 +158,7 @@ public class LwjglSwtExample {
         game.init();
         // frameWork.init();
 
-        while (!shell.isDisposed() && !exit.isExit()) {
+        while (!shell.isDisposed() && !exit.get()) {
             display.readAndDispatch();
             frameWork.updateFrame();
             Thread.yield();
@@ -175,7 +177,7 @@ public class LwjglSwtExample {
         System.exit(0);
     }
 
-    private static void addNewCanvas(final TabFolder tabFolder, final ExampleScene scene, final FrameHandler frameWork,
+    private static void addNewCanvas(final TabFolder tabFolder, final BasicScene scene, final FrameHandler frameWork,
             final LogicalLayer logicalLayer) {
         i++;
         logger.info("Adding canvas");
@@ -373,18 +375,6 @@ public class LwjglSwtExample {
             }
         };
         return retVal;
-    }
-
-    private static class MyExit implements Exit {
-        private volatile boolean exit = false;
-
-        public void exit() {
-            exit = true;
-        }
-
-        public boolean isExit() {
-            return exit;
-        }
     }
 }
 

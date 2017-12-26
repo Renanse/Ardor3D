@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,7 +14,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
 
-class BallSprite extends Quad {
+public class BallSprite extends Quad {
 
     private final Ball _ball;
     private final int _areaWidth;

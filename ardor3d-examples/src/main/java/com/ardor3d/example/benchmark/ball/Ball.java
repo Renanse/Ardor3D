@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,10 +11,10 @@
 package com.ardor3d.example.benchmark.ball;
 
 public class Ball {
-    protected final static int radius = 26;
+    public final static int radius = 26;
 
-    protected final double elastity = -.02;
-    protected final double maxSpeed = 3.0;
+    public final double elastity = -.02;
+    public final double maxSpeed = 3.0;
 
     protected double _x = 0;
     protected double _y = 0;
