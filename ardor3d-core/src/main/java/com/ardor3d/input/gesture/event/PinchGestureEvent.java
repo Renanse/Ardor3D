@@ -34,7 +34,7 @@ public class PinchGestureEvent extends AbstractGestureEvent {
 
     @Override
     public String toString() {
-        return MessageFormat.format("PinchGestureEvent: {0,percent}%", _scale);
+        return MessageFormat.format("PinchGestureEvent: {0,number,percent}", _scale);
     }
 
 }
