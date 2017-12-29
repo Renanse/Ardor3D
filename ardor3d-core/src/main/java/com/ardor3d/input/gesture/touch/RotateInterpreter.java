@@ -46,11 +46,13 @@ public class RotateInterpreter extends AbstractTouchInterpreter {
                     break;
                 case Armed:
                     if (finger == TouchStatus.Moved) {
-                        if (Math.abs(_lastAngle - angle) >= _threshold) {
+                        final double dAngle = angle - _lastAngle;
+                        if (Math.abs(dAngle) >= _threshold) {
                             _state = ArmState.Triggered;
-                            _totalAngle = _lastAngle - angle;
+                            _totalAngle = dAngle;
                             _lastAngle = angle;
-                            return new RotateGestureEvent(true, angle, _totalAngle, _totalAngle);
+                            InterpreterUtils.determineBounds(touchInfo, _lastBounds);
+                            return new RotateGestureEvent(true, _lastBounds, angle, dAngle, _totalAngle);
                         }
                     } else {
                         // invalid
@@ -59,10 +61,11 @@ public class RotateInterpreter extends AbstractTouchInterpreter {
                     break;
                 case Triggered:
                     if (finger == TouchStatus.Moved) {
-                        final double dAngle = _lastAngle - angle;
+                        final double dAngle = angle - _lastAngle;
                         _totalAngle += dAngle;
                         _lastAngle = angle;
-                        return new RotateGestureEvent(false, angle, dAngle, _totalAngle);
+                        InterpreterUtils.determineBounds(touchInfo, _lastBounds);
+                        return new RotateGestureEvent(false, _lastBounds, angle, dAngle, _totalAngle);
                     }
 
                     // invalid

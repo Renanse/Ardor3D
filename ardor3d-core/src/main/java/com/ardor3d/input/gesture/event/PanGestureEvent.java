@@ -13,6 +13,7 @@ package com.ardor3d.input.gesture.event;
 import java.text.MessageFormat;
 
 import com.ardor3d.annotation.Immutable;
+import com.ardor3d.math.Rectangle2;
 
 @Immutable
 public class PanGestureEvent extends AbstractGestureEvent {
@@ -21,14 +22,14 @@ public class PanGestureEvent extends AbstractGestureEvent {
     protected final int _xDirection;
     protected final int _yDirection;
 
-    public PanGestureEvent(final boolean startOfGesture, final int touches, final int xDirection,
-            final int yDirection) {
-        this(System.nanoTime(), startOfGesture, touches, xDirection, yDirection);
+    public PanGestureEvent(final boolean startOfGesture, final Rectangle2 bounds, final int touches,
+            final int xDirection, final int yDirection) {
+        this(System.nanoTime(), startOfGesture, bounds, touches, xDirection, yDirection);
     }
 
-    public PanGestureEvent(final long nanos, final boolean startOfGesture, final int touches, final int xDirection,
-            final int yDirection) {
-        super(nanos, startOfGesture);
+    public PanGestureEvent(final long nanos, final boolean startOfGesture, final Rectangle2 bounds, final int touches,
+            final int xDirection, final int yDirection) {
+        super(nanos, startOfGesture, bounds);
         _touches = touches;
         _xDirection = xDirection;
         _yDirection = yDirection;

@@ -50,7 +50,8 @@ public class PinchInterpreter extends AbstractTouchInterpreter {
                                 _initialDistance = distance;
                                 _state = ArmState.Triggered;
 
-                                return new PinchGestureEvent(true, distance / _initialDistance);
+                                InterpreterUtils.determineBounds(touchInfo, _lastBounds);
+                                return new PinchGestureEvent(true, _lastBounds, distance / _initialDistance);
                             }
                         } else {
                             // invalid
@@ -59,7 +60,8 @@ public class PinchInterpreter extends AbstractTouchInterpreter {
                         break;
                     case Triggered:
                         if (finger == TouchStatus.Moved) {
-                            return new PinchGestureEvent(false, distance / _initialDistance);
+                            InterpreterUtils.determineBounds(touchInfo, _lastBounds);
+                            return new PinchGestureEvent(false, _lastBounds, distance / _initialDistance);
                         } else {
                             // invalid
                             _state = ArmState.Unknown;

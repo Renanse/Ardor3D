@@ -13,6 +13,7 @@ package com.ardor3d.input.gesture.touch;
 import java.util.List;
 
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
+import com.ardor3d.math.Rectangle2;
 
 public final class InterpreterUtils {
 
@@ -57,6 +58,28 @@ public final class InterpreterUtils {
                     upcomingEvents.add(endEvent);
                 }
             }
+        }
+    }
+
+    public static void determineBounds(final List<TouchHistory> touchHistories, final Rectangle2 store) {
+        int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
+        boolean found = false;
+        for (int i = 0, maxI = touchHistories.size(); i < maxI; i++) {
+            final TouchHistory t = touchHistories.get(i);
+            if (t.currState == TouchStatus.Moved || t.currState == TouchStatus.Down) {
+                found = true;
+                minX = Math.min(minX, t.currX);
+                maxX = Math.max(maxX, t.currX);
+                minY = Math.min(minY, t.currY);
+                maxY = Math.max(maxY, t.currY);
+            }
+        }
+
+        if (found) {
+            store.set((minX + maxX) / 2, (minY + maxY) / 2, maxX - minX, maxY - minY);
+        } else {
+            store.set(-1, -1, -1, -1);
         }
     }
 

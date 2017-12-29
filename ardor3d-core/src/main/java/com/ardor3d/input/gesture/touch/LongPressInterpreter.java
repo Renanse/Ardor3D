@@ -55,6 +55,7 @@ public class LongPressInterpreter extends AbstractTouchInterpreter {
                         for (int i = 0, maxI = touchInfo.size(); i < maxI; i++) {
                             _lastArmedIds[i] = touchInfo.get(i).id;
                         }
+                        InterpreterUtils.determineBounds(touchInfo, _lastBounds);
                     }
                     break;
                 case Armed:
@@ -105,7 +106,7 @@ public class LongPressInterpreter extends AbstractTouchInterpreter {
             final long time = System.currentTimeMillis();
             if (time >= _lastArmed + _pressTime) {
                 _state = ArmState.Triggered;
-                return new LongPressGestureEvent(_touches);
+                return new LongPressGestureEvent(_lastBounds, _touches);
             }
         }
         return null;

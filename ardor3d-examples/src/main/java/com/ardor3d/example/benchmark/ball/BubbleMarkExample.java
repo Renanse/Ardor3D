@@ -232,7 +232,7 @@ public class BubbleMarkExample implements Scene {
 
         // Add balls
         for (int i = 0; i < balls.length; i++) {
-            final BallSprite ballSprite = new BallSprite("ball", Ball.radius * 2, Ball.radius * 2, width, height);
+            final BallSprite ballSprite = new BallSprite("ball", width, height);
             root.attachChild(ballSprite);
             balls[i] = ballSprite;
         }

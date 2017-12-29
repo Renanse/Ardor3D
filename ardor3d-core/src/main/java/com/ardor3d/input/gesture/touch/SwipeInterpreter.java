@@ -85,7 +85,7 @@ public class SwipeInterpreter extends AbstractTouchInterpreter {
                 return null;
             }
 
-            return new SwipeGestureEvent(_touches, dx, -dy);
+            return new SwipeGestureEvent(_lastBounds, _touches, dx, -dy);
         }
 
         return null;

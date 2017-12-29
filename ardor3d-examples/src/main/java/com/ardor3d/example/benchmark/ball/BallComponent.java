@@ -35,7 +35,7 @@ public class BallComponent extends UILabel {
     @Override
     public void updateGeometricState(final double time, final boolean initiator) {
         super.updateGeometricState(time, initiator);
-        _ball.move(_areaWidth, _areaHeight);
+        _ball.move(_areaWidth, _areaHeight, time);
         setLocalXY((int) _ball._x, (int) _ball._y);
     }
 

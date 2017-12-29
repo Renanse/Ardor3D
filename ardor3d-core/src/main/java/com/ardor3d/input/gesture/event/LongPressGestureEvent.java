@@ -13,18 +13,19 @@ package com.ardor3d.input.gesture.event;
 import java.text.MessageFormat;
 
 import com.ardor3d.annotation.Immutable;
+import com.ardor3d.math.Rectangle2;
 
 @Immutable
 public class LongPressGestureEvent extends AbstractGestureEvent {
 
     public int _touches;
 
-    public LongPressGestureEvent(final int touches) {
-        this(touches, System.nanoTime());
+    public LongPressGestureEvent(final Rectangle2 bounds, final int touches) {
+        this(System.nanoTime(), bounds, touches);
     }
 
-    public LongPressGestureEvent(final int touches, final long nanos) {
-        super(nanos, false);
+    public LongPressGestureEvent(final long nanos, final Rectangle2 bounds, final int touches) {
+        super(nanos, false, bounds);
         _touches = touches;
     }
 

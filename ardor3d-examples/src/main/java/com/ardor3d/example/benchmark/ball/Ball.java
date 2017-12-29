@@ -14,7 +14,7 @@ public class Ball {
     public final static int radius = 26;
 
     public final double elastity = -.02;
-    public final double maxSpeed = 3.0;
+    public final double maxSpeed = 300.0;
 
     protected double _x = 0;
     protected double _y = 0;
@@ -23,14 +23,28 @@ public class Ball {
     protected double _r = 0;
     protected double _d = 0;
     protected double _d2 = 0;
+    protected double _or = 0;
 
     public Ball() {
+        this(1.0);
+    }
+
+    public Ball(final double defaultScale) {
         // default provisioning
         _vx = 2 * maxSpeed * Math.random() - maxSpeed;
         _vy = 2 * maxSpeed * Math.random() - maxSpeed;
-        _r = radius; // d = 52 px
+        _or = radius * defaultScale;
+        scale(1.0);
+    }
+
+    public void scale(final double scale) {
+        _r = _or * scale;
         _d = 2 * _r;
         _d2 = _d * _d;
+    }
+
+    public double getTotalScale() {
+        return _r / radius;
     }
 
     public void setRandomPositionIn(final int areaWidth, final int areaHeight) {
@@ -38,10 +52,15 @@ public class Ball {
         _y = (areaHeight - 2 * radius) * Math.random();
     }
 
-    public void move(final int areaWidth, final int areaHeight) {
+    public void setPosition(final int locX, final int locY) {
+        _x = locX;
+        _y = locY;
+    }
 
-        _x += _vx;
-        _y += _vy;
+    public void move(final int areaWidth, final int areaHeight, final double dt) {
+
+        _x += _vx * dt;
+        _y += _vy * dt;
 
         // wall collisions
 
@@ -73,9 +92,9 @@ public class Ball {
         final double dy = _y - b._y;
         final double dvx = _vx - b._vx;
         final double dvy = _vy - b._vy;
-        final double distance2 = dx * dx + dy * dy;
+        final double distance2 = Math.max(0.0001, dx * dx + dy * dy);
 
-        if (Math.abs(dx) > _d || Math.abs(dy) > _d) {
+        if (Math.abs(dx) > Math.max(_d, b._d) || Math.abs(dy) > Math.max(_d, b._d)) {
             return false;
         }
         if (distance2 > _d2) {
@@ -102,5 +121,9 @@ public class Ball {
         b._vy += delta_vy;
 
         return true;
+    }
+
+    public double getCurrentRadius() {
+        return _r;
     }
 }

@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Rectangle2;
 
 @Immutable
 public class RotateGestureEvent extends AbstractGestureEvent {
@@ -22,14 +23,14 @@ public class RotateGestureEvent extends AbstractGestureEvent {
     protected final double _deltaRadians;
     protected final double _totalRadians;
 
-    public RotateGestureEvent(final boolean startOfGesture, final double currentAngle, final double deltaRadians,
-            final double totalRadians) {
-        this(System.nanoTime(), startOfGesture, currentAngle, deltaRadians, totalRadians);
+    public RotateGestureEvent(final boolean startOfGesture, final Rectangle2 bounds, final double currentAngle,
+            final double deltaRadians, final double totalRadians) {
+        this(System.nanoTime(), startOfGesture, bounds, currentAngle, deltaRadians, totalRadians);
     }
 
-    public RotateGestureEvent(final long nanos, final boolean startOfGesture, final double currentAngle,
-            final double deltaRadians, final double totalRadians) {
-        super(nanos, startOfGesture);
+    public RotateGestureEvent(final long nanos, final boolean startOfGesture, final Rectangle2 bounds,
+            final double currentAngle, final double deltaRadians, final double totalRadians) {
+        super(nanos, startOfGesture, bounds);
 
         _currentAngle = currentAngle;
         _deltaRadians = deltaRadians;

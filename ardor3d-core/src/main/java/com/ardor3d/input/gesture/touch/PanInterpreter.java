@@ -40,7 +40,8 @@ public class PanInterpreter extends AbstractTouchInterpreter {
             prevY /= valid;
 
             if (down || prevX != currX || prevY != currY) {
-                return new PanGestureEvent(down, _touches, currX - prevX, -(currY - prevY));
+                InterpreterUtils.determineBounds(touchInfo, _lastBounds);
+                return new PanGestureEvent(down, _lastBounds, _touches, currX - prevX, -(currY - prevY));
             }
         } else if (up > 0) {
             _state = ArmState.Unknown;

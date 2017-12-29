@@ -13,11 +13,13 @@ package com.ardor3d.input.gesture.touch;
 import java.util.List;
 
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
+import com.ardor3d.math.Rectangle2;
 
 public abstract class AbstractTouchInterpreter {
     protected final int _touches;
     protected final String[] _lastArmedIds;
     protected long _lastArmed;
+    protected final Rectangle2 _lastBounds = new Rectangle2();
 
     protected ArmState _state = ArmState.Ready;
 
