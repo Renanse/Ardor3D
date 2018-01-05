@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -52,7 +52,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
 
     @Override
     public void addFilter(final UpdateFilter filter) {
-        for(final AbstractInteractWidget widget : _widgets.values()) {
+        for (final AbstractInteractWidget widget : _widgets.values()) {
             widget.addFilter(filter);
         }
         super.addFilter(filter);
@@ -60,7 +60,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
 
     @Override
     public void removeFilter(final UpdateFilter filter) {
-        for(final AbstractInteractWidget widget : _widgets.values()) {
+        for (final AbstractInteractWidget widget : _widgets.values()) {
             widget.removeFilter(filter);
         }
         super.removeFilter(filter);
@@ -68,7 +68,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
 
     @Override
     public void clearFilters() {
-        for(final AbstractInteractWidget widget : _widgets.values()) {
+        for (final AbstractInteractWidget widget : _widgets.values()) {
             widget.clearFilters();
         }
         super.clearFilters();
@@ -285,17 +285,23 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
         // Make sure we are dragging.
         final MouseState current = inputStates.getCurrent().getMouseState();
         final MouseState previous = inputStates.getPrevious().getMouseState();
+        final Camera camera = source.getCanvasRenderer().getCamera();
 
         if (current.getButtonState(_dragButton) != ButtonState.DOWN) {
             if (_lastInputWidget != null) {
                 _lastInputWidget.processInput(source, inputStates, inputConsumed, manager);
                 _lastInputWidget = null;
+            } else {
+                // check all of the widgets for mouseover
+                for (final AbstractInteractWidget widget : _widgets.values()) {
+                    widget.checkMouseOver(camera, current, manager);
+                }
             }
+            _lastInputWidget = null;
             return;
         }
 
         if (_lastInputWidget == null) {
-            final Camera camera = source.getCanvasRenderer().getCamera();
             final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
             findPick(oldMouse, camera);
             if (_results.getNumber() <= 0) {
