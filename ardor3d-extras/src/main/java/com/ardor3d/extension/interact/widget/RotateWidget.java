@@ -32,6 +32,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
@@ -84,32 +85,27 @@ public class RotateWidget extends AbstractInteractWidget {
     public void mouseEntered(final InteractManager manager) {
         super.mouseEntered(manager);
         if (_lastMouseOverSpatial != null) {
-            cleanupBlendStates();
-            final BlendState bs = (BlendState) _lastMouseOverSpatial.getLocalRenderState(StateType.Blend);
-            if (bs != null) {
-                bs.setBlendEnabled(false);
-            }
-            _handle.updateGeometricState(0);
+            updateBlendStates(_lastMouseOverSpatial);
         }
     }
 
     @Override
     public void mouseDeparted(final InteractManager manager) {
         super.mouseDeparted(manager);
-        cleanupBlendStates();
-        _handle.updateGeometricState(0);
+        updateBlendStates(null);
     }
 
-    protected void cleanupBlendStates() {
+    protected void updateBlendStates(final Spatial highlight) {
         _handle.acceptVisitor(new Visitor() {
             @Override
             public void visit(final Spatial spatial) {
                 final BlendState bs = (BlendState) spatial.getLocalRenderState(StateType.Blend);
                 if (bs != null) {
-                    bs.setBlendEnabled(true);
+                    bs.setSourceFunction(spatial == highlight ? SourceFunction.One : SourceFunction.SourceAlpha);
                 }
             }
         }, true);
+        _handle.updateGeometricState(0);
     }
 
     public RotateWidget withXAxis() {

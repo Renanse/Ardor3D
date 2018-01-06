@@ -113,8 +113,13 @@ public abstract class AbstractInteractWidget {
                 mouseDeparted(manager);
                 return;
             }
-        } else if (!_mouseOver) {
-            mouseEntered(manager);
+        } else {
+            if (!_mouseOver) {
+                mouseEntered(manager);
+            } else if (_results.getPickData(0).getTarget() != _lastMouseOverSpatial) {
+                mouseDeparted(manager);
+                mouseEntered(manager);
+            }
         }
     }
 
