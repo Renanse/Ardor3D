@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,9 +16,19 @@ package com.ardor3d.extension.ui.layout;
 public class GridLayoutData implements UILayoutData {
 
     /**
+     * Default, no grow, no wrap, single span
+     */
+    public static GridLayoutData Default = new GridLayoutData(1, false, false);
+
+    /**
      * a shared GridLayoutData that just wraps the layout line after this component
      */
     public static GridLayoutData Wrap = new GridLayoutData(1, true, false);
+
+    /**
+     * a shared GridLayoutData that just lets a component fill any extra space in the grid
+     */
+    public static GridLayoutData Grow = new GridLayoutData(1, false, true);
 
     /**
      * a shared GridLayoutData that just wraps the layout line after this component and let it fill the space
@@ -30,7 +40,7 @@ public class GridLayoutData implements UILayoutData {
     private int span;
 
     public GridLayoutData() {
-        this(1, false, false);
+        this(GridLayoutData.Default.span, GridLayoutData.Default.wrap, GridLayoutData.Default.grow);
     }
 
     public GridLayoutData(final int span, final boolean wrap, final boolean grow) {
@@ -65,7 +75,7 @@ public class GridLayoutData implements UILayoutData {
 
     /**
      * create a new GridLayoutData that specifies the number of cells the component should use horizontally
-     * 
+     *
      * @param columns
      * @return
      */
@@ -76,7 +86,7 @@ public class GridLayoutData implements UILayoutData {
     /**
      * create a new GridLayoutData that specifies the number of cells the component should use horizontally and that the
      * layout line should wrap after this component
-     * 
+     *
      * @param columns
      * @return
      */
