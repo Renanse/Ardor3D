@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -191,7 +191,7 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager(_glCanvas.getCanvasRenderer().getRenderContext())
-                .getQueue(GameTaskQueue.UPDATE).execute();
+        .getQueue(GameTaskQueue.UPDATE).execute();
 
         updateAppletScene(_timer);
 
@@ -218,6 +218,8 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
     protected void initInput() {
         _mouseManager = new LwjglMouseManager();
+        _glCanvas.setMouseManager(_mouseManager);
+
         _logicalLayer = new LogicalLayer();
         _physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
                 new LwjglControllerWrapper(), _glCanvas);
@@ -265,23 +267,23 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final com.ardor3d.framework.Canvas source, final TwoInputStates inputState,
-                            final double tpf) {
-                        if (_mouseManager.isSetGrabbedSupported()) {
-                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
-                        }
-                    }
-                }));
+            public void perform(final com.ardor3d.framework.Canvas source, final TwoInputStates inputState,
+                    final double tpf) {
+                if (_mouseManager.isSetGrabbedSupported()) {
+                    _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                }
+            }
+        }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final com.ardor3d.framework.Canvas source, final TwoInputStates inputState,
-                            final double tpf) {
-                        if (_mouseManager.isSetGrabbedSupported()) {
-                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
-                        }
-                    }
-                }));
+            public void perform(final com.ardor3d.framework.Canvas source, final TwoInputStates inputState,
+                    final double tpf) {
+                if (_mouseManager.isSetGrabbedSupported()) {
+                    _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                }
+            }
+        }));
     }
 
     protected void initBaseScene() {
@@ -312,7 +314,7 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
         GameTaskQueueManager.getManager(_glCanvas.getCanvasRenderer().getRenderContext())
-                .getQueue(GameTaskQueue.RENDER).execute(renderer);
+        .getQueue(GameTaskQueue.RENDER).execute(renderer);
 
         // Clean up card garbage such as textures, vbos, etc.
         ContextGarbageCollector.doRuntimeCleanup(renderer);

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -222,6 +222,7 @@ public class LwjglSwtExample {
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
         final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas1);
         final SwtMouseManager mouseManager = new SwtMouseManager(canvas1);
+        canvas1.setMouseManager(mouseManager);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);

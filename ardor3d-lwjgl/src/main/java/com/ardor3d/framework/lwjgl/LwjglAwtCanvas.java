@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -19,6 +19,7 @@ import org.lwjgl.opengl.PixelFormat;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.input.MouseManager;
 
 public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
 
@@ -35,8 +36,8 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
 
     public LwjglAwtCanvas(final DisplaySettings settings, final LwjglCanvasRenderer canvasRenderer)
             throws LWJGLException {
-        super(new PixelFormat(settings.getColorDepth(), settings.getAlphaBits(), settings.getDepthBits(), settings
-                .getStencilBits(), settings.getSamples()).withStereo(settings.isStereo()));
+        super(new PixelFormat(settings.getColorDepth(), settings.getAlphaBits(), settings.getDepthBits(),
+                settings.getStencilBits(), settings.getSamples()).withStereo(settings.isStereo()));
         _settings = settings;
         _canvasRenderer = canvasRenderer;
         _canvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
@@ -107,4 +108,17 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     public LwjglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
+    }
+
 }

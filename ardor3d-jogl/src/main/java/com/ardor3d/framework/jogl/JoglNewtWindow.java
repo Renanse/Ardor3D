@@ -22,6 +22,7 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
+import com.ardor3d.input.MouseManager;
 import com.jogamp.newt.MonitorDevice;
 import com.jogamp.newt.MonitorMode;
 import com.jogamp.newt.event.KeyListener;
@@ -213,6 +214,18 @@ public class JoglNewtWindow implements NativeCanvas, NewtWindowContainer {
     @Override
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
+    }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
     }
 
     @Override

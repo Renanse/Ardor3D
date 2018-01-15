@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,6 +21,7 @@ import org.lwjgl.opengl.PixelFormat;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.input.FocusWrapper;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.util.Ardor3dException;
 
 /**
@@ -121,6 +122,18 @@ public class LwjglDisplayCanvas implements Canvas, FocusWrapper {
 
     public LwjglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
+    }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
     }
 
     public void setVSyncEnabled(final boolean enabled) {

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -239,7 +239,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.UPDATE)
-                .execute();
+        .execute();
 
         /** Call simpleUpdate in any derived classes of ExampleBase. */
         updateExample(timer);
@@ -263,7 +263,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.RENDER)
-                .execute(renderer);
+        .execute(renderer);
 
         // Clean up card garbage such as textures, vbos, etc.
         ContextGarbageCollector.doRuntimeCleanup(renderer);
@@ -347,14 +347,14 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                 prefs.getFrequency(),
                 // alpha
                 _minAlphaBits != -1 ? _minAlphaBits : prefs.getAlphaBits(),
-                // depth
-                _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
-                // stencil
-                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
-                // samples
-                prefs.getSamples(),
-                // other
-                prefs.isFullscreen(), _stereo);
+                        // depth
+                        _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
+                                // stencil
+                                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
+                                        // samples
+                                        prefs.getSamples(),
+                                        // other
+                                        prefs.isFullscreen(), _stereo);
 
         example._settings = settings;
 
@@ -363,18 +363,20 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             try {
                 SharedLibraryLoader.load(true);
             } catch (Exception e) {e.printStackTrace();}
-            
+
             final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
             example._canvas = new LwjglCanvas(settings, canvasRenderer);
             example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
                     new LwjglControllerWrapper(), (LwjglCanvas) example._canvas);
             example._mouseManager = new LwjglMouseManager();
+            example._canvas.setMouseManager(example._mouseManager);
             TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         } else if (prefs.getRenderer().startsWith("JOGL")) {
             final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
             example._canvas = new JoglNewtWindow(canvasRenderer, settings);
             final JoglNewtWindow canvas = (JoglNewtWindow) example._canvas;
             example._mouseManager = new JoglNewtMouseManager(canvas);
+            example._canvas.setMouseManager(example._mouseManager);
             example._physicalLayer = new PhysicalLayer(new JoglNewtKeyboardWrapper(canvas), new JoglNewtMouseWrapper(
                     canvas, example._mouseManager), DummyControllerWrapper.INSTANCE, new JoglNewtFocusWrapper(canvas));
             TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
@@ -460,17 +462,17 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 
-                        final Vector2 pos = Vector2.fetchTempInstance().set(
-                                inputStates.getCurrent().getMouseState().getX(),
-                                inputStates.getCurrent().getMouseState().getY());
-                        final Ray3 pickRay = new Ray3();
-                        _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-                        Vector2.releaseTempInstance(pos);
-                        doPick(pickRay);
-                    }
-                }, "pickTrigger"));
+                final Vector2 pos = Vector2.fetchTempInstance().set(
+                        inputStates.getCurrent().getMouseState().getX(),
+                        inputStates.getCurrent().getMouseState().getY());
+                final Ray3 pickRay = new Ray3();
+                _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+                Vector2.releaseTempInstance(pos);
+                doPick(pickRay);
+            }
+        }, "pickTrigger"));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
@@ -535,20 +537,20 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                        if (_mouseManager.isSetGrabbedSupported()) {
-                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
-                        }
-                    }
-                }));
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                if (_mouseManager.isSetGrabbedSupported()) {
+                    _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                }
+            }
+        }));
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                        if (_mouseManager.isSetGrabbedSupported()) {
-                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
-                        }
-                    }
-                }));
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                if (_mouseManager.isSetGrabbedSupported()) {
+                    _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                }
+            }
+        }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {

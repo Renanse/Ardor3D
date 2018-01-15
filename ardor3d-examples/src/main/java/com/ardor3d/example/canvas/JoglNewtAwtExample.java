@@ -165,6 +165,7 @@ public class JoglNewtAwtExample {
         final JoglNewtFocusWrapper focusWrapper = new JoglNewtFocusWrapper(theCanvas);
         final JoglNewtMouseManager mouseManager = new JoglNewtMouseManager(theCanvas);
         final JoglNewtMouseWrapper mouseWrapper = new JoglNewtMouseWrapper(theCanvas, mouseManager);
+        theCanvas.setMouseManager(mouseManager);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);

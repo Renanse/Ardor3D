@@ -13,6 +13,7 @@ package com.ardor3d.framework;
 import java.util.concurrent.CountDownLatch;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.input.MouseManager;
 
 /**
  * This interface defines the View, and should maybe be called the ViewUpdater. It owns the rendering phase, and
@@ -29,7 +30,7 @@ public interface Canvas {
     /**
      * Ask the canvas to render itself. Note that this may occur in another thread and therefore a latch is given so the
      * caller may know when the draw has completed.
-     * 
+     *
      * @param latch
      *            a counter that should be decremented once drawing has completed.
      */
@@ -40,4 +41,17 @@ public interface Canvas {
      * @return the CanvasRenderer associated with this Canvas.
      */
     CanvasRenderer getCanvasRenderer();
+
+    /**
+     * @return the MouseManager associated with this Canvas, if any
+     */
+    MouseManager getMouseManager();
+
+    /**
+     * Sets a MouseManager to be associated with this Canvas.
+     * 
+     * @param manager
+     *            the manager to associate
+     */
+    void setMouseManager(MouseManager manager);
 }

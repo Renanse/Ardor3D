@@ -28,6 +28,7 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.input.FocusWrapper;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -149,6 +150,18 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
 
     public CanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
+    }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
     }
 
     /**

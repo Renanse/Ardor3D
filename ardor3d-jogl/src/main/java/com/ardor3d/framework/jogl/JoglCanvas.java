@@ -35,6 +35,7 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.renderer.jogl.JoglPbufferTextureRenderer;
 
 /**
@@ -239,6 +240,18 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     @Override
     public CanvasRenderer getCanvasRenderer() {
         return _glCanvas.getCanvasRenderer();
+    }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
     }
 
     @Override

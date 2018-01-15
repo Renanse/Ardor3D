@@ -21,14 +21,15 @@ import javax.swing.SwingUtilities;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.input.MouseManager;
 
 /**
  * Ardor3D JOGL AWT heavyweight canvas, AWT component for the OpenGL rendering of Ardor3D with JOGL that supports the
  * AWT input system directly and its abstraction in Ardor3D (com.ardor3d.input.awt)
- * 
+ *
  * FIXME there is still a deadlock when using several instances of this class in the same container, see JOGL bug 572
  * Rather use JoglNewtAwtCanvas in this case.
- * 
+ *
  */
 public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
@@ -102,6 +103,18 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
     @Override
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
+    }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
     }
 
     public void setVSyncEnabled(final boolean enabled) {

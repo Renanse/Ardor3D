@@ -18,6 +18,7 @@ import javax.media.opengl.GLRunnable;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.input.MouseManager;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 
@@ -95,6 +96,18 @@ public class JoglNewtAwtCanvas extends NewtCanvasAWT implements Canvas, NewtWind
     @Override
     public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
+    }
+
+    protected MouseManager _manager;
+
+    @Override
+    public MouseManager getMouseManager() {
+        return _manager;
+    }
+
+    @Override
+    public void setMouseManager(final MouseManager manager) {
+        _manager = manager;
     }
 
     @Override

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -204,6 +204,7 @@ public class JoglNewtSwtExample {
         final JoglNewtFocusWrapper focusWrapper = new JoglNewtFocusWrapper(canvas1);
         final JoglNewtMouseManager mouseManager = new JoglNewtMouseManager(canvas1);
         final JoglNewtMouseWrapper mouseWrapper = new JoglNewtMouseWrapper(canvas1, mouseManager);
+        canvas1.setMouseManager(mouseManager);
         final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);
