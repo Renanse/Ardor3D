@@ -49,15 +49,15 @@ public class SwtMouseManager implements MouseManager {
     }
 
     public void setCursor(final MouseCursor cursor) {
-        if (cursor == MouseCursor.SYSTEM_DEFAULT) {
+        if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
             _control.setCursor(null);
             return;
         }
 
         final ImageData imageData = SWTImageUtil.convertToSWT(cursor.getImage()).get(0);
 
-        final Cursor swtCursor = new Cursor(_control.getDisplay(), imageData, cursor.getHotspotX(), cursor
-                .getHotspotY());
+        final Cursor swtCursor = new Cursor(_control.getDisplay(), imageData, cursor.getHotspotX(),
+                cursor.getHotspotY());
 
         _control.setCursor(swtCursor);
     }

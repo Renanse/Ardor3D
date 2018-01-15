@@ -63,7 +63,7 @@ public class LwjglMouseManager implements MouseManager {
     }
 
     private Cursor createLwjglCursor(final MouseCursor cursor) throws LWJGLException {
-        if (cursor == MouseCursor.SYSTEM_DEFAULT) {
+        if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
             return null; // setting the cursor to null in LWJGL means using the system default one
         }
 

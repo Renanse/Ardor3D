@@ -62,7 +62,7 @@ public class AwtMouseManager implements MouseManager {
     }
 
     public void setCursor(final MouseCursor cursor) {
-        if (cursor == MouseCursor.SYSTEM_DEFAULT) {
+        if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
             if (_grabbedState == GrabbedState.GRABBED) {
                 _pregrabCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
             } else {
