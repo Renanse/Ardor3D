@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
@@ -51,6 +52,8 @@ public class RotateWidget extends AbstractInteractWidget {
     protected InteractRing _yRing = null;
     protected InteractRing _zRing = null;
 
+    public static MouseCursor DEFAULT_CURSOR = null;
+
     public RotateWidget(final IFilterList filterList) {
         super(filterList);
         _handle = new Node("rotationHandle");
@@ -61,6 +64,10 @@ public class RotateWidget extends AbstractInteractWidget {
 
         _handle.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
         _handle.updateGeometricState(0);
+
+        if (RotateWidget.DEFAULT_CURSOR != null) {
+            setMouseOverCallback(new SetCursorCallback(RotateWidget.DEFAULT_CURSOR));
+        }
     }
 
     /**
@@ -82,16 +89,16 @@ public class RotateWidget extends AbstractInteractWidget {
     }
 
     @Override
-    public void mouseEntered(final InteractManager manager) {
-        super.mouseEntered(manager);
+    protected void mouseEntered(final Canvas source, final MouseState current, final InteractManager manager) {
+        super.mouseEntered(source, current, manager);
         if (_lastMouseOverSpatial != null) {
             updateBlendStates(_lastMouseOverSpatial);
         }
     }
 
     @Override
-    public void mouseDeparted(final InteractManager manager) {
-        super.mouseDeparted(manager);
+    protected void mouseDeparted(final Canvas source, final MouseState current, final InteractManager manager) {
+        super.mouseDeparted(source, current, manager);
         updateBlendStates(null);
     }
 
@@ -239,7 +246,7 @@ public class RotateWidget extends AbstractInteractWidget {
         final MouseState previous = inputStates.getPrevious().getMouseState();
 
         // first process mouse over state
-        checkMouseOver(camera, current, manager);
+        checkMouseOver(source, current, manager);
 
         if (current.getButtonsReleasedSince(previous).contains(_dragButton)) {
             _rotateStore.setIdentity();

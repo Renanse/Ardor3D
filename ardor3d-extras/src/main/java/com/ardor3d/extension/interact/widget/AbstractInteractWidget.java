@@ -61,13 +61,15 @@ public abstract class AbstractInteractWidget {
     /** List of filters to modify state after applying input. */
     protected IFilterList _filters;
 
+    protected InteractMouseOverCallback _mouseOverCallback;
+
     public AbstractInteractWidget(final IFilterList filterList) {
         _results.setCheckDistance(true);
         _filters = filterList;
     }
 
     /**
-     * Use the given inputstates to determine if and how to activate this widget. If the widget uses the given input,
+     * Use the given input states to determine if and how to activate this widget. If the widget uses the given input,
      * inputConsumed should be set to "true" and applyFilters should be called by this method.
      *
      * @param source
@@ -88,11 +90,13 @@ public abstract class AbstractInteractWidget {
         _filters.applyFilters(manager);
     }
 
-    public void checkMouseOver(final Camera camera, final MouseState current, final InteractManager manager) {
+    public void checkMouseOver(final Canvas source, final MouseState current, final InteractManager manager) {
+        final Camera camera = source.getCanvasRenderer().getCamera();
+
         // If we are dragging, we're in mouseOver state.
         if (_dragging) {
             if (!_mouseOver) {
-                mouseEntered(manager);
+                mouseEntered(source, current, manager);
             }
             return;
         }
@@ -100,7 +104,7 @@ public abstract class AbstractInteractWidget {
         // Make sure we have something to modify
         if (manager.getSpatialTarget() == null) {
             if (_mouseOver) {
-                mouseDeparted(manager);
+                mouseDeparted(source, current, manager);
             }
             return;
         }
@@ -110,29 +114,39 @@ public abstract class AbstractInteractWidget {
         final Vector3 lastPick = getLastPick();
         if (lastPick == null) {
             if (_mouseOver) {
-                mouseDeparted(manager);
+                mouseDeparted(source, current, manager);
                 return;
             }
         } else {
             if (!_mouseOver) {
-                mouseEntered(manager);
+                mouseEntered(source, current, manager);
             } else if (_results.getPickData(0).getTarget() != _lastMouseOverSpatial) {
-                mouseDeparted(manager);
-                mouseEntered(manager);
+                mouseDeparted(source, current, manager);
+                mouseEntered(source, current, manager);
             }
         }
     }
 
-    public void mouseEntered(final InteractManager manager) {
+    protected void mouseEntered(final Canvas source, final MouseState current, final InteractManager manager) {
         final PickData pickData = _results.getPickData(0);
         _lastMouseOverSpatial = (Spatial) pickData.getTarget();
         _mouseOver = true;
+
+        if (_mouseOverCallback != null) {
+            _mouseOverCallback.mouseEntered(source, current, manager);
+        }
+
         targetDataUpdated(manager);
     }
 
-    public void mouseDeparted(final InteractManager manager) {
+    protected void mouseDeparted(final Canvas source, final MouseState current, final InteractManager manager) {
         _lastMouseOverSpatial = null;
         _mouseOver = false;
+
+        if (_mouseOverCallback != null) {
+            _mouseOverCallback.mouseDeparted(source, current, manager);
+        }
+
         targetDataUpdated(manager);
     }
 
@@ -217,7 +231,7 @@ public abstract class AbstractInteractWidget {
             endDrag(manager);
         }
         if (_mouseOver) {
-            mouseDeparted(manager);
+            mouseDeparted(null, null, manager);
         }
         targetDataUpdated(manager);
     }
@@ -230,7 +244,11 @@ public abstract class AbstractInteractWidget {
         }
     }
 
-    public void lostControl(final InteractManager manager) { /**/}
+    public void lostControl(final InteractManager manager) {
+        if (_mouseOver) {
+            mouseDeparted(null, null, manager);
+        }
+    }
 
     public boolean isActiveInputOnly() {
         return _activeInputOnly;
@@ -318,5 +336,13 @@ public abstract class AbstractInteractWidget {
 
     public void clearFilters() {
         _filters.clear();
+    }
+
+    public void setMouseOverCallback(final InteractMouseOverCallback callback) {
+        _mouseOverCallback = callback;
+    }
+
+    public InteractMouseOverCallback getMouseOverCallback() {
+        return _mouseOverCallback;
     }
 }

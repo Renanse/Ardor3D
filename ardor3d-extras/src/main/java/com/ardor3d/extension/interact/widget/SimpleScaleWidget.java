@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
@@ -39,8 +40,14 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
 
     protected ReadOnlyVector3 _arrowDirection;
 
+    public static MouseCursor DEFAULT_CURSOR = null;
+
     public SimpleScaleWidget(final IFilterList filterList) {
         super(filterList);
+
+        if (SimpleScaleWidget.DEFAULT_CURSOR != null) {
+            setMouseOverCallback(new SetCursorCallback(SimpleScaleWidget.DEFAULT_CURSOR));
+        }
     }
 
     public SimpleScaleWidget withArrow(final ReadOnlyVector3 arrowDirection) {
@@ -113,7 +120,7 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
         final MouseState previous = inputStates.getPrevious().getMouseState();
 
         // first process mouse over state
-        checkMouseOver(camera, current, manager);
+        checkMouseOver(source, current, manager);
 
         // Now check drag status
         if (!checkShouldDrag(camera, current, previous, inputConsumed, manager)) {

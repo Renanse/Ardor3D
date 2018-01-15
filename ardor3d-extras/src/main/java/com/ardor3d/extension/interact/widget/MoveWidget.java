@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
@@ -52,6 +53,8 @@ public class MoveWidget extends AbstractInteractWidget {
 
     protected InteractMatrix _interactMatrix = InteractMatrix.World;
 
+    public static MouseCursor DEFAULT_CURSOR = null;
+
     public MoveWidget(final IFilterList filterList) {
         super(filterList);
         _handle = new Node("moveHandle");
@@ -66,6 +69,10 @@ public class MoveWidget extends AbstractInteractWidget {
 
         _handle.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
         _handle.updateGeometricState(0);
+
+        if (MoveWidget.DEFAULT_CURSOR != null) {
+            setMouseOverCallback(new SetCursorCallback(MoveWidget.DEFAULT_CURSOR));
+        }
     }
 
     public MoveWidget withXAxis() {
@@ -179,7 +186,7 @@ public class MoveWidget extends AbstractInteractWidget {
         final MouseState previous = inputStates.getPrevious().getMouseState();
 
         // first process mouse over state
-        checkMouseOver(camera, current, manager);
+        checkMouseOver(source, current, manager);
 
         // Now check drag status
         if (!checkShouldDrag(camera, current, previous, inputConsumed, manager)) {

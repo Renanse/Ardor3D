@@ -1,14 +1,16 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.example.interact;
+
+import java.net.URISyntaxException;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -18,15 +20,20 @@ import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.AllowScaleFilter;
 import com.ardor3d.extension.interact.filter.MinMaxScaleFilter;
 import com.ardor3d.extension.interact.filter.PlaneBoundaryFilter;
+import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.extension.interact.widget.BasicFilterList;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
+import com.ardor3d.extension.interact.widget.MoveMultiPlanarWidget;
+import com.ardor3d.extension.interact.widget.MovePlanarWidget;
 import com.ardor3d.extension.interact.widget.MoveWidget;
 import com.ardor3d.extension.interact.widget.RotateWidget;
 import com.ardor3d.extension.interact.widget.SimpleScaleWidget;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -49,6 +56,8 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * An example illustrating the use of the interact framework.
@@ -157,6 +166,8 @@ public class InteractExample extends ExampleBase {
     }
 
     private void addControls() {
+        setupCursors();
+
         // create our manager
         manager = new InteractManager();
         manager.setupInput(_canvas, _physicalLayer, _logicalLayer);
@@ -234,6 +245,31 @@ public class InteractExample extends ExampleBase {
         manager.addFilter(new MinMaxScaleFilter(1.0, 10.0));
         manager.addFilter(new AllowScaleFilter(false, true, false));
         manager.addFilter(new PlaneBoundaryFilter(new Plane(Vector3.UNIT_Y, 0)));
+    }
+
+    public static void setupCursors() {
+        try {
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    AbstractInteractWidget.class, "com/ardor3d/extension/interact/widget/"));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+
+            // ROTATE
+            Image img = TextureManager.load("rotate.png", Texture.MinificationFilter.BilinearNoMipMaps, true)
+                    .getImage();
+            RotateWidget.DEFAULT_CURSOR = new MouseCursor("rotate", img, img.getWidth() / 2, img.getHeight() / 2);
+
+            // SCALE
+            img = TextureManager.load("scale.png", Texture.MinificationFilter.BilinearNoMipMaps, true).getImage();
+            SimpleScaleWidget.DEFAULT_CURSOR = new MouseCursor("scale", img, 3, img.getHeight() - 3);
+
+            // MOVE
+            img = TextureManager.load("move.png", Texture.MinificationFilter.BilinearNoMipMaps, true).getImage();
+            MoveWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2, img.getHeight() / 2);
+            MoveMultiPlanarWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2, img.getHeight() / 2);
+            MovePlanarWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2, img.getHeight() / 2);
+        } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override

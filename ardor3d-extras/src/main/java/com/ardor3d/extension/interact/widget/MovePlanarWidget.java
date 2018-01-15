@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
@@ -40,6 +41,8 @@ public class MovePlanarWidget extends AbstractInteractWidget {
 
     protected MovePlane _plane = MovePlane.XZ;
 
+    public static MouseCursor DEFAULT_CURSOR = null;
+
     public enum MovePlane {
         XY, XZ, YZ
     }
@@ -58,6 +61,10 @@ public class MovePlanarWidget extends AbstractInteractWidget {
 
         _handle.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
         _handle.updateGeometricState(0);
+
+        if (MovePlanarWidget.DEFAULT_CURSOR != null) {
+            setMouseOverCallback(new SetCursorCallback(MovePlanarWidget.DEFAULT_CURSOR));
+        }
     }
 
     public MovePlanarWidget withDefaultHandle(final double radius, final double height, final ReadOnlyColorRGBA color) {
@@ -136,7 +143,7 @@ public class MovePlanarWidget extends AbstractInteractWidget {
         final MouseState previous = inputStates.getPrevious().getMouseState();
 
         // first process mouse over state
-        checkMouseOver(camera, current, manager);
+        checkMouseOver(source, current, manager);
 
         // Now check drag status
         if (!checkShouldDrag(camera, current, previous, inputConsumed, manager)) {

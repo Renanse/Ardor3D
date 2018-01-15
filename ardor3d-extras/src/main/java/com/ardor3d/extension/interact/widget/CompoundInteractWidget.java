@@ -294,7 +294,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             } else {
                 // check all of the widgets for mouseover
                 for (final AbstractInteractWidget widget : _widgets.values()) {
-                    widget.checkMouseOver(camera, current, manager);
+                    widget.checkMouseOver(source, current, manager);
                 }
             }
             _lastInputWidget = null;
