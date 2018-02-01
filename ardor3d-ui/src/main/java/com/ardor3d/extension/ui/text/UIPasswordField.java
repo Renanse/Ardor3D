@@ -8,7 +8,8 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.ui;
+package com.ardor3d.extension.ui.text;
+
 
 public class UIPasswordField extends UITextField {
 

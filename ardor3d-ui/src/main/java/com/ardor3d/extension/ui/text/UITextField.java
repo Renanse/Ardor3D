@@ -3,40 +3,64 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.ui;
+package com.ardor3d.extension.ui.text;
 
-import com.ardor3d.extension.ui.text.DefaultLatinTextAreaKeyHandler;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.UIState;
+import com.ardor3d.extension.ui.event.ActionEvent;
+import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.text.TextSelection.SelectionState;
-import com.ardor3d.extension.ui.text.UIKeyHandler;
-import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 
-public class UITextArea extends AbstractUITextEntryComponent {
+public class UITextField extends AbstractUITextEntryComponent {
+    protected final Vector2 _caretLoc = new Vector2();
+    // tracking variable for dirty use only
+    private boolean _caretIsShowing = false;
+    private UIKeyHandler _keyHandler;
 
     /** A store for the clip rectangle. */
     private final Rectangle2 _clipRectangleStore = new Rectangle2();
 
-    protected UIKeyHandler _keyHandler;
+    /** List of action listeners notified when the enter key is pressed. */
+    private final List<ActionListener> _listeners = new ArrayList<ActionListener>();
 
-    public UITextArea() {
-        setAlignment(Alignment.TOP_LEFT);
+    public UITextField() {
         _disabledState = new UIState();
         _defaultState = new DefaultTextEntryState();
-        _writingState = new TextAreaWritingState();
+        _writingState = new TextFieldWritingState();
         setEditable(true);
         applySkin();
         switchState(getDefaultState());
+    }
+
+    @Override
+    public int setCaretPosition(final int index) {
+        super.setCaretPosition(index);
+
+        if (_uiText != null) {
+            _uiText.findCaretTranslation(getCaretPosition(), _caretLoc);
+            getCaret().setPosX(Math.round(_caretLoc.getXf()));
+            getCaret().setPosY(Math.round(_caretLoc.getYf()));
+        } else {
+            getCaret().setPosX(0);
+            getCaret().setPosY(0);
+        }
+        return _caretPosition;
     }
 
     /**
@@ -56,13 +80,60 @@ public class UITextArea extends AbstractUITextEntryComponent {
     @Override
     protected UIKeyHandler getKeyHandler() {
         if (_keyHandler == null) {
-            _keyHandler = new DefaultLatinTextAreaKeyHandler(this);
+            _keyHandler = new DefaultLatinTextFieldKeyHandler(this);
         }
         return _keyHandler;
     }
 
     public void setKeyHandler(final UIKeyHandler handler) {
         _keyHandler = handler;
+    }
+
+    /**
+     * Add the specified listener to this button's list of listeners notified when pressed.
+     *
+     * @param listener
+     */
+    public void addActionListener(final ActionListener listener) {
+        _listeners.add(listener);
+    }
+
+    /**
+     * Remove the given listener from the notification list.
+     *
+     * @param listener
+     */
+    public boolean removeActionListener(final ActionListener listener) {
+        return _listeners.remove(listener);
+    }
+
+    /**
+     * Removes all of this field's listeners from notification list.
+     */
+    public void removeAllListeners() {
+        _listeners.clear();
+    }
+
+    /**
+     * Notifies all of this field's registered listeners
+     */
+    public void fireActionEvent() {
+        if (!isEnabled()) {
+            return;
+        }
+        final ActionEvent event = new ActionEvent(this);
+        for (final ActionListener l : _listeners) {
+            l.actionPerformed(event);
+        }
+    }
+
+    @Override
+    public void updateGeometricState(final double time, final boolean initiator) {
+        if (getCurrentState().equals(_writingState) && _caretIsShowing != getCaret().isShowing()) {
+            fireComponentDirty();
+            _caretIsShowing = !_caretIsShowing;
+        }
+        super.updateGeometricState(time, initiator);
     }
 
     @Override
@@ -110,14 +181,14 @@ public class UITextArea extends AbstractUITextEntryComponent {
         }
 
         // Draw our caret, if we have one.
-        if (isCopyable() && isEditable() && getCurrentState().equals(_writingState) && getCaret().isShowing()) {
+        if (isEditable() && getCurrentState().equals(_writingState) && getCaret().isShowing()) {
             getCaret().draw(r, this,
                     _uiText != null ? _uiText.getLineHeight(getCaretPosition()) : UIComponent.getDefaultFontSize(), x,
                     y);
         }
     }
 
-    public class TextAreaWritingState extends UIState {
+    public class TextFieldWritingState extends UIState {
         @Override
         public boolean keyReleased(final Key key, final InputState state) {
             return getKeyHandler().keyReleased(key, state);
@@ -135,20 +206,20 @@ public class UITextArea extends AbstractUITextEntryComponent {
 
         @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
-        // TODO: set cursor to text entry
+            // TODO: set cursor to text entry
         }
 
         @Override
         public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
-        // TODO: set cursor to default
+            // TODO: set cursor to default
         }
 
         @Override
         public boolean mousePressed(final MouseButton button, final InputState state) {
-            final int x = state.getMouseState().getX() - UITextArea.this.getHudX()
-                    - UITextArea.this.getPadding().getLeft();
-            final int y = state.getMouseState().getY() - UITextArea.this.getHudY()
-                    - UITextArea.this.getPadding().getBottom();
+            final int x = state.getMouseState().getX() - UITextField.this.getHudX()
+                    - UITextField.this.getPadding().getLeft();
+            final int y = state.getMouseState().getY() - UITextField.this.getHudY()
+                    - UITextField.this.getPadding().getBottom();
 
             if (_uiText != null) {
                 final int position = _uiText.findCaretPosition(x, y);

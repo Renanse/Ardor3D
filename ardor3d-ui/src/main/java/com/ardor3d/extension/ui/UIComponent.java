@@ -1663,6 +1663,24 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     }
 
     /**
+     * Looks up the scenegraph for a Hud and asks it to clear us as the currently focused component, if set.
+     */
+    public void clearFocus() {
+        final UIHud hud = getHud();
+        if (hud != null && hud.getFocusedComponent() == this) {
+            hud.setFocusedComponent(null);
+        }
+    }
+
+    /**
+     * @return true if we are attached to a hud and that hud has us as the currently focused component.
+     */
+    public boolean isFocused() {
+        final UIHud hud = getHud();
+        return hud != null && hud.getFocusedComponent() == this;
+    }
+
+    /**
      * @return a component we defer to for key focus. Default is null.
      */
     public UIComponent getKeyFocusTarget() {

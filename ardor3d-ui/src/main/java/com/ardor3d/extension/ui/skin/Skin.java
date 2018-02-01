@@ -18,7 +18,6 @@ import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
-import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIPieMenu;
 import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UIPopupMenu;
@@ -27,9 +26,11 @@ import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UIScrollBar;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UITab;
-import com.ardor3d.extension.ui.UITextArea;
-import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.extension.ui.UITooltip;
+import com.ardor3d.extension.ui.text.UIIntegerRollerField;
+import com.ardor3d.extension.ui.text.UIPasswordField;
+import com.ardor3d.extension.ui.text.UITextArea;
+import com.ardor3d.extension.ui.text.UITextField;
 
 public abstract class Skin {
 
@@ -63,6 +64,8 @@ public abstract class Skin {
             applyToTextField((UITextField) component);
         } else if (component instanceof UITextArea) {
             applyToTextArea((UITextArea) component);
+        } else if (component instanceof UIIntegerRollerField) {
+            applyToIntegerRollerField((UIIntegerRollerField) component);
         }
 
         // 4. PANEL / CONTAINER TYPES
@@ -112,6 +115,8 @@ public abstract class Skin {
     protected abstract void applyToPasswordField(UIPasswordField component);
 
     protected abstract void applyToTextArea(UITextArea component);
+
+    protected abstract void applyToIntegerRollerField(UIIntegerRollerField component);
 
     protected abstract void applyToPieMenu(UIPieMenu component);
 

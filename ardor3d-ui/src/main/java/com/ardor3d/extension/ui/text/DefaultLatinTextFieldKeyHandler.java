@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.ui.text;
 
-import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 
@@ -64,6 +63,7 @@ public class DefaultLatinTextFieldKeyHandler implements UIKeyHandler {
             case RETURN: {
                 // ACTION
                 _textField.fireActionEvent();
+                _textField.clearFocus();
                 return true;
             }
             case X: {

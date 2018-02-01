@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.ui.text;
 
-import com.ardor3d.extension.ui.UITextArea;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 

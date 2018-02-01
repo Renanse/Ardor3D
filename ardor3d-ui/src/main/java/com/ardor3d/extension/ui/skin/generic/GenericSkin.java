@@ -22,7 +22,6 @@ import com.ardor3d.extension.ui.UIFrameStatusBar;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIMenuItem;
 import com.ardor3d.extension.ui.UIPanel;
-import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIPieMenu;
 import com.ardor3d.extension.ui.UIPieMenuItem;
 import com.ardor3d.extension.ui.UIPopupMenu;
@@ -34,8 +33,6 @@ import com.ardor3d.extension.ui.UISliderKnob;
 import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.UITab;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
-import com.ardor3d.extension.ui.UITextArea;
-import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.extension.ui.UITooltip;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
 import com.ardor3d.extension.ui.backdrop.GradientBackdrop;
@@ -52,7 +49,12 @@ import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.skin.Skin;
 import com.ardor3d.extension.ui.skin.SkinningTask;
 import com.ardor3d.extension.ui.text.StyleConstants;
+import com.ardor3d.extension.ui.text.UIIntegerRollerField;
+import com.ardor3d.extension.ui.text.UIPasswordField;
+import com.ardor3d.extension.ui.text.UITextArea;
+import com.ardor3d.extension.ui.text.UITextField;
 import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.image.Texture;
@@ -482,6 +484,61 @@ public class GenericSkin extends Skin {
             }
         }
 
+    }
+
+    @Override
+    protected void applyToIntegerRollerField(final UIIntegerRollerField component) {
+
+        final SolidBorder border = new SolidBorder(1, 1, 1, 1);
+        border.setLeftColor(ColorRGBA.GRAY);
+        border.setTopColor(ColorRGBA.GRAY);
+        border.setRightColor(ColorRGBA.LIGHT_GRAY);
+        border.setBottomColor(ColorRGBA.LIGHT_GRAY);
+
+        final SolidBackdrop backdrop = new SolidBackdrop(ColorRGBA.WHITE);
+
+        component.setPadding(new Insets(1, 1, 1, 1));
+
+        for (final UIState state : component.getField().getStates()) {
+            state.setBorder(border);
+            state.setBackdrop(backdrop);
+            if (state.equals(component.getField().getDisabledState())) {
+                state.setForegroundColor(ColorRGBA.GRAY);
+            } else {
+                state.setForegroundColor(ColorRGBA.BLACK);
+            }
+        }
+
+        {
+            final UIButton button = component.getRollUpButton();
+            button.setBackdrop(null);
+            button.setBorder(new EmptyBorder());
+            button.setPadding(new Insets(0, 0, 0, 0));
+            button.setMargin(new Insets(0, 0, 0, 0));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(null);
+                state.setBackdrop(null);
+            }
+            button.setButtonText("");
+            button.setButtonIcon(new SubTex(_sharedTex, 97, 120, 15, 16));
+            button.setIconDimensions(new Dimension(10, 10));
+            button.getMouseOverState().setIcon(new SubTex(_sharedTex, 113, 120, 15, 16));
+        }
+        {
+            final UIButton button = component.getRollDownButton();
+            button.setBackdrop(null);
+            button.setBorder(new EmptyBorder());
+            button.setPadding(new Insets(0, 0, 0, 0));
+            button.setMargin(new Insets(0, 0, 0, 0));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(null);
+                state.setBackdrop(null);
+            }
+            button.setButtonText("");
+            button.setButtonIcon(new SubTex(_sharedTex, 97, 137, 15, 16));
+            button.setIconDimensions(new Dimension(10, 10));
+            button.getMouseOverState().setIcon(new SubTex(_sharedTex, 113, 137, 15, 16));
+        }
     }
 
     @Override

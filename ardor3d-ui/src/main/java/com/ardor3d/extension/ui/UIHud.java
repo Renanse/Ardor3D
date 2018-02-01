@@ -298,7 +298,9 @@ public class UIHud extends Node {
     public void setFocusedComponent(final UIComponent compomponent) {
         // If we already have a different focused component, tell it that it has lost focus.
         if (_focusedComponent != null && _focusedComponent != compomponent) {
-            _focusedComponent.lostFocus();
+            final UIComponent oldFocus = _focusedComponent;
+            _focusedComponent = null;
+            oldFocus.lostFocus();
         }
 
         // Set our focused component to the given component (or its focus target)

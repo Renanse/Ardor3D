@@ -8,17 +8,15 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.ui;
+package com.ardor3d.extension.ui.text;
 
 import java.util.Map;
 
-import com.ardor3d.extension.ui.text.RenderedText;
+import com.ardor3d.extension.ui.StateBasedUIComponent;
+import com.ardor3d.extension.ui.Textable;
+import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
-import com.ardor3d.extension.ui.text.StyleConstants;
-import com.ardor3d.extension.ui.text.TextCaret;
-import com.ardor3d.extension.ui.text.TextFactory;
-import com.ardor3d.extension.ui.text.TextSelection;
-import com.ardor3d.extension.ui.text.UIKeyHandler;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
@@ -88,27 +86,36 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
      *            the new text
      */
     public void setText(String text) {
-        if (text != null && text.length() == 0) {
-            text = null;
-        }
+        text = validateText(text, _uiText != null ? _uiText.getPlainText() : null);
 
         if (text != null) {
-            // no need to do anything if text is the same
-            if (text.equals(getText())) {
-                return;
-            }
             int maxWidth = getMaximumLocalComponentWidth() - getTotalLeft() - getTotalRight();
             if (maxWidth <= 0) {
                 maxWidth = -1;
             }
-            _uiText = TextFactory.INSTANCE.generateText(text, isStyledText(), getFontStyles(), _uiText, maxWidth);
+
+            _uiText = TextFactory.INSTANCE.generateText(getVisibleText(text), isStyledText(), getFontStyles(), _uiText,
+                    maxWidth);
+            _uiText.setPlainText(text);
         } else {
             _uiText = null;
+
             // reset caret position
             setCaretPosition(0);
         }
 
         updateMinimumSizeFromContents();
+    }
+
+    protected String validateText(String newText, final String oldText) {
+        if (newText != null && newText.length() == 0) {
+            newText = null;
+        }
+        return newText;
+    }
+
+    protected String getVisibleText(final String text) {
+        return text;
     }
 
     public boolean isStyledText() {
