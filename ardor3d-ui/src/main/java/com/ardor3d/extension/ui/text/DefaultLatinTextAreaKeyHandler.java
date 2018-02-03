@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,10 +12,12 @@ package com.ardor3d.extension.ui.text;
 
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
+import com.ardor3d.util.trigger.TimedTrigger;
 
 public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
 
     protected final UITextArea _textArea;
+    private final TimedTrigger _repeatTimer = new TimedTrigger();
 
     public DefaultLatinTextAreaKeyHandler(final UITextArea textArea) {
         _textArea = textArea;
@@ -23,11 +25,22 @@ public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
 
     @Override
     public boolean keyReleased(final Key key, final InputState state) {
+        _repeatTimer.disarm();
         return true;
     }
 
     @Override
     public boolean keyHeld(final Key key, final InputState state) {
+        // start a timer if we haven't already.
+        if (_repeatTimer.isArmed()) {
+            _repeatTimer.checkTrigger();
+        } else if (_repeatTimer.isTriggered()) {
+            keyPressed(key, state);
+            _repeatTimer.arm(UIKeyHandler.KeyRepeatIntervalTime);
+        } else {
+            _repeatTimer.arm(UIKeyHandler.KeyRepeatStartTime);
+        }
+        // if timer has passed, call keyPressed instead.
         return true;
     }
 
@@ -68,8 +81,7 @@ public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
 
                 if (_textArea.isCopyable() && selection.getSelectionLength() > 0) {
                     final String selectedText = text.substring(selection.getStartIndex(), _textArea.getSelection()
-                            .getStartIndex()
-                            + _textArea.getSelectionLength());
+                            .getStartIndex() + _textArea.getSelectionLength());
                     CopyPasteManager.INSTANCE.setClipBoardContents(selectedText);
                     _textArea.deleteSelectedText();
                     text = _textArea.getText();
@@ -90,8 +102,7 @@ public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
                 }
                 if (_textArea.isCopyable()) {
                     final String selectedText = text.substring(selection.getStartIndex(), _textArea.getSelection()
-                            .getStartIndex()
-                            + _textArea.getSelectionLength());
+                            .getStartIndex() + _textArea.getSelectionLength());
                     CopyPasteManager.INSTANCE.setClipBoardContents(selectedText);
                 }
                 return true;
