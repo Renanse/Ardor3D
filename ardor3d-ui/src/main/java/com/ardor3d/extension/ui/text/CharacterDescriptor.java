@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,6 +14,9 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class CharacterDescriptor {
+
+    /** The character id, i.e. char value, of this character. */
+    private final char _id;
 
     /** The x location, in pixels, of our upper left corner */
     private final int _x;
@@ -34,20 +37,22 @@ public class CharacterDescriptor {
     /** scaling to apply - optional */
     private double _scale = 1;
 
-    /** tiny to apply - optional */
+    /** tint to apply - optional */
     private ColorRGBA _tint = null;
 
-    public CharacterDescriptor(final int x, final int y, final int width, final int height, final int xAdvance) {
-        this(xAdvance, y, width, height, xAdvance, 0, 0, 1, null);
+    public CharacterDescriptor(final char id, final int x, final int y, final int width, final int height,
+            final int xAdvance) {
+        this(id, xAdvance, y, width, height, xAdvance, 0, 0, 1, null);
     }
 
     public CharacterDescriptor(final CharacterDescriptor source) {
-        this(source._x, source._y, source._width, source._height, source._xAdvance, source._xOffset, source._yOffset,
-                source._scale, source._tint);
+        this(source._id, source._x, source._y, source._width, source._height, source._xAdvance, source._xOffset,
+                source._yOffset, source._scale, source._tint);
     }
 
-    public CharacterDescriptor(final int x, final int y, final int width, final int height, final int xAdvance,
-            final int xOffset, final int yOffset, final double scale, final ReadOnlyColorRGBA tint) {
+    public CharacterDescriptor(final char id, final int x, final int y, final int width, final int height,
+            final int xAdvance, final int xOffset, final int yOffset, final double scale, final ReadOnlyColorRGBA tint) {
+        _id = id;
         _x = x;
         _y = y;
         _width = width;

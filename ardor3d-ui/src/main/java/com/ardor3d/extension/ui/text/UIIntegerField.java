@@ -19,8 +19,8 @@ public class UIIntegerField extends UITextField {
     protected int _value;
 
     @Override
-    protected String validateText(final String newText, final String oldText) {
-        String valText = super.validateText(newText, oldText);
+    protected String validateInputText(final String inputText, final String oldText) {
+        String valText = super.validateInputText(inputText, oldText);
         if (valText == null) {
             return null;
         }
@@ -61,7 +61,7 @@ public class UIIntegerField extends UITextField {
     public void lostFocus() {
         // force a clamp to [min, max] range
         final String text = getText();
-        _value = text == null ? 0 : MathUtils.clamp(Integer.parseInt(text), _minValue, _maxValue);
+        _value = text == "" ? 0 : MathUtils.clamp(Integer.parseInt(text), _minValue, _maxValue);
 
         super.lostFocus();
     }

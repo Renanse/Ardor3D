@@ -131,7 +131,7 @@ public class BMFontProvider implements FontProvider {
             final Map<Character, CharacterDescriptor> descriptors = Maps.newHashMap();
             for (final int val : closest.bmFont.getMappedChars()) {
                 final Char c = closest.bmFont.getChar(val);
-                final CharacterDescriptor desc = new CharacterDescriptor(c.x, c.y, c.width, c.height, c.xadvance,
+                final CharacterDescriptor desc = new CharacterDescriptor((char)c.id, c.x, c.y, c.width, c.height, c.xadvance,
                         c.xoffset, c.yoffset, 1.0, null);
                 descriptors.put((char) val, desc);
             }

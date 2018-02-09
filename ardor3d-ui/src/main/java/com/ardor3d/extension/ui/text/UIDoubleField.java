@@ -32,8 +32,8 @@ public class UIDoubleField extends UITextField {
     }
 
     @Override
-    protected String validateText(final String newText, final String oldText) {
-        final String valText = super.validateText(newText, oldText);
+    protected String validateInputText(final String inputText, final String oldText) {
+        final String valText = super.validateInputText(inputText, oldText);
         if (valText == null) {
             return null;
         }
@@ -117,9 +117,10 @@ public class UIDoubleField extends UITextField {
     }
 
     @Override
-    protected String getVisibleText(final String text) {
+    protected String formatRawText(final String rawText) {
         if (isFocused()) {
-            return text;
+            // don't apply formatting if we're focused
+            return rawText;
         }
         if (_displayScientific) {
             return String.format("%." + (_decimalPlaces + 1) + "g", _value);
@@ -173,8 +174,7 @@ public class UIDoubleField extends UITextField {
     public void lostFocus() {
         // force a clamp to [min, max] range
         final String text = getText();
-        final double val = text == null ? 0 : MathUtils.clamp(Double.parseDouble(text), _minValue, _maxValue);
-        setValue(val);
+        _value = text.trim() == "" ? 0.0 : MathUtils.clamp(Double.parseDouble(text), _minValue, _maxValue);
 
         super.lostFocus();
     }

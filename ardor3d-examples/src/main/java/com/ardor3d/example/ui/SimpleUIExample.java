@@ -127,7 +127,7 @@ public class SimpleUIExample extends ExampleBase {
         frame.setContentPanel(pane);
         frame.pack();
 
-        frame.setUseStandin(true);
+        frame.setUseStandin(false);
         frame.setOpacity(1f);
         frame.setName("sample");
 
@@ -218,9 +218,10 @@ public class SimpleUIExample extends ExampleBase {
     }
 
     private void applyChat(final UITextArea historyArea, final UITextField chatField, final UIScrollPanel scrollArea) {
-        final String text = chatField.getText();
-        if (text.length() > 0) {
-            historyArea.setText(historyArea.getText() + "\n" + text);
+        final String text = chatField.getRawText();
+        if (text != null && text.length() > 0) {
+            final String oldText = historyArea.getRawText() != null ? historyArea.getRawText() + "\n" : "";
+            historyArea.setText(oldText + text);
             chatField.setText("");
             scrollArea.layout();
         }

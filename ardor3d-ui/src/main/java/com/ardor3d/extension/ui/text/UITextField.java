@@ -17,10 +17,6 @@ import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
-import com.ardor3d.extension.ui.text.TextSelection.SelectionState;
-import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
@@ -42,7 +38,7 @@ public class UITextField extends AbstractUITextEntryComponent {
     public UITextField() {
         _disabledState = new UIState();
         _defaultState = new DefaultTextEntryState();
-        _writingState = new TextFieldWritingState();
+        _writingState = new TextEntryWritingState(this);
         setEditable(true);
         applySkin();
         switchState(getDefaultState());
@@ -146,37 +142,34 @@ public class UITextField extends AbstractUITextEntryComponent {
 
         // Draw our text, if we have any
         if (_uiText != null) {
-            final String text = getText();
-            if (text.length() > 0) {
-                // set our text location
-                final Vector3 v = Vector3.fetchTempInstance();
-                // note: we round to get the text pixel aligned... otherwise it can get blurry
-                v.set(Math.round(x), Math.round(y), 0);
-                final Transform t = Transform.fetchTempInstance();
-                t.set(getWorldTransform());
-                t.applyForwardVector(v);
-                t.translate(v);
-                Vector3.releaseTempInstance(v);
-                _uiText.setWorldTransform(t);
-                Transform.releaseTempInstance(t);
+            // set our text location
+            final Vector3 v = Vector3.fetchTempInstance();
+            // note: we round to get the text pixel aligned... otherwise it can get blurry
+            v.set(Math.round(x), Math.round(y), 0);
+            final Transform t = Transform.fetchTempInstance();
+            t.set(getWorldTransform());
+            t.applyForwardVector(v);
+            t.translate(v);
+            Vector3.releaseTempInstance(v);
+            _uiText.setWorldTransform(t);
+            Transform.releaseTempInstance(t);
 
-                // draw the selection first
-                if (getSelection().getSelectionLength() > 0) {
-                    getSelection().draw(r, t);
-                }
+            // draw the selection first
+            if (getSelection().getSelectionLength() > 0) {
+                getSelection().draw(r, t);
+            }
 
-                // draw text using current foreground color and alpha.
-                // TODO: alpha of text...
-                final boolean needsPop = getWorldRotation().isIdentity();
-                if (needsPop) {
-                    _clipRectangleStore.set(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(),
-                            getContentWidth(), getContentHeight());
-                    r.pushClip(_clipRectangleStore);
-                }
-                _uiText.render(r);
-                if (needsPop) {
-                    r.popClip();
-                }
+            // draw text using current foreground color and alpha.
+            // TODO: alpha of text...
+            final boolean needsPop = getWorldRotation().isIdentity();
+            if (needsPop) {
+                _clipRectangleStore.set(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
+                        getContentHeight());
+                r.pushClip(_clipRectangleStore);
+            }
+            _uiText.render(r);
+            if (needsPop) {
+                r.popClip();
             }
         }
 
@@ -185,81 +178,6 @@ public class UITextField extends AbstractUITextEntryComponent {
             getCaret().draw(r, this,
                     _uiText != null ? _uiText.getLineHeight(getCaretPosition()) : UIComponent.getDefaultFontSize(), x,
                     y);
-        }
-    }
-
-    public class TextFieldWritingState extends UIState {
-        @Override
-        public boolean keyReleased(final Key key, final InputState state) {
-            return getKeyHandler().keyReleased(key, state);
-        }
-
-        @Override
-        public boolean keyPressed(final Key key, final InputState state) {
-            return getKeyHandler().keyPressed(key, state);
-        }
-
-        @Override
-        public boolean keyHeld(final Key key, final InputState state) {
-            return getKeyHandler().keyHeld(key, state);
-        }
-
-        @Override
-        public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
-            // TODO: set cursor to text entry
-        }
-
-        @Override
-        public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
-            // TODO: set cursor to default
-        }
-
-        @Override
-        public boolean mousePressed(final MouseButton button, final InputState state) {
-            final int x = state.getMouseState().getX() - UITextField.this.getHudX()
-                    - UITextField.this.getPadding().getLeft();
-            final int y = state.getMouseState().getY() - UITextField.this.getHudY()
-                    - UITextField.this.getPadding().getBottom();
-
-            if (_uiText != null) {
-                final int position = _uiText.findCaretPosition(x, y);
-                if (isCopyable() && state.getKeyboardState().isAtLeastOneDown(Key.LSHIFT, Key.RSHIFT)) {
-                    _selection.checkStart();
-                    if (_selection.getState() == SelectionState.AT_START_OF_SELECTION) {
-                        if (position <= _selection.getEndIndex()) {
-                            _selection.setStartIndex(position);
-                        } else {
-                            final int oldEnd = _selection.getEndIndex();
-                            _selection.setEndIndex(position);
-                            _selection.setStartIndex(oldEnd);
-                            _selection.setState(SelectionState.AT_END_OF_SELECTION);
-                        }
-                    } else {
-                        if (position >= _selection.getStartIndex()) {
-                            _selection.setEndIndex(position);
-                        } else {
-                            final int oldStart = _selection.getStartIndex();
-                            _selection.setStartIndex(position);
-                            _selection.setEndIndex(oldStart);
-                            _selection.setState(SelectionState.AT_START_OF_SELECTION);
-                        }
-                    }
-                } else {
-                    // clear any getSelection()
-                    clearSelection();
-                }
-                setCaretPosition(position);
-            } else {
-                setCaretPosition(0);
-            }
-
-            return true;
-        }
-
-        @Override
-        public void lostFocus() {
-            switchState(_defaultState);
-            getSelection().setStartIndex(-1);
         }
     }
 }

@@ -71,8 +71,8 @@ public enum TextFactory {
         return _styleParser;
     }
 
-    public RenderedText generateText(final String text, final boolean styled, final Map<String, Object> defaultStyles,
-            final RenderedText store, final int maxWidth) {
+    public RenderedText generateText(final String rawText, final boolean styled,
+            final Map<String, Object> defaultStyles, final RenderedText store, final int maxWidth) {
         RenderedText rVal = store;
         if (rVal == null) {
             rVal = new RenderedText();
@@ -80,31 +80,31 @@ public enum TextFactory {
             rVal.detachAllChildren();
         }
 
+        rVal.setRawText(rawText);
         rVal.setStyled(styled);
 
         // note: spans must be in order by start index
         final LinkedList<StyleSpan> spans = Lists.newLinkedList();
-        final String plainText;
+        final String visibleText;
         if (styled && _styleParser != null) {
             // parse text for style spans
             final List<StyleSpan> styleStore = Lists.newArrayList();
-            plainText = _styleParser.parseStyleSpans(text, styleStore);
+            visibleText = _styleParser.parseStyleSpans(rawText, styleStore);
             Collections.sort(styleStore);
             if (!styleStore.isEmpty()) {
                 spans.addAll(styleStore);
             }
         } else {
-            plainText = text;
+            visibleText = rawText;
         }
 
+        rVal.setVisibleText(visibleText);
         rVal.setParsedStyleSpans(spans);
 
         // push defaults onto head of list
         for (final String style : defaultStyles.keySet()) {
-            spans.addFirst(new StyleSpan(style, defaultStyles.get(style), 0, plainText.length()));
+            spans.addFirst(new StyleSpan(style, defaultStyles.get(style), 0, visibleText.length()));
         }
-
-        rVal.setPlainText(plainText);
 
         final RenderedTextData textData = rVal.getData();
         textData.reset();
@@ -125,7 +125,7 @@ public enum TextFactory {
         double scale = 1, prevScale = 0;
         final Map<String, Object> stylesMap = Maps.newHashMap();
 
-        final char[] chars = plainText.toCharArray();
+        final char[] chars = visibleText.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             c = chars[i];
             // update our list - remove spans we've passed by

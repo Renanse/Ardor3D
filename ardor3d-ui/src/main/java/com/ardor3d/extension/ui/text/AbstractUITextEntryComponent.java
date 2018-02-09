@@ -16,7 +16,6 @@ import com.ardor3d.extension.ui.StateBasedUIComponent;
 import com.ardor3d.extension.ui.Textable;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIState;
-import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
@@ -33,7 +32,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
     protected UIState _defaultState;
     protected UIState _writingState;
 
-    /** The text object to use for drawing label text. */
+    /** The text object to use for rendering. */
     protected RenderedText _uiText;
 
     /** If true, our text could be marked up with style information. */
@@ -51,8 +50,13 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
         }
 
         @Override
-        public RenderedTextData getTextData() {
-            return _uiText.getData();
+        public void setCaretPosition(final int position) {
+            AbstractUITextEntryComponent.this.setCaretPosition(position);
+        }
+
+        @Override
+        public RenderedText getRenderedText() {
+            return _uiText;
         }
     };
 
@@ -72,31 +76,32 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
         return _writingState;
     }
 
-    /**
-     * @return the text value of this text entry widget
-     */
+    public String getRawText() {
+        return _uiText != null ? _uiText.getRawText() : null;
+    }
+
     public String getText() {
-        return _uiText != null ? _uiText.getText() : "";
+        return _uiText != null && _uiText.getVisibleText() != null ? _uiText.getVisibleText() : "";
     }
 
     /**
      * Set the text for this component. Also updates the minimum size of the component.
      *
-     * @param text
+     * @param rawText
      *            the new text
      */
-    public void setText(String text) {
-        text = validateText(text, _uiText != null ? _uiText.getPlainText() : null);
+    public void setText(String rawText) {
+        rawText = validateInputText(rawText, _uiText != null ? _uiText.getRawText() : null);
 
-        if (text != null) {
+        if (rawText != null) {
             int maxWidth = getMaximumLocalComponentWidth() - getTotalLeft() - getTotalRight();
             if (maxWidth <= 0) {
                 maxWidth = -1;
             }
 
-            _uiText = TextFactory.INSTANCE.generateText(getVisibleText(text), isStyledText(), getFontStyles(), _uiText,
-                    maxWidth);
-            _uiText.setPlainText(text);
+            _uiText = TextFactory.INSTANCE.generateText(formatRawText(rawText), isStyledText(), getFontStyles(),
+                    _uiText, maxWidth);
+            _uiText.setRawText(rawText);
         } else {
             _uiText = null;
 
@@ -107,15 +112,21 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
         updateMinimumSizeFromContents();
     }
 
-    protected String validateText(String newText, final String oldText) {
-        if (newText != null && newText.length() == 0) {
-            newText = null;
+    protected String validateInputText(String inputText, final String oldText) {
+        if (inputText != null && inputText.length() == 0) {
+            inputText = null;
         }
-        return newText;
+        return inputText;
     }
 
-    protected String getVisibleText(final String text) {
-        return text;
+    /**
+     * Applies default formatting to raw text for this component prior to passing it to rendered text generation.
+     *
+     * @param rawText
+     * @return by default, returns the rawText as is.
+     */
+    protected String formatRawText(final String rawText) {
+        return rawText;
     }
 
     public boolean isStyledText() {
@@ -143,9 +154,12 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
      */
     public int setCaretPosition(int index) {
         final String text = getText();
-        if (index > text.length()) {
+        if (text == null) {
+            index = 0;
+        } else if (index > text.length()) {
             index = text.length();
         }
+
         if (index < 0) {
             index = 0;
         }
@@ -196,7 +210,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
     @Override
     public void fireStyleChanged() {
         super.fireStyleChanged();
-        setText(getText());
+        setText(getRawText());
     }
 
     @Override
@@ -204,8 +218,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
         int width = 0;
         int height = 0;
 
-        final String textVal = getText();
-        if (textVal.length() > 0) {
+        if (_uiText != null) {
             width += Math.round(_uiText.getWidth());
             height += Math.round(_uiText.getHeight());
         }

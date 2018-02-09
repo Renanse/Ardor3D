@@ -142,7 +142,7 @@ public class BMFont implements Savable {
 
     /**
      * @param chr
-     *            ascii character code
+     *            integer character code
      * @return character descriptor for chr. If character is not in the char set, return '?' (if '?' is not in the char
      *         set, return will be null)
      */

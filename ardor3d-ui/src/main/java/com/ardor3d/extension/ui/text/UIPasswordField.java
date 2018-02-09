@@ -3,13 +3,12 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.extension.ui.text;
-
 
 public class UIPasswordField extends UITextField {
 
@@ -28,16 +27,16 @@ public class UIPasswordField extends UITextField {
     }
 
     @Override
-    public void setText(final String text) {
+    public void setText(final String rawText) {
         final StringBuilder newText = new StringBuilder();
-        if (text != null) {
-            for (int i = text.length(); --i >= 0;) {
+        if (rawText != null) {
+            for (int i = rawText.length(); --i >= 0;) {
                 newText.append(_passwordChar);
             }
         }
         super.setText(newText.toString());
         if (_uiText != null) {
-            _uiText.setPlainText(text);
+            _uiText.setRawText(rawText);
         }
     }
 

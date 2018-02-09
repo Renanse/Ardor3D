@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -25,7 +25,9 @@ import com.google.common.collect.Lists;
 
 public class RenderedText extends Node implements Renderable {
 
-    protected String _plainText = null;
+    protected String _rawText = null;
+    protected String _visibleText = null;
+
     protected List<StyleSpan> _parsedStyles = Lists.newLinkedList();
 
     protected float _width;
@@ -36,20 +38,20 @@ public class RenderedText extends Node implements Renderable {
 
     public RenderedText() {}
 
-    public String getText() {
-        if (!isStyled()) {
-            return _plainText;
-        } else {
-            return TextFactory.INSTANCE.getMarkedUpText(_plainText, _parsedStyles);
-        }
+    public String getRawText() {
+        return _rawText;
     }
 
-    public void setPlainText(final String text) {
-        _plainText = text;
+    public void setRawText(final String rawText) {
+        _rawText = rawText;
     }
 
-    public String getPlainText() {
-        return _plainText;
+    public String getVisibleText() {
+        return _visibleText;
+    }
+
+    public void setVisibleText(final String visibleText) {
+        _visibleText = visibleText;
     }
 
     public void setHeight(final float height) {
@@ -191,6 +193,19 @@ public class RenderedText extends Node implements Renderable {
         }
 
         return position;
+    }
+
+    public int getLineFromCaretPosition(final int position) {
+        int line;
+        final int max = data._lineEnds.size();
+        for (line = 0; line < max; line++) {
+            final int endPos = data._lineEnds.get(line);
+            if (endPos >= position) {
+                return line;
+            }
+        }
+
+        return max;
     }
 
     public int getLineHeight(final int caretPosition) {

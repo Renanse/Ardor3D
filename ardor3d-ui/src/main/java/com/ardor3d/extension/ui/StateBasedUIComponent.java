@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -60,7 +60,7 @@ public abstract class StateBasedUIComponent extends UIComponent {
 
     /**
      * Set our current active state.
-     * 
+     *
      * @param nextState
      *            the state to set as active for this component. If null, this is a no-op.
      */
@@ -91,7 +91,7 @@ public abstract class StateBasedUIComponent extends UIComponent {
 
     /**
      * Sets the text color on this component and (optionally) all contained states.
-     * 
+     *
      * @param color
      *            the new foreground color
      * @param allStates
@@ -123,6 +123,11 @@ public abstract class StateBasedUIComponent extends UIComponent {
     @Override
     public boolean mouseMoved(final int mouseX, final int mouseY, final InputState state) {
         return getCurrentState().mouseMoved(mouseX, mouseY, state) || super.mouseMoved(mouseX, mouseY, state);
+    }
+
+    @Override
+    public boolean mouseClicked(final MouseButton button, final InputState state) {
+        return getCurrentState().mouseClicked(button, state) || super.mouseClicked(button, state);
     }
 
     @Override

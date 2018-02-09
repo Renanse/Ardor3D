@@ -132,8 +132,11 @@ public class DefaultLatinTextFieldKeyHandler implements UIKeyHandler {
                                 s1 = text.substring(0, caretPosition);
                                 s2 = text.substring(caretPosition, text.length());
                             }
+                            final int before = _textField._uiText != null ? _textField._uiText.getData()._fontHeights.size()
+                            : 0;
                             _textField.setText(s1 + clipContents + s2);
-                            caretPosition = _textField.setCaretPosition(caretPosition + clipContents.length());
+                            final int after = _textField._uiText != null ? _textField._uiText.getData()._fontHeights.size() : 0;
+                            caretPosition = _textField.setCaretPosition(caretPosition + after - before);
                         }
                         return true;
                     }
