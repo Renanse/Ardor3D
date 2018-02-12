@@ -19,9 +19,21 @@ import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.math.Rectangle2;
+import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector2;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Renderer;
 import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent implements Textable {
+    /** tracking variable for dirty use only */
+    protected boolean _caretIsShowing = false;
+
+    /** A store for the clip rectangle. */
+    private final Rectangle2 _clipRectangleStore = new Rectangle2();
+
+    protected final Vector2 _caretLoc = new Vector2();
 
     protected int _caretPosition = 0;
 
@@ -164,6 +176,16 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
             index = 0;
         }
         _caretPosition = index;
+
+        if (_uiText != null) {
+            _uiText.findCaretTranslation(index, _caretLoc);
+            getCaret().setPosX(Math.round(_caretLoc.getXf()));
+            getCaret().setPosY(Math.round(_caretLoc.getYf()));
+        } else {
+            getCaret().setPosX(0);
+            getCaret().setPosY(0);
+        }
+
         return _caretPosition;
     }
 
@@ -181,6 +203,30 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
 
     public boolean isEditable() {
         return _editable;
+    }
+
+    /**
+     * Delete any currently selected text.
+     */
+    public void deleteSelectedText() {
+        if (_selection.getSelectionLength() != 0) {
+            final String text = getText();
+            final int sIndex = _selection.getStartIndex();
+            final int eIndex = _selection.getEndIndex();
+            if (sIndex >= 0 && sIndex <= text.length() && eIndex >= 0 && eIndex <= text.length()) {
+                setText(text.substring(0, sIndex) + text.substring(eIndex));
+            }
+        }
+    }
+
+    public String getSelectedText() {
+        if (_selection.getSelectionLength() != 0) {
+            final String text = getText();
+            final int start = getSelection().getStartIndex();
+            return text.substring(start, start + getSelectionLength());
+        }
+
+        return "";
     }
 
     /**
@@ -237,6 +283,67 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
     }
 
     @Override
+    public void updateGeometricState(final double time, final boolean initiator) {
+        if (getCurrentState().equals(_writingState) && _caretIsShowing != getCaret().isShowing()) {
+            fireComponentDirty();
+            _caretIsShowing = !_caretIsShowing;
+        }
+        super.updateGeometricState(time, initiator);
+    }
+
+    @Override
+    protected void drawComponent(final Renderer r) {
+        // figure out our offsets using alignment and edge info
+        final double x = _alignment.alignX(getContentWidth(), _uiText != null ? _uiText.getWidth() : 1)
+                + getTotalLeft();
+        final double y = _alignment.alignY(getContentHeight(), _uiText != null ? _uiText.getHeight() : 1)
+                + getTotalBottom();
+
+        // Draw our text, if we have any
+        if (_uiText != null) {
+            // set our text location
+            final Vector3 v = Vector3.fetchTempInstance();
+            // note: we round to get the text pixel aligned... otherwise it can get blurry
+            v.set(Math.round(x), Math.round(y), 0);
+            final Transform t = Transform.fetchTempInstance();
+            t.set(getWorldTransform());
+            t.applyForwardVector(v);
+            t.translate(v);
+            Vector3.releaseTempInstance(v);
+            _uiText.setWorldTransform(t);
+            Transform.releaseTempInstance(t);
+
+            // draw the selection first
+            if (getSelection().getSelectionLength() > 0) {
+                getSelection().draw(r, t);
+            }
+
+            // draw text using current foreground color and alpha.
+            // TODO: alpha of text...
+            final boolean needsPop = getWorldRotation().isIdentity();
+            if (needsPop) {
+                _clipRectangleStore.set(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
+                        getContentHeight());
+                r.pushClip(_clipRectangleStore);
+            }
+
+            _uiText.render(r);
+            if (needsPop) {
+                r.popClip();
+            }
+        }
+
+        // Draw our caret, if we have one.
+        if (isEditable() && getCurrentState().equals(_writingState) && getCaret().isShowing()) {
+            if (_uiText == null) {
+                getCaret().draw(r, this, UIComponent.getDefaultFontSize(), x, y);
+            } else {
+                getCaret().draw(r, this, _uiText.getFontHeightFromCaretPosition(getCaretPosition()), x, y);
+            }
+        }
+    }
+
+    @Override
     public ImmutableSet<UIState> getStates() {
         return ImmutableSet.of(_defaultState, _disabledState, _writingState);
     }
@@ -252,6 +359,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
                     - AbstractUITextEntryComponent.this.getPadding().getBottom();
 
             setCaretPosition(_uiText != null ? _uiText.findCaretPosition(x, y) : 0);
+            clearSelection();
 
             return true;
         }

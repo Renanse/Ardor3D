@@ -15,6 +15,8 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class CharacterDescriptor {
 
+    public static final CharacterDescriptor CR = new CharacterDescriptor('\n', 0, 0, 0, 0, 0, 0, 0, 1.0, null);
+
     /** The character id, i.e. char value, of this character. */
     private final char _id;
 

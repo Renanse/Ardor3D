@@ -157,6 +157,5 @@ public class TextEntryWritingState extends UIState {
     @Override
     public void lostFocus() {
         _component.switchState(_component.getDefaultState());
-        _component.getSelection().setStartIndex(-1);
     }
 }

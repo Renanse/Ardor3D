@@ -332,19 +332,23 @@ public abstract class TextSelection {
 
         // Make triangle strips for each line.
         final RenderedTextData data = rText.getData();
-        float xStart = 0, xEnd = 0, height = 0, yOffset = 0;
+        float xStart = 0, xEnd = 0, height = 0, yOffset = data.getTotalHeight();
+        int end, prevEnd = 0;
         boolean exit = false;
         final List<Float> verts = Lists.newArrayList();
         for (int j = 0; !exit && j < data._lineEnds.size(); j++) {
             height = data._lineHeights.get(j);
-            final int end = data._lineEnds.get(j);
+            yOffset -= height;
+
+            end = data._lineEnds.get(j);
             if (_startIndex > end) {
                 continue;
-            } else if (_startIndex <= end) {
+            } else if (_startIndex > prevEnd) {
                 xStart = data._xStarts.get(_startIndex);
             } else {
                 xStart = 0;
             }
+            prevEnd = end;
 
             if (_endIndex <= end) {
                 // last strip
@@ -380,8 +384,6 @@ public abstract class TextSelection {
             verts.add(xEnd);
             verts.add(yOffset + height);
             verts.add(0f);
-
-            yOffset += height;
         }
         final MeshData mData = _standin.getMeshData();
         mData.setVertexBuffer(BufferUtils.createVector3Buffer(mData.getVertexBuffer(), verts.size()));

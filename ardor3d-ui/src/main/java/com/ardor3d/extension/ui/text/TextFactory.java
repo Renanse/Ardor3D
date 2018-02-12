@@ -166,6 +166,9 @@ public enum TextFactory {
 
             // check for new line
             if (c == '\n') {
+                descs.add(CharacterDescriptor.CR);
+                descXStarts.add(xOffset);
+
                 // add current index to lineEnds
                 lineEnds.add(descs.size() - 1);
 
@@ -177,6 +180,7 @@ public enum TextFactory {
                 // add current max height to heights
                 lineHeights.add(maxLineHeight);
                 maxSizeHeight += maxLineHeight;
+                fontHeights.add(maxLineHeight);
 
                 // reset tracking vars
                 maxLineHeight = 0;
