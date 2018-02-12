@@ -17,6 +17,8 @@ import com.ardor3d.util.trigger.TimedTrigger;
 
 public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
 
+    public static int TAB_SIZE = 4;
+
     private final AbstractUITextEntryComponent _textEntry;
     private final TimedTrigger _repeatTimer = new TimedTrigger();
 
@@ -341,8 +343,10 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
                 }
 
                 if (c == '\t') {
-                    _textEntry.setText(s1 + "    " + s2);
-                    caretPosition = _textEntry.setCaretPosition(caretPosition + 4);
+                    _textEntry.setText(s1 + String.format("%" + DefaultLatinTextEntryKeyHandler.TAB_SIZE + "s", ' ')
+                            + s2);
+                    caretPosition = _textEntry.setCaretPosition(caretPosition
+                            + DefaultLatinTextEntryKeyHandler.TAB_SIZE);
                 } else {
                     _textEntry.setText(s1 + c + s2);
                     caretPosition = _textEntry.setCaretPosition(caretPosition + 1);
