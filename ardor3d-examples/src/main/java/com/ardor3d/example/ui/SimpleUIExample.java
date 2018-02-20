@@ -36,6 +36,8 @@ import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.GridLayout;
 import com.ardor3d.extension.ui.layout.GridLayoutData;
+import com.ardor3d.extension.ui.layout.RectLayout;
+import com.ardor3d.extension.ui.layout.RectLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.model.DefaultComboBoxModel;
 import com.ardor3d.extension.ui.text.UIPasswordField;
@@ -116,12 +118,15 @@ public class SimpleUIExample extends ExampleBase {
 
         final UIPanel panel5 = makeScrollPanel();
 
+        final UIPanel panel6 = makeSimpleRectLayout();
+
         final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
         pane.add(panel, "widgets");
         pane.add(panel2, "grid");
         pane.add(panel3, "chat");
         pane.add(panel4, "clock");
         pane.add(panel5, "picture");
+        pane.add(panel6, "rect1");
 
         frame = new UIFrame("UI Sample");
         frame.setContentPanel(pane);
@@ -353,6 +358,20 @@ public class SimpleUIExample extends ExampleBase {
         comp.setIcon(new SubTex(tex));
         comp.updateIconDimensionsFromIcon();
         final UIScrollPanel panel = new UIScrollPanel(comp);
+        return panel;
+    }
+
+    private UIPanel makeSimpleRectLayout() {
+        final UIPanel panel = new UIPanel(new RectLayout());
+
+        final UIButton okButton = new UIButton("OK!");
+        okButton.setLayoutData(RectLayoutData.pinCenter(100, 50, 55, 0));
+        panel.add(okButton);
+
+        final UIButton cancelButton = new UIButton("Cancel");
+        cancelButton.setLayoutData(RectLayoutData.pinCenter(100, 50, -55, 0));
+        panel.add(cancelButton);
+
         return panel;
     }
 

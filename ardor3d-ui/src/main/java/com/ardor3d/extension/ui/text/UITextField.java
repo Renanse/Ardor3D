@@ -33,6 +33,11 @@ public class UITextField extends AbstractUITextEntryComponent {
         switchState(getDefaultState());
     }
 
+    public UITextField(final String rawText) {
+        this();
+        setText(rawText);
+    }
+
     @Override
     protected UIKeyHandler getKeyHandler() {
         if (_keyHandler == null) {

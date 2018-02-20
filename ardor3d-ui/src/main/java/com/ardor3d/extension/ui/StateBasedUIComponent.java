@@ -10,6 +10,9 @@
 
 package com.ardor3d.extension.ui;
 
+import com.ardor3d.extension.ui.backdrop.UIBackdrop;
+import com.ardor3d.extension.ui.border.UIBorder;
+import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
@@ -102,6 +105,42 @@ public abstract class StateBasedUIComponent extends UIComponent {
         if (allStates) {
             for (final UIState state : getStates()) {
                 state.setForegroundColor(color);
+            }
+        }
+    }
+
+    public void setMargin(final Insets margin, final boolean allStates) {
+        super.setMargin(margin);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                state.setMargin(margin);
+            }
+        }
+    }
+
+    public void setPadding(final Insets padding, final boolean allStates) {
+        super.setPadding(padding);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                state.setPadding(padding);
+            }
+        }
+    }
+
+    public void setBorder(final UIBorder border, final boolean allStates) {
+        super.setBorder(border);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                state.setBorder(border);
+            }
+        }
+    }
+
+    public void setBackdrop(final UIBackdrop backDrop, final boolean allStates) {
+        super.setBackdrop(backDrop);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                state.setBackdrop(backDrop);
             }
         }
     }
