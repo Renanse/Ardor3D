@@ -75,6 +75,11 @@ public class UIHud extends Node {
     protected boolean _keyInputConsumed;
 
     /**
+     * If true, we'll assume mouse input is always consumed whenever lastMouseOverComponent is not null.
+     */
+    protected boolean _autoConsumeMouseOnOver = true;
+
+    /**
      * Flag used to determine if we should use mouse input when mouse is grabbed. Defaults to true.
      */
     private boolean _ignoreMouseInputOnGrabbed = true;
@@ -507,11 +512,11 @@ public class UIHud extends Node {
 
                     final InputState prev = states.getPrevious();
                     final InputState curr = states.getCurrent();
-                    if (!_mouseInputConsumed) {
+                    if (!_mouseInputConsumed && (!_autoConsumeMouseOnOver || _lastMouseOverComponent == null)) {
                         if (!_keyInputConsumed) {
                             // nothing consumed
                             forwardTo.getApplier()
-                                    .checkAndPerformTriggers(forwardTo.getTriggers(), source, states, tpf);
+                            .checkAndPerformTriggers(forwardTo.getTriggers(), source, states, tpf);
                         } else {
                             // only key state consumed
                             final TwoInputStates forwardingState = new TwoInputStates(
@@ -934,5 +939,13 @@ public class UIHud extends Node {
 
     public interface UIInputPostHook {
         boolean process(boolean consumed, UIHud source, TwoInputStates inputStates);
+    }
+
+    public void setAutoConsumeMouseOnOver(final boolean autoConsumeMouseOnOver) {
+        _autoConsumeMouseOnOver = autoConsumeMouseOnOver;
+    }
+
+    public boolean isAutoConsumeMouseOnOver() {
+        return _autoConsumeMouseOnOver;
     }
 }
