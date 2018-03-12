@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -33,6 +33,7 @@ import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.gesture.GestureState;
 import com.google.common.base.Predicate;
 
 /**
@@ -50,12 +51,13 @@ public class TestLogicalLayer {
     KeyboardState ks;
     MouseState ms;
     ControllerState cs;
+    GestureState gs;
 
     Canvas canvas;
 
     Object[] mocks;
 
-    @SuppressWarnings( { "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     @Before
     public void setup() throws Exception {
         pl = createMock("Physicallayer", PhysicalLayer.class);
@@ -75,6 +77,7 @@ public class TestLogicalLayer {
         ks = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);
         ms = new MouseState(0, 0, 0, 0, 0, MouseButton.makeMap(ButtonState.UP, ButtonState.UP, ButtonState.UP), null);
         cs = new ControllerState();
+        gs = new GestureState();
 
         mocks = new Object[] { pl, ta1, ta2, p1, p2, canvas };
     }
@@ -86,8 +89,8 @@ public class TestLogicalLayer {
 
     @Test
     public void testTriggers1() throws Exception {
-        final InputState state1 = new InputState(ks, ms, cs);
-        final InputState state2 = new InputState(ks, ms, cs);
+        final InputState state1 = new InputState(ks, ms, cs, gs);
+        final InputState state2 = new InputState(ks, ms, cs, gs);
 
         final double tpf = 14;
 
@@ -115,8 +118,8 @@ public class TestLogicalLayer {
 
     @Test
     public void testTriggers2() throws Exception {
-        final InputState state1 = new InputState(ks, ms, cs);
-        final InputState state2 = new InputState(ks, ms, cs);
+        final InputState state1 = new InputState(ks, ms, cs, gs);
+        final InputState state2 = new InputState(ks, ms, cs, gs);
 
         final double tpf = 14;
 
@@ -149,8 +152,8 @@ public class TestLogicalLayer {
 
     @Test
     public void testTriggers3() throws Exception {
-        final InputState state1 = new InputState(ks, ms, cs);
-        final InputState state2 = new InputState(ks, ms, cs);
+        final InputState state1 = new InputState(ks, ms, cs, gs);
+        final InputState state2 = new InputState(ks, ms, cs, gs);
 
         final double tpf = 14;
 
@@ -184,7 +187,7 @@ public class TestLogicalLayer {
 
     @Test
     public void testTriggers4() throws Exception {
-        final InputState state1 = new InputState(ks, ms, cs);
+        final InputState state1 = new InputState(ks, ms, cs, gs);
 
         final double tpf = 14;
 
@@ -218,8 +221,8 @@ public class TestLogicalLayer {
 
     @Test
     public void testLostFocus() throws Exception {
-        final InputState state1 = new InputState(ks, ms, cs);
-        final InputState state2 = new InputState(ks, ms, cs);
+        final InputState state1 = new InputState(ks, ms, cs, gs);
+        final InputState state2 = new InputState(ks, ms, cs, gs);
 
         final double tpf = 14;
 

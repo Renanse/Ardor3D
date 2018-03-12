@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -36,6 +36,7 @@ public class LwjglMouseWrapper implements MouseWrapper {
     private static final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
     private static boolean _sendClickState = false;
+    private static boolean _ignoreInput;
     private static MouseState _nextState;
 
     public LwjglMouseWrapper() {
@@ -63,12 +64,30 @@ public class LwjglMouseWrapper implements MouseWrapper {
         return _currentIterator;
     }
 
-    private static class LwjglMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
+    @Override
+    public void setIgnoreInput(final boolean ignore) {
+        _ignoreInput = ignore;
+    }
+
+    @Override
+    public boolean isIgnoreInput() {
+        return _ignoreInput;
+    }
+
+    private static class LwjglMouseIterator extends AbstractIterator<MouseState>
+            implements PeekingIterator<MouseState> {
 
         public LwjglMouseIterator() {}
 
         @Override
         protected MouseState computeNext() {
+            if (_ignoreInput) {
+                while (Mouse.next()) {
+                    ;
+                }
+                return endOfData();
+            }
+
             if (_nextState != null) {
                 final MouseState rVal = _nextState;
                 _nextState = null;
@@ -97,8 +116,8 @@ public class LwjglMouseWrapper implements MouseWrapper {
                 buttons.put(MouseButton.MIDDLE, down ? ButtonState.DOWN : ButtonState.UP);
             }
 
-            final MouseState nextState = new MouseState(Mouse.getEventX(), Mouse.getEventY(), Mouse.getEventDX(), Mouse
-                    .getEventDY(), Mouse.getEventDWheel(), buttons, null);
+            final MouseState nextState = new MouseState(Mouse.getEventX(), Mouse.getEventY(), Mouse.getEventDX(),
+                    Mouse.getEventDY(), Mouse.getEventDWheel(), buttons, null);
 
             if (nextState.getDx() != 0.0 || nextState.getDy() != 0.0) {
                 _clickArmed.clear();

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -43,6 +43,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     private final LinkedList<MouseState> _upcomingEvents = new LinkedList<MouseState>();
 
     private final Control _control;
+    private boolean _ignoreInput;
 
     @GuardedBy("this")
     private SwtMouseIterator _currentIterator = null;
@@ -88,10 +89,14 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     }
 
     public synchronized void mouseDoubleClick(final MouseEvent mouseEvent) {
-    // ignoring this. We'll handle (multi)click in a uniform way
+        // ignoring this. We'll handle (multi)click in a uniform way
     }
 
     public synchronized void mouseDown(final MouseEvent e) {
+        if (_ignoreInput) {
+            return;
+        }
+
         final MouseButton b = getButtonForEvent(e);
         if (_clickArmed.contains(b)) {
             _clicks.setCount(b, 0);
@@ -109,6 +114,10 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     }
 
     public synchronized void mouseUp(final MouseEvent e) {
+        if (_ignoreInput) {
+            return;
+        }
+
         initState(e);
 
         final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
@@ -116,7 +125,8 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         setStateForButton(e, buttons, ButtonState.UP);
 
         final MouseButton b = getButtonForEvent(e);
-        if (_clickArmed.contains(b) && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
+        if (_clickArmed.contains(b)
+                && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
             _clicks.add(b); // increment count of clicks for button b.
             // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
             addNewState(e, 0, buttons, EnumMultiset.create(_clicks));
@@ -171,6 +181,10 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     }
 
     public synchronized void mouseMove(final MouseEvent mouseEvent) {
+        if (_ignoreInput) {
+            return;
+        }
+
         _clickArmed.clear();
         _clicks.clear();
 
@@ -181,6 +195,10 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     }
 
     public synchronized void mouseScrolled(final MouseEvent mouseEvent) {
+        if (_ignoreInput) {
+            return;
+        }
+
         initState(mouseEvent);
 
         addNewState(mouseEvent, mouseEvent.count, _lastState.getButtonStates(), null);
@@ -213,5 +231,15 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
                 return _upcomingEvents.poll();
             }
         }
+    }
+
+    @Override
+    public void setIgnoreInput(final boolean ignore) {
+        _ignoreInput = ignore;
+    }
+
+    @Override
+    public boolean isIgnoreInput() {
+        return _ignoreInput;
     }
 }

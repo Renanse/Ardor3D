@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -32,6 +32,7 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ContextGarbageCollector;
@@ -62,8 +63,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </p>
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.benchmark.ball.BubbleMarkExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
+        maxHeapMemory = 64)
 public class BubbleMarkExample implements Scene {
 
     // Our native window, not the gl surface itself.
@@ -82,17 +83,20 @@ public class BubbleMarkExample implements Scene {
 
     private BasicText frameRateLabel;
 
-    private static final int width = (System.getProperty("width") != null ? Integer.parseInt(System
-            .getProperty("width")) : 500);
-    private static final int height = (System.getProperty("height") != null ? Integer.parseInt(System
-            .getProperty("height")) : 300);
+    private static final int width = (System.getProperty("width") != null
+            ? Integer.parseInt(System.getProperty("width"))
+            : 1920);
+    private static final int height = (System.getProperty("height") != null
+            ? Integer.parseInt(System.getProperty("height"))
+            : 1080);
 
     private final boolean skipBallCollide = ("true".equalsIgnoreCase(System.getProperty("noBallCollide")));
 
     private boolean adaptiveStable = !("true".equalsIgnoreCase(System.getProperty("adaptive")));
 
-    private static final int adaptiveTargetFPS = (System.getProperty("targetFPS") != null ? Integer.parseInt(System
-            .getProperty("targetFPS")) : 200);
+    private static final int adaptiveTargetFPS = (System.getProperty("targetFPS") != null
+            ? Integer.parseInt(System.getProperty("targetFPS"))
+            : 200);
 
     private int frames = 0;
     private long startTime = System.currentTimeMillis();
@@ -134,7 +138,7 @@ public class BubbleMarkExample implements Scene {
 
     /**
      * Setup a native canvas and canvas renderer.
-     * 
+     *
      * @return the canvas.
      */
     private NativeCanvas initCanvas() {
@@ -143,6 +147,12 @@ public class BubbleMarkExample implements Scene {
             final DisplaySettings settings = new DisplaySettings(width, height, 24, 0, 0, 8, 0, 0, false, false);
             return new JoglCanvas(canvasRenderer, settings);
         } else {
+            try {
+                SharedLibraryLoader.load(true);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+
             final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(this);
             final DisplaySettings settings = new DisplaySettings(width, height, 24, 0, 0, 8, 0, 0, false, false);
             return new LwjglCanvas(settings, canvasRenderer);
@@ -160,8 +170,8 @@ public class BubbleMarkExample implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    BubbleMarkExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(BubbleMarkExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -222,7 +232,7 @@ public class BubbleMarkExample implements Scene {
 
         // Add balls
         for (int i = 0; i < balls.length; i++) {
-            final BallSprite ballSprite = new BallSprite("ball", Ball.radius * 2, Ball.radius * 2, width, height);
+            final BallSprite ballSprite = new BallSprite("ball", width, height);
             root.attachChild(ballSprite);
             balls[i] = ballSprite;
         }
@@ -257,8 +267,8 @@ public class BubbleMarkExample implements Scene {
                 } else if (ratio > 4.0) {
                     ratio = 4.0;
                 }
-                final int newN = Math.max(1, (ratio > 1.1 || ratio < 0.9) ? (int) (N * ratio) : (ratio > 1.025) ? N + 1
-                        : (ratio < 0.975) ? N - 1 : N);
+                final int newN = Math.max(1, (ratio > 1.1 || ratio < 0.9) ? (int) (N * ratio)
+                        : (ratio > 1.025) ? N + 1 : (ratio < 0.975) ? N - 1 : N);
                 if (newN != N) {
                     resetBalls(newN);
                 } else {

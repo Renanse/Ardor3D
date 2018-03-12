@@ -18,12 +18,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -53,8 +55,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * description
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglAwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglAwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglAwtExample.jpg", //
+        maxHeapMemory = 64)
 public class JoglNewtAwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -67,13 +69,13 @@ public class JoglNewtAwtExample {
         final Timer timer = new Timer();
         final FrameHandler frameWork = new FrameHandler(timer);
 
-        final MyExit exit = new MyExit();
+        final AtomicBoolean exit = new AtomicBoolean(false);
         final LogicalLayer logicalLayer = new LogicalLayer();
 
-        final ExampleScene scene1 = new ExampleScene();
+        final BasicScene scene1 = new BasicScene();
         final RotatingCubeGame game1 = new RotatingCubeGame(scene1, exit, logicalLayer, Key.T);
 
-        final ExampleScene scene2 = new ExampleScene();
+        final BasicScene scene2 = new BasicScene();
         final RotatingCubeGame game2 = new RotatingCubeGame(scene2, exit, logicalLayer, Key.G);
 
         frameWork.addUpdater(game1);
@@ -83,7 +85,7 @@ public class JoglNewtAwtExample {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                exit.exit();
+                exit.set(true);
             }
         });
 
@@ -92,8 +94,8 @@ public class JoglNewtAwtExample {
         JoglImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    JoglNewtAwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(JoglNewtAwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -104,21 +106,19 @@ public class JoglNewtAwtExample {
         _cursor2 = createMouseCursor(joglImageLoader, "com/ardor3d/example/media/input/movedata.gif");
 
         addCanvas(frame, scene1, logicalLayer, frameWork);
-        frame.add(new JLabel(
-                "<html>"
-                        + "<table>"
-                        + "<tr><th align=\"left\" style=\"font-size: 16\">Action</th><th align=\"left\" style=\"font-size: 16\">Command</th></tr>"
-                        + "<tr><td>WS</td><td>Move camera position forward/back</td></tr>"
-                        + "<tr><td>AD</td><td>Turn camera left/right</td></tr>"
-                        + "<tr><td>QE</td><td>Strafe camera left/right</td></tr>"
-                        + "<tr><td>T</td><td>Toggle cube rotation for scene 1 on press</td></tr>"
-                        + "<tr><td>G</td><td>Toggle cube rotation for scene 2 on press</td></tr>"
-                        + "<tr><td>U</td><td>Toggle both cube rotations on release</td></tr>"
-                        + "<tr><td>0 (zero)</td><td>Reset camera position</td></tr>"
-                        + "<tr><td>9</td><td>Face camera towards cube without changing position</td></tr>"
-                        + "<tr><td>ESC</td><td>Quit</td></tr>"
-                        + "<tr><td>Mouse</td><td>Press left button to rotate camera.</td></tr>" + "</table>"
-                        + "</html>", SwingConstants.CENTER));
+        frame.add(new JLabel("<html>" + "<table>"
+                + "<tr><th align=\"left\" style=\"font-size: 16\">Action</th><th align=\"left\" style=\"font-size: 16\">Command</th></tr>"
+                + "<tr><td>WS</td><td>Move camera position forward/back</td></tr>"
+                + "<tr><td>AD</td><td>Turn camera left/right</td></tr>"
+                + "<tr><td>QE</td><td>Strafe camera left/right</td></tr>"
+                + "<tr><td>T</td><td>Toggle cube rotation for scene 1 on press</td></tr>"
+                + "<tr><td>G</td><td>Toggle cube rotation for scene 2 on press</td></tr>"
+                + "<tr><td>U</td><td>Toggle both cube rotations on release</td></tr>"
+                + "<tr><td>0 (zero)</td><td>Reset camera position</td></tr>"
+                + "<tr><td>9</td><td>Face camera towards cube without changing position</td></tr>"
+                + "<tr><td>ESC</td><td>Quit</td></tr>"
+                + "<tr><td>Mouse</td><td>Press left button to rotate camera.</td></tr>" + "</table>" + "</html>",
+                SwingConstants.CENTER));
         addCanvas(frame, scene1, logicalLayer, frameWork);
         frame.add(new JLabel("", SwingConstants.CENTER));
         addCanvas(frame, scene2, logicalLayer, frameWork);
@@ -130,7 +130,7 @@ public class JoglNewtAwtExample {
         game1.init();
         game2.init();
 
-        while (!exit.isExit()) {
+        while (!exit.get()) {
             frameWork.updateFrame();
             Thread.yield();
         }
@@ -141,13 +141,13 @@ public class JoglNewtAwtExample {
 
     private static MouseCursor createMouseCursor(final JoglImageLoader joglImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = joglImageLoader.load(
-                ResourceLocatorTool.getClassPathResourceAsStream(JoglNewtAwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = joglImageLoader
+                .load(ResourceLocatorTool.getClassPathResourceAsStream(JoglNewtAwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
-    private static void addCanvas(final JFrame frame, final ExampleScene scene, final LogicalLayer logicalLayer,
+    private static void addCanvas(final JFrame frame, final BasicScene scene, final LogicalLayer logicalLayer,
             final FrameHandler frameWork) throws Exception {
         final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(scene);
 
@@ -200,19 +200,5 @@ public class JoglNewtAwtExample {
         }));
 
         frameWork.addCanvas(theCanvas);
-
-    }
-
-    private static class MyExit implements Exit {
-        private volatile boolean exit = false;
-
-        @Override
-        public void exit() {
-            exit = true;
-        }
-
-        public boolean isExit() {
-            return exit;
-        }
     }
 }

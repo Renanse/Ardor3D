@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -65,8 +67,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * This examples demonstrates how to render OpenGL (via JOGL) in a SWT canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglSwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
+        maxHeapMemory = 64)
 public class JoglSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -83,8 +85,8 @@ public class JoglSwtExample {
         final FrameHandler frameWork = new FrameHandler(timer);
         final LogicalLayer logicalLayer = new LogicalLayer();
 
-        final MyExit exit = new MyExit();
-        final ExampleScene scene = new ExampleScene();
+        final AtomicBoolean exit = new AtomicBoolean(false);
+        final BasicScene scene = new BasicScene();
         final RotatingCubeGame game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
 
         frameWork.addUpdater(game);
@@ -124,8 +126,8 @@ public class JoglSwtExample {
         JoglImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    JoglSwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(JoglSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -137,7 +139,7 @@ public class JoglSwtExample {
 
         game.init();
 
-        while (!shell.isDisposed() && !exit.isExit()) {
+        while (!shell.isDisposed() && !exit.get()) {
             display.readAndDispatch();
             frameWork.updateFrame();
             Thread.yield();
@@ -147,7 +149,7 @@ public class JoglSwtExample {
         System.exit(0);
     }
 
-    private static void addNewCanvas(final TabFolder tabFolder, final ExampleScene scene, final FrameHandler frameWork,
+    private static void addNewCanvas(final TabFolder tabFolder, final BasicScene scene, final FrameHandler frameWork,
             final LogicalLayer logicalLayer) {
         i++;
         logger.info("Adding canvas");
@@ -266,8 +268,8 @@ public class JoglSwtExample {
 
     private static MouseCursor createMouseCursor(final JoglImageLoader joglImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = joglImageLoader.load(
-                ResourceLocatorTool.getClassPathResourceAsStream(JoglSwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = joglImageLoader
+                .load(ResourceLocatorTool.getClassPathResourceAsStream(JoglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
@@ -295,18 +297,5 @@ public class JoglSwtExample {
             }
         };
         return retVal;
-    }
-
-    private static class MyExit implements Exit {
-        private volatile boolean exit = false;
-
-        @Override
-        public void exit() {
-            exit = true;
-        }
-
-        public boolean isExit() {
-            return exit;
-        }
     }
 }

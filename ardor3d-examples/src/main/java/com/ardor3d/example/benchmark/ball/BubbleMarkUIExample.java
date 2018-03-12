@@ -41,8 +41,8 @@ import com.ardor3d.util.TextureManager;
  * The famous BubbleMark UI test, recreated using Ardor3D UI components.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.benchmark.ball.BubbleMarkUIExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkUIExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkUIExample.jpg", //
+        maxHeapMemory = 64)
 public class BubbleMarkUIExample extends ExampleBase {
 
     private BallComponent[] balls;
@@ -96,7 +96,7 @@ public class BubbleMarkUIExample extends ExampleBase {
 
         // Add fps display
         frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
-        frameRateLabel.setTranslation(5, hud.getHeight() - 5 - frameRateLabel.getHeight(), 0);
+        frameRateLabel.setTranslation(5, hud.getHeight() - 50 - frameRateLabel.getHeight(), 0);
         frameRateLabel.setTextColor(ColorRGBA.WHITE);
         frameRateLabel.getSceneHints().setOrthoOrder(-1);
         _root.attachChild(frameRateLabel);
@@ -109,17 +109,16 @@ public class BubbleMarkUIExample extends ExampleBase {
         final UIPanel panel = _configFrame.getContentPanel();
         panel.setLayout(new AnchorLayout());
         panel.setMinimumContentSize(320, 240);
-        _configFrame.setUseStandin(true);
-        _configFrame.setHudXY(width - _configFrame.getLocalComponentWidth() - 5,
-                height - _configFrame.getLocalComponentHeight() - 5);
+        _configFrame.setUseStandin(false);
+        _configFrame.setHudXY(100, 100);
 
         final UICheckBox vsync = new UICheckBox("Enable vsync");
         vsync.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, panel, Alignment.TOP_LEFT, 5, -5));
         vsync.setSelectable(true);
         vsync.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).render(
-                        new Callable<Void>() {
+                GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext())
+                        .render(new Callable<Void>() {
                             public Void call() throws Exception {
                                 _canvas.setVSyncEnabled(vsync.isSelected());
                                 return null;
