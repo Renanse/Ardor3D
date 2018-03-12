@@ -74,6 +74,11 @@ public enum TextFactory {
     public RenderedText generateText(final String rawText, final boolean styled,
             final Map<String, Object> defaultStyles, final RenderedText store, final int maxWidth) {
         RenderedText rVal = store;
+
+        // Hold onto these in case they get switched out by another thread during generation.
+        final FontProvider provider = _fontProvider;
+        final StyleParser parser = _styleParser;
+
         if (rVal == null) {
             rVal = new RenderedText();
         } else {
@@ -86,10 +91,10 @@ public enum TextFactory {
         // note: spans must be in order by start index
         final LinkedList<StyleSpan> spans = Lists.newLinkedList();
         final String visibleText;
-        if (styled && _styleParser != null) {
+        if (styled && parser != null) {
             // parse text for style spans
             final List<StyleSpan> styleStore = Lists.newArrayList();
-            visibleText = _styleParser.parseStyleSpans(rawText, styleStore);
+            visibleText = parser.parseStyleSpans(rawText, styleStore);
             Collections.sort(styleStore);
             if (!styleStore.isEmpty()) {
                 spans.addAll(styleStore);
@@ -157,7 +162,7 @@ public enum TextFactory {
 
             // find the UIFont related to the given font family & size & styles
             final AtomicReference<Double> scaleRef = new AtomicReference<Double>();
-            final UIFont font = _fontProvider.getClosestMatchingFont(stylesMap, scaleRef);
+            final UIFont font = provider.getClosestMatchingFont(stylesMap, scaleRef);
             if (font == null) {
                 return rVal;
             }
