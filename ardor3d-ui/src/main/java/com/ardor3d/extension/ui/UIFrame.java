@@ -78,13 +78,13 @@ public class UIFrame extends UIContainer {
     public UIFrame(final String title, final EnumSet<FrameButtons> buttons) {
         setLayout(new BorderLayout());
 
-        _basePanel = new UIPanel(new BorderLayout());
+        _basePanel = new UIPanel("basePanel", new BorderLayout());
         _basePanel.setBackdrop(new SolidBackdrop(ColorRGBA.LIGHT_GRAY));
         _basePanel.setLayoutData(BorderLayoutData.CENTER);
         _basePanel.setConsumeMouseEvents(true);
         add(_basePanel);
 
-        _contentPanel = new UIPanel();
+        _contentPanel = new UIPanel("contentPanel");
         _contentPanel.setLayoutData(BorderLayoutData.CENTER);
         _basePanel.add(_contentPanel);
 

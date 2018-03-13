@@ -157,7 +157,7 @@ public class GeneratedTexturesExample extends ExampleBase {
 
         // Set up the panels
         for (int i = 0; i < COUNT; i++) {
-            srcs[i] = new UIPanel(null) {
+            srcs[i] = new UIPanel("src-" + i, null) {
                 @Override
                 public boolean mousePressed(final com.ardor3d.input.MouseButton button,
                         final com.ardor3d.input.InputState state) {
