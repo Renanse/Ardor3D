@@ -12,6 +12,7 @@ include ':ardor3d-collada'
 include ':ardor3d-animation'
 include ':ardor3d-ui'
 include ':ardor3d-terrain'
+include ':ardor3d-tools'
 include ':ardor3d-examples'
 include ':distribution'
 
@@ -28,5 +29,6 @@ project(':ardor3d-collada').projectDir = "$rootDir/ardor3d-collada" as File
 project(':ardor3d-animation').projectDir = "$rootDir/ardor3d-animation" as File
 project(':ardor3d-ui').projectDir = "$rootDir/ardor3d-ui" as File
 project(':ardor3d-terrain').projectDir = "$rootDir/ardor3d-terrain" as File
+project(':ardor3d-tools').projectDir = "$rootDir/ardor3d-tools" as File
 project(':ardor3d-examples').projectDir = "$rootDir/ardor3d-examples" as File
 project(':distribution').projectDir = "$rootDir/ardor3d-distribution" as File
