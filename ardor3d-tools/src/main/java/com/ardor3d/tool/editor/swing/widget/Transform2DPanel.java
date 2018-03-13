@@ -29,10 +29,10 @@ public class Transform2DPanel extends JPanel {
 
     public static Font LABEL_FONT = new Font("Arial", Font.BOLD, 13);
 
-    public ValuePanel _translationX = new ValuePanel("Offset X: ", "", Double.NEGATIVE_INFINITY, Double.MAX_VALUE, 1);
-    public ValuePanel _translationY = new ValuePanel("Offset Y: ", "", Double.NEGATIVE_INFINITY, Double.MAX_VALUE, 1);
+    public ValuePanel _translationX = new ValuePanel("Offset X: ", "", Double.NEGATIVE_INFINITY, Double.MAX_VALUE, 1.0);
+    public ValuePanel _translationY = new ValuePanel("Offset Y: ", "", Double.NEGATIVE_INFINITY, Double.MAX_VALUE, 1.0);
     public ValuePanel _scale = new ValuePanel("Scale: ", "", Double.MIN_VALUE, Double.MAX_VALUE, .1);
-    public ValuePanel _rotation = new ValuePanel("Angle: ", "", -180, 180, 1);
+    public ValuePanel _rotation = new ValuePanel("Angle: ", "", -180.0, 180.0, 1.0);
 
     public Transform2DPanel() {
         super(new GridBagLayout());

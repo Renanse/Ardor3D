@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -15,16 +15,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.SceneHints;
+import com.ardor3d.tool.editor.swing.widget.SceneTreeModel;
 
 public class ScenegraphTree {
 
@@ -32,7 +31,7 @@ public class ScenegraphTree {
         final JFrame frame = new JFrame("Scenegraph Tree");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        final TreeModel model = new ArdorModel(node);
+        final TreeModel model = new SceneTreeModel(node);
         final JTree tree = new JTree(model);
 
         final JScrollPane scrollPane = new JScrollPane(tree);
@@ -96,49 +95,4 @@ public class ScenegraphTree {
         }
     }
 
-    private static class ArdorModel implements TreeModel {
-        private final Node rootNode;
-
-        public ArdorModel(final Node node) {
-            rootNode = node;
-        }
-
-        public Object getChild(final Object parent, final int index) {
-            if (parent instanceof Node) {
-                final Node parentNode = (Node) parent;
-                return parentNode.getChild(index);
-            }
-            return null;
-        }
-
-        public int getChildCount(final Object parent) {
-            if (parent instanceof Node) {
-                final Node parentNode = (Node) parent;
-                return parentNode.getNumberOfChildren();
-            }
-            return 0;
-        }
-
-        public int getIndexOfChild(final Object parent, final Object child) {
-            if (parent instanceof Node && child instanceof Spatial) {
-                final Node parentNode = (Node) parent;
-                return parentNode.getChildIndex((Spatial) child);
-            }
-            return 0;
-        }
-
-        public Object getRoot() {
-            return rootNode;
-        }
-
-        public boolean isLeaf(final Object node) {
-            return !(node instanceof Node);
-        }
-
-        public void addTreeModelListener(final TreeModelListener l) {}
-
-        public void removeTreeModelListener(final TreeModelListener l) {}
-
-        public void valueForPathChanged(final TreePath path, final Object newValue) {}
-    }
 }
