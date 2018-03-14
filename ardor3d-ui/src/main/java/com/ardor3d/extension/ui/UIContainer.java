@@ -363,7 +363,7 @@ public abstract class UIContainer extends UIComponent {
 
         // Otherwise we are not rendering to texture and we are using standins...
         // So check if we are dirty.
-        if (isDirty()) {
+        if (isDirty() || _standin == null) {
             renderer.unsetOrtho();
             // Check if we have a standin yet
             if (_standin == null) {

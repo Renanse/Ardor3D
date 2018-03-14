@@ -185,6 +185,7 @@ public class UIHud extends Node {
     public void add(final UIComponent component) {
         attachChild(component);
         component.attachedToHud();
+        component.fireComponentDirty();
         for (final HudListener hl : _hudListeners) {
             hl.componentAdded(component);
         }
