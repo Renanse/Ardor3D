@@ -16,6 +16,8 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.UIDrawer;
+import com.ardor3d.extension.ui.UIDrawerBar;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIFrameBar;
 import com.ardor3d.extension.ui.UIFrameStatusBar;
@@ -77,7 +79,7 @@ public class GenericSkin extends Skin {
 
     protected void loadTexture(final String skinTexture) {
         try {
-            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear,
+            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.BilinearNoMipMaps,
                     TextureStoreFormat.GuessNoCompressedFormat, false);
         } catch (final Exception e) {
             e.printStackTrace();
@@ -91,7 +93,7 @@ public class GenericSkin extends Skin {
 
     protected void loadTexture(final ResourceSource skinTexture) {
         try {
-            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear,
+            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.BilinearNoMipMaps,
                     TextureStoreFormat.GuessNoCompressedFormat, false);
         } catch (final Exception e) {
             e.printStackTrace();
@@ -318,7 +320,7 @@ public class GenericSkin extends Skin {
                         closeButton.refreshState();
                         closeButton.pack();
                         closeButton
-                        .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
+                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                     }
                 }
 
@@ -362,7 +364,7 @@ public class GenericSkin extends Skin {
                     }
                 }
 
-                // MINIMIZE BUTTON
+                // HELP BUTTON
                 {
                     final UIButton helpButton = titleBar.getHelpButton();
                     if (helpButton != null) {
@@ -420,6 +422,117 @@ public class GenericSkin extends Skin {
                     resize.updateMinimumSizeFromContents();
                     resize.setMinimumContentSize(resize.getContentWidth(), resize.getContentHeight());
                     resize.setMaximumContentSize(resize.getContentWidth(), resize.getContentHeight());
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void applyToDrawer(final UIDrawer component) {
+        component.setOpacity(1.0f);
+        // TITLE BAR
+        {
+            final UIDrawerBar titleBar = component.getTitleBar();
+            // Make sure exists
+            if (titleBar != null) {
+                titleBar.setMargin(new Insets(0, 0, 0, 0));
+                titleBar.setPadding(new Insets(0, 0, 0, 0));
+                switch (component.getEdge()) {
+                    case BOTTOM: {
+                        titleBar.setBorder(new ImageBorder(new SubTex(_sharedTex, 4, 5, 32, 13, 6, 6, 1, 6)));
+                        titleBar.getTitleLabel().setMargin(new Insets(0, 5, 0, 0));
+
+                        final ColorRGBA top = new ColorRGBA(203 / 255f, 203 / 255f, 203 / 255f, 1);
+                        final ColorRGBA bottom = new ColorRGBA(208 / 255f, 208 / 255f, 208 / 255f, 1);
+                        titleBar.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                        break;
+                    }
+                    case TOP: {
+                        titleBar.setBorder(new ImageBorder(new SubTex(_sharedTex, 4, 38, 32, 15, 1, 6, 8, 6)));
+                        titleBar.getTitleLabel().setMargin(new Insets(0, 5, 0, 0));
+
+                        final ColorRGBA top = new ColorRGBA(236 / 255f, 236 / 255f, 236 / 255f, 1);
+                        final ColorRGBA bottom = new ColorRGBA(244 / 255f, 244 / 255f, 244 / 255f, 1);
+                        titleBar.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                        break;
+                    }
+                    case LEFT: {// 18, 5 18, 48
+                        titleBar.setBorder(new ImageBorder(new SubTex(_sharedTex, 18, 5, 18, 48, 6, 1, 8, 6)));
+                        titleBar.getTitleLabel().setMargin(new Insets(0, 0, 5, 0));
+
+                        final ColorRGBA top = new ColorRGBA(203 / 255f, 203 / 255f, 203 / 255f, 1);
+                        final ColorRGBA bottom = new ColorRGBA(243 / 255f, 243 / 255f, 243 / 255f, 1);
+                        titleBar.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                        break;
+                    }
+                    case RIGHT: {
+                        titleBar.setBorder(new ImageBorder(new SubTex(_sharedTex, 4, 5, 18, 48, 6, 6, 8, 1)));
+                        titleBar.getTitleLabel().setMargin(new Insets(0, 0, 5, 0));
+
+                        final ColorRGBA top = new ColorRGBA(203 / 255f, 203 / 255f, 203 / 255f, 1);
+                        final ColorRGBA bottom = new ColorRGBA(243 / 255f, 243 / 255f, 243 / 255f, 1);
+                        titleBar.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                        break;
+                    }
+                }
+                titleBar.getTitleLabel().setForegroundColor(ColorRGBA.BLACK);
+
+                // CLOSE BUTTON
+                {
+                    final UIButton closeButton = titleBar.getCloseButton();
+                    if (closeButton != null) {
+                        closeButton.setButtonText("");
+                        closeButton.setButtonIcon(new SubTex(_sharedTex, 94, 76, 16, 16));
+                        closeButton.getPressedState().setIcon(new SubTex(_sharedTex, 94, 94, 16, 16));
+                        closeButton.setBackdrop(new EmptyBackdrop(), true);
+                        closeButton.setBorder(new EmptyBorder(), true);
+                        closeButton.setPadding(new Insets(0, 0, 0, 0), true);
+                        closeButton.setMargin(new Insets(1, 1, 1, 1), true);
+                        closeButton.refreshState();
+                        closeButton.pack();
+                        closeButton
+                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
+                    }
+                }
+            }
+        }
+
+        // CONTENT PANEL
+        {
+            final UIPanel content = component.getContentPanel();
+
+            content.setMargin(new Insets(0, 0, 0, 0));
+            content.setPadding(new Insets(0, 0, 0, 0));
+
+            switch (component.getEdge()) {
+                case BOTTOM: {
+                    final ColorRGBA top = new ColorRGBA(210 / 255f, 210 / 255f, 210 / 255f, 1);
+                    final ColorRGBA bottom = new ColorRGBA(244 / 255f, 244 / 255f, 244 / 255f, 1);
+                    content.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                    content.setBorder(new ImageBorder(new SubTex(_sharedTex, 4, 17, 32, 29, 0, 6, 0, 6)));
+                    break;
+                }
+                case TOP: {
+                    final ColorRGBA top = new ColorRGBA(202 / 255f, 202 / 255f, 202 / 255f, 1);
+                    final ColorRGBA bottom = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
+                    content.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                    content.setBorder(new ImageBorder(new SubTex(_sharedTex, 4, 10, 32, 28, 0, 6, 0, 6)));
+                    break;
+                }
+                case LEFT: {
+                    final ColorRGBA top = new ColorRGBA(203 / 255f, 203 / 255f, 203 / 255f, 1);
+                    final ColorRGBA bottom = new ColorRGBA(243 / 255f, 243 / 255f, 243 / 255f, 1);
+                    content.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                    content.setBorder(new ImageBorder(new SubTex(_sharedTex, 12, 5, 6, 48, 6, 0, 8, 0)));
+                    break;
+                }
+
+                case RIGHT: {
+                    final ColorRGBA top = new ColorRGBA(203 / 255f, 203 / 255f, 203 / 255f, 1);
+                    final ColorRGBA bottom = new ColorRGBA(243 / 255f, 243 / 255f, 243 / 255f, 1);
+                    content.setBackdrop(new GradientBackdrop(top, top, bottom, bottom));
+                    content.setBorder(new ImageBorder(new SubTex(_sharedTex, 22, 5, 6, 48, 6, 0, 8, 0)));
+                    break;
                 }
             }
         }

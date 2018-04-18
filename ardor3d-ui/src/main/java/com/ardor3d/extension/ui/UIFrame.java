@@ -11,7 +11,6 @@
 package com.ardor3d.extension.ui;
 
 import java.util.EnumSet;
-import java.util.concurrent.Callable;
 
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.DragListener;
@@ -21,7 +20,6 @@ import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
-import com.ardor3d.util.GameTaskQueueManager;
 
 /**
  * A component similar to an inner frame in Swing. It can be dragged around the screen, minimized, expanded, closed, and
@@ -331,23 +329,6 @@ public class UIFrame extends UIContainer {
 
         // Layout the panel
         layout();
-    }
-
-    /**
-     * Causes our shared texture renderer - used to draw cached versions of all frames - to be recreated on the next
-     * render loop.
-     */
-    public static void resetTextureRenderer(final Object queueKey) {
-        final Callable<Void> exe = new Callable<Void>() {
-            public Void call() {
-                if (UIContainer._textureRenderer != null) {
-                    UIContainer._textureRenderer.cleanup();
-                }
-                UIContainer._textureRenderer = null;
-                return null;
-            }
-        };
-        GameTaskQueueManager.getManager(queueKey).render(exe);
     }
 
     /**

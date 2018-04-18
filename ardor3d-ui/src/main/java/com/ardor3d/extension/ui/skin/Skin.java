@@ -14,6 +14,7 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.UIDrawer;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIMenuItem;
@@ -88,6 +89,8 @@ public abstract class Skin {
         // 5. FRAME TYPES
         else if (component instanceof UIFrame) {
             applyToFrame((UIFrame) component);
+        } else if (component instanceof UIDrawer) {
+            applyToDrawer((UIDrawer) component);
         }
 
         // 6. SLIDER
@@ -125,6 +128,8 @@ public abstract class Skin {
     protected abstract void applyToTooltip(UITooltip component);
 
     protected abstract void applyToFrame(UIFrame component);
+
+    protected abstract void applyToDrawer(UIDrawer component);
 
     protected abstract void applyToProgressBar(UIProgressBar component);
 

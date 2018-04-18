@@ -102,6 +102,25 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         updateMinimumSizeFromContents();
     }
 
+    /**
+     * Set a new text value for this component and (optionally) all contained states.
+     *
+     * @param rawText
+     *            the new text
+     * @param allStates
+     *            if true, set across all contained states as well as self.
+     */
+    public void setText(final String rawText, final boolean allStates) {
+        setText(rawText);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                if (state instanceof LabelState) {
+                    ((LabelState) state).setText(rawText);
+                }
+            }
+        }
+    }
+
     public boolean isStyledText() {
         return _styled;
     }
@@ -126,6 +145,17 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
     public void setAlignment(final Alignment alignment) {
         _alignment = alignment;
+    }
+
+    public void setAlignment(final Alignment alignment, final boolean allStates) {
+        setAlignment(alignment);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                if (state instanceof LabelState) {
+                    ((LabelState) state).setAlignment(alignment);
+                }
+            }
+        }
     }
 
     public int getGap() {
@@ -160,6 +190,27 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             updateIconDimensionsFromIcon();
         }
         updateMinimumSizeFromContents();
+    }
+
+    /**
+     * Set a new icon value for this component and (optionally) all contained states.
+     *
+     * Note: Also updates the minimum size of the component.
+     *
+     * @param icon
+     *            the new icon for this label.
+     * @param allStates
+     *            if true, set across all contained states as well as self.
+     */
+    public void setIcon(final SubTex icon, final boolean allStates) {
+        setIcon(icon);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                if (state instanceof LabelState) {
+                    ((LabelState) state).setIcon(icon);
+                }
+            }
+        }
     }
 
     /**

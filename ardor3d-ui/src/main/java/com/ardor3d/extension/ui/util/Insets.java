@@ -126,4 +126,10 @@ public class Insets {
         result += 31 * result + getBottom();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return String.format("'%1$s': top: %2$d, left: %3$d, bottom: %4$d, right: %5$d", this.getClass()
+                .getSimpleName(), getTop(), getLeft(), getBottom(), getRight());
+    }
 }

@@ -11,6 +11,7 @@
 package com.ardor3d.extension.ui;
 
 import java.nio.FloatBuffer;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +43,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
+import com.ardor3d.util.GameTaskQueueManager;
 
 /**
  * Defines a component that can hold and manage other components or containers, using a layout manager to position and
@@ -502,6 +504,23 @@ public abstract class UIContainer extends UIComponent {
         final TextureState ts = new TextureState();
         ts.setTexture(_fakeTexture);
         _standin.setRenderState(ts);
+    }
+
+    /**
+     * Causes our shared texture renderer - used to draw cached versions of all containers - to be recreated on the next
+     * render loop.
+     */
+    public static void resetTextureRenderer(final Object queueKey) {
+        final Callable<Void> exe = new Callable<Void>() {
+            public Void call() {
+                if (UIContainer._textureRenderer != null) {
+                    UIContainer._textureRenderer.cleanup();
+                }
+                UIContainer._textureRenderer = null;
+                return null;
+            }
+        };
+        GameTaskQueueManager.getManager(queueKey).render(exe);
     }
 
     /**
