@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,7 @@
 package com.ardor3d.extension.terrain.providers.procedural;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,6 +30,8 @@ public class ProceduralNormalMapSource implements TextureSource {
 
     private static final int tileSize = 128;
     private static final int availableClipmapLevels = 8;
+
+    private final double[][] cache = new double[tileSize + 2][tileSize + 2];
 
     private final ReentrantLock textureLock = new ReentrantLock();
     private final ThreadLocal<ByteBuffer> tileDataPool = new ThreadLocal<ByteBuffer>() {
@@ -78,6 +81,11 @@ public class ProceduralNormalMapSource implements TextureSource {
         final Vector3 normal = new Vector3();
         textureLock.lock();
         try {
+            // clear our cache
+            for (final double[] row : cache) {
+                Arrays.fill(row, Double.NEGATIVE_INFINITY);
+            }
+
             for (int y = 0; y < tileSize; y++) {
                 for (int x = 0; x < tileSize; x++) {
                     if (Thread.interrupted()) {
@@ -88,10 +96,11 @@ public class ProceduralNormalMapSource implements TextureSource {
                     final int heightY = tileY * tileSize + y;
 
                     normal.setZ(1);
-                    final double eval1 = function.eval(heightX - 1 << baseClipmapLevel, heightY << baseClipmapLevel, 0);
-                    final double eval2 = function.eval(heightX + 1 << baseClipmapLevel, heightY << baseClipmapLevel, 0);
-                    final double eval3 = function.eval(heightX << baseClipmapLevel, heightY - 1 << baseClipmapLevel, 0);
-                    final double eval4 = function.eval(heightX << baseClipmapLevel, heightY + 1 << baseClipmapLevel, 0);
+
+                    final double eval1 = getValue(x - 1, y, heightX - 1, heightY, baseClipmapLevel);
+                    final double eval2 = getValue(x + 1, y, heightX + 1, heightY, baseClipmapLevel);
+                    final double eval3 = getValue(x, y - 1, heightX, heightY - 1, baseClipmapLevel);
+                    final double eval4 = getValue(x, y + 1, heightX, heightY + 1, baseClipmapLevel);
 
                     normal.setX((eval1 - eval2) / 2.);
                     normal.setY((eval3 - eval4) / 2.);
@@ -107,5 +116,14 @@ public class ProceduralNormalMapSource implements TextureSource {
             textureLock.unlock();
         }
         return data;
+    }
+
+    private double getValue(final int x, final int y, final int heightX, final int heightY, final int baseClipmapLevel) {
+        double val = cache[x + 1][y + 1];
+        if (val == Double.NEGATIVE_INFINITY) {
+            val = cache[x + 1][y + 1] = function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0);
+        }
+
+        return val;
     }
 }

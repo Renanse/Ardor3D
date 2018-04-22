@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -18,10 +18,9 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.ardor3d.extension.terrain.client.AbstractGridCache.TileLoadingData;
 import com.ardor3d.extension.terrain.client.TextureCache;
 import com.ardor3d.extension.terrain.client.TextureGridCache;
-import com.ardor3d.extension.terrain.client.TextureGridCache.TileLoadingData;
-import com.ardor3d.extension.terrain.client.TextureGridCache.TileLoadingData.State;
 import com.ardor3d.math.MathUtils;
 
 public class TextureGridCachePanel extends JPanel {
@@ -67,14 +66,23 @@ public class TextureGridCachePanel extends JPanel {
         for (int i = 0; i < cacheList.size(); i++) {
             final TextureGridCache cache = (TextureGridCache) cacheList.get(i);
             for (final TileLoadingData data : cache.getDebugTiles()) {
-                if (data.state == State.init) {
-                    g2.setColor(Color.lightGray);
-                } else if (data.state == State.loading) {
-                    g2.setColor(Color.blue);
-                } else if (data.state == State.finished) {
-                    g2.setColor(Color.green);
-                } else {
-                    g2.setColor(Color.white);
+                switch (data.state) {
+                    case cancelled:
+                        g2.setColor(Color.orange);
+                        break;
+                    case error:
+                        g2.setColor(Color.red);
+                        break;
+                    case finished:
+                        g2.setColor(Color.green);
+                        break;
+                    case loading:
+                        g2.setColor(Color.blue);
+                        break;
+                    case init:
+                    default:
+                        g2.setColor(Color.lightGray);
+                        break;
                 }
                 final int x = MathUtils.moduloPositive(data.sourceTile.getX(), cacheSize);
                 final int y = MathUtils.moduloPositive(data.sourceTile.getY(), cacheSize);
@@ -84,9 +92,7 @@ public class TextureGridCachePanel extends JPanel {
                 g2.setColor(Color.darkGray);
                 g2.drawRect(xPos, yPos, size, size);
             }
-            g2
-                    .drawString("" + (cacheList.size() - i - 1), (cacheList.size() - i - 1) * (size * cacheSize + 5)
-                            + 25, 15);
+            g2.drawString("" + (cacheList.size() - i - 1), (cacheList.size() - i - 1) * (size * cacheSize + 5) + 25, 15);
         }
     }
 }

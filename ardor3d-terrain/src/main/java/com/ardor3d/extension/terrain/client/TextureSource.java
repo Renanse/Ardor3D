@@ -12,7 +12,7 @@ import com.ardor3d.extension.terrain.util.Tile;
 public interface TextureSource {
     /**
      * Called to initialize and setup the texture clipmap.
-     * 
+     *
      * @param mapID
      *            Map to get configuration for.
      * @return
@@ -21,8 +21,8 @@ public interface TextureSource {
     TextureConfiguration getConfiguration() throws Exception;
 
     /**
-     * Returns which tiles that contain data in the requested region.
-     * 
+     * Returns which tiles contain data in the requested region.
+     *
      * @param clipmapLevel
      * @param tileX
      * @param tileY
@@ -35,8 +35,8 @@ public interface TextureSource {
             throws Exception;
 
     /**
-     * Returns which tiles that should be marked as invalid and updated in the requested region.
-     * 
+     * Returns which tiles should be marked as invalid and updated in the requested region.
+     *
      * @param clipmapLevel
      * @param tileX
      * @param tileY
@@ -50,7 +50,7 @@ public interface TextureSource {
 
     /**
      * Returns the contributing source id for the requested tile.
-     * 
+     *
      * @param clipmapLevel
      * @param tile
      * @return
@@ -59,7 +59,7 @@ public interface TextureSource {
 
     /**
      * Request for texture data for a tile.
-     * 
+     *
      * @param clipmapLevel
      * @param tile
      * @return

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -60,8 +60,7 @@ public class ArrayTerrainSource implements TerrainSource {
                 final int xx = tileX + x;
                 final int yy = tileY + y;
                 if (xx >= 0 && xx * tileSize <= heightMapSize && yy >= 0 && yy * tileSize <= heightMapSize) {
-                    final Tile tile = new Tile(xx, yy);
-                    validTiles.add(tile);
+                    validTiles.add(new Tile(xx, yy));
                 }
             }
         }
