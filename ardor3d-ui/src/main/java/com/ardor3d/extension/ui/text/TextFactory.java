@@ -46,11 +46,21 @@ public enum TextFactory {
     TextFactory() {
         final BMFontProvider fontProvider = new BMFontProvider();
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-12-regular", "Arial", 12, false, false);
-        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-16-bold-regular", "Arial", 16, true, false);
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-16-bold", "Arial", 16, true, false);
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-regular", "Arial", 18, false, false);
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-bold", "Arial", 18, true, false);
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-bold-italic", "Arial", 18, true, true);
         fontProvider.addFont("com/ardor3d/extension/ui/font/arial-24-bold", "Arial", 24, false, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSans-14-bold-regular", "DroidSans", 14, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSans-16-bold-regular", "DroidSans", 16, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSans-16-medium-regular", "DroidSans", 16, false, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSans-20-bold-regular", "DroidSans", 20, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSans-26-bold-regular", "DroidSans", 26, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSans-40-bold-regular", "DroidSans", 40, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSansMono-15-bold-regular", "DroidSansMono", 15, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSansMono-20-bold-regular", "DroidSansMono", 20, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSansMono-26-bold-regular", "DroidSansMono", 26, true, false);
+        fontProvider.addFont("com/ardor3d/ui/text/DroidSansMono-40-bold-regular", "DroidSansMono", 40, true, false);
         setFontProvider(fontProvider);
         setStyleParser(new ForumLikeMarkupParser());
     }
