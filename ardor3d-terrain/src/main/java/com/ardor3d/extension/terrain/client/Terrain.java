@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +55,7 @@ import com.google.common.io.InputSupplier;
 /**
  * An implementation of geometry clipmapping
  */
-public class Terrain extends Node implements Pickable {
+public class Terrain extends Node implements Pickable, Runnable {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(Terrain.class.getName());
 
@@ -92,6 +93,11 @@ public class Terrain extends Node implements Pickable {
     private long oldTime = 0;
     private long updateTimer = 0;
     private final long updateThreashold = 300;
+
+    protected boolean runCacheThread = true;
+    protected Thread cacheThread;
+
+    protected final int CACHE_UPDATE_SLEEP = 250;
 
     final TextureState clipTextureState = new TextureState();
 
@@ -232,6 +238,43 @@ public class Terrain extends Node implements Pickable {
         for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
             _clips.get(i).getMeshData().getVertexCoords().setNeedsRefresh(true);
             _clips.get(i).getMeshData().getIndices().setNeedsRefresh(true);
+        }
+
+        if (runCacheThread && cacheThread == null) {
+            cacheThread = new Thread(this, "TerrainCacheUpdater");
+            cacheThread.setDaemon(true);
+            cacheThread.start();
+        }
+    }
+
+    @Override
+    public void run() {
+        while (runCacheThread) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(CACHE_UPDATE_SLEEP);
+            } catch (final InterruptedException e) {
+            }
+
+            // check clipmaps
+            for (int i = _clips.size(); --i >= 0;) {
+                _clips.get(i).getCache().checkForUpdates();
+            }
+
+            // check texture clips
+            for (int i = 0; i < _textureClipmaps.size(); i++) {
+                final List<TextureCache> list = _textureClipmaps.get(i).getCacheList();
+                for (int j = list.size(); --j >= 0;) {
+                    list.get(j).checkForUpdates();
+                }
+            }
+
+            // check normalmap, if there is one
+            if (_normalClipmap != null) {
+                final List<TextureCache> list = _normalClipmap.getCacheList();
+                for (int j = list.size(); --j >= 0;) {
+                    list.get(j).checkForUpdates();
+                }
+            }
         }
     }
 
@@ -425,7 +468,7 @@ public class Terrain extends Node implements Pickable {
                 _geometryClipmapShader.setFragmentShader(pixelShader.getInput());
             } catch (final IOException ex) {
                 Terrain.logger
-                        .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+                .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }
 
             _geometryClipmapShader.setUniform("texture", 0);
@@ -634,7 +677,7 @@ public class Terrain extends Node implements Pickable {
 
     /**
      * set the minimum (highest resolution) clipmap level visible
-     * 
+     *
      * @param level
      *            clamped to valid range
      */
@@ -679,15 +722,7 @@ public class Terrain extends Node implements Pickable {
     }
 
     public void shutdown() {
-        for (final TextureClipmap textureClipmap : _textureClipmaps) {
-            textureClipmap.shutdown();
-        }
-        for (final ClipmapLevel terrainClipmap : _clips) {
-            terrainClipmap.shutdown();
-        }
-        if (_normalClipmap != null) {
-            _normalClipmap.shutdown();
-        }
+        runCacheThread = false;
     }
 
     public TextureState getClipTextureState() {

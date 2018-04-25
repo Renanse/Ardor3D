@@ -12,7 +12,7 @@ package com.ardor3d.extension.terrain.client;
 
 import java.nio.FloatBuffer;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +23,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 /**
  * Special tile/grid based cache for terrain data
  */
-public class TerrainGridCache extends AbstractGridCache implements TerrainCache, Runnable {
+public class TerrainGridCache extends AbstractGridCache implements TerrainCache {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(TerrainGridCache.class.getName());
 
@@ -38,8 +38,8 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache,
 
     public TerrainGridCache(final TerrainCache parentCache, final int cacheSize, final TerrainSource source,
             final int tileSize, final int destinationSize, final TerrainConfiguration terrainConfiguration,
-            final int clipmapLevel, final int requestedLevel, final ThreadPoolExecutor tileThreadService) {
-        super(cacheSize, tileSize, destinationSize, clipmapLevel, requestedLevel, tileThreadService);
+            final int meshClipIndex, final int dataClipIndex, final ExecutorService tileThreadService) {
+        super(cacheSize, tileSize, destinationSize, meshClipIndex, dataClipIndex, tileThreadService);
         this.parentCache = parentCache;
         this.source = source;
         heightScale = terrainConfiguration.getScale().getYf();
@@ -47,14 +47,14 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache,
 
         data = new float[dataSize * dataSize];
 
-        vertexDistance = (int) Math.pow(2, clipmapLevel);
+        vertexDistance = (int) Math.pow(2, meshClipIndex);
     }
 
     @Override
     protected boolean copyTileData(final Tile sourceTile, final int destX, final int destY) {
         float[] sourceData = null;
         try {
-            sourceData = source.getTile(requestedLevel, sourceTile);
+            sourceData = source.getTile(dataClipIndex, sourceTile);
         } catch (final InterruptedException e) {
             // XXX: Loading can be interrupted
             return false;
@@ -98,6 +98,11 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache,
     @Override
     public void setCurrentPosition(final int x, final int y) {
         super.setCurrentPosition(x, y);
+    }
+
+    @Override
+    protected AbstractGridCache getParentCache() {
+        return parentCache instanceof AbstractGridCache ? (AbstractGridCache) parentCache : null;
     }
 
     @Override

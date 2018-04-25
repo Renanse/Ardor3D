@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -28,9 +28,9 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture3D;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -326,8 +326,8 @@ public class TextureClipmap {
         final Region region = new Region(level - 1, x * 2, y * 2, width * 2, height * 2);
         if (!regionList.contains(region)) {
             regionList.add(region);
-            recursiveAddUpdates(regionList, region.getLevel(), region.getX(), region.getY(), region.getWidth(), region
-                    .getHeight());
+            recursiveAddUpdates(regionList, region.getLevel(), region.getX(), region.getY(), region.getWidth(),
+                    region.getHeight());
         }
     }
 
@@ -628,7 +628,7 @@ public class TextureClipmap {
 
     /**
      * set the minimum (highest resolution) clipmap level visible
-     * 
+     *
      * @param level
      *            clamped to valid range
      */
@@ -646,9 +646,7 @@ public class TextureClipmap {
         return minVisibleLevel;
     }
 
-    public void shutdown() {
-        for (final TextureCache cache : cacheList) {
-            cache.shutdown();
-        }
+    public List<TextureCache> getCacheList() {
+        return cacheList;
     }
 }

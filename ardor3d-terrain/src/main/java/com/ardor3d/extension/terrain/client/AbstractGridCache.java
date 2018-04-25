@@ -12,10 +12,8 @@ package com.ardor3d.extension.terrain.client;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.Region;
@@ -23,7 +21,7 @@ import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.MathUtils;
 import com.google.common.collect.Sets;
 
-public abstract class AbstractGridCache implements Runnable {
+public abstract class AbstractGridCache {
 
     protected final int cacheSize;
     protected final int tileSize;
@@ -36,40 +34,35 @@ public abstract class AbstractGridCache implements Runnable {
     protected Set<TileLoadingData> newThreadTiles = Sets.newHashSet();
     protected Set<TileLoadingData> backThreadTiles = Sets.newHashSet();
 
-    protected final int clipmapLevel;
-    protected final int requestedLevel;
+    protected final int meshClipIndex;
+    protected final int dataClipIndex;
 
     protected final Object SWAP_LOCK = new Object();
     protected int backCurrentTileX = Integer.MAX_VALUE;
     protected int backCurrentTileY = Integer.MAX_VALUE;
     protected boolean updated = false;
 
-    protected final int TILELOCATOR_SLEEP = 250;
-
     // Debug
     protected boolean enableDebug = true;
     protected final Set<TileLoadingData> debugTiles = Sets.newHashSet();
 
-    protected final ThreadPoolExecutor tileThreadService;
+    protected final ExecutorService tileThreadService;
 
     protected DoubleBufferedList<Region> mailBox;
 
     protected Set<Tile> validTiles;
 
-    protected boolean started = false;
     protected final int locatorSize = 20;
     protected Tile locatorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-    protected boolean exit = false;
-
     protected AbstractGridCache(final int cacheSize, final int tileSize, final int destinationSize,
-            final int clipmapLevel, final int requestedLevel, final ThreadPoolExecutor tileThreadService) {
+            final int meshClipIndex, final int dataClipIndex, final ExecutorService tileThreadService) {
         this.cacheSize = cacheSize;
         this.tileSize = tileSize;
         dataSize = tileSize * cacheSize;
         this.destinationSize = destinationSize;
-        this.clipmapLevel = clipmapLevel;
-        this.requestedLevel = requestedLevel;
+        this.meshClipIndex = meshClipIndex;
+        this.dataClipIndex = dataClipIndex;
 
         this.tileThreadService = tileThreadService;
 
@@ -117,7 +110,7 @@ public abstract class AbstractGridCache implements Runnable {
                     cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
 
                     data.isCancelled = true;
-                    final Future<Boolean> future = data.future;
+                    final Future<?> future = data.future;
                     if (future != null && !future.isDone()) {
                         future.cancel(true);
                     }
@@ -137,7 +130,7 @@ public abstract class AbstractGridCache implements Runnable {
         }
 
         // Housekeeping - Wipe out future tasks that have already been cancelled.
-        tileThreadService.purge();
+        // tileThreadService.purge();
 
         if (enableDebug) {
             synchronized (debugTiles) {
@@ -145,60 +138,46 @@ public abstract class AbstractGridCache implements Runnable {
                 debugTiles.addAll(currentTiles);
             }
         }
-
-        if (!started) {
-            final Thread cacheThread = new Thread(this, "GridCacheUpdater-" + clipmapLevel);
-            cacheThread.setDaemon(true);
-            cacheThread.start();
-            started = true;
-        }
     }
 
-    @Override
-    public void run() {
-        while (!exit) {
-            while (!updated) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(TILELOCATOR_SLEEP);
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public void checkForUpdates() {
+        if (!updated) {
+            return;
+        }
+
+        int tileX;
+        int tileY;
+        synchronized (SWAP_LOCK) {
+            final Set<TileLoadingData> tmp = newThreadTiles;
+            newThreadTiles = backThreadTiles;
+            backThreadTiles = tmp;
+            backThreadTiles.clear();
+
+            tileX = backCurrentTileX;
+            tileY = backCurrentTileY;
+
+            updated = false;
+        }
+
+        if (isTileOutsideLocatorArea(tileX, tileY)) {
+            validTiles = getValidTilesFromSource(dataClipIndex, tileX - locatorSize / 2, tileY - locatorSize / 2,
+                    locatorSize, locatorSize);
+            locatorTile = new Tile(tileX, tileY);
+        }
+
+        final Iterator<TileLoadingData> tileIterator = newThreadTiles.iterator();
+        while (tileIterator.hasNext()) {
+            final TileLoadingData data = tileIterator.next();
+            if (validTiles == null || validTiles.contains(data.sourceTile)) {
+                cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
+                data.future = tileThreadService.submit(data);
             }
-
-            int tileX;
-            int tileY;
-            synchronized (SWAP_LOCK) {
-                final Set<TileLoadingData> tmp = newThreadTiles;
-                newThreadTiles = backThreadTiles;
-                backThreadTiles = tmp;
-                backThreadTiles.clear();
-
-                tileX = backCurrentTileX;
-                tileY = backCurrentTileY;
-
-                updated = false;
-            }
-
-            if (isTileOutsideLocatorArea(tileX, tileY)) {
-                validTiles = getValidTilesFromSource(requestedLevel, tileX - locatorSize / 2, tileY - locatorSize / 2,
-                        locatorSize, locatorSize);
-                locatorTile = new Tile(tileX, tileY);
-            }
-
-            final Iterator<TileLoadingData> tileIterator = newThreadTiles.iterator();
-            while (tileIterator.hasNext()) {
-                final TileLoadingData data = tileIterator.next();
-                if (validTiles == null || validTiles.contains(data.sourceTile)) {
-                    cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
-                    data.future = tileThreadService.submit(data);
-                }
-                tileIterator.remove();
-            }
+            tileIterator.remove();
         }
     }
 
     public Set<Tile> handleUpdateRequests() {
-        final Set<Tile> updateTiles = getInvalidTilesFromSource(requestedLevel, backCurrentTileX - cacheSize / 2,
+        final Set<Tile> updateTiles = getInvalidTilesFromSource(dataClipIndex, backCurrentTileX - cacheSize / 2,
                 backCurrentTileY - cacheSize / 2, cacheSize, cacheSize);
         if (updateTiles == null || updateTiles.isEmpty()) {
             return null;
@@ -221,6 +200,8 @@ public abstract class AbstractGridCache implements Runnable {
     protected abstract Set<Tile> getInvalidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
             int numTilesX, int numTilesY);
 
+    protected abstract AbstractGridCache getParentCache();
+
     protected boolean isTileOutsideLocatorArea(final int tileX, final int tileY) {
         final int locX = tileX - locatorTile.getX();
         final int locY = tileY - locatorTile.getY();
@@ -240,32 +221,26 @@ public abstract class AbstractGridCache implements Runnable {
     }
 
     public boolean isValid() {
-        int nrValid = 0;
         for (final TileLoadingData data : currentTiles) {
             if (cache[data.destTile.getX()][data.destTile.getY()].isValid) {
-                nrValid++;
+                return true;
             }
         }
-        return nrValid != 0;
+        return false;
     }
 
     public void setMailBox(final DoubleBufferedList<Region> mailBox) {
         this.mailBox = mailBox;
     }
 
-    public void shutdown() {
-        exit = true;
-        started = false;
-    }
-
-    public static class TileLoadingData implements Callable<Boolean> {
+    public static class TileLoadingData implements Runnable {
         private final AbstractGridCache sourceCache;
 
         public final Tile sourceTile;
         public final Tile destTile;
 
         public boolean isCancelled = false;
-        public Future<Boolean> future;
+        public Future<?> future;
 
         public enum State {
             init, loading, finished, cancelled, error
@@ -280,34 +255,34 @@ public abstract class AbstractGridCache implements Runnable {
         }
 
         @Override
-        public Boolean call() throws Exception {
+        public void run() {
             state = State.loading;
 
             if (isCancelled()) {
                 state = State.cancelled;
-                return false;
+                return;
             }
 
             if (!sourceCache.copyTileData(sourceTile, destTile.getX(), destTile.getY())) {
                 state = State.error;
-                return false;
+                return;
             }
 
             state = State.finished;
             sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
 
-            final int clipmapLevel = sourceCache.clipmapLevel;
-            final int vertexDistance = MathUtils.pow2(clipmapLevel);
+            final int level = sourceCache.meshClipIndex;
+            final int vertexDistance = MathUtils.pow2(level);
             final int tileSize = sourceCache.tileSize;
-            final Region region = new Region(clipmapLevel, sourceTile.getX() * tileSize * vertexDistance,
-                    sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
+            final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance, sourceTile.getY()
+                    * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
 
             final DoubleBufferedList<Region> mailBox = sourceCache.mailBox;
             if (mailBox != null) {
                 mailBox.add(region);
             }
 
-            return true;
+            return;
         }
 
         protected boolean isCancelled() {

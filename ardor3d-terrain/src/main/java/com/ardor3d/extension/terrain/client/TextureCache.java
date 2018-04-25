@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -19,7 +19,7 @@ import com.ardor3d.extension.terrain.util.Tile;
 
 /**
  * Fetches data from a source to the texture clipmap destination data through updateRegion.
- * 
+ *
  */
 public interface TextureCache {
     void setCurrentPosition(final int x, final int y);
@@ -37,5 +37,5 @@ public interface TextureCache {
 
     Set<Tile> handleUpdateRequests();
 
-    void shutdown();
+    void checkForUpdates();
 }

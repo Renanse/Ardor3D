@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -117,7 +117,7 @@ public class ClipmapLevel extends Mesh {
 
     /**
      * Creates a new clipmaplevel.
-     * 
+     *
      * @param levelIndex
      *            Levelindex of the clipmap. If is 0 this will be the finest level
      * @param clipSideSize
@@ -216,7 +216,7 @@ public class ClipmapLevel extends Mesh {
 
     /**
      * Update clipmap vertices
-     * 
+     *
      * @param center
      */
     public void updateVertices() {
@@ -263,7 +263,7 @@ public class ClipmapLevel extends Mesh {
     }
 
     /**
-     * 
+     *
      * @param cx
      * @param cz
      */
@@ -310,7 +310,7 @@ public class ClipmapLevel extends Mesh {
 
     /**
      * Updates the whole indexarray.
-     * 
+     *
      * @param nextFinerLevel
      * @param frustum
      */
@@ -406,7 +406,7 @@ public class ClipmapLevel extends Mesh {
                     // Bottom
                     fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getRight() - frameDistance,
                             clipRegion.getBottom() - frameDistance - vertexDistance, clipRegion.getBottom()
-                                    - frameDistance);
+                            - frameDistance);
                 }
             } else {
                 if ((nextFinerLevel.clipRegion.getY() - clipRegion.getY()) / vertexDistance == frameSize) {
@@ -430,7 +430,7 @@ public class ClipmapLevel extends Mesh {
                     // Bottom
                     fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getRight() - frameDistance,
                             clipRegion.getBottom() - frameDistance - vertexDistance, clipRegion.getBottom()
-                                    - frameDistance);
+                            - frameDistance);
                 }
             }
         }
@@ -458,7 +458,7 @@ public class ClipmapLevel extends Mesh {
 
     /**
      * Fills a specified area to indexarray. This will be added only after a bounding test pass.
-     * 
+     *
      * @param left
      * @param right
      * @param top
@@ -524,7 +524,7 @@ public class ClipmapLevel extends Mesh {
 
     /**
      * Fills a strip of triangles that can be build between vertices row Zn and Zn1.
-     * 
+     *
      * @param startX
      *            Start x-coordinate
      * @param endX
@@ -556,7 +556,7 @@ public class ClipmapLevel extends Mesh {
 
     /**
      * Adds a specific index to indexarray.
-     * 
+     *
      * @param x
      * @param z
      */
@@ -622,9 +622,5 @@ public class ClipmapLevel extends Mesh {
 
     public void setCullingEnabled(final boolean cullingEnabled) {
         this.cullingEnabled = cullingEnabled;
-    }
-
-    public void shutdown() {
-        cache.shutdown();
     }
 }

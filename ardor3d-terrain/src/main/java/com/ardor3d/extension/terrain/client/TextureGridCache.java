@@ -12,7 +12,7 @@ package com.ardor3d.extension.terrain.client;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +26,7 @@ import com.ardor3d.math.MathUtils;
 /**
  * Special tile/grid based cache for texture data
  */
-public class TextureGridCache extends AbstractGridCache implements TextureCache, Runnable {
+public class TextureGridCache extends AbstractGridCache implements TextureCache {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(TextureGridCache.class.getName());
 
@@ -42,8 +42,8 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache,
 
     public TextureGridCache(final TextureCache parentCache, final int cacheSize, final TextureSource source,
             final int tileSize, final int destinationSize, final TextureConfiguration textureConfiguration,
-            final int clipmapLevel, final int requestedLevel, final ThreadPoolExecutor tileThreadService) {
-        super(cacheSize, tileSize, destinationSize, clipmapLevel, requestedLevel, tileThreadService);
+            final int meshClipIndex, final int dataClipIndex, final ExecutorService tileThreadService) {
+        super(cacheSize, tileSize, destinationSize, meshClipIndex, dataClipIndex, tileThreadService);
         this.parentCache = parentCache;
         this.source = source;
         this.textureConfiguration = textureConfiguration;
@@ -60,7 +60,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache,
     protected boolean copyTileData(final Tile sourceTile, final int destX, final int destY) {
         ByteBuffer sourceData = null;
         try {
-            sourceData = source.getTile(requestedLevel, sourceTile);
+            sourceData = source.getTile(dataClipIndex, sourceTile);
         } catch (final InterruptedException e) {
             // XXX: Loading can be interrupted
             return false;
@@ -73,7 +73,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache,
         }
 
         final TextureStoreFormat format = textureConfiguration.getTextureDataType(source.getContributorId(
-                requestedLevel, sourceTile));
+                dataClipIndex, sourceTile));
         CacheFunctionUtil.applyFunction(useAlpha, function, sourceData, data, destX, destY, format, tileSize, dataSize);
 
         return true;
@@ -104,6 +104,11 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache,
     @Override
     public void setCurrentPosition(final int x, final int y) {
         super.setCurrentPosition(x, y);
+    }
+
+    @Override
+    protected AbstractGridCache getParentCache() {
+        return parentCache instanceof AbstractGridCache ? (AbstractGridCache) parentCache : null;
     }
 
     @Override
