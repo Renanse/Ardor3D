@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
+import com.ardor3d.extension.terrain.util.PriorityExecutors.PriorityRunnable;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.MathUtils;
@@ -170,7 +171,7 @@ public abstract class AbstractGridCache {
             final TileLoadingData data = tileIterator.next();
             if (validTiles == null || validTiles.contains(data.sourceTile)) {
                 cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
-                data.future = tileThreadService.submit(data);
+                data.future = tileThreadService.submit(PriorityRunnable.of(data, meshClipIndex));
             }
             tileIterator.remove();
         }
@@ -234,7 +235,7 @@ public abstract class AbstractGridCache {
     }
 
     public static class TileLoadingData implements Runnable {
-        private final AbstractGridCache sourceCache;
+        public final AbstractGridCache sourceCache;
 
         public final Tile sourceTile;
         public final Tile destTile;

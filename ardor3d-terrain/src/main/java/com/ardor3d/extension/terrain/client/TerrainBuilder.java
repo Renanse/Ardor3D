@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 import com.ardor3d.extension.terrain.util.BresenhamYUpGridTracer;
+import com.ardor3d.extension.terrain.util.PriorityExecutors;
 import com.ardor3d.extension.terrain.util.TerrainGridCachePanel;
 import com.ardor3d.extension.terrain.util.TextureGridCachePanel;
 import com.ardor3d.math.Vector3;
@@ -51,12 +52,12 @@ public class TerrainBuilder {
     private final ExecutorService tileThreadService;
 
     public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera) {
-        this(terrainDataProvider, camera, Executors.newCachedThreadPool(//
-                new ThreadFactoryBuilder() //
-                        .setThreadFactory(Executors.defaultThreadFactory())//
-                        .setDaemon(true).setNameFormat("TileCacheThread-%s")//
-                        .setPriority(Thread.MIN_PRIORITY) //
-                        .build()));
+        this(terrainDataProvider, camera, //
+                PriorityExecutors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+                        new ThreadFactoryBuilder() //
+                .setThreadFactory(Executors.defaultThreadFactory())//
+                .setDaemon(true).setNameFormat("TileCacheThread-%s")//
+                .build()));
     }
 
     public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera,
