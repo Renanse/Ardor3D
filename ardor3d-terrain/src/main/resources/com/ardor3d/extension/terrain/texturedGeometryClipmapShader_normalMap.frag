@@ -11,10 +11,6 @@
 uniform sampler3D texture;
 uniform sampler3D normalMap;
 
-
-
-
-
 uniform float levels;
 uniform vec2 sliceOffset[16];
 uniform float minLevel;

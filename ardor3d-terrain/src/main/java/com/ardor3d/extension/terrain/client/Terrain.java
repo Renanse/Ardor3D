@@ -285,6 +285,7 @@ public class Terrain extends Node implements Pickable, Runnable {
         boolean first = true;
         if (_normalClipmap != null) {
             clipTextureState.setTexture(_normalClipmap.getTexture(), _normalUnit);
+            _geometryClipmapShader.setUniform("normalMap", _normalUnit);
         }
         for (final TextureClipmap textureClipmap : _textureClipmaps) {
             clipTextureState.setTexture(textureClipmap.getTexture());
@@ -468,7 +469,7 @@ public class Terrain extends Node implements Pickable, Runnable {
                 _geometryClipmapShader.setFragmentShader(pixelShader.getInput());
             } catch (final IOException ex) {
                 Terrain.logger
-                .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+                        .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }
 
             _geometryClipmapShader.setUniform("texture", 0);
@@ -696,12 +697,15 @@ public class Terrain extends Node implements Pickable, Runnable {
     }
 
     /**
-     * convenience function to set minimum (highest resolution) texture clipmap level on all TextureClipmaps held by
-     * this terrain
+     * convenience function to set minimum (highest resolution) texture clipmap level on all TextureClipmaps and any
+     * NormalMap held by this terrain
      */
     public void setTextureMinVisibleLevel(final int level) {
         for (final TextureClipmap tc : _textureClipmaps) {
             tc.setMinVisibleLevel(level);
+        }
+        if (_normalClipmap != null) {
+            _normalClipmap.setMinVisibleLevel(level);
         }
     }
 
