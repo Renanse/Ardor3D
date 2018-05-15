@@ -29,15 +29,6 @@
         </dependency>
     </dependencies>
 	
-	
-    <repositories>
-        <!-- The current version of swt isn't on central yet. -->
-        <repository>
-        	<id>swt-repo</id>
-        	<url>https://swt-repo.googlecode.com/svn/repo/</url>
-    	</repository>
-    </repositories>
-
     <profiles>
         <profile>
             <id>linux-x86</id>
