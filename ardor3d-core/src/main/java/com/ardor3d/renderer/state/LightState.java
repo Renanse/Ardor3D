@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -104,10 +104,10 @@ public class LightState extends RenderState {
     }
 
     /**
-     * 
+     *
      * <code>attach</code> places a light in the queue to be processed. If there are already eight lights placed in the
      * queue, the light is ignored and false is returned. Otherwise, true is returned to indicate success.
-     * 
+     *
      * @param light
      *            the light to add to the queue.
      * @return true if the light was added successfully, false if there are already eight lights in the queue.
@@ -122,9 +122,9 @@ public class LightState extends RenderState {
     }
 
     /**
-     * 
+     *
      * <code>detach</code> removes a light from the queue for processing.
-     * 
+     *
      * @param light
      *            the light to be removed.
      */
@@ -134,9 +134,9 @@ public class LightState extends RenderState {
     }
 
     /**
-     * 
+     *
      * <code>detachAll</code> clears the queue of all lights to be processed.
-     * 
+     *
      */
     public void detachAll() {
         lightList.clear();
@@ -145,7 +145,7 @@ public class LightState extends RenderState {
 
     /**
      * Retrieves all lights handled by this LightState
-     * 
+     *
      * @return List of lights handled
      */
     public List<Light> getLightList() {
@@ -153,10 +153,10 @@ public class LightState extends RenderState {
     }
 
     /**
-     * 
+     *
      * <code>get</code> retrieves a particular light defined by an index. If there exists no light at a particular
      * index, null is returned.
-     * 
+     *
      * @param i
      *            the index to retrieve the light from the queue.
      * @return the light at the given index, null if no light exists at this index.
@@ -166,9 +166,9 @@ public class LightState extends RenderState {
     }
 
     /**
-     * 
+     *
      * <code>getNumberOfChildren</code> returns the number of lights currently in the queue.
-     * 
+     *
      * @return the number of lights currently in the queue.
      */
     public int getNumberOfChildren() {
@@ -179,7 +179,7 @@ public class LightState extends RenderState {
      * Sets if two sided lighting should be enabled for this LightState. Two sided lighting will cause the back of
      * surfaces to be colored using the inverse of the surface normal as well as the Material properties set for
      * MaterialFace.Back.
-     * 
+     *
      * @param twoSidedOn
      *            If true, two sided lighting is enabled.
      */
@@ -190,7 +190,7 @@ public class LightState extends RenderState {
 
     /**
      * Returns the current state of two sided lighting for this LightState. By default, it is off.
-     * 
+     *
      * @return True if two sided lighting is enabled.
      */
     public boolean getTwoSidedLighting() {
@@ -199,7 +199,7 @@ public class LightState extends RenderState {
 
     /**
      * Sets if local viewer mode should be enabled for this LightState.
-     * 
+     *
      * @param localViewerOn
      *            If true, local viewer mode is enabled.
      */
@@ -210,7 +210,7 @@ public class LightState extends RenderState {
 
     /**
      * Returns the current state of local viewer mode for this LightState. By default, it is off.
-     * 
+     *
      * @return True if local viewer mode is enabled.
      */
     public boolean getLocalViewer() {
@@ -219,7 +219,7 @@ public class LightState extends RenderState {
 
     /**
      * Sets if separate specular mode should be enabled for this LightState.
-     * 
+     *
      * @param separateSpecularOn
      *            If true, separate specular mode is enabled.
      */
@@ -230,7 +230,7 @@ public class LightState extends RenderState {
 
     /**
      * Returns the current state of separate specular mode for this LightState. By default, it is off.
-     * 
+     *
      * @return True if separate specular mode is enabled.
      */
     public boolean getSeparateSpecular() {
@@ -243,7 +243,7 @@ public class LightState extends RenderState {
     }
 
     /**
-     * 
+     *
      * @param store
      * @return
      */
@@ -261,7 +261,7 @@ public class LightState extends RenderState {
     /**
      * <code>setLightMask</code> sets what attributes of this lightstate to apply as an int comprised of bitwise or'ed
      * values.
-     * 
+     *
      * @param lightMask
      *            The lightMask to set.
      */
@@ -280,7 +280,7 @@ public class LightState extends RenderState {
 
     /**
      * Recalls the light mask from a back store or 0 if none was pushed.
-     * 
+     *
      * @see com.ardor3d.renderer.state.LightState#pushLightMask()
      */
     public void popLightMask() {
@@ -365,7 +365,7 @@ public class LightState extends RenderState {
                         copyLightState(pkLState, lightState);
                     }
                     break;
-                case Off:
+                default:
                     break;
             }
             lightState.setEnabled(foundEnabled);

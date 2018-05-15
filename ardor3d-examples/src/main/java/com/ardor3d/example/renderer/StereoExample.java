@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -46,12 +46,12 @@ public class StereoExample extends ExampleBase {
     /**
      * Change this to true to use side-by-side rendering. false will turn on left/right buffer swapping.
      */
-    private static final boolean _sideBySide = false;
+    public static boolean _sideBySide = false;
 
     /**
      * Change this to true to use anaglyph style (red/cyan) 3d. False will do hardware based 3d.
      */
-    private static final boolean _useAnaglyph = true;
+    public static boolean _useAnaglyph = true;
 
     public static void main(final String[] args) {
         _stereo = !_sideBySide && !_useAnaglyph;
@@ -168,6 +168,6 @@ public class StereoExample extends ExampleBase {
 
     @Override
     protected void renderDebug(final Renderer renderer) {
-    // ignore. We'll call super on the individual left/right renderings.
+        // ignore. We'll call super on the individual left/right renderings.
     }
 }
