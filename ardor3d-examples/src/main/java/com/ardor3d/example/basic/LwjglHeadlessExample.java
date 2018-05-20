@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -42,6 +42,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
@@ -57,7 +58,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * <p>
  * A demonstration of the LwjglHeadlessCanvas class, which is canvas used to draw Scene data to an offscreen target.
  * </p>
- * 
+ *
  * <p>
  * Also of note, this example does not allow choosing of properties on launch. It also does not handle input or show any
  * special debugging. This is to simplify the example to the basic essentials.
@@ -96,11 +97,17 @@ public class LwjglHeadlessExample implements Scene {
 
     /**
      * Our main entry point to the example. News up the example and calls start.
-     * 
+     *
      * @param args
      *            unused.
      */
     public static void main(final String[] args) {
+        try {
+            SharedLibraryLoader.load(true);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
         final LwjglHeadlessExample example = new LwjglHeadlessExample();
         example.start();
     }

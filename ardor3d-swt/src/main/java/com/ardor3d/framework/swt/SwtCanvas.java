@@ -27,33 +27,14 @@ import com.ardor3d.input.MouseManager;
  * A canvas for embedding into SWT applications.
  */
 public class SwtCanvas extends GLCanvas implements Canvas {
-    private CanvasRenderer _canvasRenderer;
-    private boolean _inited = false;
-    private final GLData _passedGLData;
+    protected CanvasRenderer _canvasRenderer;
+    protected boolean _inited = false;
+    protected final GLData _passedGLData;
 
     public SwtCanvas(final Composite composite, final int style, final GLData glData) {
         super(composite, style, glData);
-        _passedGLData = clone(glData);
+        _passedGLData = getGLData();
         setCurrent();
-    }
-
-    private GLData clone(final GLData glData) {
-        final GLData rVal = new GLData();
-        rVal.accumAlphaSize = glData.accumAlphaSize;
-        rVal.accumBlueSize = glData.accumBlueSize;
-        rVal.accumGreenSize = glData.accumGreenSize;
-        rVal.accumRedSize = glData.accumRedSize;
-        rVal.alphaSize = glData.alphaSize;
-        rVal.blueSize = glData.blueSize;
-        rVal.depthSize = glData.depthSize;
-        rVal.doubleBuffer = glData.doubleBuffer;
-        rVal.greenSize = glData.greenSize;
-        rVal.redSize = glData.redSize;
-        rVal.sampleBuffers = glData.sampleBuffers;
-        rVal.samples = glData.samples;
-        rVal.stencilSize = glData.stencilSize;
-        rVal.stereo = glData.stereo;
-        return rVal;
     }
 
     public CanvasRenderer getCanvasRenderer() {

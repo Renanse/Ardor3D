@@ -24,9 +24,9 @@ public class DisplaySettings {
     private final CanvasRenderer _shareContext;
 
     /**
-     * Convenience method equivalent to <code>DisplaySettings(width, height, 0, 0, 0, 8, 0, 0, 
+     * Convenience method equivalent to <code>DisplaySettings(width, height, 0, 0, 0, 8, 0, 0,
      * false, false, null)</code>
-     * 
+     *
      * @param width
      *            the canvas width
      * @param height
@@ -53,9 +53,9 @@ public class DisplaySettings {
     }
 
     /**
-     * Convenience method equivalent to <code>DisplaySettings(width, height, colorDepth, frequency, 
+     * Convenience method equivalent to <code>DisplaySettings(width, height, colorDepth, frequency,
      * 0, 8, 0, 0, fullScreen, false, null)</code>
-     * 
+     *
      * @param width
      *            the canvas width
      * @param height
@@ -84,9 +84,9 @@ public class DisplaySettings {
     }
 
     /**
-     * Convenience method equivalent to <code>DisplaySettings(width, height, colorDepth, frequency, 
+     * Convenience method equivalent to <code>DisplaySettings(width, height, colorDepth, frequency,
      * alphaBits, depthBits, stencilBits, samples, fullScreen, stereo, null)</code>
-     * 
+     *
      * @param width
      *            the canvas width
      * @param height
@@ -130,7 +130,7 @@ public class DisplaySettings {
 
     /**
      * Creates a new <code>DisplaySettings</code> object.
-     * 
+     *
      * @param width
      *            the canvas width
      * @param height
@@ -243,7 +243,7 @@ public class DisplaySettings {
                 && _samples != that._samples
                 && _stereo != that._stereo
                 && ((_shareContext == that._shareContext) || (_shareContext != null && _shareContext
-                        .equals(that._shareContext)));
+                .equals(that._shareContext)));
     }
 
     @Override
@@ -262,5 +262,10 @@ public class DisplaySettings {
         result = 31 * result + (_stereo ? 1 : 0);
         result = 31 * result + (_shareContext != null ? _shareContext.hashCode() : 0);
         return result;
+    }
+
+    public DisplaySettings resizedCopy(final int width, final int height) {
+        return new DisplaySettings(width, height, _colorDepth, _frequency, _alphaBits, _depthBits, _stencilBits,
+                _samples, _fullScreen, _stereo, _shareContext);
     }
 }

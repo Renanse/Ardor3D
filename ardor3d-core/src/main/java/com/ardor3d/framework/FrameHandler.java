@@ -119,7 +119,7 @@ public final class FrameHandler {
      * <strong>Note:</strong> that is the frame handler has already been initialized then the updater will <em>not</em>
      * have it's {@code init} method called automatically, it is up to the client code to perform any initialization
      * explicitly under this scenario.
-     * 
+     *
      * @param updater
      *            the updater to add.
      */
@@ -129,7 +129,7 @@ public final class FrameHandler {
 
     /**
      * Remove an updater from the frame handler.
-     * 
+     *
      * @param updater
      *            the updater to remove.
      * @return {@code true} if the updater was removed, {@code false} otherwise (which will happen if, for example, the
@@ -145,10 +145,10 @@ public final class FrameHandler {
      * The frame handler calls the {@link Canvas#draw(java.util.concurrent.CountDownLatch)} draw} method of each canvas
      * that has been added to it once per frame, after updating is complete.
      * <p>
-     * <strong>Note:</strong> that is the frame handler has already been initialized then the canvas will <em>not</em>
+     * <strong>Note:</strong> that if the frame handler has already been initialized then the canvas will <em>not</em>
      * have it's {@code init} method called automatically, it is up to the client code to perform any initialization
      * explicitly under this scenario.
-     * 
+     *
      * @param canvas
      *            the canvas to add.
      */
@@ -158,7 +158,7 @@ public final class FrameHandler {
 
     /**
      * Remove a canvas from the frame handler.
-     * 
+     *
      * @param canvas
      *            the canvas to remove.
      * @return {@code true} if the canvas was removed, {@code false} otherwise (which will happen if, for example, the
