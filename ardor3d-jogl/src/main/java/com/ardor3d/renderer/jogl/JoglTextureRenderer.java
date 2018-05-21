@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -48,7 +48,7 @@ import com.ardor3d.util.TextureKey;
  * This class is used by Ardor3D's JOGL implementation to render textures. Users should <b>not</b> create this class
  * directly.
  * </p>
- * 
+ *
  * @see TextureRendererFactory
  */
 public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
@@ -223,7 +223,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
                     }
                     _usingDepthRB = false;
-                } else if (!_usingDepthRB) {
+                } else if (!_usingDepthRB && _depthRBID != 0) {
                     // setup our default depth render buffer if not already set
                     gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
                             _depthRBID);
@@ -295,7 +295,9 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             }
 
             // setup depth RB
-            gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, _depthRBID);
+            if (_depthRBID != 0) {
+                gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, _depthRBID);
+            }
 
             setDrawBuffer(GL.GL_COLOR_ATTACHMENT0);
             setReadBuffer(GL.GL_COLOR_ATTACHMENT0);
@@ -378,7 +380,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
     /**
      * Check the currently bound FBO status for completeness. The passed in fboID is for informational purposes only.
-     * 
+     *
      * @param fboID
      *            an id to use for log messages, particularly if there are any issues.
      */
@@ -458,26 +460,12 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
-            gl.glGenRenderbuffers(1, buffer); // generate id
-            _depthRBID = buffer.get(0);
-            gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _depthRBID);
-            int format = GL2ES2.GL_DEPTH_COMPONENT;
-            if (_supportsDepthTexture && _depthBits > 0) {
-                switch (_depthBits) {
-                    case 16:
-                        format = GL.GL_DEPTH_COMPONENT16;
-                        break;
-                    case 24:
-                        format = GL.GL_DEPTH_COMPONENT24;
-                        break;
-                    case 32:
-                        format = GL.GL_DEPTH_COMPONENT32;
-                        break;
-                    default:
-                        // stick with the "undefined" GL_DEPTH_COMPONENT
-                }
+            if (_supportsDepthTexture && _depthBits != 0) {
+                gl.glGenRenderbuffers(1, buffer); // generate id
+                _depthRBID = buffer.get(0);
+                gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _depthRBID);
+                gl.glRenderbufferStorage(GL.GL_RENDERBUFFER, getDepthFormat(), _width, _height);
             }
-            gl.glRenderbufferStorage(GL.GL_RENDERBUFFER, format, _width, _height);
 
             // unbind...
             gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, 0);
@@ -500,8 +488,11 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, GL.GL_RGBA, _width,
                         _height);
 
-                gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _msdepthRBID);
-                gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, format, _width, _height);
+                if (_supportsDepthTexture && _depthBits > 0) {
+                    gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _msdepthRBID);
+                    gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, getDepthFormat(),
+                            _width, _height);
+                }
 
                 gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, 0);
 
@@ -542,6 +533,24 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);
         }
         _active++;
+    }
+
+    private int getDepthFormat() {
+        int format = GL2ES2.GL_DEPTH_COMPONENT;
+        switch (_depthBits) {
+            case 16:
+                format = GL.GL_DEPTH_COMPONENT16;
+                break;
+            case 24:
+                format = GL.GL_DEPTH_COMPONENT24;
+                break;
+            case 32:
+                format = GL.GL_DEPTH_COMPONENT32;
+                break;
+            default:
+                // stick with the "undefined" GL_DEPTH_COMPONENT
+        }
+        return format;
     }
 
     @Override

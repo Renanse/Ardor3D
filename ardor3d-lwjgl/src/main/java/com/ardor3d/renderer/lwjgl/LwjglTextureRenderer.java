@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -51,7 +51,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * This class is used by Ardor3D's LWJGL implementation to render textures. Users should <b>not</b> create this class
  * directly.
  * </p>
- * 
+ *
  * @see TextureRendererFactory
  */
 public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
@@ -233,7 +233,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
                     }
                     _usingDepthRB = false;
-                } else if (!_usingDepthRB) {
+                } else if (!_usingDepthRB && _depthRBID != 0) {
                     // setup our default depth render buffer if not already set
                     EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                             EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
@@ -314,8 +314,11 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             }
 
             // setup depth RB
-            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                    EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
+            if (_depthRBID != 0) {
+                EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
+                        EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                        _depthRBID);
+            }
 
             setDrawBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
             setReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
@@ -372,7 +375,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
 
     /**
      * Check the currently bound FBO status for completeness. The passed in fboID is for informational purposes only.
-     * 
+     *
      * @param fboID
      *            an id to use for log messages, particularly if there are any issues.
      */
@@ -442,27 +445,13 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
-            EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
-            _depthRBID = buffer.get(0);
-            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
-            int format = GL11.GL_DEPTH_COMPONENT;
-            if (_supportsDepthTexture && _depthBits > 0) {
-                switch (_depthBits) {
-                    case 16:
-                        format = ARBDepthTexture.GL_DEPTH_COMPONENT16_ARB;
-                        break;
-                    case 24:
-                        format = ARBDepthTexture.GL_DEPTH_COMPONENT24_ARB;
-                        break;
-                    case 32:
-                        format = ARBDepthTexture.GL_DEPTH_COMPONENT32_ARB;
-                        break;
-                    default:
-                        // stick with the "undefined" GL_DEPTH_COMPONENT
-                }
+            if (_supportsDepthTexture && _depthBits != 0) {
+                EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+                _depthRBID = buffer.get(0);
+                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
+                EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                        getDepthFormat(), _width, _height);
             }
-            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, format, _width,
-                    _height);
 
             // unbind...
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
@@ -485,9 +474,11 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                 EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
                         _samples, GL11.GL_RGBA, _width, _height);
 
-                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _msdepthRBID);
-                EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
-                        _samples, format, _width, _height);
+                if (_supportsDepthTexture && _depthBits > 0) {
+                    EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _msdepthRBID);
+                    EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(
+                            EXTFramebufferObject.GL_RENDERBUFFER_EXT, _samples, getDepthFormat(), _width, _height);
+                }
 
                 EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
 
@@ -530,6 +521,24 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);
         }
         _active++;
+    }
+
+    private int getDepthFormat() {
+        int format = GL11.GL_DEPTH_COMPONENT;
+        switch (_depthBits) {
+            case 16:
+                format = ARBDepthTexture.GL_DEPTH_COMPONENT16_ARB;
+                break;
+            case 24:
+                format = ARBDepthTexture.GL_DEPTH_COMPONENT24_ARB;
+                break;
+            case 32:
+                format = ARBDepthTexture.GL_DEPTH_COMPONENT32_ARB;
+                break;
+            default:
+                // stick with the "undefined" GL_DEPTH_COMPONENT
+        }
+        return format;
     }
 
     @Override

@@ -12,7 +12,7 @@ package com.ardor3d.framework.swt;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
@@ -61,11 +61,11 @@ public class SwtCanvas extends GLCanvas implements Canvas {
     private void privateInit() {
         // tell our parent to lay us out so we have the right starting size.
         getParent().layout();
-        final Point size = getSize();
+        final Rectangle size = getClientArea();
 
         setCurrent();
 
-        final DisplaySettings settings = new DisplaySettings(Math.max(size.x, 1), Math.max(size.y, 1), 0, 0,
+        final DisplaySettings settings = new DisplaySettings(Math.max(size.width, 1), Math.max(size.height, 1), 0, 0,
                 _passedGLData.alphaSize, _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples,
                 false, _passedGLData.stereo);
 

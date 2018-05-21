@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -99,7 +99,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     /**
      * <code>getCamera</code> retrieves the camera this renderer is using.
-     * 
+     *
      * @return the camera this renderer is using.
      */
     public Camera getCamera() {
@@ -229,8 +229,10 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         _parentRenderer.flushFrame(false);
 
         // reset previous camera
-        _oldCamera.update();
-        _oldCamera.apply(_parentRenderer);
+        if (_oldCamera != null) {
+            _oldCamera.update();
+            _oldCamera.apply(_parentRenderer);
+        }
 
         // back to the non rtt settings
         _parentRenderer.getQueue().popBuckets();
@@ -270,7 +272,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     }
 
     public void setMultipleTargets(final boolean multi) {
-    // ignore. Does not matter to FBO.
+        // ignore. Does not matter to FBO.
     }
 
     public void enforceState(final RenderState state) {
