@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.example.canvas;
+package com.ardor3d.framework.swt;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -25,10 +25,11 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.input.MouseManager;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
-import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -69,6 +70,8 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         _canvasRenderer = renderer;
     }
 
+    int oldRectW = 0, oldRectH = 0;
+
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
             init();
@@ -77,17 +80,26 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         if (!isDisposed() && isVisible()) {
             // draw our scene to FBO
             checkRTT();
+
+            _rtt.setBackgroundColor(_canvasRenderer.getRenderer().getBackgroundColor());
             _rtt.render(_canvasRenderer.getScene(), _texList, Renderer.BUFFER_COLOR_AND_DEPTH);
 
             // now render our quad
             final Renderer renderer = _canvasRenderer.getRenderer();
+
+            // clear color buffer
             renderer.clearBuffers(Renderer.BUFFER_COLOR);
-            _quad.onDraw(renderer);
+
+            // draw ortho quad, textured with our actual scene
+            _quad.draw(renderer);
+
+            // flush render buckets
             renderer.flushFrame(false);
 
             // Clean up card garbage such as textures, vbos, etc.
             ContextGarbageCollector.doRuntimeCleanup(renderer);
 
+            // swap our swt managed back buffer
             swapBuffers();
         }
 
@@ -99,9 +111,11 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         // tell our parent to lay us out so we have the right starting size.
         getParent().layout();
 
-        _quad = new Quad("Quad", 15, 13f);
+        _quad = new Quad("Quad", 111f, 111f);
         _quad.setModelBound(new BoundingBox());
         _quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        _quad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _quad.setSolidColor(ColorRGBA.WHITE);
 
         checkRTT();
 
@@ -116,22 +130,26 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         if (width == _oldWidth && height == _oldHeight) {
             return;
         }
-        System.err.println(size);
 
         _oldWidth = width;
         _oldHeight = height;
 
         final DisplaySettings settings = _settings.resizedCopy(width, height);
-        System.err.println(_oldWidth + ", " + _oldHeight);
         _canvasRenderer.init(settings, false);
 
         if (_fboTexture != null && _fboTexture.getTextureIdForContext(_canvasRenderer.getRenderContext()) != 0) {
             _canvasRenderer.getRenderer().deleteTexture(_fboTexture);
         }
 
-        TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         _rtt = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, _canvasRenderer.getRenderer(),
                 _canvasRenderer.getRenderContext().getCapabilities());
+
+        // copy our camera settings from the canvas renderer camera.
+        _rtt.getCamera().set(_canvasRenderer.getCamera());
+
+        // now, merge our cameras
+        _canvasRenderer.setCamera(_rtt.getCamera());
+
         _fboTexture = new Texture2D();
         _rtt.setupTexture(_fboTexture);
         _texList.clear();
@@ -142,7 +160,11 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         screen.setEnabled(true);
 
         _quad.setRenderState(screen);
-        _quad.updateGeometricState(0);
+        _quad.updateWorldRenderStates(false);
+
+        _quad.resize(width, height);
+        _quad.setTranslation(width / 2f, height / 2f, 0);
+        _quad.updateWorldTransform(false);
     }
 
     @Override

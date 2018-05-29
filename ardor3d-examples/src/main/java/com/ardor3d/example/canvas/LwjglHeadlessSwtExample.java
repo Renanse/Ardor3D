@@ -31,6 +31,7 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl.LwjglCanvasCallback;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.swt.SwtFboCanvas;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.Key;
@@ -43,6 +44,8 @@ import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -80,8 +83,10 @@ public class LwjglHeadlessSwtExample {
         final Shell shell = new Shell(display);
         shell.setLayout(new FillLayout());
 
+        // Setup AWT image loader to load our ardor3d logo and font texture.
         AWTImageLoader.registerLoader();
 
+        // Tell ardor3d where to look for scene texture resources
         try {
             final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
                     LwjglSwtExample.class, "com/ardor3d/example/media/"));
@@ -90,18 +95,23 @@ public class LwjglHeadlessSwtExample {
             ex.printStackTrace();
         }
 
+        // add our canvas to the shell, using the scene we've setup and our logic layer
         addNewFBOCanvas(shell, scene, frameWork, logicalLayer);
 
+        // show the shell
         shell.open();
 
+        // init our game
         game.init();
 
+        // game loop
         while (!shell.isDisposed() && !exit.get()) {
             display.readAndDispatch();
             frameWork.updateFrame();
             Thread.yield();
         }
 
+        // cleanup and exit
         display.dispose();
         System.exit(0);
     }
@@ -110,11 +120,18 @@ public class LwjglHeadlessSwtExample {
             final LogicalLayer logicalLayer) {
         logger.info("Adding canvas");
 
-        final DisplaySettings settings = new DisplaySettings(32, 32, 32, 16);
+        // setup the texture renderer type to be used by the SwtFboCanvas
+        TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
 
+        // Display settings to use for canvas - width/height will be updated when canvas is displayed.
+        final DisplaySettings settings = new DisplaySettings(32, 32, 32, 16);
         final SwtFboCanvas canvas = new SwtFboCanvas(shell, SWT.NONE, settings);
+
+        // set up the opengl canvas renderer to use
         final LwjglCanvasRenderer renderer = new LwjglCanvasRenderer(scene);
         canvas.setCanvasRenderer(renderer);
+
+        // add our canvas to framework for updates, etc.
         frameWork.addCanvas(canvas);
         canvas.setFocus();
 
