@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
@@ -111,7 +112,7 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         // tell our parent to lay us out so we have the right starting size.
         getParent().layout();
 
-        _quad = new Quad("Quad", 111f, 111f);
+        _quad = new Quad("Quad", 128f, 128f);
         _quad.setModelBound(new BoundingBox());
         _quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         _quad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
@@ -125,7 +126,7 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
 
     private void checkRTT() {
         final Rectangle size = getClientArea();
-        final int width = Math.max(1, size.width), height = Math.max(1, size.height);
+        int width = Math.max(1, size.width), height = Math.max(1, size.height);
 
         if (width == _oldWidth && height == _oldHeight) {
             return;
@@ -133,6 +134,9 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
 
         _oldWidth = width;
         _oldHeight = height;
+
+        width = DPIUtil.autoScaleUp(width);
+        height = DPIUtil.autoScaleUp(height);
 
         final DisplaySettings settings = _settings.resizedCopy(width, height);
         _canvasRenderer.init(settings, false);

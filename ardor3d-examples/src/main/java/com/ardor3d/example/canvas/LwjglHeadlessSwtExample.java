@@ -18,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -55,8 +56,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas via off-screen FBO rendering.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglHeadlessSwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
+        maxHeapMemory = 64)
 public class LwjglHeadlessSwtExample {
     private static final Logger logger = Logger.getLogger(LwjglHeadlessSwtExample.class.toString());
     private static RotatingCubeGame game;
@@ -88,8 +89,8 @@ public class LwjglHeadlessSwtExample {
 
         // Tell ardor3d where to look for scene texture resources
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    LwjglSwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(LwjglSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -171,7 +172,7 @@ public class LwjglHeadlessSwtExample {
             public void controlMoved(final ControlEvent e) {}
 
             public void controlResized(final ControlEvent event) {
-                final Rectangle size = comp.getClientArea();
+                final Rectangle size = DPIUtil.autoScaleUp(comp.getClientArea());
                 if ((size.width == 0) && (size.height == 0)) {
                     return;
                 }
