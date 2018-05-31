@@ -18,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -171,7 +172,7 @@ public class LwjglHeadlessSwtExample {
             public void controlMoved(final ControlEvent e) {}
 
             public void controlResized(final ControlEvent event) {
-                final Rectangle size = comp.getClientArea();
+                final Rectangle size = DPIUtil.autoScaleUp(comp.getClientArea());
                 if ((size.width == 0) && (size.height == 0)) {
                     return;
                 }

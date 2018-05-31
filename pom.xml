@@ -246,7 +246,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jogamp.version>2.1.4-rc-20140126</jogamp.version>
         <lwjgl.version>2.9.3</lwjgl.version>
-        <swt.version>4.5.2</swt.version>
+        <swt.version>3.106.3</swt.version>
     </properties>
 
     <!-- The dependencyManagement section should specify all versions of artifacts used in sub -->
@@ -312,7 +312,7 @@
                 <version>1.1.4</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.swt</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>swt</artifactId>
                 <version>${swt.version}</version>
             </dependency>

@@ -346,6 +346,7 @@ public class GesturesSwtExample implements Updater {
         logicalLayer.registerTrigger(
                 new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class), new TriggerAction() {
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                @SuppressWarnings("unused")
                         final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(SwipeGestureEvent.class);
                         resetBalls(0);

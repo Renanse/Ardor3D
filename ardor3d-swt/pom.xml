@@ -23,7 +23,7 @@
             <artifactId>easymockclassextension</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.swt</groupId>
+            <groupId>org.eclipse.platform</groupId>
             <artifactId>${swt.artifactId}</artifactId>
             <version>${swt.version}</version>
         </dependency>
