@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -191,7 +191,8 @@ public class TerrainBuilder {
 
         logger.info("client clipmapLevels: " + cacheList.size());
 
-        final TextureClipmap textureClipmap = new TextureClipmap(cacheList, clipmapTextureSize, textureConfiguration);
+        final TextureClipmap textureClipmap = new TextureClipmap(cacheList, clipmapTextureSize, textureConfiguration,
+                textureSource);
 
         if (showDebugPanels) {
             final TextureGridCachePanel panel = new TextureGridCachePanel(cacheList, cacheSize);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -49,6 +49,7 @@ public class TextureClipmap {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(TextureClipmap.class.getName());
 
+    private final TextureSource source;
     private final int textureSize;
     private final int textureLevels;
     private final int validLevels;
@@ -67,6 +68,7 @@ public class TextureClipmap {
     private final Vector3 eyePosition = new Vector3();
 
     private boolean showDebug = false;
+    private boolean enabled = true;
 
     private final List<TextureCache> cacheList;
 
@@ -87,10 +89,23 @@ public class TextureClipmap {
         }
     };
 
+    /**
+     * Construct a new TextureClipmap with the given values.
+     *
+     * @param cacheList
+     *            List of caches used to provide the clipmap with texture data.
+     * @param textureSize
+     *            our
+     * @param textureConfiguration
+     * @param source
+     *            the TextureSource this clipmap represents. This can conceivably be null if the cacheList was built in
+     *            some method that did not involve a texturesource (or involved multiple.)
+     */
     public TextureClipmap(final List<TextureCache> cacheList, final int textureSize,
-            final TextureConfiguration textureConfiguration) {
+            final TextureConfiguration textureConfiguration, final TextureSource source) {
         this.cacheList = cacheList;
         this.textureSize = textureSize;
+        this.source = source;
         validLevels = cacheList.size();
         useAlpha = textureConfiguration.isUseAlpha();
         colorBits = useAlpha ? 4 : 3;
@@ -118,6 +133,10 @@ public class TextureClipmap {
     private final List<Long> timers = Lists.newArrayList();
 
     public void update(final Renderer renderer, final ReadOnlyVector3 position) {
+        if (!isEnabled()) {
+            return;
+        }
+
         eyePosition.set(position);
         textureClipmapShader.setUniform("eyePosition", eyePosition);
         eyePosition.multiplyLocal(textureSize / (scale * 4f * 32f));
@@ -606,6 +625,21 @@ public class TextureClipmap {
         return v;
     }
 
+    /**
+     * @return true if this clipmap should be drawn during terrain rendering.
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled
+     *            true (default) if this clipmap should be drawn during terrain rendering.
+     */
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public boolean isShowDebug() {
         return showDebug;
     }
@@ -624,6 +658,10 @@ public class TextureClipmap {
 
     public int getValidLevels() {
         return validLevels;
+    }
+
+    public TextureSource getSource() {
+        return source;
     }
 
     /**

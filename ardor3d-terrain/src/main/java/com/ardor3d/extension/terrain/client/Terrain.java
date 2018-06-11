@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -262,14 +262,18 @@ public class Terrain extends Node implements Pickable, Runnable {
 
             // check texture clips
             for (int i = 0; i < _textureClipmaps.size(); i++) {
-                final List<TextureCache> list = _textureClipmaps.get(i).getCacheList();
+                final TextureClipmap cm = _textureClipmaps.get(i);
+                if (!cm.isEnabled()) {
+                    continue;
+                }
+                final List<TextureCache> list = cm.getCacheList();
                 for (int j = list.size(); --j >= 0;) {
                     list.get(j).checkForUpdates();
                 }
             }
 
             // check normalmap, if there is one
-            if (_normalClipmap != null) {
+            if (_normalClipmap != null && _normalClipmap.isEnabled()) {
                 final List<TextureCache> list = _normalClipmap.getCacheList();
                 for (int j = list.size(); --j >= 0;) {
                     list.get(j).checkForUpdates();
@@ -288,6 +292,10 @@ public class Terrain extends Node implements Pickable, Runnable {
             _geometryClipmapShader.setUniform("normalMap", _normalUnit);
         }
         for (final TextureClipmap textureClipmap : _textureClipmaps) {
+            if (!textureClipmap.isEnabled()) {
+                continue;
+            }
+
             clipTextureState.setTexture(textureClipmap.getTexture());
             if (first) {
                 blendState.setEnabled(false);
@@ -596,6 +604,16 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     public List<TextureClipmap> getTextureClipmaps() {
         return _textureClipmaps;
+    }
+
+    public TextureClipmap findTextureClipmap(final TextureSource source) {
+        for (final TextureClipmap cm : _textureClipmaps) {
+            if (cm.getSource() == source) {
+                return cm;
+            }
+        }
+
+        return null;
     }
 
     public GLSLShaderObjectsState getGeometryClipmapShader() {

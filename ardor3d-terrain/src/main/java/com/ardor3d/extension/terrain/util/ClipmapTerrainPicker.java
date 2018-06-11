@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -41,7 +41,7 @@ public class ClipmapTerrainPicker {
 
     /**
      * Construct a new picker using the supplied pyramid, tracer and arguments.
-     * 
+     *
      * @param levels
      *            the source for our height information..
      * @param tracerClass
@@ -154,6 +154,11 @@ public class ClipmapTerrainPicker {
                     dx = 1;
                     dy = 0;
                     break;
+                case NegativeY:
+                case None:
+                case PositiveY:
+                default:
+                    throw new IllegalArgumentException("Unsupported direction: " + d);
             }
 
             if (checkTriangles(tracer.getGridLocation()[0] + dx, tracer.getGridLocation()[1] + dy, intersection,
@@ -208,7 +213,7 @@ public class ClipmapTerrainPicker {
 
     /**
      * Check the two triangles of a given grid space for intersection.
-     * 
+     *
      * @param gridX
      *            grid row
      * @param gridY
@@ -247,7 +252,7 @@ public class ClipmapTerrainPicker {
     /**
      * Calculate the triangles (in world coordinate space) of a Pyramid that correspond to the given grid location. The
      * triangles are stored in the class fields _gridTriA and _gridTriB.
-     * 
+     *
      * @param gridX
      *            grid row
      * @param gridY
