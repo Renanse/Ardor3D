@@ -80,7 +80,7 @@ public class TextureClipmap {
     /** Timers for mailbox updates */
     private long oldTime = 0;
     private long updateTimer = 0;
-    private final long updateThreashold = 300;
+    private final long updateThreshold = 300;
 
     private final Comparator<Region> regionSorter = new Comparator<Region>() {
         @Override
@@ -192,8 +192,9 @@ public class TextureClipmap {
             }
         }
 
-        // final long t = System.nanoTime();
+        // Walk through each level of the clipmap
         for (int unit = validLevels - 1; unit >= currentShownLevels; unit--) {
+            // calculate the anchor of the clipmap using our eye pos
             float x = eyePosition.getXf();
             float y = eyePosition.getZf();
 
@@ -204,42 +205,37 @@ public class TextureClipmap {
             final int offX = MathUtils.floor(x);
             final int offY = MathUtils.floor(y);
 
+            // Get our level data for this level
             final LevelData levelData = levelDataList.get(unit);
 
+            // If our anchor has shifted, update our level data info.
             final TextureCache cache = cacheList.get(unit);
             if (levelData.x != offX || levelData.y != offY) {
                 cache.setCurrentPosition(offX, offY);
+                // this also calls updateQuick on level
                 updateLevel(renderer, levelData, offX, offY);
             }
 
+            // Check for individually updated tiles from our source
             final Set<Tile> updatedTiles = cache.handleUpdateRequests();
             if (updatedTiles != null) {
                 final int sX = offX - textureSize / 2;
                 final int sY = offY - textureSize / 2;
 
-                // System.out.println(unit + "[" + sX + "," + sY + "]: " + updatedTiles);
-
-                // TODO: this should update only what was changed
+                // XXX: Perhaps this could find out a subregion of the tile that had changed and update just that, but
+                // for now we will update the full level.
                 updateQuick(renderer, levelData, textureSize + 1, textureSize + 1, sX, sY, levelData.offsetX,
                         levelData.offsetY, textureSize, textureSize);
             }
 
-            x = MathUtils.moduloPositive(x, 2);
-            y = MathUtils.moduloPositive(y, 2);
-
+            // calculate values used to shift texcoords in shader
             int shiftX = levelData.x;
             int shiftY = levelData.y;
             shiftX = MathUtils.moduloPositive(shiftX, 2);
             shiftY = MathUtils.moduloPositive(shiftY, 2);
 
-            x -= shiftX;
-            y -= shiftY;
-
-            x += levelData.offsetX;
-            y += levelData.offsetY;
-
-            x /= textureSize;
-            y /= textureSize;
+            x = (MathUtils.moduloPositive(x, 2) - shiftX + levelData.offsetX) / textureSize;
+            y = (MathUtils.moduloPositive(y, 2) - shiftY + levelData.offsetY) / textureSize;
 
             sliceDataBuffer.put(unit * 2, x);
             sliceDataBuffer.put(unit * 2 + 1, y);
@@ -252,85 +248,93 @@ public class TextureClipmap {
     }
 
     private void updateFromMailbox(final Renderer renderer) {
-        if (updateTimer > updateThreashold) {
-            final List<Region> regionList = mailBox.switchAndGet();
-            if (!regionList.isEmpty()) {
-                for (int unit = validLevels - 1; unit >= 0; unit--) {
-                    final LevelData levelData = levelDataList.get(unit);
-                    // final int pow = (int) Math.pow(2, unit);
-                    final int sX = levelData.x - textureSize / 2;
-                    final int sY = levelData.y - textureSize / 2;
-                    levelData.clipRegion.setX(sX);
-                    levelData.clipRegion.setY(sY);
-                }
 
-                for (int i = regionList.size() - 1; i >= 0; i--) {
-                    final Region region = regionList.get(i);
-                    final Region clipRegion = levelDataList.get(region.getLevel()).clipRegion;
+        if (updateTimer < updateThreshold) {
+            updateThrottleTimer();
+            return;
+        }
 
-                    if (clipRegion.intersects(region)) {
-                        clipRegion.intersection(region);
-                    } else {
-                        regionList.remove(i);
-                    }
-                }
+        final List<Region> regionList = mailBox.switchAndGet();
+        if (!regionList.isEmpty()) {
+            for (int unit = validLevels - 1; unit >= 0; unit--) {
+                final LevelData levelData = levelDataList.get(unit);
+                // final int pow = (int) Math.pow(2, unit);
+                final int sX = levelData.x - textureSize / 2;
+                final int sY = levelData.y - textureSize / 2;
+                levelData.clipRegion.setX(sX);
+                levelData.clipRegion.setY(sY);
+            }
 
-                Collections.sort(regionList, regionSorter);
+            for (int i = regionList.size() - 1; i >= 0; i--) {
+                final Region region = regionList.get(i);
+                final Region clipRegion = levelDataList.get(region.getLevel()).clipRegion;
 
-                final int start = regionList.size() - 1;
-                for (int i = start; i >= 0; i--) {
-                    final Region region = regionList.get(i);
-
-                    recursiveAddUpdates(regionList, region.getLevel(), region.getX(), region.getY(), region.getWidth(),
-                            region.getHeight());
-                }
-
-                for (int i = regionList.size() - 1; i >= 0; i--) {
-                    final Region region = regionList.get(i);
-                    final Region clipRegion = levelDataList.get(region.getLevel()).clipRegion;
-
-                    if (clipRegion.intersects(region)) {
-                        clipRegion.intersection(region);
-                    } else {
-                        regionList.remove(i);
-                    }
-                }
-
-                Collections.sort(regionList, regionSorter);
-
-                final Set<Integer> affectedUnits = Sets.newHashSet();
-                for (int i = regionList.size() - 1; i >= 0; i--) {
-                    final Region region = regionList.get(i);
-
-                    final int unit = region.getLevel();
-                    affectedUnits.add(unit);
-
-                    final LevelData levelData = levelDataList.get(unit);
-                    final TextureCache cache = cacheList.get(unit);
-                    final ByteBuffer imageDestination = levelData.sliceData;
-
-                    final int sX = region.getX();
-                    final int sY = region.getY();
-                    int dX = region.getX() + textureSize / 2;
-                    int dY = region.getY() + textureSize / 2;
-                    dX = MathUtils.moduloPositive(dX, textureSize);
-                    dY = MathUtils.moduloPositive(dY, textureSize);
-
-                    cache.updateRegion(imageDestination, sX, sY, dX + 1, dY + 1, region.getWidth(), region.getHeight());
-                }
-
-                for (final int unit : affectedUnits) {
-                    final LevelData levelData = levelDataList.get(unit);
-                    final ByteBuffer imageDestination = levelData.sliceData;
-
-                    // TODO: only update subpart
-                    imageDestination.rewind();
-                    renderer.updateTexture3DSubImage(textureClipmap, 0, 0, unit, textureSize, textureSize, 1,
-                            imageDestination, 0, 0, 0, textureSize, textureSize);
+                if (clipRegion.intersects(region)) {
+                    clipRegion.intersection(region);
+                } else {
+                    regionList.remove(i);
                 }
             }
-            updateTimer %= updateThreashold;
+
+            Collections.sort(regionList, regionSorter);
+
+            final int start = regionList.size() - 1;
+            for (int i = start; i >= 0; i--) {
+                final Region region = regionList.get(i);
+
+                recursiveAddUpdates(regionList, region.getLevel(), region.getX(), region.getY(), region.getWidth(),
+                        region.getHeight());
+            }
+
+            for (int i = regionList.size() - 1; i >= 0; i--) {
+                final Region region = regionList.get(i);
+                final Region clipRegion = levelDataList.get(region.getLevel()).clipRegion;
+
+                if (clipRegion.intersects(region)) {
+                    clipRegion.intersection(region);
+                } else {
+                    regionList.remove(i);
+                }
+            }
+
+            Collections.sort(regionList, regionSorter);
+
+            final Set<Integer> affectedUnits = Sets.newHashSet();
+            for (int i = regionList.size() - 1; i >= 0; i--) {
+                final Region region = regionList.get(i);
+
+                final int unit = region.getLevel();
+                affectedUnits.add(unit);
+
+                final LevelData levelData = levelDataList.get(unit);
+                final TextureCache cache = cacheList.get(unit);
+                final ByteBuffer imageDestination = levelData.sliceData;
+
+                final int sX = region.getX();
+                final int sY = region.getY();
+                int dX = region.getX() + textureSize / 2;
+                int dY = region.getY() + textureSize / 2;
+                dX = MathUtils.moduloPositive(dX, textureSize);
+                dY = MathUtils.moduloPositive(dY, textureSize);
+
+                cache.updateRegion(imageDestination, sX, sY, dX + 1, dY + 1, region.getWidth(), region.getHeight());
+            }
+
+            for (final int unit : affectedUnits) {
+                final LevelData levelData = levelDataList.get(unit);
+                final ByteBuffer imageDestination = levelData.sliceData;
+
+                // TODO: only update subpart
+                imageDestination.rewind();
+                renderer.updateTexture3DSubImage(textureClipmap, 0, 0, unit, textureSize, textureSize, 1,
+                        imageDestination, 0, 0, 0, textureSize, textureSize);
+            }
         }
+        updateTimer %= updateThreshold;
+        updateThrottleTimer();
+    }
+
+    private void updateThrottleTimer() {
         final long time = System.currentTimeMillis();
         updateTimer += time - oldTime;
         oldTime = time;
@@ -617,12 +621,12 @@ public class TextureClipmap {
     private int roundUpPowerTwo(int v) {
         v--;
         v |= v >> 1;
-        v |= v >> 2;
-        v |= v >> 4;
-        v |= v >> 8;
-        v |= v >> 16;
-        v++;
-        return v;
+            v |= v >> 2;
+            v |= v >> 4;
+            v |= v >> 8;
+            v |= v >> 16;
+            v++;
+            return v;
     }
 
     /**

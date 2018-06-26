@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -43,7 +43,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
     public TextureGridCache(final TextureCache parentCache, final int cacheSize, final TextureSource source,
             final int tileSize, final int destinationSize, final TextureConfiguration textureConfiguration,
             final int meshClipIndex, final int dataClipIndex, final ExecutorService tileThreadService) {
-        super(cacheSize, tileSize, destinationSize, meshClipIndex, dataClipIndex, tileThreadService);
+        super(cacheSize, tileSize, destinationSize, meshClipIndex, dataClipIndex, 1, tileThreadService);
         this.parentCache = parentCache;
         this.source = source;
         this.textureConfiguration = textureConfiguration;

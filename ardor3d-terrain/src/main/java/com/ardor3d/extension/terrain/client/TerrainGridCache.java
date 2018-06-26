@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -33,21 +33,19 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
 
     protected final float[] data;
 
-    private final int vertexDistance;
     private final float heightScale;
 
     public TerrainGridCache(final TerrainCache parentCache, final int cacheSize, final TerrainSource source,
             final int tileSize, final int destinationSize, final TerrainConfiguration terrainConfiguration,
             final int meshClipIndex, final int dataClipIndex, final ExecutorService tileThreadService) {
-        super(cacheSize, tileSize, destinationSize, meshClipIndex, dataClipIndex, tileThreadService);
+        super(cacheSize, tileSize, destinationSize, meshClipIndex, dataClipIndex, MathUtils.pow2(meshClipIndex),
+                tileThreadService);
         this.parentCache = parentCache;
         this.source = source;
         heightScale = terrainConfiguration.getScale().getYf();
         this.terrainConfiguration = terrainConfiguration;
 
         data = new float[dataSize * dataSize];
-
-        vertexDistance = (int) Math.pow(2, meshClipIndex);
     }
 
     @Override

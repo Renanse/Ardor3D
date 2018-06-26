@@ -37,6 +37,7 @@ public abstract class AbstractGridCache {
 
     protected final int meshClipIndex;
     protected final int dataClipIndex;
+    protected final int vertexDistance;
 
     protected final Object SWAP_LOCK = new Object();
     protected int backCurrentTileX = Integer.MAX_VALUE;
@@ -57,13 +58,15 @@ public abstract class AbstractGridCache {
     protected Tile locatorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     protected AbstractGridCache(final int cacheSize, final int tileSize, final int destinationSize,
-            final int meshClipIndex, final int dataClipIndex, final ExecutorService tileThreadService) {
+            final int meshClipIndex, final int dataClipIndex, final int vertexDistance,
+            final ExecutorService tileThreadService) {
         this.cacheSize = cacheSize;
         this.tileSize = tileSize;
         dataSize = tileSize * cacheSize;
         this.destinationSize = destinationSize;
         this.meshClipIndex = meshClipIndex;
         this.dataClipIndex = dataClipIndex;
+        this.vertexDistance = vertexDistance;
 
         this.tileThreadService = tileThreadService;
 
@@ -82,6 +85,7 @@ public abstract class AbstractGridCache {
         final int diffX = tileX - backCurrentTileX;
         final int diffY = tileY - backCurrentTileY;
 
+        // if we have not moved to a new center tile, ignore the position change.
         if (diffX == 0 && diffY == 0) {
             return;
         }
@@ -90,6 +94,7 @@ public abstract class AbstractGridCache {
             backCurrentTileX = tileX;
             backCurrentTileY = tileY;
 
+            // Gather all of the tiles in range of our new position
             final Set<TileLoadingData> newTiles = Sets.newHashSet();
             for (int i = 0; i < cacheSize; i++) {
                 for (int j = 0; j < cacheSize; j++) {
@@ -99,40 +104,52 @@ public abstract class AbstractGridCache {
                     final int destX = MathUtils.moduloPositive(sourceX, cacheSize);
                     final int destY = MathUtils.moduloPositive(sourceY, cacheSize);
 
-                    newTiles.add(new TileLoadingData(this, new Tile(sourceX, sourceY), new Tile(destX, destY)));
+                    newTiles.add(new TileLoadingData(this, new Tile(sourceX, sourceY), new Tile(destX, destY),
+                            dataClipIndex));
                 }
             }
 
+            // Walk through tiles we are currently loading
             final Iterator<TileLoadingData> tileIterator = currentTiles.iterator();
             while (tileIterator.hasNext()) {
                 final TileLoadingData data = tileIterator.next();
 
+                // Is this tile NOT in the new data set?
                 if (!newTiles.contains(data)) {
+                    // set that destination tile as invalid
                     cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
 
+                    // try to cancel the tile's loading if possible
                     data.isCancelled = true;
                     final Future<?> future = data.future;
                     if (future != null && !future.isDone()) {
                         future.cancel(true);
                     }
+
+                    // remove the tile from current
                     tileIterator.remove();
+
+                    // remove the tile from the back accumulator list, since we don't need it anymore.
                     if (backThreadTiles.contains(data)) {
                         backThreadTiles.remove(data);
                     }
-                } else {
+                }
+
+                // If the tile IS in the new data set, we don't want to add it to current or backthread Tiles again
+                else {
                     newTiles.remove(data);
                 }
             }
 
+            // add remaining tiles to backthread for next execution pass
             backThreadTiles.addAll(newTiles);
             updated = true;
 
+            // add remaining tiles to our currentTiles for tracking here.
             currentTiles.addAll(newTiles);
         }
 
-        // Housekeeping - Wipe out future tasks that have already been cancelled.
-        // tileThreadService.purge();
-
+        // Sync our debug tiles if enabled
         if (enableDebug) {
             synchronized (debugTiles) {
                 debugTiles.clear();
@@ -149,6 +166,7 @@ public abstract class AbstractGridCache {
         int tileX;
         int tileY;
         synchronized (SWAP_LOCK) {
+            // Swap our tile sets so we work on data accumulated recently.
             final Set<TileLoadingData> tmp = newThreadTiles;
             newThreadTiles = backThreadTiles;
             backThreadTiles = tmp;
@@ -166,9 +184,12 @@ public abstract class AbstractGridCache {
             locatorTile = new Tile(tileX, tileY);
         }
 
+        // walk through the accumulated tile data
         final Iterator<TileLoadingData> tileIterator = newThreadTiles.iterator();
         while (tileIterator.hasNext()) {
             final TileLoadingData data = tileIterator.next();
+
+            // check if the given tile is valid and should be processed
             if (validTiles == null || validTiles.contains(data.sourceTile)) {
                 cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
                 data.future = tileThreadService.submit(PriorityRunnable.of(data, meshClipIndex));
@@ -239,6 +260,7 @@ public abstract class AbstractGridCache {
 
         public final Tile sourceTile;
         public final Tile destTile;
+        public final int index;
 
         public boolean isCancelled = false;
         public Future<?> future;
@@ -249,10 +271,12 @@ public abstract class AbstractGridCache {
 
         public State state = State.init;
 
-        public TileLoadingData(final AbstractGridCache sourceCache, final Tile sourceTile, final Tile destTile) {
+        public TileLoadingData(final AbstractGridCache sourceCache, final Tile sourceTile, final Tile destTile,
+                final int index) {
             this.sourceCache = sourceCache;
             this.sourceTile = sourceTile;
             this.destTile = destTile;
+            this.index = index;
         }
 
         @Override
@@ -273,7 +297,7 @@ public abstract class AbstractGridCache {
             sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
 
             final int level = sourceCache.meshClipIndex;
-            final int vertexDistance = MathUtils.pow2(level);
+            final int vertexDistance = sourceCache.vertexDistance;
             final int tileSize = sourceCache.tileSize;
             final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance, sourceTile.getY()
                     * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
@@ -337,7 +361,8 @@ public abstract class AbstractGridCache {
 
         @Override
         public String toString() {
-            return "TileLoadingData [destTile=" + destTile + ", sourceTile=" + sourceTile + "]";
+            return "TileLoadingData [destTile=" + destTile + ", sourceTile=" + sourceTile + ", clipIndex=" + index
+                    + "]";
         }
     }
 
