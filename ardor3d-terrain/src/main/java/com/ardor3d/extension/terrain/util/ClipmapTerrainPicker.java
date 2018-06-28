@@ -158,7 +158,7 @@ public class ClipmapTerrainPicker {
                 case None:
                 case PositiveY:
                 default:
-                    throw new IllegalArgumentException("Unsupported direction: " + d);
+                    ; // ignore
             }
 
             if (checkTriangles(tracer.getGridLocation()[0] + dx, tracer.getGridLocation()[1] + dy, intersection,
