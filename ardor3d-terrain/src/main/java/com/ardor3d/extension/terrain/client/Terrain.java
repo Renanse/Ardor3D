@@ -476,7 +476,7 @@ public class Terrain extends Node implements Pickable, Runnable {
                 _geometryClipmapShader.setFragmentShader(pixelShader.openStream());
             } catch (final IOException ex) {
                 Terrain.logger
-                .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+                        .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }
 
             _geometryClipmapShader.setUniform("texture", 0);
@@ -733,6 +733,16 @@ public class Terrain extends Node implements Pickable, Runnable {
         return 0;
     }
 
+    /**
+     * Get height of the terrain at the given world coordinates. This height will correlate to the finest level of
+     * detail, currently valid clipmap level at the given coordinates.
+     *
+     * @param x
+     *            world x-coordinate
+     * @param z
+     *            world z-coordinate
+     * @return the height, in world coordinate
+     */
     public float getHeightAt(final double x, final double z) {
         final Vector3 heightCalc = new Vector3(x, 0, z);
         worldToLocal(heightCalc, heightCalc);
