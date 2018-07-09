@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -38,7 +38,7 @@ import com.ardor3d.util.Ardor3dException;
 
 /**
  * <code>Renderer</code> defines an interface for classes that handle displaying of graphics data to a render context.
- * 
+ *
  * All rendering state and tasks should be handled through this class.
  */
 public interface Renderer {
@@ -72,7 +72,7 @@ public interface Renderer {
     /**
      * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel that is not set
      * via typical rendering operations.
-     * 
+     *
      * @param c
      *            the color to set the background to.
      */
@@ -80,14 +80,14 @@ public interface Renderer {
 
     /**
      * <code>getBackgroundColor</code> retrieves the clear color of the current OpenGL context.
-     * 
+     *
      * @return the current clear color.
      */
     ReadOnlyColorRGBA getBackgroundColor();
 
     /**
      * <code>clearBuffers</code> clears the given buffers (specified as a bitwise &).
-     * 
+     *
      * @param buffers
      *            the buffers to clear.
      * @see #BUFFER_COLOR
@@ -99,7 +99,7 @@ public interface Renderer {
 
     /**
      * <code>clearBuffers</code> clears the given buffers (specified as a bitwise &).
-     * 
+     *
      * @param buffers
      *            the buffers to clear.
      * @param strict
@@ -114,7 +114,7 @@ public interface Renderer {
     /**
      * <code>flushFrame</code> handles rendering any items still remaining in the render buckets and optionally swaps
      * the back buffer with the currently displayed buffer.
-     * 
+     *
      * @param doSwap
      *            if true, will ask the underlying implementation to blit the back buffer contents to the display
      *            buffer. Usually this will be true, unless you are in a windowing toolkit that handles doing this for
@@ -123,19 +123,19 @@ public interface Renderer {
     void flushFrame(boolean doSwap);
 
     /**
-     * 
+     *
      * <code>setOrtho</code> sets the display system to be in orthographic mode. If the system has already been set to
      * orthographic mode a <code>Ardor3dException</code> is thrown. The origin (0,0) is the bottom left of the screen.
-     * 
+     *
      */
     void setOrtho();
 
     /**
-     * 
+     *
      * <code>unsetOrhto</code> unsets the display system from orthographic mode back into regular projection mode. If
      * the system is not in orthographic mode a <code>Ardor3dException</code> is thrown.
-     * 
-     * 
+     *
+     *
      */
     void unsetOrtho();
 
@@ -151,7 +151,7 @@ public interface Renderer {
 
     /**
      * render queues
-     * 
+     *
      * @param doSort
      *            if true, the queues will be sorted prior to rendering.
      * @param doClear
@@ -167,7 +167,7 @@ public interface Renderer {
     /**
      * <code>grabScreenContents</code> reads a block of data as bytes from the current framebuffer. The format
      * determines how many bytes per pixel are read and thus how big the buffer must be that you pass in.
-     * 
+     *
      * @param store
      *            a buffer to store contents in.
      * @param format
@@ -188,7 +188,7 @@ public interface Renderer {
 
     /**
      * Gets the expected size (in bytes) of the buffer used to call <code>grabScreenContents</code>
-     * 
+     *
      * @param format
      *            the format to read in data for.
      * @param type
@@ -205,7 +205,7 @@ public interface Renderer {
     /**
      * <code>draw</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
      * management of the scene to spatial for it to determine when a <code>Geometry</code> leaf is reached.
-     * 
+     *
      * @param s
      *            the scene to render.
      */
@@ -224,21 +224,21 @@ public interface Renderer {
 
     /**
      * Get the render queue associated with this Renderer.
-     * 
+     *
      * @return RenderQueue
      */
     RenderQueue getQueue();
 
     /**
      * Return true if this renderer is in the middle of processing its RenderQueue.
-     * 
+     *
      * @return boolean
      */
     boolean isProcessingQueue();
 
     /**
      * Check a given Spatial to see if it should be queued. return true if it was queued.
-     * 
+     *
      * @param s
      *            Spatial to check
      * @return true if it was queued.
@@ -247,14 +247,14 @@ public interface Renderer {
 
     /**
      * Attempts to delete the VBOs with the given id. Ignores null ids or ids < 1.
-     * 
+     *
      * @param ids
      */
     void deleteVBOs(Collection<Integer> ids);
 
     /**
      * Attempts to delete any VBOs associated with this buffer that are relevant to the current RenderContext.
-     * 
+     *
      * @param ids
      */
     void deleteVBOs(AbstractBufferData<?> buffer);
@@ -266,7 +266,7 @@ public interface Renderer {
 
     /**
      * Update all or a portion of an existing one dimensional texture object.
-     * 
+     *
      * @param destination
      *            the texture to update. Should already have been sent to the card (have a valid texture id.)
      * @param dstOffsetX
@@ -282,7 +282,7 @@ public interface Renderer {
 
     /**
      * Update all or a portion of an existing two dimensional texture object.
-     * 
+     *
      * @param destination
      *            the texture to update. Should already have been sent to the card (have a valid texture id.)
      * @param dstOffsetX
@@ -307,7 +307,7 @@ public interface Renderer {
 
     /**
      * Update all or a portion of an existing one dimensional texture object.
-     * 
+     *
      * @param destination
      *            the texture to update. Should already have been sent to the card (have a valid texture id.)
      * @param dstOffsetX
@@ -341,7 +341,7 @@ public interface Renderer {
 
     /**
      * Update all or a portion of a single two dimensional face on an existing cubemap texture object.
-     * 
+     *
      * @param destination
      *            the texture to update. Should already have been sent to the card (have a valid texture id.)
      * @param dstFace
@@ -369,7 +369,7 @@ public interface Renderer {
 
     /**
      * Check the underlying rendering system (opengl, etc.) for exceptions.
-     * 
+     *
      * @throws Ardor3dException
      *             if an error is found.
      */
@@ -377,7 +377,7 @@ public interface Renderer {
 
     /**
      * <code>draw</code> renders the renderable to the back buffer.
-     * 
+     *
      * @param renderable
      *            the text object to be rendered.
      */
@@ -385,7 +385,7 @@ public interface Renderer {
 
     /**
      * <code>doTransforms</code> sets the current transform.
-     * 
+     *
      * @param transform
      *            transform to apply.
      */
@@ -393,7 +393,7 @@ public interface Renderer {
 
     /**
      * <code>undoTransforms</code> reverts the latest transform.
-     * 
+     *
      * @param transform
      *            transform to revert.
      */
@@ -434,14 +434,11 @@ public interface Renderer {
     void setupInterleavedDataVBO(FloatBufferData interleaved, FloatBufferData vertexCoords,
             FloatBufferData normalCoords, FloatBufferData colorCoords, List<FloatBufferData> textureCoords);
 
-    // TODO: Display List
-    void renderDisplayList(int displayListID);
-
     void setProjectionMatrix(FloatBuffer matrix);
 
     /**
      * Gets the current projection matrix in row major order
-     * 
+     *
      * @param store
      *            The buffer to store in. If null or remaining is < 16, a new FloatBuffer will be created and returned.
      * @return
@@ -452,7 +449,7 @@ public interface Renderer {
 
     /**
      * Gets the current modelview matrix in row major order
-     * 
+     *
      * @param store
      *            The buffer to store in. If null or remaining is < 16, a new FloatBuffer will be created and returned.
      * @return
@@ -465,7 +462,7 @@ public interface Renderer {
 
     /**
      * Specify which color buffers are to be drawn into.
-     * 
+     *
      * @param target
      */
     void setDrawBuffer(DrawBufferTarget target);
@@ -473,7 +470,7 @@ public interface Renderer {
     /**
      * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
      * lwjgl/jogl.
-     * 
+     *
      * @param lineWidth
      * @param stippleFactor
      * @param stipplePattern
@@ -484,7 +481,7 @@ public interface Renderer {
     /**
      * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
      * lwjgl/jogl.
-     * 
+     *
      * @param pointSize
      * @param antialiased
      * @param isSprite
@@ -498,7 +495,7 @@ public interface Renderer {
 
     /**
      * Apply the given state to the current RenderContext using this Renderer.
-     * 
+     *
      * @param type
      *            the state type
      * @param state
@@ -507,21 +504,8 @@ public interface Renderer {
     void applyState(StateType type, RenderState state);
 
     /**
-     * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
-     * list until {@link #endDisplayList()} is called.
-     * 
-     * @return id of new display list
-     */
-    int startDisplayList();
-
-    /**
-     * Ends a display list. Will likely cause an OpenGL exception if a display list is not currently being generated.
-     */
-    void endDisplayList();
-
-    /**
      * Loads a texture onto the card for the current OpenGL context.
-     * 
+     *
      * @param texture
      *            the texture obejct to load.
      * @param unit
@@ -533,7 +517,7 @@ public interface Renderer {
      * Explicitly remove this Texture from the graphics card. Note, the texture is only removed for the current context.
      * If the texture is used in other contexts, those uses are not touched. If the texture is not used in this context,
      * this is a no-op.
-     * 
+     *
      * @param texture
      *            the Texture object to remove.
      */
@@ -541,24 +525,16 @@ public interface Renderer {
 
     /**
      * Removes the given texture ids from the current OpenGL context.
-     * 
+     *
      * @param ids
      *            a list/set of ids to remove.
      */
     void deleteTextureIds(Collection<Integer> ids);
 
     /**
-     * Removes the given display lists by id from the current OpenGL context.
-     * 
-     * @param ids
-     *            a list/set of ids to remove.
-     */
-    void deleteDisplayLists(Collection<Integer> collection);
-
-    /**
      * Add the given rectangle to the clip stack, clipping the rendering area by the given rectangle intersected with
      * any existing scissor entries. Enable clipping if this is the first rectangle in the stack.
-     * 
+     *
      * @param rectangle
      */
     void pushClip(ReadOnlyRectangle2 rectangle);
@@ -601,7 +577,7 @@ public interface Renderer {
 
     /**
      * Set rendering logic that will be called during drawing of renderables
-     * 
+     *
      * @param logic
      *            logic to use in rendering. call with null to reset rendering.
      * @see RenderLogic

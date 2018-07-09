@@ -470,16 +470,6 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     @Override
-    public void deleteDisplayLists(final Collection<Integer> ids) {
-        final GL gl = GLContext.getCurrentGL();
-        for (final Integer i : ids) {
-            if (i != null && i != 0) {
-                gl.getGL2().glDeleteLists(i, 1);
-            }
-        }
-    }
-
-    @Override
     public void deleteVBOs(final AbstractBufferData<?> buffer) {
         if (buffer == null) {
             return;
@@ -1871,42 +1861,6 @@ public class JoglRenderer extends AbstractRenderer {
     @Override
     public void deleteTextureIds(final Collection<Integer> ids) {
         JoglTextureStateUtil.deleteTextureIds(ids);
-    }
-
-    /**
-     * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
-     * list until {@link #endDisplayList()} is called.
-     *
-     * @return id of new display list
-     */
-    @Override
-    public int startDisplayList() {
-        final GL gl = GLContext.getCurrentGL();
-
-        final int id = gl.getGL2().glGenLists(1);
-
-        gl.getGL2().glNewList(id, GL2.GL_COMPILE);
-
-        return id;
-    }
-
-    /**
-     * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
-     */
-    @Override
-    public void endDisplayList() {
-        final GL gl = GLContext.getCurrentGL();
-        gl.getGL2().glEndList();
-    }
-
-    /**
-     * Draw the given display list.
-     */
-    @Override
-    public void renderDisplayList(final int displayListID) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2().glCallList(displayListID);
     }
 
     @Override

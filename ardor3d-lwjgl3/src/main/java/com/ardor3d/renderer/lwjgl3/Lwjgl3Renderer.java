@@ -399,12 +399,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void renderDisplayList(final int displayListID) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void setProjectionMatrix(final FloatBuffer matrix) {
         // TODO Auto-generated method stub
 
@@ -462,18 +456,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public int startDisplayList() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void endDisplayList() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void loadTexture(final Texture texture, final int unit) {
         // TODO Auto-generated method stub
 
@@ -487,12 +469,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void deleteTextureIds(final Collection<Integer> ids) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteDisplayLists(final Collection<Integer> collection) {
         // TODO Auto-generated method stub
 
     }

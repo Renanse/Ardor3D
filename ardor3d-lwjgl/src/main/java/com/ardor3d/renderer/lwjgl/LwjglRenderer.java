@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -106,7 +106,7 @@ import com.ardor3d.util.stat.StatType;
 
 /**
  * <code>LwjglRenderer</code> provides an implementation of the <code>Renderer</code> interface using the LWJGL API.
- * 
+ *
  * @see com.ardor3d.renderer.Renderer
  */
 public class LwjglRenderer extends AbstractRenderer {
@@ -405,15 +405,6 @@ public class LwjglRenderer extends AbstractRenderer {
         idBuffer.flip();
         if (idBuffer.remaining() > 0) {
             ARBBufferObject.glDeleteBuffersARB(idBuffer);
-        }
-    }
-
-    public void deleteDisplayLists(final Collection<Integer> ids) {
-        for (final Integer i : ids) {
-            if (i != null && i != 0) {
-                System.err.println("deleted DL: " + i);
-                GL11.glDeleteLists(i, 1);
-            }
         }
     }
 
@@ -1664,34 +1655,6 @@ public class LwjglRenderer extends AbstractRenderer {
 
     public void deleteTextureIds(final Collection<Integer> ids) {
         LwjglTextureStateUtil.deleteTextureIds(ids);
-    }
-
-    /**
-     * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
-     * list until {@link #endDisplayList()} is called.
-     * 
-     * @return id of new display list
-     */
-    public int startDisplayList() {
-        final int id = GL11.glGenLists(1);
-
-        GL11.glNewList(id, GL11.GL_COMPILE);
-
-        return id;
-    }
-
-    /**
-     * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
-     */
-    public void endDisplayList() {
-        GL11.glEndList();
-    }
-
-    /**
-     * Draw the given display list.
-     */
-    public void renderDisplayList(final int displayListID) {
-        GL11.glCallList(displayListID);
     }
 
     public void clearClips() {
