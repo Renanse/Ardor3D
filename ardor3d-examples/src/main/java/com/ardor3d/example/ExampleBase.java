@@ -30,6 +30,8 @@ import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.jogl.JoglNewtWindow;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.lwjgl3.GLFWCanvas;
+import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.image.util.awt.ScreenShotImageExporter;
@@ -39,12 +41,15 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.control.FirstPersonControl;
+import com.ardor3d.input.glfw.GLFWMouseManager;
 import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
 import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
 import com.ardor3d.input.jogl.JoglNewtMouseManager;
 import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.DummyControllerWrapper;
+import com.ardor3d.input.logical.DummyKeyboardWrapper;
+import com.ardor3d.input.logical.DummyMouseWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -359,10 +364,20 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         example._settings = settings;
 
         // get our framework
-        if (prefs.getRenderer().startsWith("LWJGL")) {
+        if (prefs.getRenderer().startsWith("LWJGL 3")) {
+            final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(example);
+            example._canvas = new GLFWCanvas(settings, canvasRenderer);
+            example._physicalLayer = new PhysicalLayer(new DummyKeyboardWrapper(), new DummyMouseWrapper(),
+                    new DummyControllerWrapper());
+            example._mouseManager = new GLFWMouseManager();
+            example._canvas.setMouseManager(example._mouseManager);
+            TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
+        } else if (prefs.getRenderer().startsWith("LWJGL")) {
             try {
                 SharedLibraryLoader.load(true);
-            } catch (Exception e) {e.printStackTrace();}
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
 
             final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
             example._canvas = new LwjglCanvas(settings, canvasRenderer);
