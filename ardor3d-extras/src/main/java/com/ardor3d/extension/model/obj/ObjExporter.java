@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -36,7 +36,7 @@ import com.ardor3d.util.TextureKey;
  * WaveFront OBJ exporter. It supports only the meshes. Several meshes can be exported into the same OBJ file. Only a
  * few kinds of primitives are supported. N.B: If the texture is flipped in Ardor3D, you will have to flip it manually
  * when loading the resulting OBJ file.
- * 
+ *
  * @author Julien Gouesse
  */
 public class ObjExporter {
@@ -49,7 +49,7 @@ public class ObjExporter {
 
     /**
      * Save a mesh to a single WaveFront OBJ file and a MTL file
-     * 
+     *
      * @param mesh
      *            mesh to export
      * @param objFile
@@ -75,7 +75,7 @@ public class ObjExporter {
 
     /**
      * Save several meshes to a single WaveFront OBJ file and a MTL file
-     * 
+     *
      * @param meshList
      *            meshes to export
      * @param objFile
@@ -122,7 +122,7 @@ public class ObjExporter {
 
     /**
      * Save a mesh to the given files.
-     * 
+     *
      * @param mesh
      *            mesh to export
      * @param objFile
@@ -206,7 +206,7 @@ public class ObjExporter {
                                 && mtl.forceBlend == currentMtl.forceBlend && mtl.d == currentMtl.d
                                 && Arrays.equals(mtl.Ka, currentMtl.Ka) && Arrays.equals(mtl.Kd, currentMtl.Kd)
                                 && Arrays.equals(mtl.Ks, currentMtl.Ks)
-                                //&& Objects.equals(mtl.textureName, currentMtl.textureName)) {
+                                // && Objects.equals(mtl.textureName, currentMtl.textureName)) {
                                 && mtl.textureName.equals(currentMtl.textureName)) {
                             sameObjMtl = mtl;
                             break;
@@ -311,7 +311,6 @@ public class ObjExporter {
                     case TriangleFan:
                     case Triangles:
                     case TriangleStrip:
-                    case Quads:
                         for (int primIndex = 0, primCount = meshData.getPrimitiveCount(sectionIndex); primIndex < primCount; primIndex++) {
                             meshData.getPrimitiveIndices(primIndex, sectionIndex, indices);
                             objPw.print("f");

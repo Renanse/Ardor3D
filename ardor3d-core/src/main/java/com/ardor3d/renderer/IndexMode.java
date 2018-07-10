@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -26,17 +26,6 @@ public enum IndexMode {
      * additional vertex is paired with the preceding vertex and the initial vertex (V0) to make a new triangle.
      */
     TriangleFan(true),
-
-    // QUADMESH
-    /**
-     * Every four vertices referenced by the indexbuffer will be considered a stand-alone quad.
-     */
-    Quads(true),
-    /**
-     * The first four vertices referenced by the indexbuffer create a triangle, from there, every two additional
-     * vertices are paired with the two preceding vertices to make a new quad.
-     */
-    QuadStrip(true),
 
     // LINE
     /**
@@ -77,9 +66,6 @@ public enum IndexMode {
             case TriangleStrip:
             case TriangleFan:
                 return 3;
-            case Quads:
-            case QuadStrip:
-                return 4;
             case Lines:
             case LineStrip:
             case LineLoop:
@@ -103,10 +89,6 @@ public enum IndexMode {
             case TriangleFan:
             case TriangleStrip:
                 return size - 2;
-            case Quads:
-                return size / 4;
-            case QuadStrip:
-                return size / 2 - 1;
             case Lines:
                 return size / 2;
             case LineStrip:

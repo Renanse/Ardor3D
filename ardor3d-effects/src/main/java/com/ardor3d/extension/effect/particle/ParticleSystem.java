@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -47,7 +47,7 @@ public abstract class ParticleSystem extends Node {
     private static final Logger logger = Logger.getLogger(ParticleSystem.class.getName());
 
     public enum ParticleType {
-        Quad, Triangle, Point, Line, GeomMesh;
+        Triangle, Point, Line, GeomMesh;
     }
 
     protected static final double DEFAULT_END_SIZE = 4;
@@ -113,7 +113,7 @@ public abstract class ParticleSystem extends Node {
     public ParticleSystem() {}
 
     public ParticleSystem(final String name, final int numParticles) {
-        this(name, numParticles, ParticleType.Quad);
+        this(name, numParticles, ParticleType.Triangle);
     }
 
     public ParticleSystem(final String name, final int numParticles, final ParticleType particleType) {
@@ -151,8 +151,6 @@ public abstract class ParticleSystem extends Node {
                 return 1;
             case Line:
                 return 2;
-            case Quad:
-                return 4;
         }
         throw new IllegalArgumentException("Invalid ParticleType: " + type);
     }
@@ -275,7 +273,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Set the start color for particles.
-     * 
+     *
      * @param color
      *            The new start color.
      */
@@ -293,7 +291,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Set the end color for particles. The base color of the particle will linearly approach this color from the start
      * color over the lifetime of the particle.
-     * 
+     *
      * @param color
      *            ColorRGBA The ending color.
      */
@@ -303,7 +301,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * getEndColor returns the ending color.
-     * 
+     *
      * @return The ending color
      */
     public ReadOnlyColorRGBA getEndColor() {
@@ -312,7 +310,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Set the start and end spinSpeed of particles managed by this manager. Setting it to 0 means no spin.
-     * 
+     *
      * @param speed
      *            double
      */
@@ -335,7 +333,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Add an external influence to the particle controller for this mesh.
-     * 
+     *
      * @param influence
      *            ParticleInfluence
      */
@@ -345,7 +343,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Remove an influence from the particle controller for this mesh.
-     * 
+     *
      * @param influence
      *            ParticleInfluence
      * @return true if found and removed.
@@ -356,7 +354,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Returns the list of influences acting on this particle controller.
-     * 
+     *
      * @return ArrayList
      */
     public List<ParticleInfluence> getInfluences() {
@@ -374,7 +372,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Set the minimum angle (in radians) that particles can be emitted away from the emission direction. Any angle less
      * than 0 is trimmed to 0.
-     * 
+     *
      * @param f
      *            The new emission minimum angle.
      */
@@ -384,7 +382,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * getEmissionMinimumAngle returns the minimum emission angle.
-     * 
+     *
      * @return The minimum emission angle.
      */
     public double getMinimumAngle() {
@@ -394,7 +392,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Set the maximum angle (in radians) that particles can be emitted away from the emission direction. Any angle less
      * than 0 is trimmed to 0.
-     * 
+     *
      * @param f
      *            The new emission maximum angle.
      */
@@ -404,7 +402,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * getEmissionMaximumAngle returns the maximum emission angle.
-     * 
+     *
      * @return The maximum emission angle.
      */
     public double getMaximumAngle() {
@@ -414,7 +412,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Set the minimum lifespan of new particles (or recreated) managed by this manager. if a value less than zero is
      * given, 1.0 is used.
-     * 
+     *
      * @param lifeSpan
      *            in ms
      */
@@ -424,7 +422,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * getParticlesMinimumLifeTime returns the minimum life time of a particle.
-     * 
+     *
      * @return The current minimum life time in ms.
      */
     public double getMinimumLifeTime() {
@@ -434,7 +432,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Set the maximum lifespan of new particles (or recreated) managed by this manager. if a value less than zero is
      * given, 1.0 is used.
-     * 
+     *
      * @param lifeSpan
      *            in ms
      */
@@ -444,7 +442,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * getParticlesMaximumLifeTime returns the maximum life time of a particle.
-     * 
+     *
      * @return The current maximum life time in ms.
      */
     public double getMaximumLifeTime() {
@@ -477,7 +475,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Set the acceleration for any new particles created (or recreated) by this manager.
-     * 
+     *
      * @param velocity
      *            particle v0
      */
@@ -487,7 +485,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Get the acceleration set in this manager.
-     * 
+     *
      * @return The initialVelocity
      */
     public double getInitialVelocity() {
@@ -497,7 +495,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Set the offset for any new particles created (or recreated) by this manager. This is applicable only to managers
      * generating from a point (not a line, rectangle, etc..)
-     * 
+     *
      * @param offset
      *            new offset position
      */
@@ -507,7 +505,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Get the offset point set in this manager.
-     * 
+     *
      * @return origin
      */
     public ReadOnlyVector3 getOriginOffset() {
@@ -524,7 +522,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Get the number of particles the manager should release per second.
-     * 
+     *
      * @return The number of particles that should be released per second.
      */
     public int getReleaseRate() {
@@ -533,7 +531,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Set the number of particles the manager should release per second.
-     * 
+     *
      * @param particlesPerSecond
      *            number of particles per second
      */
@@ -596,7 +594,7 @@ public abstract class ParticleSystem extends Node {
     /**
      * Get which emittype method is being used by the underlying system. One of ParticleType.Quad,
      * ParticleType.Triangle, ParticleType.Point, ParticleType.Line, ParticleType.GeomMesh
-     * 
+     *
      * @return An int representing the type of particle we are emitting.
      */
     public ParticleType getParticleType() {
@@ -605,7 +603,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Set what type of particle to emit from this sytem. Does not have an effect unless recreate is called.
-     * 
+     *
      * @param type
      *            particle type to use, should be one of ParticleType.Quad, ParticleType.Triangle, ParticleType.Point,
      *            ParticleType.Line, ParticleType.GeomMesh
@@ -616,7 +614,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Set our particle emitter.
-     * 
+     *
      * @param emitter
      *            New emitter or null for default point emitter.
      */
@@ -760,7 +758,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Used to determine particle orientation (only if cameraFacing is false.)
-     * 
+     *
      * @param vector
      */
     public void setFacingUpVector(final ReadOnlyVector3 vector) {
@@ -773,7 +771,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Used to determine particle orientation (only if cameraFacing is false.)
-     * 
+     *
      * @param vector
      */
     public void setFacingLeftVector(final ReadOnlyVector3 vector) {
@@ -794,7 +792,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Returns a random angle between the min and max angles.
-     * 
+     *
      * @return the random angle.
      */
     public double getRandomAngle() {
@@ -803,7 +801,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * generate a random lifespan between the min and max lifespan of the particle system.
-     * 
+     *
      * @return the generated lifespan value
      */
     public double getRandomLifeSpan() {
@@ -812,7 +810,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Generate a random velocity within the parameters of max angle and the rotation matrix.
-     * 
+     *
      * @param store
      *            a vector to store the results in.
      */
@@ -833,7 +831,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Apply the rotation matrix to a given vector representing a particle velocity.
-     * 
+     *
      * @param pSpeed
      *            the velocity vector to be modified.
      */
@@ -911,7 +909,7 @@ public abstract class ParticleSystem extends Node {
 
     /**
      * Changes the number of particles in this particle mesh.
-     * 
+     *
      * @param count
      *            the desired number of particles to change to.
      */
@@ -992,7 +990,7 @@ public abstract class ParticleSystem extends Node {
             attachChild(geom);
         }
 
-        capsule.write(_particleType, "particleType", ParticleType.Quad);
+        capsule.write(_particleType, "particleType", ParticleType.Triangle);
         capsule.write(_particleEmitter, "particleEmitter", null);
         capsule.write(_startSize, "startSize", DEFAULT_START_SIZE);
         capsule.write(_endSize, "endSize", DEFAULT_END_SIZE);
@@ -1034,7 +1032,7 @@ public abstract class ParticleSystem extends Node {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Quad);
+        _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Triangle);
         _particleEmitter = (SavableParticleEmitter) capsule.readSavable("particleEmitter", null);
         _startSize = capsule.readDouble("startSize", DEFAULT_START_SIZE);
         _endSize = capsule.readDouble("endSize", DEFAULT_END_SIZE);

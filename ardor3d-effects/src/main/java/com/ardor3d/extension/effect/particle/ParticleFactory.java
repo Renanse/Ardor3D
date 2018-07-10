@@ -16,7 +16,7 @@ import com.ardor3d.scenegraph.Mesh;
 public class ParticleFactory {
 
     public static ParticleSystem buildParticles(final String name, final int number) {
-        return buildParticles(name, number, ParticleSystem.ParticleType.Quad);
+        return buildParticles(name, number, ParticleSystem.ParticleType.Triangle);
     }
 
     public static ParticleSystem buildParticles(final String name, final int number,

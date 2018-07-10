@@ -58,7 +58,7 @@ public class Particle implements Savable {
     private final Vector3 bbX = new Vector3(), bbY = new Vector3();
 
     // colors
-    private ParticleType type = ParticleSystem.ParticleType.Quad;
+    private ParticleType type = ParticleSystem.ParticleType.Triangle;
 
     private Triangle triModel;
 
@@ -69,7 +69,7 @@ public class Particle implements Savable {
 
     /**
      * Normal use constructor. Sets up the parent and particle type for this particle.
-     * 
+     *
      * @param parent
      *            the particle collection this particle belongs to
      */
@@ -91,7 +91,7 @@ public class Particle implements Savable {
      * Cause this particle to reset it's color, age and size per the parent's settings. status is set to
      * Status.Available. Location, velocity and lifespan are set as given. Actual geometry data is not affected by this
      * call, only particle params.
-     * 
+     *
      * @param velocity
      *            new initial particle velocity
      * @param position
@@ -113,7 +113,7 @@ public class Particle implements Savable {
     /**
      * Reset particle conditions. Besides the passed lifespan, we also reset color, size, and spin angle to their
      * starting values (as given by parent.) Status is set to Status.Available.
-     * 
+     *
      * @param lifeSpan
      *            the recreated particle's new lifespan
      */
@@ -131,7 +131,7 @@ public class Particle implements Savable {
      * Update the vertices for this particle, taking size, spin and viewer into consideration. In the case of particle
      * type ParticleType.GeomMesh, the original triangle normal is maintained rather than rotating it to face the camera
      * or parent vectors.
-     * 
+     *
      * @param cam
      *            Camera to use in determining viewer aspect. If null, or if parent is not set to camera facing,
      *            parent's left and up vectors are used.
@@ -179,20 +179,6 @@ public class Particle implements Savable {
         final Vector3 tempVec3 = Vector3.fetchTempInstance();
         final FloatBuffer vertexBuffer = parent.getParticleGeometry().getMeshData().getVertexBuffer();
         switch (type) {
-            case Quad: {
-                _position.subtract(bbX, tempVec3).subtractLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 0);
-
-                _position.subtract(bbX, tempVec3).addLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 1);
-
-                _position.add(bbX, tempVec3).addLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 2);
-
-                _position.add(bbX, tempVec3).subtractLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 3);
-                break;
-            }
             case GeomMesh: {
                 final Quaternion tempQuat = Quaternion.fetchTempInstance();
                 final ReadOnlyVector3 norm = triModel.getNormal();
@@ -245,7 +231,7 @@ public class Particle implements Savable {
      * (interpolating between start and end size), spin (using parent's spin speed) and current age of particle. If this
      * particle's age is greater than its lifespan, it is set to status DEAD.
      * </p>
-     * 
+     *
      * @param secondsPassed
      *            number of seconds passed since last update.
      * @return true if this particle is not ALIVE (in other words, if it is ready to be reused.)
@@ -278,28 +264,28 @@ public class Particle implements Savable {
         final int newTexIndex = parent.getTexAnimation().getTexIndexAtAge(currentAge, lifeSpan, parent);
         // Update tex coords if applicable
         if (currentTexIndex != newTexIndex) {
-            // Only supported in Quad type for now.
-            if (ParticleType.Quad.equals(parent.getParticleType())) {
-                // determine side
-                final float side = (float) Math.sqrt(parent.getTexQuantity());
-                int index = newTexIndex;
-                if (index >= parent.getTexQuantity()) {
-                    index %= parent.getTexQuantity();
-                }
-                // figure row / col
-                final float row = side - (int) (index / side) - 1;
-                final float col = index % side;
-                // set texcoords
-                final float sU = col / side, eU = (col + 1) / side;
-                final float sV = row / side, eV = (row + 1) / side;
-                final FloatBuffer texs = parent.getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer();
-                texs.position(startIndex * 2);
-                texs.put(eU).put(sV);
-                texs.put(eU).put(eV);
-                texs.put(sU).put(eV);
-                texs.put(sU).put(sV);
-                texs.clear();
-            }
+            // // Only supported in Quad type for now.
+            // if (ParticleType.Quad.equals(parent.getParticleType())) {
+            // // determine side
+            // final float side = (float) Math.sqrt(parent.getTexQuantity());
+            // int index = newTexIndex;
+            // if (index >= parent.getTexQuantity()) {
+            // index %= parent.getTexQuantity();
+            // }
+            // // figure row / col
+            // final float row = side - (int) (index / side) - 1;
+            // final float col = index % side;
+            // // set texcoords
+            // final float sU = col / side, eU = (col + 1) / side;
+            // final float sV = row / side, eV = (row + 1) / side;
+            // final FloatBuffer texs = parent.getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer();
+            // texs.position(startIndex * 2);
+            // texs.put(eU).put(sV);
+            // texs.put(eU).put(eV);
+            // texs.put(sU).put(eV);
+            // texs.put(sU).put(sV);
+            // texs.clear();
+            // }
             currentTexIndex = newTexIndex;
         }
 
@@ -343,7 +329,7 @@ public class Particle implements Savable {
 
     /**
      * Set the position of the particle in space.
-     * 
+     *
      * @param position
      *            the new position in world coordinates
      */
@@ -361,7 +347,7 @@ public class Particle implements Savable {
 
     /**
      * Set the status of this particle.
-     * 
+     *
      * @param status
      *            new status of this particle
      * @see Status
@@ -379,7 +365,7 @@ public class Particle implements Savable {
 
     /**
      * Set the current velocity of this particle
-     * 
+     *
      * @param velocity
      *            the new velocity
      */
@@ -403,7 +389,7 @@ public class Particle implements Savable {
 
     /**
      * Set the starting index where this particle is represented in its parent's geometry data
-     * 
+     *
      * @param index
      */
     public void setStartIndex(final int index) {
@@ -440,7 +426,7 @@ public class Particle implements Savable {
      * particle will maintain the triangle's ratio and plane of orientation. It will spin (if applicable) around the
      * triangle's normal axis. The triangle should already have its center and normal fields calculated before calling
      * this method.
-     * 
+     *
      * @param t
      *            the triangle to model this particle after.
      */
@@ -468,7 +454,7 @@ public class Particle implements Savable {
         capsule.write(currentAge, "currentAge", 0);
         capsule.write(parent, "parent", null);
         capsule.write(_velocity, "velocity", new Vector3());
-        capsule.write(type, "type", ParticleSystem.ParticleType.Quad);
+        capsule.write(type, "type", ParticleSystem.ParticleType.Triangle);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
@@ -479,7 +465,7 @@ public class Particle implements Savable {
         currentAge = capsule.readInt("currentAge", 0);
         parent = (ParticleSystem) capsule.readSavable("parent", null);
         _velocity.set((Vector3) capsule.readSavable("velocity", new Vector3()));
-        type = capsule.readEnum("type", ParticleSystem.ParticleType.class, ParticleSystem.ParticleType.Quad);
+        type = capsule.readEnum("type", ParticleSystem.ParticleType.class, ParticleSystem.ParticleType.Triangle);
     }
 
     public Class<? extends Particle> getClassTag() {

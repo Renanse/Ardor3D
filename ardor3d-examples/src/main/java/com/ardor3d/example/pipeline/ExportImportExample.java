@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -153,7 +153,7 @@ public class ExportImportExample extends ExampleBase {
         final Mesh mesh = new Mesh();
         final MeshData meshData = mesh.getMeshData();
 
-        final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(16);
+        final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(12);
 
         vertexBuffer.put(-30).put(0).put(0);
         vertexBuffer.put(-40).put(0).put(0);
@@ -164,11 +164,6 @@ public class ExportImportExample extends ExampleBase {
         vertexBuffer.put(-20).put(0).put(0);
         vertexBuffer.put(-20).put(10).put(0);
         vertexBuffer.put(-10).put(10).put(0);
-
-        vertexBuffer.put(10).put(0).put(0);
-        vertexBuffer.put(20).put(0).put(0);
-        vertexBuffer.put(20).put(10).put(0);
-        vertexBuffer.put(10).put(10).put(0);
 
         vertexBuffer.put(30).put(0).put(0);
         vertexBuffer.put(40).put(0).put(0);
@@ -183,21 +178,18 @@ public class ExportImportExample extends ExampleBase {
         indices.put(0).put(3).put(1).put(2);
         indices.put(4).put(7).put(5).put(6);
 
-        // Quad
-        indices.put(8).put(9).put(10).put(11);
-
         // Triangles
-        indices.put(12).put(13).put(15);
-        indices.put(13).put(15).put(14);
+        indices.put(8).put(9).put(11);
+        indices.put(9).put(11).put(10);
 
         meshData.setIndices(indices);
 
         // Setting sub primitive data
-        final int[] indexLengths = new int[] { 4, 4, 4, 6 };
+        final int[] indexLengths = new int[] { 4, 4, 6 };
         meshData.setIndexLengths(indexLengths);
 
         final IndexMode[] indexModes = new IndexMode[] { IndexMode.TriangleStrip, IndexMode.TriangleStrip,
-                IndexMode.Quads, IndexMode.Triangles };
+                IndexMode.Triangles };
         meshData.setIndexModes(indexModes);
 
         final WireframeState ws = new WireframeState();

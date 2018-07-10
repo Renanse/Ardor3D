@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -97,11 +97,6 @@ public class ParticleMesh extends ParticleSystem {
                 sharedTextureData = new Vector2[] { new Vector2(2.0, 0.0), new Vector2(0.0, 2.0), new Vector2(0.0, 0.0) };
                 meshData.setIndexMode(IndexMode.Triangles);
                 break;
-            case Quad:
-                sharedTextureData = new Vector2[] { new Vector2(1.0, 0.0), new Vector2(1.0, 1.0),
-                        new Vector2(0.0, 1.0), new Vector2(0.0, 0.0) };
-                meshData.setIndexMode(IndexMode.Quads);
-                break;
             default:
                 throw new IllegalStateException(
                         "Particle Mesh may only have particle type of ParticleType.Quad, ParticleType.GeomMesh or ParticleType.Triangle");
@@ -128,9 +123,9 @@ public class ParticleMesh extends ParticleSystem {
                     final Mesh sourceMesh = source.getSource();
                     final int index = sourceMesh.getMeshData().getIndices() != null ? sourceMesh.getMeshData()
                             .getIndices().get(ind) : ind;
-                    BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
-                            index);
-                    BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
+                            BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
+                                    index);
+                            BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
                 } else {
                     BufferUtils.setInBuffer(sharedTextureData[a], meshData.getTextureCoords(0).getBuffer(), ind);
                 }

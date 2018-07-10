@@ -97,7 +97,7 @@ class ParticleEditorScene implements Scene, Updater {
 
         // Execute renderQueue items
         GameTaskQueueManager.getManager(ParticleEditorFrame.GLOBAL_CONTEXT).getQueue(GameTaskQueue.RENDER)
-        .execute(renderer);
+                .execute(renderer);
 
         // Clean up card garbage such as textures, vbos, etc.
         ContextGarbageCollector.doRuntimeCleanup(renderer);
@@ -142,7 +142,6 @@ class ParticleEditorScene implements Scene, Updater {
     protected void setupStats() {
         tgrapher.addConfig(StatType.STAT_FRAMES, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.GREEN);
         tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.CYAN);
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.LIGHT_GRAY);
         tgrapher.addConfig(StatType.STAT_LINE_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.RED);
         tgrapher.addConfig(StatType.STAT_POINT_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.YELLOW);
         tgrapher.addConfig(StatType.STAT_MESH_COUNT, LineGrapher.ConfigKeys.Color.name(), ColorRGBA.GRAY);
@@ -153,9 +152,6 @@ class ParticleEditorScene implements Scene, Updater {
         tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
         tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Tris:");
         tgrapher.addConfig(StatType.STAT_TRIANGLE_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Quads:");
-        tgrapher.addConfig(StatType.STAT_QUAD_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);
         tgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.Decimals.name(), 0);
         tgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.Name.name(), "Avg.Lines:");
         tgrapher.addConfig(StatType.STAT_LINE_COUNT, TabledLabelGrapher.ConfigKeys.FrameAverage.name(), true);

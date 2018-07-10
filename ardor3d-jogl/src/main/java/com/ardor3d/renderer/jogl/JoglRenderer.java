@@ -1567,12 +1567,6 @@ public class JoglRenderer extends AbstractRenderer {
             case TriangleFan:
                 glMode = GL.GL_TRIANGLE_FAN;
                 break;
-            case Quads:
-                glMode = GL2GL3.GL_QUADS;
-                break;
-            case QuadStrip:
-                glMode = GL2.GL_QUAD_STRIP;
-                break;
             case Lines:
                 glMode = GL.GL_LINES;
                 break;

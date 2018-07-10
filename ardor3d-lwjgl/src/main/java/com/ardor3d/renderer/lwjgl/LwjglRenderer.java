@@ -1389,12 +1389,6 @@ public class LwjglRenderer extends AbstractRenderer {
             case TriangleFan:
                 glMode = GL11.GL_TRIANGLE_FAN;
                 break;
-            case Quads:
-                glMode = GL11.GL_QUADS;
-                break;
-            case QuadStrip:
-                glMode = GL11.GL_QUAD_STRIP;
-                break;
             case Lines:
                 glMode = GL11.GL_LINES;
                 break;

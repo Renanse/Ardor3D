@@ -208,7 +208,7 @@ public class BMText extends Mesh {
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
         // quads
-        getMeshData().setIndexMode(IndexMode.Quads);
+        getMeshData().setIndexMode(IndexMode.Triangles);
 
         setText(text);
 
@@ -553,8 +553,8 @@ public class BMText extends Mesh {
      * @param text
      */
     protected void checkBuffers(final String text) {
-        final int chunkSize = 20;
-        final int vertices = 4 * text.length();
+        final int chunkSize = 30;
+        final int vertices = 6 * text.length();
         final int chunks = 1 + (vertices / chunkSize);
         final int required = chunks * chunkSize;
         FloatBuffer vertexBuffer = getMeshData().getVertexBuffer();
@@ -673,8 +673,10 @@ public class BMText extends Mesh {
 
                 vertices.put(l).put(0).put(t); // left top
                 vertices.put(l).put(0).put(b); // left bottom
-                vertices.put(r).put(0).put(b); // right bottom
                 vertices.put(r).put(0).put(t); // right top
+                vertices.put(r).put(0).put(t); // right top
+                vertices.put(l).put(0).put(b); // left bottom
+                vertices.put(r).put(0).put(b); // right bottom
 
                 // -- tex coords ----------------
                 l = chr.x / txW;
@@ -686,6 +688,9 @@ public class BMText extends Mesh {
                 texCrds.put(l).put(b); // left bottom
                 texCrds.put(r).put(b); // right bottom
                 texCrds.put(r).put(t); // right top
+                texCrds.put(r).put(t); // right top
+                texCrds.put(l).put(b); // left bottom
+                texCrds.put(r).put(b); // right bottom
 
                 int nextVal = 0;
                 if (i < strLen - 1) {
@@ -711,6 +716,10 @@ public class BMText extends Mesh {
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
+        vertices.put(0).put(0).put(0);
+        vertices.put(0).put(0).put(0);
+        uvs.put(0).put(0);
+        uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);

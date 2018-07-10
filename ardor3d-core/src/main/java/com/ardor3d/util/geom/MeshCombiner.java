@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -34,7 +34,7 @@ import com.google.common.collect.Multimap;
 /**
  * Utility for combining multiple Meshes into a single Mesh. Note that you generally will want to combine Mesh objects
  * that have the same render states.
- * 
+ *
  * XXX: should add in a way to combine only meshes with similar renderstates<br>
  * XXX: Might be able to reduce memory usage in the singular case where all sources do not have indices defined
  * (arrays).<br>
@@ -52,7 +52,7 @@ public class MeshCombiner {
      * vertices and texcoords that have the same tuple width. It is possible to merge Mesh objects together that have
      * mismatched normals/colors/etc. (eg. one with colors and one without.)
      * </p>
-     * 
+     *
      * @param source
      *            our source node
      * @return the combined Mesh.
@@ -79,7 +79,7 @@ public class MeshCombiner {
      * Combine the given array of Mesh objects into a single Mesh. All Mesh objects must have vertices and texcoords
      * that have the same tuple width. It is possible to merge Mesh objects together that have mismatched
      * normals/colors/etc. (eg. one with colors and one without.)
-     * 
+     *
      * @param sources
      *            our Mesh objects to combine.
      * @return the combined Mesh.
@@ -92,7 +92,7 @@ public class MeshCombiner {
      * Combine the given collection of Mesh objects into a single Mesh. All Mesh objects must have vertices and
      * texcoords that have the same tuple width. It is possible to merge Mesh objects together that have mismatched
      * normals/colors/etc. (eg. one with colors and one without.)
-     * 
+     *
      * @param sources
      *            our collection of Mesh objects to combine.
      * @return the combined Mesh.
@@ -366,7 +366,6 @@ class IndexCombiner {
             final Collection<int[]> sources = sectionMap.get(mode);
             switch (mode) {
                 case Triangles:
-                case Quads:
                 case Lines:
                 case Points: {
                     // we can combine these as-is to our heart's content.
@@ -385,7 +384,6 @@ class IndexCombiner {
                     break;
                 }
                 case TriangleFan:
-                case QuadStrip:
                 case LineLoop:
                 case LineStrip: {
                     // these have to be kept, as is.

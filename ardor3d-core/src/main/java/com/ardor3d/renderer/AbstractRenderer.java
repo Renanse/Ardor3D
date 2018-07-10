@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -109,10 +109,6 @@ public abstract class AbstractRenderer implements Renderer {
                 break;
             case Points:
                 StatCollector.addStat(StatType.STAT_POINT_COUNT, primCount);
-                break;
-            case Quads:
-            case QuadStrip:
-                StatCollector.addStat(StatType.STAT_QUAD_COUNT, primCount);
                 break;
         }
     }

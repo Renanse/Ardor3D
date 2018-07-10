@@ -112,8 +112,8 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         _prefs = prefs;
         setLayout(new GridBagLayout());
 
-        _geomTypeBox = new JComboBox<ParticleType>(new ParticleType[] { ParticleType.Quad, ParticleType.Triangle,
-                ParticleType.Line, ParticleType.Point });
+        _geomTypeBox = new JComboBox<ParticleType>(new ParticleType[] { ParticleType.Triangle, ParticleType.Line,
+                ParticleType.Point });
         _geomTypeBox.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 changeParticleType((ParticleType) _geomTypeBox.getSelectedItem());
@@ -264,7 +264,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         rampPanel.setBorder(createTitledBorder("APPEARANCE TIMELINE"));
         rampPanel.add(new JScrollPane(_rampList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), new GridBagConstraints(1, 0, 1, 6, 1.0, 1.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+                        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         rampPanel.add(_rampAddButton, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
                 GridBagConstraints.HORIZONTAL, new Insets(5, 5, 0, 5), 0, 0));
         rampPanel.add(_rampRemoveButton, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
@@ -367,7 +367,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         animPanel.setBorder(createTitledBorder("ANIMATION TIMELINE"));
         animPanel.add(new JScrollPane(_animList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), new GridBagConstraints(1, 0, 1, 6, 1.0, 1.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+                        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
         animPanel.add(_animAddButton, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
                 GridBagConstraints.HORIZONTAL, new Insets(5, 5, 0, 5), 0, 0));
         animPanel.add(_animRemoveButton, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
