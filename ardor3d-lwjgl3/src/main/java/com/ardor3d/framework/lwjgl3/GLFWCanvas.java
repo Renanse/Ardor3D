@@ -49,6 +49,8 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
     private volatile boolean _focusLost = false;
 
+    private GLFWWindowFocusCallbackI focusCallback;
+
     /**
      * If true, we will not try to drop and reclaim the context on each frame.
      */
@@ -106,7 +108,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
             windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
-            GLFW.glfwSetWindowFocusCallback(windowId, new GLFWWindowFocusCallbackI() {
+            GLFW.glfwSetWindowFocusCallback(windowId, focusCallback = new GLFWWindowFocusCallbackI() {
                 @Override
                 public void invoke(final long window, final boolean focused) {
                     if (!focused) {
