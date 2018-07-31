@@ -441,8 +441,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupLineParameters(final float lineWidth, final int stippleFactor, final short stipplePattern,
-            final boolean antialiased) {
+    public void setupLineParameters(final float lineWidth, final boolean antialiased) {
         // TODO Auto-generated method stub
 
     }

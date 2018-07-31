@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -26,8 +26,6 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Line extends Mesh {
 
     private float _lineWidth = 1.0f;
-    private short _stipplePattern = (short) 0xFFFF;
-    private int _stippleFactor = 1;
     private boolean _antialiased = false;
 
     public Line() {
@@ -36,7 +34,7 @@ public class Line extends Mesh {
 
     /**
      * Constructs a new line with the given name. By default, the line has no information.
-     * 
+     *
      * @param name
      *            The name of the line.
      */
@@ -49,7 +47,7 @@ public class Line extends Mesh {
     /**
      * Constructor instantiates a new <code>Line</code> object with a given set of data. Any data can be null except for
      * the vertex list. If vertices are null an exception will be thrown.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
@@ -71,7 +69,7 @@ public class Line extends Mesh {
     /**
      * Constructor instantiates a new <code>Line</code> object with a given set of data. Any data can be null except for
      * the vertex list. If vertices are null an exception will be thrown.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
@@ -93,7 +91,7 @@ public class Line extends Mesh {
 
     /**
      * Initialize the meshdata object with data.
-     * 
+     *
      * @param vertices
      * @param normals
      * @param colors
@@ -111,7 +109,7 @@ public class Line extends Mesh {
     /**
      * Puts a circle into vertex and normal buffer at the current buffer position. The buffers are enlarged and copied
      * if they are too small.
-     * 
+     *
      * @param radius
      *            radius of the circle
      * @param x
@@ -158,7 +156,7 @@ public class Line extends Mesh {
      * Sets whether the point should be antialiased. May decrease performance. If you want to enabled antialiasing, you
      * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
      * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
-     * 
+     *
      * @param antialiased
      *            true if the line should be antialiased.
      */
@@ -176,7 +174,7 @@ public class Line extends Mesh {
     /**
      * Sets the width of the line when drawn. Non anti-aliased line widths are rounded to the nearest whole number by
      * opengl.
-     * 
+     *
      * @param lineWidth
      *            The lineWidth to set.
      */
@@ -184,45 +182,11 @@ public class Line extends Mesh {
         _lineWidth = lineWidth;
     }
 
-    /**
-     * @return the set stipplePattern. 0xFFFF means no stipple.
-     */
-    public short getStipplePattern() {
-        return _stipplePattern;
-    }
-
-    /**
-     * The stipple or pattern to use when drawing this line. 0xFFFF is a solid line.
-     * 
-     * @param stipplePattern
-     *            a 16bit short whose bits describe the pattern to use when drawing this line
-     */
-    public void setStipplePattern(final short stipplePattern) {
-        _stipplePattern = stipplePattern;
-    }
-
-    /**
-     * @return the set stippleFactor.
-     */
-    public int getStippleFactor() {
-        return _stippleFactor;
-    }
-
-    /**
-     * @param stippleFactor
-     *            magnification factor to apply to the stipple pattern.
-     */
-    public void setStippleFactor(final int stippleFactor) {
-        _stippleFactor = stippleFactor;
-    }
-
     @Override
     public Line makeCopy(final boolean shareGeometricData) {
         final Line lineCopy = (Line) super.makeCopy(shareGeometricData);
         lineCopy.setAntialiased(_antialiased);
         lineCopy.setLineWidth(_lineWidth);
-        lineCopy.setStippleFactor(_stippleFactor);
-        lineCopy.setStipplePattern(_stipplePattern);
         return lineCopy;
     }
 
@@ -230,7 +194,6 @@ public class Line extends Mesh {
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.write(_lineWidth, "lineWidth", 1);
-        capsule.write(_stipplePattern, "stipplePattern", (short) 0xFFFF);
         capsule.write(_antialiased, "antialiased", false);
     }
 
@@ -238,13 +201,12 @@ public class Line extends Mesh {
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         _lineWidth = capsule.readFloat("lineWidth", 1);
-        _stipplePattern = capsule.readShort("stipplePattern", (short) 0xFFFF);
         _antialiased = capsule.readBoolean("antialiased", false);
     }
 
     @Override
     public void render(final Renderer renderer) {
-        renderer.setupLineParameters(getLineWidth(), getStippleFactor(), getStipplePattern(), isAntialiased());
+        renderer.setupLineParameters(getLineWidth(), isAntialiased());
 
         super.render(renderer);
     }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -51,9 +51,9 @@ import com.ardor3d.util.ExtendedCamera;
 
 /**
  * Debugger provides tools for viewing scene data such as boundings and normals.
- * 
+ *
  * Make sure you set the RenderStateFactory before using this class.
- * 
+ *
  * @see Debugger#setRenderStateFactory(RenderStateFactory)
  */
 public final class Debugger {
@@ -87,7 +87,7 @@ public final class Debugger {
 
     /**
      * <code>drawBounds</code> draws the bounding volume for a given Spatial and its children.
-     * 
+     *
      * @param se
      *            the Spatial to draw boundings for.
      * @param r
@@ -99,7 +99,7 @@ public final class Debugger {
 
     /**
      * <code>drawBounds</code> draws the bounding volume for a given Spatial and optionally its children.
-     * 
+     *
      * @param se
      *            the Spatial to draw boundings for.
      * @param r
@@ -197,7 +197,7 @@ public final class Debugger {
 
     /**
      * <code>drawNormals</code> draws lines representing normals for a given Spatial and its children.
-     * 
+     *
      * @param element
      *            the Spatial to draw normals for.
      * @param r
@@ -213,7 +213,7 @@ public final class Debugger {
 
     /**
      * <code>drawNormals</code> draws the normals for a given Spatial and optionally its children.
-     * 
+     *
      * @param element
      *            the Spatial to draw normals for.
      * @param r
@@ -646,7 +646,6 @@ public final class Debugger {
         }
 
         lineFrustum.setDefaultColor(color);
-        lineFrustum.setStipplePattern(pattern);
 
         extendedCamera.set(camera);
         extendedCamera.calculateFrustum(fNear, fFar);

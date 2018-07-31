@@ -1706,8 +1706,7 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupLineParameters(final float lineWidth, final int stippleFactor, final short stipplePattern,
-            final boolean antialiased) {
+    public void setupLineParameters(final float lineWidth, final boolean antialiased) {
         final GL gl = GLContext.getCurrentGL();
 
         final LineRecord lineRecord = ContextManager.getCurrentContext().getLineRecord();
@@ -1715,23 +1714,6 @@ public class JoglRenderer extends AbstractRenderer {
         if (!lineRecord.isValid() || lineRecord.width != lineWidth) {
             gl.glLineWidth(lineWidth);
             lineRecord.width = lineWidth;
-        }
-
-        if (stipplePattern != (short) 0xFFFF) {
-            if (!lineRecord.isValid() || !lineRecord.stippled) {
-                gl.glEnable(GL2.GL_LINE_STIPPLE);
-                lineRecord.stippled = true;
-            }
-
-            if (!lineRecord.isValid() || stippleFactor != lineRecord.stippleFactor
-                    || stipplePattern != lineRecord.stipplePattern) {
-                gl.getGL2().glLineStipple(stippleFactor, stipplePattern);
-                lineRecord.stippleFactor = stippleFactor;
-                lineRecord.stipplePattern = stipplePattern;
-            }
-        } else if (!lineRecord.isValid() || lineRecord.stippled) {
-            gl.glDisable(GL2.GL_LINE_STIPPLE);
-            lineRecord.stippled = false;
         }
 
         if (antialiased) {

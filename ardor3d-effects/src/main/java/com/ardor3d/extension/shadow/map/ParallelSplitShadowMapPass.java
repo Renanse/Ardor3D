@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -236,7 +236,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Create a pssm shadow map pass casting shadows from a light with the direction given.
-     * 
+     *
      * @param shadowMapSize
      *            The size of the shadow map texture
      * @param numOfSplits
@@ -289,7 +289,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Initialize the pass render states.
-     * 
+     *
      * @param r
      *            the r
      */
@@ -347,7 +347,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Reinit texture size. Sets up texture renderer.
-     * 
+     *
      * @param r
      *            the Renderer
      */
@@ -426,7 +426,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Render the pass.
-     * 
+     *
      * @param r
      *            the Renderer
      */
@@ -488,7 +488,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
                 if (_drawDebug) {
                     boundingSphere
-                            .setData(frustumBoundingSphere.getCenter(), 10, 10, frustumBoundingSphere.getRadius());
+                    .setData(frustumBoundingSphere.getCenter(), 10, 10, frustumBoundingSphere.getRadius());
                     boundingSphere.draw(r);
                 }
             } else if (_light instanceof PointLight) {
@@ -556,7 +556,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Calculate optimal light frustum perspective.
-     * 
+     *
      * @param frustumCorners
      *            the frustum corners
      * @param center
@@ -626,7 +626,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     /**
      * Saving this around until we fully support a good solution for non-directional lights. Like dual paraboloid shadow
      * maps...
-     * 
+     *
      * @param frustumCorners
      * @param center
      */
@@ -709,7 +709,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Render the overlay scene with shadows.
-     * 
+     *
      * @param r
      *            The renderer to use
      */
@@ -787,7 +787,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Update the shadow map.
-     * 
+     *
      * @param index
      *            shadow map texture index to update
      */
@@ -817,7 +817,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Update texture matrix.
-     * 
+     *
      * @param index
      *            the index
      */
@@ -832,7 +832,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Checks if this pass is initialized.
-     * 
+     *
      * @return true, if is initialized
      */
     public boolean isInitialised() {
@@ -840,7 +840,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     }
 
     /**
-     * 
+     *
      * @return the offset state used for drawing the shadow textures.
      */
     public OffsetState getShadowOffsetState() {
@@ -897,7 +897,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Checks if a bounding volume is valid.
-     * 
+     *
      * @param volume
      * @return
      */
@@ -930,10 +930,10 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Gets the shadow map texture.
-     * 
+     *
      * @param index
      *            the index
-     * 
+     *
      * @return the shadow map texture
      */
     public Texture2D getShadowMapTexture(final int index) {
@@ -942,7 +942,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Gets the number of splits.
-     * 
+     *
      * @return the number of splits
      */
     public int getNumOfSplits() {
@@ -952,7 +952,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     /**
      * Sets the number of frustum splits and thus the number of shadow textures created by this pass. More splits
      * creates crisper shadows at the cost of increased texture memory.
-     * 
+     *
      * @param numOfSplits
      *            the new number of splits
      */
@@ -968,7 +968,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Gets the shadow map size.
-     * 
+     *
      * @return the shadow map size
      */
     public int getShadowMapSize() {
@@ -977,7 +977,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Sets the shadow map size.
-     * 
+     *
      * @param shadowMapSize
      *            the new shadow map size
      */
@@ -989,7 +989,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Gets the maximum distance for shadowing.
-     * 
+     *
      * @return max distance
      * @see com.ardor3d.extension.shadow.map.PSSMCamera#getMaxFarPlaneDistance()
      */
@@ -999,7 +999,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Sets the maximum distance for shadowing.
-     * 
+     *
      * @param maxShadowDistance
      *            distance to set
      * @see com.ardor3d.extension.shadow.map.PSSMCamera#setMaxFarPlaneDistance(double)
@@ -1010,7 +1010,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Gets the minimum z distance for the light.
-     * 
+     *
      * @return the minimumLightDistance
      */
     public double getMinimumLightDistance() {
@@ -1019,7 +1019,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Sets the minimum z distance for the light.
-     * 
+     *
      * @param minimumLightDistance
      *            the minimumLightDistance to set
      */
@@ -1029,7 +1029,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Gets shadow color and transparency.
-     * 
+     *
      * @return the shadowColor
      */
     public ReadOnlyColorRGBA getShadowColor() {
@@ -1038,7 +1038,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Sets shadow color and transparency.
-     * 
+     *
      * @param shadowColor
      *            the shadowColor to set
      */
@@ -1056,7 +1056,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Clean up.
-     * 
+     *
      * @see com.ardor3d.renderer.pass.Pass#cleanUp()
      */
     @Override
@@ -1078,7 +1078,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Simple clamp.
-     * 
+     *
      * @param val
      *            value to clamp
      * @param from
@@ -1235,7 +1235,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Draw debug frustum.
-     * 
+     *
      * @param r
      *            the r
      * @param cam
@@ -1252,7 +1252,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Draw debug frustum.
-     * 
+     *
      * @param r
      *            the r
      * @param cam
@@ -1295,7 +1295,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         }
 
         lineFrustum.setDefaultColor(color);
-        lineFrustum.setStipplePattern(pattern);
 
         testCam.set(cam);
         testCam.update();

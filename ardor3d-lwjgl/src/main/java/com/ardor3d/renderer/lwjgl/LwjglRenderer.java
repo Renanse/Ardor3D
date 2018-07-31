@@ -1508,30 +1508,12 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public void setupLineParameters(final float lineWidth, final int stippleFactor, final short stipplePattern,
-            final boolean antialiased) {
+    public void setupLineParameters(final float lineWidth, final boolean antialiased) {
         final LineRecord lineRecord = ContextManager.getCurrentContext().getLineRecord();
 
         if (!lineRecord.isValid() || lineRecord.width != lineWidth) {
             GL11.glLineWidth(lineWidth);
             lineRecord.width = lineWidth;
-        }
-
-        if (stipplePattern != (short) 0xFFFF) {
-            if (!lineRecord.isValid() || !lineRecord.stippled) {
-                GL11.glEnable(GL11.GL_LINE_STIPPLE);
-                lineRecord.stippled = true;
-            }
-
-            if (!lineRecord.isValid() || stippleFactor != lineRecord.stippleFactor
-                    || stipplePattern != lineRecord.stipplePattern) {
-                GL11.glLineStipple(stippleFactor, stipplePattern);
-                lineRecord.stippleFactor = stippleFactor;
-                lineRecord.stipplePattern = stipplePattern;
-            }
-        } else if (!lineRecord.isValid() || lineRecord.stippled) {
-            GL11.glDisable(GL11.GL_LINE_STIPPLE);
-            lineRecord.stippled = false;
         }
 
         if (antialiased) {

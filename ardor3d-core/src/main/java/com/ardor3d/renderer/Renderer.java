@@ -472,11 +472,9 @@ public interface Renderer {
      * lwjgl/jogl.
      *
      * @param lineWidth
-     * @param stippleFactor
-     * @param stipplePattern
      * @param antialiased
      */
-    void setupLineParameters(float lineWidth, int stippleFactor, short stipplePattern, boolean antialiased);
+    void setupLineParameters(float lineWidth, boolean antialiased);
 
     /**
      * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from

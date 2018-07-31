@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -230,8 +230,6 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         _horizontals.setDefaultColor(getColorConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Color.name(),
                 new ColorRGBA(ColorRGBA.BLUE)));
         _horizontals.setLineWidth(getIntConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Width.name(), 1));
-        _horizontals.setStipplePattern(getShortConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Stipple.name(),
-                (short) 0xFF00));
         _horizontals.setAntialiased(getBooleanConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Antialias.name(), true));
     }
 
@@ -256,8 +254,6 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         _verticals.setDefaultColor(getColorConfig(TimedAreaGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(
                 ColorRGBA.RED)));
         _verticals.setLineWidth(getIntConfig(TimedAreaGrapher.Vertical, ConfigKeys.Width.name(), 1));
-        _verticals.setStipplePattern(getShortConfig(TimedAreaGrapher.Vertical, ConfigKeys.Stipple.name(),
-                (short) 0xFF00));
         _verticals.setAntialiased(getBooleanConfig(TimedAreaGrapher.Vertical, ConfigKeys.Antialias.name(), true));
     }
 
@@ -296,7 +292,6 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
         lineKey.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
-        lineKey.setStipplePattern(getShortConfig(type, ConfigKeys.Stipple.name(), (short) 0xFFFF));
         lineKey.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
         if (!getBooleanConfig(type, ConfigKeys.ShowAreas.name(), true)) {
             lineKey.getSceneHints().setCullHint(CullHint.Always);
