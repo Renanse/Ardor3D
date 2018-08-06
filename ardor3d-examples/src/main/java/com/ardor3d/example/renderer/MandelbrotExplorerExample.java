@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -97,34 +97,34 @@ public class MandelbrotExplorerExample extends ExampleBase {
         super.registerInputTriggers();
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                        // zoom in
-                        final MouseState mouse = inputState.getCurrent().getMouseState();
-                        final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
-                                * display.getHeight());
-                        add.multiplyLocal(scale).multiplyLocal(
-                                new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
-                        trans.addLocal(add.getX(), add.getY());
-                        scale.multiplyLocal(0.5);
-                        updateTexture();
-                        iterations *= 1.1f;
-                    }
-                }));
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                // zoom in
+                final MouseState mouse = inputState.getCurrent().getMouseState();
+                final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
+                        * display.getHeight());
+                add.multiplyLocal(scale).multiplyLocal(
+                        new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
+                trans.addLocal(add.getX(), add.getY());
+                scale.multiplyLocal(0.5);
+                updateTexture();
+                iterations *= 1.1f;
+            }
+        }));
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.RIGHT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                        // zoom out
-                        final MouseState mouse = inputState.getCurrent().getMouseState();
-                        final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
-                                * display.getHeight());
-                        add.multiplyLocal(scale).multiplyLocal(
-                                new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
-                        trans.addLocal(add.getX(), add.getY());
-                        scale.multiplyLocal(1 / .5);
-                        updateTexture();
-                        iterations /= 1.1f;
-                    }
-                }));
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                // zoom out
+                final MouseState mouse = inputState.getCurrent().getMouseState();
+                final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
+                        * display.getHeight());
+                add.multiplyLocal(scale).multiplyLocal(
+                        new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
+                trans.addLocal(add.getX(), add.getY());
+                scale.multiplyLocal(1 / .5);
+                updateTexture();
+                iterations /= 1.1f;
+            }
+        }));
     }
 
     private void updateTexture() {
@@ -134,7 +134,7 @@ public class MandelbrotExplorerExample extends ExampleBase {
         final Function3D finalMandel = Functions.scaleInput(translatedMandel, scale.getX(), scale.getY(), 1);
 
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        Image img = GeneratedImageFactory.createLuminance8Image(finalMandel, cam.getWidth(), cam.getHeight(), 1);
+        Image img = GeneratedImageFactory.createRed8Image(finalMandel, cam.getWidth(), cam.getHeight(), 1);
 
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, colors);
         tex.setImage(img);

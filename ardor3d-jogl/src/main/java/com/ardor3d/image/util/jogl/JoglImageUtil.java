@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -31,7 +31,7 @@ public class JoglImageUtil {
     /**
      * Convert the given Ardor3D Image to a List of TextureData instances. It is a List because Ardor3D Images may
      * contain multiple layers (for example, in the case of cube maps or 3D textures).
-     * 
+     *
      * @param input
      *            the Ardor3D Image to convert
      * @return the TextureData instance(s) created in the conversion
@@ -43,7 +43,7 @@ public class JoglImageUtil {
     /**
      * Convert the given Ardor3D Image to a List of TextureData instances. It is a List because Ardor3D Images may
      * contain multiple layers (for example, in the case of cube maps or 3D textures).
-     * 
+     *
      * @param capsUtil
      * @param input
      *            the Ardor3D Image to convert
@@ -82,7 +82,7 @@ public class JoglImageUtil {
                 case RGB:
                     pixelFormat = PixelFormat.RGB888;
                     break;
-                case Luminance:
+                case Red:
                     pixelFormat = PixelFormat.LUMINANCE;
                     break;
                 default:

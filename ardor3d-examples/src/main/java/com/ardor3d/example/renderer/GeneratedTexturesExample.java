@@ -310,8 +310,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         // Build up our function
         final Function3D finalCheck = new CheckerFunction3D();
 
-        final Image img = GeneratedImageFactory.createLuminance8Image(finalCheck, wside, hside, 1, 1, 9, 1, 9, 0, 0,
-                -1, 1);
+        final Image img = GeneratedImageFactory.createRed8Image(finalCheck, wside, hside, 1, 1, 9, 1, 9, 0, 0, -1, 1);
         tex.setImage(img);
         // No need for filtering on this one...
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
@@ -351,8 +350,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         colors[255] = ColorRGBA.BLACK;
         GeneratedImageFactory.fillInColorTable(colors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(finalMandel, (int) (1.5 * wside), (int) (1.5 * hside),
-                1);
+        Image img = GeneratedImageFactory.createRed8Image(finalMandel, (int) (1.5 * wside), (int) (1.5 * hside), 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, colors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));
@@ -372,7 +370,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         colors[255] = ColorRGBA.BLACK;
         GeneratedImageFactory.fillInColorTable(colors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(new VoroniFunction3D(6, .5, true, 1), wside, hside, 1);
+        Image img = GeneratedImageFactory.createRed8Image(new VoroniFunction3D(6, .5, true, 1), wside, hside, 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, colors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));
@@ -388,7 +386,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         if (useFbm) {
             func = new FbmFunction3D(func, 5, 0.5, 0.5, 3.14);
         }
-        Image img = GeneratedImageFactory.createLuminance8Image(func, wside, hside, 1);
+        Image img = GeneratedImageFactory.createRed8Image(func, wside, hside, 1);
         if (useColor) {
             img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, terrainColors);
         }
@@ -423,7 +421,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         woodColors[255] = new ColorRGBA(60 / 255f, 10 / 255f, 8 / 255f, 1);
         GeneratedImageFactory.fillInColorTable(woodColors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(finalWood, wside, hside, 1);
+        Image img = GeneratedImageFactory.createRed8Image(finalWood, wside, hside, 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, woodColors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));
@@ -457,7 +455,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         jadeColors[255] = new ColorRGBA(29 / 255f, 135 / 255f, 102 / 255f, 1);
         GeneratedImageFactory.fillInColorTable(jadeColors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(finalJade, wside, hside, 1);
+        Image img = GeneratedImageFactory.createRed8Image(finalJade, wside, hside, 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, jadeColors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));
@@ -492,7 +490,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         slimeColors[255] = new ColorRGBA(128 / 255f, 255 / 255f, 128 / 255f, 1);
         GeneratedImageFactory.fillInColorTable(slimeColors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(finalSlime, wside, hside, 1);
+        Image img = GeneratedImageFactory.createRed8Image(finalSlime, wside, hside, 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, slimeColors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));

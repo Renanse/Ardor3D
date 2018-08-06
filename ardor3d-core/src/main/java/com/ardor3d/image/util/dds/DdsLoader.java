@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -223,12 +223,12 @@ public class DdsLoader implements ImageLoader {
             else if (lum || alphaPixels) {
                 if (lum && alphaPixels) {
                     logger.finest("DDS format: uncompressed LumAlpha");
-                    image.setDataFormat(ImageDataFormat.LuminanceAlpha);
+                    image.setDataFormat(ImageDataFormat.RG);
                 }
 
                 else if (lum) {
                     logger.finest("DDS format: uncompressed Lum");
-                    image.setDataFormat(ImageDataFormat.Luminance);
+                    image.setDataFormat(ImageDataFormat.Red);
                 }
 
                 else if (alpha) {

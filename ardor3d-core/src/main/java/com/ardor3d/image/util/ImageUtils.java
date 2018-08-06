@@ -122,7 +122,6 @@ public abstract class ImageUtils {
                         break;
                 }
                 break;
-            case Intensity:
             case Green:
             case Blue:
             case StencilIndex:

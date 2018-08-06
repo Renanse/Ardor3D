@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -22,8 +22,8 @@ public class ImageHeightMap {
         }
 
         final ImageDataFormat format = ardorImage.getDataFormat();
-        if (format != ImageDataFormat.RGB && format != ImageDataFormat.RGBA && format != ImageDataFormat.Luminance) {
-            throw new IllegalArgumentException("Unhandled format (must be Luminance, RGB or RGBA): " + format);
+        if (format != ImageDataFormat.RGB && format != ImageDataFormat.RGBA && format != ImageDataFormat.Red) {
+            throw new IllegalArgumentException("Unhandled format (must be Red, RGB or RGBA): " + format);
         }
 
         if (ardorImage.getWidth() != ardorImage.getHeight() || !MathUtils.isPowerOfTwo(ardorImage.getWidth())) {

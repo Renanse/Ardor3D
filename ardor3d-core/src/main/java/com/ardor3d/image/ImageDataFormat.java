@@ -16,10 +16,7 @@ public enum ImageDataFormat {
     RGBA(4, false, true), //
     BGR(3, false, false), //
     BGRA(4, false, true), //
-    Luminance(1, false, false), //
-    LuminanceAlpha(2, false, true), //
     Alpha(1, false, true), //
-    Intensity(1, false, false), //
     Red(1, false, false), //
     Green(1, false, false), //
     Blue(1, false, false), //

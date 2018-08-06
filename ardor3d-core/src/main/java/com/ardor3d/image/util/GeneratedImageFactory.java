@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -27,7 +27,7 @@ public abstract class GeneratedImageFactory {
 
     /**
      * Creates a side x side sized image of a single solid color, of data type byte.
-     * 
+     *
      * @param color
      *            the color of our image
      * @param useAlpha
@@ -56,7 +56,7 @@ public abstract class GeneratedImageFactory {
 
     /**
      * Creates a one dimensional color image using each color given as a single pixel.
-     * 
+     *
      * @param useAlpha
      *            if true, the image will have an alpha component (whose value will come from each supplied color.)
      * @param colors
@@ -81,10 +81,10 @@ public abstract class GeneratedImageFactory {
     }
 
     /**
-     * Creates an 8 bit luminance image using the given function as input. The domain of the image will be [-1, 1] on
-     * each axis unless that axis is size 0 (in which case the domain is [0, 0]. The expected range of the function
+     * Creates an 8 bit single channel image using the given function as input. The domain of the image will be [-1, 1]
+     * on each axis unless that axis is size 0 (in which case the domain is [0, 0]. The expected range of the function
      * result set is also [-1, 1] and this is remapped to [0, 255] for storage as a byte.
-     * 
+     *
      * @param source
      *            the source function to evaluate at each pixel of the image.
      * @param width
@@ -95,10 +95,9 @@ public abstract class GeneratedImageFactory {
      *            the depth of the image (for 3D texture or texture array use)
      * @return the resulting Image.
      */
-    public static Image createLuminance8Image(final Function3D source, final int width, final int height,
-            final int depth) {
+    public static Image createRed8Image(final Function3D source, final int width, final int height, final int depth) {
         // default range is [-1, 1] on each axis, unless that axis is size 1.
-        return createLuminance8Image(source, width, height, depth, //
+        return createRed8Image(source, width, height, depth, //
                 width == 1 ? 0 : -1, width == 1 ? 0 : 1, // X
                 height == 1 ? 0 : -1, height == 1 ? 0 : 1, // Y
                 depth == 1 ? 0 : -1, depth == 1 ? 0 : 1, // Z
@@ -106,8 +105,8 @@ public abstract class GeneratedImageFactory {
     }
 
     /**
-     * Creates an 8 bit luminance image using the given function as input.
-     * 
+     * Creates an 8 bit single channel image using the given function as input.
+     *
      * @param source
      *            the source function to evaluate at each pixel of the image.
      * @param width
@@ -138,9 +137,9 @@ public abstract class GeneratedImageFactory {
      *            byte.
      * @return the resulting Image.
      */
-    public static Image createLuminance8Image(final Function3D source, final int width, final int height,
-            final int depth, final double startX, final double endX, final double startY, final double endY,
-            final double startZ, final double endZ, final double rangeStart, final double rangeEnd) {
+    public static Image createRed8Image(final Function3D source, final int width, final int height, final int depth,
+            final double startX, final double endX, final double startY, final double endY, final double startZ,
+            final double endZ, final double rangeStart, final double rangeEnd) {
         double val;
         final double rangeDiv = 1.0 / (rangeEnd - rangeStart);
         // prepare list of image slices.
@@ -175,17 +174,17 @@ public abstract class GeneratedImageFactory {
             dataList.add(dataBuf);
         }
 
-        return new Image(ImageDataFormat.Luminance, PixelDataType.UnsignedByte, width, height, dataList, null);
+        return new Image(ImageDataFormat.Red, PixelDataType.UnsignedByte, width, height, dataList, null);
     }
 
     /**
      * Converts an 8 bit luminance Image to an RGB or RGBA color image by mapping the given values to a corresponding
      * color value in the given colorTable.
-     * 
+     *
      * <p>
      * XXX: perhaps replace the color array with some gradient class?
      * </p>
-     * 
+     *
      * @param lumImage
      *            the Image to convert.
      * @param useAlpha
@@ -227,7 +226,7 @@ public abstract class GeneratedImageFactory {
 
     /**
      * Fill any empty spots in the given color array by linearly interpolating the non-empty values above and below it.
-     * 
+     *
      * @param colors
      *            the color table - must be length 256.
      */

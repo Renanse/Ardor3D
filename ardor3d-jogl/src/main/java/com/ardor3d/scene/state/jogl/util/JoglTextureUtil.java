@@ -29,7 +29,7 @@ public abstract class JoglTextureUtil {
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
-        // first some frequently used formats
+            // first some frequently used formats
             case RGBA8:
                 return GL.GL_RGBA8;
             case RGB8:
@@ -198,11 +198,11 @@ public abstract class JoglTextureUtil {
             case GL.GL_ALPHA:
                 return ImageDataFormat.Alpha;
             case GL.GL_LUMINANCE:
-                return ImageDataFormat.Luminance;
+                return ImageDataFormat.Red;
             case GL2.GL_INTENSITY:
-                return ImageDataFormat.Intensity;
+                return ImageDataFormat.Red;
             case GL.GL_LUMINANCE_ALPHA:
-                return ImageDataFormat.LuminanceAlpha;
+                return ImageDataFormat.RG;
             case GL2ES2.GL_DEPTH_COMPONENT:
                 return ImageDataFormat.Depth;
             case GL2GL3.GL_BGR:
@@ -233,12 +233,6 @@ public abstract class JoglTextureUtil {
                 return GL.GL_RGB;
             case Alpha:
                 return GL.GL_ALPHA;
-            case Luminance:
-                return GL.GL_LUMINANCE;
-            case Intensity:
-                return GL2.GL_INTENSITY;
-            case LuminanceAlpha:
-                return GL.GL_LUMINANCE_ALPHA;
             case Depth:
                 return GL2ES2.GL_DEPTH_COMPONENT;
             case BGR:

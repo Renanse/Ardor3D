@@ -116,7 +116,6 @@ public abstract class AbstractRenderer implements Renderer {
     protected int getTotalInterleavedSize(final RenderContext context, final FloatBufferData vertexCoords,
             final FloatBufferData normalCoords, final FloatBufferData colorCoords,
             final List<FloatBufferData> textureCoords) {
-        final ContextCapabilities caps = context.getCapabilities();
 
         int bufferSizeBytes = 0;
         if (normalCoords != null) {

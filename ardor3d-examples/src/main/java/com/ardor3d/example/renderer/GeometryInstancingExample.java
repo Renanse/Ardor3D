@@ -49,7 +49,6 @@ public class GeometryInstancingExample extends ExampleBase {
     private int frames = 0;
     private long startTime = System.currentTimeMillis();
 
-    private final int vboMode = 0;
     private boolean instancingEnabled = true;
 
     private GLSLShaderObjectsState _shader;
