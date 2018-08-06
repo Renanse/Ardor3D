@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -51,7 +51,7 @@ public abstract class JoglShaderUtil {
 
     /**
      * Updates a uniform shadervariable.
-     * 
+     *
      * @param shaderVariable
      *            variable to update
      */
@@ -96,7 +96,7 @@ public abstract class JoglShaderUtil {
 
     /**
      * Update variableID for uniform shadervariable if needed.
-     * 
+     *
      * @param variable
      *            shadervaribale to update ID on
      * @param programID
@@ -107,7 +107,7 @@ public abstract class JoglShaderUtil {
 
         if (variable.variableID == -1) {
             variable.variableID = gl.getGL2ES2().glGetUniformLocation(programID, variable.name); // TODO Check
-                                                                                                 // variable.name
+            // variable.name
 
             if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader uniform [" + variable.name + "] could not be located in shader");
@@ -253,7 +253,7 @@ public abstract class JoglShaderUtil {
 
     /**
      * Update variableID for attribute shadervariable if needed.
-     * 
+     *
      * @param variable
      *            shadervaribale to update ID on
      * @param programID
@@ -264,7 +264,7 @@ public abstract class JoglShaderUtil {
 
         if (variable.variableID == -1) {
             variable.variableID = gl.getGL2ES2().glGetAttribLocation(programID, variable.name); // TODO Check
-                                                                                                // variable.name
+            // variable.name
 
             if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader attribute [" + variable.name + "] could not be located in shader");
@@ -275,7 +275,7 @@ public abstract class JoglShaderUtil {
 
     /**
      * Updates an vertex attribute pointer.
-     * 
+     *
      * @param renderer
      *            the current renderer
      * @param shaderVariable
@@ -297,7 +297,7 @@ public abstract class JoglShaderUtil {
 
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
-        if (caps.isVBOSupported() && !useVBO) {
+        if (!useVBO) {
             renderer.unbindVBO();
         }
 
@@ -355,17 +355,17 @@ public abstract class JoglShaderUtil {
             final int vboId = JoglRenderer.setupVBO(variable.data, context);
             JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
             GLContext
-                    .getCurrentGL()
-                    .getGL2ES2()
-                    .glVertexAttribPointer(variable.variableID, variable.size, GL.GL_FLOAT, variable.normalized,
-                            variable.stride, 0);
+            .getCurrentGL()
+            .getGL2ES2()
+            .glVertexAttribPointer(variable.variableID, variable.size, GL.GL_FLOAT, variable.normalized,
+                    variable.stride, 0);
         } else {
             variable.data.getBuffer().rewind();
             GLContext
-                    .getCurrentGL()
-                    .getGL2()
-                    .glVertexAttribPointer(variable.variableID, variable.size, GL.GL_FLOAT, variable.normalized,
-                            variable.stride, variable.data.getBuffer());
+            .getCurrentGL()
+            .getGL2()
+            .glVertexAttribPointer(variable.variableID, variable.size, GL.GL_FLOAT, variable.normalized,
+                    variable.stride, variable.data.getBuffer());
         }
     }
 
@@ -401,18 +401,18 @@ public abstract class JoglShaderUtil {
             final int vboId = JoglRenderer.setupVBO(variable.data, context);
             JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
             GLContext
-                    .getCurrentGL()
-                    .getGL2ES2()
-                    .glVertexAttribPointer(variable.variableID, variable.size,
-                            variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride,
+            .getCurrentGL()
+            .getGL2ES2()
+            .glVertexAttribPointer(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride,
                             0);
         } else {
             variable.data.getBuffer().rewind();
             GLContext
-                    .getCurrentGL()
-                    .getGL2()
-                    .glVertexAttribPointer(variable.variableID, variable.size,
-                            variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride,
+            .getCurrentGL()
+            .getGL2()
+            .glVertexAttribPointer(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride,
                             variable.data.getBuffer());
         }
     }
@@ -425,18 +425,18 @@ public abstract class JoglShaderUtil {
             final int vboId = JoglRenderer.setupVBO(variable.data, context);
             JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
             GLContext
-                    .getCurrentGL()
-                    .getGL2ES2()
-                    .glVertexAttribPointer(variable.variableID, variable.size,
-                            variable.unsigned ? GL.GL_UNSIGNED_INT : GL2ES2.GL_INT, variable.normalized,
+            .getCurrentGL()
+            .getGL2ES2()
+            .glVertexAttribPointer(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_INT : GL2ES2.GL_INT, variable.normalized,
                             variable.stride, 0);
         } else {
             variable.data.getBuffer().rewind();
             GLContext
-                    .getCurrentGL()
-                    .getGL2()
-                    .glVertexAttribPointer(variable.variableID, variable.size,
-                            variable.unsigned ? GL.GL_UNSIGNED_INT : GL2ES2.GL_INT, variable.normalized,
+            .getCurrentGL()
+            .getGL2()
+            .glVertexAttribPointer(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_INT : GL2ES2.GL_INT, variable.normalized,
                             variable.stride, variable.data.getBuffer());
         }
     }
@@ -449,18 +449,18 @@ public abstract class JoglShaderUtil {
             final int vboId = JoglRenderer.setupVBO(variable.data, context);
             JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
             GLContext
-                    .getCurrentGL()
-                    .getGL2ES2()
-                    .glVertexAttribPointer(variable.variableID, variable.size,
-                            variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized,
+            .getCurrentGL()
+            .getGL2ES2()
+            .glVertexAttribPointer(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized,
                             variable.stride, 0);
         } else {
             variable.data.getBuffer().rewind();
             GLContext
-                    .getCurrentGL()
-                    .getGL2()
-                    .glVertexAttribPointer(variable.variableID, variable.size,
-                            variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized,
+            .getCurrentGL()
+            .getGL2()
+            .glVertexAttribPointer(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized,
                             variable.stride, variable.data.getBuffer());
         }
     }

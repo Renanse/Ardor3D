@@ -23,7 +23,6 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.atlas.TexturePacker;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.util.awt.AWTImageUtil;
 import com.ardor3d.input.Key;
@@ -230,7 +229,6 @@ public class AtlasExampleMultiTextured extends ExampleBase {
 
         if (textureName2 != null) {
             final Texture texture2 = TextureManager.load(textureName2, Texture.MinificationFilter.Trilinear, true);
-            texture2.setApply(ApplyMode.Modulate);
             texture2.setWrap(mode);
             texture2.setBorderColor(ColorRGBA.RED);
             ts.setTexture(texture2, 1);

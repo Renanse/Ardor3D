@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -75,59 +75,57 @@ public abstract class JoglVertexProgramStateUtil {
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 
-        if (caps.isVertexProgramSupported()) {
-            // ask for the current state record
-            final VertexProgramStateRecord record = (VertexProgramStateRecord) context
-                    .getStateRecord(StateType.VertexProgram);
-            context.setCurrentState(StateType.VertexProgram, state);
+        // ask for the current state record
+        final VertexProgramStateRecord record = (VertexProgramStateRecord) context
+                .getStateRecord(StateType.VertexProgram);
+        context.setCurrentState(StateType.VertexProgram, state);
 
-            if (!record.isValid() || record.getReference() != state) {
-                record.setReference(state);
-                if (state.isEnabled()) {
-                    // Vertex program not yet loaded
-                    if (state._getProgramID() == -1) {
-                        if (state.getProgramAsBuffer() != null) {
-                            final int id = create(state.getProgramAsBuffer());
-                            state._setProgramID(id);
-                        } else {
-                            return;
-                        }
+        if (!record.isValid() || record.getReference() != state) {
+            record.setReference(state);
+            if (state.isEnabled()) {
+                // Vertex program not yet loaded
+                if (state._getProgramID() == -1) {
+                    if (state.getProgramAsBuffer() != null) {
+                        final int id = create(state.getProgramAsBuffer());
+                        state._setProgramID(id);
+                    } else {
+                        return;
                     }
-
-                    gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
-                    gl.getGL2().glBindProgramARB(GL2.GL_VERTEX_PROGRAM_ARB, state._getProgramID());
-
-                    // load environmental parameters...
-                    for (int i = 0; i < VertexProgramState._getEnvParameters().length; i++) {
-                        if (VertexProgramState._getEnvParameters()[i] != null) {
-                            gl.getGL2().glProgramEnvParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
-                                    VertexProgramState._getEnvParameters()[i][0],
-                                    VertexProgramState._getEnvParameters()[i][1],
-                                    VertexProgramState._getEnvParameters()[i][2],
-                                    VertexProgramState._getEnvParameters()[i][3]);
-                        }
-                    }
-
-                    // load local parameters...
-                    if (state.isUsingParameters()) {
-                        // no parameters are used
-                        for (int i = 0; i < state._getParameters().length; i++) {
-                            if (state._getParameters()[i] != null) {
-                                gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
-                                        state._getParameters()[i][0], state._getParameters()[i][1],
-                                        state._getParameters()[i][2], state._getParameters()[i][3]);
-                            }
-                        }
-                    }
-
-                } else {
-                    gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
                 }
-            }
 
-            if (!record.isValid()) {
-                record.validate();
+                gl.glEnable(GL2.GL_VERTEX_PROGRAM_ARB);
+                gl.getGL2().glBindProgramARB(GL2.GL_VERTEX_PROGRAM_ARB, state._getProgramID());
+
+                // load environmental parameters...
+                for (int i = 0; i < VertexProgramState._getEnvParameters().length; i++) {
+                    if (VertexProgramState._getEnvParameters()[i] != null) {
+                        gl.getGL2().glProgramEnvParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
+                                VertexProgramState._getEnvParameters()[i][0],
+                                VertexProgramState._getEnvParameters()[i][1],
+                                VertexProgramState._getEnvParameters()[i][2],
+                                VertexProgramState._getEnvParameters()[i][3]);
+                    }
+                }
+
+                // load local parameters...
+                if (state.isUsingParameters()) {
+                    // no parameters are used
+                    for (int i = 0; i < state._getParameters().length; i++) {
+                        if (state._getParameters()[i] != null) {
+                            gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_VERTEX_PROGRAM_ARB, i,
+                                    state._getParameters()[i][0], state._getParameters()[i][1],
+                                    state._getParameters()[i][2], state._getParameters()[i][3]);
+                        }
+                    }
+                }
+
+            } else {
+                gl.glDisable(GL2.GL_VERTEX_PROGRAM_ARB);
             }
+        }
+
+        if (!record.isValid()) {
+            record.validate();
         }
     }
 }

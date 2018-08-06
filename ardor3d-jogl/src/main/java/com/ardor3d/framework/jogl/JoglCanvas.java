@@ -36,7 +36,6 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.input.MouseManager;
-import com.ardor3d.renderer.jogl.JoglPbufferTextureRenderer;
 
 /**
  * A canvas implementation for use with native JOGL windows.
@@ -99,9 +98,6 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         if (_inited) {
             return;
         }
-
-        // FIXME: remove need for directly setting _parentContext.
-        JoglPbufferTextureRenderer._parentContext = _glCanvas.getContext();
 
         this.add(_glCanvas);
 

@@ -316,12 +316,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupFogData(final FloatBufferData fogCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void setupTextureData(final List<FloatBufferData> textureCoords) {
         // TODO Auto-generated method stub
 
@@ -374,12 +368,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void setupColorDataVBO(final FloatBufferData colorCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupFogDataVBO(final FloatBufferData fogCoords) {
         // TODO Auto-generated method stub
 
     }
@@ -504,8 +492,61 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     protected void doApplyState(final RenderState state) {
-        // TODO Auto-generated method stub
-
+        if (state == null) {
+            logger.warning("tried to apply a null state.");
+            return;
+        }
+        switch (state.getType()) {
+            case Texture:
+                // LwjglTextureStateUtil.apply((TextureState) state);
+                return;
+            case Light:
+                // LwjglLightStateUtil.apply((LightState) state);
+                return;
+            case Blend:
+                // LwjglBlendStateUtil.apply((BlendState) state);
+                return;
+            case Clip:
+                // LwjglClipStateUtil.apply((ClipState) state);
+                return;
+            case ColorMask:
+                // LwjglColorMaskStateUtil.apply((ColorMaskState) state);
+                return;
+            case Cull:
+                // LwjglCullStateUtil.apply((CullState) state);
+                return;
+            case Fog:
+                // LwjglFogStateUtil.apply((FogState) state);
+                return;
+            case FragmentProgram:
+                // LwjglFragmentProgramStateUtil.apply((FragmentProgramState) state);
+                return;
+            case GLSLShader:
+                // LwjglShaderObjectsStateUtil.apply(this, (GLSLShaderObjectsState) state);
+                return;
+            case Material:
+                // LwjglMaterialStateUtil.apply((MaterialState) state);
+                return;
+            case Offset:
+                // LwjglOffsetStateUtil.apply(this, (OffsetState) state);
+                return;
+            case Shading:
+                // LwjglShadingStateUtil.apply((ShadingState) state);
+                return;
+            case Stencil:
+                // LwjglStencilStateUtil.apply((StencilState) state);
+                return;
+            case VertexProgram:
+                // LwjglVertexProgramStateUtil.apply((VertexProgramState) state);
+                return;
+            case Wireframe:
+                // LwjglWireframeStateUtil.apply(this, (WireframeState) state);
+                return;
+            case ZBuffer:
+                // LwjglZBufferStateUtil.apply((ZBufferState) state);
+                return;
+        }
+        throw new IllegalArgumentException("Unknown state: " + state);
     }
 
 }

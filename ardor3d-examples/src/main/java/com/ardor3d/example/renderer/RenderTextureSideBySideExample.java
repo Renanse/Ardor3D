@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -110,8 +110,8 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     private void initRtt(final Renderer renderer) {
         inited = true;
 
-        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_settings, false, renderer,
-                ContextManager.getCurrentContext().getCapabilities());
+        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_settings, renderer, ContextManager
+                .getCurrentContext().getCapabilities());
 
         if (textureRenderer == null) {
             final BasicText t = BasicText.createDefaultTextLabel("Text", "RTT not supported on this computer.");

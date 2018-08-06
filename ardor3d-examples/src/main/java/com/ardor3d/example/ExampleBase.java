@@ -28,8 +28,6 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.jogl.JoglNewtWindow;
-import com.ardor3d.framework.lwjgl.LwjglCanvas;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.framework.lwjgl3.GLFWCanvas;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.TextureStoreFormat;
@@ -58,10 +56,6 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.input.lwjgl.LwjglControllerWrapper;
-import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
-import com.ardor3d.input.lwjgl.LwjglMouseManager;
-import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -76,12 +70,11 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
-import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
+import com.ardor3d.renderer.lwjgl3.Lwjgl3TextureRendererProvider;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
@@ -244,7 +237,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.UPDATE)
-        .execute();
+                .execute();
 
         /** Call simpleUpdate in any derived classes of ExampleBase. */
         updateExample(timer);
@@ -268,7 +261,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.RENDER)
-        .execute(renderer);
+                .execute(renderer);
 
         // Clean up card garbage such as textures, vbos, etc.
         ContextGarbageCollector.doRuntimeCleanup(renderer);
@@ -352,14 +345,14 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                 prefs.getFrequency(),
                 // alpha
                 _minAlphaBits != -1 ? _minAlphaBits : prefs.getAlphaBits(),
-                        // depth
-                        _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
-                                // stencil
-                                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
-                                        // samples
-                                        prefs.getSamples(),
-                                        // other
-                                        prefs.isFullscreen(), _stereo);
+                // depth
+                _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
+                // stencil
+                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
+                // samples
+                prefs.getSamples(),
+                // other
+                prefs.isFullscreen(), _stereo);
 
         example._settings = settings;
 
@@ -371,21 +364,21 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                     new DummyControllerWrapper());
             example._mouseManager = new GLFWMouseManager();
             example._canvas.setMouseManager(example._mouseManager);
-            TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
-        } else if (prefs.getRenderer().startsWith("LWJGL")) {
-            try {
-                SharedLibraryLoader.load(true);
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-
-            final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
-            example._canvas = new LwjglCanvas(settings, canvasRenderer);
-            example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
-                    new LwjglControllerWrapper(), (LwjglCanvas) example._canvas);
-            example._mouseManager = new LwjglMouseManager();
-            example._canvas.setMouseManager(example._mouseManager);
-            TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
+            TextureRendererFactory.INSTANCE.setProvider(new Lwjgl3TextureRendererProvider());
+            // } else if (prefs.getRenderer().startsWith("LWJGL")) {
+            // try {
+            // SharedLibraryLoader.load(true);
+            // } catch (final Exception e) {
+            // e.printStackTrace();
+            // }
+            //
+            // final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
+            // example._canvas = new LwjglCanvas(settings, canvasRenderer);
+            // example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
+            // new LwjglControllerWrapper(), (LwjglCanvas) example._canvas);
+            // example._mouseManager = new LwjglMouseManager();
+            // example._canvas.setMouseManager(example._mouseManager);
+            // TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         } else if (prefs.getRenderer().startsWith("JOGL")) {
             final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
             example._canvas = new JoglNewtWindow(canvasRenderer, settings);
@@ -477,17 +470,17 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT),
                 new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 
-                final Vector2 pos = Vector2.fetchTempInstance().set(
-                        inputStates.getCurrent().getMouseState().getX(),
-                        inputStates.getCurrent().getMouseState().getY());
-                final Ray3 pickRay = new Ray3();
-                _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-                Vector2.releaseTempInstance(pos);
-                doPick(pickRay);
-            }
-        }, "pickTrigger"));
+                        final Vector2 pos = Vector2.fetchTempInstance().set(
+                                inputStates.getCurrent().getMouseState().getX(),
+                                inputStates.getCurrent().getMouseState().getY());
+                        final Ray3 pickRay = new Ray3();
+                        _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+                        Vector2.releaseTempInstance(pos);
+                        doPick(pickRay);
+                    }
+                }, "pickTrigger"));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
@@ -552,20 +545,20 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                if (_mouseManager.isSetGrabbedSupported()) {
-                    _mouseManager.setGrabbed(GrabbedState.GRABBED);
-                }
-            }
-        }));
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                        }
+                    }
+                }));
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                if (_mouseManager.isSetGrabbedSupported()) {
-                    _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
-                }
-            }
-        }));
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                        }
+                    }
+                }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {

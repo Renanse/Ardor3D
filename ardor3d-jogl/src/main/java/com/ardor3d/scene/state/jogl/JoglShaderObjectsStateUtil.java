@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -168,62 +168,60 @@ public abstract class JoglShaderObjectsStateUtil {
             state._fragmentShaderID = -1;
         }
 
-        if (caps.isGeometryShader4Supported()) {
-            if (state.getGeometryShader() != null) {
-                if (state._geometryShaderID != -1) {
-                    removeGeomShader(state);
-                }
-
-                if (gl.isGL2()) {
-                    state._geometryShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_GEOMETRY_SHADER);
-                } else {
-                    if (gl.isGL2ES2()) {
-                        state._geometryShaderID = gl.getGL2ES2().glCreateShader(GL3.GL_GEOMETRY_SHADER);
-                    }
-                }
-
-                // Create the sources
-                final byte array[] = new byte[state.getGeometryShader().limit()];
-                state.getGeometryShader().rewind();
-                state.getGeometryShader().get(array);
-                if (gl.isGL2()) {
-                    gl.getGL2().glShaderSourceARB(state._geometryShaderID, 1, new String[] { new String(array) },
-                            new int[] { array.length }, 0);
-                } else {
-                    if (gl.isGL2ES2()) {
-                        gl.getGL2ES2().glShaderSource(state._geometryShaderID, 1, new String[] { new String(array) },
-                                new int[] { array.length }, 0);
-                    }
-                }
-
-                // Compile the geometry shader
-                final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
-                final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
-                compiled.clear();
-                if (gl.isGL2()) {
-                    gl.getGL2().glCompileShaderARB(state._geometryShaderID);
-                    gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
-                            compiled);
-                } else {
-                    if (gl.isGL2ES2()) {
-                        gl.getGL2ES2().glCompileShader(state._geometryShaderID);
-                        gl.getGL2ES2().glGetShaderiv(state._geometryShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
-                    }
-                }
-                checkProgramError(compiled.get(0), state._geometryShaderID, state._geometryShaderName);
-
-                // Attach the program
-                if (gl.isGL2()) {
-                    gl.getGL2().glAttachObjectARB(state._programID, state._geometryShaderID);
-                } else {
-                    if (gl.isGL2ES2()) {
-                        gl.getGL2ES2().glAttachShader(state._programID, state._geometryShaderID);
-                    }
-                }
-            } else if (state._geometryShaderID != -1) {
+        if (state.getGeometryShader() != null) {
+            if (state._geometryShaderID != -1) {
                 removeGeomShader(state);
-                state._geometryShaderID = -1;
             }
+
+            if (gl.isGL2()) {
+                state._geometryShaderID = gl.getGL2().glCreateShaderObjectARB(GL3.GL_GEOMETRY_SHADER);
+            } else {
+                if (gl.isGL2ES2()) {
+                    state._geometryShaderID = gl.getGL2ES2().glCreateShader(GL3.GL_GEOMETRY_SHADER);
+                }
+            }
+
+            // Create the sources
+            final byte array[] = new byte[state.getGeometryShader().limit()];
+            state.getGeometryShader().rewind();
+            state.getGeometryShader().get(array);
+            if (gl.isGL2()) {
+                gl.getGL2().glShaderSourceARB(state._geometryShaderID, 1, new String[] { new String(array) },
+                        new int[] { array.length }, 0);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glShaderSource(state._geometryShaderID, 1, new String[] { new String(array) },
+                            new int[] { array.length }, 0);
+                }
+            }
+
+            // Compile the geometry shader
+            final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+            final IntBuffer compiled = context.getDirectNioBuffersSet().getSingleIntBuffer();
+            compiled.clear();
+            if (gl.isGL2()) {
+                gl.getGL2().glCompileShaderARB(state._geometryShaderID);
+                gl.getGL2().glGetObjectParameterivARB(state._geometryShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB,
+                        compiled);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glCompileShader(state._geometryShaderID);
+                    gl.getGL2ES2().glGetShaderiv(state._geometryShaderID, GL2ES2.GL_COMPILE_STATUS, compiled);
+                }
+            }
+            checkProgramError(compiled.get(0), state._geometryShaderID, state._geometryShaderName);
+
+            // Attach the program
+            if (gl.isGL2()) {
+                gl.getGL2().glAttachObjectARB(state._programID, state._geometryShaderID);
+            } else {
+                if (gl.isGL2ES2()) {
+                    gl.getGL2ES2().glAttachShader(state._programID, state._geometryShaderID);
+                }
+            }
+        } else if (state._geometryShaderID != -1) {
+            removeGeomShader(state);
+            state._geometryShaderID = -1;
         }
 
         if (caps.isTessellationShadersSupported()) {
@@ -496,7 +494,7 @@ public abstract class JoglShaderObjectsStateUtil {
 
     /**
      * Check for program errors. If an error is detected, program exits.
-     * 
+     *
      * @param compilerState
      *            the compiler state for a given shader
      * @param id
@@ -553,60 +551,57 @@ public abstract class JoglShaderObjectsStateUtil {
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 
-        if (caps.isGLSLSupported()) {
-            // Ask for the current state record
-            final ShaderObjectsStateRecord record = (ShaderObjectsStateRecord) context
-                    .getStateRecord(StateType.GLSLShader);
-            context.setCurrentState(StateType.GLSLShader, state);
+        // Ask for the current state record
+        final ShaderObjectsStateRecord record = (ShaderObjectsStateRecord) context.getStateRecord(StateType.GLSLShader);
+        context.setCurrentState(StateType.GLSLShader, state);
 
-            if (state.isEnabled()) {
-                if (state._needSendShader) {
-                    sendToGL(state, caps);
-                }
-
-                if (state._shaderDataLogic != null) {
-                    state._shaderDataLogic.applyData(state, state._mesh, renderer);
-                }
+        if (state.isEnabled()) {
+            if (state._needSendShader) {
+                sendToGL(state, caps);
             }
 
-            if (!record.isValid() || record.getReference() != state || state.needsRefresh()) {
-                record.setReference(state);
-                if (state.isEnabled() && state._programID != -1) {
-                    // clear any previously existing attributes
-                    clearEnabledAttributes(record, gl);
+            if (state._shaderDataLogic != null) {
+                state._shaderDataLogic.applyData(state, state._mesh, renderer);
+            }
+        }
 
-                    // set our current shader
-                    JoglShaderUtil.useShaderProgram(state._programID, record);
+        if (!record.isValid() || record.getReference() != state || state.needsRefresh()) {
+            record.setReference(state);
+            if (state.isEnabled() && state._programID != -1) {
+                // clear any previously existing attributes
+                clearEnabledAttributes(record, gl);
 
-                    final List<ShaderVariable> attribs = state.getShaderAttributes();
-                    for (int i = attribs.size(); --i >= 0;) {
-                        final ShaderVariable shaderVariable = attribs.get(i);
-                        if (shaderVariable.needsRefresh) {
-                            JoglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
-                            shaderVariable.needsRefresh = false;
-                        }
-                        JoglShaderUtil.updateShaderAttribute(renderer, shaderVariable, state.isUseAttributeVBO());
+                // set our current shader
+                JoglShaderUtil.useShaderProgram(state._programID, record);
+
+                final List<ShaderVariable> attribs = state.getShaderAttributes();
+                for (int i = attribs.size(); --i >= 0;) {
+                    final ShaderVariable shaderVariable = attribs.get(i);
+                    if (shaderVariable.needsRefresh) {
+                        JoglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
+                        shaderVariable.needsRefresh = false;
                     }
-
-                    final List<ShaderVariable> uniforms = state.getShaderUniforms();
-                    for (int i = uniforms.size(); --i >= 0;) {
-                        final ShaderVariable shaderVariable = uniforms.get(i);
-                        if (shaderVariable.needsRefresh) {
-                            JoglShaderUtil.updateUniformLocation(shaderVariable, state._programID);
-                            JoglShaderUtil.updateShaderUniform(shaderVariable);
-                            shaderVariable.needsRefresh = false;
-                        }
-                    }
-                } else {
-                    JoglShaderUtil.useShaderProgram(0, record);
-
-                    clearEnabledAttributes(record, gl);
+                    JoglShaderUtil.updateShaderAttribute(renderer, shaderVariable, state.isUseAttributeVBO());
                 }
-            }
 
-            if (!record.isValid()) {
-                record.validate();
+                final List<ShaderVariable> uniforms = state.getShaderUniforms();
+                for (int i = uniforms.size(); --i >= 0;) {
+                    final ShaderVariable shaderVariable = uniforms.get(i);
+                    if (shaderVariable.needsRefresh) {
+                        JoglShaderUtil.updateUniformLocation(shaderVariable, state._programID);
+                        JoglShaderUtil.updateShaderUniform(shaderVariable);
+                        shaderVariable.needsRefresh = false;
+                    }
+                }
+            } else {
+                JoglShaderUtil.useShaderProgram(0, record);
+
+                clearEnabledAttributes(record, gl);
             }
+        }
+
+        if (!record.isValid()) {
+            record.validate();
         }
     }
 

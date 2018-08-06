@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -130,7 +130,7 @@ public class WaterNode extends Node {
 
     /**
      * Resets water parameters to default values
-     * 
+     *
      */
     public void resetParameters() {
         waterPlane = new Plane(new Vector3(0.0, 1.0, 0.0), 0.0);
@@ -162,7 +162,7 @@ public class WaterNode extends Node {
 
     /**
      * Creates a new WaterRenderPass
-     * 
+     *
      * @param cam
      *            main rendercam to use for reflection settings etc
      * @param renderScale
@@ -190,7 +190,7 @@ public class WaterNode extends Node {
 
     /**
      * Initialize texture renderers. Load water textures. Create shaders.
-     * 
+     *
      * @param r
      */
     private void initialize(final Renderer r) {
@@ -205,13 +205,6 @@ public class WaterNode extends Node {
                 && caps.getNumberOfFragmentTextureUnits() < 5) {
             useRefraction = false;
             logger.info("Not enough textureunits, falling back to non refraction water");
-        }
-
-        if (!caps.isGLSLSupported()) {
-            supported = false;
-        }
-        if (!(caps.isPbufferSupported() || caps.isFBOSupported())) {
-            supported = false;
         }
 
         if (isSupported()) {
@@ -465,7 +458,7 @@ public class WaterNode extends Node {
 
     /**
      * Sets a spatial up for being rendered with the watereffect
-     * 
+     *
      * @param spatial
      *            Spatial to use as base for the watereffect
      */
@@ -677,7 +670,7 @@ public class WaterNode extends Node {
 
     /**
      * Adds a spatial to the list of spatials used as reflection in the water
-     * 
+     *
      * @param renderNode
      *            Spatial to add to the list of objects used as reflection in the water
      */
@@ -693,7 +686,7 @@ public class WaterNode extends Node {
 
     /**
      * Sets up a node to be transformed and clipped for skybox usage
-     * 
+     *
      * @param skyBox
      *            Handle to a node to use as skybox
      */
@@ -743,7 +736,7 @@ public class WaterNode extends Node {
 
     /**
      * Set at what distance the waveheights should start to fade out(for projected water only)
-     * 
+     *
      * @param heightFalloffStart
      */
     public void setHeightFalloffStart(final double heightFalloffStart) {
@@ -756,7 +749,7 @@ public class WaterNode extends Node {
 
     /**
      * Set the fadeout length of the waveheights, when over falloff start(for projected water only)
-     * 
+     *
      * @param heightFalloffStart
      */
     public void setHeightFalloffSpeed(final double heightFalloffSpeed) {
@@ -769,7 +762,7 @@ public class WaterNode extends Node {
 
     /**
      * Set base height of the waterplane(Used for reflecting the camera for rendering reflection)
-     * 
+     *
      * @param waterHeight
      *            Waterplane height
      */
@@ -783,7 +776,7 @@ public class WaterNode extends Node {
 
     /**
      * Set the normal of the waterplane(Used for reflecting the camera for rendering reflection)
-     * 
+     *
      * @param normal
      *            Waterplane normal
      */
@@ -797,7 +790,7 @@ public class WaterNode extends Node {
 
     /**
      * Set the movement speed of the reflectiontexture
-     * 
+     *
      * @param speedReflection
      *            Speed of reflectiontexture
      */
@@ -811,7 +804,7 @@ public class WaterNode extends Node {
 
     /**
      * Set the movement speed of the refractiontexture
-     * 
+     *
      * @param speedRefraction
      *            Speed of refractiontexture
      */
@@ -825,7 +818,7 @@ public class WaterNode extends Node {
 
     /**
      * Maximum amplitude of the water, used for clipping correctly(projected water only)
-     * 
+     *
      * @param waterMaxAmplitude
      *            Maximum amplitude
      */
@@ -879,7 +872,7 @@ public class WaterNode extends Node {
 
     /**
      * If true, fade to fogcolor. If false, fade to 100% reflective surface
-     * 
+     *
      * @param value
      */
     public void useFadeToFogColor(final boolean value) {
@@ -896,7 +889,7 @@ public class WaterNode extends Node {
 
     /**
      * Turn reflection on and off
-     * 
+     *
      * @param useReflection
      */
     public void setUseReflection(final boolean useReflection) {
@@ -913,7 +906,7 @@ public class WaterNode extends Node {
 
     /**
      * Turn refraction on and off
-     * 
+     *
      * @param useRefraction
      */
     public void setUseRefraction(final boolean useRefraction) {

@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 description = 'Ardor 3D LWJGL3'
 
-project.ext.lwjglVersion = "3.1.6"
+project.ext.lwjglVersion = "3.2.0"
 
 switch ( OperatingSystem.current() ) {
 	case OperatingSystem.WINDOWS:
@@ -16,11 +16,16 @@ switch ( OperatingSystem.current() ) {
 		break
 }
 
+repositories {
+	mavenCentral()
+}
+
 dependencies {
   compile project(':ardor3d-core')
 	compile "org.lwjgl:lwjgl:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+	compile "org.lwjgl:lwjgl-jawt:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-openal:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-stb:$lwjglVersion"

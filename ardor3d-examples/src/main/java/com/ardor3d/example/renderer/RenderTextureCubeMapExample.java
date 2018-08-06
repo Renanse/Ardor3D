@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,11 +14,6 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.ApplyMode;
-import com.ardor3d.image.Texture.CombinerFunctionRGB;
-import com.ardor3d.image.Texture.CombinerOperandRGB;
-import com.ardor3d.image.Texture.CombinerSource;
-import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.MathUtils;
@@ -64,25 +59,25 @@ public class RenderTextureCubeMapExample extends ExampleBase {
                     @Override
                     public Void call() throws Exception {
                         final DisplaySettings settings = new DisplaySettings(256, 256, 24, 0, 0, 24, 0, 0, false, false);
-                        texRend = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, getRenderer(),
+                        texRend = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, getRenderer(),
                                 ContextManager.getCurrentContext().getCapabilities());
 
                         texRend.getCamera().setFrustum(.1, 10, -.1, .1, .1, -.1);
 
                         texture = new TextureCubeMap();
-                        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
-                        texture.setApply(ApplyMode.Combine);
-                        texture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
-                        // color 1
-                        texture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
-                        texture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
-                        // color 2
-                        texture.setCombineSrc1RGB(CombinerSource.Previous);
-                        texture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
-                        // interpolate param will come from alpha of constant color
-                        texture.setCombineSrc2RGB(CombinerSource.Constant);
-                        texture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
-                        texture.setConstantColor(0, 0, 0, .07f);
+                        // texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+                        // texture.setApply(ApplyMode.Combine);
+                        // texture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
+                        // // color 1
+                        // texture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
+                        // texture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
+                        // // color 2
+                        // texture.setCombineSrc1RGB(CombinerSource.Previous);
+                        // texture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
+                        // // interpolate param will come from alpha of constant color
+                        // texture.setCombineSrc2RGB(CombinerSource.Constant);
+                        // texture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
+                        // texture.setConstantColor(0, 0, 0, .07f);
 
                         texRend.setupTexture(texture);
 

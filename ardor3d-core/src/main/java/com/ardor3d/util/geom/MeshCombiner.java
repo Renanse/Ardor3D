@@ -238,9 +238,10 @@ public class MeshCombiner {
 
             texCoordsList = Lists.newArrayListWithCapacity(maxTextures);
             for (int i = 0; i < maxTextures; i++) {
-                texCoordsList.add(new FloatBufferData(totalVertices * texCoords, texCoords));
+                final FloatBufferData uvs = new FloatBufferData(totalVertices * texCoords, texCoords);
+                texCoordsList.add(uvs);
+                data.setTextureCoords(uvs, i);
             }
-            data.setTextureCoords(useTextures ? texCoordsList : null);
         }
 
         public void addSource(final Mesh mesh) {
@@ -286,14 +287,14 @@ public class MeshCombiner {
             }
 
             // check for texcoord usage
-            if (md.getNumberOfUnits() > 0) {
+            if (md.getMaxTextureUnitUsed() >= 0) {
                 if (!useTextures) {
                     useTextures = true;
                     texCoords = md.getTextureCoords(0).getValuesPerTuple();
                 } else if (md.getTextureCoords(0) != null && texCoords != md.getTextureCoords(0).getValuesPerTuple()) {
                     throw new IllegalArgumentException("all MeshData objects with texcoords must use same tuple size.");
                 }
-                maxTextures = Math.max(maxTextures, md.getNumberOfUnits());
+                maxTextures = Math.max(maxTextures, md.getMaxTextureUnitUsed() + 1);
             }
         }
     }

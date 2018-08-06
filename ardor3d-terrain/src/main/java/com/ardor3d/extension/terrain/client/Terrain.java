@@ -46,7 +46,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteSource;
@@ -148,14 +147,6 @@ public class Terrain extends Node implements Pickable, Runnable {
                 _clips.add(clipmap);
                 attachChild(clipmap);
 
-                clipmap.getSceneHints().setDataMode(DataMode.Arrays);
-
-                // clipmap.getSceneHints().setDataMode(DataMode.VBOInterleaved);
-                // final FloatBufferData interleavedData = new FloatBufferData();
-                // interleavedData.setVboAccessMode(VBOAccessMode.DynamicDraw);
-                // clipmap.getMeshData().setInterleavedData(interleavedData);
-
-                // clipmap.getSceneHints().setDataMode(DataMode.VBO);
                 // clipmap.getMeshData().getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
                 // clipmap.getMeshData().getIndices().setVboAccessMode(VBOAccessMode.DynamicDraw);
             }
@@ -469,52 +460,49 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     public void reloadShader() {
         final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
-        if (caps.isGLSLSupported()) {
-            _geometryClipmapShader = new GLSLShaderObjectsState();
-            try {
-                _geometryClipmapShader.setVertexShader(vertexShader.openStream());
-                _geometryClipmapShader.setFragmentShader(pixelShader.openStream());
-            } catch (final IOException ex) {
-                Terrain.logger
-                        .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
-
-            _geometryClipmapShader.setUniform("texture", 0);
-            _geometryClipmapShader.setUniform("clipSideSize", (float) _clipSideSize);
-
-            if (!_textureClipmaps.isEmpty()) {
-                final TextureClipmap textureClipmap = _textureClipmaps.get(0);
-                _geometryClipmapShader.setUniform("scale", 1f / textureClipmap.getScale());
-                _geometryClipmapShader.setUniform("textureSize", (float) textureClipmap.getTextureSize());
-                _geometryClipmapShader.setUniform("texelSize", 1f / textureClipmap.getTextureSize());
-
-                _geometryClipmapShader.setUniform("levels", (float) textureClipmap.getTextureLevels());
-                _geometryClipmapShader.setUniform("validLevels", (float) textureClipmap.getValidLevels() - 1);
-                _geometryClipmapShader.setUniform("minLevel", 0f);
-
-                _geometryClipmapShader.setUniform("showDebug", textureClipmap.isShowDebug() ? 1.0f : 0.0f);
-            }
-
-            _geometryClipmapShader.setShaderDataLogic(new GLSLShaderDataLogic() {
-                public void applyData(final GLSLShaderObjectsState shader, final Mesh mesh, final Renderer renderer) {
-                    if (mesh instanceof ClipmapLevel) {
-                        shader.setUniform("vertexDistance", (float) ((ClipmapLevel) mesh).getVertexDistance());
-                    }
-                }
-            });
-
-            applyToClips();
-
-            for (final TextureClipmap textureClipmap : _textureClipmaps) {
-                textureClipmap.setShaderState(_geometryClipmapShader);
-            }
-
-            if (_normalClipmap != null) {
-                _normalClipmap.setShaderState(_geometryClipmapShader);
-            }
-
-            updateWorldRenderStates(false);
+        _geometryClipmapShader = new GLSLShaderObjectsState();
+        try {
+            _geometryClipmapShader.setVertexShader(vertexShader.openStream());
+            _geometryClipmapShader.setFragmentShader(pixelShader.openStream());
+        } catch (final IOException ex) {
+            Terrain.logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
+
+        _geometryClipmapShader.setUniform("texture", 0);
+        _geometryClipmapShader.setUniform("clipSideSize", (float) _clipSideSize);
+
+        if (!_textureClipmaps.isEmpty()) {
+            final TextureClipmap textureClipmap = _textureClipmaps.get(0);
+            _geometryClipmapShader.setUniform("scale", 1f / textureClipmap.getScale());
+            _geometryClipmapShader.setUniform("textureSize", (float) textureClipmap.getTextureSize());
+            _geometryClipmapShader.setUniform("texelSize", 1f / textureClipmap.getTextureSize());
+
+            _geometryClipmapShader.setUniform("levels", (float) textureClipmap.getTextureLevels());
+            _geometryClipmapShader.setUniform("validLevels", (float) textureClipmap.getValidLevels() - 1);
+            _geometryClipmapShader.setUniform("minLevel", 0f);
+
+            _geometryClipmapShader.setUniform("showDebug", textureClipmap.isShowDebug() ? 1.0f : 0.0f);
+        }
+
+        _geometryClipmapShader.setShaderDataLogic(new GLSLShaderDataLogic() {
+            public void applyData(final GLSLShaderObjectsState shader, final Mesh mesh, final Renderer renderer) {
+                if (mesh instanceof ClipmapLevel) {
+                    shader.setUniform("vertexDistance", (float) ((ClipmapLevel) mesh).getVertexDistance());
+                }
+            }
+        });
+
+        applyToClips();
+
+        for (final TextureClipmap textureClipmap : _textureClipmaps) {
+            textureClipmap.setShaderState(_geometryClipmapShader);
+        }
+
+        if (_normalClipmap != null) {
+            _normalClipmap.setShaderState(_geometryClipmapShader);
+        }
+
+        updateWorldRenderStates(false);
     }
 
     protected void applyToClips() {

@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState;
@@ -45,7 +44,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected IntBuffer _attachBuffer = null;
     protected boolean _usingDepthRB = false;
-    protected final boolean _supportsDepthTexture;
     protected final boolean _supportsMultisample;
     protected boolean _neededClip;
 
@@ -56,32 +54,10 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         _parentRenderer = parentRenderer;
         _samples = Math.min(samples, caps.getMaxFBOSamples());
         _depthBits = depthBits;
-        _supportsDepthTexture = caps.isDepthTextureSupported();
         _supportsMultisample = caps.getMaxFBOSamples() != 0;
 
-        int w = width;
-        int h = height;
-        if (!caps.isNonPowerOfTwoTextureSupported()) {
-            // Check if we have non-power of two sizes. If so, find the smallest power of two size that is greater than
-            // the provided size.
-            if (!MathUtils.isPowerOfTwo(w)) {
-                int newWidth = 2;
-                do {
-                    newWidth <<= 1;
-
-                } while (newWidth < w);
-                w = newWidth;
-            }
-
-            if (!MathUtils.isPowerOfTwo(h)) {
-                int newHeight = 2;
-                do {
-                    newHeight <<= 1;
-
-                } while (newHeight < h);
-                h = newHeight;
-            }
-        }
+        final int w = width;
+        final int h = height;
 
         logger.fine("Creating FBO sized: " + w + " x " + h);
 

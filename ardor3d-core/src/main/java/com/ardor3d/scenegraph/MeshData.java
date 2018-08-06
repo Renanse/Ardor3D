@@ -16,9 +16,12 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
@@ -32,13 +35,19 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 
 /**
  * MeshData contains all the commonly used buffers for rendering a mesh.
  */
 public class MeshData implements Savable {
+
+    public final static String KEY_VertexCoords = "vertex";
+    public final static String KEY_NormalCoords = "normal";
+    public final static String KEY_ColorCoords = "color";
+    public final static String KEY_TangentCoords = "tangent";
+    public final static String KEY_TextureCoordsPrefix = "uv";
 
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
@@ -53,15 +62,7 @@ public class MeshData implements Savable {
     protected transient int[] _primitiveCounts = new int[1];
 
     /** Buffer data holding buffers and number of coordinates per vertex */
-    protected FloatBufferData _vertexCoords;
-    protected FloatBufferData _normalCoords;
-    protected FloatBufferData _colorCoords;
-    protected FloatBufferData _fogCoords;
-    protected FloatBufferData _tangentCoords;
-    protected List<FloatBufferData> _textureCoords = Lists.newArrayListWithCapacity(1);
-
-    /** Interleaved data (for VBO id use). */
-    protected FloatBufferData _interleaved;
+    protected Map<String, AbstractBufferData<? extends Buffer>> _vertexDataItems = Maps.newHashMap();
 
     /** Index data. */
     protected IndexBufferData<?> _indexBuffer;
@@ -80,15 +81,57 @@ public class MeshData implements Savable {
     }
 
     /**
+     * Gets the nio buffer associated with the given key.
+     *
+     * @return the buffer for the associated buffer data
+     */
+    public <T extends Buffer> T getBuffer(final String key) {
+        @SuppressWarnings("unchecked")
+        final AbstractBufferData<T> coords = getCoords(key);
+        if (coords == null) {
+            return null;
+        }
+        return coords.getBuffer();
+    }
+
+    /**
+     * Gets the Ardor3D buffer data object associated with the given key.
+     *
+     * @return the buffer data object
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public <T extends AbstractBufferData> T getCoords(final String key) {
+        return (T) _vertexDataItems.get(key);
+    }
+
+    /**
+     * Sets the Ardor3D buffer data object associated with a given key.
+     *
+     * @param key
+     *            the key to store under. Also used as the varying name in shaders.
+     * @param bufferData
+     *            the new buffer data object
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public <T extends AbstractBufferData> void setCoords(final String key, final T bufferData) {
+        if (bufferData == null) {
+            _vertexDataItems.remove(key);
+        } else {
+            _vertexDataItems.put(key, bufferData);
+        }
+    }
+
+    public Collection<AbstractBufferData<? extends Buffer>> listBufferDataItems() {
+        return Collections.unmodifiableCollection(_vertexDataItems.values());
+    }
+
+    /**
      * Gets the vertex buffer.
      *
      * @return the vertex buffer
      */
     public FloatBuffer getVertexBuffer() {
-        if (_vertexCoords == null) {
-            return null;
-        }
-        return _vertexCoords.getBuffer();
+        return getBuffer(KEY_VertexCoords);
     }
 
     /**
@@ -103,7 +146,6 @@ public class MeshData implements Savable {
         } else {
             setVertexCoords(new FloatBufferData(vertexBuffer, 3));
         }
-        refreshInterleaved();
     }
 
     /**
@@ -112,13 +154,7 @@ public class MeshData implements Savable {
      * @return the vertex coords
      */
     public FloatBufferData getVertexCoords() {
-        return _vertexCoords;
-    }
-
-    private void refreshInterleaved() {
-        if (_interleaved != null) {
-            _interleaved.setNeedsRefresh(true);
-        }
+        return getCoords(KEY_VertexCoords);
     }
 
     /**
@@ -128,9 +164,8 @@ public class MeshData implements Savable {
      *            the new vertex coords
      */
     public void setVertexCoords(final FloatBufferData bufferData) {
-        _vertexCoords = bufferData;
+        setCoords(KEY_VertexCoords, bufferData);
         updateVertexCount();
-        refreshInterleaved();
     }
 
     /**
@@ -139,10 +174,7 @@ public class MeshData implements Savable {
      * @return the normal buffer
      */
     public FloatBuffer getNormalBuffer() {
-        if (_normalCoords == null) {
-            return null;
-        }
-        return _normalCoords.getBuffer();
+        return getBuffer(KEY_NormalCoords);
     }
 
     /**
@@ -153,11 +185,10 @@ public class MeshData implements Savable {
      */
     public void setNormalBuffer(final FloatBuffer normalBuffer) {
         if (normalBuffer == null) {
-            _normalCoords = null;
+            setNormalCoords(null);
         } else {
-            _normalCoords = new FloatBufferData(normalBuffer, 3);
+            setNormalCoords(new FloatBufferData(normalBuffer, 3));
         }
-        refreshInterleaved();
     }
 
     /**
@@ -166,7 +197,7 @@ public class MeshData implements Savable {
      * @return the normal coords
      */
     public FloatBufferData getNormalCoords() {
-        return _normalCoords;
+        return getCoords(KEY_NormalCoords);
     }
 
     /**
@@ -176,8 +207,7 @@ public class MeshData implements Savable {
      *            the new normal coords
      */
     public void setNormalCoords(final FloatBufferData bufferData) {
-        _normalCoords = bufferData;
-        refreshInterleaved();
+        setCoords(KEY_NormalCoords, bufferData);
     }
 
     /**
@@ -186,10 +216,7 @@ public class MeshData implements Savable {
      * @return the color buffer
      */
     public FloatBuffer getColorBuffer() {
-        if (_colorCoords == null) {
-            return null;
-        }
-        return _colorCoords.getBuffer();
+        return getBuffer(KEY_ColorCoords);
     }
 
     /**
@@ -200,11 +227,10 @@ public class MeshData implements Savable {
      */
     public void setColorBuffer(final FloatBuffer colorBuffer) {
         if (colorBuffer == null) {
-            _colorCoords = null;
+            setColorCoords(null);
         } else {
-            _colorCoords = new FloatBufferData(colorBuffer, 4);
+            setColorCoords(new FloatBufferData(colorBuffer, 4));
         }
-        refreshInterleaved();
     }
 
     /**
@@ -213,7 +239,7 @@ public class MeshData implements Savable {
      * @return the color coords
      */
     public FloatBufferData getColorCoords() {
-        return _colorCoords;
+        return getCoords(KEY_ColorCoords);
     }
 
     /**
@@ -223,53 +249,7 @@ public class MeshData implements Savable {
      *            the new color coords
      */
     public void setColorCoords(final FloatBufferData bufferData) {
-        _colorCoords = bufferData;
-        refreshInterleaved();
-    }
-
-    /**
-     * Gets the fog buffer.
-     *
-     * @return the fog buffer
-     */
-    public FloatBuffer getFogBuffer() {
-        if (_fogCoords == null) {
-            return null;
-        }
-        return _fogCoords.getBuffer();
-    }
-
-    /**
-     * Sets the fog buffer.
-     *
-     * @param fogBuffer
-     *            the new fog buffer
-     */
-    public void setFogBuffer(final FloatBuffer fogBuffer) {
-        if (fogBuffer == null) {
-            _fogCoords = null;
-        } else {
-            _fogCoords = new FloatBufferData(fogBuffer, 3);
-        }
-    }
-
-    /**
-     * Gets the fog coords.
-     *
-     * @return the fog coords
-     */
-    public FloatBufferData getFogCoords() {
-        return _fogCoords;
-    }
-
-    /**
-     * Sets the fog coords.
-     *
-     * @param bufferData
-     *            the new fog coords
-     */
-    public void setFogCoords(final FloatBufferData bufferData) {
-        _fogCoords = bufferData;
+        setCoords(KEY_ColorCoords, bufferData);
     }
 
     /**
@@ -278,10 +258,7 @@ public class MeshData implements Savable {
      * @return the tangent buffer
      */
     public FloatBuffer getTangentBuffer() {
-        if (_tangentCoords == null) {
-            return null;
-        }
-        return _tangentCoords.getBuffer();
+        return getBuffer(KEY_TangentCoords);
     }
 
     /**
@@ -292,9 +269,9 @@ public class MeshData implements Savable {
      */
     public void setTangentBuffer(final FloatBuffer tangentBuffer) {
         if (tangentBuffer == null) {
-            _tangentCoords = null;
+            setTangentCoords(null);
         } else {
-            _tangentCoords = new FloatBufferData(tangentBuffer, 3);
+            setTangentCoords(new FloatBufferData(tangentBuffer, 3));
         }
     }
 
@@ -304,7 +281,7 @@ public class MeshData implements Savable {
      * @return the tangent coords
      */
     public FloatBufferData getTangentCoords() {
-        return _tangentCoords;
+        return getCoords(KEY_TangentCoords);
     }
 
     /**
@@ -314,7 +291,7 @@ public class MeshData implements Savable {
      *            the new tangent coords
      */
     public void setTangentCoords(final FloatBufferData bufferData) {
-        _tangentCoords = bufferData;
+        setCoords(KEY_TangentCoords, bufferData);
     }
 
     /**
@@ -326,14 +303,7 @@ public class MeshData implements Savable {
      * @return the texture buffer for the given index, or null if none was set.
      */
     public FloatBuffer getTextureBuffer(final int index) {
-        if (_textureCoords.size() <= index) {
-            return null;
-        }
-        final FloatBufferData textureCoord = _textureCoords.get(index);
-        if (textureCoord == null) {
-            return null;
-        }
-        return textureCoord.getBuffer();
+        return getBuffer(KEY_TextureCoordsPrefix + index);
     }
 
     /**
@@ -347,24 +317,11 @@ public class MeshData implements Savable {
      * @see #setTextureCoords(FloatBufferData, int)
      */
     public void setTextureBuffer(final FloatBuffer textureBuffer, final int index) {
-        if (textureBuffer != null) {
-            while (_textureCoords.size() <= index) {
-                _textureCoords.add(null);
-            }
-            _textureCoords.set(index, new FloatBufferData(textureBuffer, 2));
-        } else if (index < _textureCoords.size()) {
-            _textureCoords.set(index, null);
+        if (textureBuffer == null) {
+            setTextureCoords(null, index);
+        } else {
+            setTangentCoords(new FloatBufferData(textureBuffer, 2));
         }
-        refreshInterleaved();
-    }
-
-    /**
-     * Gets the texture coords.
-     *
-     * @return the texture coords
-     */
-    public List<FloatBufferData> getTextureCoords() {
-        return _textureCoords;
     }
 
     /**
@@ -376,21 +333,7 @@ public class MeshData implements Savable {
      * @return the texture coords
      */
     public FloatBufferData getTextureCoords(final int index) {
-        if (_textureCoords.size() <= index) {
-            return null;
-        }
-        return _textureCoords.get(index);
-    }
-
-    /**
-     * Sets all texture coords on this MeshData.
-     *
-     * @param textureCoords
-     *            the new texture coords
-     */
-    public void setTextureCoords(final List<FloatBufferData> textureCoords) {
-        _textureCoords = textureCoords;
-        refreshInterleaved();
+        return getCoords(KEY_TextureCoordsPrefix + index);
     }
 
     /**
@@ -402,53 +345,30 @@ public class MeshData implements Savable {
      *            the unit index
      */
     public void setTextureCoords(final FloatBufferData textureCoords, final int index) {
-        while (_textureCoords.size() <= index) {
-            _textureCoords.add(null);
+        setCoords(KEY_TextureCoordsPrefix + index, textureCoords);
+    }
+
+    public void clearAllTextureCoords() {
+        final Iterator<Entry<String, AbstractBufferData<? extends Buffer>>> items = _vertexDataItems.entrySet()
+                .iterator();
+
+        while (items.hasNext()) {
+            final Entry<String, AbstractBufferData<? extends Buffer>> entry = items.next();
+            if (entry.getKey().startsWith(KEY_TextureCoordsPrefix)) {
+                items.remove();
+            }
         }
-        _textureCoords.set(index, textureCoords);
-        refreshInterleaved();
-    }
-
-    /**
-     * Retrieves the interleaved buffer, if set or created through packInterleaved.
-     *
-     * @return the interleaved buffer
-     */
-    public FloatBuffer getInterleavedBuffer() {
-        if (_interleaved == null) {
-            return null;
-        }
-        return _interleaved.getBuffer();
-    }
-
-    /**
-     * Gets the interleaved data.
-     *
-     * @return the interleaved data
-     */
-    public FloatBufferData getInterleavedData() {
-        return _interleaved;
-    }
-
-    /**
-     * Sets the interleaved data.
-     *
-     * @param interleavedData
-     *            the interleaved data
-     */
-    public void setInterleavedData(final FloatBufferData interleavedData) {
-        _interleaved = interleavedData;
-        refreshInterleaved();
     }
 
     /**
      * Update the vertex count based on the current limit of the vertex buffer.
      */
     public void updateVertexCount() {
-        if (_vertexCoords == null) {
+        final FloatBufferData vertexCoords = getCoords(KEY_VertexCoords);
+        if (vertexCoords == null) {
             _vertexCount = 0;
         } else {
-            _vertexCount = _vertexCoords.getTupleCount();
+            _vertexCount = vertexCoords.getTupleCount();
         }
         // update primitive count if we are using arrays
         if (_indexBuffer == null) {
@@ -468,38 +388,7 @@ public class MeshData implements Savable {
      *            a multiple to apply when copying
      */
     public void copyTextureCoordinates(final int fromIndex, final int toIndex, final float factor) {
-        if (_textureCoords == null) {
-            return;
-        }
-
-        if (fromIndex < 0 || fromIndex >= _textureCoords.size() || _textureCoords.get(fromIndex) == null) {
-            return;
-        }
-
-        if (toIndex < 0 || toIndex == fromIndex) {
-            return;
-        }
-
-        // make sure we are big enough
-        while (toIndex >= _textureCoords.size()) {
-            _textureCoords.add(null);
-        }
-
-        FloatBufferData dest = _textureCoords.get(toIndex);
-        final FloatBufferData src = _textureCoords.get(fromIndex);
-        if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
-            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()),
-                    src.getValuesPerTuple());
-            _textureCoords.set(toIndex, dest);
-        }
-        dest.getBuffer().clear();
-        final int oldLimit = src.getBuffer().limit();
-        src.getBuffer().clear();
-        for (int i = 0, len = dest.getBuffer().capacity(); i < len; i++) {
-            dest.getBuffer().put(factor * src.getBuffer().get());
-        }
-        src.getBuffer().limit(oldLimit);
-        dest.getBuffer().limit(oldLimit);
+        copyTextureCoordinates(fromIndex, toIndex, factor, factor);
     }
 
     /**
@@ -516,29 +405,17 @@ public class MeshData implements Savable {
      *            a multiple to apply to the T channel when copying
      */
     public void copyTextureCoordinates(final int fromIndex, final int toIndex, final float factorS, final float factorT) {
-        if (_textureCoords == null) {
+        final FloatBufferData src = getCoords(KEY_TextureCoordsPrefix + fromIndex);
+        if (src == null) {
             return;
         }
 
-        if (fromIndex < 0 || fromIndex >= _textureCoords.size() || _textureCoords.get(fromIndex) == null) {
-            return;
-        }
+        FloatBufferData dest = getCoords(KEY_TextureCoordsPrefix + toIndex);
 
-        if (toIndex < 0 || toIndex == fromIndex) {
-            return;
-        }
-
-        // make sure we are big enough
-        while (toIndex >= _textureCoords.size()) {
-            _textureCoords.add(null);
-        }
-
-        FloatBufferData dest = _textureCoords.get(toIndex);
-        final FloatBufferData src = _textureCoords.get(fromIndex);
         if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
             dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()),
                     src.getValuesPerTuple());
-            _textureCoords.set(toIndex, dest);
+            setCoords(KEY_TextureCoordsPrefix + toIndex, dest);
         }
         dest.getBuffer().clear();
         final int oldLimit = src.getBuffer().limit();
@@ -555,15 +432,22 @@ public class MeshData implements Savable {
     }
 
     /**
-     * <code>getNumberOfUnits</code> returns the number of texture units this geometry is currently using.
+     * <code>getMaxTextureUnitUsed</code> returns the max texture unit this mesh data is currently using.
      *
-     * @return the number of texture units in use.
+     * @return the max unit in use, or -1 if none found.
      */
-    public int getNumberOfUnits() {
-        if (_textureCoords == null) {
-            return 0;
+    public int getMaxTextureUnitUsed() {
+        int max = -1;
+        for (final String key : _vertexDataItems.keySet()) {
+            if (key.startsWith(KEY_TextureCoordsPrefix)) {
+                final int unit = Integer.parseInt(key.substring(KEY_TextureCoordsPrefix.length()));
+                if (unit > max) {
+                    max = unit;
+                }
+            }
         }
-        return _textureCoords.size();
+
+        return max;
     }
 
     /**
@@ -591,7 +475,6 @@ public class MeshData implements Savable {
             _indexBuffer = new IntBufferData(indices);
         }
         updatePrimitiveCounts();
-        refreshInterleaved();
     }
 
     /**
@@ -607,7 +490,6 @@ public class MeshData implements Savable {
             _indexBuffer = new ShortBufferData(indices);
         }
         updatePrimitiveCounts();
-        refreshInterleaved();
     }
 
     /**
@@ -623,7 +505,6 @@ public class MeshData implements Savable {
             _indexBuffer = new ByteBufferData(indices);
         }
         updatePrimitiveCounts();
-        refreshInterleaved();
     }
 
     /**
@@ -644,18 +525,6 @@ public class MeshData implements Savable {
     public void setIndices(final IndexBufferData<?> bufferData) {
         _indexBuffer = bufferData;
         updatePrimitiveCounts();
-        refreshInterleaved();
-    }
-
-    /**
-     * Gets the index mode.
-     *
-     * @return the IndexMode of the first section of this MeshData.
-     * @deprecated Please switch to {@link #getIndexMode(int)}
-     */
-    @Deprecated
-    public IndexMode getIndexMode() {
-        return getIndexMode(0);
     }
 
     /**
@@ -667,7 +536,6 @@ public class MeshData implements Savable {
     public void setIndexMode(final IndexMode indexMode) {
         _indexModes[0] = indexMode;
         updatePrimitiveCounts();
-        refreshInterleaved();
     }
 
     /**
@@ -688,7 +556,6 @@ public class MeshData implements Savable {
     public void setIndexLengths(final int[] indexLengths) {
         _indexLengths = indexLengths;
         updatePrimitiveCounts();
-        refreshInterleaved();
     }
 
     /**
@@ -724,7 +591,6 @@ public class MeshData implements Savable {
     public void setIndexModes(final IndexMode[] indexModes) {
         _indexModes = indexModes;
         updatePrimitiveCounts();
-        refreshInterleaved();
     }
 
     /**
@@ -841,7 +707,7 @@ public class MeshData implements Savable {
             } else {
                 // non-indexed geometry
                 BufferUtils
-                .populateFromBuffer(result[i], getVertexBuffer(), getVertexIndex(primitiveIndex, i, section));
+                        .populateFromBuffer(result[i], getVertexBuffer(), getVertexIndex(primitiveIndex, i, section));
             }
         }
 
@@ -958,7 +824,8 @@ public class MeshData implements Savable {
      * @return a random vertex from the vertices stored in this MeshData. null is returned if there are no vertices.
      */
     public Vector3 randomVertex(final Vector3 store) {
-        if (_vertexCoords == null) {
+        final FloatBufferData vertexCoords = getVertexCoords();
+        if (vertexCoords == null) {
             return null;
         }
 
@@ -968,7 +835,7 @@ public class MeshData implements Savable {
         }
 
         final int i = MathUtils.nextRandomInt(0, getVertexCount() - 1);
-        BufferUtils.populateFromBuffer(result, _vertexCoords.getBuffer(), i);
+        BufferUtils.populateFromBuffer(result, vertexCoords.getBuffer(), i);
 
         return result;
     }
@@ -983,7 +850,8 @@ public class MeshData implements Savable {
      *         vertices or indices.
      */
     public Vector3 randomPointOnPrimitives(final Vector3 store) {
-        if (_vertexCoords == null || _indexBuffer == null) {
+        final FloatBufferData vertexCoords = getVertexCoords();
+        if (vertexCoords == null || _indexBuffer == null) {
             return null;
         }
 
@@ -1092,29 +960,32 @@ public class MeshData implements Savable {
      *            the amount
      */
     public void translatePoints(final Vector3 amount) {
+        final FloatBuffer vertexBuffer = getBuffer(KEY_VertexCoords);
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.addInBuffer(amount, _vertexCoords.getBuffer(), x);
+            BufferUtils.addInBuffer(amount, vertexBuffer, x);
         }
     }
 
     public void transformVertices(final Transform transform) {
+        final FloatBuffer vertexBuffer = getBuffer(KEY_VertexCoords);
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.populateFromBuffer(store, _vertexCoords.getBuffer(), x);
+            BufferUtils.populateFromBuffer(store, vertexBuffer, x);
             transform.applyForward(store, store);
-            BufferUtils.setInBuffer(store, _vertexCoords.getBuffer(), x);
+            BufferUtils.setInBuffer(store, vertexBuffer, x);
         }
     }
 
     public void transformNormals(final Transform transform, final boolean normalize) {
+        final FloatBuffer normalBuffer = getBuffer(KEY_VertexCoords);
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.populateFromBuffer(store, _normalCoords.getBuffer(), x);
+            BufferUtils.populateFromBuffer(store, normalBuffer, x);
             transform.applyForwardVector(store, store);
             if (normalize) {
                 store.normalizeLocal();
             }
-            BufferUtils.setInBuffer(store, _normalCoords.getBuffer(), x);
+            BufferUtils.setInBuffer(store, normalBuffer, x);
         }
     }
 
@@ -1125,11 +996,12 @@ public class MeshData implements Savable {
      *            the rotate
      */
     public void rotatePoints(final Quaternion rotate) {
+        final FloatBuffer vertexBuffer = getBuffer(KEY_VertexCoords);
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.populateFromBuffer(store, _vertexCoords.getBuffer(), x);
+            BufferUtils.populateFromBuffer(store, vertexBuffer, x);
             rotate.apply(store, store);
-            BufferUtils.setInBuffer(store, _vertexCoords.getBuffer(), x);
+            BufferUtils.setInBuffer(store, vertexBuffer, x);
         }
     }
 
@@ -1140,11 +1012,12 @@ public class MeshData implements Savable {
      *            the rotate
      */
     public void rotateNormals(final Quaternion rotate) {
+        final FloatBuffer normalBuffer = getBuffer(KEY_NormalCoords);
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.populateFromBuffer(store, _normalCoords.getBuffer(), x);
+            BufferUtils.populateFromBuffer(store, normalBuffer, x);
             rotate.apply(store, store);
-            BufferUtils.setInBuffer(store, _normalCoords.getBuffer(), x);
+            BufferUtils.setInBuffer(store, normalBuffer, x);
         }
     }
 
@@ -1206,28 +1079,8 @@ public class MeshData implements Savable {
         data._primitiveCounts = new int[_primitiveCounts.length];
         System.arraycopy(_primitiveCounts, 0, data._primitiveCounts, 0, _primitiveCounts.length);
 
-        if (_vertexCoords != null) {
-            data._vertexCoords = _vertexCoords.makeCopy();
-        }
-        if (_normalCoords != null) {
-            data._normalCoords = _normalCoords.makeCopy();
-        }
-        if (_colorCoords != null) {
-            data._colorCoords = _colorCoords.makeCopy();
-        }
-        if (_fogCoords != null) {
-            data._fogCoords = _fogCoords.makeCopy();
-        }
-        if (_tangentCoords != null) {
-            data._tangentCoords = _tangentCoords.makeCopy();
-        }
-
-        for (final FloatBufferData tCoord : _textureCoords) {
-            if (tCoord != null) {
-                data._textureCoords.add(tCoord.makeCopy());
-            } else {
-                data._textureCoords.add(null);
-            }
+        for (final Entry<String, AbstractBufferData<? extends Buffer>> entry : _vertexDataItems.entrySet()) {
+            data.setCoords(entry.getKey(), entry.getValue().makeCopy());
         }
 
         if (_indexBuffer != null) {
@@ -1256,14 +1109,9 @@ public class MeshData implements Savable {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_vertexCount, "vertexCount", 0);
-        capsule.write(_vertexCoords, "vertexBuffer", null);
-        capsule.write(_normalCoords, "normalBuffer", null);
-        capsule.write(_colorCoords, "colorBuffer", null);
-        capsule.write(_fogCoords, "fogBuffer", null);
-        capsule.write(_tangentCoords, "tangentBuffer", null);
-        capsule.writeSavableList(_textureCoords, "textureCoords", new ArrayList<FloatBufferData>(1));
-        capsule.write((Savable) _indexBuffer, "indexBuffer", null);
-        capsule.write(_interleaved, "interleaved", null);
+        capsule.writeStringSavableMap(_vertexDataItems, "vertexDataItems",
+                new HashMap<String, AbstractBufferData<? extends Buffer>>());
+        capsule.write(_indexBuffer, "indexBuffer", null);
         capsule.write(_indexLengths, "indexLengths", null);
         capsule.write(_indexModes, "indexModes");
     }
@@ -1271,14 +1119,9 @@ public class MeshData implements Savable {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         _vertexCount = capsule.readInt("vertexCount", 0);
-        _vertexCoords = (FloatBufferData) capsule.readSavable("vertexBuffer", null);
-        _normalCoords = (FloatBufferData) capsule.readSavable("normalBuffer", null);
-        _colorCoords = (FloatBufferData) capsule.readSavable("colorBuffer", null);
-        _fogCoords = (FloatBufferData) capsule.readSavable("fogBuffer", null);
-        _tangentCoords = (FloatBufferData) capsule.readSavable("tangentBuffer", null);
-        _textureCoords = capsule.readSavableList("textureCoords", new ArrayList<FloatBufferData>(1));
+        _vertexDataItems = capsule.readStringSavableMap("vertexDataItems",
+                new HashMap<String, AbstractBufferData<? extends Buffer>>());
         _indexBuffer = (IndexBufferData<?>) capsule.readSavable("indexBuffer", null);
-        _interleaved = (FloatBufferData) capsule.readSavable("interleaved", null);
         _indexLengths = capsule.readIntArray("indexLengths", null);
         _indexModes = capsule.readEnumArray("indexModes", IndexMode.class, new IndexMode[] { IndexMode.Triangles });
 

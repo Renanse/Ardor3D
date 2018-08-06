@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -29,7 +29,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.StripBox;
 import com.ardor3d.ui.text.BasicText;
@@ -53,7 +52,6 @@ public class CombinerExample extends ExampleBase {
     private final int edge = 50;
 
     private boolean showMerged = true;
-    private boolean useVBO = false;
 
     public static void main(final String[] args) {
         // turn on stats so we can use them to calc tris/sec
@@ -83,13 +81,6 @@ public class CombinerExample extends ExampleBase {
         final Mesh merged = MeshCombiner.combine(origNode);
         // attach to scene.. default will be to show the merged version first
         scene.attachChild(merged);
-
-        // Use VBO, if indicated. This improves the rendering speed of the merged mesh.
-        // Note that sometimes it is not efficient/possible to turn on VBO for tons of small meshes, but works well for
-        // a single larger combined mesh.
-        if (useVBO) {
-            merged.getSceneHints().setDataMode(DataMode.VBO);
-        }
 
         // and a texture, this will cover both the uncombined and combined meshes.
         final TextureState ts = new TextureState();
@@ -121,20 +112,6 @@ public class CombinerExample extends ExampleBase {
             }
         }));
 
-        // Add a trigger on the V key to toggle VBO use (only on merged mesh)
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.V), new TriggerAction() {
-            @Override
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                useVBO = !useVBO;
-                if (useVBO) {
-                    merged.getSceneHints().setDataMode(DataMode.VBO);
-                } else {
-                    merged.getSceneHints().setDataMode(DataMode.Arrays);
-                }
-                updateMergedLabel();
-            }
-        }));
-
         // make some text labels...
         for (int i = 0; i < text.length; i++) {
             text[i] = BasicText.createDefaultTextLabel("Text" + i, "", 16);
@@ -154,11 +131,7 @@ public class CombinerExample extends ExampleBase {
 
     private void updateMergedLabel() {
         if (showMerged) {
-            if (useVBO) {
-                text[2].setText("Showing a single, merged Mesh using VBO.  [M] to un-merge.  [V] to disable VBO");
-            } else {
-                text[2].setText("Showing a single, merged Mesh.  [M] to un-merge.  [V] to enable VBO");
-            }
+            text[2].setText("Showing a single, merged Mesh.  [M] to un-merge.  [V] to enable VBO");
         } else {
             text[2].setText("Showing " + (edge * edge) + " individual Meshes.  [M] to merge.");
         }

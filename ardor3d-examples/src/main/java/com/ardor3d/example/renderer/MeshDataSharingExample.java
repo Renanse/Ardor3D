@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -25,7 +25,6 @@ import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -63,7 +62,6 @@ public class MeshDataSharingExample extends ExampleBase {
 
         final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
         sphere.setModelBound(new BoundingBox());
-        sphere.getSceneHints().setDataMode(DataMode.VBO);
 
         final CullState cs = new CullState();
         cs.setCullFace(CullState.Face.Back);

@@ -60,7 +60,6 @@ import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -178,7 +177,7 @@ public class AnimationStateExample extends ExampleBase {
 
         punchButton = new UIButton("PUNCH!");
         punchButton
-        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
         punchButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 manager.findAnimationLayer("punch").setCurrentState("punch_right", true);
@@ -205,7 +204,7 @@ public class AnimationStateExample extends ExampleBase {
 
         stopButton = new UIButton("Stop");
         stopButton
-        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, playPauseButton, Alignment.BOTTOM_LEFT, 0, -5));
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 manager.stop();
@@ -216,7 +215,7 @@ public class AnimationStateExample extends ExampleBase {
 
         final UICheckBox resetAnimCheck = new UICheckBox("Reset Animation On Stop");
         resetAnimCheck
-        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, stopButton, Alignment.BOTTOM_LEFT, 0, -5));
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, stopButton, Alignment.BOTTOM_LEFT, 0, -5));
         resetAnimCheck.setSelected(false);
         resetAnimCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -252,20 +251,10 @@ public class AnimationStateExample extends ExampleBase {
         });
         basePanel.add(gpuSkinningCheck);
 
-        final UICheckBox vboCheck = new UICheckBox("Use VBO");
-        vboCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
-        vboCheck.setSelected(false);
-        vboCheck.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                skNode.getSceneHints().setDataMode(vboCheck.isSelected() ? DataMode.VBO : DataMode.Arrays);
-                gpuShader.setUseAttributeVBO(vboCheck.isSelected());
-            }
-        });
-        basePanel.add(vboCheck);
-
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
-        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, vboCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT,
+                0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
 

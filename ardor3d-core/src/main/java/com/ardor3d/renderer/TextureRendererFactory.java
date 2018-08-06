@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -23,10 +23,8 @@ public enum TextureRendererFactory {
     }
 
     /**
-     * Create a TextureRenderer of the given width and height. All other params are considered undefined. We will
-     * attempt to make an FBO based renderer if supported, or a Pbuffer based renderer if supported, or null if neither
-     * are supported.
-     * 
+     * Create a TextureRenderer of the given width and height.
+     *
      * @param width
      *            the width of our off screen rendering target
      * @param height
@@ -48,10 +46,8 @@ public enum TextureRendererFactory {
     }
 
     /**
-     * Create a TextureRenderer using params that are meaningful regardless of whether a Pbuffer or FBO renderer are
-     * used. We will attempt to make an FBO based renderer if supported, or a Pbuffer based renderer if supported, or
-     * null if neither are supported.
-     * 
+     * Create a TextureRenderer
+     *
      * @param width
      *            the width of our off screen rendering target
      * @param height
@@ -77,14 +73,10 @@ public enum TextureRendererFactory {
     }
 
     /**
-     * Create a TextureRenderer using as many of the given DisplaySettings that are meaningful for the chosen type.
-     * Unless forcePbuffer is true, we will attempt to make an FBO based renderer if supported, or a Pbuffer based
-     * renderer if supported, or null if neither are supported.
-     * 
+     * Create a TextureRenderer using as many of the given DisplaySettings that are meaningful.
+     *
      * @param settings
-     *            a complete set of possible display settings to use. Some will only be valid if Pbuffer is used.
-     * @param forcePbuffer
-     *            if true, we will return a pbuffer or null if pbuffers are not supported.
+     *            a complete set of possible display settings to use.
      * @param renderer
      *            the renderer to use when rendering to this off screen target.
      * @param caps
@@ -93,11 +85,11 @@ public enum TextureRendererFactory {
      * @throws IllegalStateException
      *             if provider has not been set prior to calling this method.
      */
-    public TextureRenderer createTextureRenderer(final DisplaySettings settings, final boolean forcePbuffer,
-            final Renderer renderer, final ContextCapabilities caps) {
+    public TextureRenderer createTextureRenderer(final DisplaySettings settings, final Renderer renderer,
+            final ContextCapabilities caps) {
         if (_provider == null) {
             throw new IllegalStateException("No provider has been set on TextureRendererFactory.");
         }
-        return _provider.createTextureRenderer(settings, forcePbuffer, renderer, caps);
+        return _provider.createTextureRenderer(settings, renderer, caps);
     }
 }

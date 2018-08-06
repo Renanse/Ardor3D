@@ -11,16 +11,11 @@ public class CacheFunctionUtil {
             final TextureStoreFormat format, final int tileSize, final int dataSize) {
         if (function == null) {
             switch (format) {
-                case Luminance8:
-                    Luminance8ToRGBFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize,
-                            tileSize);
+                case R8:
+                    R8ToRGBFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize, tileSize);
                     return;
-                case Luminance8Alpha8:
-                    Luminance8Alpha8ToRGBAFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize, tileSize);
-                    return;
-                case Luminance12:
-                    Luminance12ToRGBFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize,
-                            tileSize);
+                case RG8:
+                    RG8ToRGBAFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize, tileSize);
                     return;
                 case RGB8:
                     if (!targetAlpha) {

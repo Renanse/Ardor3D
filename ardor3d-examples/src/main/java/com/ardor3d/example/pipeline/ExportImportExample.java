@@ -86,7 +86,7 @@ public class ExportImportExample extends ExampleBase {
         final Texture t0 = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 true);
         final Texture t1 = TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear, true);
-        t1.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
+        // t1.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
         ts.setTexture(t0, 0);
         ts.setTexture(t1, 1);
         ts.setEnabled(true);

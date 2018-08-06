@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,10 +11,10 @@
 package com.ardor3d.extension.effect;
 
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.effect.EffectManager;
 import com.ardor3d.renderer.effect.EffectStep_RenderScreenOverlay;
 import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
@@ -131,7 +131,7 @@ public class HDREffect extends RenderEffect {
 
         final RenderTarget_Texture2D downsampled = new RenderTarget_Texture2D(downsampledWidth, downsampledHeight,
                 TextureStoreFormat.RGBA16F);
-        downsampled.getTexture().setWrap(WrapMode.Clamp);
+        downsampled.getTexture().setWrap(WrapMode.EdgeClamp);
         manager.getRenderTargetMap().put(RT_DOWNSAMPLED, downsampled);
 
         manager.getRenderTargetMap().put(RT_LUM64x64, getLuminanceDownsampleTexture(64));
@@ -140,17 +140,17 @@ public class HDREffect extends RenderEffect {
 
         final RenderTarget_Texture2D brightmap = new RenderTarget_Texture2D(downsampledWidth, downsampledHeight,
                 TextureStoreFormat.RGBA16F);
-        brightmap.getTexture().setWrap(WrapMode.Clamp);
+        brightmap.getTexture().setWrap(WrapMode.EdgeClamp);
         manager.getRenderTargetMap().put(RT_BRIGHTMAP, brightmap);
 
         final RenderTarget_Texture2D bloomHoriz = new RenderTarget_Texture2D(downsampledWidth, downsampledHeight,
                 TextureStoreFormat.RGBA8);
-        bloomHoriz.getTexture().setWrap(WrapMode.Clamp);
+        bloomHoriz.getTexture().setWrap(WrapMode.EdgeClamp);
         manager.getRenderTargetMap().put(RT_BLOOM_HORIZONTAL, bloomHoriz);
 
         final RenderTarget_Texture2D bloom = new RenderTarget_Texture2D(downsampledWidth, downsampledHeight,
                 TextureStoreFormat.RGBA8);
-        bloom.getTexture().setWrap(WrapMode.Clamp);
+        bloom.getTexture().setWrap(WrapMode.EdgeClamp);
         manager.getRenderTargetMap().put(RT_BLOOM, bloom);
     }
 
@@ -164,7 +164,7 @@ public class HDREffect extends RenderEffect {
             target.getTexture().setMagnificationFilter(MagnificationFilter.NearestNeighbor);
         }
 
-        target.getTexture().setWrap(WrapMode.Clamp);
+        target.getTexture().setWrap(WrapMode.EdgeClamp);
         return target;
     }
 

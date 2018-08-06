@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -42,7 +42,6 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -185,7 +184,6 @@ public class AnimationDemoExample extends ExampleBase {
             cullState.setCullFace(Face.Back);
             skeleton.setRenderState(cullState);
 
-            skeleton.getSceneHints().setDataMode(DataMode.VBO);
             gpuShader.setUseAttributeVBO(true);
             skeleton.setGPUShader(gpuShader);
             skeleton.setUseGPU(true);

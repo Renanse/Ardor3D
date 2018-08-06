@@ -10,8 +10,6 @@
 
 package com.ardor3d.framework.lwjgl3;
 
-import static org.lwjgl.opengl.GL11.GL_TRUE;
-
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -21,6 +19,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWWindowFocusCallbackI;
+import org.lwjgl.opengl.GL11C;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -102,7 +101,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
         try {
             GLFW.glfwDefaultWindowHints();
-            GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GL_TRUE);
+            GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GL11C.GL_TRUE);
             GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 4);
             GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 1);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -35,9 +35,9 @@ public abstract class JoglStencilStateUtil {
         final StencilStateRecord record = (StencilStateRecord) context.getStateRecord(StateType.Stencil);
         context.setCurrentState(StateType.Stencil, state);
 
-        setEnabled(state.isEnabled(), caps.isTwoSidedStencilSupported() ? state.isUseTwoSided() : false, record, caps);
+        setEnabled(state.isEnabled(), state.isUseTwoSided(), record, caps);
         if (state.isEnabled()) {
-            if (state.isUseTwoSided() && caps.isTwoSidedStencilSupported()) {
+            if (state.isUseTwoSided()) {
                 gl.getGL2().glActiveStencilFaceEXT(GL.GL_BACK);
                 applyMask(state.getStencilWriteMaskBack(), record, 2);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionBack()), state.getStencilReferenceBack(),
@@ -95,17 +95,11 @@ public abstract class JoglStencilStateUtil {
             case Keep:
                 return GL.GL_KEEP;
             case DecrementWrap:
-                if (caps.isStencilWrapSupported()) {
-                    return GL.GL_DECR_WRAP;
-                }
-                // FALLS THROUGH
+                return GL.GL_DECR_WRAP;
             case Decrement:
                 return GL.GL_DECR;
             case IncrementWrap:
-                if (caps.isStencilWrapSupported()) {
-                    return GL.GL_INCR_WRAP;
-                }
-                // FALLS THROUGH
+                return GL.GL_INCR_WRAP;
             case Increment:
                 return GL.GL_INCR;
             case Invert:
@@ -144,19 +138,17 @@ public abstract class JoglStencilStateUtil {
             final ContextCapabilities caps) {
         final GL gl = GLContext.getCurrentGL();
 
-        if (caps.isTwoSidedStencilSupported()) {
-            if (record.isValid()) {
-                if (enable && !record.useTwoSided) {
-                    gl.glEnable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
-                } else if (!enable && record.useTwoSided) {
-                    gl.glDisable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
-                }
+        if (record.isValid()) {
+            if (enable && !record.useTwoSided) {
+                gl.glEnable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
+            } else if (!enable && record.useTwoSided) {
+                gl.glDisable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
+            }
+        } else {
+            if (enable) {
+                gl.glEnable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
             } else {
-                if (enable) {
-                    gl.glEnable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
-                } else {
-                    gl.glDisable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
-                }
+                gl.glDisable(GL2.GL_STENCIL_TEST_TWO_SIDE_EXT);
             }
         }
         record.useTwoSided = enable;

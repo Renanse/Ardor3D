@@ -406,8 +406,6 @@ public interface Renderer {
 
     void setupColorData(FloatBufferData colorCoords);
 
-    void setupFogData(FloatBufferData fogCoords);
-
     void setupTextureData(List<FloatBufferData> textureCoords);
 
     void drawElements(IndexBufferData<?> indices, int[] indexLengths, IndexMode[] indexModes, int primcount);
@@ -426,8 +424,6 @@ public interface Renderer {
     void setupNormalDataVBO(FloatBufferData normalCoords);
 
     void setupColorDataVBO(FloatBufferData colorCoords);
-
-    void setupFogDataVBO(FloatBufferData fogCoords);
 
     void setupTextureDataVBO(List<FloatBufferData> textureCoords);
 

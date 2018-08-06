@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -75,55 +75,53 @@ public final class JoglFragmentProgramStateUtil {
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 
-        if (caps.isFragmentProgramSupported()) {
-            final FragmentProgramStateRecord record = (FragmentProgramStateRecord) context
-                    .getStateRecord(StateType.FragmentProgram);
-            context.setCurrentState(StateType.FragmentProgram, state);
+        final FragmentProgramStateRecord record = (FragmentProgramStateRecord) context
+                .getStateRecord(StateType.FragmentProgram);
+        context.setCurrentState(StateType.FragmentProgram, state);
 
-            if (!record.isValid() || record.getReference() != state) {
-                record.setReference(state);
-                if (state.isEnabled()) {
-                    // Fragment program not yet loaded
-                    if (state._getProgramID() == -1) {
-                        if (state.getProgramAsBuffer() != null) {
-                            final int id = create(state.getProgramAsBuffer());
-                            state._setProgramID(id);
-                        } else {
-                            return;
-                        }
+        if (!record.isValid() || record.getReference() != state) {
+            record.setReference(state);
+            if (state.isEnabled()) {
+                // Fragment program not yet loaded
+                if (state._getProgramID() == -1) {
+                    if (state.getProgramAsBuffer() != null) {
+                        final int id = create(state.getProgramAsBuffer());
+                        state._setProgramID(id);
+                    } else {
+                        return;
                     }
-
-                    gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
-                    gl.getGL2().glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, state._getProgramID());
-
-                    // load environmental parameters...
-                    // TODO: Reevaluate how this is done.
-                    /*
-                     * for (int i = 0; i < envparameters.length; i++) if (envparameters[i] != null)
-                     * gl.glProgramEnvParameter4fARB( GL.GL_FRAGMENT_PROGRAM_ARB, i, envparameters[i][0],
-                     * envparameters[i][1], envparameters[i][2], envparameters[i][3]);
-                     */
-
-                    // load local parameters...
-                    if (state.isUsingParameters()) {
-                        // no parameters are used
-                        for (int i = 0; i < state._getParameters().length; i++) {
-                            if (state._getParameters()[i] != null) {
-                                gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_FRAGMENT_PROGRAM_ARB, i,
-                                        state._getParameters()[i][0], state._getParameters()[i][1],
-                                        state._getParameters()[i][2], state._getParameters()[i][3]);
-                            }
-                        }
-                    }
-
-                } else {
-                    gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
                 }
-            }
 
-            if (!record.isValid()) {
-                record.validate();
+                gl.glEnable(GL2.GL_FRAGMENT_PROGRAM_ARB);
+                gl.getGL2().glBindProgramARB(GL2.GL_FRAGMENT_PROGRAM_ARB, state._getProgramID());
+
+                // load environmental parameters...
+                // TODO: Reevaluate how this is done.
+                /*
+                 * for (int i = 0; i < envparameters.length; i++) if (envparameters[i] != null)
+                 * gl.glProgramEnvParameter4fARB( GL.GL_FRAGMENT_PROGRAM_ARB, i, envparameters[i][0],
+                 * envparameters[i][1], envparameters[i][2], envparameters[i][3]);
+                 */
+
+                // load local parameters...
+                if (state.isUsingParameters()) {
+                    // no parameters are used
+                    for (int i = 0; i < state._getParameters().length; i++) {
+                        if (state._getParameters()[i] != null) {
+                            gl.getGL2().glProgramLocalParameter4fARB(GL2.GL_FRAGMENT_PROGRAM_ARB, i,
+                                    state._getParameters()[i][0], state._getParameters()[i][1],
+                                    state._getParameters()[i][2], state._getParameters()[i][3]);
+                        }
+                    }
+                }
+
+            } else {
+                gl.glDisable(GL2.GL_FRAGMENT_PROGRAM_ARB);
             }
+        }
+
+        if (!record.isValid()) {
+            record.validate();
         }
     }
 }

@@ -49,26 +49,8 @@ public class TextureState extends RenderState {
     protected static Texture _defaultTexture = null;
     protected static boolean defaultTextureLoaded = false;
 
-    public enum CorrectionType {
-        /**
-         * Correction modifier makes no color corrections, and is the fastest.
-         */
-        Affine,
-
-        /**
-         * Correction modifier makes color corrections based on perspective and is slower than CM_AFFINE. (Default)
-         */
-        Perspective;
-    }
-
     /** The texture(s). */
     protected List<Texture> _texture = new ArrayList<Texture>(1);
-
-    /**
-     * Perspective correction to use for the object rendered with this texture state. Default is
-     * CorrectionType.Perspective.
-     */
-    private CorrectionType _correctionType = CorrectionType.Perspective;
 
     public transient TextureKey[] _keyCache = new TextureKey[MAX_TEXTURES];
 
@@ -198,31 +180,6 @@ public class TextureState extends RenderState {
     }
 
     /**
-     * <code>setCorrectionType</code> sets the image correction type for this texture state.
-     *
-     * @param type
-     *            the correction type for this texture.
-     * @throws IllegalArgumentException
-     *             if type is null
-     */
-    public void setCorrectionType(final CorrectionType type) {
-        if (type == null) {
-            throw new IllegalArgumentException("type can not be null.");
-        }
-        _correctionType = type;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * <code>getCorrectionType</code> returns the correction mode for the texture state.
-     *
-     * @return the correction type for the texture state.
-     */
-    public CorrectionType getCorrectionType() {
-        return _correctionType;
-    }
-
-    /**
      * Returns the number of textures this texture manager is maintaining.
      *
      * @return the number of textures.
@@ -272,7 +229,6 @@ public class TextureState extends RenderState {
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.writeSavableList(_texture, "texture", new ArrayList<Texture>(1));
-        capsule.write(_correctionType, "correctionType", CorrectionType.Perspective);
 
     }
 
@@ -280,7 +236,6 @@ public class TextureState extends RenderState {
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         _texture = capsule.readSavableList("texture", new ArrayList<Texture>(1));
-        _correctionType = capsule.readEnum("correctionType", CorrectionType.class, CorrectionType.Perspective);
     }
 
     public static Image getDefaultTextureImage() {

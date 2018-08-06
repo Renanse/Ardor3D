@@ -104,11 +104,17 @@ public final class GeometryTool {
             }
 
             // see if we have uv coords
-            final Vector2[][] tex = new Vector2[mesh.getMeshData().getNumberOfUnits()][];
-            for (int x = 0; x < tex.length; x++) {
-                if (mesh.getMeshData().getTextureCoords(x) != null) {
-                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x), Vector2.ZERO);
+            final int maxUVUnit = mesh.getMeshData().getMaxTextureUnitUsed();
+            final Vector2[][] tex;
+            if (maxUVUnit >= 0) {
+                tex = new Vector2[maxUVUnit + 1][];
+                for (int x = 0; x < tex.length; x++) {
+                    if (mesh.getMeshData().getTextureCoords(x) != null) {
+                        tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x), Vector2.ZERO);
+                    }
                 }
+            } else {
+                tex = new Vector2[0][];
             }
 
             final Map<VertKey, Integer> store = Maps.newHashMap();

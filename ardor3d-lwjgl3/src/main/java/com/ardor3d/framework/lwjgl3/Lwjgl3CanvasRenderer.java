@@ -10,9 +10,9 @@
 
 package com.ardor3d.framework.lwjgl3;
 
-import org.lwjgl.opengl.ARBMultisample;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL13C;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.CanvasRenderer;
@@ -81,8 +81,8 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
 
         _renderer = createRenderer();
 
-        if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
-            GL11.glEnable(ARBMultisample.GL_MULTISAMPLE_ARB);
+        if (settings.getSamples() != 0) {
+            GL11C.glEnable(GL13C.GL_MULTISAMPLE);
         }
 
         _renderer.setBackgroundColor(ColorRGBA.BLACK);

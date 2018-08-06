@@ -33,15 +33,13 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.lwjgl.LWJGLException;
 
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.framework.lwjgl.LwjglCanvasCallback;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
@@ -68,9 +66,9 @@ import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
@@ -80,8 +78,8 @@ import com.google.common.base.Predicates;
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglSwtExample", //
-        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
-        maxHeapMemory = 64)
+thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
+maxHeapMemory = 64)
 public class LwjglSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -93,12 +91,6 @@ public class LwjglSwtExample {
     private static RotatingCubeGame game;
 
     public static void main(final String[] args) {
-        try {
-            SharedLibraryLoader.load(true);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
         System.setProperty("ardor3d.useMultipleContexts", "true");
 
         final Timer timer = new Timer();
@@ -144,8 +136,8 @@ public class LwjglSwtExample {
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(
-                    ResourceLocatorTool.getClassPathResource(LwjglSwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    LwjglSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -211,7 +203,7 @@ public class LwjglSwtExample {
         canvasParent.layout();
 
         final SwtCanvas canvas1 = new SwtCanvas(topLeft, SWT.NONE, data);
-        final LwjglCanvasRenderer lwjglCanvasRenderer1 = new LwjglCanvasRenderer(scene);
+        final Lwjgl3CanvasRenderer lwjglCanvasRenderer1 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas1, lwjglCanvasRenderer1);
         canvas1.setCanvasRenderer(lwjglCanvasRenderer1);
         frameWork.addCanvas(canvas1);
@@ -219,21 +211,21 @@ public class LwjglSwtExample {
         canvas1.setFocus();
 
         final SwtCanvas canvas2 = new SwtCanvas(bottomLeft, SWT.NONE, data);
-        final LwjglCanvasRenderer lwjglCanvasRenderer2 = new LwjglCanvasRenderer(scene);
+        final Lwjgl3CanvasRenderer lwjglCanvasRenderer2 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas2, lwjglCanvasRenderer2);
         canvas2.setCanvasRenderer(lwjglCanvasRenderer2);
         frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, lwjglCanvasRenderer2));
 
         final SwtCanvas canvas3 = new SwtCanvas(topRight, SWT.NONE, data);
-        final LwjglCanvasRenderer lwjglCanvasRenderer3 = new LwjglCanvasRenderer(scene);
+        final Lwjgl3CanvasRenderer lwjglCanvasRenderer3 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas3, lwjglCanvasRenderer3);
         canvas3.setCanvasRenderer(lwjglCanvasRenderer3);
         frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, lwjglCanvasRenderer3));
 
         final SwtCanvas canvas4 = new SwtCanvas(bottomRight, SWT.NONE, data);
-        final LwjglCanvasRenderer lwjglCanvasRenderer4 = new LwjglCanvasRenderer(scene);
+        final Lwjgl3CanvasRenderer lwjglCanvasRenderer4 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas4, lwjglCanvasRenderer4);
         canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
         frameWork.addCanvas(canvas4);
@@ -291,8 +283,8 @@ public class LwjglSwtExample {
         final Matrix4 rotate = new Matrix4(Matrix4.IDENTITY);
         final Matrix4 pivot = new Matrix4(Matrix4.IDENTITY).applyTranslationPost(-0.5, -0.5, 0);
         final Matrix4 pivotInv = new Matrix4(Matrix4.IDENTITY).applyTranslationPost(0.5, 0.5, 0);
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(RotateGestureEvent.class), new TriggerAction() {
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(RotateGestureEvent.class),
+                new TriggerAction() {
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(RotateGestureEvent.class);
@@ -303,8 +295,8 @@ public class LwjglSwtExample {
                     }
                 }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class), new TriggerAction() {
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class),
+                new TriggerAction() {
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(SwipeGestureEvent.class);
@@ -312,15 +304,14 @@ public class LwjglSwtExample {
                     }
                 }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(MouseButton.LEFT, 500, 5),
-                        new GestureEventCondition(LongPressGestureEvent.class)), new TriggerAction() {
-                            @Override
-                            public void perform(final Canvas source, final TwoInputStates inputStates,
-                                    final double tpf) {
-                                game.toggleRotation();
-                            }
-                        }));
+        logicalLayer.registerTrigger(new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(
+                MouseButton.LEFT, 500, 5), new GestureEventCondition(LongPressGestureEvent.class)),
+                new TriggerAction() {
+                    @Override
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        game.toggleRotation();
+                    }
+                }));
 
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
         try {
@@ -333,24 +324,29 @@ public class LwjglSwtExample {
         _showCursor1.put(canvas1, true);
     }
 
-    private static void addCallback(final SwtCanvas canvas, final LwjglCanvasRenderer renderer) {
-        renderer.setCanvasCallback(new LwjglCanvasCallback() {
+    private static void addCallback(final SwtCanvas canvas, final Lwjgl3CanvasRenderer renderer) {
+        renderer.setCanvasCallback(new Lwjgl3CanvasCallback() {
             @Override
-            public void makeCurrent() throws LWJGLException {
+            public void makeCurrent(final boolean force) {
                 canvas.setCurrent();
             }
 
             @Override
-            public void releaseContext() throws LWJGLException {
-                ; // do nothing?
+            public void releaseContext(final boolean force) {
+                ;
+            }
+
+            @Override
+            public void doSwap() {
+                canvas.swapBuffers();
             }
         });
     }
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader
-                .load(ResourceLocatorTool.getClassPathResourceAsStream(LwjglSwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = awtImageLoader.load(
+                ResourceLocatorTool.getClassPathResourceAsStream(LwjglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

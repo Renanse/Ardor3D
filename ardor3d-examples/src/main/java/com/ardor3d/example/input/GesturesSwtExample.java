@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.lwjgl.LWJGLException;
 
 import com.ardor3d.example.benchmark.ball.Ball;
 import com.ardor3d.example.benchmark.ball.BallSprite;
@@ -36,8 +35,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.lwjgl.LwjglCanvasCallback;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -67,9 +65,9 @@ import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -172,13 +170,6 @@ public class GesturesSwtExample implements Updater {
     }
 
     public static void main(final String[] args) {
-
-        try {
-            SharedLibraryLoader.load(true);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
         final Timer timer = new Timer();
         final FrameHandler frameWork = new FrameHandler(timer);
         final LogicalLayer logicalLayer = new LogicalLayer();
@@ -204,8 +195,8 @@ public class GesturesSwtExample implements Updater {
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(
-                    ResourceLocatorTool.getClassPathResource(GesturesSwtExample.class, "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    GesturesSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -249,22 +240,27 @@ public class GesturesSwtExample implements Updater {
         data.doubleBuffer = true;
 
         _canvas = new SwtCanvas(parent, SWT.NONE, data);
-        final LwjglCanvasRenderer lwjglCanvasRenderer = new LwjglCanvasRenderer(scene);
-        lwjglCanvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
+        final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(scene);
+        canvasRenderer.setCanvasCallback(new Lwjgl3CanvasCallback() {
             @Override
-            public void makeCurrent() throws LWJGLException {
+            public void makeCurrent(final boolean force) {
                 _canvas.setCurrent();
             }
 
             @Override
-            public void releaseContext() throws LWJGLException {
+            public void releaseContext(final boolean force) {
                 ; // do nothing?
+            }
+
+            @Override
+            public void doSwap() {
+                _canvas.swapBuffers();
             }
         });
 
-        _canvas.setCanvasRenderer(lwjglCanvasRenderer);
+        _canvas.setCanvasRenderer(canvasRenderer);
         frameWork.addCanvas(_canvas);
-        _canvas.addControlListener(newResizeHandler(_canvas, lwjglCanvasRenderer));
+        _canvas.addControlListener(newResizeHandler(_canvas, canvasRenderer));
         _canvas.setFocus();
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(_canvas);
@@ -283,87 +279,87 @@ public class GesturesSwtExample implements Updater {
 
         logicalLayer.registerInput(_canvas, pl);
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(PinchGestureEvent.class), new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        final PinchGestureEvent event = inputStates.getCurrent().getGestureState()
-                                .first(PinchGestureEvent.class);
-                        // scale the balls
-                        if (event.isStartOfGesture()) {
-                            workScale = ballScale;
-                        }
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(PinchGestureEvent.class),
+                new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final PinchGestureEvent event = inputStates.getCurrent().getGestureState()
+                        .first(PinchGestureEvent.class);
+                // scale the balls
+                if (event.isStartOfGesture()) {
+                    workScale = ballScale;
+                }
 
-                        ballScale = MathUtils.clamp(workScale * event.getScale(), 0.1, 10);
-                        if (balls != null) {
-                            for (final BallSprite b : balls) {
-                                b.getBall().scale(ballScale);
-                                b.setScale(b.getBall().getTotalScale());
-                            }
-                        }
+                ballScale = MathUtils.clamp(workScale * event.getScale(), 0.1, 10);
+                if (balls != null) {
+                    for (final BallSprite b : balls) {
+                        b.getBall().scale(ballScale);
+                        b.setScale(b.getBall().getTotalScale());
                     }
-                }));
+                }
+            }
+        }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(RotateGestureEvent.class), new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
-                                .first(RotateGestureEvent.class);
-                        // Alter time scale
-                        currentRot += event.getDeltaRadians();
-                        currentRot = MathUtils.clamp(currentRot, 0, MathUtils.PI);
-                        timeScale = currentRot * ROT_SCALE + 0.01;
-                    }
-                }));
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(RotateGestureEvent.class),
+                new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
+                        .first(RotateGestureEvent.class);
+                // Alter time scale
+                currentRot += event.getDeltaRadians();
+                currentRot = MathUtils.clamp(currentRot, 0, MathUtils.PI);
+                timeScale = currentRot * ROT_SCALE + 0.01;
+            }
+        }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(PanGestureEvent.class), new TriggerAction() {
-                    int oldX = -1, oldY = -1;
-                    int minDeltaSq = 10 * 10;
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(PanGestureEvent.class),
+                new TriggerAction() {
+            int oldX = -1, oldY = -1;
+            int minDeltaSq = 10 * 10;
 
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        final PanGestureEvent event = inputStates.getCurrent().getGestureState()
-                                .first(PanGestureEvent.class);
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final PanGestureEvent event = inputStates.getCurrent().getGestureState()
+                        .first(PanGestureEvent.class);
 
-                        if (event.isStartOfGesture()) {
-                            oldX = event.getX();
-                            oldY = event.getY();
-                            return;
-                        }
+                if (event.isStartOfGesture()) {
+                    oldX = event.getX();
+                    oldY = event.getY();
+                    return;
+                }
 
-                        final int dx = event.getX() - oldX;
-                        final int dy = event.getY() - oldY;
+                final int dx = event.getX() - oldX;
+                final int dy = event.getY() - oldY;
 
-                        final int dSq = dx * dx + dy * dy;
+                final int dSq = dx * dx + dy * dy;
 
-                        if (dSq > minDeltaSq) {
-                            spawnExtraBall(shell.getLocation(), scene, event, 1.0);
-                            oldX = event.getX();
-                            oldY = event.getY();
-                        }
-                    }
-                }));
+                if (dSq > minDeltaSq) {
+                    spawnExtraBall(shell.getLocation(), scene, event, 1.0);
+                    oldX = event.getX();
+                    oldY = event.getY();
+                }
+            }
+        }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class), new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class),
+                new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 @SuppressWarnings("unused")
-                        final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
+                final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(SwipeGestureEvent.class);
-                        resetBalls(0);
-                    }
-                }));
+                resetBalls(0);
+            }
+        }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(new GestureEventCondition(LongPressGestureEvent.class), new TriggerAction() {
-                    @Override
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        final LongPressGestureEvent event = inputStates.getCurrent().getGestureState()
-                                .first(LongPressGestureEvent.class);
+        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(LongPressGestureEvent.class),
+                new TriggerAction() {
+            @Override
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final LongPressGestureEvent event = inputStates.getCurrent().getGestureState()
+                        .first(LongPressGestureEvent.class);
 
-                        // spawn a larger bubble
-                        spawnExtraBall(shell.getLocation(), scene, event, 3.0);
-                    }
-                }));
+                // spawn a larger bubble
+                spawnExtraBall(shell.getLocation(), scene, event, 3.0);
+            }
+        }));
 
         _canvas.init();
     }

@@ -128,10 +128,8 @@ public abstract class AbstractRenderer implements Renderer {
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
             if (ts != null) {
-                final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
-                        TextureState.MAX_TEXTURES) : 1;
                 boolean exists;
-                for (int i = 0; i < max; i++) {
+                for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
                     exists = i < textureCoords.size() && textureCoords.get(i) != null
                             && i <= ts.getMaxTextureIndexUsed();
 

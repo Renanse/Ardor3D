@@ -19,7 +19,6 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
@@ -112,7 +111,7 @@ public class BloomRenderPass extends Pass {
 
     /**
      * Creates a new bloom renderpass
-     * 
+     *
      * @param cam
      *            Camera used for rendering the bloomsource
      * @param renderScale
@@ -159,10 +158,10 @@ public class BloomRenderPass extends Pass {
                 if (screenTexture == null) {
                     final DisplaySettings settings = new DisplaySettings(cam.getWidth(), cam.getHeight(), 24, 0, 0, 8,
                             0, 0, false, false);
-                    fullTRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, r,
-                            ContextManager.getCurrentContext().getCapabilities());
+                    fullTRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, ContextManager
+                            .getCurrentContext().getCapabilities());
                     screenTexture = new Texture2D();
-                    screenTexture.setWrap(Texture.WrapMode.Clamp);
+                    screenTexture.setWrap(Texture.WrapMode.EdgeClamp);
                     screenTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
                     fullTRenderer.setupTexture(screenTexture);
                 }
@@ -248,17 +247,10 @@ public class BloomRenderPass extends Pass {
 
         cleanUp();
 
-        // Test for glsl support
-        final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
-        if (!caps.isGLSLSupported() || !(caps.isPbufferSupported() || caps.isFBOSupported())) {
-            supported = false;
-            return;
-        }
-
         // Create texture renderers and rendertextures(alternating between two not to overwrite pbuffers)
         final DisplaySettings settings = new DisplaySettings(cam.getWidth() / renderScale, cam.getHeight()
                 / renderScale, 24, 0, 0, 8, 0, 0, false, false);
-        tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, r, ContextManager
+        tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, ContextManager
                 .getCurrentContext().getCapabilities());
 
         if (tRenderer == null) {
@@ -271,12 +263,12 @@ public class BloomRenderPass extends Pass {
                 cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
 
         mainTexture = new Texture2D();
-        mainTexture.setWrap(Texture.WrapMode.Clamp);
+        mainTexture.setWrap(Texture.WrapMode.EdgeClamp);
         mainTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
         tRenderer.setupTexture(mainTexture);
 
         secondTexture = new Texture2D();
-        secondTexture.setWrap(Texture.WrapMode.Clamp);
+        secondTexture.setWrap(Texture.WrapMode.EdgeClamp);
         secondTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
         tRenderer.setupTexture(secondTexture);
 

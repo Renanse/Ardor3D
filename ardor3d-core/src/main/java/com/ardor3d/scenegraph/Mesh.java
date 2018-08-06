@@ -38,7 +38,6 @@ import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.InputCapsule;
@@ -245,6 +244,17 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     }
 
     public void render(final Renderer renderer, final MeshData meshData) {
+
+        // PLAN OF ATTACK
+        // 1. Set up our data as a VBO
+        // renderer.setupVertexDataVBO();
+
+        // 2. Set up our GLSL shader
+        // 3. Set our shader attributes (the vbo from step 1)
+        // 4. Set our shader uniforms (model, view and projection matrices)
+        // 5. Apply states?
+        // 6. Draw arrays or elements (depending on indices)
+
         // Set up MeshData in GLSLShaderObjectsState if necessary
         // XXX: considered a hack until we settle on our shader model.
         final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) renderer.getProperRenderState(
@@ -267,9 +277,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             }
         }
 
-        final boolean useVBO = (getSceneHints().getDataMode() == DataMode.VBO || getSceneHints().getDataMode() == DataMode.VBOInterleaved)
-                && caps.isVBOSupported();
-
         if (instancing == null) {
             final boolean transformed = renderer.doTransforms(_worldTransform);
 
@@ -278,11 +285,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             renderer.applyState(StateType.FragmentProgram, _states.get(StateType.FragmentProgram));
             renderer.applyState(StateType.VertexProgram, _states.get(StateType.VertexProgram));
 
-            if (useVBO) {
-                renderVBO(renderer, meshData, -1);
-            } else {
-                renderArrays(renderer, meshData, -1, caps);
-            }
+            renderVBO(renderer, meshData, -1);
 
             if (transformed) {
                 renderer.undoTransforms(_worldTransform);
@@ -295,100 +298,36 @@ public class Mesh extends Spatial implements Renderable, Pickable {
                 renderer.applyState(StateType.FragmentProgram, _states.get(StateType.FragmentProgram));
                 renderer.applyState(StateType.VertexProgram, _states.get(StateType.VertexProgram));
 
-                if (useVBO) {
-                    renderVBO(renderer, meshData, instancing.getPrimitiveCount());
-                } else {
-                    renderArrays(renderer, meshData, instancing.getPrimitiveCount(), caps);
-                }
+                renderVBO(renderer, meshData, instancing.getPrimitiveCount());
             }
-        }
-    }
-
-    protected void renderArrays(final Renderer renderer, final MeshData meshData, final int primcount,
-            final ContextCapabilities caps) {
-        // Use arrays
-        if (caps.isVBOSupported()) {
-            renderer.unbindVBO();
-        }
-
-        if (RENDER_VERTEX_ONLY) {
-            renderer.applyNormalsMode(NormalsMode.Off, null);
-            renderer.setupNormalData(null);
-            renderer.applyDefaultColor(null);
-            renderer.setupColorData(null);
-            renderer.setupTextureData(null);
-        } else {
-            renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
-            if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
-                renderer.setupNormalData(meshData.getNormalCoords());
-            } else {
-                renderer.setupNormalData(null);
-            }
-
-            if (meshData.getColorCoords() != null) {
-                renderer.setupColorData(meshData.getColorCoords());
-            } else {
-                renderer.applyDefaultColor(_defaultColor);
-                renderer.setupColorData(null);
-            }
-
-            renderer.setupTextureData(meshData.getTextureCoords());
-        }
-        renderer.setupVertexData(meshData.getVertexCoords());
-
-        if (meshData.getIndices() != null) {
-            renderer.drawElements(meshData.getIndices(), meshData.getIndexLengths(), meshData.getIndexModes(),
-                    primcount);
-        } else {
-            renderer.drawArrays(meshData.getVertexCoords(), meshData.getIndexLengths(), meshData.getIndexModes(),
-                    primcount);
-        }
-
-        if (Constants.stats) {
-            StatCollector.addStat(StatType.STAT_VERTEX_COUNT, meshData.getVertexCount());
-            StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
         }
     }
 
     protected void renderVBO(final Renderer renderer, final MeshData meshData, final int primcount) {
-        if (getSceneHints().getDataMode() == DataMode.VBOInterleaved) {
-            if (meshData.getColorCoords() == null) {
-                renderer.applyDefaultColor(_defaultColor);
-            }
-            renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
-            // Make sure we have a FBD to hold our id.
-            if (meshData.getInterleavedData() == null) {
-                final FloatBufferData interleaved = new FloatBufferData(FloatBuffer.allocate(0), 1);
-                meshData.setInterleavedData(interleaved);
-            }
-            renderer.setupInterleavedDataVBO(meshData.getInterleavedData(), meshData.getVertexCoords(),
-                    meshData.getNormalCoords(), meshData.getColorCoords(), meshData.getTextureCoords());
+        if (RENDER_VERTEX_ONLY) {
+            renderer.applyNormalsMode(NormalsMode.Off, null);
+            renderer.setupNormalDataVBO(null);
+            renderer.applyDefaultColor(null);
+            renderer.setupColorDataVBO(null);
+            renderer.setupTextureDataVBO(null);
         } else {
-            if (RENDER_VERTEX_ONLY) {
-                renderer.applyNormalsMode(NormalsMode.Off, null);
-                renderer.setupNormalDataVBO(null);
-                renderer.applyDefaultColor(null);
-                renderer.setupColorDataVBO(null);
-                renderer.setupTextureDataVBO(null);
+            renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
+            if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
+                renderer.setupNormalDataVBO(meshData.getNormalCoords());
             } else {
-                renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
-                if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
-                    renderer.setupNormalDataVBO(meshData.getNormalCoords());
-                } else {
-                    renderer.setupNormalDataVBO(null);
-                }
-
-                if (meshData.getColorCoords() != null) {
-                    renderer.setupColorDataVBO(meshData.getColorCoords());
-                } else {
-                    renderer.applyDefaultColor(_defaultColor);
-                    renderer.setupColorDataVBO(null);
-                }
-
-                renderer.setupTextureDataVBO(meshData.getTextureCoords());
+                renderer.setupNormalDataVBO(null);
             }
-            renderer.setupVertexDataVBO(meshData.getVertexCoords());
+
+            if (meshData.getColorCoords() != null) {
+                renderer.setupColorDataVBO(meshData.getColorCoords());
+            } else {
+                renderer.applyDefaultColor(_defaultColor);
+                renderer.setupColorDataVBO(null);
+            }
+
+            // renderer.setupTextureDataVBO(meshData.getTextureCoords());
         }
+        renderer.setupVertexDataVBO(meshData.getVertexCoords());
 
         if (meshData.getIndices() != null) {
             // TODO: Maybe ask for the IndexBuffer's dynamic/static type and fall back to arrays for indices?
@@ -706,10 +645,9 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
         final FloatBufferData norms = meshData.getNormalBuffer() != null ? meshData.getVertexCoords().makeCopy() : null;
         final FloatBufferData colors = meshData.getColorBuffer() != null ? meshData.getColorCoords().makeCopy() : null;
-        final FloatBufferData fogs = meshData.getFogBuffer() != null ? meshData.getFogCoords().makeCopy() : null;
         final FloatBufferData tangents = meshData.getTangentBuffer() != null ? meshData.getTangentCoords().makeCopy()
                 : null;
-        final FloatBufferData[] uvs = new FloatBufferData[meshData.getNumberOfUnits()];
+        final FloatBufferData[] uvs = new FloatBufferData[meshData.getMaxTextureUnitUsed() + 1];
         for (int k = 0; k < uvs.length; k++) {
             final FloatBufferData tex = meshData.getTextureCoords(k);
             if (tex != null) {
@@ -733,10 +671,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
                 BufferUtils.copy(meshData.getColorBuffer(), i * colors.getValuesPerTuple(), colors.getBuffer(), vert
                         * colors.getValuesPerTuple(), colors.getValuesPerTuple());
             }
-            if (fogs != null) {
-                BufferUtils.copy(meshData.getFogBuffer(), i * fogs.getValuesPerTuple(), fogs.getBuffer(),
-                        vert * fogs.getValuesPerTuple(), fogs.getValuesPerTuple());
-            }
             if (tangents != null) {
                 BufferUtils.copy(meshData.getTangentBuffer(), i * tangents.getValuesPerTuple(), tangents.getBuffer(),
                         vert * tangents.getValuesPerTuple(), tangents.getValuesPerTuple());
@@ -751,7 +685,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         meshData.setVertexCoords(verts);
         meshData.setNormalCoords(norms);
         meshData.setColorCoords(colors);
-        meshData.setFogCoords(fogs);
         meshData.setTangentCoords(tangents);
         for (int k = 0; k < uvs.length; k++) {
             if (uvs[k] != null) {

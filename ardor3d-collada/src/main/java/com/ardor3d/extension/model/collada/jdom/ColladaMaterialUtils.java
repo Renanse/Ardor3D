@@ -20,10 +20,6 @@ import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.MaterialInfo;
 import com.ardor3d.extension.model.collada.jdom.data.SamplerTypes;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.ApplyMode;
-import com.ardor3d.image.Texture.CombinerFunctionRGB;
-import com.ardor3d.image.Texture.CombinerOperandRGB;
-import com.ardor3d.image.Texture.CombinerSource;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -260,22 +256,22 @@ public class ColladaMaterialUtils {
                     if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         final Texture reflectiveTexture = populateTextureState(mesh, propertyValue, effect,
                                 loadedTextures, mInfo, "reflective");
+                        //
+                        // reflectiveTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
+                        // reflectiveTexture.setApply(ApplyMode.Combine);
+                        //
+                        // reflectiveTexture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
+                        // // color 1
+                        // reflectiveTexture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
+                        // reflectiveTexture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
+                        // // color 2
+                        // reflectiveTexture.setCombineSrc1RGB(CombinerSource.Previous);
+                        // reflectiveTexture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
+                        // // interpolate param will come from alpha of constant color
+                        // reflectiveTexture.setCombineSrc2RGB(CombinerSource.Constant);
+                        // reflectiveTexture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
 
-                        reflectiveTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
-                        reflectiveTexture.setApply(ApplyMode.Combine);
-
-                        reflectiveTexture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
-                        // color 1
-                        reflectiveTexture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
-                        reflectiveTexture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
-                        // color 2
-                        reflectiveTexture.setCombineSrc1RGB(CombinerSource.Previous);
-                        reflectiveTexture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
-                        // interpolate param will come from alpha of constant color
-                        reflectiveTexture.setCombineSrc2RGB(CombinerSource.Constant);
-                        reflectiveTexture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
-
-                        reflectiveTexture.setConstantColor(new ColorRGBA(1, 1, 1, reflectivity));
+                        // reflectiveTexture.setConstantColor(new ColorRGBA(1, 1, 1, reflectivity));
                     }
                 }
 

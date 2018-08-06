@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.renderer.lwjgl;
+package com.ardor3d.renderer.lwjgl3;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -39,8 +39,8 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
-import com.ardor3d.scene.state.lwjgl.LwjglTextureStateUtil;
-import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
+import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
@@ -54,10 +54,10 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  * @see TextureRendererFactory
  */
-public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
-    private static final Logger logger = Logger.getLogger(LwjglTextureRenderer.class.getName());
+public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
+    private static final Logger logger = Logger.getLogger(Lwjgl3TextureRenderer.class.getName());
 
-    public LwjglTextureRenderer(final int width, final int height, final int depthBits, final int samples,
+    public Lwjgl3TextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
         super(width, height, depthBits, samples, parentRenderer, caps);
 
@@ -94,32 +94,32 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         final int textureId = ibuf.get(0);
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
-        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
+        Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
 
         // Initialize our texture with some default data.
-        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
-        final int dataFormat = LwjglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
-        final int pixelDataType = LwjglTextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
+        final int internalFormat = Lwjgl3TextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
+        final int dataFormat = Lwjgl3TextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
+        final int pixelDataType = Lwjgl3TextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
 
         if (tex.getType() == Type.TwoDimensional) {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
                     (ByteBuffer) null);
         } else {
             for (final Face face : Face.values()) {
-                GL11.glTexImage2D(LwjglTextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0,
+                GL11.glTexImage2D(Lwjgl3TextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0,
                         dataFormat, pixelDataType, (ByteBuffer) null);
             }
         }
 
         // Initialize mipmapping for this texture, if requested
         if (tex.getMinificationFilter().usesMipMapLevels()) {
-            EXTFramebufferObject.glGenerateMipmapEXT(LwjglTextureStateUtil.getGLType(tex.getType()));
+            EXTFramebufferObject.glGenerateMipmapEXT(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
         }
 
         // Setup filtering and wrap
         final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
-        LwjglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
-        LwjglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
+        Lwjgl3TextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
+        Lwjgl3TextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
 
         logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
     }
@@ -208,7 +208,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                     } else if (tex.getType() == Type.CubeMap) {
                         EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                                 EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + colorsAdded,
-                                LwjglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
+                                Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
                                 tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
@@ -227,7 +227,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                     } else if (tex.getType() == Type.CubeMap) {
                         EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                                 EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT,
-                                LwjglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
+                                Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
                                 tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
@@ -263,8 +263,8 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                 if (texs.get(x).getMinificationFilter().usesMipMapLevels()) {
                     final Texture tex = texs.get(x);
                     if (tex.getMinificationFilter().usesMipMapLevels()) {
-                        LwjglTextureStateUtil.doTextureBind(texs.get(x), 0, true);
-                        EXTFramebufferObject.glGenerateMipmapEXT(LwjglTextureStateUtil.getGLType(tex.getType()));
+                        Lwjgl3TextureStateUtil.doTextureBind(texs.get(x), 0, true);
+                        EXTFramebufferObject.glGenerateMipmapEXT(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
                     }
                 }
             }
@@ -291,7 +291,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             } else if (tex.getType() == Type.CubeMap) {
                 EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                         EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT,
-                        LwjglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
+                        Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
                         0);
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
@@ -307,7 +307,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             } else if (tex.getType() == Type.CubeMap) {
                 EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                         EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT,
-                        LwjglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
+                        Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
                         0);
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
@@ -351,8 +351,8 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
     protected void takedownForSingleTexDraw(final Texture tex) {
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
-            LwjglTextureStateUtil.doTextureBind(tex, 0, true);
-            EXTFramebufferObject.glGenerateMipmapEXT(LwjglTextureStateUtil.getGLType(tex.getType()));
+            Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
+            EXTFramebufferObject.glGenerateMipmapEXT(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
         }
     }
 
@@ -415,13 +415,13 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
 
     public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
             final int xoffset, final int yoffset) {
-        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
+        Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
 
         if (tex.getType() == Type.TwoDimensional) {
             GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, width, height);
         } else if (tex.getType() == Type.CubeMap) {
             GL11.glCopyTexSubImage2D(
-                    LwjglTextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), 0, xoffset,
+                    Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), 0, xoffset,
                     yoffset, x, y, width, height);
         } else {
             throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
@@ -445,7 +445,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
-            if (_supportsDepthTexture && _depthBits != 0) {
+            if (_depthBits != 0) {
                 EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
                 _depthRBID = buffer.get(0);
                 EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
@@ -474,7 +474,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                 EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
                         _samples, GL11.GL_RGBA, _width, _height);
 
-                if (_supportsDepthTexture && _depthBits > 0) {
+                if (_depthBits > 0) {
                     EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _msdepthRBID);
                     EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(
                             EXTFramebufferObject.GL_RENDERBUFFER_EXT, _samples, getDepthFormat(), _width, _height);

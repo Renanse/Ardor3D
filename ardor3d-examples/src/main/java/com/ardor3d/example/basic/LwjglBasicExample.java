@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,8 +16,8 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
-import com.ardor3d.framework.lwjgl.LwjglCanvas;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.lwjgl3.GLFWCanvas;
+import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.intersection.PickResults;
@@ -40,10 +40,10 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>
- * This lwjgl-based example is meant to show how to use Ardor3D at the most primitive level, forsaking the use of
+ * This lwjgl3-based example is meant to show how to use Ardor3D at the most primitive level, forsaking the use of
  * ExampleBase and much of Ardor3D's framework classes and interfaces.
  * </p>
- * 
+ *
  * <p>
  * Also of note, this example does not allow choosing of properties on launch. It also does not handle input or show any
  * special debugging. This is to simplify the example to the basic essentials.
@@ -56,7 +56,7 @@ maxHeapMemory = 64)
 public class LwjglBasicExample implements Scene {
 
     // Our native window, not the gl surface itself.
-    private final LwjglCanvas _canvas;
+    private final GLFWCanvas _canvas;
 
     // Our timer.
     private final Timer _timer = new Timer();
@@ -104,13 +104,13 @@ public class LwjglBasicExample implements Scene {
 
     /**
      * Setup an lwjgl canvas and canvas renderer.
-     * 
+     *
      * @return the canvas.
      */
-    private LwjglCanvas initLwjgl() {
-        final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(this);
+    private GLFWCanvas initLwjgl() {
+        final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(this);
         final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0, 0, 8, 0, 0, false, false);
-        return new LwjglCanvas(settings, canvasRenderer);
+        return new GLFWCanvas(settings, canvasRenderer);
     }
 
     /**

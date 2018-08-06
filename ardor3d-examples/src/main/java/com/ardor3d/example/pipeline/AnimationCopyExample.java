@@ -64,7 +64,6 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -229,20 +228,10 @@ public class AnimationCopyExample extends ExampleBase {
         });
         panel.add(gpuSkinningCheck);
 
-        final UICheckBox vboCheck = new UICheckBox("Use VBO");
-        vboCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
-        vboCheck.setSelected(false);
-        vboCheck.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                skNode.getSceneHints().setDataMode(vboCheck.isSelected() ? DataMode.VBO : DataMode.Arrays);
-                gpuShader.setUseAttributeVBO(vboCheck.isSelected());
-            }
-        });
-        panel.add(vboCheck);
-
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
-        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, vboCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT,
+                0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
 

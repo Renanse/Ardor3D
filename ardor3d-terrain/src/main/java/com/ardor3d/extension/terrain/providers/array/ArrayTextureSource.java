@@ -44,7 +44,7 @@ public class ArrayTextureSource implements TextureSource {
     @Override
     public TextureConfiguration getConfiguration() throws Exception {
         final Map<Integer, TextureStoreFormat> textureStoreFormat = Maps.newHashMap();
-        textureStoreFormat.put(0, TextureStoreFormat.Luminance8);
+        textureStoreFormat.put(0, TextureStoreFormat.R8);
 
         return new TextureConfiguration(heightMaps.size(), textureStoreFormat, tileSize, 1f, true, false);
     }

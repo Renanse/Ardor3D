@@ -460,7 +460,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
-            if (_supportsDepthTexture && _depthBits != 0) {
+            if (_depthBits != 0) {
                 gl.glGenRenderbuffers(1, buffer); // generate id
                 _depthRBID = buffer.get(0);
                 gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _depthRBID);
@@ -488,7 +488,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, GL.GL_RGBA, _width,
                         _height);
 
-                if (_supportsDepthTexture && _depthBits > 0) {
+                if (_depthBits > 0) {
                     gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, _msdepthRBID);
                     gl.getGL2GL3().glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, _samples, getDepthFormat(),
                             _width, _height);

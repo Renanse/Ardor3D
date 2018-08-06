@@ -56,10 +56,8 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.FogState;
 import com.ardor3d.renderer.state.FragmentProgramState;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
@@ -75,10 +73,8 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.jogl.JoglBlendStateUtil;
-import com.ardor3d.scene.state.jogl.JoglClipStateUtil;
 import com.ardor3d.scene.state.jogl.JoglColorMaskStateUtil;
 import com.ardor3d.scene.state.jogl.JoglCullStateUtil;
-import com.ardor3d.scene.state.jogl.JoglFogStateUtil;
 import com.ardor3d.scene.state.jogl.JoglFragmentProgramStateUtil;
 import com.ardor3d.scene.state.jogl.JoglLightStateUtil;
 import com.ardor3d.scene.state.jogl.JoglMaterialStateUtil;
@@ -358,7 +354,6 @@ public class JoglRenderer extends AbstractRenderer {
                         final ReadOnlyVector3 scale = worldTransform.getScale();
                         if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
                             if (scale.getX() == scale.getY() && scale.getY() == scale.getZ()
-                                    && caps.isOpenGL1_2Supported()
                                     && rendRecord.getNormalMode() != GL2ES1.GL_RESCALE_NORMAL) {
                                 if (rendRecord.getNormalMode() == GLLightingFunc.GL_NORMALIZE) {
                                     gl.glDisable(GLLightingFunc.GL_NORMALIZE);
@@ -780,24 +775,6 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupFogData(final FloatBufferData fogBufferData) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final FloatBuffer fogBuffer = fogBufferData != null ? fogBufferData.getBuffer() : null;
-
-        if (gl.isGL2()) {
-            if (fogBuffer == null) {
-                gl.getGL2().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
-            } else {
-                gl.getGL2().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
-                fogBuffer.rewind();
-                gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, fogBuffer);
-            }
-        }
-
-    }
-
-    @Override
     public void setupTextureData(final List<FloatBufferData> textureCoords) {
         final GL gl = GLContext.getCurrentGL();
 
@@ -810,9 +787,7 @@ public class JoglRenderer extends AbstractRenderer {
         final boolean valid = rendRecord.isTexturesValid();
         boolean isOn, wasOn;
         if (ts != null) {
-            final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
-                    TextureState.MAX_TEXTURES) : 1;
-            for (int i = 0; i < max; i++) {
+            for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
                 wasOn = (enabledTextures & (2 << i)) != 0;
                 isOn = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null
                         && textureCoords.get(i).getBuffer() != null;
@@ -1082,35 +1057,6 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupFogDataVBO(final FloatBufferData data) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        if (!caps.isFogCoordinatesSupported()) {
-            return;
-        }
-
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final int vboID = setupVBO(data, context);
-
-        if (vboID != 0) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
-            }
-            JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            if (gl.isGL2()) {
-                gl.getGL2().glFogCoordPointer(GL.GL_FLOAT, 0, 0);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GL2.GL_FOG_COORDINATE_ARRAY);
-            }
-        }
-    }
-
-    @Override
     public void setupTextureDataVBO(final List<FloatBufferData> textureCoords) {
         final GL gl = GLContext.getCurrentGL();
 
@@ -1123,9 +1069,7 @@ public class JoglRenderer extends AbstractRenderer {
         final boolean valid = rendRecord.isTexturesValid();
         boolean exists, wasOn;
         if (ts != null) {
-            final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
-                    TextureState.MAX_TEXTURES) : 1;
-            for (int i = 0; i < max; i++) {
+            for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
                 wasOn = (enabledTextures & (2 << i)) != 0;
                 exists = textureCoords != null && i < textureCoords.size();
 
@@ -1256,9 +1200,7 @@ public class JoglRenderer extends AbstractRenderer {
             final boolean valid = rendRecord.isTexturesValid();
             boolean exists, wasOn;
             if (ts != null) {
-                final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
-                        TextureState.MAX_TEXTURES) : 1;
-                for (int i = 0; i < max; i++) {
+                for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
                     wasOn = (enabledTextures & (2 << i)) != 0;
                     exists = i < textureCoords.size() && textureCoords.get(i) != null
                             && i <= ts.getMaxTextureIndexUsed();
@@ -1364,7 +1306,7 @@ public class JoglRenderer extends AbstractRenderer {
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
             if (ts != null) {
-                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < TextureState.MAX_TEXTURES; i++) {
                     if (i >= textureCoords.size()) {
                         continue;
                     }
@@ -1753,14 +1695,14 @@ public class JoglRenderer extends AbstractRenderer {
             }
         }
 
-        if (isSprite && context.getCapabilities().isPointSpritesSupported()) {
+        if (isSprite) {
             if (gl.isGL2ES1()) {
                 gl.glEnable(GL2ES1.GL_POINT_SPRITE);
                 gl.getGL2ES1().glTexEnvi(GL2ES1.GL_POINT_SPRITE, GL2ES1.GL_COORD_REPLACE, GL.GL_TRUE);
             }
         }
 
-        if (useDistanceAttenuation && context.getCapabilities().isPointParametersSupported()) {
+        if (useDistanceAttenuation) {
             if (gl.isGL2GL3()) {
                 gl.getGL2GL3().glPointParameterfv(GL2ES1.GL_POINT_DISTANCE_ATTENUATION, attenuationCoefficients);
                 gl.getGL2GL3().glPointParameterf(GL2ES1.GL_POINT_SIZE_MIN, minPointSize);
@@ -1782,7 +1724,7 @@ public class JoglRenderer extends AbstractRenderer {
                 JoglBlendStateUtil.apply(this, (BlendState) state);
                 return;
             case Clip:
-                JoglClipStateUtil.apply(this, (ClipState) state);
+                // JoglClipStateUtil.apply(this, (ClipState) state);
                 return;
             case ColorMask:
                 JoglColorMaskStateUtil.apply(this, (ColorMaskState) state);
@@ -1791,7 +1733,7 @@ public class JoglRenderer extends AbstractRenderer {
                 JoglCullStateUtil.apply(this, (CullState) state);
                 return;
             case Fog:
-                JoglFogStateUtil.apply(this, (FogState) state);
+                // JoglFogStateUtil.apply(this, (FogState) state);
                 return;
             case FragmentProgram:
                 JoglFragmentProgramStateUtil.apply(this, (FragmentProgramState) state);
@@ -1885,7 +1827,7 @@ public class JoglRenderer extends AbstractRenderer {
 
     public void checkAndSetTextureArrayUnit(final int unit, final GL gl, final RendererRecord record,
             final ContextCapabilities caps) {
-        if (record.getCurrentTextureArraysUnit() != unit && caps.isMultitextureSupported()) {
+        if (record.getCurrentTextureArraysUnit() != unit) {
             if (gl.isGL2ES1()) {
                 gl.getGL2ES1().glClientActiveTexture(GL.GL_TEXTURE0 + unit);
             }

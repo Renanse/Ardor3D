@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -46,9 +46,7 @@ public abstract class JoglLightStateUtil {
             setLightEnabled(true, record);
             setTwoSided(state.getTwoSidedLighting(), record);
             setLocalViewer(state.getLocalViewer(), record);
-            if (caps.isOpenGL1_2Supported()) {
-                setSpecularControl(state.getSeparateSpecular(), record);
-            }
+            setSpecularControl(state.getSeparateSpecular(), record);
 
             for (int i = 0, max = state.getNumberOfChildren(); i < max; i++) {
                 final Light light = state.get(i);
@@ -255,9 +253,9 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(ambient.getAlpha());
             record.lightBuffer.flip();
             gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_AMBIENT, record.lightBuffer); // TODO
-                                                                                                                    // Check
-                                                                                                                    // for
-                                                                                                                    // float
+            // Check
+            // for
+            // float
             lr.ambient.set(ambient);
         }
     }
@@ -274,9 +272,9 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(diffuse.getAlpha());
             record.lightBuffer.flip();
             gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_DIFFUSE, record.lightBuffer); // TODO
-                                                                                                                    // Check
-                                                                                                                    // for
-                                                                                                                    // float
+            // Check
+            // for
+            // float
             lr.diffuse.set(diffuse);
         }
     }
@@ -293,9 +291,9 @@ public abstract class JoglLightStateUtil {
             record.lightBuffer.put(specular.getAlpha());
             record.lightBuffer.flip();
             gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPECULAR, record.lightBuffer); // TODO
-                                                                                                                     // Check
-                                                                                                                     // for
-                                                                                                                     // float
+            // Check
+            // for
+            // float
             lr.specular.set(specular);
         }
     }
@@ -356,9 +354,9 @@ public abstract class JoglLightStateUtil {
         record.lightBuffer.put(value);
         record.lightBuffer.flip();
         gl.getGL2().glLightfv(GLLightingFunc.GL_LIGHT0 + index, GLLightingFunc.GL_SPOT_DIRECTION, record.lightBuffer); // TODO
-                                                                                                                       // Check
-                                                                                                                       // for
-                                                                                                                       // float
+        // Check
+        // for
+        // float
     }
 
     private static void setConstant(final int index, final float constant, final LightRecord lr, final boolean force) {

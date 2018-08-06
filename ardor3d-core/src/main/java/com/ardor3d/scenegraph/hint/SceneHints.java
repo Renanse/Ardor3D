@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -22,11 +22,6 @@ import com.ardor3d.util.export.Savable;
  * SceneHints encapsulates various rendering and interaction preferences for a scene object.
  */
 public class SceneHints implements Savable {
-
-    /**
-     * How we want the data for a subset of the scenegraph to be sent to the card.
-     */
-    protected DataMode _dataMode = DataMode.Inherit;
 
     /**
      * A flag indicating how normals should be treated by the renderer.
@@ -83,7 +78,6 @@ public class SceneHints implements Savable {
     }
 
     public void set(final SceneHints sceneHints) {
-        _dataMode = sceneHints._dataMode;
         _normalsMode = sceneHints._normalsMode;
         _cullHint = sceneHints._cullHint;
         _lightCombineMode = sceneHints._lightCombineMode;
@@ -99,41 +93,7 @@ public class SceneHints implements Savable {
     /**
      * Returns the normals mode. If the mode is set to inherit, then we get its normals mode from the given source's
      * hintable parent. If no parent, we'll default to NormalizeIfScaled.
-     * 
-     * @return The normals mode to use.
-     */
-    public DataMode getDataMode() {
-        if (_dataMode != DataMode.Inherit) {
-            return _dataMode;
-        }
-
-        final Hintable parent = _source.getParentHintable();
-        if (parent != null) {
-            return parent.getSceneHints().getDataMode();
-        }
-
-        return DataMode.Arrays;
-    }
-
-    /**
-     * @return the exact data mode set.
-     */
-    public DataMode getLocalDataMode() {
-        return _dataMode;
-    }
-
-    /**
-     * @param type
-     *            the new data mode to set on this SceneHints
-     */
-    public void setDataMode(final DataMode type) {
-        _dataMode = type;
-    }
-
-    /**
-     * Returns the normals mode. If the mode is set to inherit, then we get its normals mode from the given source's
-     * hintable parent. If no parent, we'll default to NormalizeIfScaled.
-     * 
+     *
      * @return The normals mode to use.
      */
     public NormalsMode getNormalsMode() {
@@ -194,7 +154,7 @@ public class SceneHints implements Savable {
      * throw away this object and any children during draw commands. CullHint.Never: Never throw away this object
      * (always draw it) CullHint.Inherit: Look for a non-inherit parent and use its cull mode. NOTE: You must set this
      * AFTER attaching to a parent or it will be reset with the parent's cullMode value.
-     * 
+     *
      * @param hint
      *            one of CullHint.Dynamic, CullHint.Always, CullHint.Inherit or CullHint.Never
      */
@@ -205,7 +165,7 @@ public class SceneHints implements Savable {
     /**
      * Returns this spatial's texture combine mode. If the mode is set to inherit, then the spatial gets its combine
      * mode from its parent.
-     * 
+     *
      * @return The spatial's texture current combine mode.
      */
     public TextureCombineMode getTextureCombineMode() {
@@ -230,7 +190,7 @@ public class SceneHints implements Savable {
 
     /**
      * Sets how textures from parents should be combined for this Spatial.
-     * 
+     *
      * @param mode
      *            The new texture combine mode for this spatial.
      * @throws IllegalArgumentException
@@ -246,7 +206,7 @@ public class SceneHints implements Savable {
     /**
      * Returns this spatial's light combine mode. If the mode is set to inherit, then the spatial gets its combine mode
      * from its parent.
-     * 
+     *
      * @return The spatial's light current combine mode.
      */
     public LightCombineMode getLightCombineMode() {
@@ -271,7 +231,7 @@ public class SceneHints implements Savable {
 
     /**
      * Sets how lights from parents should be combined for this spatial.
-     * 
+     *
      * @param mode
      *            The light combine mode for this spatial
      * @throws IllegalArgumentException
@@ -292,7 +252,7 @@ public class SceneHints implements Savable {
      * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
      * parent will be used during rendering. If no parent, then
      * {@link com.ardor3d.renderer.queue.RenderBucketType#Opaque Opaque} is used.
-     * 
+     *
      * @return the render queue mode used for this spatial.
      * @see com.ardor3d.renderer.queue.RenderBucketType
      */
@@ -317,7 +277,7 @@ public class SceneHints implements Savable {
      * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
      * parent will be used during rendering. If no parent, then
      * {@link com.ardor3d.renderer.queue.RenderBucketType#Opaque Opaque} is used.
-     * 
+     *
      * @return the render queue mode set on this spatial.
      * @see com.ardor3d.renderer.queue.RenderBucketType
      */
@@ -328,7 +288,7 @@ public class SceneHints implements Savable {
     /**
      * Set the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
      * in.
-     * 
+     *
      * @param renderBucketType
      *            the render bucket type to use for this spatial.
      * @see com.ardor3d.renderer.queue.RenderBucketType
@@ -339,7 +299,7 @@ public class SceneHints implements Savable {
 
     /**
      * Returns whether a certain pick hint is set on this spatial.
-     * 
+     *
      * @param pickingHint
      *            Pick hint to test for
      * @return Enabled or disabled
@@ -350,7 +310,7 @@ public class SceneHints implements Savable {
 
     /**
      * Enable or disable a picking hint for this Spatial
-     * 
+     *
      * @param pickingHint
      *            PickingHint to set. Pickable or Collidable
      * @param enabled
@@ -366,7 +326,7 @@ public class SceneHints implements Savable {
 
     /**
      * Enable or disable all picking hints for this Spatial
-     * 
+     *
      * @param enabled
      *            Enable or disable
      */
@@ -398,7 +358,7 @@ public class SceneHints implements Savable {
     /**
      * Returns the transparency rendering type. If the mode is set to inherit, then we get its type from the given
      * source's hintable parent. If no parent, we'll default to OnePass.
-     * 
+     *
      * @return The transparency rendering type to use.
      */
     public TransparencyType getTransparencyType() {
@@ -461,7 +421,6 @@ public class SceneHints implements Savable {
         _textureCombineMode = capsule.readEnum("textureCombineMode", TextureCombineMode.class,
                 TextureCombineMode.Inherit);
         _normalsMode = capsule.readEnum("normalsMode", NormalsMode.class, NormalsMode.Inherit);
-        _dataMode = capsule.readEnum("dataMode", DataMode.class, DataMode.Inherit);
         _transpType = capsule.readEnum("transpType", TransparencyType.class, TransparencyType.Inherit);
         _castsShadows = capsule.readBoolean("castsShadows", true);
         final PickingHint[] pickHints = capsule.readEnumArray("pickingHints", PickingHint.class, null);
@@ -485,7 +444,6 @@ public class SceneHints implements Savable {
         capsule.write(_lightCombineMode, "lightCombineMode", LightCombineMode.Inherit);
         capsule.write(_textureCombineMode, "textureCombineMode", TextureCombineMode.Inherit);
         capsule.write(_normalsMode, "normalsMode", NormalsMode.Inherit);
-        capsule.write(_dataMode, "dataMode", DataMode.Inherit);
         capsule.write(_pickingHints.toArray(new PickingHint[] {}), "pickingHints");
         capsule.write(_transpType, "transpType", TransparencyType.Inherit);
         capsule.write(_castsShadows, "castsShadows", true);

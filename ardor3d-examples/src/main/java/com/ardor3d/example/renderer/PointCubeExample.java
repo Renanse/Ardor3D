@@ -41,7 +41,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.TextureState.CorrectionType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Spatial;
@@ -91,7 +90,7 @@ public class PointCubeExample extends ExampleBase {
         if (!isInitialized) {
             final DisplaySettings settings = new DisplaySettings(cam.getWidth(), cam.getHeight(), 24, 0, 0, 8, 0, 0,
                     false, false);
-            _sceneTextureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, renderer,
+            _sceneTextureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, renderer,
                     ContextManager.getCurrentContext().getCapabilities());
             _sceneTextureRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.1f, 0f));
 
@@ -198,7 +197,6 @@ public class PointCubeExample extends ExampleBase {
         ts.setTexture(tex);
         ts.getTexture().setWrap(WrapMode.EdgeClamp);
         ts.setEnabled(true);
-        ts.setCorrectionType(CorrectionType.Perspective);
         _pointCubes.setRenderState(ts);
 
         int xDim, yDim, zDim;

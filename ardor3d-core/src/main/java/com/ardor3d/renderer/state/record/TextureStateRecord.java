@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -33,7 +33,6 @@ public class TextureStateRecord extends StateRecord {
 
     public HashMap<Integer, TextureRecord> textures;
     public TextureUnitRecord[] units;
-    public int hint = -1;
     public int currentUnit = -1;
 
     /**
@@ -79,7 +78,6 @@ public class TextureStateRecord extends StateRecord {
     public void invalidate() {
         super.invalidate();
         currentUnit = -1;
-        hint = -1;
         final Collection<TextureRecord> texs = textures.values();
         for (final TextureRecord tr : texs) {
             tr.invalidate();

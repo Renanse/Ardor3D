@@ -146,7 +146,7 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
             _canvasRenderer.getRenderer().deleteTexture(_fboTexture);
         }
 
-        _rtt = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, _canvasRenderer.getRenderer(),
+        _rtt = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, _canvasRenderer.getRenderer(),
                 _canvasRenderer.getRenderContext().getCapabilities());
 
         // copy our camera settings from the canvas renderer camera.

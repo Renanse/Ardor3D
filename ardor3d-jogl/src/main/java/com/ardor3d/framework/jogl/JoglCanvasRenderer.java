@@ -168,7 +168,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
             _renderer = createRenderer();
 
-            if (settings.getSamples() != 0 && caps.isMultisampleSupported()) {
+            if (settings.getSamples() != 0) {
                 final GL gl = GLContext.getCurrentGL();
                 gl.glEnable(GL.GL_MULTISAMPLE);
             }

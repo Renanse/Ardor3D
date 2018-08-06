@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,7 +12,6 @@ package com.ardor3d.example.renderer;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
@@ -32,12 +31,9 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.scenegraph.visitor.DeleteVBOsVisitor;
 import com.ardor3d.ui.text.BasicText;
-import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
@@ -53,7 +49,7 @@ public class GeometryInstancingExample extends ExampleBase {
     private int frames = 0;
     private long startTime = System.currentTimeMillis();
 
-    private int vboMode = 0;
+    private final int vboMode = 0;
     private boolean instancingEnabled = true;
 
     private GLSLShaderObjectsState _shader;
@@ -136,32 +132,6 @@ public class GeometryInstancingExample extends ExampleBase {
 
         generateSpheres(instancedBase, true, nrOfObjects);
         generateSpheres(unInstancedBase, false, nrOfObjects);
-
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.V), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                vboMode = (vboMode + 1) % 3;
-                if (vboMode == 0) {
-                    t.setText("[V] VBO Off");
-                    _base.getSceneHints().setDataMode(DataMode.Arrays);
-                    // run this in the opengl thread
-                    GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).render(
-                            new Callable<Void>() {
-                                public Void call() throws Exception {
-                                    final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer()
-                                            .getRenderer());
-                                    _base.acceptVisitor(viz, false);
-                                    return null;
-                                }
-                            });
-                } else if (vboMode == 1) {
-                    t.setText("[V] VBO On");
-                    _base.getSceneHints().setDataMode(DataMode.VBO);
-                } else if (vboMode == 2) {
-                    t.setText("[V] VBO Interleaved On");
-                    _base.getSceneHints().setDataMode(DataMode.VBOInterleaved);
-                }
-            }
-        }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), new TriggerAction() {
 

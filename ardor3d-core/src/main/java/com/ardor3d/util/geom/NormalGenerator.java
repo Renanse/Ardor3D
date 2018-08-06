@@ -238,10 +238,7 @@ public class NormalGenerator {
         mesh.getMeshData().setVertexBuffer(vertices);
         mesh.getMeshData().setNormalBuffer(normals);
         mesh.getMeshData().setColorBuffer(colors);
-        mesh.getMeshData().getTextureCoords().clear();
-        if (texCoords != null) {
-            mesh.getMeshData().setTextureBuffer(texCoords, 0);
-        }
+        mesh.getMeshData().clearAllTextureCoords();
         mesh.getMeshData().setIndices(indices);
     }
 

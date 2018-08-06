@@ -304,33 +304,30 @@ public class ParallelSplitShadowMapPass extends Pass {
         // interested in recording depth. Also only need back faces when rendering the shadow maps
 
         // Load PSSM shader.
-        final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
-        if (caps.isGLSLSupported()) {
-            _pssmShader = new GLSLShaderObjectsState();
-            try {
-                _pssmShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssm.vert"));
-                if (filter == Filter.None) {
-                    _pssmShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                            ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssm.frag"));
-                } else if (filter == Filter.Pcf) {
-                    _pssmShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                            ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmPCF.frag"));
-                }
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        _pssmShader = new GLSLShaderObjectsState();
+        try {
+            _pssmShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssm.vert"));
+            if (filter == Filter.None) {
+                _pssmShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssm.frag"));
+            } else if (filter == Filter.Pcf) {
+                _pssmShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmPCF.frag"));
             }
-            _mainShader = _pssmShader;
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        }
+        _mainShader = _pssmShader;
 
-            _pssmDebugShader = new GLSLShaderObjectsState();
-            try {
-                _pssmDebugShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmDebug.vert"));
-                _pssmDebugShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmDebug.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
+        _pssmDebugShader = new GLSLShaderObjectsState();
+        try {
+            _pssmDebugShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmDebug.vert"));
+            _pssmDebugShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmDebug.frag"));
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
 
         // Setup texture renderer.
@@ -405,7 +402,7 @@ public class ParallelSplitShadowMapPass extends Pass {
             _shadowMapTexture[i].setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
             _shadowMapTexture[i].setBorderColor(ColorRGBA.WHITE);
 
-            _shadowMapTexture[i].setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
+            // _shadowMapTexture[i].setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
 
             _shadowMapTexture[i].setTextureStoreFormat(_shadowTextureStoreFormat);
             _shadowMapTexture[i].setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
@@ -512,7 +509,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     }
 
     private void updateShaderVariables() {
-        if (_pssmShader != null && ContextManager.getCurrentContext().getCapabilities().isGLSLSupported()) {
+        if (_pssmShader != null) {
             final float split1 = (float) _pssmCam.getSplitDistances()[1];
             final float split2 = (float) (_pssmCam.getSplitDistances().length > 2 ? _pssmCam.getSplitDistances()[2]
                     : 0f);
@@ -725,7 +722,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         _context.enforceState(_discardShadowFragments);
         _context.enforceState(_shadowPassOffsetState);
 
-        if (_pssmShader != null && _context.getCapabilities().isGLSLSupported()) {
+        if (_pssmShader != null) {
             GLSLShaderObjectsState currentShader = _drawShaderDebug ? _pssmDebugShader : _pssmShader;
             if (_drawShaderDebug) {
                 currentShader = _pssmDebugShader;

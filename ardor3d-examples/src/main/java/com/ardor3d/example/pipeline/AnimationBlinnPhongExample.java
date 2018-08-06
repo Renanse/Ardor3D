@@ -38,7 +38,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.visitor.Visitor;
@@ -221,8 +220,8 @@ public class AnimationBlinnPhongExample extends ExampleBase {
         }));
 
         frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
-        frameRateLabel.setTranslation(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getHeight(), 0);
+        frameRateLabel.setTranslation(5,
+                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getHeight(), 0);
         frameRateLabel.setTextColor(ColorRGBA.WHITE);
         frameRateLabel.getSceneHints().setOrthoOrder(-1);
         _root.attachChild(frameRateLabel);
@@ -317,10 +316,8 @@ public class AnimationBlinnPhongExample extends ExampleBase {
 
         final Node rot = new Node("Model Rotation");
 
-        rot.getSceneHints().setDataMode(DataMode.VBO);
         rot.attachChild(colladaNode);
         _root.attachChild(rot);
-
     }
 
     @Override

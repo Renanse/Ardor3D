@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -42,19 +42,19 @@ import com.google.common.collect.Maps;
  * Simple use case:
  * <p>
  * <blockquote>
- * 
+ *
  * <pre>
  * // Create a texture atlas packer with maximum atlas size of 256x256
  * final TexturePacker packer = new TexturePacker(256, 256);
- * 
+ *
  * // Add meshes into atlas (lots of different ways of doing this if you have other source/target texture indices)
  * packer.insert(mesh1);
  * packer.insert(mesh2);
- * 
+ *
  * // Create all the atlases (also possible to set filters etc here through the AtlasTextureParameter)
  * packer.createAtlases();
  * </pre>
- * 
+ *
  * </blockquote>
  */
 public class TexturePacker {
@@ -303,7 +303,6 @@ public class TexturePacker {
             texture.setMagnificationFilter(atlasTextureParameter.magnificationFilter);
 
             texture.setWrap(atlasTextureParameter.wrapMode);
-            texture.setApply(atlasTextureParameter.applyMode);
 
             textures.add(texture);
         }

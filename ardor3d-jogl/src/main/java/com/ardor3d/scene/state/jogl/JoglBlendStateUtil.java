@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,7 +13,7 @@ package com.ardor3d.scene.state.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
-import javax.media.opengl.GL2GL3;
+import javax.media.opengl.GL2ES3;
 import javax.media.opengl.GLContext;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -46,11 +46,9 @@ public abstract class JoglBlendStateUtil {
 
             applyTest(gl, state.isTestEnabled(), state, record);
 
-            if (caps.isMultisampleSupported()) {
-                applyAlphaCoverage(gl, state.isSampleAlphaToCoverageEnabled(), state.isSampleAlphaToOneEnabled(),
-                        record, caps);
-                applySampleCoverage(gl, state.isSampleCoverageEnabled(), state, record, caps);
-            }
+            applyAlphaCoverage(gl, state.isSampleAlphaToCoverageEnabled(), state.isSampleAlphaToOneEnabled(), record,
+                    caps);
+            applySampleCoverage(gl, state.isSampleCoverageEnabled(), state, record, caps);
         } else {
             // disable blend
             applyBlendEquations(gl, false, state, record, caps);
@@ -59,10 +57,8 @@ public abstract class JoglBlendStateUtil {
             applyTest(gl, false, state, record);
 
             // disable sample coverage
-            if (caps.isMultisampleSupported()) {
-                applyAlphaCoverage(gl, false, false, record, caps);
-                applySampleCoverage(gl, false, state, record, caps);
-            }
+            applyAlphaCoverage(gl, false, false, record, caps);
+            applySampleCoverage(gl, false, state, record, caps);
         }
 
         if (!record.isValid()) {
@@ -79,18 +75,11 @@ public abstract class JoglBlendStateUtil {
                     record.blendEnabled = true;
                 }
                 final int blendEqRGB = getGLEquationValue(state.getBlendEquationRGB(), caps);
-                if (caps.isSeparateBlendEquationsSupported()) {
-                    final int blendEqAlpha = getGLEquationValue(state.getBlendEquationAlpha(), caps);
-                    if (record.blendEqRGB != blendEqRGB || record.blendEqAlpha != blendEqAlpha) {
-                        gl.glBlendEquationSeparate(blendEqRGB, blendEqAlpha);
-                        record.blendEqRGB = blendEqRGB;
-                        record.blendEqAlpha = blendEqAlpha;
-                    }
-                } else if (caps.isBlendEquationSupported()) {
-                    if (record.blendEqRGB != blendEqRGB) {
-                        gl.glBlendEquation(blendEqRGB);
-                        record.blendEqRGB = blendEqRGB;
-                    }
+                final int blendEqAlpha = getGLEquationValue(state.getBlendEquationAlpha(), caps);
+                if (record.blendEqRGB != blendEqRGB || record.blendEqAlpha != blendEqAlpha) {
+                    gl.glBlendEquationSeparate(blendEqRGB, blendEqAlpha);
+                    record.blendEqRGB = blendEqRGB;
+                    record.blendEqAlpha = blendEqAlpha;
                 }
             } else if (record.blendEnabled) {
                 gl.glDisable(GL.GL_BLEND);
@@ -102,15 +91,10 @@ public abstract class JoglBlendStateUtil {
                 gl.glEnable(GL.GL_BLEND);
                 record.blendEnabled = true;
                 final int blendEqRGB = getGLEquationValue(state.getBlendEquationRGB(), caps);
-                if (caps.isSeparateBlendEquationsSupported()) {
-                    final int blendEqAlpha = getGLEquationValue(state.getBlendEquationAlpha(), caps);
-                    gl.glBlendEquationSeparate(blendEqRGB, blendEqAlpha);
-                    record.blendEqRGB = blendEqRGB;
-                    record.blendEqAlpha = blendEqAlpha;
-                } else if (caps.isBlendEquationSupported()) {
-                    gl.glBlendEquation(blendEqRGB);
-                    record.blendEqRGB = blendEqRGB;
-                }
+                final int blendEqAlpha = getGLEquationValue(state.getBlendEquationAlpha(), caps);
+                gl.glBlendEquationSeparate(blendEqRGB, blendEqAlpha);
+                record.blendEqRGB = blendEqRGB;
+                record.blendEqAlpha = blendEqAlpha;
             } else {
                 gl.glDisable(GL.GL_BLEND);
                 record.blendEnabled = false;
@@ -123,11 +107,11 @@ public abstract class JoglBlendStateUtil {
         if (enabled) {
             final boolean applyConstant = state.getDestinationFunctionRGB().usesConstantColor()
                     || state.getSourceFunctionRGB().usesConstantColor()
-                    || (caps.isConstantBlendColorSupported() && (state.getDestinationFunctionAlpha()
-                            .usesConstantColor() || state.getSourceFunctionAlpha().usesConstantColor()));
-            if (applyConstant && caps.isConstantBlendColorSupported()) {
+                    || (state.getDestinationFunctionAlpha().usesConstantColor() || state.getSourceFunctionAlpha()
+                            .usesConstantColor());
+            if (applyConstant) {
                 final ReadOnlyColorRGBA constant = state.getConstantColor();
-                if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
+                if (!record.isValid() || !record.blendColor.equals(constant)) {
                     if (gl.isGL2ES2()) {
                         gl.getGL2ES2().glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
                                 constant.getAlpha());
@@ -144,40 +128,28 @@ public abstract class JoglBlendStateUtil {
             if (enabled) {
                 final int glSrcRGB = getGLSrcValue(state.getSourceFunctionRGB(), caps);
                 final int glDstRGB = getGLDstValue(state.getDestinationFunctionRGB(), caps);
-                if (caps.isSeparateBlendFunctionsSupported()) {
-                    final int glSrcAlpha = getGLSrcValue(state.getSourceFunctionAlpha(), caps);
-                    final int glDstAlpha = getGLDstValue(state.getDestinationFunctionAlpha(), caps);
-                    if (record.srcFactorRGB != glSrcRGB || record.dstFactorRGB != glDstRGB
-                            || record.srcFactorAlpha != glSrcAlpha || record.dstFactorAlpha != glDstAlpha) {
-                        gl.glBlendFuncSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
-                        record.srcFactorRGB = glSrcRGB;
-                        record.dstFactorRGB = glDstRGB;
-                        record.srcFactorAlpha = glSrcAlpha;
-                        record.dstFactorAlpha = glDstAlpha;
-                    }
-                } else if (record.srcFactorRGB != glSrcRGB || record.dstFactorRGB != glDstRGB) {
-                    gl.glBlendFunc(glSrcRGB, glDstRGB);
+                final int glSrcAlpha = getGLSrcValue(state.getSourceFunctionAlpha(), caps);
+                final int glDstAlpha = getGLDstValue(state.getDestinationFunctionAlpha(), caps);
+                if (record.srcFactorRGB != glSrcRGB || record.dstFactorRGB != glDstRGB
+                        || record.srcFactorAlpha != glSrcAlpha || record.dstFactorAlpha != glDstAlpha) {
+                    gl.glBlendFuncSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
                     record.srcFactorRGB = glSrcRGB;
                     record.dstFactorRGB = glDstRGB;
+                    record.srcFactorAlpha = glSrcAlpha;
+                    record.dstFactorAlpha = glDstAlpha;
                 }
             }
         } else {
             if (enabled) {
                 final int glSrcRGB = getGLSrcValue(state.getSourceFunctionRGB(), caps);
                 final int glDstRGB = getGLDstValue(state.getDestinationFunctionRGB(), caps);
-                if (caps.isSeparateBlendFunctionsSupported()) {
-                    final int glSrcAlpha = getGLSrcValue(state.getSourceFunctionAlpha(), caps);
-                    final int glDstAlpha = getGLDstValue(state.getDestinationFunctionAlpha(), caps);
-                    gl.glBlendFuncSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
-                    record.srcFactorRGB = glSrcRGB;
-                    record.dstFactorRGB = glDstRGB;
-                    record.srcFactorAlpha = glSrcAlpha;
-                    record.dstFactorAlpha = glDstAlpha;
-                } else {
-                    gl.glBlendFunc(glSrcRGB, glDstRGB);
-                    record.srcFactorRGB = glSrcRGB;
-                    record.dstFactorRGB = glDstRGB;
-                }
+                final int glSrcAlpha = getGLSrcValue(state.getSourceFunctionAlpha(), caps);
+                final int glDstAlpha = getGLDstValue(state.getDestinationFunctionAlpha(), caps);
+                gl.glBlendFuncSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);
+                record.srcFactorRGB = glSrcRGB;
+                record.dstFactorRGB = glDstRGB;
+                record.srcFactorAlpha = glSrcAlpha;
+                record.dstFactorAlpha = glDstAlpha;
             }
         }
     }
@@ -273,25 +245,13 @@ public abstract class JoglBlendStateUtil {
             case SourceAlphaSaturate:
                 return GL.GL_SRC_ALPHA_SATURATE;
             case ConstantColor:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_CONSTANT_COLOR;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_CONSTANT_COLOR;
             case OneMinusConstantColor:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_ONE_MINUS_CONSTANT_COLOR;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_ONE_MINUS_CONSTANT_COLOR;
             case ConstantAlpha:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_CONSTANT_ALPHA;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_CONSTANT_ALPHA;
             case OneMinusConstantAlpha:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_ONE_MINUS_CONSTANT_ALPHA;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_ONE_MINUS_CONSTANT_ALPHA;
             case One:
                 return GL.GL_ONE;
         }
@@ -315,25 +275,13 @@ public abstract class JoglBlendStateUtil {
             case OneMinusDestinationAlpha:
                 return GL.GL_ONE_MINUS_DST_ALPHA;
             case ConstantColor:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_CONSTANT_COLOR;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_CONSTANT_COLOR;
             case OneMinusConstantColor:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_ONE_MINUS_CONSTANT_COLOR;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_ONE_MINUS_CONSTANT_COLOR;
             case ConstantAlpha:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_CONSTANT_ALPHA;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_CONSTANT_ALPHA;
             case OneMinusConstantAlpha:
-                if (caps.isConstantBlendColorSupported()) {
-                    return GL2ES2.GL_ONE_MINUS_CONSTANT_ALPHA;
-                }
-                // FALLS THROUGH
+                return GL2ES2.GL_ONE_MINUS_CONSTANT_ALPHA;
             case One:
                 return GL.GL_ONE;
         }
@@ -343,26 +291,13 @@ public abstract class JoglBlendStateUtil {
     private static int getGLEquationValue(final BlendEquation eq, final ContextCapabilities caps) {
         switch (eq) {
             case Min:
-                if (caps.isMinMaxBlendEquationsSupported()) {
-                    return GL2GL3.GL_MIN;
-                }
-                // FALLS THROUGH
+                return GL2ES3.GL_MIN;
             case Max:
-                if (caps.isMinMaxBlendEquationsSupported()) {
-                    return GL2GL3.GL_MAX;
-                } else {
-                    return GL.GL_FUNC_ADD;
-                }
+                return GL2ES3.GL_MAX;
             case Subtract:
-                if (caps.isSubtractBlendEquationsSupported()) {
-                    return GL.GL_FUNC_SUBTRACT;
-                }
-                // FALLS THROUGH
+                return GL.GL_FUNC_SUBTRACT;
             case ReverseSubtract:
-                if (caps.isSubtractBlendEquationsSupported()) {
-                    return GL.GL_FUNC_REVERSE_SUBTRACT;
-                }
-                // FALLS THROUGH
+                return GL.GL_FUNC_REVERSE_SUBTRACT;
             case Add:
                 return GL.GL_FUNC_ADD;
         }
