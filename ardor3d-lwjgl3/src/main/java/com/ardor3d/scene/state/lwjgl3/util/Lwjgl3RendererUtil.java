@@ -12,7 +12,7 @@ package com.ardor3d.scene.state.lwjgl3.util;
 
 import java.util.Stack;
 
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyRectangle2;
@@ -51,7 +51,7 @@ public abstract class Lwjgl3RendererUtil {
                 setClippingEnabled(rendRecord, false);
             } else {
                 setClippingEnabled(rendRecord, true);
-                GL11.glScissor(init.getX(), init.getY(), init.getWidth(), init.getHeight());
+                GL11C.glScissor(init.getX(), init.getY(), init.getWidth(), init.getHeight());
             }
             Rectangle2.releaseTempInstance(init);
         } else {
@@ -62,10 +62,10 @@ public abstract class Lwjgl3RendererUtil {
 
     public static void setClippingEnabled(final RendererRecord rendRecord, final boolean enabled) {
         if (enabled && (!rendRecord.isClippingTestValid() || !rendRecord.isClippingTestEnabled())) {
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            GL11C.glEnable(GL11C.GL_SCISSOR_TEST);
             rendRecord.setClippingTestEnabled(true);
         } else if (!enabled && (!rendRecord.isClippingTestValid() || rendRecord.isClippingTestEnabled())) {
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            GL11C.glDisable(GL11C.GL_SCISSOR_TEST);
             rendRecord.setClippingTestEnabled(false);
         }
         rendRecord.setClippingTestValid(true);

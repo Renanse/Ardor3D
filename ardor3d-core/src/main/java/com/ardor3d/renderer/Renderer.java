@@ -56,13 +56,9 @@ public interface Renderer {
      */
     public static int BUFFER_DEPTH = 0x02;
     /**
-     * Often a higher precision buffer used to gather rendering results over time.
-     */
-    public static int BUFFER_ACCUMULATION = 0x04;
-    /**
      * A buffer used for masking out areas of the screen to prevent drawing.
      */
-    public static int BUFFER_STENCIL = 0x08;
+    public static int BUFFER_STENCIL = 0x04;
 
     /**
      * Convenience for those that find it too hard to do bitwise or. :)

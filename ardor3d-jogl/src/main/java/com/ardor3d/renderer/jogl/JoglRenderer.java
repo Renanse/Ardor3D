@@ -193,10 +193,6 @@ public class JoglRenderer extends AbstractRenderer {
             gl.glClear(GL.GL_STENCIL_BUFFER_BIT);
         }
 
-        if ((buffers & Renderer.BUFFER_ACCUMULATION) != 0) {
-            clear |= GL2.GL_ACCUM_BUFFER_BIT;
-        }
-
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord record = context.getRendererRecord();
 

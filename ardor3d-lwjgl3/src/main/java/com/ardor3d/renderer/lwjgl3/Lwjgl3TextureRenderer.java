@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -16,12 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.lwjgl.opengl.ARBDepthTexture;
-import org.lwjgl.opengl.ARBDrawBuffers;
-import org.lwjgl.opengl.EXTFramebufferBlit;
-import org.lwjgl.opengl.EXTFramebufferMultisample;
-import org.lwjgl.opengl.EXTFramebufferObject;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL14C;
+import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL30C;
 
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
@@ -64,7 +62,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         if (caps.getMaxFBOColorAttachments() > 1) {
             _attachBuffer = BufferUtils.createIntBuffer(caps.getMaxFBOColorAttachments());
             for (int i = 0; i < caps.getMaxFBOColorAttachments(); i++) {
-                _attachBuffer.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + i);
+                _attachBuffer.put(GL30C.GL_COLOR_ATTACHMENT0 + i);
             }
         }
     }
@@ -90,7 +88,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
         // Create the texture
         final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
-        GL11.glGenTextures(ibuf);
+        GL11C.glGenTextures(ibuf);
         final int textureId = ibuf.get(0);
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
@@ -102,18 +100,18 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         final int pixelDataType = Lwjgl3TextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
 
         if (tex.getType() == Type.TwoDimensional) {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
+            GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
                     (ByteBuffer) null);
         } else {
             for (final Face face : Face.values()) {
-                GL11.glTexImage2D(Lwjgl3TextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0,
-                        dataFormat, pixelDataType, (ByteBuffer) null);
+                GL11C.glTexImage2D(Lwjgl3TextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height,
+                        0, dataFormat, pixelDataType, (ByteBuffer) null);
             }
         }
 
         // Initialize mipmapping for this texture, if requested
         if (tex.getMinificationFilter().usesMipMapLevels()) {
-            EXTFramebufferObject.glGenerateMipmapEXT(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+            GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
         }
 
         // Setup filtering and wrap
@@ -202,12 +200,10 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 while (colorsAdded < maxDrawBuffers && !colors.isEmpty()) {
                     final Texture tex = colors.removeFirst();
                     if (tex.getType() == Type.TwoDimensional) {
-                        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                                EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + colorsAdded, GL11.GL_TEXTURE_2D,
-                                tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
+                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else if (tex.getType() == Type.CubeMap) {
-                        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                                EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + colorsAdded,
+                        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
                                 Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
                                 tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else {
@@ -221,12 +217,10 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = depths.removeFirst();
                     // Set up our depth texture
                     if (tex.getType() == Type.TwoDimensional) {
-                        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                                EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D,
-                                tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
+                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else if (tex.getType() == Type.CubeMap) {
-                        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                                EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT,
+                        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
                                 Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
                                 tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     } else {
@@ -235,14 +229,13 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     _usingDepthRB = false;
                 } else if (!_usingDepthRB && _depthRBID != 0) {
                     // setup our default depth render buffer if not already set
-                    EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                            EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
-                            _depthRBID);
+                    GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
+                            GL30C.GL_RENDERBUFFER, _depthRBID);
                     _usingDepthRB = true;
                 }
 
                 setDrawBuffers(colorsAdded);
-                setReadBuffer(colorsAdded != 0 ? EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT : GL11.GL_NONE);
+                setReadBuffer(colorsAdded != 0 ? GL30C.GL_COLOR_ATTACHMENT0 : GL11C.GL_NONE);
 
                 // Check FBO complete
                 checkFBOComplete(_fboID);
@@ -264,7 +257,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = texs.get(x);
                     if (tex.getMinificationFilter().usesMipMapLevels()) {
                         Lwjgl3TextureStateUtil.doTextureBind(texs.get(x), 0, true);
-                        EXTFramebufferObject.glGenerateMipmapEXT(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+                        GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
                     }
                 }
             }
@@ -281,32 +274,29 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
         if (tex.getTextureStoreFormat().isDepthFormat()) {
             // No color buffer
-            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                    EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
+            GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0, GL30C.GL_RENDERBUFFER, 0);
 
             // Setup depth texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
-                EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, textureId, 0);
+                GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL11C.GL_TEXTURE_2D,
+                        textureId, 0);
             } else if (tex.getType() == Type.CubeMap) {
-                EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT,
+                GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
                         Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
                         0);
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
             }
 
-            setDrawBuffer(GL11.GL_NONE);
-            setReadBuffer(GL11.GL_NONE);
+            setDrawBuffer(GL11C.GL_NONE);
+            setReadBuffer(GL11C.GL_NONE);
         } else {
             // Set color texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
-                EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, textureId, 0);
+                GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0, GL11C.GL_TEXTURE_2D,
+                        textureId, 0);
             } else if (tex.getType() == Type.CubeMap) {
-                EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT,
+                GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0,
                         Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
                         0);
             } else {
@@ -315,13 +305,12 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
             // setup depth RB
             if (_depthRBID != 0) {
-                EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_RENDERBUFFER,
                         _depthRBID);
             }
 
-            setDrawBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
-            setReadBuffer(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
+            setDrawBuffer(GL30C.GL_COLOR_ATTACHMENT0);
+            setReadBuffer(GL30C.GL_COLOR_ATTACHMENT0);
         }
 
         // Check FBO complete
@@ -329,21 +318,21 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     private void setReadBuffer(final int attachVal) {
-        GL11.glReadBuffer(attachVal);
+        GL11C.glReadBuffer(attachVal);
     }
 
     private void setDrawBuffer(final int attachVal) {
-        GL11.glDrawBuffer(attachVal);
+        GL11C.glDrawBuffer(attachVal);
     }
 
     private void setDrawBuffers(final int maxEntry) {
         if (maxEntry <= 1) {
-            setDrawBuffer(maxEntry != 0 ? EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT : GL11.GL_NONE);
+            setDrawBuffer(maxEntry != 0 ? GL30C.GL_COLOR_ATTACHMENT0 : GL11C.GL_NONE);
         } else {
             // We should only get to this point if we support ARBDrawBuffers.
             _attachBuffer.clear();
             _attachBuffer.limit(maxEntry);
-            ARBDrawBuffers.glDrawBuffersARB(_attachBuffer);
+            GL20C.glDrawBuffers(_attachBuffer);
         }
     }
 
@@ -352,25 +341,25 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
             Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
-            EXTFramebufferObject.glGenerateMipmapEXT(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+            GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
         }
     }
 
     @Override
     protected void setMSFBO() {
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, _msfboID);
+        GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, _msfboID);
     }
 
     @Override
     protected void blitMSFBO() {
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT, _msfboID);
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, _fboID);
-        EXTFramebufferBlit.glBlitFramebufferEXT(0, 0, _width, _height, 0, 0, _width, _height, GL11.GL_COLOR_BUFFER_BIT
-                | GL11.GL_DEPTH_BUFFER_BIT, GL11.GL_NEAREST);
+        GL30C.glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, _msfboID);
+        GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, _fboID);
+        GL30C.glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL11C.GL_COLOR_BUFFER_BIT
+                | GL11C.GL_DEPTH_BUFFER_BIT, GL11C.GL_NEAREST);
 
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT, 0);
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, 0);
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+        GL30C.glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, 0);
+        GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, 0);
+        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
     }
 
     /**
@@ -380,34 +369,28 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
      *            an id to use for log messages, particularly if there are any issues.
      */
     public static void checkFBOComplete(final int fboID) {
-        final int status = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
+        final int status = GL30C.glCheckFramebufferStatus(GL30C.GL_FRAMEBUFFER);
         switch (status) {
-            case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
+            case GL30C.GL_FRAMEBUFFER_COMPLETE:
                 break;
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+            case GL30C.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
                 throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT exception");
+            case GL30C.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
                 throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT exception");
+            case GL30C.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
                 throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER exception");
+            case GL30C.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
                 throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER exception");
+            case GL30C.GL_FRAMEBUFFER_UNSUPPORTED:
                 throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
-            case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED exception.");
+            case GL30C.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
                 throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
-            case EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception.");
-            case EXTFramebufferMultisample.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT exception.");
+                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE exception.");
             default:
                 throw new IllegalStateException("Unexpected reply from glCheckFramebufferStatusEXT: " + status);
         }
@@ -418,9 +401,9 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
 
         if (tex.getType() == Type.TwoDimensional) {
-            GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, width, height);
+            GL11C.glCopyTexSubImage2D(GL11C.GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, width, height);
         } else if (tex.getType() == Type.CubeMap) {
-            GL11.glCopyTexSubImage2D(
+            GL11C.glCopyTexSubImage2D(
                     Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), 0, xoffset,
                     yoffset, x, y, width, height);
         } else {
@@ -430,7 +413,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void clearBuffers(final int clear) {
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        GL11C.glDisable(GL11C.GL_SCISSOR_TEST);
         _parentRenderer.clearBuffers(clear);
     }
 
@@ -441,60 +424,56 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             final IntBuffer buffer = BufferUtils.createIntBuffer(1);
 
             // Create our texture binding FBO
-            EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate id
+            GL30C.glGenFramebuffers(buffer); // generate id
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
             if (_depthBits != 0) {
-                EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+                GL30C.glGenRenderbuffers(buffer); // generate id
                 _depthRBID = buffer.get(0);
-                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
-                EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
-                        getDepthFormat(), _width, _height);
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _depthRBID);
+                GL30C.glRenderbufferStorage(GL30C.GL_RENDERBUFFER, getDepthFormat(), _width, _height);
             }
 
             // unbind...
-            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+            GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
+            GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
 
             // If we support it, rustle up a multisample framebuffer + renderbuffers
             if (_samples != 0 && _supportsMultisample) {
                 // create ms framebuffer object
-                EXTFramebufferObject.glGenFramebuffersEXT(buffer);
+                GL30C.glGenFramebuffers(buffer);
                 _msfboID = buffer.get(0);
 
                 // create ms renderbuffers
-                EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+                GL30C.glGenRenderbuffers(buffer); // generate id
                 _mscolorRBID = buffer.get(0);
-                EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+                GL30C.glGenRenderbuffers(buffer); // generate id
                 _msdepthRBID = buffer.get(0);
 
                 // set up renderbuffer properties
-                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _mscolorRBID);
-                EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
-                        _samples, GL11.GL_RGBA, _width, _height);
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _mscolorRBID);
+                GL30C.glRenderbufferStorageMultisample(GL30C.GL_RENDERBUFFER, _samples, GL11C.GL_RGBA, _width, _height);
 
                 if (_depthBits > 0) {
-                    EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _msdepthRBID);
-                    EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(
-                            EXTFramebufferObject.GL_RENDERBUFFER_EXT, _samples, getDepthFormat(), _width, _height);
+                    GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _msdepthRBID);
+                    GL30C.glRenderbufferStorageMultisample(GL30C.GL_RENDERBUFFER, _samples, getDepthFormat(), _width,
+                            _height);
                 }
 
-                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
 
-                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _msfboID);
-                EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
-                        _mscolorRBID);
-                EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                        EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, _msfboID);
+                GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0,
+                        GL30C.GL_RENDERBUFFER, _mscolorRBID);
+                GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_RENDERBUFFER,
                         _msdepthRBID);
 
                 // check for errors
                 checkFBOComplete(_msfboID);
 
                 // release
-                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+                GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
             }
 
         }
@@ -513,9 +492,9 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 _parentRenderer.pushEmptyClip();
             }
 
-            GL11.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
+            GL11C.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                     _backgroundColor.getAlpha());
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboID);
+            GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, _fboID);
             ContextManager.getCurrentContext().pushEnforcedStates();
             ContextManager.getCurrentContext().clearEnforcedStates();
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);
@@ -524,16 +503,16 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     private int getDepthFormat() {
-        int format = GL11.GL_DEPTH_COMPONENT;
+        int format = GL11C.GL_DEPTH_COMPONENT;
         switch (_depthBits) {
             case 16:
-                format = ARBDepthTexture.GL_DEPTH_COMPONENT16_ARB;
+                format = GL14C.GL_DEPTH_COMPONENT16;
                 break;
             case 24:
-                format = ARBDepthTexture.GL_DEPTH_COMPONENT24_ARB;
+                format = GL14C.GL_DEPTH_COMPONENT24;
                 break;
             case 32:
-                format = ARBDepthTexture.GL_DEPTH_COMPONENT32_ARB;
+                format = GL14C.GL_DEPTH_COMPONENT32;
                 break;
             default:
                 // stick with the "undefined" GL_DEPTH_COMPONENT
@@ -545,8 +524,8 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     protected void deactivate() {
         if (_active == 1) {
             final ReadOnlyColorRGBA bgColor = _parentRenderer.getBackgroundColor();
-            GL11.glClearColor(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), bgColor.getAlpha());
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+            GL11C.glClearColor(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), bgColor.getAlpha());
+            GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
 
             ContextManager.getCurrentContext().popEnforcedStates();
 
@@ -562,14 +541,14 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_fboID);
             id.rewind();
-            EXTFramebufferObject.glDeleteFramebuffersEXT(id);
+            GL30C.glDeleteFramebuffers(id);
         }
 
         if (_depthRBID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_depthRBID);
             id.rewind();
-            EXTFramebufferObject.glDeleteRenderbuffersEXT(id);
+            GL30C.glDeleteRenderbuffers(id);
         }
     }
 }

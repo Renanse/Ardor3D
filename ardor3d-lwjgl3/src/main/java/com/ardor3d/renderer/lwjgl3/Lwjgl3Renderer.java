@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GLUtil;
 
 import com.ardor3d.image.ImageDataFormat;
@@ -94,7 +94,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     @Override
     public void setBackgroundColor(final ReadOnlyColorRGBA color) {
         _backgroundColor.set(color);
-        GL11.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
+        GL11C.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                 _backgroundColor.getAlpha());
 
     }
@@ -115,11 +115,11 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         int clear = 0;
 
         if ((buffers & Renderer.BUFFER_COLOR) != 0) {
-            clear |= GL11.GL_COLOR_BUFFER_BIT;
+            clear |= GL11C.GL_COLOR_BUFFER_BIT;
         }
 
         if ((buffers & Renderer.BUFFER_DEPTH) != 0) {
-            clear |= GL11.GL_DEPTH_BUFFER_BIT;
+            clear |= GL11C.GL_DEPTH_BUFFER_BIT;
 
             // make sure no funny business is going on in the z before clearing.
             if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
@@ -129,15 +129,11 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         }
 
         if ((buffers & Renderer.BUFFER_STENCIL) != 0) {
-            clear |= GL11.GL_STENCIL_BUFFER_BIT;
+            clear |= GL11C.GL_STENCIL_BUFFER_BIT;
 
-            GL11.glClearStencil(_stencilClearValue);
-            GL11.glStencilMask(~0);
-            GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
-        }
-
-        if ((buffers & Renderer.BUFFER_ACCUMULATION) != 0) {
-            clear |= GL11.GL_ACCUM_BUFFER_BIT;
+            GL11C.glClearStencil(_stencilClearValue);
+            GL11C.glStencilMask(~0);
+            GL11C.glClear(GL11C.GL_STENCIL_BUFFER_BIT);
         }
 
         final RenderContext context = ContextManager.getCurrentContext();
@@ -147,12 +143,12 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             // grab our camera to get width and height info.
             final Camera cam = Camera.getCurrentCamera();
 
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
-            GL11.glScissor(0, 0, cam.getWidth(), cam.getHeight());
+            GL11C.glEnable(GL11C.GL_SCISSOR_TEST);
+            GL11C.glScissor(0, 0, cam.getWidth(), cam.getHeight());
             record.setClippingTestEnabled(true);
         }
 
-        GL11.glClear(clear);
+        GL11C.glClear(clear);
 
         if (strict) {
             // put us back.
@@ -164,7 +160,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     public void flushFrame(final boolean doSwap) {
         renderBuckets();
 
-        GL11.glFlush();
+        GL11C.glFlush();
         if (doSwap) {
             doApplyState(defaultStateList.get(RenderState.StateType.ColorMask));
         }
@@ -191,7 +187,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             final int x, final int y, final int w, final int h) {
         final int pixFormat = Lwjgl3TextureUtil.getGLPixelFormat(format);
         final int pixDataType = Lwjgl3TextureUtil.getGLPixelDataType(type);
-        GL11.glReadPixels(x, y, w, h, pixFormat, pixDataType, store);
+        GL11C.glReadPixels(x, y, w, h, pixFormat, pixDataType, store);
     }
 
     @Override
@@ -202,11 +198,11 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     public void flushGraphics() {
-        GL11.glFlush();
+        GL11C.glFlush();
     }
 
     public void finishGraphics() {
-        GL11.glFinish();
+        GL11C.glFinish();
     }
 
     @Override

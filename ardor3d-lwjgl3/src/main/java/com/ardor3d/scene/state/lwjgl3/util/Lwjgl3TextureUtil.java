@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -33,7 +33,7 @@ public abstract class Lwjgl3TextureUtil {
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
-            // first some frequently used formats
+        // first some frequently used formats
             case RGBA8:
                 return GL11C.GL_RGBA8;
             case RGB8:
