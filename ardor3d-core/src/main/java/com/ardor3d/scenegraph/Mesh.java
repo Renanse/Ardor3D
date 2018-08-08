@@ -11,9 +11,11 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
@@ -246,19 +248,22 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     public void render(final Renderer renderer, final MeshData meshData) {
 
         // PLAN OF ATTACK
-        // 1. Set up our data as a VBO
-        // renderer.setupVertexDataVBO();
 
-        // 2. Set up our GLSL shader
-        // 3. Set our shader attributes (the vbo from step 1)
-        // 4. Set our shader uniforms (model, view and projection matrices)
-        // 5. Apply states?
-        // 6. Draw arrays or elements (depending on indices)
-
-        // Set up MeshData in GLSLShaderObjectsState if necessary
-        // XXX: considered a hack until we settle on our shader model.
+        // 1. Set up our GLSL shader
         final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) renderer.getProperRenderState(
                 RenderState.StateType.GLSLShader, _states.get(RenderState.StateType.GLSLShader));
+
+        // 2. Set up our mesh data as VBOs and apply them to our shader as attributes
+        for (final Entry<String, AbstractBufferData<? extends Buffer>> e : meshData._vertexDataItems.entrySet()) {
+            renderer.setupVBO(e.getValue());
+            glsl.setAttributePointer(e.getKey(), size, normalized, stride, data);
+        }
+
+        // 3. Set our shader uniforms (model, view and projection matrices)
+
+        // 4. Apply states?
+
+        // 5. Draw arrays or elements (depending on indices)
 
         if (glsl != null && glsl.getShaderDataLogic() != null) {
             glsl.setMesh(this);

@@ -77,13 +77,10 @@ public class WaterNode extends Node {
     protected GLSLShaderObjectsState waterShader;
     protected CullState cullBackFace;
     protected TextureState textureState;
-    protected TextureState fallbackTextureState;
 
     private Texture normalmapTexture;
     private Texture dudvTexture;
     private Texture foamTexture;
-    private Texture fallbackTexture;
-    private Matrix4 fallbackTextureStateMatrix;
 
     protected BlendState as1;
     protected FogState noFog;
@@ -104,7 +101,6 @@ public class WaterNode extends Node {
     protected boolean aboveWater;
     protected double normalTranslation = 0.0;
     protected double refractionTranslation = 0.0;
-    protected boolean supported = true;
     protected boolean useProjectedShader = false;
     protected boolean useRefraction = false;
     protected boolean useReflection = true;
@@ -148,16 +144,12 @@ public class WaterNode extends Node {
     }
 
     /**
-     * Release pbuffers in TextureRenderer's. Preferably called from user cleanup method.
+     * Release fbo in TextureRenderer's. Preferably called from user cleanup method.
      */
     public void cleanup() {
-        if (isSupported() && tRenderer != null) {
+        if (tRenderer != null) {
             tRenderer.cleanup();
         }
-    }
-
-    public boolean isSupported() {
-        return supported;
     }
 
     /**
@@ -207,45 +199,39 @@ public class WaterNode extends Node {
             logger.info("Not enough textureunits, falling back to non refraction water");
         }
 
-        if (isSupported()) {
-            tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer( //
-                    cam.getWidth() / renderScale, // width
-                    cam.getHeight() / renderScale, // height
-                    8, // Depth bits... TODO: Make configurable?
-                    0, // Samples... TODO: Make configurable?
-                    r, caps);
+        tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer( //
+                cam.getWidth() / renderScale, // width
+                cam.getHeight() / renderScale, // height
+                8, // Depth bits... TODO: Make configurable?
+                0, // Samples... TODO: Make configurable?
+                r, caps);
 
-            // blurSampleDistance = 1f / ((float) cam.getHeight() / renderScale);
+        // blurSampleDistance = 1f / ((float) cam.getHeight() / renderScale);
 
-            tRenderer.setMultipleTargets(true);
-            tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
-            tRenderer.getCamera().setFrustum(cam.getFrustumNear(), cam.getFrustumFar(), cam.getFrustumLeft(),
-                    cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
+        tRenderer.setMultipleTargets(true);
+        tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
+        tRenderer.getCamera().setFrustum(cam.getFrustumNear(), cam.getFrustumFar(), cam.getFrustumLeft(),
+                cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
 
-            textureState = new TextureState();
-            textureState.setEnabled(true);
+        textureState = new TextureState();
+        textureState.setEnabled(true);
 
-            setupTextures();
+        setupTextures();
 
-            fullScreenQuad = new Quad("FullScreenQuad", cam.getWidth() / 4, cam.getHeight() / 4);
-            fullScreenQuad.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
-            fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-            fullScreenQuad.getSceneHints().setCullHint(CullHint.Never);
-            fullScreenQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-            fullScreenQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-            final TextureState ts = new TextureState();
-            ts.setTexture(textureReflect);
-            fullScreenQuad.setRenderState(ts);
-            fullScreenQuad.setRenderState(blurShaderVertical);
-            fullScreenQuad.updateWorldRenderStates(false);
-        }
+        fullScreenQuad = new Quad("FullScreenQuad", cam.getWidth() / 4, cam.getHeight() / 4);
+        fullScreenQuad.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
+        fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        fullScreenQuad.getSceneHints().setCullHint(CullHint.Never);
+        fullScreenQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        fullScreenQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        final TextureState ts = new TextureState();
+        ts.setTexture(textureReflect);
+        fullScreenQuad.setRenderState(ts);
+        fullScreenQuad.setRenderState(blurShaderVertical);
+        fullScreenQuad.updateWorldRenderStates(false);
 
-        if (!isSupported()) {
-            createFallbackData();
-        } else {
-            noFog = new FogState();
-            noFog.setEnabled(false);
-        }
+        noFog = new FogState();
+        noFog.setEnabled(false);
 
         getSceneHints().setCullHint(CullHint.Never);
 
@@ -317,28 +303,6 @@ public class WaterNode extends Node {
         reloadShader();
     }
 
-    /**
-     * Create setup to use as fallback if fancy water is not supported.
-     */
-    private void createFallbackData() {
-        fallbackTextureState = new TextureState();
-        fallbackTextureState.setEnabled(true);
-
-        fallbackTexture = TextureManager.load(fallbackMapTextureString, Texture.MinificationFilter.Trilinear,
-                TextureStoreFormat.GuessCompressedFormat, true);
-        fallbackTextureState.setTexture(fallbackTexture, 0);
-        fallbackTexture.setWrap(Texture.WrapMode.Repeat);
-
-        fallbackTextureStateMatrix = new Matrix4();
-
-        as1 = new BlendState();
-        as1.setBlendEnabled(true);
-        as1.setTestEnabled(true);
-        as1.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        as1.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        as1.setEnabled(true);
-    }
-
     public void update(final double tpf) {
         this.tpf = tpf;
     }
@@ -352,42 +316,35 @@ public class WaterNode extends Node {
         final double camWaterDist = waterPlane.pseudoDistance(cam.getLocation());
         aboveWater = camWaterDist >= 0;
 
-        if (isSupported()) {
-            waterShader.setUniform("tangent", tangent);
-            waterShader.setUniform("binormal", binormal);
-            waterShader.setUniform("useFadeToFogColor", useFadeToFogColor);
-            waterShader.setUniform("waterColor", waterColorStart);
-            waterShader.setUniform("waterColorEnd", waterColorEnd);
-            waterShader.setUniform("normalTranslation", (float) normalTranslation);
-            waterShader.setUniform("refractionTranslation", (float) refractionTranslation);
-            waterShader.setUniform("abovewater", aboveWater);
-            if (useProjectedShader) {
-                waterShader.setUniform("cameraPos", cam.getLocation());
-                waterShader.setUniform("waterHeight", (float) waterPlane.getConstant());
-                waterShader.setUniform("amplitude", (float) waterMaxAmplitude);
-                waterShader.setUniform("heightFalloffStart", (float) heightFalloffStart);
-                waterShader.setUniform("heightFalloffSpeed", (float) heightFalloffSpeed);
-            }
-
-            final double heightTotal = clipBias + waterMaxAmplitude - waterPlane.getConstant();
-            final Vector4 clipPlane = Vector4.fetchTempInstance();
-
-            if (useReflection) {
-                clipPlane.set(waterPlane.getNormal().getX(), waterPlane.getNormal().getY(), waterPlane.getNormal()
-                        .getZ(), heightTotal);
-                renderReflection(clipPlane);
-            }
-
-            if (useRefraction && aboveWater) {
-                clipPlane.set(-waterPlane.getNormal().getX(), -waterPlane.getNormal().getY(), -waterPlane.getNormal()
-                        .getZ(), -waterPlane.getConstant());
-                renderRefraction(clipPlane);
-            }
+        waterShader.setUniform("tangent", tangent);
+        waterShader.setUniform("binormal", binormal);
+        waterShader.setUniform("useFadeToFogColor", useFadeToFogColor);
+        waterShader.setUniform("waterColor", waterColorStart);
+        waterShader.setUniform("waterColorEnd", waterColorEnd);
+        waterShader.setUniform("normalTranslation", (float) normalTranslation);
+        waterShader.setUniform("refractionTranslation", (float) refractionTranslation);
+        waterShader.setUniform("abovewater", aboveWater);
+        if (useProjectedShader) {
+            waterShader.setUniform("cameraPos", cam.getLocation());
+            waterShader.setUniform("waterHeight", (float) waterPlane.getConstant());
+            waterShader.setUniform("amplitude", (float) waterMaxAmplitude);
+            waterShader.setUniform("heightFalloffStart", (float) heightFalloffStart);
+            waterShader.setUniform("heightFalloffSpeed", (float) heightFalloffSpeed);
         }
 
-        if (fallbackTextureState != null) {
-            fallbackTextureStateMatrix.setM31(normalTranslation);
-            fallbackTexture.setTextureMatrix(fallbackTextureStateMatrix);
+        final double heightTotal = clipBias + waterMaxAmplitude - waterPlane.getConstant();
+        final Vector4 clipPlane = Vector4.fetchTempInstance();
+
+        if (useReflection) {
+            clipPlane.set(waterPlane.getNormal().getX(), waterPlane.getNormal().getY(), waterPlane.getNormal().getZ(),
+                    heightTotal);
+            renderReflection(clipPlane);
+        }
+
+        if (useRefraction && aboveWater) {
+            clipPlane.set(-waterPlane.getNormal().getX(), -waterPlane.getNormal().getY(), -waterPlane.getNormal()
+                    .getZ(), -waterPlane.getConstant());
+            renderRefraction(clipPlane);
         }
 
         super.draw(r);
@@ -464,16 +421,9 @@ public class WaterNode extends Node {
      */
     public void setWaterEffectOnSpatial(final Spatial spatial) {
         spatial.setRenderState(cullBackFace);
-        if (isSupported()) {
-            // spatial.setRenderBucketType(RenderBucketType.Skip);
-            spatial.setRenderState(waterShader);
-            spatial.setRenderState(textureState);
-        } else {
-            spatial.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-            spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-            spatial.setRenderState(fallbackTextureState);
-            spatial.setRenderState(as1);
-        }
+        // spatial.setRenderBucketType(RenderBucketType.Skip);
+        spatial.setRenderState(waterShader);
+        spatial.setRenderState(textureState);
     }
 
     // temporary vectors for mem opt.
@@ -962,18 +912,7 @@ public class WaterNode extends Node {
     }
 
     public void updateCamera() {
-        if (isSupported()) {
-            tRenderer.getCamera().setFrustum(cam.getFrustumNear(), cam.getFrustumFar(), cam.getFrustumLeft(),
-                    cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
-        }
-    }
-
-    public void setFallbackTexture(final Texture fallbackTexture) {
-        this.fallbackTexture = fallbackTexture;
-    }
-
-    public Texture getFallbackTexture() {
-        return fallbackTexture;
+        tRenderer.getCamera().setFrustum(cam);
     }
 
     public void setNormalmapTexture(final Texture normalmapTexture) {

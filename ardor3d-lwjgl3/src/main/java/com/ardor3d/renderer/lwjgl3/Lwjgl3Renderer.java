@@ -38,8 +38,10 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.RendererRecord;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3RendererUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
@@ -500,7 +502,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 // LwjglLightStateUtil.apply((LightState) state);
                 return;
             case Blend:
-                // LwjglBlendStateUtil.apply((BlendState) state);
+                Lwjgl3BlendStateUtil.apply((BlendState) state);
                 return;
             case Clip:
                 // LwjglClipStateUtil.apply((ClipState) state);

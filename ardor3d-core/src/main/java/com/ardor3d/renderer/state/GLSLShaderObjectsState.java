@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -107,9 +107,6 @@ public class GLSLShaderObjectsState extends RenderState {
     /** OpenGL id for the attached tessellation evaluation shader. */
     public int _tessellationEvaluationShaderID = -1;
 
-    /** if true, we'll send our vertex attributes to the shader via vbo */
-    private boolean _useAttributeVBO;
-
     /** optional name for our vertex shader, used for debugging details. */
     public String _vertexShaderName;
 
@@ -127,7 +124,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets the currently loaded vertex shader.
-     * 
+     *
      * @return
      */
     public ByteBuffer getVertexShader() {
@@ -136,7 +133,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets the currently loaded fragment shader.
-     * 
+     *
      * @return
      */
     public ByteBuffer getFragmentShader() {
@@ -145,7 +142,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets the currently loaded geometry shader.
-     * 
+     *
      * @return
      */
     public ByteBuffer getGeometryShader() {
@@ -154,7 +151,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets the currently loaded tessellation control shader.
-     * 
+     *
      * @return
      */
     public ByteBuffer getTessellationControlShader() {
@@ -163,7 +160,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets the currently loaded tessellation evaluation shader.
-     * 
+     *
      * @return
      */
     public ByteBuffer getTessellationEvaluationShader() {
@@ -243,7 +240,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our vertex shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -253,7 +250,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our vertex shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -266,7 +263,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our fragment shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -276,7 +273,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our fragment shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -289,7 +286,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our geometry shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -299,7 +296,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our geometry shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -312,7 +309,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation control shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -322,7 +319,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation control shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -335,7 +332,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation evaluation shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -345,7 +342,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation evaluation shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -358,7 +355,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our vertex shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -368,7 +365,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our vertex shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -381,7 +378,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our fragment shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -391,7 +388,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our fragment shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -404,7 +401,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our geometry shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -414,7 +411,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our geometry shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -427,7 +424,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation control shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -437,7 +434,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation control shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -450,7 +447,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation evaluation shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      */
@@ -460,7 +457,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set the contents for our tessellation evaluation shader
-     * 
+     *
      * @param shader
      *            the shader contents.
      * @param name
@@ -481,7 +478,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets all shader uniforms variables.
-     * 
+     *
      * @return
      */
     public List<ShaderVariable> getShaderUniforms() {
@@ -490,7 +487,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Retrieves a shader uniform by name.
-     * 
+     *
      * @param uniformName
      * @return
      */
@@ -506,7 +503,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Gets all shader attribute variables.
-     * 
+     *
      * @return
      */
     public List<ShaderVariable> getShaderAttributes() {
@@ -515,7 +512,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Retrieves a shader attribute by name.
-     * 
+     *
      * @param uniformName
      * @return
      */
@@ -530,7 +527,7 @@ public class GLSLShaderObjectsState extends RenderState {
     }
 
     /**
-     * 
+     *
      * @param meshData
      */
     public void setMesh(final Mesh mesh) {
@@ -539,7 +536,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Logic to handle setting mesh-specific data to a shader before rendering
-     * 
+     *
      * @param shaderDataLogic
      */
     public void setShaderDataLogic(final GLSLShaderDataLogic shaderDataLogic) {
@@ -564,7 +561,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -579,7 +576,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -594,7 +591,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -609,7 +606,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -627,7 +624,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -645,7 +642,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -663,7 +660,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -684,7 +681,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -705,7 +702,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -726,7 +723,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -751,7 +748,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -775,7 +772,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value1
@@ -800,7 +797,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -819,7 +816,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -834,7 +831,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -849,7 +846,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -864,7 +861,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -880,7 +877,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -897,7 +894,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -915,7 +912,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -933,7 +930,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -951,7 +948,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -973,7 +970,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -995,7 +992,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform Matrix4 variable to change
      * @param value
@@ -1015,7 +1012,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an uniform value for this shader object.
-     * 
+     *
      * @param name
      *            uniform variable to change
      * @param value
@@ -1051,7 +1048,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an attribute pointer value for this shader object.
-     * 
+     *
      * @param name
      *            attribute variable to change
      * @param size
@@ -1079,7 +1076,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an attribute pointer value for this shader object.
-     * 
+     *
      * @param name
      *            attribute variable to change
      * @param size
@@ -1103,7 +1100,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an attribute pointer value for this shader object.
-     * 
+     *
      * @param name
      *            attribute variable to change
      * @param size
@@ -1134,7 +1131,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an attribute pointer value for this shader object.
-     * 
+     *
      * @param name
      *            attribute variable to change
      * @param size
@@ -1165,7 +1162,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Set an attribute pointer value for this shader object.
-     * 
+     *
      * @param name
      *            attribute variable to change
      * @param size
@@ -1208,7 +1205,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Creates or retrieves a uniform shadervariable.
-     * 
+     *
      * @param name
      *            Name of the uniform shadervariable to retrieve or create
      * @param classz
@@ -1222,7 +1219,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /**
      * Creates or retrieves a attribute shadervariable.
-     * 
+     *
      * @param name
      *            Name of the attribute shadervariable to retrieve or create
      * @param classz

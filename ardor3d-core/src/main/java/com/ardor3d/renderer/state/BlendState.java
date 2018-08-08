@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -281,7 +281,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>isBlendEnabled</code> returns true if blending is turned on, otherwise false is returned.
-     * 
+     *
      * @return true if blending is enabled, false otherwise.
      */
     public boolean isBlendEnabled() {
@@ -290,7 +290,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>setBlendEnabled</code> sets whether or not blending is enabled.
-     * 
+     *
      * @param value
      *            true to enable the blending, false to disable it.
      */
@@ -301,7 +301,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>setSrcFunction</code> sets the source function for the blending equation for both rgb and alpha values.
-     * 
+     *
      * @param function
      *            the source function for the blending equation.
      * @throws IllegalArgumentException
@@ -315,7 +315,7 @@ public class BlendState extends RenderState {
     /**
      * <code>setSrcFunction</code> sets the source function for the blending equation. If supportsSeparateFunc is false,
      * this value will be used for RGB and Alpha.
-     * 
+     *
      * @param function
      *            the source function for the blending equation.
      * @throws IllegalArgumentException
@@ -331,7 +331,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>setSourceFunctionAlpha</code> sets the source function for the blending equation used with alpha values.
-     * 
+     *
      * @param function
      *            the source function for the blending equation for alpha values.
      * @throws IllegalArgumentException
@@ -347,7 +347,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>getSourceFunction</code> returns the source function for the blending function.
-     * 
+     *
      * @return the source function for the blending function.
      */
     public SourceFunction getSourceFunctionRGB() {
@@ -356,7 +356,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>getSourceFunction</code> returns the source function for the blending function.
-     * 
+     *
      * @return the source function for the blending function.
      */
     public SourceFunction getSourceFunctionAlpha() {
@@ -366,7 +366,7 @@ public class BlendState extends RenderState {
     /**
      * <code>setDestinationFunction</code> sets the destination function for the blending equation for both Alpha and
      * RGB values.
-     * 
+     *
      * @param function
      *            the destination function for the blending equation.
      * @throws IllegalArgumentException
@@ -380,7 +380,7 @@ public class BlendState extends RenderState {
     /**
      * <code>setDestinationFunctionRGB</code> sets the destination function for the blending equation. If
      * supportsSeparateFunc is false, this value will be used for RGB and Alpha.
-     * 
+     *
      * @param function
      *            the destination function for the blending equation for RGB values.
      * @throws IllegalArgumentException
@@ -396,7 +396,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>setDestinationFunctionAlpha</code> sets the destination function for the blending equation.
-     * 
+     *
      * @param function
      *            the destination function for the blending equation for Alpha values.
      * @throws IllegalArgumentException
@@ -412,7 +412,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>getDestinationFunction</code> returns the destination function for the blending function.
-     * 
+     *
      * @return the destination function for the blending function.
      */
     public DestinationFunction getDestinationFunctionRGB() {
@@ -421,7 +421,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>getDestinationFunction</code> returns the destination function for the blending function.
-     * 
+     *
      * @return the destination function for the blending function.
      */
     public DestinationFunction getDestinationFunctionAlpha() {
@@ -457,7 +457,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>isTestEnabled</code> returns true if alpha testing is enabled, false otherwise.
-     * 
+     *
      * @return true if alpha testing is enabled, false otherwise.
      */
     public boolean isTestEnabled() {
@@ -465,8 +465,8 @@ public class BlendState extends RenderState {
     }
 
     /**
-     * <code>setTestEnabled</code> turns alpha testing on and off. True turns on the testing, while false diables it.
-     * 
+     * <code>setTestEnabled</code> turns alpha testing on and off. True turns on the testing, while false disables it.
+     *
      * @param value
      *            true to enabled alpha testing, false to disable it.
      */
@@ -478,7 +478,7 @@ public class BlendState extends RenderState {
     /**
      * <code>setTestFunction</code> sets the testing function used for the alpha testing. If an invalid value is passed,
      * the default TF_ALWAYS is used.
-     * 
+     *
      * @param function
      *            the testing function used for the alpha testing.
      * @throws IllegalArgumentException
@@ -494,7 +494,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>getTestFunction</code> returns the testing function used for the alpha testing.
-     * 
+     *
      * @return the testing function used for the alpha testing.
      */
     public TestFunction getTestFunction() {
@@ -504,7 +504,7 @@ public class BlendState extends RenderState {
     /**
      * <code>setReference</code> sets the reference value that incoming alpha values are compared to when doing alpha
      * testing. This is clamped to [0, 1].
-     * 
+     *
      * @param reference
      *            the reference value that alpha values are compared to.
      */
@@ -522,7 +522,7 @@ public class BlendState extends RenderState {
 
     /**
      * <code>getReference</code> returns the reference value that incoming alpha values are compared to.
-     * 
+     *
      * @return the reference value that alpha values are compared to.
      */
     public float getReference() {

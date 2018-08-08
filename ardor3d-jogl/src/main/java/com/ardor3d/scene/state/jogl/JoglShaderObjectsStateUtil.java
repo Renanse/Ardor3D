@@ -90,7 +90,7 @@ public abstract class JoglShaderObjectsStateUtil {
             if (gl.isGL2()) {
                 gl.getGL2().glCompileShaderARB(state._vertexShaderID);
                 gl.getGL2()
-                        .glGetObjectParameterivARB(state._vertexShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                .glGetObjectParameterivARB(state._vertexShaderID, GL2.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
             } else {
                 if (gl.isGL2ES2()) {
                     gl.getGL2ES2().glCompileShader(state._vertexShaderID);
@@ -290,11 +290,11 @@ public abstract class JoglShaderObjectsStateUtil {
 
                 if (gl.isGL2()) {
                     state._tessellationEvaluationShaderID = gl.getGL2().glCreateShaderObjectARB(
-                            GL4.GL_TESS_CONTROL_SHADER);
+                            GL4.GL_TESS_EVALUATION_SHADER);
                 } else {
                     if (gl.isGL2ES2()) {
                         state._tessellationEvaluationShaderID = gl.getGL2ES2().glCreateShader(
-                                GL4.GL_TESS_CONTROL_SHADER);
+                                GL4.GL_TESS_EVALUATION_SHADER);
                     }
                 }
 
