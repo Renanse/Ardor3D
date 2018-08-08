@@ -184,7 +184,6 @@ public class AnimationDemoExample extends ExampleBase {
             cullState.setCullFace(Face.Back);
             skeleton.setRenderState(cullState);
 
-            gpuShader.setUseAttributeVBO(true);
             skeleton.setGPUShader(gpuShader);
             skeleton.setUseGPU(true);
 

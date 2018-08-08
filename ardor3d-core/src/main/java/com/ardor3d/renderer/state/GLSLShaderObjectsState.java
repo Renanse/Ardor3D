@@ -547,18 +547,6 @@ public class GLSLShaderObjectsState extends RenderState {
         return _shaderDataLogic;
     }
 
-    public boolean isUseAttributeVBO() {
-        return _useAttributeVBO;
-    }
-
-    /**
-     * @param useAttributeVBO
-     *            if true, and we support VBO, we'll use VBO for shader attributes.
-     */
-    public void setUseAttributeVBO(final boolean useAttributeVBO) {
-        _useAttributeVBO = useAttributeVBO;
-    }
-
     /**
      * Set an uniform value for this shader object.
      *
@@ -1292,7 +1280,6 @@ public class GLSLShaderObjectsState extends RenderState {
         capsule.write(_geomShader, "geomShader", null);
         capsule.write(_tessControlShader, "tessControlShader", null);
         capsule.write(_tessEvalShader, "tessEvalShader", null);
-        capsule.write(_useAttributeVBO, "useAttributeVBO", false);
 
         if (_shaderDataLogic instanceof Savable) {
             capsule.write((Savable) _shaderDataLogic, "shaderDataLogic", null);
@@ -1309,7 +1296,6 @@ public class GLSLShaderObjectsState extends RenderState {
         _geomShader = capsule.readByteBuffer("geomShader", null);
         _tessControlShader = capsule.readByteBuffer("tessControlShader", null);
         _tessEvalShader = capsule.readByteBuffer("tessEvalShader", null);
-        _useAttributeVBO = capsule.readBoolean("useAttributeVBO", false);
 
         final Savable shaderDataLogic = capsule.readSavable("shaderDataLogic", null);
         // only override set _shaderDataLogic if we have something in the capsule.

@@ -255,8 +255,8 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
         // 2. Set up our mesh data as VBOs and apply them to our shader as attributes
         for (final Entry<String, AbstractBufferData<? extends Buffer>> e : meshData._vertexDataItems.entrySet()) {
-            renderer.setupVBO(e.getValue());
-            glsl.setAttributePointer(e.getKey(), size, normalized, stride, data);
+            // renderer.setupVBO(e.getValue());
+            // glsl.setAttributePointer(e.getKey(), size, normalized, stride, data);
         }
 
         // 3. Set our shader uniforms (model, view and projection matrices)
