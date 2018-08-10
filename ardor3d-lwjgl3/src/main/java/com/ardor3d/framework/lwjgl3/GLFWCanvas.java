@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -250,5 +250,9 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
         _focusLost = false;
 
         return result;
+    }
+
+    public long getWindowId() {
+        return windowId;
     }
 }

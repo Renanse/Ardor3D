@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2012 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -72,7 +72,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
         // look to handle special keys
         RenderedText uiText = _textEntry._uiText;
         switch (key) {
-            case RETURN: {
+            case ENTER: {
                 if (handleEnterKey()) {
                     return true;
                 }
@@ -134,7 +134,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
                 return true;
             }
 
-            case BACK: {
+            case BACKSPACE: {
                 // Backspace
                 if (!_textEntry.isEditable()) {
                     return false;
@@ -358,16 +358,16 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
     }
 
     protected boolean isShiftDown(final InputState state) {
-        return state.getKeyboardState().isAtLeastOneDown(Key.LSHIFT, Key.RSHIFT);
+        return state.getKeyboardState().isAtLeastOneDown(Key.LEFT_SHIFT, Key.RIGHT_SHIFT);
     }
 
     protected boolean isCtrtlDown(final InputState state) {
         if (System.getProperty("mrj.version") != null) {
             // mac
-            return state.getKeyboardState().isAtLeastOneDown(Key.LMETA, Key.RMETA);
+            return state.getKeyboardState().isAtLeastOneDown(Key.LEFT_META, Key.RIGHT_META);
         } else {
             // non-mac
-            return state.getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL);
+            return state.getKeyboardState().isAtLeastOneDown(Key.LEFT_CONTROL, Key.RIGHT_CONTROL);
         }
     }
 

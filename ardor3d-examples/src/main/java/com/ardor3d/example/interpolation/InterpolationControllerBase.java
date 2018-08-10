@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2012 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,8 +21,8 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.scenegraph.controller.interpolation.CurveInterpolationController;
@@ -94,7 +94,7 @@ public abstract class InterpolationControllerBase<C extends InterpolationControl
         }));
 
         // Add a slow down command
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LBRACKET), new TriggerAction() {
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT_BRACKET), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 controller.setSpeed(getNewSpeed(false, controller));
                 speedText.setText(getSpeedText(controller));
@@ -102,7 +102,7 @@ public abstract class InterpolationControllerBase<C extends InterpolationControl
         }));
 
         // Add a speed up command
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RBRACKET), new TriggerAction() {
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT_BRACKET), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 controller.setSpeed(getNewSpeed(true, controller));
                 speedText.setText(getSpeedText(controller));
@@ -128,7 +128,7 @@ public abstract class InterpolationControllerBase<C extends InterpolationControl
 
     /**
      * Implemented by sub classes to return a concrete controller.
-     * 
+     *
      * @return The controller to test, can not be null (otherwise a null pointer exception will be thrown).
      */
     protected abstract C createController();

@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2012 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -26,14 +26,14 @@ public enum JoglNewtKey {
     EIGHT(KeyEvent.VK_8, Key.EIGHT), //
     NINE(KeyEvent.VK_9, Key.NINE), //
     A(KeyEvent.VK_A, Key.A), //
-    ADD(KeyEvent.VK_ADD, Key.NUMPADADD), //
+    ADD(KeyEvent.VK_ADD, Key.KP_ADD), //
     AT(KeyEvent.VK_AT, Key.AT), //
     B(KeyEvent.VK_B, Key.B), //
-    BACK_QUOTE(KeyEvent.VK_BACK_QUOTE, Key.GRAVE), //
-    BACK_SPACE(KeyEvent.VK_BACK_SPACE, Key.BACK), //
+    BACK_QUOTE(KeyEvent.VK_BACK_QUOTE, Key.GRAVE_ACCENT), //
+    BACK_SPACE(KeyEvent.VK_BACK_SPACE, Key.BACKSPACE), //
     BACK_SLASH(KeyEvent.VK_BACK_SLASH, Key.BACKSLASH), //
     C(KeyEvent.VK_C, Key.C), //
-    CAPS_LOCK(KeyEvent.VK_CAPS_LOCK, Key.CAPITAL), //
+    CAPS_LOCK(KeyEvent.VK_CAPS_LOCK, Key.CAPS_LOCK), //
     CIRCUMFLEX(KeyEvent.VK_CIRCUMFLEX, Key.CIRCUMFLEX), //
     COLON(KeyEvent.VK_COLON, Key.COLON), //
     COMMA(KeyEvent.VK_COMMA, Key.COMMA), //
@@ -45,7 +45,7 @@ public enum JoglNewtKey {
     DOWN(KeyEvent.VK_DOWN, Key.DOWN), //
     E(KeyEvent.VK_E, Key.E), //
     END(KeyEvent.VK_END, Key.END), //
-    EQUALS(KeyEvent.VK_EQUALS, Key.EQUALS), //
+    EQUALS(KeyEvent.VK_EQUALS, Key.EQUAL), //
     ESCAPE(KeyEvent.VK_ESCAPE, Key.ESCAPE), //
     F(KeyEvent.VK_F, Key.F), //
     F1(KeyEvent.VK_F1, Key.F1), //
@@ -73,47 +73,47 @@ public enum JoglNewtKey {
     // KANA(KeyEvent.VK_KANA, Key.KANA), //
     // KANJI(KeyEvent.VK_KANJI, Key.KANJI), //
     L(KeyEvent.VK_L, Key.L), //
-    OPEN_BRACKET(KeyEvent.VK_OPEN_BRACKET, Key.LBRACKET), //
-    CONTROL(KeyEvent.VK_CONTROL, Key.LCONTROL), //
+    OPEN_BRACKET(KeyEvent.VK_OPEN_BRACKET, Key.LEFT_BRACKET), //
+    CONTROL(KeyEvent.VK_CONTROL, Key.LEFT_CONTROL), //
     LEFT(KeyEvent.VK_LEFT, Key.LEFT), //
-    ALT(KeyEvent.VK_ALT, Key.LMENU), //
-    META(KeyEvent.VK_META, Key.LMETA), //
-    SHIFT(KeyEvent.VK_SHIFT, Key.LSHIFT), //
+    ALT(KeyEvent.VK_ALT, Key.LEFT_ALT), //
+    META(KeyEvent.VK_META, Key.LEFT_META), //
+    SHIFT(KeyEvent.VK_SHIFT, Key.LEFT_SHIFT), //
     M(KeyEvent.VK_M, Key.M), //
     MINUS(KeyEvent.VK_MINUS, Key.MINUS), //
     MULTIPLY(KeyEvent.VK_MULTIPLY, Key.MULTIPLY), //
     N(KeyEvent.VK_N, Key.N), //
-    PAGE_DOWN(KeyEvent.VK_PAGE_DOWN, Key.PAGEDOWN_NEXT), //
+    PAGE_DOWN(KeyEvent.VK_PAGE_DOWN, Key.PAGE_DOWN), //
     NONCONVERT(KeyEvent.VK_NONCONVERT, Key.NOCONVERT), //
-    NUM_LOCK(KeyEvent.VK_NUM_LOCK, Key.NUMLOCK), //
-    NUMPAD0(KeyEvent.VK_NUMPAD0, Key.NUMPAD0), //
-    NUMPAD1(KeyEvent.VK_NUMPAD1, Key.NUMPAD1), //
-    NUMPAD2(KeyEvent.VK_NUMPAD2, Key.NUMPAD2), //
-    NUMPAD3(KeyEvent.VK_NUMPAD3, Key.NUMPAD3), //
-    NUMPAD4(KeyEvent.VK_NUMPAD4, Key.NUMPAD4), //
-    NUMPAD5(KeyEvent.VK_NUMPAD5, Key.NUMPAD5), //
-    NUMPAD6(KeyEvent.VK_NUMPAD6, Key.NUMPAD6), //
-    NUMPAD7(KeyEvent.VK_NUMPAD7, Key.NUMPAD7), //
-    NUMPAD8(KeyEvent.VK_NUMPAD8, Key.NUMPAD8), //
-    NUMPAD9(KeyEvent.VK_NUMPAD9, Key.NUMPAD9), //
+    NUM_LOCK(KeyEvent.VK_NUM_LOCK, Key.NUM_LOCK), //
+    NUMPAD0(KeyEvent.VK_NUMPAD0, Key.KP_0), //
+    NUMPAD1(KeyEvent.VK_NUMPAD1, Key.KP_1), //
+    NUMPAD2(KeyEvent.VK_NUMPAD2, Key.KP_2), //
+    NUMPAD3(KeyEvent.VK_NUMPAD3, Key.KP_3), //
+    NUMPAD4(KeyEvent.VK_NUMPAD4, Key.KP_4), //
+    NUMPAD5(KeyEvent.VK_NUMPAD5, Key.KP_5), //
+    NUMPAD6(KeyEvent.VK_NUMPAD6, Key.KP_6), //
+    NUMPAD7(KeyEvent.VK_NUMPAD7, Key.KP_7), //
+    NUMPAD8(KeyEvent.VK_NUMPAD8, Key.KP_8), //
+    NUMPAD9(KeyEvent.VK_NUMPAD9, Key.KP_9), //
     O(KeyEvent.VK_O, Key.O), //
     P(KeyEvent.VK_P, Key.P), //
     PAUSE(KeyEvent.VK_PAUSE, Key.PAUSE), //
     PERIOD(KeyEvent.VK_PERIOD, Key.PERIOD), //
-    PAGE_UP(KeyEvent.VK_PAGE_UP, Key.PAGEUP_PRIOR), //
+    PAGE_UP(KeyEvent.VK_PAGE_UP, Key.PAGE_UP), //
     Q(KeyEvent.VK_Q, Key.Q), //
     QUOTE(KeyEvent.VK_QUOTE, Key.APOSTROPHE), //
     R(KeyEvent.VK_R, Key.R), //
-    CLOSE_BRACKET(KeyEvent.VK_CLOSE_BRACKET, Key.RBRACKET), //
-    ENTER(KeyEvent.VK_ENTER, Key.RETURN), //
+    CLOSE_BRACKET(KeyEvent.VK_CLOSE_BRACKET, Key.RIGHT_BRACKET), //
+    ENTER(KeyEvent.VK_ENTER, Key.ENTER), //
     RIGHT(KeyEvent.VK_RIGHT, Key.RIGHT), //
     S(KeyEvent.VK_S, Key.S), //
-    SCROLL_LOCK(KeyEvent.VK_SCROLL_LOCK, Key.SCROLL), //
+    SCROLL_LOCK(KeyEvent.VK_SCROLL_LOCK, Key.SCROLL_LOCK), //
     SEMICOLON(KeyEvent.VK_SEMICOLON, Key.SEMICOLON), //
     SLASH(KeyEvent.VK_SLASH, Key.SLASH), //
     SPACE(KeyEvent.VK_SPACE, Key.SPACE), //
     STOP(KeyEvent.VK_STOP, Key.STOP), //
-    PRINTSCREEN(KeyEvent.VK_PRINTSCREEN, Key.SYSRQ), //
+    PRINTSCREEN(KeyEvent.VK_PRINTSCREEN, Key.PRINT_SCREEN), //
     T(KeyEvent.VK_T, Key.T), //
     TAB(KeyEvent.VK_TAB, Key.TAB), //
     U(KeyEvent.VK_U, Key.U), //

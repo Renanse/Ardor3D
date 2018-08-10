@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2012 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -30,8 +30,8 @@ public enum SwtKey {
     SWT_9('9', Key.NINE), //
     SWT_0('0', Key.ZERO), //
     SWT_MINUS('-', Key.MINUS), //
-    SWT_EQUALS('=', Key.EQUALS), //
-    SWT_BACK(SWT.BS, Key.BACK), //
+    SWT_EQUALS('=', Key.EQUAL), //
+    SWT_BACK(SWT.BS, Key.BACKSPACE), //
     SWT_TAB(SWT.TAB, Key.TAB), //
     SWT_Q('q', Key.Q), //
     SWT_W('w', Key.W), //
@@ -43,10 +43,10 @@ public enum SwtKey {
     SWT_I('i', Key.I), //
     SWT_O('o', Key.O), //
     SWT_P('p', Key.P), //
-    SWT_LBRACKET('(', Key.LBRACKET), //
-    SWT_RBRACKET(')', Key.RBRACKET), //
-    SWT_RETURN(SWT.TRAVERSE_RETURN, Key.RETURN), //
-    SWT_LCONTROL(SWT.CTRL, Key.LCONTROL), //
+    SWT_LBRACKET('(', Key.LEFT_BRACKET), //
+    SWT_RBRACKET(')', Key.RIGHT_BRACKET), //
+    SWT_RETURN(SWT.TRAVERSE_RETURN, Key.ENTER), //
+    SWT_LCONTROL(SWT.CTRL, Key.LEFT_CONTROL), //
     SWT_A('a', Key.A), //
     SWT_S('s', Key.S), //
     SWT_D('d', Key.D), //
@@ -58,8 +58,8 @@ public enum SwtKey {
     SWT_L('l', Key.L), //
     SWT_SEMICOLON(';', Key.SEMICOLON), //
     SWT_APOSTROPHE('\'', Key.APOSTROPHE), //
-    SWT_GRAVE('`', Key.GRAVE), //
-    SWT_LSHIFT(SWT.SHIFT, Key.LSHIFT), //
+    SWT_GRAVE('`', Key.GRAVE_ACCENT), //
+    SWT_LSHIFT(SWT.SHIFT, Key.LEFT_SHIFT), //
     SWT_BACKSLASH('\\', Key.BACKSLASH), //
     SWT_Z('z', Key.Z), //
     SWT_X('x', Key.X), //
@@ -73,7 +73,7 @@ public enum SwtKey {
     SWT_SLASH('/', Key.SLASH), //
     SWT_MULTIPLY('*', Key.MULTIPLY), //
     SWT_SPACE(' ', Key.SPACE), //
-    SWT_CAPITAL(SWT.CAPS_LOCK, Key.CAPITAL), //
+    SWT_CAPITAL(SWT.CAPS_LOCK, Key.CAPS_LOCK), //
     SWT_F1(SWT.F1, Key.F1), //
     SWT_F2(SWT.F2, Key.F2), //
     SWT_F3(SWT.F3, Key.F3), //
@@ -84,19 +84,19 @@ public enum SwtKey {
     SWT_F8(SWT.F8, Key.F8), //
     SWT_F9(SWT.F9, Key.F9), //
     SWT_F10(SWT.F10, Key.F10), //
-    SWT_NUMLOCK(SWT.NUM_LOCK, Key.NUMLOCK), //
-    SWT_SCROLL(SWT.SCROLL_LOCK, Key.SCROLL), //
-    SWT_NUMPAD7(SWT.KEYPAD_7, Key.NUMPAD7), //
-    SWT_NUMPAD8(SWT.KEYPAD_8, Key.NUMPAD8), //
-    SWT_NUMPAD9(SWT.KEYPAD_9, Key.NUMPAD9), //
-    SWT_NUMPAD4(SWT.KEYPAD_4, Key.NUMPAD4), //
-    SWT_NUMPAD5(SWT.KEYPAD_5, Key.NUMPAD5), //
-    SWT_NUMPAD6(SWT.KEYPAD_6, Key.NUMPAD6), //
-    SWT_ADD('+', Key.NUMPADADD), //
-    SWT_NUMPAD1(SWT.KEYPAD_1, Key.NUMPAD1), //
-    SWT_NUMPAD2(SWT.KEYPAD_2, Key.NUMPAD2), //
-    SWT_NUMPAD3(SWT.KEYPAD_3, Key.NUMPAD3), //
-    SWT_NUMPAD0(SWT.KEYPAD_0, Key.NUMPAD0), //
+    SWT_NUMLOCK(SWT.NUM_LOCK, Key.NUM_LOCK), //
+    SWT_SCROLL(SWT.SCROLL_LOCK, Key.SCROLL_LOCK), //
+    SWT_NUMPAD7(SWT.KEYPAD_7, Key.KP_7), //
+    SWT_NUMPAD8(SWT.KEYPAD_8, Key.KP_8), //
+    SWT_NUMPAD9(SWT.KEYPAD_9, Key.KP_9), //
+    SWT_NUMPAD4(SWT.KEYPAD_4, Key.KP_4), //
+    SWT_NUMPAD5(SWT.KEYPAD_5, Key.KP_5), //
+    SWT_NUMPAD6(SWT.KEYPAD_6, Key.KP_6), //
+    SWT_ADD('+', Key.KP_ADD), //
+    SWT_NUMPAD1(SWT.KEYPAD_1, Key.KP_1), //
+    SWT_NUMPAD2(SWT.KEYPAD_2, Key.KP_2), //
+    SWT_NUMPAD3(SWT.KEYPAD_3, Key.KP_3), //
+    SWT_NUMPAD0(SWT.KEYPAD_0, Key.KP_0), //
     SWT_DECIMAL(SWT.KEYPAD_DECIMAL, Key.DECIMAL), //
     SWT_F11(SWT.F11, Key.F11), //
     SWT_F12(SWT.F12, Key.F12), //
@@ -110,22 +110,22 @@ public enum SwtKey {
     SWT_PAUSE(SWT.PAUSE, Key.PAUSE), //
     SWT_HOME(SWT.HOME, Key.HOME), //
     SWT_UP(SWT.ARROW_UP, Key.UP), //
-    SWT_PAGEUP_PRIOR(SWT.PAGE_UP, Key.PAGEUP_PRIOR), //
+    SWT_PAGEUP_PRIOR(SWT.PAGE_UP, Key.PAGE_UP), //
     SWT_LEFT(SWT.ARROW_LEFT, Key.LEFT), //
     SWT_RIGHT(SWT.ARROW_RIGHT, Key.RIGHT), //
     SWT_END(SWT.END, Key.END), //
     SWT_DOWN(SWT.ARROW_DOWN, Key.DOWN), //
-    SWT_PAGEDOWN_NEXT(SWT.PAGE_DOWN, Key.PAGEDOWN_NEXT), //
+    SWT_PAGEDOWN_NEXT(SWT.PAGE_DOWN, Key.PAGE_DOWN), //
     SWT_INSERT(SWT.INSERT, Key.INSERT), //
     SWT_DELETE(SWT.DEL, Key.DELETE), //
-    SWT_NUMPADADD(SWT.KEYPAD_ADD, Key.NUMPADADD), //
-    SWT_NUMPADSUB(SWT.KEYPAD_SUBTRACT, Key.NUMPADSUBTRACT), //
+    SWT_NUMPADADD(SWT.KEYPAD_ADD, Key.KP_ADD), //
+    SWT_NUMPADSUB(SWT.KEYPAD_SUBTRACT, Key.KP_SUBTRACT), //
     SWT_NUMPADMULTIPLY(SWT.KEYPAD_MULTIPLY, Key.MULTIPLY), //
     SWT_NUMPADDIVIDE(SWT.KEYPAD_DIVIDE, Key.DIVIDE), //
-    SWT_NUMPADENTER(SWT.KEYPAD_CR, Key.NUMPADENTER), //
-    SWT_LMENU(SWT.ALT, Key.LMENU), //
-    SWT_COMMAND(SWT.COMMAND, Key.LMETA), //
-    SWT_SYSRQ(SWT.PRINT_SCREEN, Key.SYSRQ);
+    SWT_NUMPADENTER(SWT.KEYPAD_CR, Key.KP_ENTER), //
+    SWT_LMENU(SWT.ALT, Key.LEFT_ALT), //
+    SWT_COMMAND(SWT.COMMAND, Key.LEFT_META), //
+    SWT_SYSRQ(SWT.PRINT_SCREEN, Key.PRINT_SCREEN);
 
     private final int _swtCode;
     private final Key _key;

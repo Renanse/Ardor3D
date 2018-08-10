@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -191,28 +191,28 @@ public class InteractExample extends ExampleBase {
 
         // add triggers to change which widget is active
         manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyHeldCondition(Key.LSHIFT), new TriggerAction() {
+                new InputTrigger(new KeyHeldCondition(Key.LEFT_SHIFT), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(scaleWidget);
                     }
                 }));
         manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.LSHIFT), new TriggerAction() {
+                new InputTrigger(new KeyReleasedCondition(Key.LEFT_SHIFT), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(rotateWidget);
                     }
                 }));
         manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyHeldCondition(Key.LCONTROL), new TriggerAction() {
+                new InputTrigger(new KeyHeldCondition(Key.LEFT_CONTROL), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(moveWidget);
                     }
                 }));
         manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.LCONTROL), new TriggerAction() {
+                new InputTrigger(new KeyReleasedCondition(Key.LEFT_CONTROL), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(rotateWidget);

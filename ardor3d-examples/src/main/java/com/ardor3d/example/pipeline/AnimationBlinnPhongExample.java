@@ -142,7 +142,7 @@ public class AnimationBlinnPhongExample extends ExampleBase {
             }
         }));
 
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NUMPADADD), new TriggerAction() {
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.KP_ADD), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (quantizationFactor > 1) {
                     quantizationFactor /= 2f;
@@ -151,16 +151,15 @@ public class AnimationBlinnPhongExample extends ExampleBase {
                 System.out.println("quantizationFactor = " + quantizationFactor);
             }
         }));
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NUMPADSUBTRACT),
-                new TriggerAction() {
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        if (quantizationFactor < 512) {
-                            quantizationFactor *= 2f;
-                        }
-                        gpuShader.setUniform("quantizationFactor", 1f / quantizationFactor);
-                        System.out.println("quantizationFactor = " + quantizationFactor);
-                    }
-                }));
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.KP_SUBTRACT), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                if (quantizationFactor < 512) {
+                    quantizationFactor *= 2f;
+                }
+                gpuShader.setUniform("quantizationFactor", 1f / quantizationFactor);
+                System.out.println("quantizationFactor = " + quantizationFactor);
+            }
+        }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.Y), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {

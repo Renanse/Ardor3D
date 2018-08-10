@@ -1,9 +1,9 @@
 /**
- * Copyright  2008-2012 Ardor Labs, Inc.
+ * Copyright  2008-2012 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -82,12 +82,12 @@ public enum Key {
     /**
      * = key.
      */
-    EQUALS,
+    EQUAL,
 
     /**
-     * back key.
+     * backspace key.
      */
-    BACK,
+    BACKSPACE,
 
     /**
      * tab key.
@@ -147,22 +147,22 @@ public enum Key {
     /**
      * [ key.
      */
-    LBRACKET,
+    LEFT_BRACKET,
 
     /**
      * ] key.
      */
-    RBRACKET,
+    RIGHT_BRACKET,
 
     /**
      * enter key.
      */
-    RETURN,
+    ENTER,
 
     /**
      * left control key.
      */
-    LCONTROL,
+    LEFT_CONTROL,
 
     /**
      * a key.
@@ -220,19 +220,14 @@ public enum Key {
     APOSTROPHE,
 
     /**
-     * Applications key.
-     */
-    APPS,
-
-    /**
      * ` key.
      */
-    GRAVE,
+    GRAVE_ACCENT,
 
     /**
      * left shift key.
      */
-    LSHIFT,
+    LEFT_SHIFT,
 
     /**
      * \ key.
@@ -292,7 +287,7 @@ public enum Key {
     /**
      * right shift key.
      */
-    RSHIFT,
+    RIGHT_SHIFT,
 
     /**
      * * key .
@@ -302,7 +297,7 @@ public enum Key {
     /**
      * left alt key.
      */
-    LMENU,
+    LEFT_ALT,
 
     /**
      * space key.
@@ -312,7 +307,7 @@ public enum Key {
     /**
      * caps lock key.
      */
-    CAPITAL,
+    CAPS_LOCK,
 
     /**
      * F1 key.
@@ -365,81 +360,6 @@ public enum Key {
     F10,
 
     /**
-     * NumLK key.
-     */
-    NUMLOCK,
-
-    /**
-     * Scroll lock key.
-     */
-    SCROLL,
-
-    /**
-     * 7 key .
-     */
-    NUMPAD7,
-
-    /**
-     * 8 key .
-     */
-    NUMPAD8,
-
-    /**
-     * 9 key .
-     */
-    NUMPAD9,
-
-    /**
-     * - key .
-     */
-    NUMPADSUBTRACT,
-
-    /**
-     * 4 key .
-     */
-    NUMPAD4,
-
-    /**
-     * 5 key .
-     */
-    NUMPAD5,
-
-    /**
-     * 6 key .
-     */
-    NUMPAD6,
-
-    /**
-     * + key .
-     */
-    NUMPADADD,
-
-    /**
-     * 1 key .
-     */
-    NUMPAD1,
-
-    /**
-     * 2 key .
-     */
-    NUMPAD2,
-
-    /**
-     * 3 key .
-     */
-    NUMPAD3,
-
-    /**
-     * 0 key .
-     */
-    NUMPAD0,
-
-    /**
-     * . key .
-     */
-    DECIMAL,
-
-    /**
      * F11 key.
      */
     F11,
@@ -465,6 +385,146 @@ public enum Key {
     F15,
 
     /**
+     * F16 key.
+     */
+    F16,
+
+    /**
+     * F17 key.
+     */
+    F17,
+
+    /**
+     * F18 key.
+     */
+    F18,
+
+    /**
+     * F19 key.
+     */
+    F19,
+
+    /**
+     * F20 key.
+     */
+    F20,
+
+    /**
+     * F21 key.
+     */
+    F21,
+
+    /**
+     * F22 key.
+     */
+    F22,
+
+    /**
+     * F23 key.
+     */
+    F23,
+
+    /**
+     * F24 key.
+     */
+    F24,
+
+    /**
+     * F25 key.
+     */
+    F25,
+
+    /**
+     * Number lock key.
+     */
+    NUM_LOCK,
+
+    /**
+     * Scroll lock key.
+     */
+    SCROLL_LOCK,
+
+    /**
+     * 7 key on numpad.
+     */
+    KP_7,
+
+    /**
+     * 8 key on numpad.
+     */
+    KP_8,
+
+    /**
+     * 9 key on numpad.
+     */
+    KP_9,
+
+    /**
+     * - key on numpad.
+     */
+    KP_SUBTRACT,
+
+    /**
+     * / key on numpad.
+     */
+    KP_DIVIDE,
+
+    /**
+     * * key on numpad.
+     */
+    KP_MULTIPLY,
+
+    /**
+     * . key on numpad.
+     */
+    KP_DECIMAL,
+
+    /**
+     * 4 key on numpad.
+     */
+    KP_4,
+
+    /**
+     * 5 key on numpad.
+     */
+    KP_5,
+
+    /**
+     * 6 key on numpad.
+     */
+    KP_6,
+
+    /**
+     * + key on numpad.
+     */
+    KP_ADD,
+
+    /**
+     * 1 key on numpad.
+     */
+    KP_1,
+
+    /**
+     * 2 key on numpad.
+     */
+    KP_2,
+
+    /**
+     * 3 key on numpad.
+     */
+    KP_3,
+
+    /**
+     * 0 key on numpad.
+     */
+    KP_0,
+
+    /**
+     * . key .
+     */
+    DECIMAL,
+
+    /**
      * kana key .
      */
     KANA,
@@ -487,7 +547,7 @@ public enum Key {
     /**
      * = on num pad .
      */
-    NUMPADEQUALS,
+    KP_EQUAL,
 
     /**
      * circum flex key .
@@ -532,17 +592,17 @@ public enum Key {
     /**
      * Enter key .
      */
-    NUMPADENTER,
+    KP_ENTER,
 
     /**
      * right control key.
      */
-    RCONTROL,
+    RIGHT_CONTROL,
 
     /**
      * , key on num pad .
      */
-    NUMPADCOMMA,
+    KP_COMMA,
 
     /**
      * / key .
@@ -550,14 +610,14 @@ public enum Key {
     DIVIDE,
 
     /**
-     * SysRq key.
+     * print screen key.
      */
-    SYSRQ,
+    PRINT_SCREEN,
 
     /**
      * right alt key.
      */
-    RMENU,
+    RIGHT_ALT,
 
     /**
      * pause key.
@@ -577,7 +637,7 @@ public enum Key {
     /**
      * PageUp/Prior key.
      */
-    PAGEUP_PRIOR,
+    PAGE_UP,
 
     /**
      * left arrow key.
@@ -602,7 +662,7 @@ public enum Key {
     /**
      * PageDown/Next key.
      */
-    PAGEDOWN_NEXT,
+    PAGE_DOWN,
 
     /**
      * insert key.
@@ -617,12 +677,12 @@ public enum Key {
     /**
      * Left Windows/Option key
      */
-    LMETA,
+    LEFT_META,
 
     /**
      * Right Windows/Option key
      */
-    RMETA,
+    RIGHT_META,
 
     /**
      * power key.
@@ -725,9 +785,9 @@ public enum Key {
     NOTIFICATION,
 
     /**
-     * plus key
+     * add key
      */
-    PLUS,
+    ADD,
 
     /**
      * pound key
@@ -748,6 +808,16 @@ public enum Key {
      * mobile # button
      */
     SYM,
+
+    /**
+     * mobile world 1
+     */
+    WORLD_1,
+
+    /**
+     * mobile world 2
+     */
+    WORLD_2,
 
     /**
      * volume down button

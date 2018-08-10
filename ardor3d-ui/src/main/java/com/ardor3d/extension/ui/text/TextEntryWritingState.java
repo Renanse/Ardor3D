@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -110,7 +110,7 @@ public class TextEntryWritingState extends UIState {
             return super.mousePressed(button, state);
         }
 
-        final boolean copyToggled = state.getKeyboardState().isAtLeastOneDown(Key.LSHIFT, Key.RSHIFT);
+        final boolean copyToggled = state.getKeyboardState().isAtLeastOneDown(Key.LEFT_SHIFT, Key.RIGHT_SHIFT);
         updateSelection(state.getMouseState(), copyToggled);
 
         return true;

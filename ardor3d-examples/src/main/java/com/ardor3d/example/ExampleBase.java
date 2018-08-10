@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2017 Ardor Labs, Inc.
+ * Copyright (c) 2008-2017 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -41,6 +41,7 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.control.FirstPersonControl;
+import com.ardor3d.input.glfw.GLFWKeyboardWrapper;
 import com.ardor3d.input.glfw.GLFWMouseManager;
 import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
 import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
@@ -48,7 +49,6 @@ import com.ardor3d.input.jogl.JoglNewtMouseManager;
 import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.DummyControllerWrapper;
-import com.ardor3d.input.logical.DummyKeyboardWrapper;
 import com.ardor3d.input.logical.DummyMouseWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -362,8 +362,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         if (prefs.getRenderer().startsWith("LWJGL 3")) {
             Configuration.DEBUG.set(true);
             final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(example);
-            example._canvas = new GLFWCanvas(settings, canvasRenderer);
-            example._physicalLayer = new PhysicalLayer(new DummyKeyboardWrapper(), new DummyMouseWrapper(),
+            final GLFWCanvas canvas = new GLFWCanvas(settings, canvasRenderer);
+            example._canvas = canvas;
+            example._physicalLayer = new PhysicalLayer(new GLFWKeyboardWrapper(canvas), new DummyMouseWrapper(),
                     new DummyControllerWrapper());
             example._mouseManager = new GLFWMouseManager();
             example._canvas.setMouseManager(example._mouseManager);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -48,10 +48,14 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ShaderStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3WireframeStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3ZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3RendererUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
@@ -532,10 +536,10 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 // LwjglStencilStateUtil.apply((StencilState) state);
                 return;
             case Wireframe:
-                // LwjglWireframeStateUtil.apply(this, (WireframeState) state);
+                Lwjgl3WireframeStateUtil.apply(this, (WireframeState) state);
                 return;
             case ZBuffer:
-                // LwjglZBufferStateUtil.apply((ZBufferState) state);
+                Lwjgl3ZBufferStateUtil.apply((ZBufferState) state);
                 return;
         }
         throw new IllegalArgumentException("Unknown state: " + state);
