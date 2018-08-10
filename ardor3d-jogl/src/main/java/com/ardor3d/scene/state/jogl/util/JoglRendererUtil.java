@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,40 +13,21 @@ package com.ardor3d.scene.state.jogl.util;
 import java.util.Stack;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL3;
 import javax.media.opengl.GLContext;
 
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyRectangle2;
-import com.ardor3d.renderer.jogl.state.record.JoglRendererRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 
 public abstract class JoglRendererUtil {
 
-    public static void switchMode(final JoglRendererRecord rendRecord, final int mode) {
-        if (!rendRecord.isMatrixValid() || rendRecord.getMatrixMode() != mode) {
-            rendRecord.getMatrixBackend().setMatrixMode(mode);
-            rendRecord.setMatrixMode(mode);
-            rendRecord.setMatrixValid(true);
-        }
-    }
-
-    public static void setBoundVBO(final RendererRecord rendRecord, final int id) {
-        final GL gl = GLContext.getCurrentGL();
-
-        if (!rendRecord.isVboValid() || rendRecord.getCurrentVboId() != id) {
-            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, id);
-            rendRecord.setCurrentVboId(id);
-            rendRecord.setVboValid(true);
-        }
-    }
-
-    public static void setBoundElementVBO(final RendererRecord rendRecord, final int id) {
-        final GL gl = GLContext.getCurrentGL();
-
-        if (!rendRecord.isElementVboValid() || rendRecord.getCurrentElementVboId() != id) {
-            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, id);
-            rendRecord.setCurrentElementVboId(id);
-            rendRecord.setElementVboValid(true);
+    public static void setBoundVAO(final RendererRecord rendRecord, final int id) {
+        if (!rendRecord.isVaoValid() || rendRecord.getCurrentVaoId() != id) {
+            final GL3 gl = GLContext.getCurrentGL().getGL3();
+            gl.glBindVertexArray(id);
+            rendRecord.setCurrentVaoId(id);
+            rendRecord.setVaoValid(true);
         }
     }
 

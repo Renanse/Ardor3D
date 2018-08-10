@@ -10,15 +10,16 @@
 
 package com.ardor3d.renderer.state;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.ref.ReferenceQueue;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,16 +33,15 @@ import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.state.record.ShaderObjectsStateRecord;
+import com.ardor3d.renderer.state.record.ShaderStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.ByteBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IntBufferData;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.ShortBufferData;
+import com.ardor3d.util.ContextIdReference;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.shader.ShaderVariable;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
@@ -62,418 +62,139 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerFloat;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerFloatMatrix;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerShort;
+import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 
 /**
  * Implementation of the GL_ARB_shader_objects extension.
  */
-public class GLSLShaderObjectsState extends RenderState {
-    private static final Logger logger = Logger.getLogger(GLSLShaderObjectsState.class.getName());
+public class ShaderState extends RenderState {
+    public enum ShaderType {
+        Fragment, Vertex, Geometry, TessellationControl, TessellationEvaluation
+    }
+
+    public class ShaderInfo {
+        public int id;
+        public String program;
+        public String name;
+    }
+
+    private static final Logger logger = Logger.getLogger(ShaderState.class.getName());
+
+    protected Map<ShaderType, ShaderInfo> _shaders = Maps.newEnumMap(ShaderType.class);
+
+    /** OpenGL id for this program. */
+    protected int _programID = -1;
+
+    private static ReferenceQueue<ShaderState> _shaderRefQueue = new ReferenceQueue<ShaderState>();
+    protected transient ContextIdReference<ShaderState> _shaderIdCache;
+
+    public int getProgramId(final Object glContext) {
+        if (_shaderIdCache != null) {
+            final Integer id = _shaderIdCache.getValue(glContext);
+            if (id != null) {
+                return id.intValue();
+            }
+        }
+        return 0;
+    }
+
+    public void setProgramId(final Object glContextRep, final int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("id must be > 0");
+        }
+
+        if (_shaderIdCache == null) {
+            _shaderIdCache = new ContextIdReference<ShaderState>(this, _shaderRefQueue);
+        }
+        _shaderIdCache.put(glContextRep, id);
+    }
 
     /** Storage for shader uniform values */
     protected List<ShaderVariable> _shaderUniforms = new ArrayList<ShaderVariable>();
     /** Storage for shader attribute values */
     protected List<ShaderVariable> _shaderAttributes = new ArrayList<ShaderVariable>();
 
-    protected ByteBuffer _vertShader, _fragShader, _geomShader, _tessControlShader, _tessEvalShader;
-
-    // XXX: The below fields are public for brevity mostly as a way to remember that this class needs revisiting.
-
-    /**
-     * Optional logic for setting shadervariables based on the current geom. Note: If this object does not implement
-     * Savable, it will be ignored during write.
-     */
-    public GLSLShaderDataLogic _shaderDataLogic;
-
-    /** The Mesh this shader currently operates on during rendering */
-    public Mesh _mesh;
-
-    public boolean _needSendShader = true;
-
-    /** OpenGL id for this program. * */
-    public int _programID = -1;
-
-    /** OpenGL id for the attached vertex shader. */
-    public int _vertexShaderID = -1;
-
-    /** OpenGL id for the attached fragment shader. */
-    public int _fragmentShaderID = -1;
-
-    /** OpenGL id for the attached geometry shader. */
-    public int _geometryShaderID = -1;
-
-    /** OpenGL id for the attached tessellation control shader. */
-    public int _tessellationControlShaderID = -1;
-
-    /** OpenGL id for the attached tessellation evaluation shader. */
-    public int _tessellationEvaluationShaderID = -1;
-
-    /** optional name for our vertex shader, used for debugging details. */
-    public String _vertexShaderName;
-
-    /** optional name for our fragment shader, used for debugging details. */
-    public String _fragmentShaderName;
-
-    /** optional name for our geometry shader, used for debugging details. */
-    public String _geometryShaderName;
-
-    /** optional name for our tessellation control shader, used for debugging details. */
-    public String _tessellationControlShaderName;
-
-    /** optional name for our tessellation evaluation shader, used for debugging details. */
-    public String _tessellationEvaluationShaderName;
-
-    /**
-     * Gets the currently loaded vertex shader.
-     *
-     * @return
-     */
-    public ByteBuffer getVertexShader() {
-        return _vertShader;
+    public boolean hasShader(final ShaderType type) {
+        return _shaders.containsKey(type);
     }
 
-    /**
-     * Gets the currently loaded fragment shader.
-     *
-     * @return
-     */
-    public ByteBuffer getFragmentShader() {
-        return _fragShader;
-    }
-
-    /**
-     * Gets the currently loaded geometry shader.
-     *
-     * @return
-     */
-    public ByteBuffer getGeometryShader() {
-        return _geomShader;
-    }
-
-    /**
-     * Gets the currently loaded tessellation control shader.
-     *
-     * @return
-     */
-    public ByteBuffer getTessellationControlShader() {
-        return _tessControlShader;
-    }
-
-    /**
-     * Gets the currently loaded tessellation evaluation shader.
-     *
-     * @return
-     */
-    public ByteBuffer getTessellationEvaluationShader() {
-        return _tessEvalShader;
-    }
-
-    public void setVertexShader(final InputStream stream) throws IOException {
-        setVertexShader(stream, "");
-    }
-
-    public void setVertexShader(final InputStream stream, final String name) throws IOException {
-        setVertexShader(load(stream));
-        _vertexShaderName = name;
-    }
-
-    public void setFragmentShader(final InputStream stream) throws IOException {
-        setFragmentShader(stream, "");
-    }
-
-    public void setFragmentShader(final InputStream stream, final String name) throws IOException {
-        setFragmentShader(load(stream));
-        _fragmentShaderName = name;
-    }
-
-    public void setGeometryShader(final InputStream stream) throws IOException {
-        setGeometryShader(stream, "");
-    }
-
-    public void setGeometryShader(final InputStream stream, final String name) throws IOException {
-        setGeometryShader(load(stream));
-        _geometryShaderName = name;
-    }
-
-    public void setTessellationControlShader(final InputStream stream) throws IOException {
-        setTessellationControlShader(stream, "");
-    }
-
-    public void setTessellationControlShader(final InputStream stream, final String name) throws IOException {
-        setTessellationControlShader(load(stream));
-        _tessellationControlShaderName = name;
-    }
-
-    public void setTessellationEvaluationShader(final InputStream stream) throws IOException {
-        setTessellationEvaluationShader(stream, "");
-    }
-
-    public void setTessellationEvaluationShader(final InputStream stream, final String name) throws IOException {
-        setTessellationEvaluationShader(load(stream));
-        _tessellationEvaluationShaderName = name;
-    }
-
-    protected ByteBuffer load(final InputStream in) throws IOException {
-        DataInputStream dataStream = null;
-        try {
-            final BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
-            dataStream = new DataInputStream(bufferedInputStream);
-            final byte shaderCode[] = new byte[bufferedInputStream.available()];
-            dataStream.readFully(shaderCode);
-            bufferedInputStream.close();
-            dataStream.close();
-            final ByteBuffer shaderByteBuffer = BufferUtils.createByteBuffer(shaderCode.length);
-            shaderByteBuffer.put(shaderCode);
-            shaderByteBuffer.rewind();
-
-            return shaderByteBuffer;
-        } finally {
-            // Ensure that the stream is closed, even if there is an exception.
-            if (dataStream != null) {
-                try {
-                    dataStream.close();
-                } catch (final IOException closeFailure) {
-                    logger.log(Level.WARNING, "Failed to close the shader object", closeFailure);
-                }
-            }
+    public String getShader(final ShaderType type) {
+        final ShaderInfo info = _shaders.get(type);
+        if (info == null) {
+            return null;
         }
+        return info.program;
     }
 
-    /**
-     * Set the contents for our vertex shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setVertexShader(final ByteBuffer shader) {
-        setVertexShader(shader, "");
+    public String getShaderName(final ShaderType type) {
+        final ShaderInfo info = _shaders.get(type);
+        if (info == null) {
+            return null;
+        }
+        return info.name;
     }
 
-    /**
-     * Set the contents for our vertex shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setVertexShader(final ByteBuffer shader, final String name) {
-        _vertShader = shader;
-        _vertexShaderName = name;
+    public int getShaderId(final ShaderType type) {
+        final ShaderInfo info = _shaders.get(type);
+        if (info == null) {
+            return -1;
+        }
+        return info.id;
     }
 
-    /**
-     * Set the contents for our fragment shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setFragmentShader(final ByteBuffer shader) {
-        setFragmentShader(shader, "");
+    public boolean setShaderId(final ShaderType type, final int id) {
+        final ShaderInfo info = _shaders.get(type);
+        if (info == null) {
+            return false;
+        }
+
+        info.id = id;
+
+        return true;
     }
 
-    /**
-     * Set the contents for our fragment shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setFragmentShader(final ByteBuffer shader, final String name) {
-        _fragShader = shader;
-        _fragmentShaderName = name;
+    public void setShader(final ShaderType type, final String name, final String shaderContents) {
+        final ShaderInfo info = new ShaderInfo();
+        info.name = name;
+        info.program = shaderContents;
+
+        _shaders.put(type, info);
     }
 
-    /**
-     * Set the contents for our geometry shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setGeometryShader(final ByteBuffer shader) {
-        setGeometryShader(shader, "");
+    public void setShader(final ShaderType type, final String shaderContents) {
+        setShader(type, type.name(), shaderContents);
     }
 
-    /**
-     * Set the contents for our geometry shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setGeometryShader(final ByteBuffer shader, final String name) {
-        _geomShader = shader;
-        _geometryShaderName = name;
+    public void setShader(final ShaderType type, final String name, final InputStream shaderContents)
+            throws IOException {
+        String text;
+        try (final Reader reader = new InputStreamReader(shaderContents)) {
+            text = CharStreams.toString(reader);
+        }
+
+        setShader(type, name, text);
     }
 
-    /**
-     * Set the contents for our tessellation control shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setTessellationControlShader(final ByteBuffer shader) {
-        setTessellationControlShader(shader, "");
+    public void setShader(final ShaderType type, final InputStream shaderContents) throws IOException {
+        setShader(type, type.name(), shaderContents);
     }
 
-    /**
-     * Set the contents for our tessellation control shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setTessellationControlShader(final ByteBuffer shader, final String name) {
-        _tessControlShader = shader;
-        _tessellationControlShaderName = name;
+    @Override
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
+        // capsule.write(_vertShader, "vertShader", null);
     }
 
-    /**
-     * Set the contents for our tessellation evaluation shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setTessellationEvaluationShader(final ByteBuffer shader) {
-        setTessellationEvaluationShader(shader, "");
+    @Override
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
+        // _vertShader = capsule.readByteBuffer("vertShader", null);
     }
 
-    /**
-     * Set the contents for our tessellation evaluation shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setTessellationEvaluationShader(final ByteBuffer shader, final String name) {
-        _tessEvalShader = shader;
-        _tessellationEvaluationShaderName = name;
-    }
-
-    /**
-     * Set the contents for our vertex shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setVertexShader(final String shader) {
-        setVertexShader(shader, "");
-    }
-
-    /**
-     * Set the contents for our vertex shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setVertexShader(final String shader, final String name) {
-        _vertShader = stringToByteBuffer(shader);
-        _vertexShaderName = name;
-    }
-
-    /**
-     * Set the contents for our fragment shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setFragmentShader(final String shader) {
-        setFragmentShader(shader, "");
-    }
-
-    /**
-     * Set the contents for our fragment shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setFragmentShader(final String shader, final String name) {
-        _fragShader = stringToByteBuffer(shader);
-        _fragmentShaderName = name;
-    }
-
-    /**
-     * Set the contents for our geometry shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setGeometryShader(final String shader) {
-        setGeometryShader(shader, "");
-    }
-
-    /**
-     * Set the contents for our geometry shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setGeometryShader(final String shader, final String name) {
-        _geomShader = stringToByteBuffer(shader);
-        _geometryShaderName = name;
-    }
-
-    /**
-     * Set the contents for our tessellation control shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setTessellationControlShader(final String shader) {
-        setTessellationControlShader(shader, "");
-    }
-
-    /**
-     * Set the contents for our tessellation control shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setTessellationControlShader(final String shader, final String name) {
-        _tessControlShader = stringToByteBuffer(shader);
-        _tessellationControlShaderName = name;
-    }
-
-    /**
-     * Set the contents for our tessellation evaluation shader
-     *
-     * @param shader
-     *            the shader contents.
-     */
-    public void setTessellationEvaluationShader(final String shader) {
-        setTessellationEvaluationShader(shader, "");
-    }
-
-    /**
-     * Set the contents for our tessellation evaluation shader
-     *
-     * @param shader
-     *            the shader contents.
-     * @param name
-     *            a label for this shader, displayer upon shader errors.
-     */
-    public void setTessellationEvaluationShader(final String shader, final String name) {
-        _tessEvalShader = stringToByteBuffer(shader);
-        _tessellationEvaluationShaderName = name;
-    }
-
-    private ByteBuffer stringToByteBuffer(final String str) {
-        final byte[] bytes = str.getBytes();
-        final ByteBuffer buf = BufferUtils.createByteBuffer(bytes.length);
-        buf.put(bytes);
-        buf.rewind();
-        return buf;
+    @Override
+    public StateRecord createStateRecord(final ContextCapabilities caps) {
+        return new ShaderStateRecord();
     }
 
     /**
@@ -524,27 +245,6 @@ public class GLSLShaderObjectsState extends RenderState {
         }
 
         return null;
-    }
-
-    /**
-     *
-     * @param meshData
-     */
-    public void setMesh(final Mesh mesh) {
-        _mesh = mesh;
-    }
-
-    /**
-     * Logic to handle setting mesh-specific data to a shader before rendering
-     *
-     * @param shaderDataLogic
-     */
-    public void setShaderDataLogic(final GLSLShaderDataLogic shaderDataLogic) {
-        _shaderDataLogic = shaderDataLogic;
-    }
-
-    public GLSLShaderDataLogic getShaderDataLogic() {
-        return _shaderDataLogic;
     }
 
     /**
@@ -1188,7 +888,7 @@ public class GLSLShaderObjectsState extends RenderState {
 
     @Override
     public StateType getType() {
-        return StateType.GLSLShader;
+        return StateType.Shader;
     }
 
     /**
@@ -1269,48 +969,4 @@ public class GLSLShaderObjectsState extends RenderState {
         }
     }
 
-    @Override
-    public void write(final OutputCapsule capsule) throws IOException {
-        super.write(capsule);
-        capsule.writeSavableList(_shaderUniforms, "shaderUniforms", new ArrayList<ShaderVariable>());
-        capsule.writeSavableList(_shaderAttributes, "shaderAttributes", new ArrayList<ShaderVariable>());
-        capsule.write(_vertShader, "vertShader", null);
-        capsule.write(_fragShader, "fragShader", null);
-        capsule.write(_geomShader, "geomShader", null);
-        capsule.write(_geomShader, "geomShader", null);
-        capsule.write(_tessControlShader, "tessControlShader", null);
-        capsule.write(_tessEvalShader, "tessEvalShader", null);
-
-        if (_shaderDataLogic instanceof Savable) {
-            capsule.write((Savable) _shaderDataLogic, "shaderDataLogic", null);
-        }
-    }
-
-    @Override
-    public void read(final InputCapsule capsule) throws IOException {
-        super.read(capsule);
-        _shaderUniforms = capsule.readSavableList("shaderUniforms", new ArrayList<ShaderVariable>());
-        _shaderAttributes = capsule.readSavableList("shaderAttributes", new ArrayList<ShaderVariable>());
-        _vertShader = capsule.readByteBuffer("vertShader", null);
-        _fragShader = capsule.readByteBuffer("fragShader", null);
-        _geomShader = capsule.readByteBuffer("geomShader", null);
-        _tessControlShader = capsule.readByteBuffer("tessControlShader", null);
-        _tessEvalShader = capsule.readByteBuffer("tessEvalShader", null);
-
-        final Savable shaderDataLogic = capsule.readSavable("shaderDataLogic", null);
-        // only override set _shaderDataLogic if we have something in the capsule.
-        if (shaderDataLogic != null) {
-            if (shaderDataLogic instanceof GLSLShaderDataLogic) {
-                _shaderDataLogic = (GLSLShaderDataLogic) shaderDataLogic;
-            } else {
-                logger.warning("Deserialized shaderDataLogic is not of type GLSLShaderDataLogic. "
-                        + shaderDataLogic.getClass().getName());
-            }
-        }
-    }
-
-    @Override
-    public StateRecord createStateRecord(final ContextCapabilities caps) {
-        return new ShaderObjectsStateRecord();
-    }
 }

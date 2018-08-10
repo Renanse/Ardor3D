@@ -30,10 +30,11 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -58,7 +59,7 @@ public class AnimationBlinnPhongExample extends ExampleBase {
     private ColladaImporter colladaImporter;
     private ColladaStorage colladaStorage;
     private Node colladaNode;
-    private GLSLShaderObjectsState gpuShader;
+    private ShaderState gpuShader;
     private float quantizationFactor = 8f; // used for posterization
     private boolean useNormalMap = false;
     private boolean useDiffuseMap = false;
@@ -266,15 +267,15 @@ public class AnimationBlinnPhongExample extends ExampleBase {
 
         colladaNode = colladaStorage.getScene();
 
-        gpuShader = new GLSLShaderObjectsState();
+        gpuShader = new ShaderState();
         gpuShader.setEnabled(true);
         try {
-            gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                    AnimationBlinnPhongExample.class,
-                    "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.vert"));
-            gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                    AnimationBlinnPhongExample.class,
-                    "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.frag"));
+            gpuShader.setShader(ShaderType.Vertex, "skinning_gpu2.vert", ResourceLocatorTool
+                    .getClassPathResourceAsString(AnimationBlinnPhongExample.class,
+                            "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.vert"));
+            gpuShader.setShader(ShaderType.Fragment, "skinning_gpu2.frag", ResourceLocatorTool
+                    .getClassPathResourceAsString(AnimationBlinnPhongExample.class,
+                            "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.frag"));
 
             gpuShader.setUniform("quantizationFactor", 1f / quantizationFactor);
             gpuShader.setUniform("flags", useNormalMap, useDiffuseMap, useSpecularMap, false);

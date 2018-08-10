@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,6 +14,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -65,6 +66,7 @@ public class BoxExample extends ExampleBase {
     @Override
     protected void initExample() {
         _canvas.setTitle("Box Example");
+        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.BLUE);
 
         // Create a new box centered at (0,0,0) with width/height/depth of size 10.
         box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);

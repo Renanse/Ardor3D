@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -22,7 +22,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -40,7 +41,7 @@ public class WireframeGeometryShaderExample extends ExampleBase {
 
     // passthru vertex shader
     private static final String s_vert_passthru_120 = //
-    "#version 120\n" + //
+            "#version 120\n" + //
             "" + //
             "void main()" + //
             "{" + //
@@ -48,7 +49,7 @@ public class WireframeGeometryShaderExample extends ExampleBase {
             "}";
 
     private static final String s_geom_wireframe_150 = //
-    "#version 150\n" + //
+            "#version 150\n" + //
             "layout(triangles) in;" + //
             "layout(triangle_strip, max_vertices = 3) out;" + //
             "" + //
@@ -87,7 +88,7 @@ public class WireframeGeometryShaderExample extends ExampleBase {
             "  gl_FragColor = I*wireColor + (1.0 - I)*faceColor;" + //
             "}";
 
-    private GLSLShaderObjectsState _wireframeShaderState;
+    private ShaderState _wireframeShaderState;
 
     public static void main(final String[] args) {
         start(WireframeGeometryShaderExample.class);
@@ -129,10 +130,10 @@ public class WireframeGeometryShaderExample extends ExampleBase {
         final Vector2 scale = new Vector2(_canvas.getCanvasRenderer().getCamera().getWidth(), _canvas
                 .getCanvasRenderer().getCamera().getHeight());
 
-        _wireframeShaderState = new GLSLShaderObjectsState();
-        _wireframeShaderState.setVertexShader(s_vert_passthru_120);
-        _wireframeShaderState.setGeometryShader(s_geom_wireframe_150);
-        _wireframeShaderState.setFragmentShader(s_frag_wireframe_120);
+        _wireframeShaderState = new ShaderState();
+        _wireframeShaderState.setShader(ShaderType.Vertex, s_vert_passthru_120);
+        _wireframeShaderState.setShader(ShaderType.Geometry, s_geom_wireframe_150);
+        _wireframeShaderState.setShader(ShaderType.Fragment, s_frag_wireframe_120);
         _wireframeShaderState.setUniform("wireColor", new ColorRGBA(0, 0, 0, 1));
         _wireframeShaderState.setUniform("faceColor", new ColorRGBA(1, 1, 1, 1));
         _wireframeShaderState.setUniform("factor", 2f);

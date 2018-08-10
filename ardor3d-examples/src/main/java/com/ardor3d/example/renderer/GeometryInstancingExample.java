@@ -26,9 +26,10 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -51,7 +52,7 @@ public class GeometryInstancingExample extends ExampleBase {
 
     private boolean instancingEnabled = true;
 
-    private GLSLShaderObjectsState _shader;
+    private ShaderState _shader;
     private Node _base;
 
     public static void main(final String[] args) {
@@ -103,12 +104,12 @@ public class GeometryInstancingExample extends ExampleBase {
         ms.setColorMaterial(ColorMaterial.Diffuse);
         _root.setRenderState(ms);
 
-        _shader = new GLSLShaderObjectsState();
+        _shader = new ShaderState();
         try {
-            _shader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(GLSLRibbonExample.class,
-                    "com/ardor3d/example/media/shaders/geometryBasic.vert.glsl"));
-            _shader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(GLSLRibbonExample.class,
-                    "com/ardor3d/example/media/shaders/geometryBasic.frag.glsl"));
+            _shader.setShader(ShaderType.Vertex, "geometryBasic", ResourceLocatorTool.getClassPathResourceAsString(
+                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.vert.glsl"));
+            _shader.setShader(ShaderType.Fragment, "geometryBasic", ResourceLocatorTool.getClassPathResourceAsString(
+                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.frag.glsl"));
 
         } catch (final IOException ex) {
             ex.printStackTrace();

@@ -11,11 +11,9 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
@@ -29,18 +27,14 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.renderer.ContextCapabilities;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -246,107 +240,86 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     }
 
     public void render(final Renderer renderer, final MeshData meshData) {
+        // 1. Set up our shader program and its shader objects.
+        final ShaderState shader = (ShaderState) renderer.applyState(RenderState.StateType.Shader,
+                _states.get(RenderState.StateType.Shader));
 
-        // PLAN OF ATTACK
-
-        // 1. Set up our GLSL shader
-        final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) renderer.getProperRenderState(
-                RenderState.StateType.GLSLShader, _states.get(RenderState.StateType.GLSLShader));
-
-        // 2. Set up our mesh data as VBOs and apply them to our shader as attributes
-        for (final Entry<String, AbstractBufferData<? extends Buffer>> e : meshData._vertexDataItems.entrySet()) {
-            // renderer.setupVBO(e.getValue());
-            // glsl.setAttributePointer(e.getKey(), size, normalized, stride, data);
+        // 2. Set up our mesh data as VBOs in a VAO and apply them to our shader as attributes
+        if (!renderer.prepareForDraw(meshData, shader)) {
+            return;
         }
 
-        // 3. Set our shader uniforms (model, view and projection matrices)
+        // 3. Set our matrices in uniforms (model, view and projection matrices)
+        renderer.applyMatrices(getWorldTransform(), shader);
 
         // 4. Apply states?
-
-        // 5. Draw arrays or elements (depending on indices)
-
-        if (glsl != null && glsl.getShaderDataLogic() != null) {
-            glsl.setMesh(this);
-            glsl.setNeedsRefresh(true);
-        }
-
-        final InstancingManager instancing = glsl != null ? meshData.getInstancingManager() : null;
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        // Apply fixed function states before mesh transforms for proper function
         for (final StateType type : StateType.values) {
-            if (type != StateType.GLSLShader && type != StateType.FragmentProgram && type != StateType.VertexProgram) {
+            if (type != StateType.Shader) {
                 renderer.applyState(type, _states.get(type));
             }
         }
 
-        if (instancing == null) {
-            final boolean transformed = renderer.doTransforms(_worldTransform);
+        // 5. Draw arrays or elements (depending on indices)
+        final IndexMode[] modes = meshData.getIndexModes();
+        final int[] indexLengths = meshData.getIndexLengths();
+        final IndexBufferData<?> indices = meshData.getIndices();
 
-            // Apply shader states here for the ability to retrieve mesh matrices
-            renderer.applyState(StateType.GLSLShader, _states.get(StateType.GLSLShader));
-            renderer.applyState(StateType.FragmentProgram, _states.get(StateType.FragmentProgram));
-            renderer.applyState(StateType.VertexProgram, _states.get(StateType.VertexProgram));
-
-            renderVBO(renderer, meshData, -1);
-
-            if (transformed) {
-                renderer.undoTransforms(_worldTransform);
-            }
-
-        } else {
-            while (instancing.apply(this, renderer, glsl)) {
-                // Apply shader states here for the ability to retrieve mesh matrices
-                renderer.applyState(StateType.GLSLShader, _states.get(StateType.GLSLShader));
-                renderer.applyState(StateType.FragmentProgram, _states.get(StateType.FragmentProgram));
-                renderer.applyState(StateType.VertexProgram, _states.get(StateType.VertexProgram));
-
-                renderVBO(renderer, meshData, instancing.getPrimitiveCount());
-            }
-        }
-    }
-
-    protected void renderVBO(final Renderer renderer, final MeshData meshData, final int primcount) {
-        if (RENDER_VERTEX_ONLY) {
-            renderer.applyNormalsMode(NormalsMode.Off, null);
-            renderer.setupNormalDataVBO(null);
-            renderer.applyDefaultColor(null);
-            renderer.setupColorDataVBO(null);
-            renderer.setupTextureDataVBO(null);
-        } else {
-            renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
-            if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
-                renderer.setupNormalDataVBO(meshData.getNormalCoords());
+        if (indexLengths == null) {
+            if (indices != null) {
+                renderer.drawElements(indices, 0, indices.getBufferLimit(), modes[0]);
             } else {
-                renderer.setupNormalDataVBO(null);
+                renderer.drawArrays(0, meshData.getVertexCount(), modes[0]);
             }
-
-            if (meshData.getColorCoords() != null) {
-                renderer.setupColorDataVBO(meshData.getColorCoords());
-            } else {
-                renderer.applyDefaultColor(_defaultColor);
-                renderer.setupColorDataVBO(null);
-            }
-
-            // renderer.setupTextureDataVBO(meshData.getTextureCoords());
-        }
-        renderer.setupVertexDataVBO(meshData.getVertexCoords());
-
-        if (meshData.getIndices() != null) {
-            // TODO: Maybe ask for the IndexBuffer's dynamic/static type and fall back to arrays for indices?
-            renderer.drawElementsVBO(meshData.getIndices(), meshData.getIndexLengths(), meshData.getIndexModes(),
-                    primcount);
         } else {
-            renderer.drawArrays(meshData.getVertexCoords(), meshData.getIndexLengths(), meshData.getIndexModes(),
-                    primcount);
+            int offset = 0;
+            int modeIndex = 0;
+            for (int i = 0; i < indexLengths.length; i++) {
+                final int count = indexLengths[i];
+
+                if (indices != null) {
+                    renderer.drawElements(indices, offset, count, modes[modeIndex]);
+                } else {
+                    renderer.drawArrays(offset, count, modes[modeIndex]);
+                }
+
+                offset += count;
+
+                if (modeIndex < modes.length - 1) {
+                    modeIndex++;
+                }
+            }
         }
 
         if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_VERTEX_COUNT, meshData.getVertexCount());
             StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
         }
+
+        // final InstancingManager instancing = glsl != null ? meshData.getInstancingManager() : null;
+
+        // final RenderContext context = ContextManager.getCurrentContext();
+        // final ContextCapabilities caps = context.getCapabilities();
+
+        // if (instancing == null) {
+        // final boolean transformed = renderer.doTransforms(_worldTransform);
+
+        // // Apply shader states here for the ability to retrieve mesh matrices
+        // renderer.applyState(StateType.Shader, _states.get(StateType.Shader));
+
+        // renderVBO(renderer, meshData, -1);
+
+        // if (transformed) {
+        // renderer.undoTransforms(_worldTransform);
+        // }
+
+        // } else {
+        // while (instancing.apply(this, renderer, glsl)) {
+        // // Apply shader states here for the ability to retrieve mesh matrices
+        // renderer.applyState(StateType.Shader, _states.get(StateType.Shader));
+        //
+        // renderVBO(renderer, meshData, instancing.getPrimitiveCount());
+        // }
+        // }
     }
 
     @Override

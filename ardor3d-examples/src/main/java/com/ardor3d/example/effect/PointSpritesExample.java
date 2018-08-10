@@ -17,7 +17,8 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Point;
@@ -38,7 +39,7 @@ maxHeapMemory = 64)
 public class PointSpritesExample extends ExampleBase {
     private final int _spriteCount = 60000;
     private Point _pointSprites;
-    private GLSLShaderObjectsState _pointSpriteShaderState;
+    private ShaderState _pointSpriteShaderState;
 
     private final Matrix3 rotation = new Matrix3();
 
@@ -79,9 +80,9 @@ public class PointSpritesExample extends ExampleBase {
     }
 
     private void buildShader() {
-        _pointSpriteShaderState = new GLSLShaderObjectsState();
-        _pointSpriteShaderState.setVertexShader(s_vert_pointsprite);
-        _pointSpriteShaderState.setFragmentShader(s_frag_pointsprite);
+        _pointSpriteShaderState = new ShaderState();
+        _pointSpriteShaderState.setShader(ShaderType.Vertex, s_vert_pointsprite);
+        _pointSpriteShaderState.setShader(ShaderType.Fragment, s_frag_pointsprite);
         _pointSpriteShaderState.setUniform("texture", 0);
         _pointSpriteShaderState.setUniform("time", 0f);
     }

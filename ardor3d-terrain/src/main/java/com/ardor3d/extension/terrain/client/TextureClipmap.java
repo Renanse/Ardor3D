@@ -35,7 +35,8 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -59,7 +60,7 @@ public class TextureClipmap {
     private float scale = 1f;
 
     private Texture3D textureClipmap;
-    private GLSLShaderObjectsState textureClipmapShader;
+    private ShaderState textureClipmapShader;
 
     private final List<LevelData> levelDataList = Lists.newArrayList();
 
@@ -546,11 +547,11 @@ public class TextureClipmap {
     }
 
     public void reloadShader() {
-        textureClipmapShader = new GLSLShaderObjectsState();
+        textureClipmapShader = new ShaderState();
         try {
-            textureClipmapShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(TextureClipmap.class,
-                    "com/ardor3d/extension/terrain/textureClipmapShader.vert"));
-            textureClipmapShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+            textureClipmapShader.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
+                    TextureClipmap.class, "com/ardor3d/extension/terrain/textureClipmapShader.vert"));
+            textureClipmapShader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
                     TextureClipmap.class, "com/ardor3d/extension/terrain/textureClipmapShader.frag"));
         } catch (final IOException ex) {
             TextureClipmap.logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.",
@@ -569,14 +570,14 @@ public class TextureClipmap {
         textureClipmapShader.setUniform("showDebug", showDebug ? 1.0f : 0.0f);
     }
 
-    public GLSLShaderObjectsState getShaderState() {
+    public ShaderState getShaderState() {
         if (textureClipmapShader == null) {
             reloadShader();
         }
         return textureClipmapShader;
     }
 
-    public void setShaderState(final GLSLShaderObjectsState textureClipmapShader) {
+    public void setShaderState(final ShaderState textureClipmapShader) {
         this.textureClipmapShader = textureClipmapShader;
     }
 
@@ -621,12 +622,12 @@ public class TextureClipmap {
     private int roundUpPowerTwo(int v) {
         v--;
         v |= v >> 1;
-            v |= v >> 2;
-            v |= v >> 4;
-            v |= v >> 8;
-            v |= v >> 16;
-            v++;
-            return v;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        v++;
+        return v;
     }
 
     /**

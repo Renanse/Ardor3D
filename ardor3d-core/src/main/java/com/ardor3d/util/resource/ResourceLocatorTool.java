@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,8 @@ package com.ardor3d.util.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -25,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
 
 /**
  * Manager class for locator utility classes used to find various assets. (XXX: Needs more documentation)
@@ -69,8 +72,8 @@ public class ResourceLocatorTool {
                     return new URLResourceSource(u);
                 }
             } catch (final Exception e) {
-                logger.logp(Level.WARNING, ResourceLocatorTool.class.getName(), "locateResource(String, String)", e
-                        .getMessage(), e);
+                logger.logp(Level.WARNING, ResourceLocatorTool.class.getName(), "locateResource(String, String)",
+                        e.getMessage(), e);
             }
 
             logger.warning("Unable to locate: " + resourceName);
@@ -107,13 +110,13 @@ public class ResourceLocatorTool {
 
     /**
      * Locate a resource using various classloaders.
-     * 
+     *
      * <ul>
      * <li>First it tries the Thread.currentThread().getContextClassLoader().</li>
      * <li>Then it tries the ClassLoader.getSystemClassLoader() (if not same as context class loader).</li>
      * <li>Finally it tries the clazz.getClassLoader()</li>
      * </ul>
-     * 
+     *
      * @param clazz
      *            a class to use as a local reference.
      * @param name
@@ -134,7 +137,7 @@ public class ResourceLocatorTool {
 
     /**
      * Locate a resource using various classloaders and open a stream to it.
-     * 
+     *
      * @param clazz
      *            a class to use as a local reference.
      * @param name
@@ -154,8 +157,38 @@ public class ResourceLocatorTool {
     }
 
     /**
+     * Locate a resource using various classloaders and open a stream to it.
+     *
+     * @param clazz
+     *            a class to use as a local reference.
+     * @param name
+     *            the name and path of the resource.
+     * @return the input stream if resource is found, or null if not.
+     * @throws IOException
+     */
+    public static String getClassPathResourceAsString(final Class<?> clazz, final String name) throws IOException {
+        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+        if (stream == null
+                && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+            stream = ClassLoader.getSystemResourceAsStream(name);
+        }
+        if (stream == null) {
+            stream = clazz.getClassLoader().getResourceAsStream(name);
+        }
+
+        if (stream == null) {
+            return null;
+        }
+        String text = null;
+        try (final Reader reader = new InputStreamReader(stream)) {
+            text = CharStreams.toString(reader);
+        }
+        return text;
+    }
+
+    /**
      * Locate all instances of a resource using various classloaders.
-     * 
+     *
      * @param clazz
      *            a class to use as a local reference.
      * @param name

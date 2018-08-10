@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Ardor Labs, Inc.
+ * Copyright (c) 2008-2018 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -8,20 +8,20 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.scene.state.jogl.shader;
+package com.ardor3d.scene.state.lwjgl3.util;
 
+import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2ES2;
-import javax.media.opengl.GL3;
-import javax.media.opengl.GL4;
-import javax.media.opengl.GLContext;
+import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL32C;
+import org.lwjgl.opengl.GL40C;
 
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.record.ShaderStateRecord;
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.shader.ShaderVariable;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat2;
@@ -38,9 +38,9 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4Array;
 
-/** Utility class for updating shadervariables(uniforms and attributes) */
-public abstract class JoglShaderUtil {
-    private static final Logger logger = Logger.getLogger(JoglShaderUtil.class.getName());
+/** Utility class for updating shadervariables (uniforms and attributes) */
+public abstract class Lwjgl3ShaderUtil {
+    private static final Logger logger = Logger.getLogger(Lwjgl3ShaderUtil.class.getName());
 
     /**
      * Updates a uniform shadervariable.
@@ -96,11 +96,13 @@ public abstract class JoglShaderUtil {
      *            shader program context ID
      */
     public static void updateUniformLocation(final ShaderVariable variable, final int programID) {
-        final GL gl = GLContext.getCurrentGL();
-
         if (variable.variableID == -1) {
-            variable.variableID = gl.getGL2ES2().glGetUniformLocation(programID, variable.name); // TODO Check
-            // variable.name
+            final ByteBuffer nameBuf = BufferUtils.createByteBuffer(variable.name.getBytes().length + 1);
+            nameBuf.clear();
+            nameBuf.put(variable.name.getBytes());
+            nameBuf.rewind();
+
+            variable.variableID = GL20C.glGetUniformLocation(programID, nameBuf);
 
             if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader uniform [" + variable.name + "] could not be located in shader");
@@ -110,50 +112,35 @@ public abstract class JoglShaderUtil {
     }
 
     private static void updateShaderUniform(final ShaderVariableInt shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform1i(shaderUniform.variableID, shaderUniform.value1);
+        GL20C.glUniform1i(shaderUniform.variableID, shaderUniform.value1);
     }
 
     private static void updateShaderUniform(final ShaderVariableInt2 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform2i(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2);
+        GL20C.glUniform2i(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2);
     }
 
     private static void updateShaderUniform(final ShaderVariableInt3 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform3i(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2,
-                shaderUniform.value3);
+        GL20C.glUniform3i(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2, shaderUniform.value3);
     }
 
     private static void updateShaderUniform(final ShaderVariableInt4 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform4i(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2,
-                shaderUniform.value3, shaderUniform.value4);
+        GL20C.glUniform4i(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2, shaderUniform.value3,
+                shaderUniform.value4);
     }
 
     private static void updateShaderUniform(final ShaderVariableIntArray shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
         switch (shaderUniform.size) {
             case 1:
-                gl.getGL2ES2().glUniform1iv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform1iv(shaderUniform.variableID, shaderUniform.value);
                 break;
             case 2:
-                gl.getGL2ES2().glUniform2iv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform2iv(shaderUniform.variableID, shaderUniform.value);
                 break;
             case 3:
-                gl.getGL2ES2().glUniform3iv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform3iv(shaderUniform.variableID, shaderUniform.value);
                 break;
             case 4:
-                gl.getGL2ES2().glUniform4iv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform4iv(shaderUniform.variableID, shaderUniform.value);
                 break;
             default:
                 throw new IllegalArgumentException("Wrong size: " + shaderUniform.size);
@@ -161,50 +148,35 @@ public abstract class JoglShaderUtil {
     }
 
     private static void updateShaderUniform(final ShaderVariableFloat shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform1f(shaderUniform.variableID, shaderUniform.value1);
+        GL20C.glUniform1f(shaderUniform.variableID, shaderUniform.value1);
     }
 
     private static void updateShaderUniform(final ShaderVariableFloat2 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform2f(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2);
+        GL20C.glUniform2f(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2);
     }
 
     private static void updateShaderUniform(final ShaderVariableFloat3 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform3f(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2,
-                shaderUniform.value3);
+        GL20C.glUniform3f(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2, shaderUniform.value3);
     }
 
     private static void updateShaderUniform(final ShaderVariableFloat4 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
-        gl.getGL2ES2().glUniform4f(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2,
-                shaderUniform.value3, shaderUniform.value4);
+        GL20C.glUniform4f(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2, shaderUniform.value3,
+                shaderUniform.value4);
     }
 
     private static void updateShaderUniform(final ShaderVariableFloatArray shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
         switch (shaderUniform.size) {
             case 1:
-                gl.getGL2ES2().glUniform1fv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform1fv(shaderUniform.variableID, shaderUniform.value);
                 break;
             case 2:
-                gl.getGL2ES2().glUniform2fv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform2fv(shaderUniform.variableID, shaderUniform.value);
                 break;
             case 3:
-                gl.getGL2ES2().glUniform3fv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform3fv(shaderUniform.variableID, shaderUniform.value);
                 break;
             case 4:
-                gl.getGL2ES2().glUniform4fv(shaderUniform.variableID, shaderUniform.value.remaining(),
-                        shaderUniform.value);
+                GL20C.glUniform4fv(shaderUniform.variableID, shaderUniform.value);
                 break;
             default:
                 throw new IllegalArgumentException("Wrong size: " + shaderUniform.size);
@@ -212,36 +184,23 @@ public abstract class JoglShaderUtil {
     }
 
     private static void updateShaderUniform(final ShaderVariableMatrix2 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
         shaderUniform.matrixBuffer.rewind();
-        gl.getGL2ES2().glUniformMatrix2fv(shaderUniform.variableID, 1, shaderUniform.rowMajor,
-                shaderUniform.matrixBuffer);
+        GL20C.glUniformMatrix2fv(shaderUniform.variableID, shaderUniform.rowMajor, shaderUniform.matrixBuffer);
     }
 
     private static void updateShaderUniform(final ShaderVariableMatrix3 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
         shaderUniform.matrixBuffer.rewind();
-        gl.getGL2ES2().glUniformMatrix3fv(shaderUniform.variableID, 1, shaderUniform.rowMajor,
-                shaderUniform.matrixBuffer);
+        GL20C.glUniformMatrix3fv(shaderUniform.variableID, shaderUniform.rowMajor, shaderUniform.matrixBuffer);
     }
 
     private static void updateShaderUniform(final ShaderVariableMatrix4 shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
         shaderUniform.matrixBuffer.rewind();
-        gl.getGL2ES2().glUniformMatrix4fv(shaderUniform.variableID, 1, shaderUniform.rowMajor,
-                shaderUniform.matrixBuffer);
+        GL20C.glUniformMatrix4fv(shaderUniform.variableID, shaderUniform.rowMajor, shaderUniform.matrixBuffer);
     }
 
     private static void updateShaderUniform(final ShaderVariableMatrix4Array shaderUniform) {
-        final GL gl = GLContext.getCurrentGL();
-
         shaderUniform.matrixBuffer.rewind();
-        // count == number of matrices we are sending, or iotw, limit / 16
-        gl.getGL2ES2().glUniformMatrix4fv(shaderUniform.variableID, shaderUniform.matrixBuffer.limit() >> 4,
-                shaderUniform.rowMajor, shaderUniform.matrixBuffer);
+        GL20C.glUniformMatrix4fv(shaderUniform.variableID, shaderUniform.rowMajor, shaderUniform.matrixBuffer);
     }
 
     /**
@@ -253,11 +212,13 @@ public abstract class JoglShaderUtil {
      *            shader program context ID
      */
     public static void updateAttributeLocation(final ShaderVariable variable, final int programID) {
-        final GL gl = GLContext.getCurrentGL();
-
         if (variable.variableID == -1) {
-            variable.variableID = gl.getGL2ES2().glGetAttribLocation(programID, variable.name); // TODO Check
-            // variable.name
+            final ByteBuffer nameBuf = BufferUtils.createByteBuffer(variable.name.getBytes().length + 1);
+            nameBuf.clear();
+            nameBuf.put(variable.name.getBytes());
+            nameBuf.rewind();
+
+            variable.variableID = GL20C.glGetAttribLocation(programID, nameBuf);
 
             if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader attribute [" + variable.name + "] could not be located in shader");
@@ -273,8 +234,11 @@ public abstract class JoglShaderUtil {
      *            the current renderer
      * @param shaderVariable
      *            variable to update
+     * @param useVBO
+     *            if true, we'll use VBO for the attributes, if false we'll use arrays.
      */
-    public static void updateShaderAttribute(final Renderer renderer, final ShaderVariable shaderVariable) {
+    public static void updateShaderAttribute(final Renderer renderer, final ShaderVariable shaderVariable,
+            final boolean useVBO) {
         if (shaderVariable.variableID == -1) {
             // attribute is not bound, or was not found in shader.
             return;
@@ -289,8 +253,7 @@ public abstract class JoglShaderUtil {
 
     public static void useShaderProgram(final int id, final ShaderStateRecord record) {
         if (record.programId != id) {
-            final GL gl = GLContext.getCurrentGL();
-            gl.getGL3().glUseProgram(id);
+            GL20C.glUseProgram(id);
             record.programId = id;
         }
     }
@@ -298,15 +261,15 @@ public abstract class JoglShaderUtil {
     public static int getGLShaderType(final ShaderType type) {
         switch (type) {
             case Fragment:
-                return GL2ES2.GL_FRAGMENT_SHADER;
+                return GL20C.GL_FRAGMENT_SHADER;
             case Geometry:
-                return GL3.GL_GEOMETRY_SHADER;
+                return GL32C.GL_GEOMETRY_SHADER;
             case TessellationControl:
-                return GL4.GL_TESS_CONTROL_SHADER;
+                return GL40C.GL_TESS_CONTROL_SHADER;
             case TessellationEvaluation:
-                return GL4.GL_TESS_EVALUATION_SHADER;
+                return GL40C.GL_TESS_EVALUATION_SHADER;
             case Vertex:
-                return GL2ES2.GL_VERTEX_SHADER;
+                return GL20C.GL_VERTEX_SHADER;
             default:
                 throw new Ardor3dException("Unhandled shader type: " + type);
         }

@@ -33,6 +33,9 @@ import com.google.common.collect.Multimap;
 
 public abstract class AbstractBufferData<T extends Buffer> implements Savable {
 
+    /** Specifies the number of coordinates per vertex. Must be 1 - 4. */
+    protected int _valuesPerTuple;
+
     private static Map<AbstractBufferData<?>, Object> _identityCache = new MapMaker().weakKeys().makeMap();
     private static final Object STATIC_REF = new Object();
 
@@ -46,7 +49,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         });
     }
 
-    protected transient ContextIdReference<AbstractBufferData<T>> _vboIdCache;
+    protected transient ContextIdReference<AbstractBufferData<T>> _bufferIdCache;
 
     /** Buffer holding the data. */
     protected T _buffer;
@@ -70,6 +73,17 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
      * @return the number of bytes per entry in the buffer. For example, an IntBuffer would return 4.
      */
     public abstract int getByteCount();
+
+    public int getTupleCount() {
+        return getBufferLimit() / _valuesPerTuple;
+    }
+
+    /**
+     * @return number of values per tuple
+     */
+    public int getValuesPerTuple() {
+        return _valuesPerTuple;
+    }
 
     /**
      * Gets the count.
@@ -118,13 +132,14 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
 
     /**
      * @param glContext
-     *            the object representing the OpenGL context a vbo belongs to. See
+     *            the object representing the OpenGL context a buffer belongs to. See
      *            {@link RenderContext#getGlContextRep()}
-     * @return the vbo id of a vbo in the given context. If the vbo is not found in the given context, 0 is returned.
+     * @return the buffer id of a buffer in the given context. If the buffer is not found in the given context, 0 is
+     *         returned.
      */
-    public int getVBOID(final Object glContext) {
-        if (_vboIdCache != null) {
-            final Integer id = _vboIdCache.getValue(glContext);
+    public int getBufferId(final Object glContext) {
+        if (_bufferIdCache != null) {
+            final Integer id = _bufferIdCache.getValue(glContext);
             if (id != null) {
                 return id.intValue();
             }
@@ -133,41 +148,41 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     }
 
     /**
-     * Removes any vbo id from this buffer's data for the given OpenGL context.
+     * Removes any buffer id from this object for the given OpenGL context.
      *
      * @param glContext
-     *            the object representing the OpenGL context a vbo would belong to. See
+     *            the object representing the OpenGL context a buffer would belong to. See
      *            {@link RenderContext#getGlContextRep()}
      * @return the id removed or 0 if not found.
      */
-    public int removeVBOID(final Object glContext) {
-        if (_vboIdCache != null) {
-            return _vboIdCache.removeValue(glContext);
+    public int removeBufferId(final Object glContext) {
+        if (_bufferIdCache != null) {
+            return _bufferIdCache.removeValue(glContext);
         } else {
             return 0;
         }
     }
 
     /**
-     * Sets the id for a vbo based on this buffer's data in regards to the given OpenGL context.
+     * Sets the buffer id representing this data in regards to the given OpenGL context.
      *
      * @param glContextRep
-     *            the object representing the OpenGL context a vbo belongs to. See
+     *            the object representing the OpenGL context a buffer belongs to. See
      *            {@link RenderContext#getGlContextRep()}
-     * @param vboId
-     *            the vbo id of a vbo. To be valid, this must be not equals to 0.
+     * @param id
+     *            the buffer id. To be valid, this must greater than 0.
      * @throws IllegalArgumentException
-     *             if vboId is less than or equal to 0.
+     *             if id is less than or equal to 0.
      */
-    public void setVBOID(final Object glContextRep, final int vboId) {
-        if (vboId == 0) {
-            throw new IllegalArgumentException("vboId must != 0");
+    public void setBufferId(final Object glContextRep, final int id) {
+        if (id == 0) {
+            throw new IllegalArgumentException("id must != 0");
         }
 
-        if (_vboIdCache == null) {
-            _vboIdCache = new ContextIdReference<AbstractBufferData<T>>(this, _vboRefQueue);
+        if (_bufferIdCache == null) {
+            _bufferIdCache = new ContextIdReference<AbstractBufferData<T>>(this, _vboRefQueue);
         }
-        _vboIdCache.put(glContextRep, vboId);
+        _bufferIdCache.put(glContextRep, id);
     }
 
     public VBOAccessMode getVboAccessMode() {
@@ -194,17 +209,17 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
 
         // Walk through the cached items and delete those too.
         for (final AbstractBufferData<?> buf : _identityCache.keySet()) {
-            if (buf._vboIdCache != null) {
+            if (buf._bufferIdCache != null) {
                 if (Constants.useMultipleContexts) {
-                    final Set<Object> contextObjects = buf._vboIdCache.getContextObjects();
+                    final Set<Object> contextObjects = buf._bufferIdCache.getContextObjects();
                     for (final Object o : contextObjects) {
                         // Add id to map
-                        idMap.put(o, buf.getVBOID(o));
+                        idMap.put(o, buf.getBufferId(o));
                     }
                 } else {
-                    idMap.put(ContextManager.getCurrentContext().getGlContextRep(), buf.getVBOID(null));
+                    idMap.put(ContextManager.getCurrentContext().getGlContextRep(), buf.getBufferId(null));
                 }
-                buf._vboIdCache.clear();
+                buf._bufferIdCache.clear();
             }
         }
 
@@ -221,8 +236,8 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         // Walk through the cached items and delete those too.
         for (final AbstractBufferData<?> buf : _identityCache.keySet()) {
             // only worry about buffers that have received ids.
-            if (buf._vboIdCache != null) {
-                final Integer id = buf._vboIdCache.removeValue(glRep);
+            if (buf._bufferIdCache != null) {
+                final Integer id = buf._bufferIdCache.removeValue(glRep);
                 if (id != null && id.intValue() != 0) {
                     idMap.put(context.getGlContextRep(), id);
                 }

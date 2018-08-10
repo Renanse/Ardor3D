@@ -15,7 +15,7 @@ import java.util.List;
 
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
@@ -109,7 +109,7 @@ public class InstancingManager {
      * @param shader
      * @return continue rendering or skip rendering all together
      */
-    public boolean apply(final Mesh mesh, final Renderer renderer, final GLSLShaderObjectsState shader) {
+    public boolean apply(final Mesh mesh, final Renderer renderer, final ShaderState shader) {
         if (_meshesToDraw <= 0) {
             // reset for next draw call
             _primCount = -1;

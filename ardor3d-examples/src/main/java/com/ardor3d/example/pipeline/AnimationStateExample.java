@@ -56,8 +56,9 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
@@ -91,7 +92,7 @@ public class AnimationStateExample extends ExampleBase {
 
     private UIButton runWalkButton, punchButton, playPauseButton, stopButton;
 
-    private GLSLShaderObjectsState gpuShader;
+    private ShaderState gpuShader;
 
     private final Node skNode = new Node("model");
 
@@ -241,7 +242,7 @@ public class AnimationStateExample extends ExampleBase {
                                 skinnedSpatial.setUseGPU(true);
                             } else {
                                 skinnedSpatial.setGPUShader(null);
-                                skinnedSpatial.clearRenderState(StateType.GLSLShader);
+                                skinnedSpatial.clearRenderState(StateType.Shader);
                                 skinnedSpatial.setUseGPU(false);
                             }
                         }
@@ -313,14 +314,15 @@ public class AnimationStateExample extends ExampleBase {
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
-            gpuShader = new GLSLShaderObjectsState();
+            gpuShader = new ShaderState();
             gpuShader.setEnabled(true);
             try {
-                gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationStateExample.class,
-                        "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                        AnimationStateExample.class,
-                        "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
+                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert", ResourceLocatorTool
+                        .getClassPathResourceAsString(ExampleBase.class,
+                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
+                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag", ResourceLocatorTool
+                        .getClassPathResourceAsString(ExampleBase.class,
+                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
 
                 gpuShader.setUniform("texture", 0);
                 gpuShader.setUniform("lightDirection", new Vector3(1, 1, 1).normalizeLocal());

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -38,6 +38,8 @@ public final class DirectNioBuffersSet {
 
     private static final int vboIdsBufferMaxSize = 256;// 1KB
 
+    private static final int vaoIdsBufferMaxSize = 256;// 1KB
+
     /** buffer containing all others, sliced to occupy only a single memory page */
     private final ByteBuffer slicedByteBuffer;
 
@@ -54,6 +56,8 @@ public final class DirectNioBuffersSet {
     private final IntBuffer textureIdsBuffer;
 
     private final IntBuffer vboIdsBuffer;
+
+    private final IntBuffer vaoIdsBuffer;
 
     public DirectNioBuffersSet() {
         slicedByteBuffer = BufferUtils.createByteBuffer(slicedByteBufferMaxSize);
@@ -76,6 +80,9 @@ public final class DirectNioBuffersSet {
         slicedByteBuffer.position(slicedByteBuffer.limit()).limit(
                 slicedByteBuffer.position() + (Buffers.SIZEOF_INT * vboIdsBufferMaxSize));
         vboIdsBuffer = slicedByteBuffer.slice().order(ByteOrder.nativeOrder()).asIntBuffer();
+        slicedByteBuffer.position(slicedByteBuffer.limit()).limit(
+                slicedByteBuffer.position() + (Buffers.SIZEOF_INT * vaoIdsBufferMaxSize));
+        vaoIdsBuffer = slicedByteBuffer.slice().order(ByteOrder.nativeOrder()).asIntBuffer();
         slicedByteBuffer.clear();
     }
 
@@ -105,6 +112,10 @@ public final class DirectNioBuffersSet {
 
     public IntBuffer getVboIdsBuffer() {
         return vboIdsBuffer;
+    }
+
+    public IntBuffer getVaoIdsBuffer() {
+        return vaoIdsBuffer;
     }
 
 }

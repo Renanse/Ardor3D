@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -37,30 +37,5 @@ public class FloatBufferDataUtil {
         }
 
         return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 1);
-    }
-
-    /**
-     * Check an incoming TexCoords object for null and correct size.
-     * 
-     * @param tc
-     * @param vertexCount
-     * @param perVert
-     * @return tc if it is not null and the right size, otherwise it will be a new TexCoords object.
-     */
-    public static FloatBufferData ensureSize(final FloatBufferData tc, final int vertexCount, final int coordsPerVertex) {
-        if (tc == null) {
-            return new FloatBufferData(BufferUtils.createFloatBuffer(vertexCount * coordsPerVertex), coordsPerVertex);
-        }
-
-        if (tc.getBuffer().limit() == coordsPerVertex * vertexCount && tc.getValuesPerTuple() == coordsPerVertex) {
-            tc.getBuffer().rewind();
-            return tc;
-        } else if (tc.getBuffer().limit() == coordsPerVertex * vertexCount) {
-            tc.setValuesPerTuple(coordsPerVertex);
-        } else {
-            return new FloatBufferData(BufferUtils.createFloatBuffer(vertexCount * coordsPerVertex), coordsPerVertex);
-        }
-
-        return tc;
     }
 }

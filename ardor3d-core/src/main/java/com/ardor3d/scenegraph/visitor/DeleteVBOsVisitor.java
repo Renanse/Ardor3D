@@ -10,6 +10,9 @@
 
 package com.ardor3d.scenegraph.visitor;
 
+import java.nio.Buffer;
+import java.util.Map.Entry;
+
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -27,8 +30,8 @@ public class DeleteVBOsVisitor implements Visitor {
         if (spatial instanceof Mesh) {
             final Mesh mesh = (Mesh) spatial;
             final MeshData meshData = mesh.getMeshData();
-            for (final AbstractBufferData<?> buff : meshData.listBufferDataItems()) {
-                _deleter.deleteVBOs(buff);
+            for (final Entry<String, AbstractBufferData<? extends Buffer>> entry : meshData.listDataItems()) {
+                _deleter.deleteVBOs(entry.getValue());
             }
         }
     }

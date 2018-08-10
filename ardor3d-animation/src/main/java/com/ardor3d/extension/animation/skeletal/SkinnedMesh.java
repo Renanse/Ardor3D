@@ -19,7 +19,7 @@ import com.ardor3d.extension.animation.skeletal.util.SkinUtils;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -85,7 +85,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     /**
      * The shader state to update with GLSL attributes/uniforms related to GPU skinning. See class doc for more.
      */
-    protected GLSLShaderObjectsState _gpuShader;
+    protected ShaderState _gpuShader;
 
     /**
      * <p>
@@ -310,9 +310,9 @@ public class SkinnedMesh extends Mesh implements PoseListener {
 
     /**
      * @return the shader being used for GPU skinning. Must first have been set via
-     *         {@link #setGPUShader(GLSLShaderObjectsState)}
+     *         {@link #setGPUShader(ShaderState)}
      */
-    public GLSLShaderObjectsState getGPUShader() {
+    public ShaderState getGPUShader() {
         return _gpuShader;
     }
 
@@ -321,7 +321,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      *            the shader to use for GPU skinning. Should be set up to accept vec4 attributes "Weights" and
      *            "JointIDs" and a mat4[] uniform called "JointPalette". Applies the renderstate to this mesh as well.
      */
-    public void setGPUShader(final GLSLShaderObjectsState shaderState) {
+    public void setGPUShader(final ShaderState shaderState) {
         _gpuShader = shaderState;
         setRenderState(_gpuShader);
     }
@@ -695,7 +695,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _bindPoseData = (MeshData) capsule.readSavable("bindPoseData", null);
         _currentPose = (SkeletonPose) capsule.readSavable("currentPose", null);
         _useGPU = capsule.readBoolean("useGPU", false);
-        _gpuShader = (GLSLShaderObjectsState) capsule.readSavable("gpuShader", null);
+        _gpuShader = (ShaderState) capsule.readSavable("gpuShader", null);
         _gpuAttributeSize = capsule.readInt("gpuAttributeSize", 4);
         _gpuUseMatrixAttribute = capsule.readBoolean("gpuUseMatrixAttribute", false);
         _autoUpdateSkinBound = capsule.readBoolean("autoUpdateSkinBound", false);

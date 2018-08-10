@@ -16,20 +16,16 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL2ES3;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
-import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
-import javax.media.opengl.fixedfunc.GLPointerFunc;
 import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.image.ImageDataFormat;
@@ -44,7 +40,6 @@ import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyRectangle2;
 import com.ardor3d.math.type.ReadOnlyTransform;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.AbstractRenderer;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -58,16 +53,14 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.FragmentProgramState;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.VertexProgramState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.LineRecord;
@@ -75,7 +68,6 @@ import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.jogl.JoglBlendStateUtil;
 import com.ardor3d.scene.state.jogl.JoglColorMaskStateUtil;
 import com.ardor3d.scene.state.jogl.JoglCullStateUtil;
-import com.ardor3d.scene.state.jogl.JoglFragmentProgramStateUtil;
 import com.ardor3d.scene.state.jogl.JoglLightStateUtil;
 import com.ardor3d.scene.state.jogl.JoglMaterialStateUtil;
 import com.ardor3d.scene.state.jogl.JoglOffsetStateUtil;
@@ -83,19 +75,17 @@ import com.ardor3d.scene.state.jogl.JoglShaderObjectsStateUtil;
 import com.ardor3d.scene.state.jogl.JoglShadingStateUtil;
 import com.ardor3d.scene.state.jogl.JoglStencilStateUtil;
 import com.ardor3d.scene.state.jogl.JoglTextureStateUtil;
-import com.ardor3d.scene.state.jogl.JoglVertexProgramStateUtil;
 import com.ardor3d.scene.state.jogl.JoglWireframeStateUtil;
 import com.ardor3d.scene.state.jogl.JoglZBufferStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
@@ -248,7 +238,7 @@ public class JoglRenderer extends AbstractRenderer {
         // set up ortho mode
         final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
                 .getRendererRecord();
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
         matRecord.getMatrixBackend().pushMatrix();
         matRecord.getMatrixBackend().loadIdentity();
 
@@ -256,7 +246,7 @@ public class JoglRenderer extends AbstractRenderer {
         final double viewportWidth = camera.getWidth() * (camera.getViewPortRight() - camera.getViewPortLeft());
         final double viewportHeight = camera.getHeight() * (camera.getViewPortTop() - camera.getViewPortBottom());
         matRecord.getMatrixBackend().setOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
         matRecord.getMatrixBackend().pushMatrix();
         matRecord.getMatrixBackend().loadIdentity();
         _inOrthoMode = true;
@@ -271,9 +261,9 @@ public class JoglRenderer extends AbstractRenderer {
         // state
         final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
                 .getRendererRecord();
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
         matRecord.getMatrixBackend().popMatrix();
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
         matRecord.getMatrixBackend().popMatrix();
         _inOrthoMode = false;
     }
@@ -338,100 +328,55 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     @Override
-    public void applyNormalsMode(final NormalsMode normalsMode, final ReadOnlyTransform worldTransform) {
+    public void deleteVAOs(final Collection<Integer> ids) {
         final GL gl = GLContext.getCurrentGL();
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        if (normalsMode != NormalsMode.Off) {
-            final ContextCapabilities caps = context.getCapabilities();
-            switch (normalsMode) {
-                case NormalizeIfScaled:
-                    if (worldTransform.isRotationMatrix()) {
-                        final ReadOnlyVector3 scale = worldTransform.getScale();
-                        if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
-                            if (scale.getX() == scale.getY() && scale.getY() == scale.getZ()
-                                    && rendRecord.getNormalMode() != GL2ES1.GL_RESCALE_NORMAL) {
-                                if (rendRecord.getNormalMode() == GLLightingFunc.GL_NORMALIZE) {
-                                    gl.glDisable(GLLightingFunc.GL_NORMALIZE);
-                                }
-                                gl.glEnable(GL2ES1.GL_RESCALE_NORMAL);
-                                rendRecord.setNormalMode(GL2ES1.GL_RESCALE_NORMAL);
-                            } else if (rendRecord.getNormalMode() != GLLightingFunc.GL_NORMALIZE) {
-                                if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                                    gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-                                }
-                                gl.glEnable(GLLightingFunc.GL_NORMALIZE);
-                                rendRecord.setNormalMode(GLLightingFunc.GL_NORMALIZE);
-                            }
-                        } else {
-                            if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                                gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-                            } else if (rendRecord.getNormalMode() == GLLightingFunc.GL_NORMALIZE) {
-                                gl.glDisable(GLLightingFunc.GL_NORMALIZE);
-                            }
-                            rendRecord.setNormalMode(GL.GL_ZERO);
-                        }
-                    } else {
-                        if (!worldTransform.getMatrix().isIdentity()) {
-                            // *might* be scaled...
-                            if (rendRecord.getNormalMode() != GLLightingFunc.GL_NORMALIZE) {
-                                if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                                    gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-                                }
-                                gl.glEnable(GLLightingFunc.GL_NORMALIZE);
-                                rendRecord.setNormalMode(GLLightingFunc.GL_NORMALIZE);
-                            }
-                        } else {
-                            // not scaled
-                            if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                                gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-                            } else if (rendRecord.getNormalMode() == GLLightingFunc.GL_NORMALIZE) {
-                                gl.glDisable(GLLightingFunc.GL_NORMALIZE);
-                            }
-                            rendRecord.setNormalMode(GL.GL_ZERO);
-                        }
-                    }
-                    break;
-                case AlwaysNormalize:
-                    if (rendRecord.getNormalMode() != GLLightingFunc.GL_NORMALIZE) {
-                        if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                            gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-                        }
-                        gl.glEnable(GLLightingFunc.GL_NORMALIZE);
-                        rendRecord.setNormalMode(GLLightingFunc.GL_NORMALIZE);
-                    }
-                    break;
-                case UseProvided:
-                default:
-                    if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                        gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-                    } else if (rendRecord.getNormalMode() == GLLightingFunc.GL_NORMALIZE) {
-                        gl.glDisable(GLLightingFunc.GL_NORMALIZE);
-                    }
-                    rendRecord.setNormalMode(GL.GL_ZERO);
-                    break;
+
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+        final IntBuffer vaoIdsBuffer = context.getDirectNioBuffersSet().getVaoIdsBuffer();
+        vaoIdsBuffer.clear();
+        for (final Integer i : ids) {
+            if (!vaoIdsBuffer.hasRemaining()) {
+                vaoIdsBuffer.flip();
+                if (vaoIdsBuffer.remaining() > 0) {
+                    gl.getGL3().glDeleteVertexArrays(vaoIdsBuffer.remaining(), vaoIdsBuffer);
+                }
+                vaoIdsBuffer.clear();
             }
-        } else {
-            if (rendRecord.getNormalMode() == GL2ES1.GL_RESCALE_NORMAL) {
-                gl.glDisable(GL2ES1.GL_RESCALE_NORMAL);
-            } else if (rendRecord.getNormalMode() == GLLightingFunc.GL_NORMALIZE) {
-                gl.glDisable(GLLightingFunc.GL_NORMALIZE);
+            if (i != null && i != 0) {
+                vaoIdsBuffer.put(i);
             }
-            rendRecord.setNormalMode(GL.GL_ZERO);
         }
+        vaoIdsBuffer.flip();
+        if (vaoIdsBuffer.remaining() > 0) {
+            gl.getGL3().glDeleteVertexArrays(vaoIdsBuffer.remaining(), vaoIdsBuffer);
+        }
+        vaoIdsBuffer.clear();
     }
 
     @Override
-    public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
-        final GL gl = GLContext.getCurrentGL();
-        if (gl.isGL2ES1()) {
-            if (defaultColor != null) {
-                gl.getGL2ES1().glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
-                        defaultColor.getAlpha());
-            } else {
-                gl.getGL2ES1().glColor4f(1, 1, 1, 1);
-            }
+    public void deleteVAOs(final MeshData data) {
+        if (data == null) {
+            return;
         }
+
+        final GL gl = GLContext.getCurrentGL();
+
+        // ask for the current state record
+        final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
+
+        final int id = data.getVAOID(context.getGlContextRep());
+        if (id == 0) {
+            // Not on card... return.
+            return;
+        }
+
+        data.removeVAOID(context.getGlContextRep());
+
+        final IntBuffer idBuff = context.getDirectNioBuffersSet().getSingleIntBuffer();
+        idBuff.clear();
+        idBuff.put(id);
+        idBuff.flip();
+        gl.getGL3().glDeleteVertexArrays(1, idBuff);
     }
 
     @Override
@@ -445,7 +390,7 @@ public class JoglRenderer extends AbstractRenderer {
             if (!vboIdsBuffer.hasRemaining()) {
                 vboIdsBuffer.flip();
                 if (vboIdsBuffer.remaining() > 0) {
-                    gl.glDeleteTextures(vboIdsBuffer.remaining(), vboIdsBuffer);
+                    gl.glDeleteBuffers(vboIdsBuffer.remaining(), vboIdsBuffer);
                 }
                 vboIdsBuffer.clear();
             }
@@ -455,7 +400,7 @@ public class JoglRenderer extends AbstractRenderer {
         }
         vboIdsBuffer.flip();
         if (vboIdsBuffer.remaining() > 0) {
-            gl.glDeleteTextures(vboIdsBuffer.remaining(), vboIdsBuffer);
+            gl.glDeleteBuffers(vboIdsBuffer.remaining(), vboIdsBuffer);
         }
         vboIdsBuffer.clear();
     }
@@ -471,13 +416,13 @@ public class JoglRenderer extends AbstractRenderer {
         // ask for the current state record
         final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
 
-        final int id = buffer.getVBOID(context.getGlContextRep());
+        final int id = buffer.getBufferId(context.getGlContextRep());
         if (id == 0) {
             // Not on card... return.
             return;
         }
 
-        buffer.removeVBOID(context.getGlContextRep());
+        buffer.removeBufferId(context.getGlContextRep());
 
         final IntBuffer idBuff = context.getDirectNioBuffersSet().getSingleIntBuffer();
         idBuff.clear();
@@ -690,7 +635,7 @@ public class JoglRenderer extends AbstractRenderer {
                 transform.getGLApplyMatrix(_transformBuffer);
 
                 final JoglRendererRecord matRecord = context.getRendererRecord();
-                JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
+                // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
                 matRecord.getMatrixBackend().pushMatrix();
                 matRecord.getMatrixBackend().multMatrix(_transformBuffer);
                 return true;
@@ -703,741 +648,98 @@ public class JoglRenderer extends AbstractRenderer {
     public void undoTransforms(final ReadOnlyTransform transform) {
         final JoglRenderContext context = (JoglRenderContext) ContextManager.getCurrentContext();
         final JoglRendererRecord matRecord = context.getRendererRecord();
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
         matRecord.getMatrixBackend().popMatrix();
     }
 
     @Override
-    public void setupVertexData(final FloatBufferData vertexBufferData) {
-        final GL gl = GLContext.getCurrentGL();
+    public boolean prepareForDraw(final MeshData data, final ShaderState currentShader) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-        final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
+    @Override
+    public void applyMatrices(final ReadOnlyTransform worldTransform, final ShaderState currentShader) {
+        // TODO Auto-generated method stub
 
-        if (vertexBuffer == null) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-            }
-            vertexBuffer.rewind();
-            if (gl.isGL2ES1() && vertexBufferData != null) {
-                gl.getGL2ES1().glVertexPointer(vertexBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, vertexBuffer);
-            }
+    }
+
+    @Override
+    public void drawArrays(final int start, final int count, final IndexMode mode) {
+        final int glIndexMode = getGLIndexMode(mode);
+
+        GLContext.getCurrentGL().getGL3().glDrawArrays(glIndexMode, start, count);
+
+        if (Constants.stats) {
+            addStats(mode, count);
         }
     }
 
     @Override
-    public void setupNormalData(final FloatBufferData normalBufferData) {
-        final GL gl = GLContext.getCurrentGL();
+    public void drawArraysInstanced(final int start, final int count, final IndexMode mode, final int instanceCount) {
+        final int glIndexMode = getGLIndexMode(mode);
 
-        final FloatBuffer normalBuffer = normalBufferData != null ? normalBufferData.getBuffer() : null;
+        GLContext.getCurrentGL().getGL3().glDrawArraysInstanced(glIndexMode, start, count, instanceCount);
 
-        if (normalBuffer == null) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
-            }
-            normalBuffer.rewind();
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, normalBuffer);
-            }
+        if (Constants.stats) {
+            addStats(mode, count * instanceCount);
         }
     }
 
     @Override
-    public void setupColorData(final FloatBufferData colorBufferData) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final FloatBuffer colorBuffer = colorBufferData != null ? colorBufferData.getBuffer() : null;
-
-        if (colorBuffer == null) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            }
-            colorBuffer.rewind();
-            if (gl.isGL2ES1() && colorBufferData != null) {
-                gl.getGL2ES1().glColorPointer(colorBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, colorBuffer);
-            }
-        }
-    }
-
-    @Override
-    public void setupTextureData(final List<FloatBufferData> textureCoords) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final ContextCapabilities caps = context.getCapabilities();
-        final RendererRecord rendRecord = context.getRendererRecord();
-
-        final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-        int enabledTextures = rendRecord.getEnabledTextures();
-        final boolean valid = rendRecord.isTexturesValid();
-        boolean isOn, wasOn;
-        if (ts != null) {
-            for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
-                wasOn = (enabledTextures & (2 << i)) != 0;
-                isOn = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null
-                        && textureCoords.get(i).getBuffer() != null;
-
-                if (!isOn) {
-                    if (valid && !wasOn) {
-                        continue;
-                    } else {
-                        checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
-
-                        // disable bit in tracking int
-                        enabledTextures &= ~(2 << i);
-
-                        // disable state
-                        if (gl.isGL2GL3()) {
-                            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                        }
-
-                        continue;
-                    }
-                } else {
-                    checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
-
-                    if (!valid || !wasOn) {
-                        // enable state
-                        if (gl.isGL2GL3()) {
-                            gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                        }
-
-                        // enable bit in tracking int
-                        enabledTextures |= (2 << i);
-                    }
-
-                    final FloatBufferData textureBufferData = textureCoords.get(i);
-                    final FloatBuffer textureBuffer = textureBufferData.getBuffer();
-
-                    if (gl.isGL2GL3()) {
-                        gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                    }
-                    textureBuffer.rewind();
-                    if (gl.isGL2ES1()) {
-                        gl.getGL2ES1().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
-                                textureBuffer);
-                    }
-                }
-            }
-        }
-
-        rendRecord.setEnabledTextures(enabledTextures);
-        rendRecord.setTexturesValid(true);
-    }
-
-    @Override
-    public void drawElements(final IndexBufferData<?> indices, final int[] indexLengths, final IndexMode[] indexModes,
-            final int primcount) {
-        if (indices == null || indices.getBuffer() == null) {
-            logger.severe("Missing indices for drawElements call without VBO");
-            return;
-        }
-
-        final GL gl = GLContext.getCurrentGL();
-
+    public void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode) {
         final int type = getGLDataType(indices);
-        if (indexLengths == null) {
-            final int glIndexMode = getGLIndexMode(indexModes[0]);
+        final int byteSize = indices.getByteCount();
+        final int glIndexMode = getGLIndexMode(mode);
 
-            indices.position(0);
+        GLContext.getCurrentGL().getGL3().glDrawElements(glIndexMode, count, type, (long) start * byteSize);
 
-            if (primcount < 0) {
-                if (gl.isGL2ES1()) {
-                    gl.getGL2ES1().glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
-                }
-            } else {
-                if (gl.isGL2()) {
-                    gl.getGL2().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
-                            indices.getBuffer(), primcount);
-
-                }
-            }
-
-            if (Constants.stats) {
-                addStats(indexModes[0], indices.getBufferLimit());
-            }
-        } else {
-            int offset = 0;
-            int indexModeCounter = 0;
-            for (int i = 0; i < indexLengths.length; i++) {
-                final int count = indexLengths[i];
-
-                final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
-
-                indices.getBuffer().position(offset);
-                indices.getBuffer().limit(offset + count);
-
-                if (gl.isGL2()) {
-                    if (primcount < 0) {
-                        gl.getGL2ES1().glDrawElements(glIndexMode, count, type, indices.getBuffer());
-                    } else {
-                        gl.getGL2().glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
-                    }
-                }
-
-                if (Constants.stats) {
-                    addStats(indexModes[indexModeCounter], count);
-                }
-
-                offset += count;
-
-                if (indexModeCounter < indexModes.length - 1) {
-                    indexModeCounter++;
-                }
-            }
+        if (Constants.stats) {
+            addStats(mode, count);
         }
     }
 
-    public static int setupVBO(final AbstractBufferData<? extends Buffer> data, final RenderContext context) {
-        if (data == null) {
-            return 0;
+    @Override
+    public void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count,
+            final IndexMode mode, final int instanceCount) {
+        final int type = getGLDataType(indices);
+        final int byteSize = indices.getByteCount();
+        final int glIndexMode = getGLIndexMode(mode);
+
+        GLContext.getCurrentGL().getGL3()
+                .glDrawElementsInstanced(glIndexMode, count, type, (long) start * byteSize, instanceCount);
+
+        if (Constants.stats) {
+            addStats(mode, count * instanceCount);
         }
 
-        final GL gl = GLContext.getCurrentGL();
+    }
 
-        final RendererRecord rendRecord = context.getRendererRecord();
-        int vboID = data.getVBOID(context.getGlContextRep());
-        if (vboID != 0) {
-            updateVBO(data, rendRecord, vboID, 0);
-            return vboID;
+    protected static int setupBufferObject(final AbstractBufferData<? extends Buffer> data, final boolean isEBO,
+            final RenderContext context) {
+
+        final GL gl = GLContext.getCurrentGL().getGL3();
+
+        int id = data.getBufferId(context.getGlContextRep());
+        if (id != 0) {
+            return id;
         }
 
         final Buffer dataBuffer = data.getBuffer();
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
-            vboID = makeVBOId();
-            data.setVBOID(context.getGlContextRep(), vboID);
+            id = makeVBOId();
+            data.setBufferId(context.getGlContextRep(), id);
 
-            rendRecord.invalidateVBO();
-            JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferData(GL.GL_ARRAY_BUFFER, dataBuffer.limit() * data.getByteCount(), dataBuffer,
+            final int target = isEBO ? GL.GL_ELEMENT_ARRAY_BUFFER : GL.GL_ARRAY_BUFFER;
+            gl.glBindBuffer(target, id);
+            gl.glBufferData(target, dataBuffer.limit() * data.getByteCount(), dataBuffer,
                     getGLVBOAccessMode(data.getVboAccessMode()));
         } else {
-            throw new Ardor3dException("Attempting to create a vbo id for an AbstractBufferData with no Buffer value.");
+            throw new Ardor3dException("Attempting to create a buffer object with no Buffer value.");
         }
-        return vboID;
-    }
-
-    private static void updateVBO(final AbstractBufferData<? extends Buffer> data, final RendererRecord rendRecord,
-            final int vboID, final int offsetBytes) {
-        if (data.isNeedsRefresh()) {
-            final GL gl = GLContext.getCurrentGL();
-            final Buffer dataBuffer = data.getBuffer();
-            dataBuffer.rewind();
-            JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offsetBytes, dataBuffer.limit() * data.getByteCount(), dataBuffer);
-            data.setNeedsRefresh(false);
-        }
-    }
-
-    private int setupIndicesVBO(final IndexBufferData<?> data, final RenderContext context,
-            final RendererRecord rendRecord) {
-        if (data == null) {
-            return 0;
-        }
-
-        final GL gl = GLContext.getCurrentGL();
-
-        int vboID = data.getVBOID(context.getGlContextRep());
-        if (vboID != 0) {
-            if (data.isNeedsRefresh()) {
-                final Buffer dataBuffer = data.getBuffer();
-                dataBuffer.rewind();
-                JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-                gl.glBufferSubData(GL.GL_ELEMENT_ARRAY_BUFFER, 0, dataBuffer.limit() * data.getByteCount(), dataBuffer);
-                data.setNeedsRefresh(false);
-            }
-
-            return vboID;
-        }
-
-        final Buffer dataBuffer = data.getBuffer();
-        if (dataBuffer != null) {
-            // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
-            dataBuffer.rewind();
-            vboID = makeVBOId();
-            data.setVBOID(context.getGlContextRep(), vboID);
-
-            rendRecord.invalidateVBO();
-            JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-            gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, dataBuffer.limit() * data.getByteCount(), dataBuffer,
-                    getGLVBOAccessMode(data.getVboAccessMode()));
-        } else {
-            throw new Ardor3dException("Attempting to create a vbo id for a IndexBufferData with no Buffer value.");
-        }
-        return vboID;
-    }
-
-    @Override
-    public void setupVertexDataVBO(final FloatBufferData data) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-
-        final int vboID = setupVBO(data, context);
-
-        if (vboID != 0) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-            }
-            JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glVertexPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-            }
-        }
-    }
-
-    @Override
-    public void setupNormalDataVBO(final FloatBufferData data) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-
-        final int vboID = setupVBO(data, context);
-
-        if (vboID != 0) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
-            }
-            JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, 0);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
-            }
-        }
-    }
-
-    @Override
-    public void setupColorDataVBO(final FloatBufferData data) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-
-        final int vboID = setupVBO(data, context);
-
-        if (vboID != 0) {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            }
-            JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glColorPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            }
-        }
-    }
-
-    @Override
-    public void setupTextureDataVBO(final List<FloatBufferData> textureCoords) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-        int enabledTextures = rendRecord.getEnabledTextures();
-        final boolean valid = rendRecord.isTexturesValid();
-        boolean exists, wasOn;
-        if (ts != null) {
-            for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
-                wasOn = (enabledTextures & (2 << i)) != 0;
-                exists = textureCoords != null && i < textureCoords.size();
-
-                if (!exists) {
-                    if (valid && !wasOn) {
-                        continue;
-                    } else {
-                        checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
-
-                        // disable bit in tracking int
-                        enabledTextures &= ~(2 << i);
-
-                        // disable state
-                        if (gl.isGL2GL3()) {
-                            gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                        }
-
-                        continue;
-                    }
-                } else {
-                    checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
-
-                    // grab a vboID and make sure it exists and is up to date.
-                    final FloatBufferData data = textureCoords.get(i);
-                    final int vboID = setupVBO(data, context);
-
-                    // Found good vbo
-                    if (vboID != 0) {
-                        if (!valid || !wasOn) {
-                            // enable bit in tracking int
-                            enabledTextures |= (2 << i);
-
-                            // enable state
-                            if (gl.isGL2GL3()) {
-                                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                            }
-                        }
-
-                        // set our active vbo
-                        JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-
-                        // send data
-                        if (gl.isGL2ES1()) {
-                            gl.getGL2ES1().glTexCoordPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
-                        }
-                    }
-                    // Not a good vbo, disable it.
-                    else {
-                        if (!valid || wasOn) {
-                            // disable bit in tracking int
-                            enabledTextures &= ~(2 << i);
-
-                            // disable state
-                            if (gl.isGL2GL3()) {
-                                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        rendRecord.setEnabledTextures(enabledTextures);
-        rendRecord.setTexturesValid(true);
-    }
-
-    @Override
-    public void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
-            final FloatBufferData normalCoords, final FloatBufferData colorCoords,
-            final List<FloatBufferData> textureCoords) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final int lengthBytes = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
-        int currLengthBytes = 0;
-        if (interleaved.getBufferLimit() > 0) {
-            interleaved.getBuffer().rewind();
-            currLengthBytes = Math.round(interleaved.getBuffer().get());
-        }
-
-        if (lengthBytes != currLengthBytes || interleaved.getVBOID(context.getGlContextRep()) == 0
-                || interleaved.isNeedsRefresh()) {
-            initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords,
-                    lengthBytes);
-        }
-
-        final int vboID = interleaved.getVBOID(context.getGlContextRep());
-        JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-
-        int offsetBytes = 0;
-
-        if (normalCoords != null) {
-            updateVBO(normalCoords, rendRecord, vboID, offsetBytes);
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glNormalPointer(GL.GL_FLOAT, 0, offsetBytes);
-            }
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
-            }
-            offsetBytes += normalCoords.getBufferLimit() * 4;
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_NORMAL_ARRAY);
-            }
-        }
-
-        if (colorCoords != null) {
-            updateVBO(colorCoords, rendRecord, vboID, offsetBytes);
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glColorPointer(colorCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
-            }
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            }
-            offsetBytes += colorCoords.getBufferLimit() * 4;
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            }
-        }
-
-        if (textureCoords != null) {
-            final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-            int enabledTextures = rendRecord.getEnabledTextures();
-            final boolean valid = rendRecord.isTexturesValid();
-            boolean exists, wasOn;
-            if (ts != null) {
-                for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
-                    wasOn = (enabledTextures & (2 << i)) != 0;
-                    exists = i < textureCoords.size() && textureCoords.get(i) != null
-                            && i <= ts.getMaxTextureIndexUsed();
-
-                    if (!exists) {
-                        if (valid && !wasOn) {
-                            continue;
-                        } else {
-                            checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
-
-                            // disable bit in tracking int
-                            enabledTextures &= ~(2 << i);
-
-                            // disable state
-                            if (gl.isGL2GL3()) {
-                                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                            }
-
-                            continue;
-                        }
-
-                    } else {
-                        checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
-
-                        // grab a vboID and make sure it exists and is up to date.
-                        final FloatBufferData textureBufferData = textureCoords.get(i);
-                        updateVBO(textureBufferData, rendRecord, vboID, offsetBytes);
-
-                        if (!valid || !wasOn) {
-                            // enable bit in tracking int
-                            enabledTextures |= (2 << i);
-
-                            // enable state
-                            if (gl.isGL2GL3()) {
-                                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_TEXTURE_COORD_ARRAY);
-                            }
-                        }
-
-                        // send data
-                        if (gl.isGL2ES1()) {
-                            gl.getGL2ES1().glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0,
-                                    offsetBytes);
-                        }
-                        offsetBytes += textureBufferData.getBufferLimit() * 4;
-                    }
-                }
-            }
-
-            rendRecord.setEnabledTextures(enabledTextures);
-            rendRecord.setTexturesValid(true);
-        }
-
-        if (vertexCoords != null) {
-            updateVBO(vertexCoords, rendRecord, vboID, offsetBytes);
-            if (gl.isGL2ES1()) {
-                gl.getGL2ES1().glVertexPointer(vertexCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
-            }
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-            }
-        } else {
-            if (gl.isGL2GL3()) {
-                gl.getGL2GL3().glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-            }
-        }
-    }
-
-    private void initializeInterleavedVBO(final RenderContext context, final FloatBufferData interleaved,
-            final FloatBufferData vertexCoords, final FloatBufferData normalCoords, final FloatBufferData colorCoords,
-            final List<FloatBufferData> textureCoords, final int bufferSize) {
-
-        // keep around buffer size
-        if (interleaved.getBufferCapacity() != 1) {
-            final FloatBuffer buffer = BufferUtils.createFloatBufferOnHeap(1);
-            interleaved.setBuffer(buffer);
-        }
-        interleaved.getBuffer().rewind();
-        interleaved.getBuffer().put(bufferSize);
-
-        final GL gl = GLContext.getCurrentGL();
-
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final int vboID = makeVBOId();
-        interleaved.setVBOID(context.getGlContextRep(), vboID);
-
-        rendRecord.invalidateVBO();
-        JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, bufferSize, null, getGLVBOAccessMode(interleaved.getVboAccessMode()));
-
-        int offset = 0;
-        if (normalCoords != null) {
-            normalCoords.getBuffer().rewind();
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, normalCoords.getBufferLimit() * 4, normalCoords.getBuffer());
-            offset += normalCoords.getBufferLimit() * 4;
-        }
-        if (colorCoords != null) {
-            colorCoords.getBuffer().rewind();
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, colorCoords.getBufferLimit() * 4, colorCoords.getBuffer());
-            offset += colorCoords.getBufferLimit() * 4;
-        }
-        if (textureCoords != null) {
-            final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-            if (ts != null) {
-                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < TextureState.MAX_TEXTURES; i++) {
-                    if (i >= textureCoords.size()) {
-                        continue;
-                    }
-
-                    final FloatBufferData textureBufferData = textureCoords.get(i);
-                    final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
-                    if (textureBuffer != null) {
-                        textureBuffer.rewind();
-                        gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, textureBufferData.getBufferLimit() * 4,
-                                textureBuffer);
-                        offset += textureBufferData.getBufferLimit() * 4;
-                    }
-                }
-            }
-        }
-        if (vertexCoords != null) {
-            vertexCoords.getBuffer().rewind();
-            gl.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, vertexCoords.getBufferLimit() * 4, vertexCoords.getBuffer());
-        }
-
-        interleaved.setNeedsRefresh(false);
-    }
-
-    @Override
-    public void drawElementsVBO(final IndexBufferData<?> indices, final int[] indexLengths,
-            final IndexMode[] indexModes, final int primcount) {
-        final GL gl = GLContext.getCurrentGL();
-
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-
-        final int vboID = setupIndicesVBO(indices, context, rendRecord);
-
-        JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-
-        if (indexLengths == null) {
-            final int glIndexMode = getGLIndexMode(indexModes[0]);
-
-            final int type = getGLDataType(indices);
-
-            if (primcount < 0) {
-                gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, 0);
-            } else {
-                if (gl.isGL2()) {
-                    gl.getGL2().glDrawElementsInstanced(glIndexMode, indices.getBufferLimit(), type,
-                            indices.getBuffer(), primcount);
-                }
-            }
-
-            if (Constants.stats) {
-                addStats(indexModes[0], indices.getBufferLimit());
-            }
-        } else {
-            int offset = 0;
-            int indexModeCounter = 0;
-            for (int i = 0; i < indexLengths.length; i++) {
-                final int count = indexLengths[i];
-
-                final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
-
-                final int type = getGLDataType(indices);
-                final int byteSize = indices.getByteCount();
-                // offset in this call is done in bytes.
-                gl.glDrawElements(glIndexMode, count, type, offset * byteSize);
-
-                if (primcount < 0) {
-                    gl.glDrawElements(glIndexMode, count, type, offset * byteSize);
-                } else {
-                    final int previousPos = indices.getBuffer().position();
-                    indices.getBuffer().position(offset * byteSize);
-                    if (gl.isGL2()) {
-                        gl.getGL2().glDrawElementsInstanced(glIndexMode, count, type, indices.getBuffer(), primcount);
-                    }
-                    indices.getBuffer().position(previousPos);
-                }
-
-                if (Constants.stats) {
-                    addStats(indexModes[indexModeCounter], count);
-                }
-
-                offset += count;
-
-                if (indexModeCounter < indexModes.length - 1) {
-                    indexModeCounter++;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void drawArrays(final FloatBufferData vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes,
-            final int primcount) {
-        final GL gl = GLContext.getCurrentGL();
-
-        if (indexLengths == null) {
-            final int glIndexMode = getGLIndexMode(indexModes[0]);
-
-            if (primcount < 0) {
-                gl.glDrawArrays(glIndexMode, 0, vertexBuffer.getTupleCount());
-            } else {
-                if (gl.isGL2GL3()) {
-                    gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, 0, vertexBuffer.getTupleCount(), primcount);
-                }
-            }
-
-            if (Constants.stats) {
-                addStats(indexModes[0], vertexBuffer.getTupleCount());
-            }
-        } else {
-            int offset = 0;
-            int indexModeCounter = 0;
-            for (int i = 0; i < indexLengths.length; i++) {
-                final int count = indexLengths[i];
-
-                final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
-
-                if (primcount < 0) {
-                    gl.glDrawArrays(glIndexMode, offset, count);
-                } else {
-                    if (gl.isGL2GL3()) {
-                        gl.getGL2GL3().glDrawArraysInstanced(glIndexMode, offset, count, primcount);
-                    }
-                }
-
-                if (Constants.stats) {
-                    addStats(indexModes[indexModeCounter], count);
-                }
-
-                offset += count;
-
-                if (indexModeCounter < indexModes.length - 1) {
-                    indexModeCounter++;
-                }
-            }
-        }
+        return id;
     }
 
     private static int makeVBOId() {
@@ -1449,14 +751,6 @@ public class JoglRenderer extends AbstractRenderer {
         idBuff.clear();
         gl.glGenBuffers(1, idBuff);
         return idBuff.get(0);
-    }
-
-    @Override
-    public void unbindVBO() {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        JoglRendererUtil.setBoundVBO(rendRecord, 0);
-        JoglRendererUtil.setBoundElementVBO(rendRecord, 0);
     }
 
     private static int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
@@ -1537,7 +831,7 @@ public class JoglRenderer extends AbstractRenderer {
     public void setModelViewMatrix(final FloatBuffer matrix) {
         final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
                 .getRendererRecord();
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_MODELVIEW);
 
         loadMatrix(matrix);
     }
@@ -1546,7 +840,7 @@ public class JoglRenderer extends AbstractRenderer {
     public void setProjectionMatrix(final FloatBuffer matrix) {
         final JoglRendererRecord matRecord = (JoglRendererRecord) ContextManager.getCurrentContext()
                 .getRendererRecord();
-        JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
+        // JoglRendererUtil.switchMode(matRecord, GLMatrixFunc.GL_PROJECTION);
 
         loadMatrix(matrix);
     }
@@ -1620,18 +914,6 @@ public class JoglRenderer extends AbstractRenderer {
                     break;
                 case Right:
                     buffer = GL2GL3.GL_RIGHT;
-                    break;
-                case Aux0:
-                    buffer = GL2.GL_AUX0;
-                    break;
-                case Aux1:
-                    buffer = GL2.GL_AUX1;
-                    break;
-                case Aux2:
-                    buffer = GL2.GL_AUX2;
-                    break;
-                case Aux3:
-                    buffer = GL2.GL_AUX3;
                     break;
             }
 
@@ -1731,11 +1013,8 @@ public class JoglRenderer extends AbstractRenderer {
             case Fog:
                 // JoglFogStateUtil.apply(this, (FogState) state);
                 return;
-            case FragmentProgram:
-                JoglFragmentProgramStateUtil.apply(this, (FragmentProgramState) state);
-                return;
-            case GLSLShader:
-                JoglShaderObjectsStateUtil.apply(this, (GLSLShaderObjectsState) state);
+            case Shader:
+                JoglShaderObjectsStateUtil.apply(this, (ShaderState) state);
                 return;
             case Material:
                 JoglMaterialStateUtil.apply(this, (MaterialState) state);
@@ -1748,9 +1027,6 @@ public class JoglRenderer extends AbstractRenderer {
                 return;
             case Stencil:
                 JoglStencilStateUtil.apply(this, (StencilState) state);
-                return;
-            case VertexProgram:
-                JoglVertexProgramStateUtil.apply(this, (VertexProgramState) state);
                 return;
             case Wireframe:
                 JoglWireframeStateUtil.apply(this, (WireframeState) state);

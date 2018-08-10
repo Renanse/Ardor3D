@@ -38,12 +38,11 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.GLSLShaderDataLogic;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.MaterialFace;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -71,7 +70,7 @@ public class Terrain extends Node implements Pickable, Runnable {
     private boolean _initialized = false;
 
     /** Shader for rendering clipmap geometry with morphing. */
-    private GLSLShaderObjectsState _geometryClipmapShader;
+    private ShaderState _geometryClipmapShader;
 
     /** Reference to the texture clipmap */
     private final List<TextureClipmap> _textureClipmaps = Lists.newArrayList();
@@ -460,10 +459,10 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     public void reloadShader() {
         final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
-        _geometryClipmapShader = new GLSLShaderObjectsState();
+        _geometryClipmapShader = new ShaderState();
         try {
-            _geometryClipmapShader.setVertexShader(vertexShader.openStream());
-            _geometryClipmapShader.setFragmentShader(pixelShader.openStream());
+            _geometryClipmapShader.setShader(ShaderType.Vertex, vertexShader.openStream());
+            _geometryClipmapShader.setShader(ShaderType.Fragment, pixelShader.openStream());
         } catch (final IOException ex) {
             Terrain.logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
@@ -484,13 +483,13 @@ public class Terrain extends Node implements Pickable, Runnable {
             _geometryClipmapShader.setUniform("showDebug", textureClipmap.isShowDebug() ? 1.0f : 0.0f);
         }
 
-        _geometryClipmapShader.setShaderDataLogic(new GLSLShaderDataLogic() {
-            public void applyData(final GLSLShaderObjectsState shader, final Mesh mesh, final Renderer renderer) {
-                if (mesh instanceof ClipmapLevel) {
-                    shader.setUniform("vertexDistance", (float) ((ClipmapLevel) mesh).getVertexDistance());
-                }
-            }
-        });
+        // _geometryClipmapShader.setShaderDataLogic(new GLSLShaderDataLogic() {
+        // public void applyData(final ShaderState shader, final Mesh mesh, final Renderer renderer) {
+        // if (mesh instanceof ClipmapLevel) {
+        // shader.setUniform("vertexDistance", (float) ((ClipmapLevel) mesh).getVertexDistance());
+        // }
+        // }
+        // });
 
         applyToClips();
 
@@ -603,11 +602,11 @@ public class Terrain extends Node implements Pickable, Runnable {
         return null;
     }
 
-    public GLSLShaderObjectsState getGeometryClipmapShader() {
+    public ShaderState getGeometryClipmapShader() {
         return _geometryClipmapShader;
     }
 
-    public void setGeometryClipmapShader(final GLSLShaderObjectsState shaderState) {
+    public void setGeometryClipmapShader(final ShaderState shaderState) {
         _geometryClipmapShader = shaderState;
 
         applyToClips();

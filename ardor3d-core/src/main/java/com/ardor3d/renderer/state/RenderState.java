@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -33,9 +33,8 @@ import com.google.common.collect.Maps;
  */
 public abstract class RenderState implements Savable {
 
-    // XXX: This enum may change, particularly the shader portions
     public enum StateType {
-        Blend, Fog, Light, Material, Shading, Texture, Wireframe, ZBuffer, Cull, VertexProgram, FragmentProgram, Stencil, GLSLShader, ColorMask, Clip, Offset;
+        Blend, Fog, Light, Material, Shading, Texture, Wireframe, ZBuffer, Cull, Stencil, Shader, ColorMask, Clip, Offset;
 
         // cached
         public static StateType[] values = values();
@@ -67,10 +66,8 @@ public abstract class RenderState implements Savable {
      * <li>Wireframe: false - because line attributes can change when drawing regular lines, affecting wireframe lines</li>
      * <li>ZBuffer: true</li>
      * <li>Cull: true</li>
-     * <li>VertexShader1: true</li>
-     * <li>FragmentShader1: true</li>
      * <li>Stencil: false</li>
-     * <li>GLSLShader: true</li>
+     * <li>Shader: true</li>
      * <li>ColorMask: true</li>
      * <li>Clip: true</li>
      * <li>Offset: true</li>
@@ -84,9 +81,7 @@ public abstract class RenderState implements Savable {
         _quickCompare.add(StateType.Shading);
         _quickCompare.add(StateType.ZBuffer);
         _quickCompare.add(StateType.Cull);
-        _quickCompare.add(StateType.VertexProgram);
-        _quickCompare.add(StateType.FragmentProgram);
-        _quickCompare.add(StateType.GLSLShader);
+        _quickCompare.add(StateType.Shader);
         _quickCompare.add(StateType.ColorMask);
         _quickCompare.add(StateType.Offset);
     }
@@ -161,7 +156,7 @@ public abstract class RenderState implements Savable {
 
     /**
      * Returns if this render state is enabled during rendering. Disabled states are ignored.
-     * 
+     *
      * @return True if this state is enabled.
      */
     public boolean isEnabled() {
@@ -170,7 +165,7 @@ public abstract class RenderState implements Savable {
 
     /**
      * Sets if this render state is enabled during rendering. Disabled states are ignored.
-     * 
+     *
      * @param value
      *            False if the state is to be disabled, true otherwise.
      */
@@ -183,7 +178,7 @@ public abstract class RenderState implements Savable {
      * Extracts from the stack the correct renderstate that should apply to the given spatial. This is mainly used for
      * RenderStates that can be cumulitive such as TextureState or LightState. By default, the top of the static is
      * returned. This function should not be called by users directly.
-     * 
+     *
      * @param stack
      *            The stack to extract render states from.
      * @param spat
@@ -220,7 +215,7 @@ public abstract class RenderState implements Savable {
 
     /**
      * This should be called by states when it knows internal data has been altered.
-     * 
+     *
      * @param refresh
      *            true if we should apply this state even if we think it is the current state of its type in the current
      *            context.
@@ -252,10 +247,8 @@ public abstract class RenderState implements Savable {
                 return new CullState();
             case Fog:
                 return new FogState();
-            case FragmentProgram:
-                return new FragmentProgramState();
-            case GLSLShader:
-                return new GLSLShaderObjectsState();
+            case Shader:
+                return new ShaderState();
             case Light:
                 return new LightState();
             case Material:
@@ -268,8 +261,6 @@ public abstract class RenderState implements Savable {
                 return new StencilState();
             case Texture:
                 return new TextureState();
-            case VertexProgram:
-                return new VertexProgramState();
             case Wireframe:
                 return new WireframeState();
             case ZBuffer:

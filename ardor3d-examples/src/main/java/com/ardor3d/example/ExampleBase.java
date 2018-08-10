@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.lwjgl.system.Configuration;
+
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
@@ -358,6 +360,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         // get our framework
         if (prefs.getRenderer().startsWith("LWJGL 3")) {
+            Configuration.DEBUG.set(true);
             final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(example);
             example._canvas = new GLFWCanvas(settings, canvasRenderer);
             example._physicalLayer = new PhysicalLayer(new DummyKeyboardWrapper(), new DummyMouseWrapper(),

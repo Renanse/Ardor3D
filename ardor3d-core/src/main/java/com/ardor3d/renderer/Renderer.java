@@ -13,7 +13,6 @@ package com.ardor3d.renderer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Collection;
-import java.util.List;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
@@ -28,12 +27,12 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.AbstractBufferData;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 
 /**
@@ -256,9 +255,18 @@ public interface Renderer {
     void deleteVBOs(AbstractBufferData<?> buffer);
 
     /**
-     * Unbind the current VBO elements.
+     * Attempts to delete the VAOs with the given id. Ignores null ids or ids < 1.
+     *
+     * @param ids
      */
-    void unbindVBO();
+    void deleteVAOs(Collection<Integer> ids);
+
+    /**
+     * Attempts to delete any VAOs associated with this mesh data that are relevant to the current RenderContext.
+     *
+     * @param ids
+     */
+    void deleteVAOs(MeshData data);
 
     /**
      * Update all or a portion of an existing one dimensional texture object.
@@ -395,37 +403,30 @@ public interface Renderer {
      */
     void undoTransforms(ReadOnlyTransform transform);
 
-    // TODO: Arrays
-    void setupVertexData(FloatBufferData vertexCoords);
+    /**
+     * Check that the data has a VAO, all buffers have vbo set, and shader attributes are set.
+     *
+     * @param data
+     * @param currentShader
+     * @return true if we were able to setup for draw.
+     */
+    boolean prepareForDraw(MeshData data, ShaderState currentShader);
 
-    void setupNormalData(FloatBufferData normalCoords);
+    void applyMatrices(ReadOnlyTransform worldTransform, ShaderState currentShader);
 
-    void setupColorData(FloatBufferData colorCoords);
+    void drawArrays(int start, int count, IndexMode mode);
 
-    void setupTextureData(List<FloatBufferData> textureCoords);
+    void drawArraysInstanced(int start, int count, IndexMode mode, int instanceCount);
 
-    void drawElements(IndexBufferData<?> indices, int[] indexLengths, IndexMode[] indexModes, int primcount);
+    void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode);
 
-    void drawArrays(FloatBufferData vertexBuffer, int[] indexLengths, IndexMode[] indexModes, int primcount);
+    void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count,
+            final IndexMode mode, int instanceCount);
 
-    void drawElementsVBO(IndexBufferData<?> indices, int[] indexLengths, IndexMode[] indexModes, int primcount);
-
-    void applyNormalsMode(NormalsMode normMode, ReadOnlyTransform worldTransform);
-
-    void applyDefaultColor(ReadOnlyColorRGBA defaultColor);
-
-    // TODO: VBO
-    void setupVertexDataVBO(FloatBufferData vertexCoords);
-
-    void setupNormalDataVBO(FloatBufferData normalCoords);
-
-    void setupColorDataVBO(FloatBufferData colorCoords);
-
-    void setupTextureDataVBO(List<FloatBufferData> textureCoords);
-
-    void setupInterleavedDataVBO(FloatBufferData interleaved, FloatBufferData vertexCoords,
-            FloatBufferData normalCoords, FloatBufferData colorCoords, List<FloatBufferData> textureCoords);
-
+    /**
+     *
+     * @param matrix
+     */
     void setProjectionMatrix(FloatBuffer matrix);
 
     /**
@@ -490,8 +491,10 @@ public interface Renderer {
      *            the state type
      * @param state
      *            the render state. If null, the renderer's default is applied instead.
+     * @return the actual state we applied - could be different from state if another state is enforced, or if state was
+     *         null.
      */
-    void applyState(StateType type, RenderState state);
+    RenderState applyState(StateType type, RenderState state);
 
     /**
      * Loads a texture onto the card for the current OpenGL context.

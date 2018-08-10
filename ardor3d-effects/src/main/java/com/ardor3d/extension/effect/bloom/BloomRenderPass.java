@@ -26,8 +26,9 @@ import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.pass.Pass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -57,11 +58,11 @@ public class BloomRenderPass extends Pass {
 
     private Quad fullScreenQuad = null;
 
-    private GLSLShaderObjectsState extractionShader = null;
-    private GLSLShaderObjectsState blurShader = null;
-    private GLSLShaderObjectsState blurShaderHorizontal = null;
-    private GLSLShaderObjectsState blurShaderVertical = null;
-    private GLSLShaderObjectsState finalShader = null;
+    private ShaderState extractionShader = null;
+    private ShaderState blurShader = null;
+    private ShaderState blurShaderHorizontal = null;
+    private ShaderState blurShaderVertical = null;
+    private ShaderState finalShader = null;
 
     private final Camera cam;
     private final int renderScale;
@@ -272,60 +273,90 @@ public class BloomRenderPass extends Pass {
         secondTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
         tRenderer.setupTexture(secondTexture);
 
-        extractionShader = new GLSLShaderObjectsState();
+        extractionShader = new ShaderState();
         try {
-            extractionShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_extract.vert"));
-            extractionShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_extract.frag"));
+            extractionShader.setShader(
+                    ShaderType.Vertex,
+                    "bloom_extract",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_extract.vert"));
+            extractionShader.setShader(
+                    ShaderType.Fragment,
+                    "bloom_extract",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_extract.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
         extractionShader.setUniform("RT", 0);
 
         // Create blur shader
-        blurShader = new GLSLShaderObjectsState();
+        blurShader = new ShaderState();
         try {
-            blurShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_blur.vert"));
-            blurShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_blur.frag"));
+            blurShader.setShader(
+                    ShaderType.Vertex,
+                    "bloom_blur",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_blur.vert"));
+            blurShader.setShader(
+                    ShaderType.Fragment,
+                    "bloom_blur",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_blur.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
         blurShader.setUniform("RT", 0);
 
         // Create blur shader horizontal
-        blurShaderHorizontal = new GLSLShaderObjectsState();
+        blurShaderHorizontal = new ShaderState();
         try {
-            blurShaderHorizontal.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                    BloomRenderPass.class, shaderDirectory + "bloom_blur.vert"));
-            blurShaderHorizontal.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                    BloomRenderPass.class, shaderDirectory + "bloom_blur_horizontal7.frag"));
+            blurShaderHorizontal.setShader(
+                    ShaderType.Vertex,
+                    "bloom_blur",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_blur.vert"));
+            blurShaderHorizontal.setShader(
+                    ShaderType.Fragment,
+                    "bloom_blur_horizontal7",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_blur_horizontal7.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
         blurShaderHorizontal.setUniform("RT", 0);
 
         // Create blur shader vertical
-        blurShaderVertical = new GLSLShaderObjectsState();
+        blurShaderVertical = new ShaderState();
         try {
-            blurShaderVertical.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                    BloomRenderPass.class, shaderDirectory + "bloom_blur_vertical7.frag"));
+            blurShaderVertical.setShader(
+                    ShaderType.Vertex,
+                    "bloom_blur",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_blur.vert"));
+            blurShaderVertical.setShader(
+                    ShaderType.Fragment,
+                    "bloom_blur_vertical7",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_blur_vertical7.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
         blurShaderVertical.setUniform("RT", 0);
 
         // Create final shader(basic texturing)
-        finalShader = new GLSLShaderObjectsState();
+        finalShader = new ShaderState();
         try {
-            finalShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_final.vert"));
-            finalShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_final.frag"));
+            finalShader.setShader(
+                    ShaderType.Vertex,
+                    "bloom_final",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_final.vert"));
+            finalShader.setShader(
+                    ShaderType.Fragment,
+                    "bloom_final",
+                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
+                            + "bloom_final.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }

@@ -10,13 +10,20 @@
 
 package com.ardor3d.renderer.lwjgl3;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL15C;
+import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL30C;
+import org.lwjgl.opengl.GL31C;
 import org.lwjgl.opengl.GLUtil;
 
 import com.ardor3d.image.ImageDataFormat;
@@ -40,18 +47,22 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3ShaderStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3RendererUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
-import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.IndexBufferData;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
@@ -218,6 +229,18 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
+    public void deleteVAOs(final Collection<Integer> ids) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void deleteVAOs(final MeshData data) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public void deleteVBOs(final Collection<Integer> ids) {
         // TODO Auto-generated method stub
 
@@ -225,12 +248,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void deleteVBOs(final AbstractBufferData<?> buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void unbindVBO() {
         // TODO Auto-generated method stub
 
     }
@@ -296,95 +313,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupVertexData(final FloatBufferData vertexCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupNormalData(final FloatBufferData normalCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupColorData(final FloatBufferData colorCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupTextureData(final List<FloatBufferData> textureCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void drawElements(final IndexBufferData<?> indices, final int[] indexLengths, final IndexMode[] indexModes,
-            final int primcount) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void drawArrays(final FloatBufferData vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes,
-            final int primcount) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void drawElementsVBO(final IndexBufferData<?> indices, final int[] indexLengths,
-            final IndexMode[] indexModes, final int primcount) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void applyNormalsMode(final NormalsMode normMode, final ReadOnlyTransform worldTransform) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupVertexDataVBO(final FloatBufferData vertexCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupNormalDataVBO(final FloatBufferData normalCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupColorDataVBO(final FloatBufferData colorCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupTextureDataVBO(final List<FloatBufferData> textureCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
-            final FloatBufferData normalCoords, final FloatBufferData colorCoords,
-            final List<FloatBufferData> textureCoords) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void setProjectionMatrix(final FloatBuffer matrix) {
         // TODO Auto-generated method stub
 
@@ -410,34 +338,106 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void setViewport(final int x, final int y, final int width, final int height) {
-        // TODO Auto-generated method stub
-
+        GL11C.glViewport(x, y, width, height);
     }
 
     @Override
     public void setDepthRange(final double depthRangeNear, final double depthRangeFar) {
-        // TODO Auto-generated method stub
-
+        GL11C.glDepthRange(depthRangeNear, depthRangeFar);
     }
 
     @Override
     public void setDrawBuffer(final DrawBufferTarget target) {
-        // TODO Auto-generated method stub
+        final RendererRecord record = ContextManager.getCurrentContext().getRendererRecord();
+        if (record.getDrawBufferTarget() != target) {
+            int buffer = GL11C.GL_BACK;
+            switch (target) {
+                case Back:
+                    break;
+                case Front:
+                    buffer = GL11C.GL_FRONT;
+                    break;
+                case BackLeft:
+                    buffer = GL11C.GL_BACK_LEFT;
+                    break;
+                case BackRight:
+                    buffer = GL11C.GL_BACK_RIGHT;
+                    break;
+                case FrontLeft:
+                    buffer = GL11C.GL_FRONT_LEFT;
+                    break;
+                case FrontRight:
+                    buffer = GL11C.GL_FRONT_RIGHT;
+                    break;
+                case FrontAndBack:
+                    buffer = GL11C.GL_FRONT_AND_BACK;
+                    break;
+                case Left:
+                    buffer = GL11C.GL_LEFT;
+                    break;
+                case Right:
+                    buffer = GL11C.GL_RIGHT;
+                    break;
+            }
 
+            GL11C.glDrawBuffer(buffer);
+            record.setDrawBufferTarget(target);
+        }
     }
 
     @Override
     public void setupLineParameters(final float lineWidth, final boolean antialiased) {
-        // TODO Auto-generated method stub
+        final LineRecord lineRecord = ContextManager.getCurrentContext().getLineRecord();
 
+        if (!lineRecord.isValid() || lineRecord.width != lineWidth) {
+            GL11C.glLineWidth(lineWidth);
+            lineRecord.width = lineWidth;
+        }
+
+        if (antialiased) {
+            if (!lineRecord.isValid() || !lineRecord.smoothed) {
+                GL11C.glEnable(GL11C.GL_LINE_SMOOTH);
+                lineRecord.smoothed = true;
+            }
+            if (!lineRecord.isValid() || lineRecord.smoothHint != GL11C.GL_NICEST) {
+                GL11C.glHint(GL11C.GL_LINE_SMOOTH_HINT, GL11C.GL_NICEST);
+                lineRecord.smoothHint = GL11C.GL_NICEST;
+            }
+        } else if (!lineRecord.isValid() || lineRecord.smoothed) {
+            GL11C.glDisable(GL11C.GL_LINE_SMOOTH);
+            lineRecord.smoothed = false;
+        }
+
+        if (!lineRecord.isValid()) {
+            lineRecord.validate();
+        }
     }
 
     @Override
     public void setupPointParameters(final float pointSize, final boolean antialiased, final boolean isSprite,
             final boolean useDistanceAttenuation, final FloatBuffer attenuationCoefficients, final float minPointSize,
             final float maxPointSize) {
-        // TODO Auto-generated method stub
+        final RenderContext context = ContextManager.getCurrentContext();
 
+        // TODO: make a record for point states
+        GL11C.glPointSize(pointSize);
+
+        // Supposedly all points are smoothed now and the below is meaningless in opengl core
+        // if (isSprite) {
+        // GL11C.glEnable(GL46C.GL_POINT_SPRITE);
+        // GL11C.glTexEnvi(GL46C.GL_POINT_SPRITE, GL46C.GL_COORD_REPLACE, GL11C.GL_TRUE);
+        // }
+        //
+        // if (useDistanceAttenuation && context.getCapabilities().isPointParametersSupported()) {
+        // GL46C.glPointParameter(GL46C.GL_POINT_DISTANCE_ATTENUATION, attenuationCoefficients);
+        // GL46C.glPointParameterf(GL46C.GL_POINT_SIZE_MIN, minPointSize);
+        // GL46C.glPointParameterf(GL46C.GL_POINT_SIZE_MAX, maxPointSize);
+        // }
+        //
+        // if (antialiased) {
+        // GL11C.glEnable(GL46C.GL_POINT_SMOOTH);
+        // GL11C.glHint(GL46C.GL_POINT_SMOOTH_HINT, GL11C.GL_NICEST);
+        // }
     }
 
     @Override
@@ -516,11 +516,8 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             case Fog:
                 // LwjglFogStateUtil.apply((FogState) state);
                 return;
-            case FragmentProgram:
-                // LwjglFragmentProgramStateUtil.apply((FragmentProgramState) state);
-                return;
-            case GLSLShader:
-                // LwjglShaderObjectsStateUtil.apply(this, (GLSLShaderObjectsState) state);
+            case Shader:
+                Lwjgl3ShaderStateUtil.apply(this, (ShaderState) state);
                 return;
             case Material:
                 // LwjglMaterialStateUtil.apply((MaterialState) state);
@@ -534,9 +531,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             case Stencil:
                 // LwjglStencilStateUtil.apply((StencilState) state);
                 return;
-            case VertexProgram:
-                // LwjglVertexProgramStateUtil.apply((VertexProgramState) state);
-                return;
             case Wireframe:
                 // LwjglWireframeStateUtil.apply(this, (WireframeState) state);
                 return;
@@ -545,6 +539,228 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 return;
         }
         throw new IllegalArgumentException("Unknown state: " + state);
+    }
+
+    @Override
+    public boolean prepareForDraw(final MeshData data, final ShaderState currentShader) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+
+        // Make sure our meshdata has a VAO bound
+        int vaoID = data.getVAOID(context.getGlContextRep());
+        if (vaoID <= 0) {
+            vaoID = GL30C.glGenVertexArrays();
+            data.setVAOID(context.getGlContextRep(), vaoID);
+
+            rendRecord.invalidateVAO();
+            Lwjgl3RendererUtil.setBoundVAO(rendRecord, vaoID);
+        } else {
+            Lwjgl3RendererUtil.setBoundVAO(rendRecord, vaoID);
+            return true;
+        }
+
+        // send our mesh data to the card, binding them to the VAO
+        final int programId = currentShader.getProgramId(context);
+        for (final Entry<String, AbstractBufferData<? extends Buffer>> e : data.listDataItems()) {
+            final AbstractBufferData<? extends Buffer> buffer = e.getValue();
+            final int index = GL20C.glGetAttribLocation(programId, e.getKey());
+            if (index < 0) {
+                // logger.warning("attribute not found: " + key);
+                continue;
+            }
+
+            // make sure our vbo has an id and the data is bound.
+            setupBufferObject(buffer, false, context);
+
+            // now set up our attribute pointer to it
+            GL20C.glVertexAttribPointer(index, buffer.getValuesPerTuple(), GL11C.GL_FLOAT, false, 0, 0);
+            GL20C.glEnableVertexAttribArray(index);
+        }
+
+        // send our indices to the card, if any
+        if (data.getIndexBuffer() != null) {
+            setupBufferObject(data.getIndices(), true, context);
+        }
+
+        return true;
+    }
+
+    @Override
+    public void applyMatrices(final ReadOnlyTransform worldTransform, final ShaderState currentShader) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final int programId = currentShader.getProgramId(context.getGlContextRep());
+
+        final FloatBuffer buff = BufferUtils.createFloatBuffer(16);
+        buff.put(0, 1);
+        buff.put(5, 1);
+        buff.put(10, 1);
+        buff.put(15, 1);
+        final int modelLoc = GL20C.glGetUniformLocation(programId, "model");
+        worldTransform.getHomogeneousMatrix(null).toFloatBuffer(buff, true);
+        buff.rewind();
+        GL20C.glUniformMatrix4fv(modelLoc, true, buff);
+
+        final Camera cam = Camera.getCurrentCamera();
+        buff.rewind();
+        final int viewLoc = GL20C.glGetUniformLocation(programId, "viewProjection");
+        cam.getModelViewProjectionMatrix().toFloatBuffer(buff, false);
+        buff.rewind();
+        GL20C.glUniformMatrix4fv(viewLoc, true, buff);
+    }
+
+    @Override
+    public void drawArrays(final int start, final int count, final IndexMode mode) {
+        final int glIndexMode = getGLIndexMode(mode);
+
+        GL11C.glDrawArrays(glIndexMode, start, count);
+
+        if (Constants.stats) {
+            addStats(mode, count);
+        }
+    }
+
+    @Override
+    public void drawArraysInstanced(final int start, final int count, final IndexMode mode, final int instanceCount) {
+        final int glIndexMode = getGLIndexMode(mode);
+
+        GL31C.glDrawArraysInstanced(glIndexMode, start, count, instanceCount);
+
+        if (Constants.stats) {
+            addStats(mode, count * instanceCount);
+        }
+    }
+
+    @Override
+    public void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode) {
+        final int type = getGLDataType(indices);
+        final int byteSize = indices.getByteCount();
+        final int glIndexMode = getGLIndexMode(mode);
+
+        GL11C.glDrawElements(glIndexMode, count, type, (long) start * byteSize);
+
+        if (Constants.stats) {
+            addStats(mode, count);
+        }
+    }
+
+    @Override
+    public void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count,
+            final IndexMode mode, final int instanceCount) {
+        final int type = getGLDataType(indices);
+        final int byteSize = indices.getByteCount();
+        final int glIndexMode = getGLIndexMode(mode);
+
+        GL31C.glDrawElementsInstanced(glIndexMode, count, type, (long) start * byteSize, instanceCount);
+
+        if (Constants.stats) {
+            addStats(mode, count * instanceCount);
+        }
+    }
+
+    protected static int setupBufferObject(final AbstractBufferData<? extends Buffer> data, final boolean isEBO,
+            final RenderContext context) {
+
+        int id = data.getBufferId(context.getGlContextRep());
+        if (id != 0) {
+            return id;
+        }
+
+        final Buffer dataBuffer = data.getBuffer();
+        if (dataBuffer != null) {
+            // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
+            dataBuffer.rewind();
+            id = GL15C.glGenBuffers();
+            data.setBufferId(context.getGlContextRep(), id);
+
+            final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
+            GL15C.glBindBuffer(target, id);
+            if (dataBuffer instanceof FloatBuffer) {
+                GL15C.glBufferData(target, (FloatBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof ByteBuffer) {
+                GL15C.glBufferData(target, (ByteBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof IntBuffer) {
+                GL15C.glBufferData(target, (IntBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof ShortBuffer) {
+                GL15C.glBufferData(target, (ShortBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            }
+        } else {
+            throw new Ardor3dException("Attempting to create a buffer object with no Buffer value.");
+        }
+        return id;
+    }
+
+    private static int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
+        int glMode = GL15C.GL_STATIC_DRAW;
+        switch (vboAccessMode) {
+            case StaticDraw:
+                glMode = GL15C.GL_STATIC_DRAW;
+                break;
+            case StaticRead:
+                glMode = GL15C.GL_STATIC_READ;
+                break;
+            case StaticCopy:
+                glMode = GL15C.GL_STATIC_COPY;
+                break;
+            case DynamicDraw:
+                glMode = GL15C.GL_DYNAMIC_DRAW;
+                break;
+            case DynamicRead:
+                glMode = GL15C.GL_DYNAMIC_READ;
+                break;
+            case DynamicCopy:
+                glMode = GL15C.GL_DYNAMIC_COPY;
+                break;
+            case StreamDraw:
+                glMode = GL15C.GL_STREAM_DRAW;
+                break;
+            case StreamRead:
+                glMode = GL15C.GL_STREAM_READ;
+                break;
+            case StreamCopy:
+                glMode = GL15C.GL_STREAM_COPY;
+                break;
+        }
+        return glMode;
+    }
+
+    private int getGLIndexMode(final IndexMode indexMode) {
+        int glMode = GL11C.GL_TRIANGLES;
+        switch (indexMode) {
+            case Triangles:
+                glMode = GL11C.GL_TRIANGLES;
+                break;
+            case TriangleStrip:
+                glMode = GL11C.GL_TRIANGLE_STRIP;
+                break;
+            case TriangleFan:
+                glMode = GL11C.GL_TRIANGLE_FAN;
+                break;
+            case Lines:
+                glMode = GL11C.GL_LINES;
+                break;
+            case LineStrip:
+                glMode = GL11C.GL_LINE_STRIP;
+                break;
+            case LineLoop:
+                glMode = GL11C.GL_LINE_LOOP;
+                break;
+            case Points:
+                glMode = GL11C.GL_POINTS;
+                break;
+        }
+        return glMode;
+    }
+
+    private int getGLDataType(final IndexBufferData<?> indices) {
+        if (indices.getBuffer() instanceof ByteBuffer) {
+            return GL11C.GL_UNSIGNED_BYTE;
+        } else if (indices.getBuffer() instanceof ShortBuffer) {
+            return GL11C.GL_UNSIGNED_SHORT;
+        } else if (indices.getBuffer() instanceof IntBuffer) {
+            return GL11C.GL_UNSIGNED_INT;
+        }
+
+        throw new IllegalArgumentException("Unknown buffer type: " + indices.getBuffer());
     }
 
 }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -30,7 +30,8 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -95,7 +96,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.setWeightsPerVert(4);
 
         final float[] weights = { //
-        1, 0, 0, 0, //
+                1, 0, 0, 0, //
                 1, 0, 0, 0, //
                 1, 0, 0, 0, //
                 1, 0, 0, 0, //
@@ -136,13 +137,13 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         }
         arm.setJointIndices(indices);
 
-        final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
+        final ShaderState gpuShader = new ShaderState();
         gpuShader.setEnabled(useGPU);
         try {
-            gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(PrimitiveSkeletonExample.class,
-                    "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
-            gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(PrimitiveSkeletonExample.class,
-                    "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
+            gpuShader.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
+                    PrimitiveSkeletonExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
+            gpuShader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+                    PrimitiveSkeletonExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
         } catch (final IOException ioe) {
             ioe.printStackTrace();
         }

@@ -11,6 +11,7 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
+import java.lang.ref.ReferenceQueue;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
@@ -29,14 +31,22 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.RendererCallable;
+import com.ardor3d.util.Constants;
+import com.ardor3d.util.ContextIdReference;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 
 /**
  * MeshData contains all the commonly used buffers for rendering a mesh.
@@ -52,8 +62,10 @@ public class MeshData implements Savable {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
 
-    /** A cache of ids for interleaved use. */
-    private transient Map<Object, Integer> _vboIdCache = null;
+    private static Map<MeshData, Object> _identityCache = new MapMaker().weakKeys().makeMap();
+    private static final Object STATIC_REF = new Object();
+
+    private static ReferenceQueue<MeshData> _vaoRefQueue = new ReferenceQueue<MeshData>();
 
     /** Number of vertices represented by this data. */
     protected int _vertexCount;
@@ -69,7 +81,13 @@ public class MeshData implements Savable {
     protected int[] _indexLengths;
     protected IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
 
+    protected transient ContextIdReference<MeshData> _vaoIdCache;
+
     private InstancingManager _instancingManager;
+
+    public MeshData() {
+        _identityCache.put(this, STATIC_REF);
+    }
 
     /**
      * Gets the vertex count.
@@ -78,6 +96,60 @@ public class MeshData implements Savable {
      */
     public int getVertexCount() {
         return _vertexCount;
+    }
+
+    /**
+     * @param glContext
+     *            the object representing the OpenGL context a vao belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @return the id of a vao in the given context. If the vao is not found in the given context, 0 is returned.
+     */
+    public int getVAOID(final Object glContext) {
+        if (_vaoIdCache != null) {
+            final Integer id = _vaoIdCache.getValue(glContext);
+            if (id != null) {
+                return id.intValue();
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Removes any vao id from this buffer's data for the given OpenGL context.
+     *
+     * @param glContext
+     *            the object representing the OpenGL context a vao would belong to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @return the id removed or 0 if not found.
+     */
+    public int removeVAOID(final Object glContext) {
+        if (_vaoIdCache != null) {
+            return _vaoIdCache.removeValue(glContext);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Sets the id for a vao based on this data in regards to the given OpenGL context.
+     *
+     * @param glContextRep
+     *            the object representing the OpenGL context a vao belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @param id
+     *            the id of a vao. To be valid, this must be not equal to 0.
+     * @throws IllegalArgumentException
+     *             if id is less than or equal to 0.
+     */
+    public void setVAOID(final Object glContextRep, final int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("id must be > 0");
+        }
+
+        if (_vaoIdCache == null) {
+            _vaoIdCache = new ContextIdReference<MeshData>(this, _vaoRefQueue);
+        }
+        _vaoIdCache.put(glContextRep, id);
     }
 
     /**
@@ -121,8 +193,8 @@ public class MeshData implements Savable {
         }
     }
 
-    public Collection<AbstractBufferData<? extends Buffer>> listBufferDataItems() {
-        return Collections.unmodifiableCollection(_vertexDataItems.values());
+    public Collection<Entry<String, AbstractBufferData<? extends Buffer>>> listDataItems() {
+        return Collections.unmodifiableCollection(_vertexDataItems.entrySet());
     }
 
     /**
@@ -320,7 +392,7 @@ public class MeshData implements Savable {
         if (textureBuffer == null) {
             setTextureCoords(null, index);
         } else {
-            setTangentCoords(new FloatBufferData(textureBuffer, 2));
+            setTextureCoords(new FloatBufferData(textureBuffer, 2), index);
         }
     }
 
@@ -364,7 +436,7 @@ public class MeshData implements Savable {
      * Update the vertex count based on the current limit of the vertex buffer.
      */
     public void updateVertexCount() {
-        final FloatBufferData vertexCoords = getCoords(KEY_VertexCoords);
+        final FloatBufferData vertexCoords = getVertexCoords();
         if (vertexCoords == null) {
             _vertexCount = 0;
         } else {
@@ -707,7 +779,7 @@ public class MeshData implements Savable {
             } else {
                 // non-indexed geometry
                 BufferUtils
-                        .populateFromBuffer(result[i], getVertexBuffer(), getVertexIndex(primitiveIndex, i, section));
+                .populateFromBuffer(result[i], getVertexBuffer(), getVertexIndex(primitiveIndex, i, section));
             }
         }
 
@@ -960,14 +1032,14 @@ public class MeshData implements Savable {
      *            the amount
      */
     public void translatePoints(final Vector3 amount) {
-        final FloatBuffer vertexBuffer = getBuffer(KEY_VertexCoords);
+        final FloatBuffer vertexBuffer = getVertexBuffer();
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.addInBuffer(amount, vertexBuffer, x);
         }
     }
 
     public void transformVertices(final Transform transform) {
-        final FloatBuffer vertexBuffer = getBuffer(KEY_VertexCoords);
+        final FloatBuffer vertexBuffer = getVertexBuffer();
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.populateFromBuffer(store, vertexBuffer, x);
@@ -977,7 +1049,7 @@ public class MeshData implements Savable {
     }
 
     public void transformNormals(final Transform transform, final boolean normalize) {
-        final FloatBuffer normalBuffer = getBuffer(KEY_VertexCoords);
+        final FloatBuffer normalBuffer = getNormalBuffer();
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.populateFromBuffer(store, normalBuffer, x);
@@ -996,7 +1068,7 @@ public class MeshData implements Savable {
      *            the rotate
      */
     public void rotatePoints(final Quaternion rotate) {
-        final FloatBuffer vertexBuffer = getBuffer(KEY_VertexCoords);
+        final FloatBuffer vertexBuffer = getVertexBuffer();
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.populateFromBuffer(store, vertexBuffer, x);
@@ -1012,7 +1084,7 @@ public class MeshData implements Savable {
      *            the rotate
      */
     public void rotateNormals(final Quaternion rotate) {
-        final FloatBuffer normalBuffer = getBuffer(KEY_NormalCoords);
+        final FloatBuffer normalBuffer = getNormalBuffer();
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.populateFromBuffer(store, normalBuffer, x);
@@ -1036,41 +1108,6 @@ public class MeshData implements Savable {
             _primitiveCounts[i] = count;
         }
 
-    }
-
-    /**
-     * @param glContext
-     *            the object representing the OpenGL context a vbo belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
-     * @return the vbo id of a vbo in the given context. If the vbo is not found in the given context, 0 is returned.
-     */
-    public int getVBOInterleavedID(final Object glContext) {
-        if (_vboIdCache != null && _vboIdCache.containsKey(glContext)) {
-            return _vboIdCache.get(glContext);
-        }
-        return 0;
-    }
-
-    /**
-     * Sets the id for a vbo based on interleaving this MeshData's buffer, in regards to the given OpenGL context.
-     *
-     * @param glContext
-     *            the object representing the OpenGL context a vbo belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
-     * @param vboId
-     *            the vbo id of a vbo. To be valid, this must be != 0.
-     * @throws IllegalArgumentException
-     *             if vboId is equal to 0.
-     */
-    public void setVBOInterleavedID(final Object glContext, final int vboId) {
-        if (vboId == 0) {
-            throw new IllegalArgumentException("vboId must != 0");
-        }
-
-        if (_vboIdCache == null) {
-            _vboIdCache = new MapMaker().initialCapacity(1).weakKeys().makeMap();
-        }
-        _vboIdCache.put(glContext, vboId);
     }
 
     public MeshData makeCopy() {
@@ -1134,6 +1171,109 @@ public class MeshData implements Savable {
 
     public void setInstancingManager(final InstancingManager info) {
         _instancingManager = info;
+    }
+
+    public static void cleanAllVAOs(final Renderer deleter) {
+        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+
+        // gather up expired vaos... these don't exist in our cache
+        gatherGCdIds(idMap);
+
+        // Walk through the cached items and delete those too.
+        for (final MeshData data : _identityCache.keySet()) {
+            if (data._vaoIdCache != null) {
+                if (Constants.useMultipleContexts) {
+                    final Set<Object> contextObjects = data._vaoIdCache.getContextObjects();
+                    for (final Object o : contextObjects) {
+                        // Add id to map
+                        idMap.put(o, data.getVAOID(o));
+                    }
+                } else {
+                    idMap.put(ContextManager.getCurrentContext().getGlContextRep(), data.getVAOID(null));
+                }
+                data._vaoIdCache.clear();
+            }
+        }
+
+        handleVAODelete(deleter, idMap);
+    }
+
+    public static void cleanAllVAOs(final Renderer deleter, final RenderContext context) {
+        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+
+        // gather up expired vaos... these don't exist in our cache
+        gatherGCdIds(idMap);
+
+        final Object glRep = context.getGlContextRep();
+        // Walk through the cached items and delete those too.
+        for (final MeshData data : _identityCache.keySet()) {
+            // only worry about data that have received ids.
+            if (data._vaoIdCache != null) {
+                final Integer id = data._vaoIdCache.removeValue(glRep);
+                if (id != null && id.intValue() != 0) {
+                    idMap.put(context.getGlContextRep(), id);
+                }
+            }
+        }
+
+        handleVAODelete(deleter, idMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static final Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
+        // Pull all expired vaos from ref queue and add to an id multimap.
+        ContextIdReference<MeshData> ref;
+        while ((ref = (ContextIdReference<MeshData>) _vaoRefQueue.poll()) != null) {
+            if (Constants.useMultipleContexts) {
+                final Set<Object> contextObjects = ref.getContextObjects();
+                for (final Object o : contextObjects) {
+                    // Add id to map
+                    final Integer id = ref.getValue(o);
+                    if (id != null) {
+                        if (store == null) { // lazy init
+                            store = ArrayListMultimap.create();
+                        }
+                        store.put(o, id);
+                    }
+                }
+            } else {
+                final Integer id = ref.getValue(null);
+                if (id != null) {
+                    if (store == null) { // lazy init
+                        store = ArrayListMultimap.create();
+                    }
+                    store.put(ContextManager.getCurrentContext().getGlContextRep(), id);
+                }
+            }
+            ref.clear();
+        }
+
+        return store;
+    }
+
+    private static void handleVAODelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {
+        Object currentGLRef = null;
+        // Grab the current context, if any.
+        if (deleter != null && ContextManager.getCurrentContext() != null) {
+            currentGLRef = ContextManager.getCurrentContext().getGlContextRep();
+        }
+        // For each affected context...
+        for (final Object glref : idMap.keySet()) {
+            // If we have a deleter and the context is current, immediately delete
+            if (deleter != null && glref.equals(currentGLRef)) {
+                deleter.deleteVAOs(idMap.get(glref));
+            }
+            // Otherwise, add a delete request to that context's render task queue.
+            else {
+                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(
+                        new RendererCallable<Void>() {
+                            public Void call() throws Exception {
+                                getRenderer().deleteVAOs(idMap.get(glref));
+                                return null;
+                            }
+                        });
+            }
+        }
     }
 
 }

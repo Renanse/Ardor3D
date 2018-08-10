@@ -22,7 +22,8 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -144,8 +145,8 @@ public class RTTShaderExample extends ExampleBase {
         quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         _root.attachChild(quad);
 
-        final GLSLShaderObjectsState shader = new GLSLShaderObjectsState();
-        shader.setFragmentShader("void main() { gl_FragColor = vec4(1,0,0,1); }");
+        final ShaderState shader = new ShaderState();
+        shader.setShader(ShaderType.Fragment, "void main() { gl_FragColor = vec4(1,0,0,1); }");
 
         sphere.setRenderState(shader);
     }

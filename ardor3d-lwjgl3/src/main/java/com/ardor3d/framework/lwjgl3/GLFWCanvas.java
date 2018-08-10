@@ -19,6 +19,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWWindowFocusCallbackI;
+import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 import org.lwjgl.opengl.GL11C;
 
 import com.ardor3d.framework.CanvasRenderer;
@@ -49,6 +50,10 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     private volatile boolean _focusLost = false;
 
     private GLFWWindowFocusCallbackI focusCallback;
+
+    private GLFWErrorCallback errorCallback;
+
+    private GLFWWindowSizeCallbackI resizeCallback;
 
     /**
      * If true, we will not try to drop and reclaim the context on each frame.
@@ -102,10 +107,12 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
         try {
             GLFW.glfwDefaultWindowHints();
             GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GL11C.GL_TRUE);
-            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 4);
-            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 1);
+            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
+            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
+            GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
             windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
             GLFW.glfwSetWindowFocusCallback(windowId, focusCallback = new GLFWWindowFocusCallbackI() {
                 @Override
@@ -113,6 +120,12 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
                     if (!focused) {
                         _focusLost = true;
                     }
+                }
+            });
+            GLFW.glfwSetWindowSizeCallback(windowId, resizeCallback = new GLFWWindowSizeCallbackI() {
+                @Override
+                public void invoke(final long window, final int width, final int height) {
+                    _canvasRenderer.getRenderer().setViewport(0, 0, width, height);
                 }
             });
         } catch (final Exception e) {

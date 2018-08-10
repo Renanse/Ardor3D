@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -39,7 +39,8 @@ import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
@@ -62,7 +63,7 @@ public class PointCubeExample extends ExampleBase {
     protected BasicText _exampleInfo[] = new BasicText[4];
 
     private Point _pointCubes;
-    private GLSLShaderObjectsState _pointCubeShaderState;
+    private ShaderState _pointCubeShaderState;
 
     private TextureRenderer _sceneTextureRenderer;
     private Texture2D _blurBufferTexture = null;
@@ -117,17 +118,17 @@ public class PointCubeExample extends ExampleBase {
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
         if (_rotationEnabled) {
-            _rotation.fromAngles(0.0 * timer.getTimeInSeconds(), 0.1 * timer.getTimeInSeconds(), 0.0 * timer
-                    .getTimeInSeconds());
+            _rotation.fromAngles(0.0 * timer.getTimeInSeconds(), 0.1 * timer.getTimeInSeconds(),
+                    0.0 * timer.getTimeInSeconds());
             _pointCubes.setRotation(_rotation);
         }
         if (_waveEnabled) {
             _pointCubeShaderState.setUniform("time", (float) timer.getTimeInSeconds());
         }
         if (_scaleEnabled) {
-            _boxScale.set((float) (7 + 6 * Math.cos(0.5 * timer.getTimeInSeconds())), (float) (7 + 6 * Math
-                    .cos(0.5 * timer.getTimeInSeconds())), (float) (7 + 6 * Math.cos(0.5 * timer.getTimeInSeconds())),
-                    1);
+            _boxScale.set((float) (7 + 6 * Math.cos(0.5 * timer.getTimeInSeconds())),
+                    (float) (7 + 6 * Math.cos(0.5 * timer.getTimeInSeconds())),
+                    (float) (7 + 6 * Math.cos(0.5 * timer.getTimeInSeconds())), 1);
             _pointCubeShaderState.setUniform("scale", _boxScale);
         }
         if (_blurEnabled) {
@@ -179,10 +180,10 @@ public class PointCubeExample extends ExampleBase {
     }
 
     private void buildShader() {
-        _pointCubeShaderState = new GLSLShaderObjectsState();
-        _pointCubeShaderState.setVertexShader(s_vert);
-        _pointCubeShaderState.setGeometryShader(s_geom);
-        _pointCubeShaderState.setFragmentShader(s_frag);
+        _pointCubeShaderState = new ShaderState();
+        _pointCubeShaderState.setShader(ShaderType.Vertex, "", s_vert);
+        _pointCubeShaderState.setShader(ShaderType.Geometry, "", s_geom);
+        _pointCubeShaderState.setShader(ShaderType.Fragment, "", s_frag);
         _pointCubeShaderState.setUniform("texture", 0);
         _pointCubeShaderState.setUniform("scale", _boxScale);
     }

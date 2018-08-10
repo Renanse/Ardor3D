@@ -13,12 +13,21 @@ package com.ardor3d.scene.state.lwjgl3.util;
 import java.util.Stack;
 
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL30C;
 
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyRectangle2;
 import com.ardor3d.renderer.state.record.RendererRecord;
 
 public abstract class Lwjgl3RendererUtil {
+
+    public static void setBoundVAO(final RendererRecord rendRecord, final int id) {
+        if (!rendRecord.isVaoValid() || rendRecord.getCurrentVaoId() != id) {
+            GL30C.glBindVertexArray(id);
+            rendRecord.setCurrentVaoId(id);
+            rendRecord.setVaoValid(true);
+        }
+    }
 
     public static void applyScissors(final RendererRecord rendRecord) {
         final Stack<ReadOnlyRectangle2> clips = rendRecord.getScissorClips();

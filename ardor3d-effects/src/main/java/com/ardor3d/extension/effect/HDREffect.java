@@ -21,9 +21,10 @@ import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
 import com.ardor3d.renderer.effect.RenderTarget;
 import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class HDREffect extends RenderEffect {
@@ -58,7 +59,7 @@ public class HDREffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_LUM64x64));
             final EffectStep_RenderScreenOverlay extract64 = new EffectStep_RenderScreenOverlay();
-            extract64.getEnforcedStates().put(StateType.GLSLShader, getLuminanceExtractionShader());
+            extract64.getEnforcedStates().put(StateType.Shader, getLuminanceExtractionShader());
             extract64.getTargetMap().put(RT_DOWNSAMPLED, 0);
             _steps.add(extract64);
 
@@ -77,7 +78,7 @@ public class HDREffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_BRIGHTMAP));
             final EffectStep_RenderScreenOverlay bright = new EffectStep_RenderScreenOverlay();
-            bright.getEnforcedStates().put(StateType.GLSLShader, getBrightMapShader());
+            bright.getEnforcedStates().put(StateType.Shader, getBrightMapShader());
             bright.getTargetMap().put(RT_DOWNSAMPLED, 0);
             bright.getTargetMap().put(RT_LUM1x1, 1);
             _steps.add(bright);
@@ -94,12 +95,18 @@ public class HDREffect extends RenderEffect {
     }
 
     private RenderState getLuminanceExtractionShader() {
-        final GLSLShaderObjectsState shader = new GLSLShaderObjectsState();
+        final ShaderState shader = new ShaderState();
         try {
-            shader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(ColorReplaceEffect.class,
-                    shaderDirectory + "fsq.vert"));
-            shader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(ColorReplaceEffect.class,
-                    shaderDirectory + "luminance.frag"));
+            shader.setShader(
+                    ShaderType.Vertex,
+                    "fsq",
+                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
+                            + "fsq.vert"));
+            shader.setShader(
+                    ShaderType.Fragment,
+                    "luminance",
+                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
+                            + "luminance.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -108,12 +115,18 @@ public class HDREffect extends RenderEffect {
     }
 
     private RenderState getBrightMapShader() {
-        final GLSLShaderObjectsState shader = new GLSLShaderObjectsState();
+        final ShaderState shader = new ShaderState();
         try {
-            shader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(ColorReplaceEffect.class,
-                    shaderDirectory + "fsq.vert"));
-            shader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(ColorReplaceEffect.class,
-                    shaderDirectory + "brightmap.frag"));
+            shader.setShader(
+                    ShaderType.Vertex,
+                    "fsq",
+                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
+                            + "fsq.vert"));
+            shader.setShader(
+                    ShaderType.Fragment,
+                    "brightmap",
+                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
+                            + "brightmap.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }

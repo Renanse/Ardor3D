@@ -39,7 +39,8 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
@@ -141,14 +142,15 @@ public class AnimationDemoExample extends ExampleBase {
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
-            final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
+            final ShaderState gpuShader = new ShaderState();
             gpuShader.setEnabled(true);
             try {
-                gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationDemoExample.class,
-                        "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-                        AnimationDemoExample.class,
-                        "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
+                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert", ResourceLocatorTool
+                        .getClassPathResourceAsString(ExampleBase.class,
+                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
+                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag", ResourceLocatorTool
+                        .getClassPathResourceAsString(ExampleBase.class,
+                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
 
                 gpuShader.setUniform("texture", 0);
                 gpuShader.setUniform("lightDirection", new Vector3(1, 1, 1).normalizeLocal());

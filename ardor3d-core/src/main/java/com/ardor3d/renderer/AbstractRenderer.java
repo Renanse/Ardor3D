@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.List;
@@ -22,10 +23,13 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.Constants;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
@@ -56,6 +60,19 @@ public abstract class AbstractRenderer implements Renderer {
             state.setEnabled(false);
             defaultStateList.put(type, state);
         }
+
+        try {
+            final ShaderState shader = (ShaderState) defaultStateList.get(RenderState.StateType.Shader);
+            shader.setShader(ShaderType.Vertex, "default_vert", //
+                    ResourceLocatorTool.getClassPathResourceAsString(AbstractRenderer.class,
+                            "com/ardor3d/renderer/default.vert"));
+            shader.setShader(ShaderType.Fragment, "default_frag", //
+                    ResourceLocatorTool.getClassPathResourceAsString(AbstractRenderer.class,
+                            "com/ardor3d/renderer/default.frag"));
+            shader.setEnabled(true);
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public boolean isInOrthoMode() {
@@ -74,7 +91,7 @@ public abstract class AbstractRenderer implements Renderer {
         return _processingQueue;
     }
 
-    public void applyState(final StateType type, final RenderState state) {
+    public RenderState applyState(final StateType type, final RenderState state) {
         if (Constants.stats) {
             StatCollector.startStat(StatType.STAT_STATES_TIMER);
         }
@@ -90,6 +107,8 @@ public abstract class AbstractRenderer implements Renderer {
         if (Constants.stats) {
             StatCollector.endStat(StatType.STAT_STATES_TIMER);
         }
+
+        return tempState;
     }
 
     protected abstract void doApplyState(RenderState state);

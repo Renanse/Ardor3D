@@ -37,7 +37,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.FogState;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -74,7 +75,7 @@ public class WaterNode extends Node {
     protected ArrayList<Texture> texArray = Lists.newArrayList();
     protected Node skyBox;
 
-    protected GLSLShaderObjectsState waterShader;
+    protected ShaderState waterShader;
     protected CullState cullBackFace;
     protected TextureState textureState;
 
@@ -117,7 +118,7 @@ public class WaterNode extends Node {
     protected String foamMapTextureString = "";
     protected String fallbackMapTextureString = "";
 
-    private GLSLShaderObjectsState blurShaderVertical = null;
+    private ShaderState blurShaderVertical = null;
     private float blurSampleDistance = 0.002f;
     private Quad fullScreenQuad = null;
     private boolean doBlurReflection = true;
@@ -172,8 +173,8 @@ public class WaterNode extends Node {
         this.renderScale = renderScale;
         resetParameters();
 
-        waterShader = new GLSLShaderObjectsState();
-        blurShaderVertical = new GLSLShaderObjectsState();
+        waterShader = new ShaderState();
+        blurShaderVertical = new ShaderState();
 
         cullBackFace = new CullState();
         cullBackFace.setEnabled(true);
@@ -372,10 +373,10 @@ public class WaterNode extends Node {
 
         try {
             logger.info("loading " + currentShaderStr);
-            waterShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
-                    currentShaderStr + ".vert"));
-            waterShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
-                    currentShaderStr + ".frag"));
+            waterShader.setShader(ShaderType.Vertex,
+                    ResourceLocatorTool.getClassPathResourceAsString(WaterNode.class, currentShaderStr + ".vert"));
+            waterShader.setShader(ShaderType.Fragment,
+                    ResourceLocatorTool.getClassPathResourceAsString(WaterNode.class, currentShaderStr + ".frag"));
         } catch (final IOException e) {
             logger.log(Level.WARNING, "Error loading shader", e);
             return;
@@ -396,19 +397,16 @@ public class WaterNode extends Node {
             }
         }
 
-        waterShader._needSendShader = true;
-
         try {
-            blurShaderVertical.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
-                    "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
-                    "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
+            blurShaderVertical.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
+                    WaterNode.class, "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
+            blurShaderVertical.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+                    WaterNode.class, "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
         blurShaderVertical.setUniform("RT", 0);
         blurShaderVertical.setUniform("sampleDist", blurSampleDistance);
-        blurShaderVertical._needSendShader = true;
 
         logger.info("Shader reloaded...");
     }

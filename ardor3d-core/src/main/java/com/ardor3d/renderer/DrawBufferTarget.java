@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -61,28 +61,4 @@ public enum DrawBufferTarget {
      * All of FrontLeft, FrontRight, BackLeft, BackRight, if exists.
      */
     FrontAndBack,
-
-    /**
-     * Auxiliary color buffer 0. Should check first that {@link ContextCapabilities#getNumberOfAuxiliaryDrawBuffers()}
-     * >= 1.
-     */
-    Aux0,
-
-    /**
-     * Auxiliary color buffer 1. Should check first that {@link ContextCapabilities#getNumberOfAuxiliaryDrawBuffers()}
-     * >= 2.
-     */
-    Aux1,
-
-    /**
-     * Auxiliary color buffer 2. Should check first that {@link ContextCapabilities#getNumberOfAuxiliaryDrawBuffers()}
-     * >= 3.
-     */
-    Aux2,
-
-    /**
-     * Auxiliary color buffer 3. Should check first that {@link ContextCapabilities#getNumberOfAuxiliaryDrawBuffers()}
-     * >= 4.
-     */
-    Aux3;
 }
