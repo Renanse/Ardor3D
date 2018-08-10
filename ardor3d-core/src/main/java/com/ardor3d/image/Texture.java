@@ -145,32 +145,10 @@ public abstract class Texture implements Savable {
          */
         MirroredRepeat,
         /**
-         * coordinate will be clamped to [0,1]
-         *
-         * @deprecated Use EdgeClamp instead
-         */
-        @Deprecated
-        Clamp,
-        /**
-         * mirrors and clamps the texture coordinate, where mirroring and clamping a value f computes:
-         * <code>mirrorClamp(f) = min(1, max(1/(2*N),
-         * abs(f)))</code> where N is the size of the one-, two-, or three-dimensional texture image in the direction of
-         * wrapping. (Introduced after OpenGL1.4) Falls back on Clamp if not supported.
-         */
-        MirrorClamp,
-        /**
          * coordinate will be clamped to the range [-1/(2N), 1 + 1/(2N)] where N is the size of the texture in the
          * direction of clamping. Falls back on Clamp if not supported.
          */
         BorderClamp,
-        /**
-         * Wrap mode MIRROR_CLAMP_TO_BORDER_EXT mirrors and clamps to border the texture coordinate, where mirroring and
-         * clamping to border a value f computes:
-         * <code>mirrorClampToBorder(f) = min(1+1/(2*N), max(1/(2*N), abs(f)))</code> where N is the size of the one-,
-         * two-, or three-dimensional texture image in the direction of wrapping." (Introduced after OpenGL1.4) Falls
-         * back on BorderClamp if not supported.
-         */
-        MirrorBorderClamp,
         /**
          * coordinate will be clamped to the range [1/(2N), 1 - 1/(2N)] where N is the size of the texture in the
          * direction of clamping. Falls back on Clamp if not supported.
@@ -220,18 +198,6 @@ public abstract class Texture implements Savable {
         GreaterThanEqual
     }
 
-    /**
-     * The type of depth texture translation to output
-     */
-    public enum DepthTextureMode {
-        /** Output luminance values based on the depth comparison */
-        Luminance,
-        /** Output alpha values based on the depth comparison */
-        Alpha,
-        /** Output intensity values based on the depth comparison */
-        Intensity
-    }
-
     // texture attributes.
     private Image _image = null;
     private final ColorRGBA _borderColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
@@ -253,7 +219,6 @@ public abstract class Texture implements Savable {
 
     private DepthTextureCompareMode _depthCompareMode = DepthTextureCompareMode.None;
     private DepthTextureCompareFunc _depthCompareFunc = DepthTextureCompareFunc.GreaterThanEqual;
-    private DepthTextureMode _depthMode = DepthTextureMode.Intensity;
 
     private int _textureBaseLevel = 0;
     private int _textureMaxLevel = -1;
@@ -534,25 +499,6 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * Get the depth texture apply mode
-     *
-     * @return The depth texture apply mode
-     */
-    public DepthTextureMode getDepthMode() {
-        return _depthMode;
-    }
-
-    /**
-     * Set the depth texture apply mode
-     *
-     * @param depthMode
-     *            The depth texture apply mode
-     */
-    public void setDepthMode(final DepthTextureMode depthMode) {
-        _depthMode = depthMode;
-    }
-
-    /**
      * Get the depth texture compare mode
      *
      * @return The depth texture compare mode
@@ -625,7 +571,6 @@ public abstract class Texture implements Savable {
         rVal.setBorderColor(_borderColor);
         rVal.setDepthCompareFunc(_depthCompareFunc);
         rVal.setDepthCompareMode(_depthCompareMode);
-        rVal.setDepthMode(_depthMode);
         rVal.setHasBorder(_hasBorder);
         rVal.setTextureStoreFormat(_storeFormat);
         rVal.setRenderedTexturePixelDataType(_rttPixelDataType);

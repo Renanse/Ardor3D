@@ -24,7 +24,6 @@ import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.DepthTextureCompareFunc;
 import com.ardor3d.image.Texture.DepthTextureCompareMode;
-import com.ardor3d.image.Texture.DepthTextureMode;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.DirectionalLight;
@@ -410,7 +409,6 @@ public class ParallelSplitShadowMapPass extends Pass {
             _shadowMapTexture[i].setTextureStoreFormat(_shadowTextureStoreFormat);
             _shadowMapTexture[i].setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
             _shadowMapTexture[i].setDepthCompareFunc(DepthTextureCompareFunc.GreaterThanEqual);
-            _shadowMapTexture[i].setDepthMode(DepthTextureMode.Intensity);
 
             _shadowMapRenderer.setupTexture(_shadowMapTexture[i]);
             _shadowTextureState.setTexture(_shadowMapTexture[i], i);

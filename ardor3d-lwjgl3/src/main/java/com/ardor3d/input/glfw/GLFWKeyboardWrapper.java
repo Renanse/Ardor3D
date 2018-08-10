@@ -29,6 +29,7 @@ public class GLFWKeyboardWrapper implements KeyboardWrapper {
     @GuardedBy("this")
     protected final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<KeyEvent>();
 
+    @SuppressWarnings("unused")
     private GLFWKeyCallback _keyCallback;
 
     private KeyboardIterator _currentIterator;

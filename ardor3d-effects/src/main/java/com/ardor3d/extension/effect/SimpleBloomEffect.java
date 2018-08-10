@@ -105,12 +105,12 @@ public class SimpleBloomEffect extends RenderEffect {
 
         final RenderTarget_Texture2D main = new RenderTarget_Texture2D(downsampledWidth, downsampledHeight,
                 manager.getOutputFormat());
-        main.getTexture().setWrap(WrapMode.Clamp);
+        main.getTexture().setWrap(WrapMode.EdgeClamp);
         manager.getRenderTargetMap().put(RT_MAIN, main);
 
         final RenderTarget_Texture2D secondary = new RenderTarget_Texture2D(downsampledWidth, downsampledHeight,
                 manager.getOutputFormat());
-        secondary.getTexture().setWrap(WrapMode.Clamp);
+        secondary.getTexture().setWrap(WrapMode.EdgeClamp);
         manager.getRenderTargetMap().put(RT_SECONDARY, secondary);
     }
 

@@ -676,14 +676,6 @@ public class JoglTextureStateUtil {
 
         final Type type = texture.getType();
 
-        final int depthMode = JoglTextureUtil.getGLDepthTextureMode(texture.getDepthMode());
-        // set up magnification filter
-        if (!texRecord.isValid() || texRecord.depthTextureMode != depthMode) {
-            checkAndSetUnit(unit, record, caps);
-            gl.glTexParameteri(getGLType(type), GL2.GL_DEPTH_TEXTURE_MODE, depthMode);
-            texRecord.depthTextureMode = depthMode;
-        }
-
         final int depthCompareMode = JoglTextureUtil.getGLDepthTextureCompareMode(texture.getDepthCompareMode());
         // set up magnification filter
         if (!texRecord.isValid() || texRecord.depthTextureCompareMode != depthCompareMode) {
@@ -1003,12 +995,6 @@ public class JoglTextureStateUtil {
                 return GL.GL_REPEAT;
             case MirroredRepeat:
                 return GL.GL_MIRRORED_REPEAT;
-            case MirrorClamp:
-                return GL2.GL_MIRROR_CLAMP_EXT;
-            case Clamp:
-                return GL.GL_CLAMP_TO_EDGE;
-            case MirrorBorderClamp:
-                return GL2.GL_MIRROR_CLAMP_TO_BORDER_EXT;
             case BorderClamp:
                 return GL2GL3.GL_CLAMP_TO_BORDER;
             case MirrorEdgeClamp:

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -141,10 +141,10 @@ public class AtlasExample extends ExampleBase {
         for (int i = 0; i < 40; i++) {
             createBox(boxNode, "images/ball.png", WrapMode.BorderClamp);
             createSphere(boxNode, "images/ball.png", WrapMode.BorderClamp);
-            createBox(boxNode, "images/trail.png", WrapMode.Clamp);
+            createBox(boxNode, "images/trail.png", WrapMode.EdgeClamp);
             createBox(boxNode, "images/flare.png", WrapMode.EdgeClamp);
-            createBox(boxNode, "images/flaresmall.jpg", WrapMode.MirrorBorderClamp);
-            createBox(boxNode, "icons/ardor3d_white_24.png", WrapMode.MirrorClamp);
+            createBox(boxNode, "images/flaresmall.jpg", WrapMode.MirrorEdgeClamp);
+            createBox(boxNode, "icons/ardor3d_white_24.png", WrapMode.MirrorEdgeClamp);
             createBox(boxNode, "icons/console.png", WrapMode.MirrorEdgeClamp);
             createBox(boxNode, "icons/declaration.png", WrapMode.MirroredRepeat);
             createBox(boxNode, "icons/list-add.png", WrapMode.Repeat);

@@ -48,12 +48,14 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ShaderStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3WireframeStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3RendererUtil;
@@ -452,8 +454,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void deleteTexture(final Texture texture) {
-        // TODO Auto-generated method stub
-
+        Lwjgl3TextureStateUtil.deleteTexture(texture);
     }
 
     @Override
@@ -464,32 +465,46 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void pushClip(final ReadOnlyRectangle2 rectangle) {
-        // TODO Auto-generated method stub
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().push(rectangle);
 
+        Lwjgl3RendererUtil.applyScissors(record);
     }
 
     @Override
     public void pushEmptyClip() {
-        // TODO Auto-generated method stub
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().push(null);
 
+        Lwjgl3RendererUtil.applyScissors(record);
     }
 
     @Override
     public void popClip() {
-        // TODO Auto-generated method stub
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().pop();
 
+        Lwjgl3RendererUtil.applyScissors(record);
     }
 
     @Override
     public void clearClips() {
-        // TODO Auto-generated method stub
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().clear();
 
+        Lwjgl3RendererUtil.applyScissors(record);
     }
 
     @Override
     public void setClipTestEnabled(final boolean enabled) {
-        // TODO Auto-generated method stub
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
 
+        Lwjgl3RendererUtil.setClippingEnabled(record, enabled);
     }
 
     @Override
@@ -500,7 +515,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         }
         switch (state.getType()) {
             case Texture:
-                // LwjglTextureStateUtil.apply((TextureState) state);
+                Lwjgl3TextureStateUtil.apply((TextureState) state);
                 return;
             case Light:
                 // LwjglLightStateUtil.apply((LightState) state);
@@ -671,7 +686,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
         final Buffer dataBuffer = data.getBuffer();
         if (dataBuffer != null) {
-            // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
             id = GL15C.glGenBuffers();
             data.setBufferId(context.getGlContextRep(), id);

@@ -23,7 +23,6 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapAxis;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -46,11 +45,11 @@ import com.google.common.collect.Maps;
  * <pre>
  * // Create a texture atlas packer with maximum atlas size of 256x256
  * final TexturePacker packer = new TexturePacker(256, 256);
- *
+ * 
  * // Add meshes into atlas (lots of different ways of doing this if you have other source/target texture indices)
  * packer.insert(mesh1);
  * packer.insert(mesh2);
- *
+ * 
  * // Create all the atlases (also possible to set filters etc here through the AtlasTextureParameter)
  * packer.createAtlases();
  * </pre>
@@ -194,14 +193,8 @@ public class TexturePacker {
         final WrapMode mode = parameterObject.getTexture().getWrap(WrapAxis.S);
         switch (mode) {
             case BorderClamp:
-            case MirrorBorderClamp:
                 final ReadOnlyColorRGBA col = parameterObject.getTexture().getBorderColor();
                 borderClamp(data, rectangle, textureWidth, textureHeight, parameterObject, col);
-                break;
-
-            case Clamp:
-            case MirrorClamp:
-                borderClamp(data, rectangle, textureWidth, textureHeight, parameterObject, ColorRGBA.BLACK);
                 break;
 
             case EdgeClamp:

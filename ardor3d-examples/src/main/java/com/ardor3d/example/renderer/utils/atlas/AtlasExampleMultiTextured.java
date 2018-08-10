@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -141,10 +141,10 @@ public class AtlasExampleMultiTextured extends ExampleBase {
         for (int i = 0; i < 40; i++) {
             createBox(boxNode, "images/ball.png", "icons/console.png", WrapMode.BorderClamp);
             createSphere(boxNode, "images/ball.png", "icons/console.png", WrapMode.BorderClamp);
-            createBox(boxNode, "images/trail.png", "icons/console.png", WrapMode.Clamp);
+            createBox(boxNode, "images/trail.png", "icons/console.png", WrapMode.EdgeClamp);
             createBox(boxNode, "images/flare.png", "icons/console.png", WrapMode.EdgeClamp);
-            createBox(boxNode, "images/flaresmall.jpg", "icons/console.png", WrapMode.MirrorBorderClamp);
-            createBox(boxNode, "icons/ardor3d_white_24.png", "icons/console.png", WrapMode.MirrorClamp);
+            createBox(boxNode, "images/flaresmall.jpg", "icons/console.png", WrapMode.MirrorEdgeClamp);
+            createBox(boxNode, "icons/ardor3d_white_24.png", "icons/console.png", WrapMode.MirrorEdgeClamp);
             createBox(boxNode, "icons/console.png", "icons/console.png", WrapMode.MirrorEdgeClamp);
             createBox(boxNode, "icons/declaration.png", "icons/console.png", WrapMode.MirroredRepeat);
             createBox(boxNode, "icons/list-add.png", "images/flare.png", WrapMode.Repeat);

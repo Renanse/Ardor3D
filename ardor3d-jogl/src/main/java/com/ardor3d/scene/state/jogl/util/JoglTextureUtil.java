@@ -20,7 +20,6 @@ import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture.DepthTextureCompareFunc;
 import com.ardor3d.image.Texture.DepthTextureCompareMode;
-import com.ardor3d.image.Texture.DepthTextureMode;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.TextureStoreFormat;
@@ -29,7 +28,7 @@ public abstract class JoglTextureUtil {
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
-            // first some frequently used formats
+        // first some frequently used formats
             case RGBA8:
                 return GL.GL_RGBA8;
             case RGB8:
@@ -333,18 +332,6 @@ public abstract class JoglTextureUtil {
                 break;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
-    }
-
-    public static int getGLDepthTextureMode(final DepthTextureMode mode) {
-        switch (mode) {
-            case Alpha:
-                return GL.GL_ALPHA;
-            case Luminance:
-                return GL.GL_LUMINANCE;
-            case Intensity:
-            default:
-                return GL2.GL_INTENSITY;
-        }
     }
 
     public static int getGLDepthTextureCompareMode(final DepthTextureCompareMode mode) {

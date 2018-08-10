@@ -15,17 +15,15 @@ import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import org.lwjgl.opengl.ARBDepthTexture;
 import org.lwjgl.opengl.ARBShadow;
 import org.lwjgl.opengl.ARBTextureCompression;
-import org.lwjgl.opengl.ARBTextureCubeMap;
-import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
-import org.lwjgl.opengl.EXTTextureMirrorClamp;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL12C;
 import org.lwjgl.opengl.GL13C;
 import org.lwjgl.opengl.GL14C;
 import org.lwjgl.opengl.GL30C;
+import org.lwjgl.opengl.GL44C;
+import org.lwjgl.opengl.GL46C;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -223,9 +221,6 @@ public abstract class Lwjgl3TextureStateUtil {
                 // A new mipmap builder may be needed to build mipmaps for
                 // compressed textures.
 
-                // Flag the card to generate mipmaps
-                GL30C.glGenerateMipmap(getGLType(type));
-
                 switch (type) {
                     case TwoDimensional:
                         // ensure the buffer is ready for reading
@@ -292,6 +287,9 @@ public abstract class Lwjgl3TextureStateUtil {
                         }
                         break;
                 }
+
+                // Ask the card to generate mipmaps
+                GL30C.glGenerateMipmap(getGLType(type));
 
                 if (texture.getTextureMaxLevel() >= 0) {
                     GL11C.glTexParameteri(GL11C.GL_TEXTURE_2D, GL12C.GL_TEXTURE_MAX_LEVEL, texture.getTextureMaxLevel());
@@ -613,14 +611,6 @@ public abstract class Lwjgl3TextureStateUtil {
             final TextureStateRecord record, final ContextCapabilities caps) {
         final Type type = texture.getType();
 
-        final int depthMode = Lwjgl3TextureUtil.getGLDepthTextureMode(texture.getDepthMode());
-        // set up magnification filter
-        if (!texRecord.isValid() || texRecord.depthTextureMode != depthMode) {
-            checkAndSetUnit(unit, record, caps);
-            GL11C.glTexParameteri(getGLType(type), ARBDepthTexture.GL_DEPTH_TEXTURE_MODE_ARB, depthMode);
-            texRecord.depthTextureMode = depthMode;
-        }
-
         final int depthCompareMode = Lwjgl3TextureUtil.getGLDepthTextureCompareMode(texture.getDepthCompareMode());
         // set up magnification filter
         if (!texRecord.isValid() || texRecord.depthTextureCompareMode != depthCompareMode) {
@@ -673,7 +663,7 @@ public abstract class Lwjgl3TextureStateUtil {
             aniso += 1.0f;
             if (!texRecord.isValid() || (texRecord.anisoLevel - aniso > MathUtils.ZERO_TOLERANCE)) {
                 checkAndSetUnit(unit, record, caps);
-                GL11C.glTexParameterf(getGLType(type), EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, aniso);
+                GL11C.glTexParameterf(getGLType(type), GL46C.GL_TEXTURE_MAX_ANISOTROPY, aniso);
                 texRecord.anisoLevel = aniso;
             }
         }
@@ -798,17 +788,17 @@ public abstract class Lwjgl3TextureStateUtil {
 
         if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
             checkAndSetUnit(unit, record, caps);
-            GL11C.glTexParameteri(ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_ARB, GL11C.GL_TEXTURE_WRAP_S, wrapS);
+            GL11C.glTexParameteri(GL13C.GL_TEXTURE_CUBE_MAP, GL11C.GL_TEXTURE_WRAP_S, wrapS);
             texRecord.wrapS = wrapS;
         }
         if (!texRecord.isValid() || texRecord.wrapT != wrapT) {
             checkAndSetUnit(unit, record, caps);
-            GL11C.glTexParameteri(ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_ARB, GL11C.GL_TEXTURE_WRAP_T, wrapT);
+            GL11C.glTexParameteri(GL13C.GL_TEXTURE_CUBE_MAP, GL11C.GL_TEXTURE_WRAP_T, wrapT);
             texRecord.wrapT = wrapT;
         }
         if (!texRecord.isValid() || texRecord.wrapR != wrapR) {
             checkAndSetUnit(unit, record, caps);
-            GL11C.glTexParameteri(ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_ARB, GL12C.GL_TEXTURE_WRAP_R, wrapR);
+            GL11C.glTexParameteri(GL13C.GL_TEXTURE_CUBE_MAP, GL12C.GL_TEXTURE_WRAP_R, wrapR);
             texRecord.wrapR = wrapR;
         }
     }
@@ -885,7 +875,7 @@ public abstract class Lwjgl3TextureStateUtil {
             case ThreeDimensional:
                 return GL12C.GL_TEXTURE_3D;
             case CubeMap:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP;
         }
         throw new IllegalArgumentException("invalid texture type: " + type);
     }
@@ -893,17 +883,17 @@ public abstract class Lwjgl3TextureStateUtil {
     public static int getGLCubeMapFace(final TextureCubeMap.Face face) {
         switch (face) {
             case PositiveX:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
             case NegativeX:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
             case PositiveY:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
             case NegativeY:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
             case PositiveZ:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
             case NegativeZ:
-                return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB;
+                return GL13C.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
         }
         throw new IllegalArgumentException("invalid cubemap face: " + face);
     }
@@ -914,16 +904,10 @@ public abstract class Lwjgl3TextureStateUtil {
                 return GL11C.GL_REPEAT;
             case MirroredRepeat:
                 return GL14C.GL_MIRRORED_REPEAT;
-            case MirrorClamp:
-                return EXTTextureMirrorClamp.GL_MIRROR_CLAMP_EXT;
-            case Clamp:
-                return GL12C.GL_CLAMP_TO_EDGE;
-            case MirrorBorderClamp:
-                return EXTTextureMirrorClamp.GL_MIRROR_CLAMP_TO_BORDER_EXT;
             case BorderClamp:
                 return GL13C.GL_CLAMP_TO_BORDER;
             case MirrorEdgeClamp:
-                return EXTTextureMirrorClamp.GL_MIRROR_CLAMP_TO_EDGE_EXT;
+                return GL44C.GL_MIRROR_CLAMP_TO_EDGE;
             case EdgeClamp:
                 return GL12C.GL_CLAMP_TO_EDGE;
         }

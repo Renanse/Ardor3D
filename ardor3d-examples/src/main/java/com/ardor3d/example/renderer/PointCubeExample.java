@@ -96,7 +96,7 @@ public class PointCubeExample extends ExampleBase {
             _sceneTextureRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.1f, 0f));
 
             _blurBufferTexture = new Texture2D();
-            _blurBufferTexture.setWrap(Texture.WrapMode.Clamp);
+            _blurBufferTexture.setWrap(Texture.WrapMode.EdgeClamp);
             _blurBufferTexture.setMinificationFilter(MinificationFilter.NearestNeighborNoMipMaps);
             _blurBufferTexture.setMagnificationFilter(Texture.MagnificationFilter.NearestNeighbor);
             _sceneTextureRenderer.setupTexture(_blurBufferTexture);
