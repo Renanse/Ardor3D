@@ -207,7 +207,7 @@ public class BMText extends Mesh {
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
-        // quads
+        // triangles now
         getMeshData().setIndexMode(IndexMode.Triangles);
 
         setText(text);
@@ -687,7 +687,6 @@ public class BMText extends Mesh {
                 texCrds.put(l).put(t); // left top
                 texCrds.put(l).put(b); // left bottom
                 texCrds.put(r).put(b); // right bottom
-                texCrds.put(r).put(t); // right top
                 texCrds.put(r).put(t); // right top
                 texCrds.put(l).put(b); // left bottom
                 texCrds.put(r).put(b); // right bottom
