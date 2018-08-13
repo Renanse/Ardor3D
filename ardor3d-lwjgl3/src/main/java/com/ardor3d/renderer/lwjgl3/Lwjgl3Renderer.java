@@ -47,19 +47,23 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShaderState;
+import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3ColorMaskStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3CullStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3OffsetStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ShaderStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3StencilStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3WireframeStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ZBufferStateUtil;
@@ -521,44 +525,46 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             case Texture:
                 Lwjgl3TextureStateUtil.apply((TextureState) state);
                 return;
-            case Light:
-                // LwjglLightStateUtil.apply((LightState) state);
-                return;
             case Blend:
                 Lwjgl3BlendStateUtil.apply((BlendState) state);
                 return;
-            case Clip:
-                // LwjglClipStateUtil.apply((ClipState) state);
-                return;
             case ColorMask:
-                // LwjglColorMaskStateUtil.apply((ColorMaskState) state);
+                Lwjgl3ColorMaskStateUtil.apply((ColorMaskState) state);
                 return;
             case Cull:
                 Lwjgl3CullStateUtil.apply((CullState) state);
                 return;
-            case Fog:
-                // LwjglFogStateUtil.apply((FogState) state);
-                return;
             case Shader:
                 Lwjgl3ShaderStateUtil.apply(this, (ShaderState) state);
-                return;
-            case Material:
-                // LwjglMaterialStateUtil.apply((MaterialState) state);
                 return;
             case Offset:
                 Lwjgl3OffsetStateUtil.apply(this, (OffsetState) state);
                 return;
-            case Shading:
-                // LwjglShadingStateUtil.apply((ShadingState) state);
-                return;
             case Stencil:
-                // LwjglStencilStateUtil.apply((StencilState) state);
+                Lwjgl3StencilStateUtil.apply((StencilState) state);
                 return;
             case Wireframe:
                 Lwjgl3WireframeStateUtil.apply(this, (WireframeState) state);
                 return;
             case ZBuffer:
                 Lwjgl3ZBufferStateUtil.apply((ZBufferState) state);
+                return;
+
+                // XXX: The following are not core compatible states - we'll need to do them in shader?
+            case Light:
+                // LwjglLightStateUtil.apply((LightState) state);
+                return;
+            case Fog:
+                // LwjglFogStateUtil.apply((FogState) state);
+                return;
+            case Clip:
+                // LwjglClipStateUtil.apply((ClipState) state);
+                return;
+            case Material:
+                // LwjglMaterialStateUtil.apply((MaterialState) state);
+                return;
+            case Shading:
+                // LwjglShadingStateUtil.apply((ShadingState) state);
                 return;
         }
         throw new IllegalArgumentException("Unknown state: " + state);
