@@ -11,6 +11,7 @@
 package com.ardor3d.framework.lwjgl3;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,9 +19,10 @@ import java.util.logging.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.glfw.GLFWWindowFocusCallbackI;
+import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.system.MemoryStack;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -45,18 +47,20 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     private final DisplaySettings _settings;
     private boolean _inited = false;
 
-    private long windowId;
+    private long _windowId;
 
     private volatile boolean _focusLost = false;
 
     @SuppressWarnings("unused")
-    private GLFWWindowFocusCallbackI focusCallback;
+    private GLFWWindowFocusCallback _focusCallback;
 
     @SuppressWarnings("unused")
-    private GLFWErrorCallback errorCallback;
+    private GLFWErrorCallback _errorCallback;
 
     @SuppressWarnings("unused")
-    private GLFWWindowSizeCallbackI resizeCallback;
+    private GLFWWindowSizeCallbackI _resizeCallback;
+
+    private int _contentWidth, _contentHeight;
 
     /**
      * If true, we will not try to drop and reclaim the context on each frame.
@@ -69,7 +73,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             @Override
             public void makeCurrent(final boolean force) {
                 if (force || !SINGLE_THREADED_MODE) {
-                    GLFW.glfwMakeContextCurrent(windowId);
+                    GLFW.glfwMakeContextCurrent(_windowId);
                 }
             }
 
@@ -85,7 +89,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
                 if (Constants.stats) {
                     StatCollector.startStat(StatType.STAT_DISPLAYSWAP_TIMER);
                 }
-                GLFW.glfwSwapBuffers(windowId);
+                GLFW.glfwSwapBuffers(_windowId);
                 GLFW.glfwPollEvents();
                 if (Constants.stats) {
                     StatCollector.endStat(StatType.STAT_DISPLAYSWAP_TIMER);
@@ -115,9 +119,11 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
-            GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-            windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
-            GLFW.glfwSetWindowFocusCallback(windowId, focusCallback = new GLFWWindowFocusCallbackI() {
+            GLFW.glfwSetErrorCallback(_errorCallback = GLFWErrorCallback.createPrint(System.err));
+            _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
+            updateContentSize();
+
+            GLFW.glfwSetWindowFocusCallback(_windowId, _focusCallback = new GLFWWindowFocusCallback() {
                 @Override
                 public void invoke(final long window, final boolean focused) {
                     if (!focused) {
@@ -125,10 +131,12 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
                     }
                 }
             });
-            GLFW.glfwSetWindowSizeCallback(windowId, resizeCallback = new GLFWWindowSizeCallbackI() {
+
+            GLFW.glfwSetWindowSizeCallback(_windowId, _resizeCallback = new GLFWWindowSizeCallbackI() {
                 @Override
                 public void invoke(final long window, final int width, final int height) {
                     _canvasRenderer.getRenderer().setViewport(0, 0, width, height);
+                    updateContentSize();
                 }
             });
         } catch (final Exception e) {
@@ -139,6 +147,16 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
         _canvasRenderer.init(_settings, true); // true - do swap in renderer.
         _inited = true;
+    }
+
+    private void updateContentSize() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            final IntBuffer width = stack.mallocInt(1);
+            final IntBuffer height = stack.mallocInt(1);
+            GLFW.glfwGetFramebufferSize(_windowId, width, height);
+            _contentWidth = width.get();
+            _contentHeight = height.get();
+        }
     }
 
     @Override
@@ -172,18 +190,18 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
     @Override
     public void close() {
-        GLFW.glfwDestroyWindow(windowId);
+        GLFW.glfwDestroyWindow(_windowId);
     }
 
     @Override
     public boolean isActive() {
         // XXX: Needs more investigation
-        return GLFW.glfwGetWindowAttrib(windowId, GLFW.GLFW_FOCUSED) != 0;
+        return GLFW.glfwGetWindowAttrib(_windowId, GLFW.GLFW_FOCUSED) != 0;
     }
 
     @Override
     public boolean isClosing() {
-        return GLFW.glfwWindowShouldClose(windowId);
+        return GLFW.glfwWindowShouldClose(_windowId);
     }
 
     @Override
@@ -193,7 +211,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
     @Override
     public void setTitle(final String title) {
-        GLFW.glfwSetWindowTitle(windowId, title);
+        GLFW.glfwSetWindowTitle(_windowId, title);
     }
 
     public void setIcon(final Image[] iconImages) {
@@ -221,7 +239,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
         final GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
         img.set(image.getWidth(), image.getHeight(), iconData);
         imagebf.put(0, img);
-        GLFW.glfwSetWindowIcon(windowId, imagebf);
+        GLFW.glfwSetWindowIcon(_windowId, imagebf);
     }
 
     private static Image _RGB888_to_RGBA8888(final Image rgb888) {
@@ -244,7 +262,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
     @Override
     public void moveWindowTo(final int locX, final int locY) {
-        GLFW.glfwSetWindowPos(windowId, locX, locY);
+        GLFW.glfwSetWindowPos(_windowId, locX, locY);
     }
 
     public boolean getAndClearFocusLost() {
@@ -256,6 +274,14 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     }
 
     public long getWindowId() {
-        return windowId;
+        return _windowId;
+    }
+
+    public int getContentHeight() {
+        return _contentHeight;
+    }
+
+    public int getContentWidth() {
+        return _contentWidth;
     }
 }

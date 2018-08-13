@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,8 +11,8 @@
 package com.ardor3d.input.logical;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseState;
 import com.google.common.base.Predicate;
 
 /**
@@ -25,7 +25,7 @@ public final class MouseButtonClickedCondition implements Predicate<TwoInputStat
 
     /**
      * Construct a new MouseButtonClickedCondition.
-     * 
+     *
      * @param button
      *            the button that should be "clicked" to trigger this condition
      * @throws NullPointerException
@@ -40,8 +40,10 @@ public final class MouseButtonClickedCondition implements Predicate<TwoInputStat
     }
 
     public boolean apply(final TwoInputStates states) {
-        final InputState currentState = states.getCurrent();
+        final MouseState currentState = states.getCurrent().getMouseState();
+        final MouseState previousState = states.getPrevious().getMouseState();
 
-        return currentState.getMouseState().getButtonsClicked().contains(_button);
+        return !currentState.getButtonsReleasedSince(previousState).isEmpty()
+                && currentState.getButtonsClicked().contains(_button);
     }
 }

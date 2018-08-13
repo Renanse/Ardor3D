@@ -6,14 +6,15 @@ layout (location = 2) in vec4 color;
 layout (location = 3) in vec2 uv0;
 
 uniform mat4 model;
-uniform mat4 viewProjection;
+uniform mat4 view;
+uniform mat4 projection;
 
 out vec4 DiffuseColor;
 out vec2 TexCoord0;
 
 void main()
 {
-    gl_Position = viewProjection * model * vec4(vertex, 1.0);
+    gl_Position = projection * view * model * vec4(vertex, 1.0);
     DiffuseColor = color;
     TexCoord0 = uv0;
 }

@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL31C;
 import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.MemoryStack;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
@@ -68,7 +69,6 @@ import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
@@ -609,22 +609,24 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final int programId = currentShader.getProgramId(context.getGlContextRep());
 
-        final FloatBuffer buff = BufferUtils.createFloatBuffer(16);
-        buff.put(0, 1);
-        buff.put(5, 1);
-        buff.put(10, 1);
-        buff.put(15, 1);
-        final int modelLoc = GL20C.glGetUniformLocation(programId, "model");
-        worldTransform.getHomogeneousMatrix(null).toFloatBuffer(buff, true);
-        buff.rewind();
-        GL20C.glUniformMatrix4fv(modelLoc, true, buff);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            final FloatBuffer buff = stack.callocFloat(16);
+            final int modelLoc = GL20C.glGetUniformLocation(programId, "model");
+            worldTransform.getHomogeneousMatrix(null).toFloatBuffer(buff, true);
+            buff.rewind();
+            GL20C.glUniformMatrix4fv(modelLoc, true, buff);
 
-        final Camera cam = Camera.getCurrentCamera();
-        buff.rewind();
-        final int viewLoc = GL20C.glGetUniformLocation(programId, "viewProjection");
-        cam.getModelViewProjectionMatrix().toFloatBuffer(buff, false);
-        buff.rewind();
-        GL20C.glUniformMatrix4fv(viewLoc, true, buff);
+            final Camera cam = Camera.getCurrentCamera();
+            final int viewLoc = GL20C.glGetUniformLocation(programId, "view");
+            cam.getModelViewMatrix().toFloatBuffer(buff, false);
+            buff.rewind();
+            GL20C.glUniformMatrix4fv(viewLoc, true, buff);
+
+            final int projLoc = GL20C.glGetUniformLocation(programId, "projection");
+            cam.getProjectionMatrix().toFloatBuffer(buff, false);
+            buff.rewind();
+            GL20C.glUniformMatrix4fv(projLoc, true, buff);
+        }
     }
 
     @Override
