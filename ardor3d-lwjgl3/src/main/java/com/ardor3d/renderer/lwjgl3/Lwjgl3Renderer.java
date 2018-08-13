@@ -47,6 +47,8 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.renderer.state.TextureState;
@@ -55,6 +57,8 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3CullStateUtil;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3OffsetStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ShaderStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3WireframeStateUtil;
@@ -530,7 +534,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 // LwjglColorMaskStateUtil.apply((ColorMaskState) state);
                 return;
             case Cull:
-                // LwjglCullStateUtil.apply((CullState) state);
+                Lwjgl3CullStateUtil.apply((CullState) state);
                 return;
             case Fog:
                 // LwjglFogStateUtil.apply((FogState) state);
@@ -542,7 +546,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 // LwjglMaterialStateUtil.apply((MaterialState) state);
                 return;
             case Offset:
-                // LwjglOffsetStateUtil.apply(this, (OffsetState) state);
+                Lwjgl3OffsetStateUtil.apply(this, (OffsetState) state);
                 return;
             case Shading:
                 // LwjglShadingStateUtil.apply((ShadingState) state);
