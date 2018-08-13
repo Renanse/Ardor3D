@@ -366,23 +366,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             example._canvas = canvas;
             example._physicalLayer = new PhysicalLayer(new GLFWKeyboardWrapper(canvas), new GLFWMouseWrapper(canvas),
                     new DummyControllerWrapper());
-            example._mouseManager = new GLFWMouseManager();
+            example._mouseManager = new GLFWMouseManager(canvas);
             example._canvas.setMouseManager(example._mouseManager);
             TextureRendererFactory.INSTANCE.setProvider(new Lwjgl3TextureRendererProvider());
-            // } else if (prefs.getRenderer().startsWith("LWJGL")) {
-            // try {
-            // SharedLibraryLoader.load(true);
-            // } catch (final Exception e) {
-            // e.printStackTrace();
-            // }
-            //
-            // final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
-            // example._canvas = new LwjglCanvas(settings, canvasRenderer);
-            // example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
-            // new LwjglControllerWrapper(), (LwjglCanvas) example._canvas);
-            // example._mouseManager = new LwjglMouseManager();
-            // example._canvas.setMouseManager(example._mouseManager);
-            // TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         } else if (prefs.getRenderer().startsWith("JOGL")) {
             final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
             example._canvas = new JoglNewtWindow(canvasRenderer, settings);
