@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -27,7 +27,6 @@ import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.scenegraph.RenderDelegate;
 
 /**
  * Node defines an internal node of a scene graph. The internal node maintains a collection of children and handles
@@ -50,7 +49,7 @@ public class Node extends Spatial {
 
     /**
      * Constructs a new <code>Node</code> with a given name.
-     * 
+     *
      * @param name
      *            the name of the node. This is required for identification purposes.
      */
@@ -60,7 +59,7 @@ public class Node extends Spatial {
 
     /**
      * Constructs a new <code>Node</code> with a given name.
-     * 
+     *
      * @param name
      *            the name of the node. This is required for identification purposes.
      * @param children
@@ -73,11 +72,11 @@ public class Node extends Spatial {
     }
 
     /**
-     * 
+     *
      * <code>attachChild</code> attaches a child to this node. This node becomes the child's parent. The current number
      * of children maintained is returned. <br>
      * If the child already had a parent it is detached from that former parent.
-     * 
+     *
      * @param child
      *            the child to attach to this node.
      * @return the number of children maintained by this node.
@@ -104,11 +103,11 @@ public class Node extends Spatial {
     }
 
     /**
-     * 
+     *
      * <code>attachChildAt</code> attaches a child to this node at an index. This node becomes the child's parent. The
      * current number of children maintained is returned. <br>
      * If the child already had a parent it is detached from that former parent.
-     * 
+     *
      * @param child
      *            the child to attach to this node.
      * @return the number of children maintained by this node.
@@ -136,7 +135,7 @@ public class Node extends Spatial {
 
     /**
      * <code>detachChild</code> removes a given child from the node's list. This child will no longe be maintained.
-     * 
+     *
      * @param child
      *            the child to remove.
      * @return the index the child was at. -1 if the child was not in the list.
@@ -159,7 +158,7 @@ public class Node extends Spatial {
     /**
      * <code>detachChild</code> removes a given child from the node's list. This child will no longe be maintained. Only
      * the first child with a matching name is removed.
-     * 
+     *
      * @param childName
      *            the child to remove.
      * @return the index the child was at. -1 if the child was not in the list.
@@ -179,9 +178,9 @@ public class Node extends Spatial {
     }
 
     /**
-     * 
+     *
      * <code>detachChildAt</code> removes a child at a given index. That child is returned for saving purposes.
-     * 
+     *
      * @param index
      *            the index of the child to be removed.
      * @return the child at the supplied index.
@@ -202,7 +201,7 @@ public class Node extends Spatial {
     }
 
     /**
-     * 
+     *
      * <code>detachAllChildren</code> removes all children attached to this node.
      */
     public void detachAllChildren() {
@@ -214,7 +213,7 @@ public class Node extends Spatial {
 
     /**
      * Get the index of the specified spatial.
-     * 
+     *
      * @param sp
      *            spatial to retrieve index for.
      * @return the index
@@ -225,7 +224,7 @@ public class Node extends Spatial {
 
     /**
      * Returns all children to this node.
-     * 
+     *
      * @return a list containing all children to this node
      */
     public List<Spatial> getChildren() {
@@ -234,7 +233,7 @@ public class Node extends Spatial {
 
     /**
      * Swaps two children.
-     * 
+     *
      * @param index1
      * @param index2
      */
@@ -257,9 +256,9 @@ public class Node extends Spatial {
     }
 
     /**
-     * 
+     *
      * <code>getChild</code> returns a child at a given index.
-     * 
+     *
      * @param i
      *            the index to retrieve the child from.
      * @return the child at a specified index.
@@ -271,7 +270,7 @@ public class Node extends Spatial {
     /**
      * <code>getChild</code> returns the first child found with exactly the given name (case sensitive.) If our children
      * are Nodes, we will search their children as well.
-     * 
+     *
      * @param name
      *            the name of the child to retrieve. If null, we'll return null.
      * @return the child if found, or null.
@@ -296,7 +295,7 @@ public class Node extends Spatial {
 
     /**
      * determines if the provided Spatial is contained in the children list of this node.
-     * 
+     *
      * @param spat
      *            the child object to look for.
      * @return true if the object is contained, false otherwise.
@@ -317,9 +316,9 @@ public class Node extends Spatial {
     }
 
     /**
-     * 
+     *
      * <code>getNumberOfChildren</code> returns the number of children this node maintains.
-     * 
+     *
      * @return the number of children this node maintains.
      */
     public int getNumberOfChildren() {
@@ -361,39 +360,26 @@ public class Node extends Spatial {
 
     /**
      * <code>draw</code> calls the onDraw method for each child maintained by this node.
-     * 
+     *
      * @see com.ardor3d.scenegraph.Spatial#draw(com.ardor3d.renderer.Renderer)
      * @param r
      *            the renderer to draw to.
      */
     @Override
     public void draw(final Renderer r) {
-
-        final RenderDelegate delegate = getCurrentRenderDelegate();
-        if (delegate == null) {
-            Spatial child;
-            for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
-                child = _children.get(i);
-                if (child != null) {
-                    child.onDraw(r);
-                }
+        Spatial child;
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
+            child = _children.get(i);
+            if (child != null) {
+                child.onDraw(r);
             }
-        } else {
-            // Queue as needed
-            if (!r.isProcessingQueue()) {
-                if (r.checkAndAdd(this)) {
-                    return;
-                }
-            }
-
-            delegate.render(this, r);
         }
     }
 
     /**
      * <code>updateWorldBound</code> merges the bounds of all the children maintained by this node. This will allow for
      * faster culling operations.
-     * 
+     *
      * @see com.ardor3d.scenegraph.Spatial#updateWorldBound(boolean)
      */
     @Override
@@ -411,8 +397,8 @@ public class Node extends Spatial {
 
                     // simple check to catch NaN issues
                     if (!Vector3.isValid(worldBound.getCenter())) {
-                        throw new Ardor3dException("WorldBound center is invalid after merge between " + this + " and "
-                                + child);
+                        throw new Ardor3dException(
+                                "WorldBound center is invalid after merge between " + this + " and " + child);
                     }
                 } else {
                     // set world bound to first non-null child world bound

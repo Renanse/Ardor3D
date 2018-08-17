@@ -20,7 +20,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.google.common.collect.Lists;
 
 public class RenderedText extends Node implements Renderable {
@@ -103,12 +102,7 @@ public class RenderedText extends Node implements Renderable {
             }
         }
 
-        final RenderDelegate delegate = getCurrentRenderDelegate();
-        if (delegate == null) {
-            r.draw((Renderable) this);
-        } else {
-            delegate.render(this, r);
-        }
+        r.draw((Renderable) this);
     }
 
     @Override

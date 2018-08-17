@@ -39,7 +39,6 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 import com.google.common.collect.Lists;
@@ -350,12 +349,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             }
         }
 
-        final RenderDelegate delegate = getCurrentRenderDelegate();
-        if (delegate == null) {
-            r.draw((Renderable) this);
-        } else {
-            delegate.render(this, r);
-        }
+        r.draw((Renderable) this);
     }
 
     /**
@@ -642,12 +636,12 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             BufferUtils.copy(meshData.getVertexBuffer(), i * verts.getValuesPerTuple(), verts.getBuffer(),
                     vert * verts.getValuesPerTuple(), verts.getValuesPerTuple());
             if (norms != null) {
-                BufferUtils.copy(meshData.getNormalBuffer(), i * norms.getValuesPerTuple(), norms.getBuffer(), vert
-                        * norms.getValuesPerTuple(), norms.getValuesPerTuple());
+                BufferUtils.copy(meshData.getNormalBuffer(), i * norms.getValuesPerTuple(), norms.getBuffer(),
+                        vert * norms.getValuesPerTuple(), norms.getValuesPerTuple());
             }
             if (colors != null) {
-                BufferUtils.copy(meshData.getColorBuffer(), i * colors.getValuesPerTuple(), colors.getBuffer(), vert
-                        * colors.getValuesPerTuple(), colors.getValuesPerTuple());
+                BufferUtils.copy(meshData.getColorBuffer(), i * colors.getValuesPerTuple(), colors.getBuffer(),
+                        vert * colors.getValuesPerTuple(), colors.getValuesPerTuple());
             }
             if (tangents != null) {
                 BufferUtils.copy(meshData.getTangentBuffer(), i * tangents.getValuesPerTuple(), tangents.getBuffer(),
