@@ -706,8 +706,8 @@ public class JoglRenderer extends AbstractRenderer {
         final int byteSize = indices.getByteCount();
         final int glIndexMode = getGLIndexMode(mode);
 
-        GLContext.getCurrentGL().getGL3()
-                .glDrawElementsInstanced(glIndexMode, count, type, (long) start * byteSize, instanceCount);
+        GLContext.getCurrentGL().getGL3().glDrawElementsInstanced(glIndexMode, count, type, (long) start * byteSize,
+                instanceCount);
 
         if (Constants.stats) {
             addStats(mode, count * instanceCount);
@@ -888,7 +888,6 @@ public class JoglRenderer extends AbstractRenderer {
         if (record.getDrawBufferTarget() != target) {
             int buffer = GL.GL_BACK;
             switch (target) {
-                case None:
                 case Back:
                     break;
                 case Front:
@@ -914,6 +913,9 @@ public class JoglRenderer extends AbstractRenderer {
                     break;
                 case Right:
                     buffer = GL2GL3.GL_RIGHT;
+                    break;
+                case None:
+                    buffer = GL.GL_NONE;
                     break;
             }
 

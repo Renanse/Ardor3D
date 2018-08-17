@@ -291,9 +291,9 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void updateTextureCubeMapSubImage(final TextureCubeMap destination, final Face dstFace,
-            final int dstOffsetX, final int dstOffsetY, final int dstWidth, final int dstHeight,
-            final ByteBuffer source, final int srcOffsetX, final int srcOffsetY, final int srcTotalWidth) {
+    public void updateTextureCubeMapSubImage(final TextureCubeMap destination, final Face dstFace, final int dstOffsetX,
+            final int dstOffsetY, final int dstWidth, final int dstHeight, final ByteBuffer source,
+            final int srcOffsetX, final int srcOffsetY, final int srcTotalWidth) {
         // TODO Auto-generated method stub
 
     }
@@ -391,6 +391,9 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                     break;
                 case Right:
                     buffer = GL11C.GL_RIGHT;
+                    break;
+                case None:
+                    buffer = GL11C.GL_NONE;
                     break;
             }
 
@@ -550,7 +553,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 Lwjgl3ZBufferStateUtil.apply((ZBufferState) state);
                 return;
 
-                // XXX: The following are not core compatible states - we'll need to do them in shader?
+            // XXX: The following are not core compatible states - we'll need to do them in shader?
             case Light:
                 // LwjglLightStateUtil.apply((LightState) state);
                 return;
