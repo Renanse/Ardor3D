@@ -87,31 +87,29 @@ public class TechniquePass implements Savable {
     }
 
     public void setShader(final ShaderType type, final String shaderContents) {
-        setShader(type, shaderContents, type.name(), null);
+        setShader(type, shaderContents, type.name());
     }
 
-    public void setShader(final ShaderType type, final String shaderContents, final String name,
-            final Map<String, String> defines) {
+    public void setShader(final ShaderType type, final String shaderContents, final String name) {
         final ShaderInfo info = new ShaderInfo();
         info.name = name;
         info.program = shaderContents;
-        info.defines = defines == null ? null : Maps.newHashMap(defines);
 
         _shaders.put(type, info);
     }
 
     public void setShader(final ShaderType type, final InputStream shaderContents) throws IOException {
-        setShader(type, shaderContents, type.name(), null);
+        setShader(type, shaderContents, type.name());
     }
 
-    public void setShader(final ShaderType type, final InputStream shaderContents, final String name,
-            final Map<String, String> defines) throws IOException {
+    public void setShader(final ShaderType type, final InputStream shaderContents, final String name)
+            throws IOException {
         String text;
         try (final Reader reader = new InputStreamReader(shaderContents)) {
             text = CharStreams.toString(reader);
         }
 
-        setShader(type, text, name, null);
+        setShader(type, text, name);
     }
 
     public void addAttribute(final VertexAttributeRef attribute) {
