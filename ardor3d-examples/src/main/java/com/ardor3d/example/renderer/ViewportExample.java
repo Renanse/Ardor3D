@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -44,8 +44,8 @@ import com.ardor3d.util.ReadOnlyTimer;
  * surface.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.ViewportExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_ViewportExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_ViewportExample.jpg", //
+        maxHeapMemory = 64)
 public class ViewportExample extends ExampleBase {
 
     private Box box2;
@@ -137,7 +137,6 @@ public class ViewportExample extends ExampleBase {
 
         final Camera camera = Camera.getCurrentCamera();
         camera.setViewPort(vpLeft, vpRight, vpBottom, vpTop);
-        camera.update();
 
         fullViewport = full;
     }

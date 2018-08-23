@@ -156,8 +156,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             // Look up a shared context, if a shared JoglCanvasRenderer is given.
             RenderContext sharedContext = null;
             if (settings.getShareContext() != null) {
-                sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
-                        .getContextKey());
+                sharedContext = ContextManager
+                        .getContextForKey(settings.getShareContext().getRenderContext().getContextKey());
             }
 
             final ContextCapabilities caps = createContextCapabilities();
@@ -256,9 +256,6 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // render stuff, first apply our camera if we have one
         if (_camera != null) {
-            if (Camera.getCurrentCamera() != _camera) {
-                _camera.update();
-            }
             _camera.apply(_renderer);
         }
         _renderer.clearBuffers(_frameClear);

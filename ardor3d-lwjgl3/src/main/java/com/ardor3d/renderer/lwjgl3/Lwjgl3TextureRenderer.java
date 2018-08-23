@@ -27,18 +27,18 @@ import com.ardor3d.image.Texture.Type;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.renderer.AbstractFBOTextureRenderer;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
+import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
-import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
+import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
@@ -95,17 +95,17 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
 
         // Initialize our texture with some default data.
-        final int internalFormat = Lwjgl3TextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
-        final int dataFormat = Lwjgl3TextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
-        final int pixelDataType = Lwjgl3TextureUtil.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
+        final int internalFormat = Lwjgl3TextureUtils.getGLInternalFormat(tex.getTextureStoreFormat());
+        final int dataFormat = Lwjgl3TextureUtils.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
+        final int pixelDataType = Lwjgl3TextureUtils.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
 
         if (tex.getType() == Type.TwoDimensional) {
             GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
                     (ByteBuffer) null);
         } else {
             for (final Face face : Face.values()) {
-                GL11C.glTexImage2D(Lwjgl3TextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height,
-                        0, dataFormat, pixelDataType, (ByteBuffer) null);
+                GL11C.glTexImage2D(Lwjgl3TextureStateUtil.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0,
+                        dataFormat, pixelDataType, (ByteBuffer) null);
             }
         }
 
@@ -354,8 +354,8 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     protected void blitMSFBO() {
         GL30C.glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, _msfboID);
         GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, _fboID);
-        GL30C.glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL11C.GL_COLOR_BUFFER_BIT
-                | GL11C.GL_DEPTH_BUFFER_BIT, GL11C.GL_NEAREST);
+        GL30C.glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height,
+                GL11C.GL_COLOR_BUFFER_BIT | GL11C.GL_DEPTH_BUFFER_BIT, GL11C.GL_NEAREST);
 
         GL30C.glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, 0);
         GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, 0);
@@ -374,23 +374,23 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             case GL30C.GL_FRAMEBUFFER_COMPLETE:
                 break;
             case GL30C.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT exception");
+                throw new IllegalStateException(
+                        "FrameBuffer: " + fboID + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT exception");
             case GL30C.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
                 throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT exception");
             case GL30C.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER exception");
+                throw new IllegalStateException(
+                        "FrameBuffer: " + fboID + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER exception");
             case GL30C.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER exception");
+                throw new IllegalStateException(
+                        "FrameBuffer: " + fboID + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER exception");
             case GL30C.GL_FRAMEBUFFER_UNSUPPORTED:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED exception.");
+                throw new IllegalStateException(
+                        "FrameBuffer: " + fboID + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED exception.");
             case GL30C.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-                throw new IllegalStateException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE exception.");
+                throw new IllegalStateException(
+                        "FrameBuffer: " + fboID + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE exception.");
             default:
                 throw new IllegalStateException("Unexpected reply from glCheckFramebufferStatusEXT: " + status);
         }
@@ -418,7 +418,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     @Override
-    protected void activate() {
+    public void activate() {
         // Lazy init
         if (_fboID == 0) {
             final IntBuffer buffer = BufferUtils.createIntBuffer(1);
@@ -464,8 +464,8 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
 
                 GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, _msfboID);
-                GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0,
-                        GL30C.GL_RENDERBUFFER, _mscolorRBID);
+                GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0, GL30C.GL_RENDERBUFFER,
+                        _mscolorRBID);
                 GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_RENDERBUFFER,
                         _msdepthRBID);
 
@@ -487,9 +487,9 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             record.setClippingTestValid(false);
 
             // push a delimiter onto the clip stack
-            _neededClip = _parentRenderer.isClipTestEnabled();
+            _neededClip = _parentRenderer.getScissorUtils().isClipTestEnabled();
             if (_neededClip) {
-                _parentRenderer.pushEmptyClip();
+                _parentRenderer.getScissorUtils().pushEmptyClip();
             }
 
             GL11C.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
@@ -521,7 +521,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     @Override
-    protected void deactivate() {
+    public void deactivate() {
         if (_active == 1) {
             final ReadOnlyColorRGBA bgColor = _parentRenderer.getBackgroundColor();
             GL11C.glClearColor(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), bgColor.getAlpha());
@@ -530,7 +530,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             ContextManager.getCurrentContext().popEnforcedStates();
 
             if (_neededClip) {
-                _parentRenderer.popClip();
+                _parentRenderer.getScissorUtils().popClip();
             }
         }
         _active--;

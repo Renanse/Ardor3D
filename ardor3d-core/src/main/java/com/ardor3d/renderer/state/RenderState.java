@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 public abstract class RenderState implements Savable {
 
     public enum StateType {
-        Blend, Fog, Light, Material, Shading, Texture, Wireframe, ZBuffer, Cull, Stencil, Shader, ColorMask, Clip, Offset;
+        Blend, Fog, Light, Material, Shading, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Clip, Offset;
 
         // cached
         public static StateType[] values = values();
@@ -63,11 +63,11 @@ public abstract class RenderState implements Savable {
      * <li>Material: true</li>
      * <li>Shading: true</li>
      * <li>Texture: false - because you can change a texture object directly without telling the state</li>
-     * <li>Wireframe: false - because line attributes can change when drawing regular lines, affecting wireframe lines</li>
+     * <li>Wireframe: false - because line attributes can change when drawing regular lines, affecting wireframe
+     * lines</li>
      * <li>ZBuffer: true</li>
      * <li>Cull: true</li>
      * <li>Stencil: false</li>
-     * <li>Shader: true</li>
      * <li>ColorMask: true</li>
      * <li>Clip: true</li>
      * <li>Offset: true</li>
@@ -81,7 +81,6 @@ public abstract class RenderState implements Savable {
         _quickCompare.add(StateType.Shading);
         _quickCompare.add(StateType.ZBuffer);
         _quickCompare.add(StateType.Cull);
-        _quickCompare.add(StateType.Shader);
         _quickCompare.add(StateType.ColorMask);
         _quickCompare.add(StateType.Offset);
     }
@@ -247,8 +246,6 @@ public abstract class RenderState implements Savable {
                 return new CullState();
             case Fog:
                 return new FogState();
-            case Shader:
-                return new ShaderState();
             case Light:
                 return new LightState();
             case Material:

@@ -19,6 +19,7 @@ import org.lwjgl.system.jawt.JAWT;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.input.FocusWrapper;
@@ -154,4 +155,27 @@ public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrappe
 
     }
 
+    @Override
+    public int getContentWidth() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getContentHeight() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void addListener(final ICanvasListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean removeListener(final ICanvasListener listener) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

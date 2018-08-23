@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -78,7 +78,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Constructs a new Transform object from the information stored in the given source Transform.
-     * 
+     *
      * @param source
      * @throws NullPointerException
      *             if source is null.
@@ -96,7 +96,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Internal only constructor, generally used for making an immutable transform.
-     * 
+     *
      * @param matrix
      * @param scale
      * @param translation
@@ -158,7 +158,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Resets this transform to identity and resets all flags.
-     * 
+     *
      * @return this Transform for chaining.
      */
     public Transform setIdentity() {
@@ -173,10 +173,10 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Sets the matrix portion of this transform to the given value.
-     * 
+     *
      * NB: Calling this with a matrix that is not purely rotational (orthonormal) will result in a Transform whose scale
      * comes from its matrix. Further attempts to set scale directly will throw an error.
-     * 
+     *
      * @param rotation
      *            our new matrix.
      * @return this transform for chaining.
@@ -193,7 +193,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     /**
      * Sets the matrix portion of this transform to the rotational value of the given Quaternion. Calling this allows
      * scale to be set and used.
-     * 
+     *
      * @param rotation
      * @return this transform for chaining.
      * @throws NullPointerException
@@ -207,7 +207,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Sets the translation portion of this transform to the given value.
-     * 
+     *
      * @param translation
      * @return this transform for chaining.
      * @throws NullPointerException
@@ -221,7 +221,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Sets the translation portion of this transform to the given values.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -235,7 +235,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Sets the scale portion of this transform to the given value.
-     * 
+     *
      * @param scale
      * @return this transform for chaining.
      * @throws NullPointerException
@@ -262,7 +262,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Sets the scale portion of this transform to the given values.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -291,7 +291,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Sets the scale portion of this transform to the given value as a vector (u, u, u)
-     * 
+     *
      * @param uniformScale
      * @return this transform for chaining.
      * @throws TransformException
@@ -316,7 +316,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Copies the given transform values into this transform object.
-     * 
+     *
      * @param source
      * @return this transform for chaining.
      * @throws NullPointerException
@@ -339,7 +339,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Locally adds to the translation of this transform.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -353,7 +353,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Locally adds to the translation of this transform.
-     * 
+     *
      * @param vec
      * @return this transform for chaining.
      */
@@ -365,7 +365,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Locally applies this transform to the given point: P' = M*P+T
-     * 
+     *
      * @param point
      * @return the transformed point.
      * @throws NullPointerException
@@ -402,7 +402,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Applies this transform to the given point and returns the result in the given store vector: P' = M*P+T
-     * 
+     *
      * @param point
      * @param store
      *            the vector to store our result in. if null, a new vector will be created.
@@ -422,7 +422,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Locally applies the inverse of this transform to the given point: P' = M^{-1}*(P-T)
-     * 
+     *
      * @param point
      * @return the transformed point.
      * @throws NullPointerException
@@ -467,7 +467,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     /**
      * Applies the inverse of this transform to the given point and returns the result in the given store vector: P' =
      * M^{-1}*(P-T)
-     * 
+     *
      * @param point
      * @param store
      *            the vector to store our result in. if null, a new vector will be created.
@@ -487,7 +487,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Locally applies this transform to the given vector: V' = M*V
-     * 
+     *
      * @param vector
      * @return the transformed vector.
      * @throws NullPointerException
@@ -522,7 +522,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Applies this transform to the given vector and returns the result in the given store vector: V' = M*V
-     * 
+     *
      * @param vector
      * @param store
      *            the vector to store our result in. if null, a new vector will be created.
@@ -542,7 +542,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Locally applies the inverse of this transform to the given vector: V' = M^{-1}*V
-     * 
+     *
      * @param vector
      * @return the transformed vector.
      * @throws NullPointerException
@@ -584,7 +584,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     /**
      * Applies the inverse of this transform to the given vector and returns the result in the given store vector: V' =
      * M^{-1}*V
-     * 
+     *
      * @param vector
      * @param store
      *            the vector to store our result in. if null, a new vector will be created.
@@ -605,7 +605,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     /**
      * Calculates the product of this transform with the given "transformBy" transform (P = this * T) and stores this in
      * store.
-     * 
+     *
      * @param transformBy
      * @param store
      *            the transform to store the result in for return. If null, a new transform object is created and
@@ -654,11 +654,13 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
         }
 
         // In all remaining cases, the matrix cannot be written as R*S*X+T.
-        final ReadOnlyMatrix3 matrixA = isRotationMatrix() ? _matrix.multiplyDiagonalPost(_scale,
-                Matrix3.fetchTempInstance()) : _matrix;
+        final ReadOnlyMatrix3 matrixA = isRotationMatrix()
+                ? _matrix.multiplyDiagonalPost(_scale, Matrix3.fetchTempInstance())
+                : _matrix;
 
-        final ReadOnlyMatrix3 matrixB = transformBy.isRotationMatrix() ? transformBy.getMatrix().multiplyDiagonalPost(
-                transformBy.getScale(), Matrix3.fetchTempInstance()) : transformBy.getMatrix();
+        final ReadOnlyMatrix3 matrixB = transformBy.isRotationMatrix()
+                ? transformBy.getMatrix().multiplyDiagonalPost(transformBy.getScale(), Matrix3.fetchTempInstance())
+                : transformBy.getMatrix();
 
         final Matrix3 newMatrix = result._matrix;
         newMatrix.set(matrixA).multiplyLocal(matrixB);
@@ -684,7 +686,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Updates _rotationMatrix, _uniformScale and _identity based on the current contents of this Transform.
-     * 
+     *
      * @param rotationMatrixGuaranteed
      *            true if we know for sure that the _matrix component is rotational.
      */
@@ -701,7 +703,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Calculates the inverse of this transform.
-     * 
+     *
      * @param store
      *            the transform to store the result in for return. If null, a new transform object is created and
      *            returned. It IS safe for store to be the same object as "this".
@@ -744,13 +746,13 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      * @param store
      *            the matrix to store the result in for return. If null, a new matrix object is created and returned.
      * @return this transform represented as a 4x4 matrix:
-     * 
+     *
      *         <pre>
      * R R R Tx
      * R R R Ty
      * R R R Tz
      * 0 0 0 1
-     * </pre>
+     *         </pre>
      */
     @Override
     public Matrix4 getHomogeneousMatrix(final Matrix4 store) {
@@ -795,6 +797,10 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     @Override
     public void getGLApplyMatrix(final DoubleBuffer store) {
+        store.put(3, 0.0);
+        store.put(7, 0.0);
+        store.put(11, 0.0);
+
         if (_rotationMatrix) {
             store.put(0, _scale.getX() * _matrix._m00);
             store.put(1, _scale.getX() * _matrix._m10);
@@ -825,6 +831,10 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     @Override
     public void getGLApplyMatrix(final FloatBuffer store) {
+        store.put(3, 0f);
+        store.put(7, 0f);
+        store.put(11, 0f);
+
         if (_rotationMatrix) {
             store.put(0, (float) (_scale.getX() * _matrix._m00));
             store.put(1, (float) (_scale.getX() * _matrix._m10));
@@ -850,12 +860,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
         store.put(12, _translation.getXf());
         store.put(13, _translation.getYf());
         store.put(14, _translation.getZf());
-        store.put(15, 1.0f);
+        store.put(15, 1f);
     }
 
     /**
      * Reads in a 4x4 matrix as a 3x3 matrix and translation.
-     * 
+     *
      * @param matrix
      * @return this matrix for chaining.
      * @throws NullPointerException
@@ -872,10 +882,10 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Check a transform... if it is null or one of its members are invalid, return false. Else return true.
-     * 
+     *
      * @param transform
      *            the transform to check
-     * 
+     *
      * @return true or false as stated above.
      */
     public static boolean isValid(final ReadOnlyTransform transform) {
@@ -997,7 +1007,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param in
      *            ObjectInput
      * @throws IOException
@@ -1015,9 +1025,9 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /*
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param out ObjectOutput
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -1049,7 +1059,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     /**
      * Releases a Transform back to be used by a future call to fetchTempInstance. TAKE CARE: this Transform object
      * should no longer have other classes referencing it or "Bad Things" will happen.
-     * 
+     *
      * @param trans
      *            the Transform to release.
      */

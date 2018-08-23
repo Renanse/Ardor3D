@@ -37,10 +37,9 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
@@ -53,13 +52,14 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.jogamp.opengl.util.glsl.ShaderState;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationDemoExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
+        maxHeapMemory = 64)
 public class AnimationDemoExample extends ExampleBase {
 
     private static final long MIN_STATE_TIME = 5000;
@@ -97,7 +97,6 @@ public class AnimationDemoExample extends ExampleBase {
         cam.setLocation(197, 113, -126);
         cam.lookAt(new Vector3(157, 91, -174), Vector3.UNIT_Y);
         cam.setFrustumPerspective(45.0, cam.getWidth() / (double) cam.getHeight(), .25, 900);
-        cam.update();
 
         // speed up wasd control a little
         _controlHandle.setMoveSpeed(200);
@@ -145,11 +144,11 @@ public class AnimationDemoExample extends ExampleBase {
             final ShaderState gpuShader = new ShaderState();
             gpuShader.setEnabled(true);
             try {
-                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert", ResourceLocatorTool
-                        .getClassPathResourceAsString(ExampleBase.class,
+                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert",
+                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
                                 "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag", ResourceLocatorTool
-                        .getClassPathResourceAsString(ExampleBase.class,
+                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag",
+                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
                                 "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
 
                 gpuShader.setUniform("texture", 0);

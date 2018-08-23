@@ -54,8 +54,8 @@ import com.ardor3d.util.TextureKey;
  * textures.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.GeneratedTexturesExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
+        maxHeapMemory = 64)
 public class GeneratedTexturesExample extends ExampleBase {
     private final static int COUNT = 10;
     private final static int SPAN = 3;
@@ -198,18 +198,18 @@ public class GeneratedTexturesExample extends ExampleBase {
 
         // simplex - luminance
         setTerrain(srcs[index], terrain, false, false);
-        srcs[index++].setTooltipText("Simplex noise.");
+//        srcs[index++].setTooltipText("Simplex noise.");
 
         // simplex + FBM - luminance
         setTerrain(srcs[index], terrain, true, false);
-        srcs[index++].setTooltipText("Simplex noise + Fractional Brownian Motion (fBm).");
+//        srcs[index++].setTooltipText("Simplex noise + Fractional Brownian Motion (fBm).");
 
         // color ramp
         setColors(srcs[index++]);
 
         // simplex + FBM - color
         setTerrain(srcs[index], terrain, true, true);
-        srcs[index++].setTooltipText("Noise + Colormap == Something that looks like a map. :)");
+//        srcs[index++].setTooltipText("Noise + Colormap == Something that looks like a map. :)");
 
         // *** A few textures derived from samples in the libnoise project.
         // *** Perhaps we can get an some better ones from the community :)
@@ -303,7 +303,7 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setCheck(final UIPanel panel) {
-        panel.setTooltipText("Simple Checkerboard pattern");
+        // panel.setTooltipText("Simple Checkerboard pattern");
 
         final Texture tex = new Texture2D();
 
@@ -321,7 +321,7 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setColors(final UIPanel panel) {
-        panel.setTooltipText("The 1-D color map used to colorize our gradient.");
+        // panel.setTooltipText("The 1-D color map used to colorize our gradient.");
 
         final Texture tex = new Texture2D();
         final Image img = GeneratedImageFactory.create1DColorImage(false, terrainColors);
@@ -334,7 +334,7 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setMandelbrot(final UIPanel panel) {
-        panel.setTooltipText("The famous Mandelbrot fractal");
+        // panel.setTooltipText("The famous Mandelbrot fractal");
 
         final Texture tex = new Texture2D();
 
@@ -361,7 +361,7 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setVoronoi(final UIPanel panel) {
-        panel.setTooltipText("Voronoi graph");
+        // panel.setTooltipText("Voronoi graph");
 
         final Texture tex = new Texture2D();
 
@@ -399,7 +399,7 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setWoodGrain(final UIPanel panel) {
-        panel.setTooltipText("Dark wood grain.");
+        // panel.setTooltipText("Dark wood grain.");
 
         final Texture tex = new Texture2D();
 
@@ -432,7 +432,7 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setJade(final UIPanel panel) {
-        panel.setTooltipText("A Jade-like texture");
+        // panel.setTooltipText("A Jade-like texture");
 
         final Texture tex = new Texture2D();
 
@@ -466,8 +466,8 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void setSlime(final UIPanel panel) {
-        panel.setTooltipText("Slime: Built with two bubble functions of different sizes\n"
-                + "and blended with a mapping function.");
+        // panel.setTooltipText( "Slime: Built with two bubble functions of different sizes\n" + "and blended with a
+        // mapping function.");
         panel.setTooltipPopTime(25);
 
         final Texture tex = new Texture2D();
@@ -501,8 +501,8 @@ public class GeneratedTexturesExample extends ExampleBase {
     }
 
     private void applyTexture(final Texture tex, final UIPanel panel) {
-        final ImageBackdrop backdrop = new ImageBackdrop(new SubTex(tex, 0, 0, tex.getImage().getWidth(), -tex
-                .getImage().getHeight()));
+        final ImageBackdrop backdrop = new ImageBackdrop(
+                new SubTex(tex, 0, 0, tex.getImage().getWidth(), -tex.getImage().getHeight()));
         panel.setBackdrop(backdrop);
     }
 }

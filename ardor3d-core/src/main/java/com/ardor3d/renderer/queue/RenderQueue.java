@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -43,7 +43,6 @@ public class RenderQueue {
         setRenderBucket(RenderBucketType.Shadow, new OpaqueRenderBucket());
         setRenderBucket(RenderBucketType.Opaque, new OpaqueRenderBucket());
         setRenderBucket(RenderBucketType.Transparent, new TransparentRenderBucket());
-        setRenderBucket(RenderBucketType.Ortho, new OrthoRenderBucket());
         setRenderBucket(RenderBucketType.PostBucket, new OpaqueRenderBucket());
     }
 

@@ -16,6 +16,7 @@ import com.ardor3d.image.Image;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -61,11 +62,13 @@ public class UIArc extends Mesh {
         final int verts = radialVerts * 4 + 4 * 4; // bg verts + edge decorations
         if (_meshData.getVertexBuffer() == null || _meshData.getVertexBuffer().capacity() < verts * 2) {
             _meshData.setVertexCoords(new FloatBufferData(verts * 2, 2));
+            _meshData.getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
         } else {
             _meshData.getVertexBuffer().clear();
         }
         if (_meshData.getTextureBuffer(0) == null || _meshData.getTextureBuffer(0).capacity() < verts * 2) {
             _meshData.setTextureCoords(new FloatBufferData(verts * 2, 2), 0);
+            _meshData.getTextureCoords(0).setVboAccessMode(VBOAccessMode.DynamicDraw);
         } else {
             _meshData.getTextureBuffer(0).clear();
         }
@@ -75,6 +78,7 @@ public class UIArc extends Mesh {
         final int indices = tris * 3;
         if (_meshData.getIndexBuffer() == null || _meshData.getIndexBuffer().capacity() < indices) {
             _meshData.setIndices(BufferUtils.createIndexBufferData(indices, verts - 1));
+            _meshData.getIndices().setVboAccessMode(VBOAccessMode.DynamicDraw);
         } else {
             _meshData.getIndexBuffer().clear();
         }
@@ -119,8 +123,8 @@ public class UIArc extends Mesh {
             final double actualSampleRate = _arcLength / (radialVerts - 1);
             double angle = startAngle;
             for (int x = 0; x < radialVerts; x++) {
-                final float radialU = txOff + leftOffTx + (txScale - leftOffTx - rightOffTx)
-                        * ((float) x / (radialVerts - 1));
+                final float radialU = txOff + leftOffTx
+                        + (txScale - leftOffTx - rightOffTx) * ((float) x / (radialVerts - 1));
                 final Vector2 radial = new Vector2(MathUtils.sin(angle), MathUtils.cos(angle));
                 radialOffset.set(radial).multiplyLocal(_innerRadius);
 
@@ -254,6 +258,11 @@ public class UIArc extends Mesh {
                 }
             }
         }
+
+        _meshData.getVertexCoords().markDirty();
+        _meshData.getTextureCoords(0).markDirty();
+        _meshData.getIndices().markDirty();
+        _meshData.markBuffersDirty();
     }
 
     public double getSampleRate() {

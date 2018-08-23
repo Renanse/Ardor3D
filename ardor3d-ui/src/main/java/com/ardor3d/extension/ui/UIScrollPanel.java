@@ -69,10 +69,10 @@ public class UIScrollPanel extends UIPanel {
     @Override
     protected void drawComponent(final Renderer renderer) {
         _clipRectangleStore.set(getHudX() + getTotalLeft(),
-                getHudY() + getTotalBottom() + horizontalScrollBar.getContentHeight(), getContentWidth()
-                - verticalScrollBar.getContentWidth(),
+                getHudY() + getTotalBottom() + horizontalScrollBar.getContentHeight(),
+                getContentWidth() - verticalScrollBar.getContentWidth(),
                 getContentHeight() - horizontalScrollBar.getContentHeight());
-        renderer.pushClip(_clipRectangleStore);
+        renderer.getScissorUtils().pushClip(_clipRectangleStore);
 
         // temporary translate the view - this is a hack and there may be a better solution
         final int x = view.getLocalX();
@@ -81,7 +81,7 @@ public class UIScrollPanel extends UIPanel {
         view.updateWorldTransform(true);
         view.draw(renderer);
         view.setLocalXY(x, y);
-        renderer.popClip();
+        renderer.getScissorUtils().popClip();
         horizontalScrollBar.onDraw(renderer);
         verticalScrollBar.onDraw(renderer);
     }
@@ -100,8 +100,8 @@ public class UIScrollPanel extends UIPanel {
             verticalScrollBar.setMaxValue(view.getLocalComponentHeight() - getContentHeight()
                     + horizontalScrollBar.getLocalComponentHeight());
             horizontalScrollBar.setValue(offsetX);
-            horizontalScrollBar.setMaxValue(view.getLocalComponentWidth() - getContentWidth()
-                    + verticalScrollBar.getLocalComponentWidth());
+            horizontalScrollBar.setMaxValue(
+                    view.getLocalComponentWidth() - getContentWidth() + verticalScrollBar.getLocalComponentWidth());
             verticalScrollBar.fireComponentDirty();
             horizontalScrollBar.fireComponentDirty();
         }

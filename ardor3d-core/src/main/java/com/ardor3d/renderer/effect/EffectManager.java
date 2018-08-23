@@ -47,7 +47,7 @@ public class EffectManager {
         _canvasSettings = settings;
         _fsqCamera = new Camera(settings.getWidth(), settings.getHeight());
         _fsqCamera.setFrustum(-1, 1, -1, 1, 1, -1);
-        _fsqCamera.setProjectionMode(ProjectionMode.Parallel);
+        _fsqCamera.setProjectionMode(ProjectionMode.Orthographic);
         _fsqCamera.setAxes(Vector3.NEG_UNIT_X, Vector3.UNIT_Y, Vector3.NEG_UNIT_Z);
 
         _outputFormat = outputformat;

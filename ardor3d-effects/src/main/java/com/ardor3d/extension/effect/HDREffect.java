@@ -21,10 +21,10 @@ import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
 import com.ardor3d.renderer.effect.RenderTarget;
 import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
+import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class HDREffect extends RenderEffect {

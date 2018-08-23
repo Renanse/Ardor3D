@@ -10,28 +10,29 @@
 
 package com.ardor3d.renderer;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyMatrix4;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
+import com.google.common.collect.Maps;
 
 /**
  * Provides some common base level method implementations for Renderers.
@@ -44,39 +45,24 @@ public abstract class AbstractRenderer implements Renderer {
 
     protected RenderQueue _queue = new RenderQueue();
 
-    protected boolean _inOrthoMode;
-
     protected int _stencilClearValue;
 
-    protected RenderLogic renderLogic;
+    protected Map<RenderMatrixType, FloatBuffer> _matrixStore = Maps.newEnumMap(RenderMatrixType.class);
 
     /** List of default rendering states for this specific renderer type */
     protected final EnumMap<RenderState.StateType, RenderState> defaultStateList = new EnumMap<RenderState.StateType, RenderState>(
             RenderState.StateType.class);
 
     public AbstractRenderer() {
+        for (final RenderMatrixType type : RenderMatrixType.values()) {
+            _matrixStore.put(type, BufferUtils.createFloatBuffer(16));
+        }
+
         for (final RenderState.StateType type : RenderState.StateType.values()) {
             final RenderState state = RenderState.createState(type);
             state.setEnabled(false);
             defaultStateList.put(type, state);
         }
-
-        try {
-            final ShaderState shader = (ShaderState) defaultStateList.get(RenderState.StateType.Shader);
-            shader.setShader(ShaderType.Vertex, "default_vert", //
-                    ResourceLocatorTool.getClassPathResourceAsString(AbstractRenderer.class,
-                            "com/ardor3d/renderer/default.vert"));
-            shader.setShader(ShaderType.Fragment, "default_frag", //
-                    ResourceLocatorTool.getClassPathResourceAsString(AbstractRenderer.class,
-                            "com/ardor3d/renderer/default.frag"));
-            shader.setEnabled(true);
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public boolean isInOrthoMode() {
-        return _inOrthoMode;
     }
 
     public ReadOnlyColorRGBA getBackgroundColor() {
@@ -177,12 +163,6 @@ public abstract class AbstractRenderer implements Renderer {
         _stencilClearValue = stencilClearValue;
     }
 
-    public boolean isClipTestEnabled() {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord record = context.getRendererRecord();
-        return record.isClippingTestEnabled();
-    }
-
     public RenderState getProperRenderState(final StateType type, final RenderState current) {
         final RenderContext context = ContextManager.getCurrentContext();
 
@@ -201,10 +181,6 @@ public abstract class AbstractRenderer implements Renderer {
         }
     }
 
-    public void setRenderLogic(final RenderLogic renderLogic) {
-        this.renderLogic = renderLogic;
-    }
-
     @Override
     public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final int x, final int y,
             final int w, final int h) {
@@ -214,7 +190,32 @@ public abstract class AbstractRenderer implements Renderer {
     @Override
     public int getExpectedBufferSizeToGrabScreenContents(final ImageDataFormat format, final PixelDataType type,
             final int w, final int h) {
-        final int size = w * h * ImageUtils.getPixelByteSize(format, type);
-        return size;
+        return w * h * ImageUtils.getPixelByteSize(format, type);
+    }
+
+    @Override
+    public FloatBuffer getMatrix(final RenderMatrixType type) {
+        return _matrixStore.get(type);
+    }
+
+    @Override
+    public void setMatrix(final RenderMatrixType type, final FloatBuffer matrix) {
+        final FloatBuffer dst = _matrixStore.get(type);
+        dst.clear();
+        dst.put(matrix);
+    }
+
+    @Override
+    public void setMatrix(final RenderMatrixType type, final ReadOnlyMatrix4 matrix, final boolean rowMajor) {
+        final FloatBuffer dst = _matrixStore.get(type);
+        dst.clear();
+        matrix.toFloatBuffer(dst, rowMajor);
+    }
+
+    @Override
+    public void setMatrix(final RenderMatrixType type, final ReadOnlyTransform transform) {
+        final FloatBuffer dst = _matrixStore.get(type);
+        dst.clear();
+        transform.getGLApplyMatrix(dst);
     }
 }

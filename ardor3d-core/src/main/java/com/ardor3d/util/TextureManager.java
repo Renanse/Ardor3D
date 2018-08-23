@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -28,9 +28,10 @@ import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.texture.ITextureUtils;
+import com.ardor3d.util.gc.ContextValueReference;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.ArrayListMultimap;
@@ -60,7 +61,7 @@ final public class TextureManager {
 
     /**
      * Loads a texture by attempting to locate the given name using ResourceLocatorTool.
-     * 
+     *
      * @param name
      *            the name of the texture image.
      * @param minFilter
@@ -77,7 +78,7 @@ final public class TextureManager {
 
     /**
      * Loads a texture by attempting to locate the given name using ResourceLocatorTool.
-     * 
+     *
      * @param name
      *            the name of the texture image.
      * @param minFilter
@@ -96,7 +97,7 @@ final public class TextureManager {
 
     /**
      * Loads a texture from the given source.
-     * 
+     *
      * @param source
      *            the source of the texture image.
      * @param minFilter
@@ -112,7 +113,7 @@ final public class TextureManager {
 
     /**
      * Loads a texture from the given source.
-     * 
+     *
      * @param source
      *            the source of the texture image.
      * @param minFilter
@@ -138,7 +139,7 @@ final public class TextureManager {
 
     /**
      * Creates a texture from a given Ardor3D Image object.
-     * 
+     *
      * @param image
      *            the Ardor3D image.
      * @param minFilter
@@ -151,7 +152,7 @@ final public class TextureManager {
 
     /**
      * Creates a texture from a given Ardor3D Image object.
-     * 
+     *
      * @param image
      *            the Ardor3D image.
      * @param minFilter
@@ -169,7 +170,7 @@ final public class TextureManager {
     /**
      * Load a texture from the given TextureKey. If imageData is given, use that, otherwise load it using the key's
      * source information. If store is given, populate and return that Texture object.
-     * 
+     *
      * @param tkey
      *            our texture key. Must not be null.
      * @param imageData
@@ -235,21 +236,20 @@ final public class TextureManager {
 
     /**
      * Add a given texture to the cache
-     * 
+     *
      * @param texture
      *            our texture
      */
     public static void addToCache(final Texture texture) {
-        if (TextureState.getDefaultTexture() == null
-                || (texture != TextureState.getDefaultTexture() && texture.getImage() != TextureState
-                        .getDefaultTextureImage())) {
+        if (TextureState.getDefaultTexture() == null || (texture != TextureState.getDefaultTexture()
+                && texture.getImage() != TextureState.getDefaultTextureImage())) {
             _tCache.put(texture.getTextureKey(), texture);
         }
     }
 
     /**
      * Locate a texture in the cache by key
-     * 
+     *
      * @param textureKey
      *            our key
      * @return the texture, or null if not found.
@@ -268,13 +268,13 @@ final public class TextureManager {
      * be deleted immediately. If a deleter is not passed in, we do not have an active context, or we encounter textures
      * that are not part of the current context, then we will queue those textures to be deleted later using the
      * GameTaskQueueManager.
-     * 
-     * @param deleter
-     *            if not null, this renderer will be used to immediately delete any textures in the currently active
-     *            context. All other textures will be queued to delete in their own contexts.
+     *
+     * @param utils
+     *            if not null, this will be used to immediately delete any textures in the currently active context. All
+     *            other textures will be queued to delete in their own contexts.
      */
-    public static void cleanAllTextures(final Renderer deleter) {
-        cleanAllTextures(deleter, null);
+    public static void cleanAllTextures(final ITextureUtils utils) {
+        cleanAllTextures(utils, null);
     }
 
     /**
@@ -283,17 +283,17 @@ final public class TextureManager {
      * be deleted immediately. If a deleter is not passed in, we do not have an active context, or we encounter textures
      * that are not part of the current context, then we will queue those textures to be deleted later using the
      * GameTaskQueueManager.
-     * 
+     *
      * If a non null map is passed into futureStore, it will be populated with Future objects for each queued context.
      * These objects may be used to discover when the deletion tasks have all completed.
-     * 
-     * @param deleter
-     *            if not null, this renderer will be used to immediately delete any textures in the currently active
-     *            context. All other textures will be queued to delete in their own contexts.
+     *
+     * @param utils
+     *            if not null, this will be used to immediately delete any textures in the currently active context. All
+     *            other textures will be queued to delete in their own contexts.
      * @param futureStore
      *            if not null, this map will be populated with any Future task handles created during cleanup.
      */
-    public static void cleanAllTextures(final Renderer deleter, final Map<Object, Future<Void>> futureStore) {
+    public static void cleanAllTextures(final ITextureUtils utils, final Map<Object, Future<Void>> futureStore) {
         // gather up expired textures... these don't exist in our cache
         Multimap<Object, Integer> idMap = gatherGCdIds();
 
@@ -318,7 +318,7 @@ final public class TextureManager {
 
         // delete the ids
         if (idMap != null && !idMap.isEmpty()) {
-            handleTextureDelete(deleter, idMap, futureStore);
+            handleTextureDelete(utils, idMap, futureStore);
         }
     }
 
@@ -328,19 +328,19 @@ final public class TextureManager {
      * currently active context (if one is active) will be deleted immediately. If a deleter is not passed in, we do not
      * have an active context, or we encounter textures that are not part of the current context, then we will queue
      * those textures to be deleted later using the GameTaskQueueManager.
-     * 
+     *
      * If a non null map is passed into futureStore, it will be populated with Future objects for each queued context.
      * These objects may be used to discover when the deletion tasks have all completed.
-     * 
-     * @param deleter
-     *            if not null, this renderer will be used to immediately delete any textures in the currently active
-     *            context. All other textures will be queued to delete in their own contexts.
+     *
+     * @param utils
+     *            if not null, this will be used to immediately delete any textures in the currently active context. All
+     *            other textures will be queued to delete in their own contexts.
      * @param context
      *            the context to delete for.
      * @param futureStore
      *            if not null, this map will be populated with any Future task handles created during cleanup.
      */
-    public static void cleanAllTextures(final Renderer deleter, final RenderContext context,
+    public static void cleanAllTextures(final ITextureUtils utils, final RenderContext context,
             final Map<Object, Future<Void>> futureStore) {
         // gather up expired textures... these don't exist in our cache
         Multimap<Object, Integer> idMap = gatherGCdIds();
@@ -362,7 +362,7 @@ final public class TextureManager {
 
         // delete the ids
         if (!idMap.isEmpty()) {
-            handleTextureDelete(deleter, idMap, futureStore);
+            handleTextureDelete(utils, idMap, futureStore);
         }
     }
 
@@ -371,13 +371,13 @@ final public class TextureManager {
      * gc'd textures that are part of the currently active context (if one is active) will be deleted immediately. If a
      * deleter is not passed in, we do not have an active context, or we encounter gc'd textures that are not part of
      * the current context, then we will queue those textures to be deleted later using the GameTaskQueueManager.
-     * 
-     * @param deleter
-     *            if not null, this renderer will be used to immediately delete any gc'd textures in the currently
-     *            active context. All other gc'd textures will be queued to delete in their own contexts.
+     *
+     * @param utils
+     *            if not null, this will be used to immediately delete any gc'd textures in the currently active
+     *            context. All other gc'd textures will be queued to delete in their own contexts.
      */
-    public static void cleanExpiredTextures(final Renderer deleter) {
-        cleanExpiredTextures(deleter, null);
+    public static void cleanExpiredTextures(final ITextureUtils utils) {
+        cleanExpiredTextures(utils, null);
     }
 
     /**
@@ -385,23 +385,23 @@ final public class TextureManager {
      * gc'd textures that are part of the currently active context (if one is active) will be deleted immediately. If a
      * deleter is not passed in, we do not have an active context, or we encounter gc'd textures that are not part of
      * the current context, then we will queue those textures to be deleted later using the GameTaskQueueManager.
-     * 
+     *
      * If a non null map is passed into futureStore, it will be populated with Future objects for each queued context.
      * These objects may be used to discover when the deletion tasks have all completed.
-     * 
-     * @param deleter
-     *            if not null, this renderer will be used to immediately delete any gc'd textures in the currently
-     *            active context. All other gc'd textures will be queued to delete in their own contexts.
+     *
+     * @param utils
+     *            if not null, this will be used to immediately delete any gc'd textures in the currently active
+     *            context. All other gc'd textures will be queued to delete in their own contexts.
      * @param futureStore
      *            if not null, this map will be populated with any Future task handles created during cleanup.
      */
-    public static void cleanExpiredTextures(final Renderer deleter, final Map<Object, Future<Void>> futureStore) {
+    public static void cleanExpiredTextures(final ITextureUtils utils, final Map<Object, Future<Void>> futureStore) {
         // gather up expired textures...
         final Multimap<Object, Integer> idMap = gatherGCdIds();
 
         // send to be deleted on next render.
         if (idMap != null) {
-            handleTextureDelete(deleter, idMap, futureStore);
+            handleTextureDelete(utils, idMap, futureStore);
         }
     }
 
@@ -409,9 +409,9 @@ final public class TextureManager {
     private static Multimap<Object, Integer> gatherGCdIds() {
         Multimap<Object, Integer> idMap = null;
         // Pull all expired textures from ref queue and add to an id multimap.
-        ContextIdReference<TextureKey> ref;
+        ContextValueReference<TextureKey, Integer> ref;
         Integer id;
-        while ((ref = (ContextIdReference<TextureKey>) _textureRefQueue.poll()) != null) {
+        while ((ref = (ContextValueReference<TextureKey, Integer>) _textureRefQueue.poll()) != null) {
             // lazy init
             if (idMap == null) {
                 idMap = ArrayListMultimap.create();
@@ -436,25 +436,25 @@ final public class TextureManager {
         return idMap;
     }
 
-    private static void handleTextureDelete(final Renderer deleter, final Multimap<Object, Integer> idMap,
+    private static void handleTextureDelete(final ITextureUtils utils, final Multimap<Object, Integer> idMap,
             final Map<Object, Future<Void>> futureStore) {
         Object currentGLRef = null;
         // Grab the current context, if any.
-        if (deleter != null && ContextManager.getCurrentContext() != null) {
+        if (utils != null && ContextManager.getCurrentContext() != null) {
             currentGLRef = ContextManager.getCurrentContext().getGlContextRep();
         }
         // For each affected context...
         for (final Object glref : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
             if (currentGLRef != null && (!Constants.useMultipleContexts || glref.equals(currentGLRef))) {
-                deleter.deleteTextureIds(idMap.get(glref));
+                utils.deleteTextureIds(idMap.get(glref));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
                 final Future<Void> future = GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref))
                         .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().deleteTextureIds(idMap.get(glref));
+                                getRenderer().getTextureUtils().deleteTextureIds(idMap.get(glref));
                                 return null;
                             }
                         });
@@ -466,13 +466,13 @@ final public class TextureManager {
     }
 
     @MainThread
-    public static void preloadCache(final Renderer r) {
+    public static void preloadCache(final ITextureUtils util) {
         for (final Texture t : _tCache.values()) {
             if (t == null) {
                 continue;
             }
             if (t.getTextureKey().getSource() != null) {
-                r.loadTexture(t, 0);
+                util.loadTexture(t, 0);
             }
         }
     }

@@ -30,14 +30,14 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -284,7 +284,7 @@ public abstract class UIContainer extends UIComponent {
             if (_doClip && getWorldRotation().isIdentity()) {
                 _clipRectangleStore.set(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
                         getContentHeight());
-                renderer.pushClip(_clipRectangleStore);
+                renderer.getScissorUtils().pushClip(_clipRectangleStore);
                 needsPop = true;
             }
             Spatial child;
@@ -295,7 +295,7 @@ public abstract class UIContainer extends UIComponent {
                 }
             }
             if (needsPop) {
-                renderer.popClip();
+                renderer.getScissorUtils().popClip();
             }
         }
     }
@@ -316,7 +316,7 @@ public abstract class UIContainer extends UIComponent {
 
         // If we are currently in the process of rendering this container to a texture...
         if (UIContainer._drawingStandin) {
-            renderer.setOrtho();
+            getHud().getHudCamera().apply(renderer);
 
             // hold onto our old translation
             final ReadOnlyVector3 wTrans = getWorldTranslation();
@@ -343,8 +343,6 @@ public abstract class UIContainer extends UIComponent {
             setWorldRotation(rot);
             updateWorldTransform(true);
 
-            renderer.unsetOrtho();
-
             // exit
             return;
         }
@@ -366,7 +364,8 @@ public abstract class UIContainer extends UIComponent {
         // Otherwise we are not rendering to texture and we are using standins...
         // So check if we are dirty.
         if (isDirty() || _standin == null) {
-            renderer.unsetOrtho();
+            getHud().getCanvas().getCanvasRenderer().getCamera().apply(renderer);
+
             // Check if we have a standin yet
             if (_standin == null) {
                 try {
@@ -410,7 +409,7 @@ public abstract class UIContainer extends UIComponent {
 
                 _dirty = false;
             }
-            renderer.setOrtho();
+            getHud().getHudCamera().apply(renderer);
         }
 
         // Now, render the standin quad.
@@ -431,11 +430,11 @@ public abstract class UIContainer extends UIComponent {
             _standin.setWorldTranslation(x, y, getWorldTranslation().getZ());
             _standin.setWorldRotation(getWorldRotation());
 
-            final boolean clipTest = renderer.isClipTestEnabled();
-            renderer.setClipTestEnabled(false);
+            final boolean clipTest = renderer.getScissorUtils().isClipTestEnabled();
+            renderer.getScissorUtils().setClipTestEnabled(false);
             // draw our standin quad with cached container texture.
             _standin.draw(renderer);
-            renderer.setClipTestEnabled(clipTest);
+            renderer.getScissorUtils().setClipTestEnabled(clipTest);
         }
     }
 

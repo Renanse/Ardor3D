@@ -44,7 +44,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.state.record.TextureUnitRecord;
-import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
+import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
@@ -153,20 +153,20 @@ public abstract class Lwjgl3TextureStateUtil {
                         image.getData(0).rewind();
                         // send top level to card
                         GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0,
-                                Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                 image.getWidth(), image.getHeight(), hasBorder ? 1 : 0,
-                                Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), image.getData(0));
+                                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
                         break;
                     case OneDimensional:
                         // ensure the buffer is ready for reading
                         image.getData(0).rewind();
                         // send top level to card
                         GL11C.glTexImage1D(GL11C.GL_TEXTURE_1D, 0,
-                                Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                 image.getWidth(), hasBorder ? 1 : 0,
-                                Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), image.getData(0));
+                                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
                         break;
                     case ThreeDimensional:
                         // concat data into single buffer:
@@ -193,10 +193,10 @@ public abstract class Lwjgl3TextureStateUtil {
                         }
                         // send top level to card
                         GL12C.glTexImage3D(GL12C.GL_TEXTURE_3D, 0,
-                                Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                 image.getWidth(), image.getHeight(), image.getDepth(), hasBorder ? 1 : 0,
-                                Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), data);
+                                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                         break;
                     case CubeMap:
                         // NOTE: Cubemaps MUST be square, so height is ignored on purpose.
@@ -205,10 +205,10 @@ public abstract class Lwjgl3TextureStateUtil {
                             image.getData(face.ordinal()).rewind();
                             // send top level to card
                             GL11C.glTexImage2D(getGLCubeMapFace(face), 0,
-                                    Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                    Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                     image.getWidth(), image.getWidth(), hasBorder ? 1 : 0,
-                                    Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                    Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()),
+                                    Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                    Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()),
                                     image.getData(face.ordinal()));
                         }
                         break;
@@ -227,20 +227,20 @@ public abstract class Lwjgl3TextureStateUtil {
                         image.getData(0).rewind();
                         // send top level to card
                         GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0,
-                                Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                 image.getWidth(), image.getHeight(), hasBorder ? 1 : 0,
-                                Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), image.getData(0));
+                                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
                         break;
                     case OneDimensional:
                         // ensure the buffer is ready for reading
                         image.getData(0).rewind();
                         // send top level to card
                         GL11C.glTexImage1D(GL11C.GL_TEXTURE_1D, 0,
-                                Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                 image.getWidth(), hasBorder ? 1 : 0,
-                                Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), image.getData(0));
+                                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
                         break;
                     case ThreeDimensional:
                         // concat data into single buffer:
@@ -267,10 +267,10 @@ public abstract class Lwjgl3TextureStateUtil {
                         }
                         // send top level to card
                         GL12C.glTexImage3D(GL12C.GL_TEXTURE_3D, 0,
-                                Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                 image.getWidth(), image.getHeight(), image.getDepth(), hasBorder ? 1 : 0,
-                                Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), data);
+                                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                         break;
                     case CubeMap:
                         // NOTE: Cubemaps MUST be square, so height is ignored on purpose.
@@ -279,10 +279,10 @@ public abstract class Lwjgl3TextureStateUtil {
                             image.getData(face.ordinal()).rewind();
                             // send top level to card
                             GL11C.glTexImage2D(getGLCubeMapFace(face), 0,
-                                    Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                    Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                     image.getWidth(), image.getWidth(), hasBorder ? 1 : 0,
-                                    Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                    Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()),
+                                    Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                    Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()),
                                     image.getData(face.ordinal()));
                         }
                         break;
@@ -325,14 +325,14 @@ public abstract class Lwjgl3TextureStateUtil {
 
                             if (texture.getTextureStoreFormat().isCompressed()) {
                                 ARBTextureCompression.glCompressedTexImage2DARB(getGLCubeMapFace(face), m,
-                                        Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()), width,
+                                        Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width,
                                         height, data);
                             } else {
                                 GL11C.glTexImage2D(getGLCubeMapFace(face), m,
-                                        Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()), width,
+                                        Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width,
                                         height, hasBorder ? 1 : 0,
-                                        Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                        Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), data);
+                                        Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                        Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                             }
                             pos += mipSizes[m];
                         }
@@ -399,27 +399,27 @@ public abstract class Lwjgl3TextureStateUtil {
                             case TwoDimensional:
                                 if (texture.getTextureStoreFormat().isCompressed()) {
                                     ARBTextureCompression.glCompressedTexImage2DARB(GL11C.GL_TEXTURE_2D, m,
-                                            Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                            Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, data);
                                 } else {
                                     GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, m,
-                                            Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                            Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, hasBorder ? 1 : 0,
-                                            Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                            Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), data);
+                                            Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                            Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                                 }
                                 break;
                             case OneDimensional:
                                 if (texture.getTextureStoreFormat().isCompressed()) {
                                     ARBTextureCompression.glCompressedTexImage1DARB(GL11C.GL_TEXTURE_1D, m,
-                                            Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                            Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, data);
                                 } else {
                                     GL11C.glTexImage1D(GL11C.GL_TEXTURE_1D, m,
-                                            Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                            Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, hasBorder ? 1 : 0,
-                                            Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                            Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), data);
+                                            Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                            Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                                 }
                                 break;
                             case ThreeDimensional:
@@ -427,14 +427,14 @@ public abstract class Lwjgl3TextureStateUtil {
                                 // already checked for support above...
                                 if (texture.getTextureStoreFormat().isCompressed()) {
                                     ARBTextureCompression.glCompressedTexImage3DARB(GL12C.GL_TEXTURE_3D, m,
-                                            Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                            Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, depth, data);
                                 } else {
                                     GL12C.glTexImage3D(GL12C.GL_TEXTURE_3D, m,
-                                            Lwjgl3TextureUtil.getGLInternalFormat(texture.getTextureStoreFormat()),
+                                            Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()),
                                             width, height, depth, hasBorder ? 1 : 0,
-                                            Lwjgl3TextureUtil.getGLPixelFormat(image.getDataFormat()),
-                                            Lwjgl3TextureUtil.getGLPixelDataType(image.getDataType()), data);
+                                            Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
+                                            Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                                 }
                                 break;
                         }
@@ -611,7 +611,7 @@ public abstract class Lwjgl3TextureStateUtil {
             final TextureStateRecord record, final ContextCapabilities caps) {
         final Type type = texture.getType();
 
-        final int depthCompareMode = Lwjgl3TextureUtil.getGLDepthTextureCompareMode(texture.getDepthCompareMode());
+        final int depthCompareMode = Lwjgl3TextureUtils.getGLDepthTextureCompareMode(texture.getDepthCompareMode());
         // set up magnification filter
         if (!texRecord.isValid() || texRecord.depthTextureCompareMode != depthCompareMode) {
             checkAndSetUnit(unit, record, caps);
@@ -619,7 +619,7 @@ public abstract class Lwjgl3TextureStateUtil {
             texRecord.depthTextureCompareMode = depthCompareMode;
         }
 
-        final int depthCompareFunc = Lwjgl3TextureUtil.getGLDepthTextureCompareFunc(texture.getDepthCompareFunc());
+        final int depthCompareFunc = Lwjgl3TextureUtils.getGLDepthTextureCompareFunc(texture.getDepthCompareFunc());
         // set up magnification filter
         if (!texRecord.isValid() || texRecord.depthTextureCompareFunc != depthCompareFunc) {
             checkAndSetUnit(unit, record, caps);
@@ -641,7 +641,7 @@ public abstract class Lwjgl3TextureStateUtil {
             final TextureStateRecord record, final ContextCapabilities caps) {
         final Type type = texture.getType();
 
-        final int magFilter = Lwjgl3TextureUtil.getGLMagFilter(texture.getMagnificationFilter());
+        final int magFilter = Lwjgl3TextureUtils.getGLMagFilter(texture.getMagnificationFilter());
         // set up magnification filter
         if (!texRecord.isValid() || texRecord.magFilter != magFilter) {
             checkAndSetUnit(unit, record, caps);
@@ -649,7 +649,7 @@ public abstract class Lwjgl3TextureStateUtil {
             texRecord.magFilter = magFilter;
         }
 
-        final int minFilter = Lwjgl3TextureUtil.getGLMinFilter(texture.getMinificationFilter());
+        final int minFilter = Lwjgl3TextureUtils.getGLMinFilter(texture.getMinificationFilter());
         // set up mipmap filter
         if (!texRecord.isValid() || texRecord.minFilter != minFilter) {
             checkAndSetUnit(unit, record, caps);

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -25,6 +25,7 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.gc.ContextValueReference;
 import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.Lists;
 
@@ -66,8 +67,8 @@ final public class TextureKey implements Savable {
     private boolean _dirty;
 
     /** cache of OpenGL context specific texture ids for the associated texture. */
-    protected final transient ContextIdReference<TextureKey> _idCache = new ContextIdReference<TextureKey>(this,
-            TextureManager.getRefQueue());
+    protected final transient ContextValueReference<TextureKey, Integer> _idCache = ContextValueReference
+            .newReference(this, TextureManager.getRefQueue());
 
     /** cached hashcode value. */
     protected transient int _code = Integer.MAX_VALUE;
@@ -165,7 +166,7 @@ final public class TextureKey implements Savable {
     /**
      * Get a new unique TextureKey. This is meant for use by RTT and other situations where we know we are making a
      * unique texture.
-     * 
+     *
      * @param minFilter
      *            our minification filter value.
      * @return the new TextureKey
@@ -263,7 +264,7 @@ final public class TextureKey implements Savable {
      * Note: This does not remove the texture from the card and is provided for use by code that does remove textures
      * from the card.
      * </p>
-     * 
+     *
      * @param glContext
      *            the object representing the OpenGL context this texture belongs to. See
      *            {@link RenderContext#getGlContextRep()}
@@ -287,7 +288,7 @@ final public class TextureKey implements Savable {
 
     /**
      * Sets the id for a texture in regards to the given OpenGL context.
-     * 
+     *
      * @param glContext
      *            the object representing the OpenGL context a texture belongs to. See
      *            {@link RenderContext#getGlContextRep()}

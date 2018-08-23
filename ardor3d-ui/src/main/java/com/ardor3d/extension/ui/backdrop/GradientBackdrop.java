@@ -21,7 +21,9 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -139,20 +141,27 @@ public class GradientBackdrop extends UIBackdrop {
         GradientBackdrop._cVals[14] = _topLeft.getBlue();
         GradientBackdrop._cVals[15] = _topLeft.getAlpha() * pAlpha;
 
-        GradientBackdrop._mesh.getMeshData().getVertexBuffer().rewind();
-        GradientBackdrop._mesh.getMeshData().getVertexBuffer().put(GradientBackdrop._vals);
+        final MeshData meshData = GradientBackdrop._mesh.getMeshData();
+        meshData.getVertexBuffer().rewind();
+        meshData.getVertexBuffer().put(GradientBackdrop._vals);
+        meshData.getVertexCoords().markDirty();
 
-        GradientBackdrop._mesh.getMeshData().getColorBuffer().rewind();
-        GradientBackdrop._mesh.getMeshData().getColorBuffer().put(GradientBackdrop._cVals);
+        meshData.getColorBuffer().rewind();
+        meshData.getColorBuffer().put(GradientBackdrop._cVals);
+        meshData.getColorCoords().markDirty();
 
+        meshData.markBuffersDirty();
         GradientBackdrop._mesh.render(renderer);
     }
 
     private static Mesh createMesh() {
         final Mesh mesh = new Mesh();
-        mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-        mesh.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(4));
-        mesh.getMeshData().setIndexMode(IndexMode.TriangleFan);
+        final MeshData meshData = mesh.getMeshData();
+        meshData.setVertexBuffer(BufferUtils.createVector3Buffer(4));
+        meshData.getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
+        meshData.setColorBuffer(BufferUtils.createColorBuffer(4));
+        meshData.getColorCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
+        meshData.setIndexMode(IndexMode.TriangleFan);
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);

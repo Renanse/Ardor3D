@@ -10,34 +10,19 @@
 
 package com.ardor3d.renderer.lwjgl3;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Collection;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL15C;
-import org.lwjgl.opengl.GL20C;
-import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL31C;
 import org.lwjgl.opengl.GLUtil;
-import org.lwjgl.system.MemoryStack;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture1D;
-import com.ardor3d.image.Texture2D;
-import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.TextureCubeMap;
-import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyRectangle2;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.AbstractRenderer;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
@@ -51,7 +36,6 @@ import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
@@ -62,17 +46,14 @@ import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ColorMaskStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3CullStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3OffsetStateUtil;
-import com.ardor3d.scene.state.lwjgl3.Lwjgl3ShaderStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3StencilStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3WireframeStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ZBufferStateUtil;
-import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3RendererUtil;
-import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtil;
-import com.ardor3d.scenegraph.AbstractBufferData;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3ScissorUtils;
+import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3ShaderUtils;
+import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
 import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
@@ -88,11 +69,18 @@ import com.ardor3d.util.stat.StatType;
 public class Lwjgl3Renderer extends AbstractRenderer {
     private static final Logger logger = Logger.getLogger(Lwjgl3Renderer.class.getName());
 
+    protected Lwjgl3ShaderUtils _shaderUtils;
+    protected Lwjgl3TextureUtils _textureUtils;
+    protected Lwjgl3ScissorUtils _scissorUtils;
+
     /**
      * Constructor instantiates a new <code>Lwjgl3Renderer</code> object.
      */
     public Lwjgl3Renderer() {
         logger.fine("Lwjgl3Renderer created.");
+        _shaderUtils = new Lwjgl3ShaderUtils(this);
+        _textureUtils = new Lwjgl3TextureUtils();
+        _scissorUtils = new Lwjgl3ScissorUtils();
         GLUtil.setupDebugMessageCallback();
     }
 
@@ -179,7 +167,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
         if (strict) {
             // put us back.
-            Lwjgl3RendererUtil.applyScissors(record);
+            Lwjgl3ScissorUtils.applyScissors(record);
         }
     }
 
@@ -198,22 +186,10 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void setOrtho() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void unsetOrtho() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type,
             final int x, final int y, final int w, final int h) {
-        final int pixFormat = Lwjgl3TextureUtil.getGLPixelFormat(format);
-        final int pixDataType = Lwjgl3TextureUtil.getGLPixelDataType(type);
+        final int pixFormat = Lwjgl3TextureUtils.getGLPixelFormat(format);
+        final int pixDataType = Lwjgl3TextureUtils.getGLPixelDataType(type);
         GL11C.glReadPixels(x, y, w, h, pixFormat, pixDataType, store);
     }
 
@@ -243,111 +219,13 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void deleteVAOs(final Collection<Integer> ids) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteVAOs(final MeshData data) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteVBOs(final Collection<Integer> ids) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteVBOs(final AbstractBufferData<?> buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateTexture1DSubImage(final Texture1D destination, final int dstOffsetX, final int dstWidth,
-            final ByteBuffer source, final int srcOffsetX) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateTexture2DSubImage(final Texture2D destination, final int dstOffsetX, final int dstOffsetY,
-            final int dstWidth, final int dstHeight, final ByteBuffer source, final int srcOffsetX,
-            final int srcOffsetY, final int srcTotalWidth) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateTexture3DSubImage(final Texture3D destination, final int dstOffsetX, final int dstOffsetY,
-            final int dstOffsetZ, final int dstWidth, final int dstHeight, final int dstDepth, final ByteBuffer source,
-            final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
-            final int srcTotalHeight) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateTextureCubeMapSubImage(final TextureCubeMap destination, final Face dstFace, final int dstOffsetX,
-            final int dstOffsetY, final int dstWidth, final int dstHeight, final ByteBuffer source,
-            final int srcOffsetX, final int srcOffsetY, final int srcTotalWidth) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void checkCardError() throws Ardor3dException {
         ; // We're using GLUtil with its callback for this
     }
 
     @Override
     public void draw(final Renderable renderable) {
-        if (renderLogic != null) {
-            renderLogic.apply(renderable);
-        }
         renderable.render(this);
-        if (renderLogic != null) {
-            renderLogic.restore(renderable);
-        }
-    }
-
-    @Override
-    public boolean doTransforms(final ReadOnlyTransform transform) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void undoTransforms(final ReadOnlyTransform transform) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setProjectionMatrix(final FloatBuffer matrix) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public FloatBuffer getProjectionMatrix(final FloatBuffer store) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setModelViewMatrix(final FloatBuffer matrix) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public FloatBuffer getModelViewMatrix(final FloatBuffer store) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -458,67 +336,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void loadTexture(final Texture texture, final int unit) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteTexture(final Texture texture) {
-        Lwjgl3TextureStateUtil.deleteTexture(texture);
-    }
-
-    @Override
-    public void deleteTextureIds(final Collection<Integer> ids) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void pushClip(final ReadOnlyRectangle2 rectangle) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord record = context.getRendererRecord();
-        record.getScissorClips().push(rectangle);
-
-        Lwjgl3RendererUtil.applyScissors(record);
-    }
-
-    @Override
-    public void pushEmptyClip() {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord record = context.getRendererRecord();
-        record.getScissorClips().push(null);
-
-        Lwjgl3RendererUtil.applyScissors(record);
-    }
-
-    @Override
-    public void popClip() {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord record = context.getRendererRecord();
-        record.getScissorClips().pop();
-
-        Lwjgl3RendererUtil.applyScissors(record);
-    }
-
-    @Override
-    public void clearClips() {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord record = context.getRendererRecord();
-        record.getScissorClips().clear();
-
-        Lwjgl3RendererUtil.applyScissors(record);
-    }
-
-    @Override
-    public void setClipTestEnabled(final boolean enabled) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord record = context.getRendererRecord();
-
-        Lwjgl3RendererUtil.setClippingEnabled(record, enabled);
-    }
-
-    @Override
     protected void doApplyState(final RenderState state) {
         if (state == null) {
             logger.warning("tried to apply a null state.");
@@ -536,9 +353,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 return;
             case Cull:
                 Lwjgl3CullStateUtil.apply((CullState) state);
-                return;
-            case Shader:
-                Lwjgl3ShaderStateUtil.apply(this, (ShaderState) state);
                 return;
             case Offset:
                 Lwjgl3OffsetStateUtil.apply(this, (OffsetState) state);
@@ -573,74 +387,30 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         throw new IllegalArgumentException("Unknown state: " + state);
     }
 
-    @Override
-    public boolean prepareForDraw(final MeshData data, final ShaderState currentShader) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-
-        // Make sure our meshdata has a VAO bound
-        int vaoID = data.getVAOID(context.getGlContextRep());
-        if (vaoID <= 0) {
-            vaoID = GL30C.glGenVertexArrays();
-            data.setVAOID(context.getGlContextRep(), vaoID);
-
-            rendRecord.invalidateVAO();
-            Lwjgl3RendererUtil.setBoundVAO(rendRecord, vaoID);
-        } else {
-            Lwjgl3RendererUtil.setBoundVAO(rendRecord, vaoID);
-            return true;
-        }
-
-        // send our mesh data to the card, binding them to the VAO
-        final int programId = currentShader.getProgramId(context);
-        for (final Entry<String, AbstractBufferData<? extends Buffer>> e : data.listDataItems()) {
-            final AbstractBufferData<? extends Buffer> buffer = e.getValue();
-            final int index = GL20C.glGetAttribLocation(programId, e.getKey());
-            if (index < 0) {
-                // logger.warning("attribute not found: " + key);
-                continue;
-            }
-
-            // make sure our vbo has an id and the data is bound.
-            setupBufferObject(buffer, false, context);
-
-            // now set up our attribute pointer to it
-            GL20C.glVertexAttribPointer(index, buffer.getValuesPerTuple(), GL11C.GL_FLOAT, false, 0, 0);
-            GL20C.glEnableVertexAttribArray(index);
-        }
-
-        // send our indices to the card, if any
-        if (data.getIndexBuffer() != null) {
-            setupBufferObject(data.getIndices(), true, context);
-        }
-
-        return true;
-    }
-
-    @Override
-    public void applyMatrices(final ReadOnlyTransform worldTransform, final ShaderState currentShader) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final int programId = currentShader.getProgramId(context.getGlContextRep());
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            final FloatBuffer buff = stack.callocFloat(16);
-            final int modelLoc = GL20C.glGetUniformLocation(programId, "model");
-            worldTransform.getHomogeneousMatrix(null).toFloatBuffer(buff, true);
-            buff.rewind();
-            GL20C.glUniformMatrix4fv(modelLoc, true, buff);
-
-            final Camera cam = Camera.getCurrentCamera();
-            final int viewLoc = GL20C.glGetUniformLocation(programId, "view");
-            cam.getModelViewMatrix().toFloatBuffer(buff, false);
-            buff.rewind();
-            GL20C.glUniformMatrix4fv(viewLoc, true, buff);
-
-            final int projLoc = GL20C.glGetUniformLocation(programId, "projection");
-            cam.getProjectionMatrix().toFloatBuffer(buff, false);
-            buff.rewind();
-            GL20C.glUniformMatrix4fv(projLoc, true, buff);
-        }
-    }
+//    @Override
+//    public void applyMatrices(final ReadOnlyTransform worldTransform, final ShaderState currentShader) {
+//        final RenderContext context = ContextManager.getCurrentContext();
+//        final int programId = currentShader.getProgramId(context.getGlContextRep());
+//
+//        try (MemoryStack stack = MemoryStack.stackPush()) {
+//            final FloatBuffer buff = stack.callocFloat(16);
+//            final int modelLoc = GL20C.glGetUniformLocation(programId, "model");
+//            worldTransform.getHomogeneousMatrix(null).toFloatBuffer(buff, true);
+//            buff.rewind();
+//            GL20C.glUniformMatrix4fv(modelLoc, true, buff);
+//
+//            final Camera cam = Camera.getCurrentCamera();
+//            final int viewLoc = GL20C.glGetUniformLocation(programId, "view");
+//            cam.getModelViewMatrix().toFloatBuffer(buff, false);
+//            buff.rewind();
+//            GL20C.glUniformMatrix4fv(viewLoc, true, buff);
+//
+//            final int projLoc = GL20C.glGetUniformLocation(programId, "projection");
+//            cam.getProjectionMatrix().toFloatBuffer(buff, false);
+//            buff.rewind();
+//            GL20C.glUniformMatrix4fv(projLoc, true, buff);
+//        }
+//    }
 
     @Override
     public void drawArrays(final int start, final int count, final IndexMode mode) {
@@ -691,71 +461,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         }
     }
 
-    protected static int setupBufferObject(final AbstractBufferData<? extends Buffer> data, final boolean isEBO,
-            final RenderContext context) {
-
-        int id = data.getBufferId(context.getGlContextRep());
-        if (id != 0) {
-            return id;
-        }
-
-        final Buffer dataBuffer = data.getBuffer();
-        if (dataBuffer != null) {
-            dataBuffer.rewind();
-            id = GL15C.glGenBuffers();
-            data.setBufferId(context.getGlContextRep(), id);
-
-            final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
-            GL15C.glBindBuffer(target, id);
-            if (dataBuffer instanceof FloatBuffer) {
-                GL15C.glBufferData(target, (FloatBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
-            } else if (dataBuffer instanceof ByteBuffer) {
-                GL15C.glBufferData(target, (ByteBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
-            } else if (dataBuffer instanceof IntBuffer) {
-                GL15C.glBufferData(target, (IntBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
-            } else if (dataBuffer instanceof ShortBuffer) {
-                GL15C.glBufferData(target, (ShortBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
-            }
-        } else {
-            throw new Ardor3dException("Attempting to create a buffer object with no Buffer value.");
-        }
-        return id;
-    }
-
-    private static int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
-        int glMode = GL15C.GL_STATIC_DRAW;
-        switch (vboAccessMode) {
-            case StaticDraw:
-                glMode = GL15C.GL_STATIC_DRAW;
-                break;
-            case StaticRead:
-                glMode = GL15C.GL_STATIC_READ;
-                break;
-            case StaticCopy:
-                glMode = GL15C.GL_STATIC_COPY;
-                break;
-            case DynamicDraw:
-                glMode = GL15C.GL_DYNAMIC_DRAW;
-                break;
-            case DynamicRead:
-                glMode = GL15C.GL_DYNAMIC_READ;
-                break;
-            case DynamicCopy:
-                glMode = GL15C.GL_DYNAMIC_COPY;
-                break;
-            case StreamDraw:
-                glMode = GL15C.GL_STREAM_DRAW;
-                break;
-            case StreamRead:
-                glMode = GL15C.GL_STREAM_READ;
-                break;
-            case StreamCopy:
-                glMode = GL15C.GL_STREAM_COPY;
-                break;
-        }
-        return glMode;
-    }
-
     private int getGLIndexMode(final IndexMode indexMode) {
         int glMode = GL11C.GL_TRIANGLES;
         switch (indexMode) {
@@ -796,4 +501,18 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         throw new IllegalArgumentException("Unknown buffer type: " + indices.getBuffer());
     }
 
+    @Override
+    public Lwjgl3ShaderUtils getShaderUtils() {
+        return _shaderUtils;
+    }
+
+    @Override
+    public Lwjgl3TextureUtils getTextureUtils() {
+        return _textureUtils;
+    }
+
+    @Override
+    public Lwjgl3ScissorUtils getScissorUtils() {
+        return _scissorUtils;
+    }
 }

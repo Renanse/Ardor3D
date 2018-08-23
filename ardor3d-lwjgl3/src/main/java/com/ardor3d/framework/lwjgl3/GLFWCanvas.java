@@ -12,6 +12,7 @@ package com.ardor3d.framework.lwjgl3;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,7 @@ import org.lwjgl.system.MemoryStack;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
@@ -38,29 +40,32 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
+import com.google.common.collect.Lists;
 
 public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     private static final Logger logger = Logger.getLogger(GLFWCanvas.class.getName());
 
-    private final Lwjgl3CanvasRenderer _canvasRenderer;
+    protected final Lwjgl3CanvasRenderer _canvasRenderer;
 
-    private final DisplaySettings _settings;
-    private boolean _inited = false;
+    protected final DisplaySettings _settings;
+    protected boolean _inited = false;
 
-    private long _windowId;
+    protected long _windowId;
 
-    private volatile boolean _focusLost = false;
-
-    @SuppressWarnings("unused")
-    private GLFWWindowFocusCallback _focusCallback;
+    protected volatile boolean _focusLost = false;
 
     @SuppressWarnings("unused")
-    private GLFWErrorCallback _errorCallback;
+    protected GLFWWindowFocusCallback _focusCallback;
 
     @SuppressWarnings("unused")
-    private GLFWWindowSizeCallbackI _resizeCallback;
+    protected GLFWErrorCallback _errorCallback;
 
-    private int _contentWidth, _contentHeight;
+    @SuppressWarnings("unused")
+    protected GLFWWindowSizeCallbackI _resizeCallback;
+
+    protected int _contentWidth, _contentHeight;
+
+    protected List<ICanvasListener> _listeners = Lists.newArrayList();
 
     /**
      * If true, we will not try to drop and reclaim the context on each frame.
@@ -137,6 +142,9 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
                 public void invoke(final long window, final int width, final int height) {
                     _canvasRenderer.getRenderer().setViewport(0, 0, width, height);
                     updateContentSize();
+                    for (final ICanvasListener l : _listeners) {
+                        l.onResize(width, height);
+                    }
                 }
             });
         } catch (final Exception e) {
@@ -277,11 +285,23 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
         return _windowId;
     }
 
+    @Override
     public int getContentHeight() {
         return _contentHeight;
     }
 
+    @Override
     public int getContentWidth() {
         return _contentWidth;
+    }
+
+    @Override
+    public void addListener(final ICanvasListener listener) {
+        _listeners.add(listener);
+    }
+
+    @Override
+    public boolean removeListener(final ICanvasListener listener) {
+        return _listeners.remove(listener);
     }
 }

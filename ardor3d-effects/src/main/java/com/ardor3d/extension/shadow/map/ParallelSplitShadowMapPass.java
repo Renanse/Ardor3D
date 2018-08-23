@@ -44,8 +44,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderLogic;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.pass.Pass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -59,9 +58,10 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -381,7 +381,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         }
 
         if (_light instanceof DirectionalLight) {
-            _shadowMapRenderer.getCamera().setProjectionMode(ProjectionMode.Parallel);
+            _shadowMapRenderer.getCamera().setProjectionMode(ProjectionMode.Orthographic);
         }
     }
 
@@ -822,7 +822,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     private void updateTextureMatrix(final int index) {
         // Create a matrix going from light to camera space
         final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
-        _shadowMatrix.set(cam.getModelViewMatrix()).invertLocal();
+        _shadowMatrix.set(cam.getViewMatrix()).invertLocal();
         _shadowMatrix.multiplyLocal(_shadowMapRenderer.getCamera().getModelViewProjectionMatrix()).multiplyLocal(
                 SCALE_BIAS_MATRIX);
         _shadowMapTexture[index].setTextureMatrix(_shadowMatrix);

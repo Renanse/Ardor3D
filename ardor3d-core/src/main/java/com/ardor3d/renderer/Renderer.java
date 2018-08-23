@@ -12,25 +12,18 @@ package com.ardor3d.renderer;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.Collection;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture1D;
-import com.ardor3d.image.Texture2D;
-import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyRectangle2;
+import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyTransform;
+import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.scenegraph.AbstractBufferData;
+import com.ardor3d.renderer.texture.ITextureUtils;
 import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
@@ -118,28 +111,6 @@ public interface Renderer {
     void flushFrame(boolean doSwap);
 
     /**
-     *
-     * <code>setOrtho</code> sets the display system to be in orthographic mode. If the system has already been set to
-     * orthographic mode a <code>Ardor3dException</code> is thrown. The origin (0,0) is the bottom left of the screen.
-     *
-     */
-    void setOrtho();
-
-    /**
-     *
-     * <code>unsetOrhto</code> unsets the display system from orthographic mode back into regular projection mode. If
-     * the system is not in orthographic mode a <code>Ardor3dException</code> is thrown.
-     *
-     *
-     */
-    void unsetOrtho();
-
-    /**
-     * @return true if the renderer is currently in ortho mode.
-     */
-    boolean isInOrthoMode();
-
-    /**
      * render queues - will first sort, then render, then finally clear the queue
      */
     void renderBuckets();
@@ -178,8 +149,8 @@ public interface Renderer {
      */
     void grabScreenContents(ByteBuffer store, ImageDataFormat format, int x, int y, int w, int h);
 
-    void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type,
-            final int x, final int y, final int w, final int h);
+    void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type, final int x,
+            final int y, final int w, final int h);
 
     /**
      * Gets the expected size (in bytes) of the buffer used to call <code>grabScreenContents</code>
@@ -241,137 +212,6 @@ public interface Renderer {
     boolean checkAndAdd(Spatial s);
 
     /**
-     * Attempts to delete the VBOs with the given id. Ignores null ids or ids < 1.
-     *
-     * @param ids
-     */
-    void deleteVBOs(Collection<Integer> ids);
-
-    /**
-     * Attempts to delete any VBOs associated with this buffer that are relevant to the current RenderContext.
-     *
-     * @param ids
-     */
-    void deleteVBOs(AbstractBufferData<?> buffer);
-
-    /**
-     * Attempts to delete the VAOs with the given id. Ignores null ids or ids < 1.
-     *
-     * @param ids
-     */
-    void deleteVAOs(Collection<Integer> ids);
-
-    /**
-     * Attempts to delete any VAOs associated with this mesh data that are relevant to the current RenderContext.
-     *
-     * @param ids
-     */
-    void deleteVAOs(MeshData data);
-
-    /**
-     * Update all or a portion of an existing one dimensional texture object.
-     *
-     * @param destination
-     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
-     * @param dstOffsetX
-     *            the offset into the destination to start our update.
-     * @param dstWidth
-     *            the width of the region to update.
-     * @param source
-     *            the data to update from.
-     * @param srcOffsetX
-     *            the optional offset into our source data.
-     */
-    void updateTexture1DSubImage(Texture1D destination, int dstOffsetX, int dstWidth, ByteBuffer source, int srcOffsetX);
-
-    /**
-     * Update all or a portion of an existing two dimensional texture object.
-     *
-     * @param destination
-     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
-     * @param dstOffsetX
-     *            the x offset into the destination to start our update.
-     * @param dstOffsetY
-     *            the y offset into the destination to start our update.
-     * @param dstWidth
-     *            the width of the region to update.
-     * @param dstHeight
-     *            the height of the region to update.
-     * @param source
-     *            the data to update from.
-     * @param srcOffsetX
-     *            the optional X offset into our source data.
-     * @param srcOffsetY
-     *            the optional Y offset into our source data.
-     * @param srcTotalWidth
-     *            the total width of our source data, so we can properly walk through it.
-     */
-    void updateTexture2DSubImage(Texture2D destination, int dstOffsetX, int dstOffsetY, int dstWidth, int dstHeight,
-            ByteBuffer source, int srcOffsetX, int srcOffsetY, int srcTotalWidth);
-
-    /**
-     * Update all or a portion of an existing one dimensional texture object.
-     *
-     * @param destination
-     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
-     * @param dstOffsetX
-     *            the x offset into the destination to start our update.
-     * @param dstOffsetY
-     *            the y offset into the destination to start our update.
-     * @param dstOffsetZ
-     *            the z offset into the destination to start our update.
-     * @param dstWidth
-     *            the width of the region to update.
-     * @param dstHeight
-     *            the height of the region to update.
-     * @param dstDepth
-     *            the depth of the region to update. eg. 1 == one slice
-     * @param source
-     *            the data to update from.
-     * @param srcOffsetX
-     *            the optional X offset into our source data.
-     * @param srcOffsetY
-     *            the optional Y offset into our source data.
-     * @param srcOffsetZ
-     *            the optional Z offset into our source data.
-     * @param srcTotalWidth
-     *            the total width of our source data, so we can properly walk through it.
-     * @param srcTotalHeight
-     *            the total height of our source data, so we can properly walk through it.
-     */
-    void updateTexture3DSubImage(Texture3D destination, int dstOffsetX, int dstOffsetY, int dstOffsetZ, int dstWidth,
-            int dstHeight, int dstDepth, ByteBuffer source, int srcOffsetX, int srcOffsetY, int srcOffsetZ,
-            int srcTotalWidth, int srcTotalHeight);
-
-    /**
-     * Update all or a portion of a single two dimensional face on an existing cubemap texture object.
-     *
-     * @param destination
-     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
-     * @param dstFace
-     *            the face to update.
-     * @param dstOffsetX
-     *            the x offset into the destination to start our update.
-     * @param dstOffsetY
-     *            the y offset into the destination to start our update.
-     * @param dstWidth
-     *            the width of the region to update.
-     * @param dstHeight
-     *            the height of the region to update.
-     * @param source
-     *            the data to update from.
-     * @param srcOffsetX
-     *            the optional X offset into our source data.
-     * @param srcOffsetY
-     *            the optional Y offset into our source data.
-     * @param srcTotalWidth
-     *            the total width of our source data, so we can properly walk through it.
-     */
-    void updateTextureCubeMapSubImage(TextureCubeMap destination, TextureCubeMap.Face dstFace, int dstOffsetX,
-            int dstOffsetY, int dstWidth, int dstHeight, ByteBuffer source, int srcOffsetX, int srcOffsetY,
-            int srcTotalWidth);
-
-    /**
      * Check the underlying rendering system (opengl, etc.) for exceptions.
      *
      * @throws Ardor3dException
@@ -387,67 +227,22 @@ public interface Renderer {
      */
     void draw(Renderable renderable);
 
-    /**
-     * <code>doTransforms</code> sets the current transform.
-     *
-     * @param transform
-     *            transform to apply.
-     */
-    boolean doTransforms(ReadOnlyTransform transform);
-
-    /**
-     * <code>undoTransforms</code> reverts the latest transform.
-     *
-     * @param transform
-     *            transform to revert.
-     */
-    void undoTransforms(ReadOnlyTransform transform);
-
-    /**
-     * Check that the data has a VAO, all buffers have vbo set, and shader attributes are set.
-     *
-     * @param data
-     * @param currentShader
-     * @return true if we were able to setup for draw.
-     */
-    boolean prepareForDraw(MeshData data, ShaderState currentShader);
-
-    void applyMatrices(ReadOnlyTransform worldTransform, ShaderState currentShader);
-
     void drawArrays(int start, int count, IndexMode mode);
 
     void drawArraysInstanced(int start, int count, IndexMode mode, int instanceCount);
 
     void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode);
 
-    void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count,
-            final IndexMode mode, int instanceCount);
+    void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode,
+            int instanceCount);
 
-    /**
-     *
-     * @param matrix
-     */
-    void setProjectionMatrix(FloatBuffer matrix);
+    FloatBuffer getMatrix(RenderMatrixType type);
 
-    /**
-     * Gets the current projection matrix in row major order
-     *
-     * @param store
-     *            The buffer to store in. If null or remaining is < 16, a new FloatBuffer will be created and returned.
-     * @return
-     */
-    FloatBuffer getProjectionMatrix(FloatBuffer store);
+    void setMatrix(RenderMatrixType type, FloatBuffer matrix);
 
-    void setModelViewMatrix(FloatBuffer matrix);
+    void setMatrix(RenderMatrixType type, ReadOnlyMatrix4 matrix, boolean rowMajor);
 
-    /**
-     * Gets the current modelview matrix in row major order
-     *
-     * @param store
-     *            The buffer to store in. If null or remaining is < 16, a new FloatBuffer will be created and returned.
-     * @return
-     */
-    FloatBuffer getModelViewMatrix(FloatBuffer store);
+    void setMatrix(RenderMatrixType type, ReadOnlyTransform transform);
 
     void setViewport(int x, int y, int width, int height);
 
@@ -497,70 +292,6 @@ public interface Renderer {
     RenderState applyState(StateType type, RenderState state);
 
     /**
-     * Loads a texture onto the card for the current OpenGL context.
-     *
-     * @param texture
-     *            the texture obejct to load.
-     * @param unit
-     *            the texture unit to load into
-     */
-    void loadTexture(Texture texture, int unit);
-
-    /**
-     * Explicitly remove this Texture from the graphics card. Note, the texture is only removed for the current context.
-     * If the texture is used in other contexts, those uses are not touched. If the texture is not used in this context,
-     * this is a no-op.
-     *
-     * @param texture
-     *            the Texture object to remove.
-     */
-    void deleteTexture(Texture texture);
-
-    /**
-     * Removes the given texture ids from the current OpenGL context.
-     *
-     * @param ids
-     *            a list/set of ids to remove.
-     */
-    void deleteTextureIds(Collection<Integer> ids);
-
-    /**
-     * Add the given rectangle to the clip stack, clipping the rendering area by the given rectangle intersected with
-     * any existing scissor entries. Enable clipping if this is the first rectangle in the stack.
-     *
-     * @param rectangle
-     */
-    void pushClip(ReadOnlyRectangle2 rectangle);
-
-    /**
-     * Push a clip onto the stack indicating that future clips should not intersect with clips prior to this one.
-     * Basically this allows you to ignore prior clips for nested drawing. Make sure you pop this using
-     * {@link #popClip()}.
-     */
-    void pushEmptyClip();
-
-    /**
-     * Pop the most recent rectangle from the stack and adjust the rendering area accordingly.
-     */
-    void popClip();
-
-    /**
-     * Clear all rectangles from the clip stack and disable clipping.
-     */
-    void clearClips();
-
-    /**
-     * @param enabled
-     *            toggle clipping without effecting the current clip stack.
-     */
-    void setClipTestEnabled(boolean enabled);
-
-    /**
-     * @return true if the renderer believes clipping is enabled
-     */
-    boolean isClipTestEnabled();
-
-    /**
      * @param type
      *            the state type to grab
      * @return the appropriate render state for the current context for the current type. This is the enforced state if
@@ -569,12 +300,18 @@ public interface Renderer {
     RenderState getProperRenderState(StateType type, RenderState current);
 
     /**
-     * Set rendering logic that will be called during drawing of renderables
-     *
-     * @param logic
-     *            logic to use in rendering. call with null to reset rendering.
-     * @see RenderLogic
+     * @return the renderer specific shader utils class.
      */
-    void setRenderLogic(RenderLogic logic);
+    IShaderUtils getShaderUtils();
+
+    /**
+     * @return the renderer specific texture utils class.
+     */
+    ITextureUtils getTextureUtils();
+
+    /**
+     * @return the renderer specific texture utils class.
+     */
+    IScissorUtils getScissorUtils();
 
 }

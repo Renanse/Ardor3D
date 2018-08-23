@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,7 @@
 package com.ardor3d.image.util;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Color;
@@ -19,7 +20,6 @@ import org.eclipse.swt.graphics.PaletteData;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.PixelDataType;
-import com.google.common.collect.Lists;
 
 /**
  * Utility methods for converting Ardor3D Images to SWT ImageData.
@@ -29,7 +29,7 @@ public abstract class SWTImageUtil {
     /**
      * Convert the given Ardor3D Image to a List of ImageData objects. It is a List because Ardor3D Images may contain
      * multiple layers (for example, in the case of cube maps or 3D textures).
-     * 
+     *
      * @param input
      *            the Ardor3D Image to convert
      * @return the ImageData object(s) created in the conversion
@@ -43,11 +43,11 @@ public abstract class SWTImageUtil {
      * Convert the given Ardor3D Image to a List of ImageData objects. It is a List because Ardor3D Images may contain
      * multiple layers (for example, in the case of cube maps or 3D textures). The given SWT Color is used to modulate
      * or "tint" the returned image.
-     * 
+     *
      * TODO: Add support for more formats.<br/>
      * XXX: Note that only images of data type ImageDataType.UnsignedByte and ImageDataFormat of RGB or RGBA are
      * currently supported.
-     * 
+     *
      * @param input
      *            the Ardor3D Image to convert
      * @param tint
@@ -65,7 +65,7 @@ public abstract class SWTImageUtil {
         final int width = input.getWidth(), height = input.getHeight();
 
         // create our return list
-        final List<ImageData> rVal = Lists.newArrayList();
+        final List<ImageData> rVal = new ArrayList<>();
 
         // Calculate our modulation or "tint" values per channel
         final double tRed = tint != null ? tint.getRed() / 255. : 1.0;
@@ -92,12 +92,7 @@ public abstract class SWTImageUtil {
                         image = new ImageData(width, height, 24, new PaletteData(0xFF0000, 0x00FF00, 0x0000FF));
                         image.transparentPixel = 255;
                     }
-                    int index,
-                    r,
-                    g,
-                    b,
-                    a,
-                    argb;
+                    int index, r, g, b, a, argb;
 
                     // Go through each pixel
                     for (int x = 0; x < width; x++) {

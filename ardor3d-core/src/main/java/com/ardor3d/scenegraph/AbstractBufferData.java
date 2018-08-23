@@ -19,14 +19,14 @@ import java.util.Set;
 import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
+import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.ContextIdReference;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.gc.ContextValueReference;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multimap;
@@ -44,12 +44,13 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     static {
         ContextManager.addContextCleanListener(new ContextCleanListener() {
             public void cleanForContext(final RenderContext renderContext) {
-                AbstractBufferData.cleanAllVBOs(null, renderContext);
+                AbstractBufferData.cleanAllBuffers(null, renderContext);
             }
         });
     }
 
-    protected transient ContextIdReference<AbstractBufferData<T>> _bufferIdCache;
+    protected transient ContextValueReference<AbstractBufferData<T>, Integer> _bufferIdCache;
+    protected transient ContextValueReference<AbstractBufferData<T>, Boolean> _bufferCleanCache;
 
     /** Buffer holding the data. */
     protected T _buffer;
@@ -61,9 +62,6 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
 
     /** VBO Access mode for this buffer. */
     protected VBOAccessMode _vboAccessMode = VBOAccessMode.StaticDraw;
-
-    /** Flag for notifying the renderer that the VBO buffer needs to be updated. */
-    protected boolean _needsRefresh = false;
 
     AbstractBufferData() {
         _identityCache.put(this, STATIC_REF);
@@ -156,17 +154,20 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
      * @return the id removed or 0 if not found.
      */
     public int removeBufferId(final Object glContext) {
+        if (_bufferCleanCache != null) {
+            _bufferCleanCache.removeValue(glContext);
+        }
         if (_bufferIdCache != null) {
             return _bufferIdCache.removeValue(glContext);
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**
      * Sets the buffer id representing this data in regards to the given OpenGL context.
      *
-     * @param glContextRep
+     * @param glContext
      *            the object representing the OpenGL context a buffer belongs to. See
      *            {@link RenderContext#getGlContextRep()}
      * @param id
@@ -174,15 +175,57 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
      * @throws IllegalArgumentException
      *             if id is less than or equal to 0.
      */
-    public void setBufferId(final Object glContextRep, final int id) {
+    public void setBufferId(final Object glContext, final int id) {
         if (id == 0) {
             throw new IllegalArgumentException("id must != 0");
         }
 
         if (_bufferIdCache == null) {
-            _bufferIdCache = new ContextIdReference<AbstractBufferData<T>>(this, _vboRefQueue);
+            _bufferIdCache = ContextValueReference.newReference(this, _vboRefQueue);
         }
-        _bufferIdCache.put(glContextRep, id);
+        _bufferIdCache.put(glContext, id);
+    }
+
+    /**
+     * @param glContext
+     *            the object representing the OpenGL context a buffer belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @return false if the buffer is dirty for the given context or we don't have the given object in memory.
+     */
+    public boolean isBufferClean(final Object glContext) {
+        if (_bufferCleanCache != null) {
+            final Boolean value = _bufferCleanCache.getValue(glContext);
+            if (value != null) {
+                return value.booleanValue();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Mark this buffer dirty on all contexts.
+     */
+    public void markDirty() {
+        if (_bufferCleanCache == null) {
+            return;
+        }
+        // we assume an entry is to mark us clean
+        _bufferCleanCache.clear();
+    }
+
+    /**
+     * Mark this buffer clean on the given context.
+     *
+     * @param glContext
+     *            the object representing the OpenGL context a buffer belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     */
+    public void markClean(final Object glContext) {
+        if (_bufferCleanCache == null) {
+            _bufferCleanCache = ContextValueReference.newReference(this, null);
+        }
+        _bufferCleanCache.put(glContext, true);
     }
 
     public VBOAccessMode getVboAccessMode() {
@@ -193,15 +236,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         this._vboAccessMode = vboAccessMode;
     }
 
-    public boolean isNeedsRefresh() {
-        return _needsRefresh;
-    }
-
-    public void setNeedsRefresh(final boolean needsRefresh) {
-        this._needsRefresh = needsRefresh;
-    }
-
-    public static void cleanAllVBOs(final Renderer deleter) {
+    public static void cleanAllBuffers(final IShaderUtils utils) {
         final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vbos... these don't exist in our cache
@@ -223,10 +258,10 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
             }
         }
 
-        handleVBODelete(deleter, idMap);
+        handleVBODelete(utils, idMap);
     }
 
-    public static void cleanAllVBOs(final Renderer deleter, final RenderContext context) {
+    public static void cleanAllBuffers(final IShaderUtils utils, final RenderContext context) {
         final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vbos... these don't exist in our cache
@@ -244,23 +279,23 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
             }
         }
 
-        handleVBODelete(deleter, idMap);
+        handleVBODelete(utils, idMap);
     }
 
     /**
-     * Clean any VBO ids from the hardware, using the given Renderer object to do the work immediately, if given. If
-     * not, we will delete in the next execution of the appropriate context's game task render queue.
+     * Clean any VBO ids from the hardware, using the given utility object to do the work immediately, if given. If not,
+     * we will delete in the next execution of the appropriate context's game task render queue.
      *
-     * @param deleter
-     *            the Renderer to use. If null, execution will not occur immediately.
+     * @param utils
+     *            the util class to use. If null, execution will not occur immediately.
      */
-    public static void cleanExpiredVBOs(final Renderer deleter) {
+    public static void cleanExpiredVBOs(final IShaderUtils utils) {
         // gather up expired vbos...
         final Multimap<Object, Integer> idMap = gatherGCdIds(null);
 
         if (idMap != null) {
             // send to be deleted (perhaps on next render.)
-            handleVBODelete(deleter, idMap);
+            handleVBODelete(utils, idMap);
         }
     }
 
@@ -272,8 +307,8 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     @SuppressWarnings("unchecked")
     private static final Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
         // Pull all expired vbos from ref queue and add to an id multimap.
-        ContextIdReference<AbstractBufferData<?>> ref;
-        while ((ref = (ContextIdReference<AbstractBufferData<?>>) _vboRefQueue.poll()) != null) {
+        ContextValueReference<AbstractBufferData<?>, Integer> ref;
+        while ((ref = (ContextValueReference<AbstractBufferData<?>, Integer>) _vboRefQueue.poll()) != null) {
             if (Constants.useMultipleContexts) {
                 final Set<Object> contextObjects = ref.getContextObjects();
                 for (final Object o : contextObjects) {
@@ -301,24 +336,24 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         return store;
     }
 
-    private static void handleVBODelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {
+    private static void handleVBODelete(final IShaderUtils utils, final Multimap<Object, Integer> idMap) {
         Object currentGLRef = null;
         // Grab the current context, if any.
-        if (deleter != null && ContextManager.getCurrentContext() != null) {
+        if (utils != null && ContextManager.getCurrentContext() != null) {
             currentGLRef = ContextManager.getCurrentContext().getGlContextRep();
         }
         // For each affected context...
         for (final Object glref : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
-            if (deleter != null && glref.equals(currentGLRef)) {
-                deleter.deleteVBOs(idMap.get(glref));
+            if (utils != null && glref.equals(currentGLRef)) {
+                utils.deleteBuffers(idMap.get(glref));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(
-                        new RendererCallable<Void>() {
+                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref))
+                        .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().deleteVBOs(idMap.get(glref));
+                                getRenderer().getShaderUtils().deleteBuffers(idMap.get(glref));
                                 return null;
                             }
                         });

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
@@ -36,6 +37,7 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -132,12 +134,21 @@ public class UIHud extends Node {
 
     private UIInputPostHook _postMouseHook;
 
+    private final Camera _hudCamera;
+
     /**
      * Construct a new UIHud for a given canvas
      */
     public UIHud(final Canvas canvas) {
         setName("UIHud");
         _canvas = canvas;
+        _hudCamera = Camera.newOrthoCamera(_canvas);
+        _canvas.addListener(new ICanvasListener() {
+            @Override
+            public void onResize(final int newWidth, final int newHeight) {
+                _hudCamera.resize(newWidth, newHeight);
+            }
+        });
 
         getSceneHints().setCullHint(CullHint.Never);
         getSceneHints().setRenderBucketType(RenderBucketType.Skip);
@@ -346,7 +357,7 @@ public class UIHud extends Node {
      */
     @Override
     public void draw(final Renderer r) {
-        r.setOrtho();
+        _hudCamera.apply(r);
         try {
             Spatial child;
             int i, max;
@@ -367,10 +378,7 @@ public class UIHud extends Node {
         } catch (final Exception e) {
             UIHud._logger.logp(Level.SEVERE, getClass().getName(), "draw(Renderer)", "Exception", e);
         } finally {
-            if (r.isInOrthoMode()) {
-                r.unsetOrtho();
-            }
-            r.clearClips();
+            r.getScissorUtils().clearClips();
         }
     }
 
@@ -516,24 +524,26 @@ public class UIHud extends Node {
                     if (!_mouseInputConsumed && (!_autoConsumeMouseOnOver || _lastMouseOverComponent == null)) {
                         if (!_keyInputConsumed) {
                             // nothing consumed
-                            forwardTo.getApplier()
-                            .checkAndPerformTriggers(forwardTo.getTriggers(), source, states, tpf);
+                            forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source, states,
+                                    tpf);
                         } else {
                             // only key state consumed
-                            final TwoInputStates forwardingState = new TwoInputStates(new InputState(
-                                    KeyboardState.NOTHING, prev.getMouseState(), prev.getControllerState(), prev
-                                            .getGestureState()), new InputState(KeyboardState.NOTHING, curr
-                                    .getMouseState(), curr.getControllerState(), prev.getGestureState()));
+                            final TwoInputStates forwardingState = new TwoInputStates(
+                                    new InputState(KeyboardState.NOTHING, prev.getMouseState(),
+                                            prev.getControllerState(), prev.getGestureState()),
+                                    new InputState(KeyboardState.NOTHING, curr.getMouseState(),
+                                            curr.getControllerState(), prev.getGestureState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         }
                     } else {
                         if (!_keyInputConsumed) {
                             // only mouse consumed
-                            final TwoInputStates forwardingState = new TwoInputStates(new InputState(prev
-                                    .getKeyboardState(), MouseState.NOTHING, prev.getControllerState(), prev
-                                    .getGestureState()), new InputState(curr.getKeyboardState(), MouseState.NOTHING,
-                                    curr.getControllerState(), prev.getGestureState()));
+                            final TwoInputStates forwardingState = new TwoInputStates(
+                                    new InputState(prev.getKeyboardState(), MouseState.NOTHING,
+                                            prev.getControllerState(), prev.getGestureState()),
+                                    new InputState(curr.getKeyboardState(), MouseState.NOTHING,
+                                            curr.getControllerState(), prev.getGestureState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         } else {
@@ -879,6 +889,10 @@ public class UIHud extends Node {
 
     public int getHeight() {
         return _canvas.getCanvasRenderer().getCamera().getHeight();
+    }
+
+    public Camera getHudCamera() {
+        return _hudCamera;
     }
 
     public void closePopupMenus() {

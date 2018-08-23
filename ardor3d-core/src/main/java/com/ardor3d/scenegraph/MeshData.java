@@ -31,17 +31,18 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
+import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.ContextIdReference;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.gc.ContextValueReference;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
@@ -67,6 +68,14 @@ public class MeshData implements Savable {
 
     private static ReferenceQueue<MeshData> _vaoRefQueue = new ReferenceQueue<MeshData>();
 
+    static {
+        ContextManager.addContextCleanListener(new ContextCleanListener() {
+            public void cleanForContext(final RenderContext renderContext) {
+                MeshData.cleanAllVertexArrays(null, renderContext);
+            }
+        });
+    }
+
     /** Number of vertices represented by this data. */
     protected int _vertexCount;
 
@@ -81,7 +90,8 @@ public class MeshData implements Savable {
     protected int[] _indexLengths;
     protected IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
 
-    protected transient ContextIdReference<MeshData> _vaoIdCache;
+    protected transient ContextValueReference<MeshData, Integer> _vaoIdCache;
+    protected transient ContextValueReference<MeshData, Boolean> _buffersCleanCache;
 
     private InstancingManager _instancingManager;
 
@@ -147,9 +157,53 @@ public class MeshData implements Savable {
         }
 
         if (_vaoIdCache == null) {
-            _vaoIdCache = new ContextIdReference<MeshData>(this, _vaoRefQueue);
+            _vaoIdCache = ContextValueReference.newReference(this, _vaoRefQueue);
         }
         _vaoIdCache.put(glContextRep, id);
+    }
+
+    /**
+     * @param glContext
+     *            the object representing the OpenGL context a buffer belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @return false if the MeshData has at least one dirty buffer for the given context or we don't have the given a
+     *         record of it in memory.
+     */
+    public boolean isBuffersClean(final Object glContext) {
+        if (_buffersCleanCache != null) {
+            final Boolean value = _buffersCleanCache.getValue(glContext);
+            if (value != null) {
+                return value.booleanValue();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Mark this MeshData as having at least one dirty Buffer. The buffer(s) itself should also be marked dirty
+     * separately via {@link AbstractBufferData#markDirty()}
+     */
+    public void markBuffersDirty() {
+        if (_buffersCleanCache == null) {
+            return;
+        }
+        // we assume an entry is to mark us clean
+        _buffersCleanCache.clear();
+    }
+
+    /**
+     * Mark this MeshData as having sent all of its buffers to the given context.
+     *
+     * @param glContext
+     *            the object representing the OpenGL context a buffer belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     */
+    public void markBuffersClean(final Object glContext) {
+        if (_buffersCleanCache == null) {
+            _buffersCleanCache = ContextValueReference.newReference(this, null);
+        }
+        _buffersCleanCache.put(glContext, true);
     }
 
     /**
@@ -174,6 +228,15 @@ public class MeshData implements Savable {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T extends AbstractBufferData> T getCoords(final String key) {
         return (T) _vertexDataItems.get(key);
+    }
+
+    /**
+     * @param key
+     *            the key to check
+     * @return true if we have a vertex data item stored for the given key.
+     */
+    public boolean containsKey(final String key) {
+        return _vertexDataItems.containsKey(key);
     }
 
     /**
@@ -476,7 +539,8 @@ public class MeshData implements Savable {
      * @param factorT
      *            a multiple to apply to the T channel when copying
      */
-    public void copyTextureCoordinates(final int fromIndex, final int toIndex, final float factorS, final float factorT) {
+    public void copyTextureCoordinates(final int fromIndex, final int toIndex, final float factorS,
+            final float factorT) {
         final FloatBufferData src = getCoords(KEY_TextureCoordsPrefix + fromIndex);
         if (src == null) {
             return;
@@ -778,8 +842,8 @@ public class MeshData implements Savable {
                         getIndices().get(getVertexIndex(primitiveIndex, i, section)));
             } else {
                 // non-indexed geometry
-                BufferUtils
-                .populateFromBuffer(result[i], getVertexBuffer(), getVertexIndex(primitiveIndex, i, section));
+                BufferUtils.populateFromBuffer(result[i], getVertexBuffer(),
+                        getVertexIndex(primitiveIndex, i, section));
             }
         }
 
@@ -806,8 +870,8 @@ public class MeshData implements Savable {
         if (getTextureBuffer(textureIndex) != null) {
             final int count = getPrimitiveCount(section);
             if (primitiveIndex >= count || primitiveIndex < 0) {
-                throw new IndexOutOfBoundsException("Invalid primitiveIndex '" + primitiveIndex + "'.  Count is "
-                        + count);
+                throw new IndexOutOfBoundsException(
+                        "Invalid primitiveIndex '" + primitiveIndex + "'.  Count is " + count);
             }
             final IndexMode mode = getIndexMode(section);
             final int rSize = mode.getVertexCount();
@@ -856,7 +920,7 @@ public class MeshData implements Savable {
                 index += (primitiveIndex * 3) + point;
                 break;
             case TriangleStrip:
-                // XXX: we need to flip point 0 and 1 on odd primitiveIndex values
+                // NB: we need to flip point 0 and 1 on odd primitiveIndex values
                 if (point < 2 && primitiveIndex % 2 == 1) {
                     index += primitiveIndex + (point == 0 ? 1 : 0);
                 } else {
@@ -1173,7 +1237,7 @@ public class MeshData implements Savable {
         _instancingManager = info;
     }
 
-    public static void cleanAllVAOs(final Renderer deleter) {
+    public static void cleanAllVertexArrays(final IShaderUtils utils) {
         final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vaos... these don't exist in our cache
@@ -1195,10 +1259,10 @@ public class MeshData implements Savable {
             }
         }
 
-        handleVAODelete(deleter, idMap);
+        handleVAODelete(utils, idMap);
     }
 
-    public static void cleanAllVAOs(final Renderer deleter, final RenderContext context) {
+    public static void cleanAllVertexArrays(final IShaderUtils utils, final RenderContext context) {
         final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vaos... these don't exist in our cache
@@ -1216,14 +1280,14 @@ public class MeshData implements Savable {
             }
         }
 
-        handleVAODelete(deleter, idMap);
+        handleVAODelete(utils, idMap);
     }
 
     @SuppressWarnings("unchecked")
     private static final Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
         // Pull all expired vaos from ref queue and add to an id multimap.
-        ContextIdReference<MeshData> ref;
-        while ((ref = (ContextIdReference<MeshData>) _vaoRefQueue.poll()) != null) {
+        ContextValueReference<MeshData, Integer> ref;
+        while ((ref = (ContextValueReference<MeshData, Integer>) _vaoRefQueue.poll()) != null) {
             if (Constants.useMultipleContexts) {
                 final Set<Object> contextObjects = ref.getContextObjects();
                 for (final Object o : contextObjects) {
@@ -1251,24 +1315,24 @@ public class MeshData implements Savable {
         return store;
     }
 
-    private static void handleVAODelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {
+    private static void handleVAODelete(final IShaderUtils utils, final Multimap<Object, Integer> idMap) {
         Object currentGLRef = null;
         // Grab the current context, if any.
-        if (deleter != null && ContextManager.getCurrentContext() != null) {
+        if (utils != null && ContextManager.getCurrentContext() != null) {
             currentGLRef = ContextManager.getCurrentContext().getGlContextRep();
         }
         // For each affected context...
         for (final Object glref : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
-            if (deleter != null && glref.equals(currentGLRef)) {
-                deleter.deleteVAOs(idMap.get(glref));
+            if (utils != null && glref.equals(currentGLRef)) {
+                utils.deleteVertexArrays(idMap.get(glref));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(
-                        new RendererCallable<Void>() {
+                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref))
+                        .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().deleteVAOs(idMap.get(glref));
+                                getRenderer().getShaderUtils().deleteVertexArrays(idMap.get(glref));
                                 return null;
                             }
                         });

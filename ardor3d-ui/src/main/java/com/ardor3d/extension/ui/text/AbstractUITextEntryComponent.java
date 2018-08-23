@@ -324,12 +324,12 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
             if (needsPop) {
                 _clipRectangleStore.set(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
                         getContentHeight());
-                r.pushClip(_clipRectangleStore);
+                r.getScissorUtils().pushClip(_clipRectangleStore);
             }
 
             _uiText.render(r);
             if (needsPop) {
-                r.popClip();
+                r.getScissorUtils().popClip();
             }
         }
 

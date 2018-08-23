@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,6 +16,8 @@ package com.ardor3d.util;
 public class Constants {
 
     public static boolean updateGraphs = false;
+
+    public static final boolean strictVertexAttributes;
 
     public static final boolean useStatePools;
 
@@ -49,11 +51,13 @@ public class Constants {
             useMultipleContexts = (System.getProperty("ardor3d.useMultipleContexts") != null);
             useStatePools = (System.getProperty("ardor3d.noStatePools") == null);
             storeSavableImages = (System.getProperty("ardor3d.storeSavableImages") != null);
-            maxStatePoolSize = (System.getProperty("ardor3d.maxStatePoolSize") != null ? Integer.parseInt(System
-                    .getProperty("ardor3d.maxStatePoolSize")) : 11);
+            maxStatePoolSize = (System.getProperty("ardor3d.maxStatePoolSize") != null
+                    ? Integer.parseInt(System.getProperty("ardor3d.maxStatePoolSize"))
+                    : 11);
 
             useValidatingTransform = (System.getProperty("ardor3d.disableValidatingTransform") == null);
             enableInstancedGeometrySupport = (System.getProperty("ardor3d.enableInstancedGeometrySupport") != null);
+            strictVertexAttributes = (System.getProperty("ardor3d.strictVertexAttributes") != null);
         } else {
             stats = false;
             trackDirectMemory = false;
@@ -63,6 +67,7 @@ public class Constants {
             maxStatePoolSize = 11;
             useValidatingTransform = true;
             enableInstancedGeometrySupport = false;
+            strictVertexAttributes = false;
         }
     }
 }

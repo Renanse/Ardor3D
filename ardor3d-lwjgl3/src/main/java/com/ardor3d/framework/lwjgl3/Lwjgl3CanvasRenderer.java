@@ -67,8 +67,8 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
         // Grab a shared context, if one is given.
         RenderContext sharedContext = null;
         if (settings.getShareContext() != null) {
-            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
-                    .getContextKey());
+            sharedContext = ContextManager
+                    .getContextForKey(settings.getShareContext().getRenderContext().getContextKey());
         }
 
         _canvasCallback.makeCurrent(true);
@@ -101,9 +101,8 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
             _camera.setFrame(loc, left, up, dir);
         } else {
             // use new width and height to set ratio.
-            _camera.setFrustumPerspective(_camera.getFovY(),
-                    (float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(),
-                    _camera.getFrustumFar());
+            _camera.setFrustumPerspective(_camera.getFovY(), (float) settings.getWidth() / (float) settings.getHeight(),
+                    _camera.getFrustumNear(), _camera.getFrustumFar());
         }
     }
 
@@ -114,9 +113,6 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
 
         // render stuff, first apply our camera if we have one
         if (_camera != null) {
-            if (Camera.getCurrentCamera() != _camera) {
-                _camera.update();
-            }
             _camera.apply(_renderer);
         }
         _renderer.clearBuffers(_frameClear);

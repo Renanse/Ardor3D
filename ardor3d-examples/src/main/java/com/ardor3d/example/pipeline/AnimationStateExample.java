@@ -54,11 +54,10 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
@@ -69,13 +68,14 @@ import com.ardor3d.util.geom.MeshCombiner;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
+import com.jogamp.opengl.util.glsl.ShaderState;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationStateExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationStateExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationStateExample.jpg", //
+        maxHeapMemory = 64)
 public class AnimationStateExample extends ExampleBase {
 
     private Spatial primeModel;
@@ -119,7 +119,6 @@ public class AnimationStateExample extends ExampleBase {
         cam.setLocation(280, 372, -280);
         cam.lookAt(new Vector3(250, 350, -280), Vector3.UNIT_Y);
         cam.setFrustumPerspective(50.0, cam.getWidth() / (double) cam.getHeight(), .25, 900);
-        cam.update();
 
         // speed up wasd control a little
         _controlHandle.setMoveSpeed(200);
@@ -188,8 +187,8 @@ public class AnimationStateExample extends ExampleBase {
         basePanel.add(punchButton);
 
         playPauseButton = new UIButton("Pause");
-        playPauseButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, punchButton, Alignment.BOTTOM_LEFT, 0,
-                -5));
+        playPauseButton
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, punchButton, Alignment.BOTTOM_LEFT, 0, -5));
         playPauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 if (playPauseButton.getText().equals("Pause")) {
@@ -227,8 +226,8 @@ public class AnimationStateExample extends ExampleBase {
         basePanel.add(resetAnimCheck);
 
         final UICheckBox gpuSkinningCheck = new UICheckBox("Use GPU skinning");
-        gpuSkinningCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, resetAnimCheck, Alignment.BOTTOM_LEFT,
-                0, -5));
+        gpuSkinningCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, resetAnimCheck, Alignment.BOTTOM_LEFT, 0, -5));
         gpuSkinningCheck.setSelected(false);
         gpuSkinningCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -254,8 +253,8 @@ public class AnimationStateExample extends ExampleBase {
 
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
-        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT,
-                0, -5));
+        skeletonCheck.setLayoutData(
+                new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
 
@@ -266,8 +265,8 @@ public class AnimationStateExample extends ExampleBase {
         });
         basePanel.add(skeletonCheck);
 
-        boneLabelCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skeletonCheck, Alignment.BOTTOM_LEFT, 0,
-                -5));
+        boneLabelCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skeletonCheck, Alignment.BOTTOM_LEFT, 0, -5));
         boneLabelCheck.setSelected(false);
         boneLabelCheck.setEnabled(showSkeleton);
         boneLabelCheck.addActionListener(new ActionListener() {
@@ -284,8 +283,8 @@ public class AnimationStateExample extends ExampleBase {
         optionsFrame.setOpacity(0.8f);
 
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        optionsFrame.setLocalXY(cam.getWidth() - optionsFrame.getLocalComponentWidth() - 10, cam.getHeight()
-                - optionsFrame.getLocalComponentHeight() - 10);
+        optionsFrame.setLocalXY(cam.getWidth() - optionsFrame.getLocalComponentWidth() - 10,
+                cam.getHeight() - optionsFrame.getLocalComponentHeight() - 10);
         hud.add(optionsFrame);
 
         UIComponent.setUseTransparency(true);
@@ -317,11 +316,11 @@ public class AnimationStateExample extends ExampleBase {
             gpuShader = new ShaderState();
             gpuShader.setEnabled(true);
             try {
-                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert", ResourceLocatorTool
-                        .getClassPathResourceAsString(ExampleBase.class,
+                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert",
+                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
                                 "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag", ResourceLocatorTool
-                        .getClassPathResourceAsString(ExampleBase.class,
+                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag",
+                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
                                 "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
 
                 gpuShader.setUniform("texture", 0);

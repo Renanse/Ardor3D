@@ -16,9 +16,9 @@ import com.ardor3d.renderer.effect.EffectManager;
 import com.ardor3d.renderer.effect.EffectStep_RenderScreenOverlay;
 import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
+import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class ColorReplaceEffect extends RenderEffect {

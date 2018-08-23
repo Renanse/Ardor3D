@@ -29,6 +29,7 @@ public class RendererRecord extends StateRecord {
     private int _enabledTextures = 0;
     private boolean _texturesValid = false;
     private int _currentTextureArraysUnit = 0;
+    private int _programId;
 
     @Override
     public void invalidate() {
@@ -141,5 +142,13 @@ public class RendererRecord extends StateRecord {
 
     public void setCurrentTextureArraysUnit(final int currentTextureArraysUnit) {
         _currentTextureArraysUnit = currentTextureArraysUnit;
+    }
+
+    public int getProgramId() {
+        return _programId;
+    }
+
+    public void setProgramId(final int programId) {
+        _programId = programId;
     }
 }

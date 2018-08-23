@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -28,12 +28,15 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.MaterialTechnique;
+import com.ardor3d.renderer.material.TechniquePass;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.InputCapsule;
@@ -238,53 +241,52 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         }
     }
 
-    public void render(final Renderer renderer, final MeshData meshData) {
-        // 1. Set up our shader program and its shader objects.
-        final ShaderState shader = (ShaderState) renderer.applyState(RenderState.StateType.Shader,
-                _states.get(RenderState.StateType.Shader));
+    protected void render(final Renderer renderer, final MeshData meshData) {
 
-        // 2. Set up our mesh data as VBOs in a VAO and apply them to our shader as attributes
-        if (!renderer.prepareForDraw(meshData, shader)) {
+        // Grab our proper RenderTechnique
+        final MaterialTechnique technique = MaterialManager.INSTANCE.chooseTechnique(this);
+
+        // No technique? Can't render.
+        if (technique == null) {
             return;
         }
 
-        // 3. Set our matrices in uniforms (model, view and projection matrices)
-        renderer.applyMatrices(getWorldTransform(), shader);
+        // Set our model matrix
+        renderer.setMatrix(RenderMatrixType.Model, getWorldTransform());
 
-        // 4. Apply states?
-        for (final StateType type : StateType.values) {
-            if (type != StateType.Shader) {
-                renderer.applyState(type, _states.get(type));
-            }
-        }
+        // Walk through the passes of the technique and draw this mesh for each
+        for (final TechniquePass pass : technique.getPasses()) {
+            // setup for drawing this pass - shaders, data, states, etc.
+            pass.setupForDraw(renderer, this);
 
-        // 5. Draw arrays or elements (depending on indices)
-        final IndexMode[] modes = meshData.getIndexModes();
-        final int[] indexLengths = meshData.getIndexLengths();
-        final IndexBufferData<?> indices = meshData.getIndices();
+            // Now we draw ourselves - (TODO: Instancing support)
+            final IndexMode[] modes = meshData.getIndexModes();
+            final int[] indexLengths = meshData.getIndexLengths();
+            final IndexBufferData<?> indices = meshData.getIndices();
 
-        if (indexLengths == null) {
-            if (indices != null) {
-                renderer.drawElements(indices, 0, indices.getBufferLimit(), modes[0]);
-            } else {
-                renderer.drawArrays(0, meshData.getVertexCount(), modes[0]);
-            }
-        } else {
-            int offset = 0;
-            int modeIndex = 0;
-            for (int i = 0; i < indexLengths.length; i++) {
-                final int count = indexLengths[i];
-
+            if (indexLengths == null) {
                 if (indices != null) {
-                    renderer.drawElements(indices, offset, count, modes[modeIndex]);
+                    renderer.drawElements(indices, 0, indices.getBufferLimit(), modes[0]);
                 } else {
-                    renderer.drawArrays(offset, count, modes[modeIndex]);
+                    renderer.drawArrays(0, meshData.getVertexCount(), modes[0]);
                 }
+            } else {
+                int offset = 0;
+                int modeIndex = 0;
+                for (int i = 0; i < indexLengths.length; i++) {
+                    final int count = indexLengths[i];
 
-                offset += count;
+                    if (indices != null) {
+                        renderer.drawElements(indices, offset, count, modes[modeIndex]);
+                    } else {
+                        renderer.drawArrays(offset, count, modes[modeIndex]);
+                    }
 
-                if (modeIndex < modes.length - 1) {
-                    modeIndex++;
+                    offset += count;
+
+                    if (modeIndex < modes.length - 1) {
+                        modeIndex++;
+                    }
                 }
             }
         }

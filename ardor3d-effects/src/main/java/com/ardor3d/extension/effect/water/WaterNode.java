@@ -30,16 +30,16 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.FogState;
 import com.ardor3d.renderer.state.ShaderState;
-import com.ardor3d.renderer.state.ShaderState.ShaderType;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -550,7 +550,7 @@ public class WaterNode extends Node {
         texArray.add(textureDepth);
 
         tRenderer.getCamera().update();
-        tRenderer.getCamera().getModelViewMatrix();
+        tRenderer.getCamera().getViewMatrix();
         tRenderer.getCamera().getProjectionMatrix();
 
         tRenderer.render(renderList, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
@@ -579,7 +579,7 @@ public class WaterNode extends Node {
         projectionMatrix = cam.getProjectionMatrix().toArray(projectionMatrix);
 
         // Get the inverse transpose of the current modelview matrix
-        final ReadOnlyMatrix4 modelViewMatrixInvTrans = tRenderer.getCamera().getModelViewMatrix().invert(tmpMatrix)
+        final ReadOnlyMatrix4 modelViewMatrixInvTrans = tRenderer.getCamera().getViewMatrix().invert(tmpMatrix)
                 .transposeLocal();
         modelViewMatrixInvTrans.applyPre(clipPlane, clipPlane);
 

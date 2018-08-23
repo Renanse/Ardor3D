@@ -19,9 +19,9 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Spatial;
 
 public class RenderTarget_Texture2D implements RenderTarget {

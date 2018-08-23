@@ -17,8 +17,8 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.util.stat.StatListener;
 import com.ardor3d.util.stat.StatType;
 

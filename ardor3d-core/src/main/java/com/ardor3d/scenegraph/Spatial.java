@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +33,7 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateStack;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -48,6 +50,7 @@ import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.google.common.collect.Maps;
 
 /**
  * Base class for all scenegraph objects.
@@ -73,7 +76,7 @@ public abstract class Spatial implements Savable, Hintable {
     /** ArrayList of controllers for this spatial. */
     protected List<SpatialController<?>> _controllers;
 
-    /** The render states of this spatial. */
+    /** The local render states of this spatial. */
     protected EnumMap<RenderState.StateType, RenderState> _renderStateList = new EnumMap<RenderState.StateType, RenderState>(
             RenderState.StateType.class);
 
@@ -84,14 +87,17 @@ public abstract class Spatial implements Savable, Hintable {
     protected EnumSet<DirtyType> _dirtyMark = EnumSet.of(DirtyType.Bounding, DirtyType.RenderState,
             DirtyType.Transform);
 
-    /** Field for user data. Note: If this object is not explicitly of type Savable, it will be ignored during save. */
-    protected Object _userData = null;
+    /** User supplied properties. */
+    protected Map<String, Object> _properties = Maps.newHashMap();
 
     /** Keeps track of the current frustum intersection state of this Spatial. */
     protected Camera.FrustumIntersect _frustumIntersects = Camera.FrustumIntersect.Intersects;
 
     /** The hints for Ardor3D's use when evaluating and rendering this spatial. */
     protected SceneHints _sceneHints;
+
+    /** The local RenderMaterial used by this spatial. Inherited by children if they have none set. */
+    protected RenderMaterial _material;
 
     public transient double _queueDistance = Double.NEGATIVE_INFINITY;
 
@@ -101,6 +107,8 @@ public abstract class Spatial implements Savable, Hintable {
     protected static final EnumSet<DirtyType> ON_DIRTY_BOUNDING = EnumSet.of(DirtyType.Bounding);
     protected static final EnumSet<DirtyType> ON_DIRTY_ATTACHED = EnumSet.of(DirtyType.Transform, DirtyType.RenderState,
             DirtyType.Bounding);
+
+    protected static final String PKEY_USER_DATA = "_userdata";
 
     /**
      * Constructs a new Spatial. Initializes the transform fields.
@@ -788,9 +796,25 @@ public abstract class Spatial implements Savable, Hintable {
      *
      * @param recurse
      *            usually false when updating the tree. Set to true when you just want to update the world transforms
-     *            for a branch without updating geometric state.
+     *            for a branch without updating the full geometric state.
      */
     public void updateWorldTransform(final boolean recurse) {
+        if (_parent != null) {
+            _parent._worldTransform.multiply(_localTransform, _worldTransform);
+        } else {
+            _worldTransform.set(_localTransform);
+        }
+        clearDirty(DirtyType.Transform);
+    }
+
+    /**
+     * Updates the world material.
+     *
+     * @param recurse
+     *            usually false when updating the tree. Set to true when you just want to update the world materials for
+     *            a branch without updating the full geometric state.
+     */
+    public void updateWorldRenderMaterial(final boolean recurse) {
         if (_parent != null) {
             _parent._worldTransform.multiply(_localTransform, _worldTransform);
         } else {
@@ -831,6 +855,32 @@ public abstract class Spatial implements Savable, Hintable {
         }
 
         return _worldTransform.applyInverse(in, store);
+    }
+
+    /**
+     * Sets the local render material.
+     *
+     * @param material
+     *            the new material
+     */
+    public void setRenderMaterial(final RenderMaterial material) {
+        _material = material;
+    }
+
+    /**
+     * Gets the locally set render material.
+     *
+     * @return the material, or null if none set.
+     */
+    public RenderMaterial getRenderMaterial() {
+        return _material;
+    }
+
+    /**
+     * @return our locally set RenderMaterial, or the closest locally set material on a scene graph ancestor.
+     */
+    public RenderMaterial getWorldRenderMaterial() {
+        return _material != null ? _material : _parent != null ? _parent.getWorldRenderMaterial() : null;
     }
 
     /**
@@ -989,7 +1039,7 @@ public abstract class Spatial implements Savable, Hintable {
      * @return the user data
      */
     public Object getUserData() {
-        return _userData;
+        return getProperty(PKEY_USER_DATA);
     }
 
     /**
@@ -1000,7 +1050,29 @@ public abstract class Spatial implements Savable, Hintable {
      *            ignored during read/write.
      */
     public void setUserData(final Object userData) {
-        _userData = userData;
+        setProperty(PKEY_USER_DATA, userData);
+    }
+
+    /**
+     * Get a property from this spatial, or null if the property is not set.
+     *
+     * @param key
+     *            property key
+     * @return the property, cast to T
+     * @throws ClassCastException
+     *             if property is not correct type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getProperty(final String key) {
+        return (T) _properties.getOrDefault(PKEY_USER_DATA, null);
+    }
+
+    public void setProperty(final String key, final Object value) {
+        if (value == null) {
+            _properties.remove(key);
+        } else {
+            _properties.put(key, value);
+        }
     }
 
     /**
@@ -1290,7 +1362,7 @@ public abstract class Spatial implements Savable, Hintable {
         final Savable userData = capsule.readSavable("userData", null);
         // only override set userdata if we have something in the capsule.
         if (userData != null) {
-            _userData = userData;
+            setUserData(userData);
         }
 
         final List<Savable> list = capsule.readSavableList("controllers", null);
@@ -1318,8 +1390,10 @@ public abstract class Spatial implements Savable, Hintable {
         capsule.write(_localTransform, "localTransform", new Transform(Transform.IDENTITY));
         capsule.write(_worldTransform, "worldTransform", new Transform(Transform.IDENTITY));
 
-        if (_userData instanceof Savable) {
-            capsule.write((Savable) _userData, "userData", null);
+        // FIXME: Needs to handle properties as well. Making it backwards compatible for the time being.
+        final Object userData = getUserData();
+        if (userData instanceof Savable) {
+            capsule.write((Savable) userData, "userData", null);
         }
 
         if (_controllers != null) {

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -53,22 +53,20 @@ public interface ReadOnlyTransform {
     Matrix4 getHomogeneousMatrix(Matrix4 store);
 
     /**
-     * Populates an nio double buffer with data from this transform to use as a model view matrix in OpenGL. This is
-     * done as efficiently as possible, not touching positions 3, 7, 11 and 15.
-     * 
+     * Populates an nio double buffer with data from this transform to use as a model view matrix in OpenGL. Does not
+     * modify the position of store.
+     *
      * @param store
-     *            double buffer to store in. Assumes a size of 16 and that position 3, 7 and 11 are already set as 0.0
-     *            and 15 is already 1.0.
+     *            double buffer to store in. Assumes a size of 16.
      */
     void getGLApplyMatrix(DoubleBuffer store);
 
     /**
-     * Populates an nio float buffer with data from this transform to use as a model view matrix in OpenGL. This is done
-     * as efficiently as possible, not touching positions 3, 7, 11 and 15.
-     * 
+     * Populates an nio float buffer with data from this transform to use as a model view matrix in OpenGL. Does not
+     * modify the position of store.
+     *
      * @param store
-     *            float buffer to store in. Assumes a size of 16 and that position 3, 7 and 11 are already set as 0.0f
-     *            and 15 is already 1.0f.
+     *            float buffer to store in. Assumes a size of 16.
      */
     void getGLApplyMatrix(FloatBuffer store);
 

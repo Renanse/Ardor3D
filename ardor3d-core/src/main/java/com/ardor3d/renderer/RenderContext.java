@@ -19,6 +19,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
+import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
 
 /**
  * Represents the state of an individual context in OpenGL.

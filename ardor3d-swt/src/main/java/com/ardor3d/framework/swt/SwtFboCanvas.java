@@ -10,9 +10,11 @@
 
 package com.ardor3d.framework.swt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.opengl.GLCanvas;
@@ -23,19 +25,19 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.input.MouseManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ContextGarbageCollector;
-import com.google.common.collect.Lists;
 
 public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canvas {
     // Canvas items
@@ -49,12 +51,21 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
 
     protected int _oldWidth, _oldHeight;
     private Texture2D _fboTexture;
-    private final List<Texture> _texList = Lists.newArrayList();
+    private final List<Texture> _texList = new ArrayList<>();
     private Quad _quad;
+
+    protected List<ICanvasListener> _listeners = new ArrayList<>();
 
     public SwtFboCanvas(final Composite composite, final int style, final DisplaySettings settings) {
         super(composite, style, toGLData(settings));
         _settings = settings;
+
+        addListener(SWT.Resize, event -> {
+            final Rectangle clientArea = getClientArea();
+            for (final ICanvasListener l : _listeners) {
+                l.onResize(clientArea.width, clientArea.height);
+            }
+        });
     }
 
     private static GLData toGLData(final DisplaySettings settings) {
@@ -143,7 +154,7 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         _canvasRenderer.init(settings, false);
 
         if (_fboTexture != null && _fboTexture.getTextureIdForContext(_canvasRenderer.getRenderContext()) != 0) {
-            _canvasRenderer.getRenderer().deleteTexture(_fboTexture);
+            _canvasRenderer.getRenderer().getTextureUtils().deleteTexture(_fboTexture);
         }
 
         _rtt = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, _canvasRenderer.getRenderer(),
@@ -180,5 +191,25 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
     @Override
     public void setMouseManager(final MouseManager manager) {
         _manager = manager;
+    }
+
+    @Override
+    public int getContentHeight() {
+        return getClientArea().x;
+    }
+
+    @Override
+    public int getContentWidth() {
+        return getClientArea().y;
+    }
+
+    @Override
+    public void addListener(final ICanvasListener listener) {
+        _listeners.add(listener);
+    }
+
+    @Override
+    public boolean removeListener(final ICanvasListener listener) {
+        return _listeners.remove(listener);
     }
 }

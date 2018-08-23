@@ -10,6 +10,7 @@
 
 package com.ardor3d.input.swt;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -36,7 +37,6 @@ import com.ardor3d.input.gesture.touch.TouchHistory;
 import com.ardor3d.input.gesture.touch.TouchStatus;
 import com.ardor3d.math.MathUtils;
 import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
 
 /**
@@ -51,10 +51,10 @@ public class SwtGestureWrapper implements GestureWrapper, TouchListener {
     private SwtGestureIterator _currentIterator = null;
 
     @GuardedBy("this")
-    private final List<AbstractTouchInterpreter> _touchInterpreters = Lists.newArrayList();
+    private final List<AbstractTouchInterpreter> _touchInterpreters = new ArrayList<>();
 
     @GuardedBy("this")
-    private final List<TouchHistory> _touchHistories = Lists.newArrayList();
+    private final List<TouchHistory> _touchHistories = new ArrayList<>();
 
     private final Control _control;
     private final MouseWrapper _mouse;

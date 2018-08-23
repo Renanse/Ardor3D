@@ -13,17 +13,17 @@ package com.ardor3d.scenegraph.visitor;
 import java.nio.Buffer;
 import java.util.Map.Entry;
 
-import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 
 public class DeleteVBOsVisitor implements Visitor {
-    final Renderer _deleter;
+    final IShaderUtils _utils;
 
-    public DeleteVBOsVisitor(final Renderer deleter) {
-        _deleter = deleter;
+    public DeleteVBOsVisitor(final IShaderUtils utils) {
+        _utils = utils;
     }
 
     public void visit(final Spatial spatial) {
@@ -31,7 +31,7 @@ public class DeleteVBOsVisitor implements Visitor {
             final Mesh mesh = (Mesh) spatial;
             final MeshData meshData = mesh.getMeshData();
             for (final Entry<String, AbstractBufferData<? extends Buffer>> entry : meshData.listDataItems()) {
-                _deleter.deleteVBOs(entry.getValue());
+                _utils.deleteBuffer(entry.getValue());
             }
         }
     }

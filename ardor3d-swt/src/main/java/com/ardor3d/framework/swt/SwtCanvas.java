@@ -10,8 +10,11 @@
 
 package com.ardor3d.framework.swt;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
@@ -21,6 +24,7 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.input.MouseManager;
 
 /**
@@ -31,10 +35,19 @@ public class SwtCanvas extends GLCanvas implements Canvas {
     protected boolean _inited = false;
     protected final GLData _passedGLData;
 
+    protected List<ICanvasListener> _listeners = new ArrayList<>();
+
     public SwtCanvas(final Composite composite, final int style, final GLData glData) {
         super(composite, style, glData);
         _passedGLData = getGLData();
         setCurrent();
+
+        addListener(SWT.Resize, event -> {
+            final Rectangle clientArea = getClientArea();
+            for (final ICanvasListener l : _listeners) {
+                l.onResize(clientArea.width, clientArea.height);
+            }
+        });
     }
 
     public CanvasRenderer getCanvasRenderer() {
@@ -94,5 +107,25 @@ public class SwtCanvas extends GLCanvas implements Canvas {
         }
 
         latch.countDown();
+    }
+
+    @Override
+    public int getContentHeight() {
+        return getClientArea().x;
+    }
+
+    @Override
+    public int getContentWidth() {
+        return getClientArea().y;
+    }
+
+    @Override
+    public void addListener(final ICanvasListener listener) {
+        _listeners.add(listener);
+    }
+
+    @Override
+    public boolean removeListener(final ICanvasListener listener) {
+        return _listeners.remove(listener);
     }
 }

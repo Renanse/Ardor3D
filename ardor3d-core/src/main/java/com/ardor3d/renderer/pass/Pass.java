@@ -19,8 +19,8 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Spatial;
 
 /**

@@ -15,7 +15,7 @@ import java.util.List;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRenderer;
 
 /**
  * <code>BasicPassManager</code> controls a set of passes and sends through calls to render and update.

@@ -365,7 +365,7 @@ public class BMText extends Mesh {
 
         // calculate the height in world units of the screen at that depth
         final double heightAtZ;
-        if (cam.getProjectionMode().equals(ProjectionMode.Parallel)) {
+        if (cam.getProjectionMode().equals(ProjectionMode.Orthographic)) {
             heightAtZ = cam.getFrustumBottom();
         } else {
             heightAtZ = zDepth * cam.getFrustumTop() / cam.getFrustumNear();

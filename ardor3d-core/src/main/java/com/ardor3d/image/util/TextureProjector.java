@@ -36,7 +36,7 @@ public class TextureProjector extends Camera {
 
     public void updateTextureMatrix(final Matrix4 matrixStore) {
         update();
-        final ReadOnlyMatrix4 projectorView = getModelViewMatrix();
+        final ReadOnlyMatrix4 projectorView = getViewMatrix();
         final ReadOnlyMatrix4 projectorProjection = getProjectionMatrix();
         matrixStore.set(projectorView).multiplyLocal(projectorProjection).multiplyLocal(BIAS);
     }

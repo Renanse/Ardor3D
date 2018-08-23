@@ -15,8 +15,8 @@ import java.util.List;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.google.common.collect.Lists;
 
 public enum TextureRendererPool {

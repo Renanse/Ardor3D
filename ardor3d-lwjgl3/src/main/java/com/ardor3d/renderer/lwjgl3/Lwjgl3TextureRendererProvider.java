@@ -13,8 +13,8 @@ package com.ardor3d.renderer.lwjgl3;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererProvider;
+import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.renderer.texture.TextureRendererProvider;
 
 public class Lwjgl3TextureRendererProvider implements TextureRendererProvider {
 

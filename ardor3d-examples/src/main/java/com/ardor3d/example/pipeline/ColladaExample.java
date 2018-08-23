@@ -68,8 +68,8 @@ import com.ardor3d.util.resource.URLResourceSource;
  * Illustrates loading a model from Collada. If the model also contains an animation, the animation is played as well.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ColladaExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
-maxHeapMemory = 128)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
+        maxHeapMemory = 128)
 public class ColladaExample extends ExampleBase {
 
     private Node colladaNode;
@@ -104,7 +104,8 @@ public class ColladaExample extends ExampleBase {
         _lightState.attach(light);
 
         // Load collada model
-        loadColladaModel(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "collada/sony/Seymour.dae"));
+        loadColladaModel(
+                ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "collada/sony/Seymour.dae"));
 
         final File rootDir = new File(".");
         daeFiles = findFiles(rootDir, ".dae", null);
@@ -165,7 +166,7 @@ public class ColladaExample extends ExampleBase {
 
         final UICheckBox skinCheck = new UICheckBox("Show skin mesh");
         skinCheck
-        .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, loadSceneButton, Alignment.BOTTOM_LEFT, 0, -5));
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, loadSceneButton, Alignment.BOTTOM_LEFT, 0, -5));
         skinCheck.setSelected(true);
         skinCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -186,8 +187,8 @@ public class ColladaExample extends ExampleBase {
         });
         basePanel.add(skeletonCheck);
 
-        boneLabelCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skeletonCheck, Alignment.BOTTOM_LEFT, 0,
-                -5));
+        boneLabelCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skeletonCheck, Alignment.BOTTOM_LEFT, 0, -5));
         boneLabelCheck.setSelected(false);
         boneLabelCheck.setEnabled(showSkeleton);
         boneLabelCheck.addActionListener(new ActionListener() {
@@ -203,8 +204,8 @@ public class ColladaExample extends ExampleBase {
         optionsFrame.setOpacity(0.8f);
 
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        optionsFrame.setLocalXY(cam.getWidth() - optionsFrame.getLocalComponentWidth() - 10, cam.getHeight()
-                - optionsFrame.getLocalComponentHeight() - 10);
+        optionsFrame.setLocalXY(cam.getWidth() - optionsFrame.getLocalComponentWidth() - 10,
+                cam.getHeight() - optionsFrame.getLocalComponentHeight() - 10);
         hud.add(optionsFrame);
 
         UIComponent.setUseTransparency(true);
@@ -303,7 +304,6 @@ public class ColladaExample extends ExampleBase {
             final double near = Math.max(radius / 50.0, 0.25);
             final double far = Math.min(radius * 5, 10000.0);
             cam.setFrustumPerspective(50.0, cam.getWidth() / (double) cam.getHeight(), near, far);
-            cam.update();
 
             _controlHandle.setMoveSpeed(radius / 1.0);
         }

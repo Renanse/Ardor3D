@@ -49,9 +49,34 @@ public interface Canvas {
 
     /**
      * Sets a MouseManager to be associated with this Canvas.
-     * 
+     *
      * @param manager
      *            the manager to associate
      */
     void setMouseManager(MouseManager manager);
+
+    /**
+     * Add a listener to this canvas.
+     *
+     * @param listener
+     */
+    void addListener(ICanvasListener listener);
+
+    /**
+     * Remove a listener from this canvas.
+     *
+     * @param listener
+     * @return true if the listener was removed.
+     */
+    boolean removeListener(ICanvasListener listener);
+
+    /**
+     * @return the width, in pixels, of the content portion of this canvas (i.e. without any chrome.)
+     */
+    int getContentWidth();
+
+    /**
+     * @return the height, in pixels, of the content portion of this canvas (i.e. without any chrome.)
+     */
+    int getContentHeight();
 }

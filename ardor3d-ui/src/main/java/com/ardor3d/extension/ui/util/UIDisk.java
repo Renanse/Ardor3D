@@ -110,11 +110,16 @@ public class UIDisk extends Mesh {
                 BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0).getBuffer(), i);
             }
         }
+
+        _meshData.getVertexCoords().markDirty();
+        _meshData.getTextureCoords(0).markDirty();
+        _meshData.markBuffersDirty();
     }
 
     private void setIndexData() {
         // generate connectivity
-        for (int radialCount0 = _radialSamples - 1, radialCount1 = 0; radialCount1 < _radialSamples; radialCount0 = radialCount1++) {
+        for (int radialCount0 = _radialSamples
+                - 1, radialCount1 = 0; radialCount1 < _radialSamples; radialCount0 = radialCount1++) {
             final int i00 = 2 * radialCount0;
             final int i01 = 2 * radialCount1;
             final int i10 = i00 + 1;
