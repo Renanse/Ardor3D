@@ -385,12 +385,13 @@ public abstract class TextSelection {
             verts.add(yOffset + height);
             verts.add(0f);
         }
-        final MeshData mData = _standin.getMeshData();
-        mData.setVertexBuffer(BufferUtils.createVector3Buffer(mData.getVertexBuffer(), verts.size()));
-        final FloatBuffer vertBuffer = mData.getVertexBuffer();
+        final MeshData meshData = _standin.getMeshData();
+        meshData.setVertexBuffer(BufferUtils.createVector3Buffer(meshData.getVertexBuffer(), verts.size()));
+        final FloatBuffer vertBuffer = meshData.getVertexBuffer();
         for (final float f : verts) {
             vertBuffer.put(f);
         }
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
     }
 
     public void draw(final Renderer renderer, final ReadOnlyTransform xform) {

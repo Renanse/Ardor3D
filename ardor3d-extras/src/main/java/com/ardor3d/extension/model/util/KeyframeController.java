@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,6 +20,7 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
@@ -29,24 +30,24 @@ import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * TODO: Revisit for better Ardor3D integration.
- * 
+ *
  * Started Date: Jun 12, 2004 <br>
- * 
- * 
+ *
+ *
  * Class can do linear interpolation of a Mesh between units of time. Similar to VertexKeyframeController but
  * interpolates float units of time instead of integer key frames.
- * 
+ *
  * setSpeed(float) sets a speed relative to the defined speed. For example, the default is 1. A speed of 2 would run
  * twice as fast and a speed of .5 would run half as fast
- * 
+ *
  * setMinTime(float) and setMaxTime(float) both define the bounds that KeyframeController should follow. It is the
  * programmer's responsibility to make sure that the MinTime and MaxTime are within the span of the defined setKeyframe
- * 
+ *
  * Controller functions RepeatType and isActive are both defined in their default way for KeyframeController
- * 
+ *
  * When this controller is saved/loaded to XML format, it assumes that the mesh it morphs is the Mesh it belongs to, so
  * it is recommended to only attach this controller to the Mesh it animates.
- * 
+ *
  * (Based on work by Jack Lindamood, kevglass (parts), hevee (blend time), Julien Gouesse (port to Ardor3D))
  */
 
@@ -151,7 +152,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * Sets the current time in the animation
-     * 
+     *
      * @param time
      *            The time this Controller should continue at
      */
@@ -161,7 +162,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * Sets the Mesh that will be physically changed by this KeyframeController
-     * 
+     *
      * @param morph
      *            The new mesh to morph
      */
@@ -180,17 +181,15 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
      * non-null and shape must have the same number of vertexes as the current shape. If not, then nothing happens. It
      * is also required that setMorphingMesh(Mesh) is called before setKeyframe. It is assumed that shape.indices ==
      * morphMesh.indices, otherwise morphing may look funny
-     * 
+     *
      * @param time
      *            The time for the change
      * @param shape
      *            The new shape at that time
      */
     public void setKeyframe(final double time, final Mesh shape) {
-        if (_morphMesh == null
-                || time < 0
-                || shape.getMeshData().getVertexBuffer().capacity() != _morphMesh.getMeshData().getVertexBuffer()
-                        .capacity()) {
+        if (_morphMesh == null || time < 0 || shape.getMeshData().getVertexBuffer().capacity() != _morphMesh
+                .getMeshData().getVertexBuffer().capacity()) {
             return;
         }
         for (int i = 0; i < _keyframes.size(); i++) {
@@ -220,7 +219,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
      * <br>
      * This would be useful for example when a figure stops running and tries to raise an arm. Instead of "teleporting"
      * to the raise-arm animation beginning, a smooth translation can occur.
-     * 
+     *
      * @param newTimeToReach
      *            The time to reach.
      * @param translationLen
@@ -292,7 +291,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
      * warning is set and nothing happens. <br>
      * It is suggested that this function be called if new animation boundaries need to be set, instead of setMinTime
      * and setMaxTime directly.
-     * 
+     *
      * @param newBeginTime
      *            The starting time
      * @param newEndTime
@@ -328,97 +327,105 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * Saves whatever the current morphMesh looks like into the dataCopy
-     * 
+     *
      * @param dataCopy
      *            The copy to save the current mesh into
      */
     private void getCurrent(final Mesh dataCopy) {
-        if (_morphMesh.getMeshData().getColorBuffer() != null) {
-            FloatBuffer dcColors = dataCopy.getMeshData().getColorBuffer();
-            if (dcColors != null) {
-                dcColors.clear();
+        final MeshData srcMeshData = _morphMesh.getMeshData();
+        final MeshData dstMeshData = dataCopy.getMeshData();
+        if (srcMeshData.getColorBuffer() != null) {
+            FloatBuffer dstColors = dstMeshData.getColorBuffer();
+            if (dstColors != null) {
+                dstColors.clear();
             }
-            final FloatBuffer mmColors = _morphMesh.getMeshData().getColorBuffer();
-            mmColors.clear();
-            if (dcColors == null || dcColors.capacity() != mmColors.capacity()) {
-                dcColors = BufferUtils.createFloatBuffer(mmColors.capacity());
-                dcColors.clear();
-                dataCopy.getMeshData().setColorBuffer(dcColors);
+            final FloatBuffer srcColors = srcMeshData.getColorBuffer();
+            srcColors.clear();
+            if (dstColors == null || dstColors.capacity() != srcColors.capacity()) {
+                dstColors = BufferUtils.createFloatBuffer(srcColors.capacity());
+                dstColors.clear();
+                dstMeshData.setColorBuffer(dstColors);
             }
 
-            dcColors.put(mmColors);
-            dcColors.flip();
+            dstColors.put(srcColors);
+            dstColors.flip();
+            dstMeshData.markBufferDirty(MeshData.KEY_ColorCoords);
         }
-        if (_morphMesh.getMeshData().getVertexBuffer() != null) {
-            FloatBuffer dcVerts = dataCopy.getMeshData().getVertexBuffer();
-            if (dcVerts != null) {
-                dcVerts.clear();
+        if (srcMeshData.getVertexBuffer() != null) {
+            FloatBuffer dstVerts = dstMeshData.getVertexBuffer();
+            if (dstVerts != null) {
+                dstVerts.clear();
             }
-            final FloatBuffer mmVerts = _morphMesh.getMeshData().getVertexBuffer();
-            mmVerts.clear();
-            if (dcVerts == null || dcVerts.capacity() != mmVerts.capacity()) {
-                dcVerts = BufferUtils.createFloatBuffer(mmVerts.capacity());
-                dcVerts.clear();
-                dataCopy.getMeshData().setVertexBuffer(dcVerts);
+            final FloatBuffer srcVerts = srcMeshData.getVertexBuffer();
+            srcVerts.clear();
+            if (dstVerts == null || dstVerts.capacity() != srcVerts.capacity()) {
+                dstVerts = BufferUtils.createFloatBuffer(srcVerts.capacity());
+                dstVerts.clear();
+                dstMeshData.setVertexBuffer(dstVerts);
             }
 
-            dcVerts.put(mmVerts);
-            dcVerts.flip();
+            dstVerts.put(srcVerts);
+            dstVerts.flip();
+            dstMeshData.markBufferDirty(MeshData.KEY_VertexCoords);
         }
-        if (_morphMesh.getMeshData().getNormalBuffer() != null) {
-            FloatBuffer dcNorms = dataCopy.getMeshData().getNormalBuffer();
-            if (dcNorms != null) {
-                dcNorms.clear();
+        if (srcMeshData.getNormalBuffer() != null) {
+            FloatBuffer dstNorms = dstMeshData.getNormalBuffer();
+            if (dstNorms != null) {
+                dstNorms.clear();
             }
-            final FloatBuffer mmNorms = _morphMesh.getMeshData().getNormalBuffer();
-            mmNorms.clear();
-            if (dcNorms == null || dcNorms.capacity() != mmNorms.capacity()) {
-                dcNorms = BufferUtils.createFloatBuffer(mmNorms.capacity());
-                dcNorms.clear();
-                dataCopy.getMeshData().setNormalBuffer(dcNorms);
+            final FloatBuffer srcNorms = srcMeshData.getNormalBuffer();
+            srcNorms.clear();
+            if (dstNorms == null || dstNorms.capacity() != srcNorms.capacity()) {
+                dstNorms = BufferUtils.createFloatBuffer(srcNorms.capacity());
+                dstNorms.clear();
+                dstMeshData.setNormalBuffer(dstNorms);
             }
 
-            dcNorms.put(mmNorms);
-            dcNorms.flip();
+            dstNorms.put(srcNorms);
+            dstNorms.flip();
+            dstMeshData.markBufferDirty(MeshData.KEY_NormalCoords);
         }
-        if (_morphMesh.getMeshData().getIndices() != null) {
-            IndexBufferData<?> dcInds = dataCopy.getMeshData().getIndices();
-            if (dcInds != null) {
-                dcInds.rewind();
+        if (srcMeshData.getIndices() != null) {
+            IndexBufferData<?> dstInds = dstMeshData.getIndices();
+            if (dstInds != null) {
+                dstInds.rewind();
             }
-            final IndexBufferData<?> mmInds = _morphMesh.getMeshData().getIndices();
-            mmInds.clear();
-            if (dcInds == null || dcInds.capacity() != mmInds.capacity() || dcInds.getClass() != mmInds.getClass()) {
-                dcInds = BufferUtils.createIndexBufferData(mmInds.capacity(), _morphMesh.getMeshData()
-                        .getVertexBuffer().capacity() - 1);
-                dcInds.clear();
-                dataCopy.getMeshData().setIndices(dcInds);
+            final IndexBufferData<?> srcInds = srcMeshData.getIndices();
+            srcInds.clear();
+            if (dstInds == null || dstInds.capacity() != srcInds.capacity()
+                    || dstInds.getClass() != srcInds.getClass()) {
+                dstInds = BufferUtils.createIndexBufferData(srcInds.capacity(),
+                        srcMeshData.getVertexBuffer().capacity() - 1);
+                dstInds.clear();
+                dstMeshData.setIndices(dstInds);
             }
 
-            dcInds.put(mmInds);
-            dcInds.flip();
+            dstInds.put(srcInds);
+            dstInds.flip();
+            srcInds.markDirty();
         }
-        if (_morphMesh.getMeshData().getTextureCoords(0) != null) {
-            FloatBuffer dcTexs = dataCopy.getMeshData().getTextureCoords(0).getBuffer();
-            if (dcTexs != null) {
-                dcTexs.clear();
+        if (srcMeshData.getTextureCoords(0) != null) {
+            FloatBuffer dstTexs = dstMeshData.getTextureCoords(0).getBuffer();
+            if (dstTexs != null) {
+                dstTexs.clear();
             }
-            final FloatBuffer mmTexs = _morphMesh.getMeshData().getTextureCoords(0).getBuffer();
-            mmTexs.clear();
-            if (dcTexs == null || dcTexs.capacity() != mmTexs.capacity()) {
-                dcTexs = BufferUtils.createFloatBuffer(mmTexs.capacity());
-                dcTexs.clear();
-                dataCopy.getMeshData().setTextureCoords(new FloatBufferData(dcTexs, 2), 0);
+            final FloatBuffer srcTexs = srcMeshData.getTextureCoords(0).getBuffer();
+            srcTexs.clear();
+            if (dstTexs == null || dstTexs.capacity() != srcTexs.capacity()) {
+                dstTexs = BufferUtils.createFloatBuffer(srcTexs.capacity());
+                dstTexs.clear();
+                dstMeshData.setTextureCoords(new FloatBufferData(dstTexs, 2), 0);
             }
 
-            dcTexs.put(mmTexs);
-            dcTexs.flip();
+            dstTexs.put(srcTexs);
+            dstTexs.flip();
+            dstMeshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
         }
     }
 
     /**
      * As defined in Controller
-     * 
+     *
      * @param time
      *            as defined in Controller
      */
@@ -460,20 +467,23 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
         final FloatBuffer verts = _morphMesh.getMeshData().getVertexBuffer();
         final FloatBuffer norms = _morphMesh.getMeshData().getNormalBuffer();
-        final FloatBuffer texts = _interpTex ? _morphMesh.getMeshData().getTextureCoords(0) != null ? _morphMesh
-                .getMeshData().getTextureCoords(0).getBuffer() : null : null;
+        final FloatBuffer texts = _interpTex ? _morphMesh.getMeshData().getTextureCoords(0) != null
+                ? _morphMesh.getMeshData().getTextureCoords(0).getBuffer()
+                : null : null;
         final FloatBuffer colors = _morphMesh.getMeshData().getColorBuffer();
 
         final FloatBuffer oldverts = oldShape.getMeshData().getVertexBuffer();
         final FloatBuffer oldnorms = oldShape.getMeshData().getNormalBuffer();
-        final FloatBuffer oldtexts = _interpTex ? oldShape.getMeshData().getTextureCoords(0) != null ? oldShape
-                .getMeshData().getTextureCoords(0).getBuffer() : null : null;
+        final FloatBuffer oldtexts = _interpTex ? oldShape.getMeshData().getTextureCoords(0) != null
+                ? oldShape.getMeshData().getTextureCoords(0).getBuffer()
+                : null : null;
         final FloatBuffer oldcolors = oldShape.getMeshData().getColorBuffer();
 
         final FloatBuffer newverts = newShape.getMeshData().getVertexBuffer();
         final FloatBuffer newnorms = newShape.getMeshData().getNormalBuffer();
-        final FloatBuffer newtexts = _interpTex ? newShape.getMeshData().getTextureCoords(0) != null ? newShape
-                .getMeshData().getTextureCoords(0).getBuffer() : null : null;
+        final FloatBuffer newtexts = _interpTex ? newShape.getMeshData().getTextureCoords(0) != null
+                ? newShape.getMeshData().getTextureCoords(0).getBuffer()
+                : null : null;
         final FloatBuffer newcolors = newShape.getMeshData().getColorBuffer();
         if (verts == null || oldverts == null || newverts == null) {
             return;
@@ -529,7 +539,9 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
                     verts.put(i * 3 + x,
                             (float) ((1f - delta) * trOldverts.getValue(x) + delta * trNewverts.getValue(x)));
                 }
+
             }
+            _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
         } else {
             for (int i = 0; i < vertQuantity; i++) {
                 for (int x = 0; x < 3; x++) {
@@ -537,6 +549,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
                             (float) ((1f - delta) * oldverts.get(i * 3 + x) + delta * newverts.get(i * 3 + x)));
                 }
             }
+            _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
         }
 
         for (int i = 0; i < vertQuantity; i++) {
@@ -545,6 +558,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
                     norms.put(i * 3 + x,
                             (float) ((1f - delta) * oldnorms.get(i * 3 + x) + delta * newnorms.get(i * 3 + x)));
                 }
+                _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_NormalCoords);
             }
 
             if (_interpTex && texts != null && oldtexts != null && newtexts != null) {
@@ -552,6 +566,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
                     texts.put(i * 2 + x,
                             (float) ((1f - delta) * oldtexts.get(i * 2 + x) + delta * newtexts.get(i * 2 + x)));
                 }
+                _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
             }
 
             if (colors != null && oldcolors != null && newcolors != null) {
@@ -559,6 +574,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
                     colors.put(i * 4 + x,
                             (float) ((1f - delta) * oldcolors.get(i * 4 + x) + delta * newcolors.get(i * 4 + x)));
                 }
+                _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_ColorCoords);
             }
         }
 
@@ -577,7 +593,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
     /**
      * If both min and max time are equal and the model is already updated, then it's an easy quit, or if it's on CLAMP
      * and I've exceeded my time it's also an easy quit.
-     * 
+     *
      * @return true if update doesn't need to be called, false otherwise
      */
     private boolean easyQuit() {
@@ -594,7 +610,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * If true, the model's bounding volume will be updated every frame. If false, it will not.
-     * 
+     *
      * @param update
      *            The new update model volume per frame value.
      */
@@ -604,7 +620,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * Returns true if the model's bounding volume is being updated every frame.
-     * 
+     *
      * @return True if bounding volume is updating.
      */
     public boolean isUpdateBounding() {
@@ -625,7 +641,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
      * If repeat type RT_WRAP is set, after reaching the last frame of the currently set animation maxTime (see
      * Controller.setMaxTime), there will be an additional blendTime seconds long phase inserted, morphing from the last
      * frame to the first.
-     * 
+     *
      * @param blendTime
      *            The blend time to set
      */
@@ -635,7 +651,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
     /**
      * Gets the currently set blending time for smooth animation transitions
-     * 
+     *
      * @return The current blend time
      * @see #setBlendTime(float blendTime)
      */
@@ -744,8 +760,8 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
         public PointInTime() {}
 
         public PointInTime(final double time, final Mesh shape) {
-            this._time = time;
-            this._newShape = shape;
+            _time = time;
+            _newShape = shape;
         }
 
         @Override

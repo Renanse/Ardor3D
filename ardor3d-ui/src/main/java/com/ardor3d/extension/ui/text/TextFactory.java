@@ -81,6 +81,7 @@ public enum TextFactory {
         return _styleParser;
     }
 
+    // FIXME: Should reuse our buffers whenever possible! Particularly now that we are VBO only.
     public RenderedText generateText(final String rawText, final boolean styled,
             final Map<String, Object> defaultStyles, final RenderedText store, final int maxWidth) {
         RenderedText rVal = store;

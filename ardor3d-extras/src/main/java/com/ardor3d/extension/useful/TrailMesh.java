@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,6 +20,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -78,7 +79,7 @@ public class TrailMesh extends Mesh {
 
     /**
      * Creates a new TrailMesh.
-     * 
+     *
      * @param name
      *            Name of Spatial
      * @param nrTrailSections
@@ -100,7 +101,7 @@ public class TrailMesh extends Mesh {
 
     /**
      * Update the front position of the trail.
-     * 
+     *
      * @param position
      *            New position of the trail front
      * @param width
@@ -114,7 +115,7 @@ public class TrailMesh extends Mesh {
 
     /**
      * Update the front position of the trail.
-     * 
+     *
      * @param position
      *            New position of the trail front
      * @param tangent
@@ -158,7 +159,7 @@ public class TrailMesh extends Mesh {
 
     /**
      * Update the vertices of the trail.
-     * 
+     *
      * @param camPos
      *            Camera position used for billboarding.
      */
@@ -173,6 +174,7 @@ public class TrailMesh extends Mesh {
             } else {
                 updateInterpolate(camPos);
             }
+            _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
             invalid = false;
         }
     }
@@ -248,8 +250,8 @@ public class TrailMesh extends Mesh {
                 } else if (i == nrTrailSections - 1) {
                     trailDirection.set(trailVector).subtractLocal(trailVectors.get(i - 1).interpolatedPosition);
                 } else {
-                    trailDirection.set(trailVectors.get(i + 1).interpolatedPosition).subtractLocal(
-                            trailVectors.get(i - 1).interpolatedPosition);
+                    trailDirection.set(trailVectors.get(i + 1).interpolatedPosition)
+                            .subtractLocal(trailVectors.get(i - 1).interpolatedPosition);
                 }
 
                 trailCamVec.set(trailVector).subtractLocal(camPos);
@@ -340,7 +342,7 @@ public class TrailMesh extends Mesh {
 
     /**
      * Get the mesh data to modify it manually. If data is modified, invalidate() method call is required.
-     * 
+     *
      * @return
      */
     public LinkedList<TrailData> getTrailData() {

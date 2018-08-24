@@ -16,6 +16,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -66,13 +67,13 @@ public class UIQuad extends Mesh {
         _width = width;
         _height = height;
 
-        _meshData.getVertexBuffer().clear();
-        _meshData.getVertexBuffer().put(0).put((float) _height);
-        _meshData.getVertexBuffer().put(0).put(0);
-        _meshData.getVertexBuffer().put((float) _width).put(0);
-        _meshData.getVertexBuffer().put((float) _width).put((float) _height);
-        _meshData.getVertexCoords().markDirty();
-        _meshData.markBuffersDirty();
+        FloatBuffer vertexBuffer = _meshData.getVertexBuffer();
+        vertexBuffer.clear();
+        vertexBuffer.put(0).put((float) _height);
+        vertexBuffer.put(0).put(0);
+        vertexBuffer.put((float) _width).put(0);
+        vertexBuffer.put((float) _width).put((float) _height);
+        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
     }
 
     /**

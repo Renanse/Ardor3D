@@ -14,6 +14,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class UIDisk extends Mesh {
@@ -111,9 +112,8 @@ public class UIDisk extends Mesh {
             }
         }
 
-        _meshData.getVertexCoords().markDirty();
-        _meshData.getTextureCoords(0).markDirty();
-        _meshData.markBuffersDirty();
+        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
     }
 
     private void setIndexData() {

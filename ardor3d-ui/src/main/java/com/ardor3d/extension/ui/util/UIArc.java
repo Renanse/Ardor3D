@@ -20,6 +20,7 @@ import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class UIArc extends Mesh {
@@ -259,10 +260,9 @@ public class UIArc extends Mesh {
             }
         }
 
-        _meshData.getVertexCoords().markDirty();
-        _meshData.getTextureCoords(0).markDirty();
+        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
         _meshData.getIndices().markDirty();
-        _meshData.markBuffersDirty();
     }
 
     public double getSampleRate() {

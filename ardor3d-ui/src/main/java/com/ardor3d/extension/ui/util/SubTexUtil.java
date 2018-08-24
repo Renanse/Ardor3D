@@ -284,15 +284,14 @@ public class SubTexUtil {
         // set our vertices into the mesh
         meshData.getVertexBuffer().rewind();
         meshData.getVertexBuffer().put(SubTexUtil._vals);
-        meshData.getVertexCoords().markDirty();
 
         // set our texture coords into the mesh
         meshData.getTextureBuffer(0).rewind();
         meshData.getTextureBuffer(0).put(SubTexUtil._texc);
-        meshData.getTextureCoords(0).markDirty();
 
         // draw mesh
-        meshData.markBuffersDirty();
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
         SubTexUtil._mesh.render(renderer);
     }
 
@@ -399,15 +398,14 @@ public class SubTexUtil {
         // set our vertices into the mesh
         meshData.getVertexBuffer().rewind();
         meshData.getVertexBuffer().put(SubTexUtil._vals);
-        meshData.getVertexCoords().markDirty();
 
         // set our texture coords into the mesh
         meshData.getTextureBuffer(0).rewind();
         meshData.getTextureBuffer(0).put(SubTexUtil._texc);
-        meshData.getTextureCoords(0).markDirty();
 
         // draw mesh
-        meshData.markBuffersDirty();
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
         SubTexUtil._mesh.render(renderer);
     }
 

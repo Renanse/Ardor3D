@@ -26,6 +26,7 @@ import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -178,11 +179,15 @@ public class SolidBorder extends UIBorder {
         setColor(6, _rightColor, pAlpha);
         setColor(7, _rightColor, pAlpha);
 
-        SolidBorder._mesh.getMeshData().getVertexBuffer().rewind();
-        SolidBorder._mesh.getMeshData().getVertexBuffer().put(SolidBorder._verts);
+        final MeshData meshData = SolidBorder._mesh.getMeshData();
+        meshData.getVertexBuffer().rewind();
+        meshData.getVertexBuffer().put(SolidBorder._verts);
 
-        SolidBorder._mesh.getMeshData().getColorBuffer().rewind();
-        SolidBorder._mesh.getMeshData().getColorBuffer().put(SolidBorder._colors);
+        meshData.getColorBuffer().rewind();
+        meshData.getColorBuffer().put(SolidBorder._colors);
+
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        meshData.markBufferDirty(MeshData.KEY_ColorCoords);
 
         SolidBorder._mesh.render(renderer);
     }

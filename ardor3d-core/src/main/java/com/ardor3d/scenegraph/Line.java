@@ -143,6 +143,9 @@ public class Line extends Mesh {
         }
         verts.put((float) (radius + x)).put((float) y).put(0);
         normals.put((float) radius).put(0).put(0);
+
+        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        _meshData.markBufferDirty(MeshData.KEY_NormalCoords);
     }
 
     /**

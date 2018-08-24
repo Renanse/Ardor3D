@@ -144,13 +144,12 @@ public class GradientBackdrop extends UIBackdrop {
         final MeshData meshData = GradientBackdrop._mesh.getMeshData();
         meshData.getVertexBuffer().rewind();
         meshData.getVertexBuffer().put(GradientBackdrop._vals);
-        meshData.getVertexCoords().markDirty();
 
         meshData.getColorBuffer().rewind();
         meshData.getColorBuffer().put(GradientBackdrop._cVals);
-        meshData.getColorCoords().markDirty();
 
-        meshData.markBuffersDirty();
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        meshData.markBufferDirty(MeshData.KEY_ColorCoords);
         GradientBackdrop._mesh.render(renderer);
     }
 

@@ -37,6 +37,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.material.IShaderUtils;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.export.InputCapsule;
@@ -160,6 +161,24 @@ public class MeshData implements Savable {
             _vaoIdCache = ContextValueReference.newReference(this, _vaoRefQueue);
         }
         _vaoIdCache.put(glContextRep, id);
+    }
+
+    /**
+     * Mark a specific data buffer as dirty in this MeshData. Also calls {@link #markBuffersDirty()}
+     * 
+     * @param key
+     *            the key of the buffer to mark dirty.
+     * @throws Ardor3DException
+     *             if buffer is not found
+     */
+    public void markBufferDirty(final String key) {
+        final AbstractBufferData<?> data = getCoords(key);
+        if (data == null) {
+            throw new Ardor3dException("Buffer not found: " + key);
+        }
+
+        data.markDirty();
+        markBuffersDirty();
     }
 
     /**

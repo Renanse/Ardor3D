@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -18,8 +18,9 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -72,7 +73,7 @@ public class InteractRing extends Mesh {
 
     /**
      * Convenience method for setting texture without managing TextureState.
-     * 
+     *
      * @param texture
      *            the new texture to set on unit 0.
      */
@@ -87,23 +88,31 @@ public class InteractRing extends Mesh {
     }
 
     /**
-     * 
+     *
      */
     public void updateGeometry() {
         final int numPairs = _tessSteps + 1;
         final int totalVerts = _tessRings * numPairs * 2;
 
-        FloatBuffer crdBuf = getMeshData().getVertexBuffer();
+        final MeshData meshData = getMeshData();
+        FloatBuffer crdBuf = meshData.getVertexBuffer();
         if (crdBuf == null || totalVerts != crdBuf.limit() / 3) { // allocate new buffers
-            getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(totalVerts * 3));
-            getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(totalVerts * 3));
-            getMeshData().setTextureCoords(new FloatBufferData(BufferUtils.createFloatBuffer(totalVerts * 2), 2), 0);
-            crdBuf = getMeshData().getVertexBuffer();
+            meshData.setVertexBuffer(BufferUtils.createVector3Buffer(totalVerts));
+            meshData.setNormalBuffer(BufferUtils.createVector3Buffer(totalVerts));
+            meshData.setTextureBuffer(BufferUtils.createVector2Buffer(totalVerts), 0);
+            crdBuf = meshData.getVertexBuffer();
+            meshData.getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
+            meshData.getNormalCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
+            meshData.getTextureCoords(0).setVboAccessMode(VBOAccessMode.DynamicDraw);
         }
-        final FloatBuffer nrmBuf = getMeshData().getNormalBuffer();
-        final FloatBufferData tc = getMeshData().getTextureCoords(0);
-        final FloatBuffer txcBuf = tc.getBuffer();
+        final FloatBuffer nrmBuf = meshData.getNormalBuffer();
+        final FloatBuffer txcBuf = meshData.getTextureBuffer(0);
         calculateVertexData(_tessRings, numPairs, totalVerts, crdBuf, nrmBuf, txcBuf);
+
+        // mark our data as needing updates
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        meshData.markBufferDirty(MeshData.KEY_NormalCoords);
+        meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
 
         updateModelBound();
     }
