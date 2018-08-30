@@ -10,15 +10,21 @@
 
 package com.ardor3d.renderer.material;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.ResourceSource;
 
 public enum MaterialManager {
 
     INSTANCE;
 
     private RenderMaterial _defaultMaterial = null;
+    private final Map<ResourceSource, RenderMaterial> _materialCache = new HashMap<>();
 
     public void setDefaultMaterial(final RenderMaterial material) {
         _defaultMaterial = material;
@@ -28,13 +34,32 @@ public enum MaterialManager {
         return _defaultMaterial;
     }
 
+    public RenderMaterial findMaterial(final String materialUrl) {
+        final ResourceSource key = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, materialUrl);
+        if (key == null) {
+            return null;
+        }
+
+        RenderMaterial mat = _materialCache.get(key);
+        if (mat == null) {
+            mat = YamlMaterialReader.load(key);
+            if (mat != null) {
+                _materialCache.put(key, mat);
+            }
+        }
+
+        return mat;
+    }
+
     public MaterialTechnique chooseTechnique(final Mesh mesh) {
 
         // find the local or inherited material for the given mesh
         RenderMaterial material = mesh.getWorldRenderMaterial();
 
         // if we have no material, use any set default
-        material = _defaultMaterial;
+        if (material == null) {
+            material = _defaultMaterial;
+        }
 
         // look for the technique to use in the material
         return chooseTechnique(mesh, material);

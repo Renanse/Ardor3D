@@ -33,6 +33,7 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateStack;
@@ -865,6 +866,16 @@ public abstract class Spatial implements Savable, Hintable {
      */
     public void setRenderMaterial(final RenderMaterial material) {
         _material = material;
+    }
+
+    /**
+     * Sets the local render material.
+     *
+     * @param materialUrl
+     *            the url of a Material to look up
+     */
+    public void setRenderMaterial(final String materialUrl) {
+        _material = MaterialManager.INSTANCE.findMaterial(materialUrl);
     }
 
     /**

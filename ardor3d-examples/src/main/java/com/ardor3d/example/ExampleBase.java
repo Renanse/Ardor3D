@@ -11,7 +11,6 @@
 package com.ardor3d.example;
 
 import java.awt.EventQueue;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Stack;
@@ -188,14 +187,11 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                     ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/models/")));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, new SimpleResourceLocator(
                     ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/material")));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER,
-                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(MaterialManager.class,
-                            "com/ardor3d/renderer/material/shader")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/shader")));
             MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
                     .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
         } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        } catch (final IOException ex) {
             ex.printStackTrace();
         }
 

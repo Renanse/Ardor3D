@@ -1,0 +1,26 @@
+--- # Material
+name: unlit, textured, vertex color
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+        uniforms: 
+          - shaderKey: model
+            source: RendererMatrix
+            type: Matrix4x4
+            value: Model
+          - shaderKey: view
+            source: RendererMatrix
+            type: Matrix4x4
+            value: View
+          - shaderKey: projection
+            source: RendererMatrix
+            type: Matrix4x4
+            value: Projection
+        shaders: 
+          Vertex: 
+            source: unlit/textured/basic.vert
+          Fragment:
+            source: unlit/textured/basic.frag

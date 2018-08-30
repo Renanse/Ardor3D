@@ -67,7 +67,39 @@ public class YamlMaterialReader {
         return rVal;
     }
 
-    public static RenderMaterial load(final ResourceSource source) throws IOException {
+    public static RenderMaterial load(final String sourceUrl) {
+        try {
+            return loadChecked(sourceUrl);
+        } catch (final IOException ex) {
+            logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(String)",
+                    "Unable to locate '" + sourceUrl + "'");
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static RenderMaterial loadChecked(final String sourceUrl) throws IOException {
+        final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, sourceUrl);
+
+        if (source == null) {
+            throw new IOException("Unable to locate '" + sourceUrl + "'");
+        }
+
+        return load(source);
+    }
+
+    public static RenderMaterial load(final ResourceSource source) {
+        try {
+            return loadChecked(source);
+        } catch (final IOException ex) {
+            logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
+                    "Unable to load '" + source + "'");
+            return null;
+        }
+
+    }
+
+    public static RenderMaterial loadChecked(final ResourceSource source) throws IOException {
 
         if (source == null) {
             if (logger.isLoggable(Level.WARNING)) {
@@ -390,9 +422,8 @@ public class YamlMaterialReader {
         }
     }
 
-    /// PROPERTY READERS
-
     private static Buffer getBufferForType(final Object doc, final UniformType type) {
+        // TODO: FINISH!
         switch (type) {
             case Double1:
                 break;
@@ -468,6 +499,8 @@ public class YamlMaterialReader {
         }
         return null;
     }
+
+    /// PROPERTY READERS
 
     public static <T extends Enum<T>> T getEnum(final Map<String, Object> properties, final String key,
             final Class<T> enumType, final T defVal) {

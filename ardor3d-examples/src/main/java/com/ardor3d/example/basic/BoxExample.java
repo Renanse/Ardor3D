@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -30,8 +30,8 @@ import com.ardor3d.util.TextureManager;
  * A simple example showing a textured and lit box spinning.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.BoxExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
+        maxHeapMemory = 64)
 public class BoxExample extends ExampleBase {
 
     /** Keep a reference to the box to be able to rotate it each frame. */
@@ -76,6 +76,8 @@ public class BoxExample extends ExampleBase {
         box.setTranslation(new Vector3(0, 0, -15));
         // Give the box some nice colors.
         box.setRandomColors();
+        // Set the box's material
+        box.setRenderMaterial("unlit/textured/vertexcolor.yaml");
         // Attach the box to the scenegraph root.
         _root.attachChild(box);
 

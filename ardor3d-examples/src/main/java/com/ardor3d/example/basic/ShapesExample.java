@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -76,8 +76,8 @@ import com.ardor3d.util.geom.BufferUtils;
  * A display of intrinsic shapes (e.g. Box, Cone, Torus).
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.ShapesExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_ShapesExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_ShapesExample.jpg", //
+        maxHeapMemory = 64)
 public class ShapesExample extends ExampleBase {
     private int wrapCount;
     private int index;
@@ -129,6 +129,9 @@ public class ShapesExample extends ExampleBase {
         final BlendState bs = new BlendState();
         bs.setBlendEnabled(true);
         _root.setRenderState(bs);
+
+        // Our shapes material
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         // Set up a reusable pick results
         _pickResults = new BoundingPickResults();
