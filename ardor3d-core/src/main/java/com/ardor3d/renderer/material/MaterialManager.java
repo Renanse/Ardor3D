@@ -10,56 +10,15 @@
 
 package com.ardor3d.renderer.material;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.ardor3d.renderer.material.uniform.RenderStateProperty;
-import com.ardor3d.renderer.material.uniform.UniformRef;
-import com.ardor3d.renderer.material.uniform.UniformSource;
-import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public enum MaterialManager {
 
     INSTANCE;
 
-    private RenderMaterial _defaultMaterial;
-    private final String DEFAULT_MATERIAL_FILE = "com/ardor3d/renderer/default_material.txt";
-
-    private MaterialManager() {
-        // Load our default Material
-        _defaultMaterial = LoadMaterial(DEFAULT_MATERIAL_FILE);
-    }
-
-    private RenderMaterial LoadMaterial(final String file) {
-        final RenderMaterial material = new RenderMaterial();
-
-        final MaterialTechnique e = new MaterialTechnique();
-        material.getTechniques().add(e);
-
-        final TechniquePass pass = new TechniquePass();
-        e.getPasses().add(pass);
-
-        pass.addDefaultPositionAttribute();
-        pass.addDefaultColorAttribute();
-        pass.addDefaultTextureCoordsAttribute(0);
-
-        pass.addDefaultMatrixUniforms();
-        pass.addUniform(new UniformRef("defaultColor", UniformType.Float4, UniformSource.RenderState,
-                RenderStateProperty.MeshDefaultColorRGBA));
-
-        try {
-            pass.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(MaterialManager.class,
-                    "com/ardor3d/renderer/default.vert"));
-            pass.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(MaterialManager.class,
-                    "com/ardor3d/renderer/default.frag"));
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return material;
-    }
+    private RenderMaterial _defaultMaterial = null;
 
     public void setDefaultMaterial(final RenderMaterial material) {
         _defaultMaterial = material;

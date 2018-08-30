@@ -11,6 +11,7 @@
 package com.ardor3d.example;
 
 import java.awt.EventQueue;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Stack;
@@ -72,6 +73,8 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3TextureRendererProvider;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
@@ -179,13 +182,20 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         AWTImageLoader.registerLoader();
 
         try {
-            SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    ExampleBase.class, "com/ardor3d/example/media/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-            srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ExampleBase.class,
-                    "com/ardor3d/example/media/models/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, srl);
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/models/")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/material")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER,
+                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(MaterialManager.class,
+                            "com/ardor3d/renderer/material/shader")));
+            MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
+                    .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
         } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
+        } catch (final IOException ex) {
             ex.printStackTrace();
         }
 
@@ -239,7 +249,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.UPDATE)
-        .execute();
+                .execute();
 
         /** Call simpleUpdate in any derived classes of ExampleBase. */
         updateExample(timer);
@@ -263,7 +273,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.RENDER)
-        .execute(renderer);
+                .execute(renderer);
 
         // Clean up card garbage such as textures, vbos, etc.
         ContextGarbageCollector.doRuntimeCleanup(renderer);
@@ -317,8 +327,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     protected void processPicks(final PrimitivePickResults pickResults) {
         final PickData pick = pickResults.findFirstIntersectingPickData();
         if (pick != null) {
-            System.err.println("picked: " + pick.getTarget() + " at: "
-                    + pick.getIntersectionRecord().getIntersectionPoint(0));
+            System.err.println(
+                    "picked: " + pick.getTarget() + " at: " + pick.getIntersectionRecord().getIntersectionPoint(0));
         } else {
             System.err.println("picked: nothing");
         }
@@ -339,22 +349,22 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         }
 
         // Ask for properties
-        final PropertiesGameSettings prefs = example.getAttributes(new PropertiesGameSettings(
-                "ardorSettings.properties", null));
+        final PropertiesGameSettings prefs = example
+                .getAttributes(new PropertiesGameSettings("ardorSettings.properties", null));
 
         // Convert to DisplayProperties (XXX: maybe merge these classes?)
         final DisplaySettings settings = new DisplaySettings(prefs.getWidth(), prefs.getHeight(), prefs.getDepth(),
                 prefs.getFrequency(),
                 // alpha
                 _minAlphaBits != -1 ? _minAlphaBits : prefs.getAlphaBits(),
-                        // depth
-                        _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
-                                // stencil
-                                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
-                                        // samples
-                                        prefs.getSamples(),
-                                        // other
-                                        prefs.isFullscreen(), _stereo);
+                // depth
+                _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
+                // stencil
+                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
+                // samples
+                prefs.getSamples(),
+                // other
+                prefs.isFullscreen(), _stereo);
 
         example._settings = settings;
 
@@ -375,8 +385,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             final JoglNewtWindow canvas = (JoglNewtWindow) example._canvas;
             example._mouseManager = new JoglNewtMouseManager(canvas);
             example._canvas.setMouseManager(example._mouseManager);
-            example._physicalLayer = new PhysicalLayer(new JoglNewtKeyboardWrapper(canvas), new JoglNewtMouseWrapper(
-                    canvas, example._mouseManager), DummyControllerWrapper.INSTANCE, new JoglNewtFocusWrapper(canvas));
+            example._physicalLayer = new PhysicalLayer(new JoglNewtKeyboardWrapper(canvas),
+                    new JoglNewtMouseWrapper(canvas, example._mouseManager), DummyControllerWrapper.INSTANCE,
+                    new JoglNewtFocusWrapper(canvas));
             TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
         }
 
@@ -458,19 +469,19 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         _controlHandle = FirstPersonControl.setupTriggers(_logicalLayer, _worldUp, true);
 
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+        _logicalLayer.registerTrigger(
+                new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 
-                final Vector2 pos = Vector2.fetchTempInstance().set(
-                        inputStates.getCurrent().getMouseState().getX(),
-                        inputStates.getCurrent().getMouseState().getY());
-                final Ray3 pickRay = new Ray3();
-                _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-                Vector2.releaseTempInstance(pos);
-                doPick(pickRay);
-            }
-        }, "pickTrigger"));
+                        final Vector2 pos = Vector2.fetchTempInstance().set(
+                                inputStates.getCurrent().getMouseState().getX(),
+                                inputStates.getCurrent().getMouseState().getY());
+                        final Ray3 pickRay = new Ray3();
+                        _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+                        Vector2.releaseTempInstance(pos);
+                        doPick(pickRay);
+                    }
+                }, "pickTrigger"));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
@@ -524,8 +535,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             }
         }));
 
-        final Predicate<TwoInputStates> clickLeftOrRight = Predicates.or(new MouseButtonClickedCondition(
-                MouseButton.LEFT), new MouseButtonClickedCondition(MouseButton.RIGHT));
+        final Predicate<TwoInputStates> clickLeftOrRight = Predicates.or(
+                new MouseButtonClickedCondition(MouseButton.LEFT), new MouseButtonClickedCondition(MouseButton.RIGHT));
 
         _logicalLayer.registerTrigger(new InputTrigger(clickLeftOrRight, new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -533,22 +544,22 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             }
         }));
 
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                if (_mouseManager.isSetGrabbedSupported()) {
-                    _mouseManager.setGrabbed(GrabbedState.GRABBED);
-                }
-            }
-        }));
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                if (_mouseManager.isSetGrabbedSupported()) {
-                    _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
-                }
-            }
-        }));
+        _logicalLayer.registerTrigger(
+                new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                        }
+                    }
+                }));
+        _logicalLayer.registerTrigger(
+                new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                        }
+                    }
+                }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {

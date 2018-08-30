@@ -45,7 +45,7 @@ public class TechniquePass implements Savable {
     protected String _name;
 
     /** Our shaders, mapped by their type. */
-    protected Map<ShaderType, ShaderInfo> _shaders = Maps.newEnumMap(ShaderType.class);
+    protected Map<ShaderType, List<String>> _shaders = Maps.newEnumMap(ShaderType.class);
 
     /** Context specific reference to an id for the shader program used by this pass. */
     protected static ReferenceQueue<TechniquePass> _shaderRefQueue = new ReferenceQueue<TechniquePass>();
@@ -87,29 +87,22 @@ public class TechniquePass implements Savable {
     }
 
     public void setShader(final ShaderType type, final String shaderContents) {
-        setShader(type, shaderContents, type.name());
+        final List<String> programs = new ArrayList<>();
+        programs.add(shaderContents);
+        setShader(type, programs);
     }
 
-    public void setShader(final ShaderType type, final String shaderContents, final String name) {
-        final ShaderInfo info = new ShaderInfo();
-        info.name = name;
-        info.program = shaderContents;
-
-        _shaders.put(type, info);
+    public void setShader(final ShaderType type, final List<String> shaderContents) {
+        _shaders.put(type, shaderContents);
     }
 
     public void setShader(final ShaderType type, final InputStream shaderContents) throws IOException {
-        setShader(type, shaderContents, type.name());
-    }
-
-    public void setShader(final ShaderType type, final InputStream shaderContents, final String name)
-            throws IOException {
         String text;
         try (final Reader reader = new InputStreamReader(shaderContents)) {
             text = CharStreams.toString(reader);
         }
 
-        setShader(type, text, name);
+        setShader(type, text);
     }
 
     public void addAttribute(final VertexAttributeRef attribute) {

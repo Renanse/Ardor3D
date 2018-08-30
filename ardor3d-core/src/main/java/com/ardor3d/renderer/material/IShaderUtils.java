@@ -12,6 +12,7 @@ package com.ardor3d.renderer.material;
 
 import java.nio.Buffer;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.ardor3d.renderer.RenderContext;
@@ -22,7 +23,7 @@ import com.ardor3d.scenegraph.MeshData;
 
 public interface IShaderUtils {
 
-    int createShaderProgram(Map<ShaderType, ShaderInfo> shaders, RenderContext context);
+    int createShaderProgram(Map<ShaderType, List<String>> shaders, RenderContext context);
 
     void useShaderProgram(int id, RenderContext context);
 

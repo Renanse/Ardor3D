@@ -17,6 +17,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -38,7 +39,6 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3Renderer;
 import com.ardor3d.renderer.material.IShaderUtils;
-import com.ardor3d.renderer.material.ShaderInfo;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.material.uniform.RenderStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
@@ -58,7 +58,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     }
 
     @Override
-    public int createShaderProgram(final Map<ShaderType, ShaderInfo> shaders, final RenderContext context) {
+    public int createShaderProgram(final Map<ShaderType, List<String>> shaders, final RenderContext context) {
         // Validate we have appropriate shaders
         if (!shaders.containsKey(ShaderType.Vertex) || !shaders.containsKey(ShaderType.Fragment)) {
             throw new Ardor3dException("Invalid Shader Program - must have at least Vertex and Fragment shaders.");
@@ -150,7 +150,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
     }
 
-    private static int prepareShader(final ShaderInfo info, final ShaderType type) {
+    private static int prepareShader(final List<String> info, final ShaderType type) {
         if (info == null) {
             return -1;
         }
@@ -159,7 +159,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         final int shaderId = GL20C.glCreateShader(Lwjgl3ShaderUtils.getGLShaderType(type));
 
         // provide our source code
-        GL20C.glShaderSource(shaderId, info.program);
+        GL20C.glShaderSource(shaderId, info.toArray(new String[info.size()]));
 
         // compile
         GL20C.glCompileShader(shaderId);
@@ -169,7 +169,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         if (success == GL11C.GL_FALSE) {
             final String log = GL20C.glGetShaderInfoLog(shaderId);
 
-            throw new Ardor3dException("Error compiling shader [" + info.name + "]: " + log);
+            throw new Ardor3dException("Error compiling " + type.name() + " shader: " + log);
         }
 
         return shaderId;

@@ -1,0 +1,45 @@
+--- # Material
+name: basic white
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+        uniforms: 
+          - shaderKey: model
+            source: RendererMatrix
+            type: Matrix4x4
+            value: Model
+          - shaderKey: view
+            source: RendererMatrix
+            type: Matrix4x4
+            value: View
+          - shaderKey: projection
+            source: RendererMatrix
+            type: Matrix4x4
+            value: Projection
+        shaders: 
+          Vertex: 
+            program: |
+                #version 330 core
+                
+                layout (location = 0) in vec3 vertex;
+                
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+                
+                void main()
+                {
+                    gl_Position = projection * view * model * vec4(vertex, 1.0);
+                }
+          Fragment:
+            program: |
+                #version 330 core
+
+                out vec4 FragColor;
+                
+                void main()
+                {
+                    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+                }
