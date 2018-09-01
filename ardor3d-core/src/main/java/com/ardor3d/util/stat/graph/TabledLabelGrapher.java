@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -54,7 +54,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
 
     private AbstractStatGrapher _linkedGraph;
 
-    public TabledLabelGrapher(final int width, final int height, final Renderer renderer, final ContextCapabilities caps) {
+    public TabledLabelGrapher(final int width, final int height, final Renderer renderer,
+            final ContextCapabilities caps) {
         super(width, height, renderer, caps);
 
         _defBlendState = new BlendState();
@@ -64,7 +65,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
         _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
         _graphRoot.setRenderState(_defBlendState);
 
-        _bgQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _bgQuad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         _bgQuad.setDefaultColor(new ColorRGBA(ColorRGBA.BLACK));
         _graphRoot.getSceneHints().setCullHint(CullHint.Never);
     }
@@ -124,8 +125,9 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 entry.visited = true;
 
                 // Update text value
-                final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? val
-                        .getAverageValue() : val.getAccumulatedValue();
+                final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false)
+                        ? val.getAverageValue()
+                        : val.getAccumulatedValue();
                 entry.text.setText(getStringConfig(type, ConfigKeys.Name.name(), type.getStatName()) + " "
                         + stripVal(value, type));
 
@@ -136,9 +138,11 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 // See if we have a defained color for this type, otherwise use
                 // the corresponding color from a linked line grapher, or if
                 // none, use white.
-                entry.text.setTextColor(getColorConfig(type, ConfigKeys.TextColor.name(),
-                        _linkedGraph != null ? _linkedGraph.getColorConfig(type, LineGrapher.ConfigKeys.Color.name(),
-                                new ColorRGBA(ColorRGBA.WHITE)) : new ColorRGBA(ColorRGBA.WHITE)));
+                entry.text
+                        .setTextColor(getColorConfig(type, ConfigKeys.TextColor.name(),
+                                _linkedGraph != null ? _linkedGraph.getColorConfig(type,
+                                        LineGrapher.ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.WHITE))
+                                        : new ColorRGBA(ColorRGBA.WHITE)));
 
                 // Update text placement.
                 final double labelHeight = entry.text.getHeight();
@@ -155,8 +159,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                         _graphRoot.attachChild(entry.lineKey);
                     }
                     final ReadOnlyVector3 tLoc = entry.text.getTranslation();
-                    entry.lineKey.setTranslation((float) (tLoc.getX() + entry.text.getWidth() + 15), (float) (tLoc
-                            .getY() + (.5 * entry.text.getHeight())), 0);
+                    entry.lineKey.setTranslation((float) (tLoc.getX() + entry.text.getWidth() + 15),
+                            (float) (tLoc.getY() + (.5 * entry.text.getHeight())), 0);
                 }
 
                 // update column / row variables
@@ -284,8 +288,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
 
         public LabelEntry(final StatType type) {
             _type = type;
-            text = BasicText.createDefaultTextLabel("label", getStringConfig(type, ConfigKeys.Name.name(), type
-                    .getStatName()));
+            text = BasicText.createDefaultTextLabel("label",
+                    getStringConfig(type, ConfigKeys.Name.name(), type.getStatName()));
         }
     }
 

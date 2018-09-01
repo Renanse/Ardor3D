@@ -57,7 +57,8 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
     private BlendState _defBlendState = null;
 
-    public TimedAreaGrapher(final int width, final int height, final Renderer renderer, final ContextCapabilities caps) {
+    public TimedAreaGrapher(final int width, final int height, final Renderer renderer,
+            final ContextCapabilities caps) {
         super(width, height, renderer, caps);
 
         // Setup our static horizontal graph lines
@@ -225,10 +226,10 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
         _horizontals = new Line("horiz", verts, null, null, null);
         _horizontals.getMeshData().setIndexMode(IndexMode.Lines);
-        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
 
-        _horizontals.setDefaultColor(getColorConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Color.name(),
-                new ColorRGBA(ColorRGBA.BLUE)));
+        _horizontals.setDefaultColor(
+                getColorConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.BLUE)));
         _horizontals.setLineWidth(getIntConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Width.name(), 1));
         _horizontals.setAntialiased(getBooleanConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Antialias.name(), true));
     }
@@ -249,10 +250,10 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
         _verticals = new Line("vert", verts, null, null, null);
         _verticals.getMeshData().setIndexMode(IndexMode.Lines);
-        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
 
-        _verticals.setDefaultColor(getColorConfig(TimedAreaGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(
-                ColorRGBA.RED)));
+        _verticals.setDefaultColor(
+                getColorConfig(TimedAreaGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.RED)));
         _verticals.setLineWidth(getIntConfig(TimedAreaGrapher.Vertical, ConfigKeys.Width.name(), 1));
         _verticals.setAntialiased(getBooleanConfig(TimedAreaGrapher.Vertical, ConfigKeys.Antialias.name(), true));
     }
@@ -268,7 +269,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
             area = new Mesh("a");
             area.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(maxSamples * 2));
-            area.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+            area.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
             area.getMeshData().setIndexMode(IndexMode.LineStrip);
 
             area.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
@@ -281,13 +282,13 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
     public Line updateLineKey(final StatType type, Line lineKey) {
         if (lineKey == null) {
             lineKey = new Line("lk", BufferUtils.createVector3Buffer(2), null, null, null);
-            final FloatBuffer fb = BufferUtils.createFloatBuffer(new Vector3[] { new Vector3(0, 0, 0),
-                    new Vector3(30, 0, 0) });
+            final FloatBuffer fb = BufferUtils
+                    .createFloatBuffer(new Vector3[] { new Vector3(0, 0, 0), new Vector3(30, 0, 0) });
             fb.rewind();
             lineKey.getMeshData().setVertexBuffer(fb);
         }
 
-        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         lineKey.getMeshData().setIndexMode(IndexMode.LineLoop);
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));

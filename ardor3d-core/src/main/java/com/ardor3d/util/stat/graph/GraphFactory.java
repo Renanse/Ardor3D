@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,16 +12,16 @@ package com.ardor3d.util.stat.graph;
 
 import java.nio.FloatBuffer;
 
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -34,7 +34,7 @@ public abstract class GraphFactory {
 
     /**
      * Makes a new line grapher and sets up a quad to display it.
-     * 
+     *
      * @param width
      *            the width in pixels of the graph
      * @param height
@@ -60,7 +60,7 @@ public abstract class GraphFactory {
 
     /**
      * Makes a new area grapher and sets up a quad to display it.
-     * 
+     *
      * @param width
      *            the width in pixels of the graph
      * @param height
@@ -85,7 +85,7 @@ public abstract class GraphFactory {
 
     /**
      * Makes a new label grapher and sets up a quad to display it.
-     * 
+     *
      * @param width
      *            the width in pixels of the graph
      * @param height
@@ -111,7 +111,7 @@ public abstract class GraphFactory {
     /**
      * Creates and sets up a texture to be used as the texture for a given grapher. Also applies appropriate texture
      * filter modes. (NearestNeighborNoMipMaps and Bilinear)
-     * 
+     *
      * @param grapher
      *            the grapher to associate the texture with
      * @return the texture
@@ -127,7 +127,7 @@ public abstract class GraphFactory {
     /**
      * Sets up a Quad to be used as the display surface for a grapher. Puts it in the ortho mode, sets up UVs, and sets
      * up a TextureState and an alpha transparency BlendState.
-     * 
+     *
      * @param quad
      *            the Quad to use
      * @param graphTexture
@@ -140,7 +140,7 @@ public abstract class GraphFactory {
     private static void setupGraphQuad(final Quad quad, final Texture2D graphTexture, final float maxU, final float maxV) {
         quad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
         quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        quad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        quad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         quad.getSceneHints().setOrthoOrder(-1);
 
         final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0).getBuffer();

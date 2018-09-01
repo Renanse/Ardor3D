@@ -223,14 +223,16 @@ public final class Debugger {
      * @param doChildren
      *            if true, normals for any children will also be drawn
      */
-    public static void drawNormals(final Spatial element, final Renderer r, final double size, final boolean doChildren) {
+    public static void drawNormals(final Spatial element, final Renderer r, final double size,
+            final boolean doChildren) {
         if (element == null) {
             return;
         }
 
         final Camera cam = Camera.getCurrentCamera();
         final int state = cam.getPlaneState();
-        if (element.getWorldBound() != null && cam.contains(element.getWorldBound()) == Camera.FrustumIntersect.Outside) {
+        if (element.getWorldBound() != null
+                && cam.contains(element.getWorldBound()) == Camera.FrustumIntersect.Outside) {
             cam.setPlaneState(state);
             return;
         }
@@ -284,8 +286,8 @@ public final class Debugger {
                 IndexBufferData<?> lineInds = normalLines.getMeshData().getIndices();
                 if (lineInds == null || lineInds.getBufferCapacity() < (normalLines.getMeshData().getVertexCount())) {
                     normalLines.getMeshData().setIndices(null);
-                    lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2, normalLines
-                            .getMeshData().getVertexCount() - 1);
+                    lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2,
+                            normalLines.getMeshData().getVertexCount() - 1);
                     normalLines.getMeshData().setIndices(lineInds);
                 } else {
                     lineInds.getBuffer().clear();
@@ -341,14 +343,16 @@ public final class Debugger {
         }
     }
 
-    public static void drawTangents(final Spatial element, final Renderer r, final double size, final boolean doChildren) {
+    public static void drawTangents(final Spatial element, final Renderer r, final double size,
+            final boolean doChildren) {
         if (element == null) {
             return;
         }
 
         final Camera cam = Camera.getCurrentCamera();
         final int state = cam.getPlaneState();
-        if (element.getWorldBound() != null && cam.contains(element.getWorldBound()) == Camera.FrustumIntersect.Outside) {
+        if (element.getWorldBound() != null
+                && cam.contains(element.getWorldBound()) == Camera.FrustumIntersect.Outside) {
             cam.setPlaneState(state);
             return;
         }
@@ -398,8 +402,8 @@ public final class Debugger {
                 IndexBufferData<?> lineInds = normalLines.getMeshData().getIndices();
                 if (lineInds == null || lineInds.getBufferCapacity() < (normalLines.getMeshData().getVertexCount())) {
                     normalLines.getMeshData().setIndices(null);
-                    lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2, normalLines
-                            .getMeshData().getVertexCount() - 1);
+                    lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2,
+                            normalLines.getMeshData().getVertexCount() - 1);
                     normalLines.getMeshData().setIndices(lineInds);
                 } else {
                     lineInds.getBuffer().clear();
@@ -467,7 +471,8 @@ public final class Debugger {
         drawAxis(spat, r, true, false);
     }
 
-    public static void drawAxis(final Spatial spat, final Renderer r, final boolean drawChildren, final boolean drawAll) {
+    public static void drawAxis(final Spatial spat, final Renderer r, final boolean drawChildren,
+            final boolean drawAll) {
         if (!axisInited) {
             final BlendState blendState = new BlendState();
             blendState.setBlendEnabled(true);
@@ -527,7 +532,7 @@ public final class Debugger {
     private static TextureRenderer bufTexRend;
 
     static {
-        bQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        bQuad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         bQuad.getSceneHints().setCullHint(CullHint.Never);
     }
 
@@ -573,8 +578,8 @@ public final class Debugger {
             height = newHeight;
         }
         if (bufTexRend == null) {
-            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, r, ContextManager
-                    .getCurrentContext().getCapabilities());
+            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, r,
+                    ContextManager.getCurrentContext().getCapabilities());
             bufTexRend.setupTexture(bufTexture);
         }
         bufTexRend.copyToTexture(bufTexture, 0, 0, width, height, 0, 0);

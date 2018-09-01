@@ -134,8 +134,9 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
                             _entries.put(type, entry);
                         }
 
-                        final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? sample
-                                .getStatValue(type).getAverageValue() : sample.getStatValue(type).getAccumulatedValue();
+                        final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false)
+                                ? sample.getStatValue(type).getAverageValue()
+                                : sample.getStatValue(type).getAccumulatedValue();
 
                         final Vector3 point = new Vector3(i, value, 0);
                         // Now, add
@@ -230,10 +231,10 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
         _horizontals = new Line("horiz", verts, null, null, null);
         _horizontals.getMeshData().setIndexMode(IndexMode.Lines);
-        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
 
-        _horizontals.setDefaultColor(getColorConfig(LineGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(
-                ColorRGBA.BLUE)));
+        _horizontals.setDefaultColor(
+                getColorConfig(LineGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.BLUE)));
         _horizontals.setLineWidth(getIntConfig(LineGrapher.Horizontal, ConfigKeys.Width.name(), 1));
         _horizontals.setAntialiased(getBooleanConfig(LineGrapher.Horizontal, ConfigKeys.Antialias.name(), true));
     }
@@ -254,10 +255,10 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
         _verticals = new Line("vert", verts, null, null, null);
         _verticals.getMeshData().setIndexMode(IndexMode.Lines);
-        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
 
-        _verticals.setDefaultColor(getColorConfig(LineGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(
-                ColorRGBA.RED)));
+        _verticals.setDefaultColor(
+                getColorConfig(LineGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.RED)));
         _verticals.setLineWidth(getIntConfig(LineGrapher.Vertical, ConfigKeys.Width.name(), 1));
         _verticals.setAntialiased(getBooleanConfig(LineGrapher.Vertical, ConfigKeys.Antialias.name(), true));
     }
@@ -275,7 +276,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             this.maxSamples = maxSamples;
 
             point = new Point("p", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
-            point.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+            point.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
 
             point.setDefaultColor(getColorConfig(type, ConfigKeys.PointColor.name(), new ColorRGBA(ColorRGBA.WHITE)));
             point.setPointSize(getIntConfig(type, ConfigKeys.PointSize.name(), 5));
@@ -285,7 +286,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             }
 
             line = new Line("l", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
-            line.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+            line.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
             line.getMeshData().setIndexMode(IndexMode.LineStrip);
 
             line.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
@@ -300,13 +301,13 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
     public Line updateLineKey(final StatType type, Line lineKey) {
         if (lineKey == null) {
             lineKey = new Line("lk", BufferUtils.createVector3Buffer(2), null, null, null);
-            final FloatBuffer fb = BufferUtils.createFloatBuffer(new Vector3[] { new Vector3(0, 0, 0),
-                    new Vector3(30, 0, 0) });
+            final FloatBuffer fb = BufferUtils
+                    .createFloatBuffer(new Vector3[] { new Vector3(0, 0, 0), new Vector3(30, 0, 0) });
             fb.rewind();
             lineKey.getMeshData().setVertexBuffer(fb);
         }
 
-        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         lineKey.getMeshData().setIndexMode(IndexMode.LineStrip);
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
