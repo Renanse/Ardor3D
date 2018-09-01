@@ -169,7 +169,7 @@ public class ShapesExample extends ExampleBase {
         _textNode = new Node("textNode");
         _textNode.setTranslation(20, 20, 0);
         _textNode.getSceneHints().setCullHint(CullHint.Always);
-        _root.attachChild(_textNode);
+        _orthoRoot.attachChild(_textNode);
 
         _text = BasicText.createDefaultTextLabel("", "pick");
         _text.getSceneHints().setOrthoOrder(0);
@@ -180,14 +180,14 @@ public class ShapesExample extends ExampleBase {
         final BMTextBackground outerBorder = new BMTextBackground("bg1", _text, border);
         outerBorder.setTexBorderOffsets(0.2f);
         outerBorder.setContentPadding(10);
-        outerBorder.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        outerBorder.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         outerBorder.getSceneHints().setOrthoOrder(2);
         outerBorder.setBackgroundColor(ColorRGBA.LIGHT_GRAY);
         _textNode.attachChild(outerBorder);
 
         final BMTextBackground innerBG = new BMTextBackground("bg2", _text, border);
         innerBG.setTexBorderOffsets(0.2f);
-        innerBG.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        innerBG.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         innerBG.getSceneHints().setOrthoOrder(1);
         innerBG.setBackgroundColor(ColorRGBA.BLUE);
         _textNode.attachChild(innerBG);
@@ -226,7 +226,9 @@ public class ShapesExample extends ExampleBase {
                             _picked = topLevel;
                             _picked.addController(_pickedControl);
                         }
-                        _text.setText(topLevel.getName());
+                        if (!_text.getText().equals(topLevel.getName())) {
+                            _text.setText(topLevel.getName());
+                        }
                     }
                 } else {
                     // No pick, clear label.
