@@ -367,7 +367,7 @@ public class YamlMaterialReader {
 
         final List<Object> items = getList(doc, false);
         if (items == null) {
-            final UniformRef uniform = readUniform(doc);
+            final UniformRef uniform = readUniform(doc, pass);
             if (uniform != null) {
                 pass.addUniform(uniform);
             }
@@ -375,16 +375,30 @@ public class YamlMaterialReader {
         }
 
         for (final Object item : items) {
-            final UniformRef uniform = readUniform(item);
+            final UniformRef uniform = readUniform(item, pass);
             if (uniform != null) {
                 pass.addUniform(uniform);
             }
         }
     }
 
-    private static UniformRef readUniform(final Object doc) {
+    private static UniformRef readUniform(final Object doc, final TechniquePass pass) {
         // doc needs to be a Map here
         final Map<String, Object> properties = getMap(doc, true);
+
+        // check for builtIn requests first
+        if (properties.containsKey("builtIn")) {
+            final Object builtIn = properties.get("builtIn");
+            final List<Object> values = getList(builtIn, false);
+            if (values == null) {
+                addDefaultUniform(getString(builtIn), pass);
+            } else {
+                for (final Object obj : values) {
+                    addDefaultUniform(getString(obj), pass);
+                }
+            }
+            return null;
+        }
 
         // determine our type
         final UniformType type = getEnum(properties, "type", UniformType.class, UniformType.Int1);
@@ -403,6 +417,16 @@ public class YamlMaterialReader {
 
         final String shaderKey = getString(properties, "shaderKey", null);
         return new UniformRef(shaderKey, type, source, value);
+    }
+
+    private static void addDefaultUniform(final String type, final TechniquePass pass) {
+        switch (type.toLowerCase()) {
+            case "defaultmatrices":
+                pass.addDefaultMatrixUniforms();
+                return;
+            default:
+                throw new Ardor3dException("Unknown default uniform type: " + type);
+        }
     }
 
     private static Object readUniformValue(final Object doc, final UniformType type, final UniformSource source) {

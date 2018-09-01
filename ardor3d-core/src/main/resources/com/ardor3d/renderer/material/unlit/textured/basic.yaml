@@ -7,18 +7,7 @@ techniques:
           - key: vertex
           - key: uv0
         uniforms: 
-          - shaderKey: model
-            type: Matrix4x4
-            source: RendererMatrix
-            value: Model
-          - shaderKey: view
-            type: Matrix4x4
-            source: RendererMatrix
-            value: View
-          - shaderKey: projection
-            type: Matrix4x4
-            source: RendererMatrix
-            value: Projection
+          - builtIn: defaultMatrices
         shaders: 
           Vertex: 
             source: unlit/textured/basic.vert
