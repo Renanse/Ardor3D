@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -23,7 +23,7 @@ public final class RenderBucketType {
         RenderBucketType bucketType = bucketTypeMap.get(name);
         if (bucketType == null) {
             bucketType = new RenderBucketType(name);
-			  bucketTypeMap.put(name, bucketType);
+            bucketTypeMap.put(name, bucketType);
         }
         return bucketType;
     }
@@ -74,11 +74,10 @@ public final class RenderBucketType {
     public static final RenderBucketType Transparent = getRenderBucketType("Transparent");
 
     /**
-     * Draw in orthographic mode where the x and y coordinates are in screen space with the origin in the lower left
-     * corner. Uses {@link com.ardor3d.scenegraph.hint.SceneHints#getOrthoOrder() SceneHints.getOrthoOrder()} to
-     * determine draw order.
+     * Uses {@link com.ardor3d.scenegraph.hint.SceneHints#getOrthoOrder() SceneHints.getOrthoOrder()} to determine draw
+     * order.
      */
-    public static final RenderBucketType Ortho = getRenderBucketType("Ortho");
+    public static final RenderBucketType OrthoOrder = getRenderBucketType("OrthoOrder");
 
     /**
      * Used for objects that we want to guarantee will be rendered last.

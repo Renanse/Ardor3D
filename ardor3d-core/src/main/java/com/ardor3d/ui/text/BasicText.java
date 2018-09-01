@@ -78,7 +78,7 @@ public class BasicText extends BMText {
         blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         setRenderState(blend);
 
-        getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         getSceneHints().setCullHint(CullHint.Never);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);

@@ -43,6 +43,7 @@ public class RenderQueue {
         setRenderBucket(RenderBucketType.Shadow, new OpaqueRenderBucket());
         setRenderBucket(RenderBucketType.Opaque, new OpaqueRenderBucket());
         setRenderBucket(RenderBucketType.Transparent, new TransparentRenderBucket());
+        setRenderBucket(RenderBucketType.OrthoOrder, new OrthoOrderRenderBucket());
         setRenderBucket(RenderBucketType.PostBucket, new OpaqueRenderBucket());
     }
 
