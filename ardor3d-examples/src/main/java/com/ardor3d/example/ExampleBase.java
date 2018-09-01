@@ -67,6 +67,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
@@ -111,6 +112,10 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     protected DisplaySettings _settings;
 
     protected final Node _root = new Node();
+
+    protected final Node _orthoRoot = new Node();
+
+    protected Camera _orthoCam;
 
     protected LightState _lightState;
 
@@ -252,6 +257,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         /** Update controllers/render states/transforms/bounds for rootNode. */
         _root.updateGeometricState(timer.getTimePerFrame(), true);
+
+        /** Update controllers/render states/transforms/bounds for orthoRoot. */
+        _orthoRoot.updateGeometricState(timer.getTimePerFrame(), true);
     }
 
     protected void updateLogicalLayer(final ReadOnlyTimer timer) {
@@ -293,7 +301,11 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     }
 
     protected void renderExample(final Renderer renderer) {
+        _canvas.getCanvasRenderer().getCamera().apply(renderer);
         _root.onDraw(renderer);
+        renderer.renderBuckets();
+        _orthoCam.apply(renderer);
+        _orthoRoot.onDraw(renderer);
     }
 
     protected void renderDebug(final Renderer renderer) {
@@ -387,9 +399,13 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
         }
 
+        // setup our ortho camera
+        example._orthoCam = Camera.newOrthoCamera(example._canvas);
+
+        // register our canvas/physical layer
         example._logicalLayer.registerInput(example._canvas, example._physicalLayer);
 
-        // Register our example as an updater.
+        // register our example as an updater.
         example._frameHandler.addUpdater(example);
 
         // register our native canvas
