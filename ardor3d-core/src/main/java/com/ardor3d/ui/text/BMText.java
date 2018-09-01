@@ -26,7 +26,9 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
@@ -209,6 +211,8 @@ public class BMText extends Mesh {
 
         // triangles now
         getMeshData().setIndexMode(IndexMode.Triangles);
+
+        setRenderMaterial("bmtext.yaml");
 
         setText(text);
 
@@ -564,6 +568,8 @@ public class BMText extends Mesh {
             texCrdBuffer = BufferUtils.createVector2Buffer(required);
             getMeshData().setVertexBuffer(vertexBuffer);
             getMeshData().setTextureBuffer(texCrdBuffer, 0);
+            getMeshData().getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
+            getMeshData().getTextureCoords(0).setVboAccessMode(VBOAccessMode.DynamicDraw);
         }
         vertexBuffer.limit(vertices * 3).rewind();
         texCrdBuffer.limit(vertices * 2).rewind();
@@ -699,6 +705,9 @@ public class BMText extends Mesh {
                 cursorX += chr.xadvance + kern + _spacing;
             }
         }
+
+        _meshData.updateVertexCount();
+
         _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
         _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
 

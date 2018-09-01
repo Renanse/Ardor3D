@@ -1,0 +1,32 @@
+--- # Material
+name: basic white
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+        uniforms: 
+          - builtIn: defaultMatrices
+          - shaderKey: defaultColor
+            type: Float4
+            source: RenderState
+            value: MeshDefaultColorRGBA
+        shaders: 
+          Vertex: 
+            source: unlit/textured/basic.vert
+          Fragment:
+            program: |
+                #version 330 core
+
+                out vec4 FragColor;
+                
+                in vec2 TexCoord0;
+                
+                uniform sampler2D tex0;
+                uniform vec4 defaultColor;
+                
+                void main()
+                {
+                    FragColor = defaultColor * texture(tex0, TexCoord0);
+                }

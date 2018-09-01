@@ -28,6 +28,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
@@ -74,6 +75,8 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         setTextureData();
         setIndexData();
 
+        setRenderMaterial("bmtext.yaml");
+
         // -- add self as change listener
         _text.addChangeListener(this);
     }
@@ -114,6 +117,7 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         indices.put(13).put(12).put(9).put(8).put(5).put(4);
         _meshData.setIndexLengths(new int[] { 4, 6, 6, 6, 6 });
         _meshData.setIndexMode(IndexMode.TriangleStrip);
+        indices.markDirty();
     }
 
     private void setTextureData() {
@@ -139,6 +143,7 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         coords.put(_textureBorderOffsets.getXf()).put(1);
         coords.put(1f - _textureBorderOffsets.getZf()).put(1);
         coords.put(1).put(1);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
     }
 
     public void setBackgroundColor(final ReadOnlyColorRGBA color) {
@@ -268,11 +273,13 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         vertices.put(x).put(0).put(ys + topB);
         vertices.put(xs).put(0).put(ys + topB);
         vertices.put(xs + rightB).put(0).put(ys + topB);
+        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
     }
 
     @Override
     public void textAlphaChanged(final BMText text, final float alpha) {
-        setDefaultColor(_tintColor.getRed(), _tintColor.getGreen(), _tintColor.getBlue(), _tintColor.getAlpha() * alpha);
+        setDefaultColor(_tintColor.getRed(), _tintColor.getGreen(), _tintColor.getBlue(),
+                _tintColor.getAlpha() * alpha);
     }
 
     // /////////////////

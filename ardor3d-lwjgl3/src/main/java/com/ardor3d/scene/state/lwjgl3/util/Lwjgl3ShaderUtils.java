@@ -378,25 +378,18 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
             final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
             GL15C.glBindBuffer(target, id);
             if (newBuffer) {
-                if (dataBuffer instanceof FloatBuffer) {
-                    GL15C.glBufferData(target, (FloatBuffer) dataBuffer, getGLVBOAccessMode(buffer.getVboAccessMode()));
-                } else if (dataBuffer instanceof ByteBuffer) {
-                    GL15C.glBufferData(target, (ByteBuffer) dataBuffer, getGLVBOAccessMode(buffer.getVboAccessMode()));
-                } else if (dataBuffer instanceof IntBuffer) {
-                    GL15C.glBufferData(target, (IntBuffer) dataBuffer, getGLVBOAccessMode(buffer.getVboAccessMode()));
-                } else if (dataBuffer instanceof ShortBuffer) {
-                    GL15C.glBufferData(target, (ShortBuffer) dataBuffer, getGLVBOAccessMode(buffer.getVboAccessMode()));
-                }
-            } else {
-                if (dataBuffer instanceof FloatBuffer) {
-                    GL15C.glBufferSubData(target, 0, (FloatBuffer) dataBuffer);
-                } else if (dataBuffer instanceof ByteBuffer) {
-                    GL15C.glBufferSubData(target, 0, (ByteBuffer) dataBuffer);
-                } else if (dataBuffer instanceof IntBuffer) {
-                    GL15C.glBufferSubData(target, 0, (IntBuffer) dataBuffer);
-                } else if (dataBuffer instanceof ShortBuffer) {
-                    GL15C.glBufferSubData(target, 0, (ShortBuffer) dataBuffer);
-                }
+                GL15C.glBufferData(target, dataBuffer.capacity() * buffer.getByteCount(),
+                        getGLVBOAccessMode(buffer.getVboAccessMode()));
+            }
+
+            if (dataBuffer instanceof FloatBuffer) {
+                GL15C.glBufferSubData(target, 0, (FloatBuffer) dataBuffer);
+            } else if (dataBuffer instanceof ByteBuffer) {
+                GL15C.glBufferSubData(target, 0, (ByteBuffer) dataBuffer);
+            } else if (dataBuffer instanceof IntBuffer) {
+                GL15C.glBufferSubData(target, 0, (IntBuffer) dataBuffer);
+            } else if (dataBuffer instanceof ShortBuffer) {
+                GL15C.glBufferSubData(target, 0, (ShortBuffer) dataBuffer);
             }
 
             buffer.markClean(glContextRep);
