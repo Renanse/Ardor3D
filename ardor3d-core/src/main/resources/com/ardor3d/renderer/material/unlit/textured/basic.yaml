@@ -8,16 +8,16 @@ techniques:
           - key: uv0
         uniforms: 
           - shaderKey: model
-            source: RendererMatrix
             type: Matrix4x4
+            source: RendererMatrix
             value: Model
           - shaderKey: view
-            source: RendererMatrix
             type: Matrix4x4
+            source: RendererMatrix
             value: View
           - shaderKey: projection
-            source: RendererMatrix
             type: Matrix4x4
+            source: RendererMatrix
             value: Projection
         shaders: 
           Vertex: 

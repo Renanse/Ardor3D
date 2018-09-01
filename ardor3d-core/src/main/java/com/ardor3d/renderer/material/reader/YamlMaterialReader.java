@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.Buffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +38,7 @@ import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.io.CharStreams;
@@ -424,80 +428,75 @@ public class YamlMaterialReader {
 
     private static Buffer getBufferForType(final Object doc, final UniformType type) {
         // TODO: FINISH!
+        System.err.println(type + " " + doc.getClass().getName() + " - " + doc);
         switch (type) {
             case Double1:
-                break;
+                return getDoubleBuffer(doc, 1);
             case Double2:
-                break;
+                return getDoubleBuffer(doc, 2);
             case Double3:
-                break;
+                return getDoubleBuffer(doc, 3);
             case Double4:
-                break;
+                return getDoubleBuffer(doc, 4);
             case Float1:
-                break;
+                return getFloatBuffer(doc, 1);
             case Float2:
-                break;
+                return getFloatBuffer(doc, 2);
             case Float3:
-                break;
+                return getFloatBuffer(doc, 3);
             case Float4:
-                break;
+                return getFloatBuffer(doc, 4);
             case Int1:
-                break;
-            case Int2:
-                break;
-            case Int3:
-                break;
-            case Int4:
-                break;
-            case Matrix2x2:
-                break;
-            case Matrix2x2D:
-                break;
-            case Matrix2x3:
-                break;
-            case Matrix2x3D:
-                break;
-            case Matrix2x4:
-                break;
-            case Matrix2x4D:
-                break;
-            case Matrix3x2:
-                break;
-            case Matrix3x2D:
-                break;
-            case Matrix3x3:
-                break;
-            case Matrix3x3D:
-                break;
-            case Matrix3x4:
-                break;
-            case Matrix3x4D:
-                break;
-            case Matrix4x2:
-                break;
-            case Matrix4x2D:
-                break;
-            case Matrix4x3:
-                break;
-            case Matrix4x3D:
-                break;
-            case Matrix4x4:
-                break;
-            case Matrix4x4D:
-                break;
             case UInt1:
-                break;
+                return getIntBuffer(doc, 1);
+            case Int2:
             case UInt2:
-                break;
+                return getIntBuffer(doc, 2);
+            case Int3:
             case UInt3:
-                break;
+                return getIntBuffer(doc, 3);
+            case Int4:
             case UInt4:
-                break;
+                return getIntBuffer(doc, 4);
+            case Matrix2x2:
+                return getFloatBuffer(doc, 2, 2);
+            case Matrix2x2D:
+                return getDoubleBuffer(doc, 2, 2);
+            case Matrix2x3:
+                return getFloatBuffer(doc, 2, 3);
+            case Matrix2x3D:
+                return getDoubleBuffer(doc, 2, 3);
+            case Matrix2x4:
+                return getFloatBuffer(doc, 2, 4);
+            case Matrix2x4D:
+                return getDoubleBuffer(doc, 2, 4);
+            case Matrix3x2:
+                return getFloatBuffer(doc, 3, 2);
+            case Matrix3x2D:
+                return getDoubleBuffer(doc, 3, 2);
+            case Matrix3x3:
+                return getFloatBuffer(doc, 3, 3);
+            case Matrix3x3D:
+                return getDoubleBuffer(doc, 3, 3);
+            case Matrix3x4:
+                return getFloatBuffer(doc, 3, 4);
+            case Matrix3x4D:
+                return getDoubleBuffer(doc, 3, 4);
+            case Matrix4x2:
+                return getFloatBuffer(doc, 4, 2);
+            case Matrix4x2D:
+                return getDoubleBuffer(doc, 4, 2);
+            case Matrix4x3:
+                return getFloatBuffer(doc, 4, 3);
+            case Matrix4x3D:
+                return getDoubleBuffer(doc, 4, 3);
+            case Matrix4x4:
+                return getFloatBuffer(doc, 4, 4);
+            case Matrix4x4D:
+                return getDoubleBuffer(doc, 4, 4);
             default:
-                break;
-
+                throw new Ardor3dException("Unhandled uniform type: " + type);
         }
-        return null;
     }
 
     /// PROPERTY READERS
@@ -531,11 +530,166 @@ public class YamlMaterialReader {
     /// YAML NODE CONVERTERS
 
     protected static int getInt(final Object doc) {
-        return (Integer) doc;
+        if (doc instanceof Number) {
+            return ((Number) doc).intValue();
+        } else {
+            return Integer.parseInt(doc.toString());
+        }
+    }
+
+    protected static float getFloat(final Object doc) {
+        if (doc instanceof Number) {
+            return ((Number) doc).floatValue();
+        } else {
+            return Float.parseFloat(doc.toString());
+        }
+    }
+
+    protected static double getDouble(final Object doc) {
+        if (doc instanceof Number) {
+            return ((Number) doc).doubleValue();
+        } else {
+            return Double.parseDouble(doc.toString());
+        }
     }
 
     protected static String getString(final Object doc) {
         return doc.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static DoubleBuffer getDoubleBuffer(final Object doc, final int sizeM, final int sizeN) {
+        if (doc == null) {
+            return null;
+        }
+
+        if (!(doc instanceof ArrayList<?>)) {
+            throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + sizeM + ".  Got: "
+                    + doc.getClass().getName() + " value: " + doc);
+        }
+        final List<Object> vals = (ArrayList<Object>) doc;
+        if (vals.size() != sizeM) {
+            throw new Ardor3dException("Incorrect size.  Expected: " + sizeM + " value: " + doc);
+        }
+
+        final DoubleBuffer buff = BufferUtils.createDoubleBuffer(sizeM * sizeN);
+        for (final Object val : vals) {
+            buff.put(getDoubleBuffer(val, sizeN));
+        }
+
+        buff.flip();
+        return buff;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static DoubleBuffer getDoubleBuffer(final Object doc, final int size) {
+        if (doc == null) {
+            return null;
+        }
+        DoubleBuffer buff;
+        if (size == 1) {
+            buff = BufferUtils.createDoubleBuffer(1);
+            buff.put(getDouble(doc));
+        } else {
+            if (!(doc instanceof ArrayList<?>)) {
+                throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + size + ".  Got: "
+                        + doc.getClass().getName() + " value: " + doc);
+            }
+            final List<Object> vals = (ArrayList<Object>) doc;
+            if (vals.size() != size) {
+                throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
+            }
+
+            buff = BufferUtils.createDoubleBuffer(size);
+            for (final Object val : vals) {
+                buff.put(getDouble(val));
+            }
+        }
+
+        buff.flip();
+        return buff;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static FloatBuffer getFloatBuffer(final Object doc, final int sizeM, final int sizeN) {
+        if (doc == null) {
+            return null;
+        }
+
+        if (!(doc instanceof ArrayList<?>)) {
+            throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + sizeM + ".  Got: "
+                    + doc.getClass().getName() + " value: " + doc);
+        }
+        final List<Object> vals = (ArrayList<Object>) doc;
+        if (vals.size() != sizeM) {
+            throw new Ardor3dException("Incorrect size.  Expected: " + sizeM + " value: " + doc);
+        }
+
+        final FloatBuffer buff = BufferUtils.createFloatBuffer(sizeM * sizeN);
+        for (final Object val : vals) {
+            buff.put(getFloatBuffer(val, sizeN));
+        }
+
+        buff.flip();
+        return buff;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static FloatBuffer getFloatBuffer(final Object doc, final int size) {
+        if (doc == null) {
+            return null;
+        }
+        FloatBuffer buff;
+        if (size == 1) {
+            buff = BufferUtils.createFloatBuffer(1);
+            buff.put(getFloat(doc));
+        } else {
+            if (!(doc instanceof ArrayList<?>)) {
+                throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + size + ".  Got: "
+                        + doc.getClass().getName() + " value: " + doc);
+            }
+            final List<Object> vals = (ArrayList<Object>) doc;
+            if (vals.size() != size) {
+                throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
+            }
+
+            buff = BufferUtils.createFloatBuffer(size);
+            for (final Object val : vals) {
+                buff.put(getFloat(val));
+            }
+        }
+
+        buff.flip();
+        return buff;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static IntBuffer getIntBuffer(final Object doc, final int size) {
+        if (doc == null) {
+            return null;
+        }
+        IntBuffer buff;
+        if (size == 1) {
+            buff = BufferUtils.createIntBuffer(1);
+            buff.put(getInt(doc));
+        } else {
+            if (!(doc instanceof ArrayList<?>)) {
+                throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + size + ".  Got: "
+                        + doc.getClass().getName() + " value: " + doc);
+            }
+            final List<Object> vals = (ArrayList<Object>) doc;
+            if (vals.size() != size) {
+                throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
+            }
+
+            buff = BufferUtils.createIntBuffer(size);
+            for (final Object val : vals) {
+                buff.put(getInt(val));
+            }
+        }
+
+        buff.flip();
+        return buff;
     }
 
     @SuppressWarnings("unchecked")
