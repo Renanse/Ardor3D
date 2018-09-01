@@ -427,8 +427,6 @@ public class YamlMaterialReader {
     }
 
     private static Buffer getBufferForType(final Object doc, final UniformType type) {
-        // TODO: FINISH!
-        System.err.println(type + " " + doc.getClass().getName() + " - " + doc);
         switch (type) {
             case Double1:
                 return getDoubleBuffer(doc, 1);
