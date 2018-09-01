@@ -686,7 +686,7 @@ public class BMText extends Mesh {
 
                 texCrds.put(l).put(t); // left top
                 texCrds.put(l).put(b); // left bottom
-                texCrds.put(r).put(b); // right bottom
+                texCrds.put(r).put(t); // right top
                 texCrds.put(r).put(t); // right top
                 texCrds.put(l).put(b); // left bottom
                 texCrds.put(r).put(b); // right bottom
@@ -699,8 +699,8 @@ public class BMText extends Mesh {
                 cursorX += chr.xadvance + kern + _spacing;
             }
         }
-        _meshData.setVertexBuffer(vertices);
-        _meshData.setTextureBuffer(texCrds, 0);
+        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
 
         // -- notify listeners
         for (final BMTextChangeListener listener : _listeners) {
@@ -714,12 +714,6 @@ public class BMText extends Mesh {
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
-        vertices.put(0).put(0).put(0);
-        vertices.put(0).put(0).put(0);
-        vertices.put(0).put(0).put(0);
-        uvs.put(0).put(0);
-        uvs.put(0).put(0);
-        uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);
