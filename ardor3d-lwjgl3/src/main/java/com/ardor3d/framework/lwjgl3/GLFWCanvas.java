@@ -142,9 +142,6 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
                 public void invoke(final long window, final int width, final int height) {
                     _canvasRenderer.getRenderer().setViewport(0, 0, width, height);
                     updateContentSize();
-                    for (final ICanvasListener l : _listeners) {
-                        l.onResize(width, height);
-                    }
                 }
             });
         } catch (final Exception e) {
@@ -164,6 +161,9 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwGetFramebufferSize(_windowId, width, height);
             _contentWidth = width.get();
             _contentHeight = height.get();
+        }
+        for (final ICanvasListener l : _listeners) {
+            l.onResize(_contentWidth, _contentHeight);
         }
     }
 
@@ -199,6 +199,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     @Override
     public void close() {
         GLFW.glfwDestroyWindow(_windowId);
+        GLFW.glfwTerminate();
     }
 
     @Override
