@@ -73,6 +73,9 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     public abstract int getByteCount();
 
     public int getTupleCount() {
+        if (_valuesPerTuple == 0) {
+            return 0;
+        }
         return getBufferLimit() / _valuesPerTuple;
     }
 
