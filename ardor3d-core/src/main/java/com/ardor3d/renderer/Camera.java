@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Plane;
@@ -1640,7 +1641,7 @@ public class Camera implements Savable, Externalizable {
 
     public static Camera newOrthoCamera(final Canvas canvas) {
         final int width = canvas.getContentWidth();
-        final int height = canvas.getContentWidth();
+        final int height = canvas.getContentHeight();
 
         final Camera camera = new Camera(width, height);
         camera.setFrustum(-1, 1, 0, width, height, 0);
@@ -1653,6 +1654,14 @@ public class Camera implements Savable, Externalizable {
         /** Move our camera to a correct place and orientation. */
         camera.setFrame(loc, left, up, dir);
 
+        canvas.addListener(new ICanvasListener() {
+            @Override
+            public void onResize(final int newWidth, final int newHeight) {
+                camera.resize(newWidth, newHeight);
+                camera.setFrustumRight(newWidth);
+                camera.setFrustumTop(newHeight);
+            }
+        });
         return camera;
     }
 }

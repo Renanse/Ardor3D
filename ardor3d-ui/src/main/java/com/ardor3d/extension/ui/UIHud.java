@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
@@ -143,12 +142,6 @@ public class UIHud extends Node {
         setName("UIHud");
         _canvas = canvas;
         _hudCamera = Camera.newOrthoCamera(_canvas);
-        _canvas.addListener(new ICanvasListener() {
-            @Override
-            public void onResize(final int newWidth, final int newHeight) {
-                _hudCamera.resize(newWidth, newHeight);
-            }
-        });
 
         getSceneHints().setCullHint(CullHint.Never);
         getSceneHints().setRenderBucketType(RenderBucketType.Skip);
