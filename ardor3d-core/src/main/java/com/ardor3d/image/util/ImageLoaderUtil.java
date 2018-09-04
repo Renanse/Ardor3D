@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.util.dds.DdsLoader;
+import com.ardor3d.image.util.hdr.HdrLoader;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.resource.ResourceSource;
 
@@ -31,6 +32,7 @@ public abstract class ImageLoaderUtil {
 
     static {
         registerHandler(new DdsLoader(), ".DDS"); // dxt image
+        registerHandler(new HdrLoader(), ".HDR"); // hdr radiance image
         registerHandler(new TgaLoader(), ".TGA"); // targa image
         registerHandler(new AbiLoader(), ".ABI"); // ardor3d binary image
     }
@@ -92,7 +94,7 @@ public abstract class ImageLoaderUtil {
     /**
      * Register an ImageLoader to handle all files with a specific type. An ImageLoader can be registered to handle
      * several formats without problems.
-     * 
+     *
      * @param handler
      *            the handler to use
      * @param types
