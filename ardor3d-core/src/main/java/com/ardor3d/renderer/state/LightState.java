@@ -162,6 +162,9 @@ public class LightState extends RenderState {
      * @return the light at the given index, null if no light exists at this index.
      */
     public Light get(final int i) {
+        if (lightList.size() <= i) {
+            return null;
+        }
         return lightList.get(i);
     }
 

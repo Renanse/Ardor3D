@@ -7,7 +7,7 @@ techniques:
           - key: vertex
           - key: uv0
         uniforms: 
-          - builtIn: defaultMatrices
+          - builtIn: [model, view, projection]
           - shaderKey: defaultColor
             type: Float4
             source: RenderState

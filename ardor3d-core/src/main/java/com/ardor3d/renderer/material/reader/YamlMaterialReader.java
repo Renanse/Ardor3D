@@ -400,36 +400,67 @@ public class YamlMaterialReader {
             return null;
         }
 
+        // get our shaderKey, if provided
+        final String shaderKey = getString(properties, "shaderKey", null);
+
         // determine our type
         final UniformType type = getEnum(properties, "type", UniformType.class, UniformType.Int1);
 
         // determine our source
         final UniformSource source = getEnum(properties, "source", UniformSource.class, UniformSource.Value);
 
+        // determine any extra
+        final Object extra = properties.get("extra");
+
         // determine our value
-        final Object value = readUniformValue(properties.get("value"), type, source);
+        final Object value = readUniformValue(properties.get("value"), type, source, shaderKey);
 
         // Figure out which key type we are
         final int location = getInt(properties, "location", -1);
         if (location >= 0) {
-            return new UniformRef(location, type, source, value);
+            return new UniformRef(location, type, source, value, extra);
         }
 
-        final String shaderKey = getString(properties, "shaderKey", null);
-        return new UniformRef(shaderKey, type, source, value);
+        return new UniformRef(shaderKey, type, source, value, extra);
     }
 
     private static void addDefaultUniform(final String type, final TechniquePass pass) {
         switch (type.toLowerCase()) {
-            case "defaultmatrices":
-                pass.addDefaultMatrixUniforms();
+            case "view":
+                pass.addUniform(new UniformRef("view", UniformType.Matrix4x4, UniformSource.RendererMatrix,
+                        RenderMatrixType.View));
+                return;
+            case "model":
+                pass.addUniform(new UniformRef("model", UniformType.Matrix4x4, UniformSource.RendererMatrix,
+                        RenderMatrixType.Model));
+                return;
+            case "projection":
+                pass.addUniform(new UniformRef("projection", UniformType.Matrix4x4, UniformSource.RendererMatrix,
+                        RenderMatrixType.Projection));
+                return;
+            case "cameraloc":
+                pass.addUniform(new UniformRef("cameraLoc", UniformType.Float3, UniformSource.RenderState,
+                        RenderStateProperty.CurrentCameraLocation));
+                return;
+            case "lights1":
+                pass.addLightInfoUniforms(1);
+                return;
+            case "lights2":
+                pass.addLightInfoUniforms(2);
+                return;
+            case "lights3":
+                pass.addLightInfoUniforms(3);
+                return;
+            case "lights4":
+                pass.addLightInfoUniforms(4);
                 return;
             default:
                 throw new Ardor3dException("Unknown default uniform type: " + type);
         }
     }
 
-    private static Object readUniformValue(final Object doc, final UniformType type, final UniformSource source) {
+    private static Object readUniformValue(final Object doc, final UniformType type, final UniformSource source,
+            final String shaderKey) {
         switch (source) {
             case RenderState:
                 return Enum.valueOf(RenderStateProperty.class, getString(doc));
@@ -437,8 +468,10 @@ public class YamlMaterialReader {
             case RendererMatrix:
                 return Enum.valueOf(RenderMatrixType.class, getString(doc));
 
-            case SpatialProperty:
-                return getString(doc);
+            case SpatialProperty: {
+                final String key = getString(doc);
+                return (key == null) ? shaderKey : key;
+            }
 
             case Value:
                 return getBufferForType(doc, type);
@@ -576,7 +609,7 @@ public class YamlMaterialReader {
     }
 
     protected static String getString(final Object doc) {
-        return doc.toString();
+        return doc != null ? doc.toString() : null;
     }
 
     @SuppressWarnings("unchecked")

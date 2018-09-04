@@ -24,6 +24,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.uniform.RenderStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
@@ -141,7 +142,19 @@ public class TechniquePass implements Savable {
                 RenderMatrixType.Projection));
     }
 
+    public void addLightInfoUniforms(final int maxLights) {
+        for (int i = 0; i < maxLights; i++) {
+            addUniform(new UniformRef("lightPositions[" + i + "]", UniformType.Float3, UniformSource.RenderState,
+                    RenderStateProperty.LightPosition, i));
+            addUniform(new UniformRef("lightColors[" + i + "]", UniformType.Float3, UniformSource.RenderState,
+                    RenderStateProperty.LightColorRGB, i));
+        }
+    }
+
     public void setupForDraw(final Renderer renderer, final Mesh mesh) {
+        // Apply our states - modulated by any enforced by the pass
+        applyRenderStates(renderer, mesh);
+
         // Start our pass - generates the shader program and links the shader objects.
         startPass(renderer);
 
@@ -150,10 +163,6 @@ public class TechniquePass implements Savable {
 
         // Setup our uniforms using spatial and current scene information
         setupUniforms(renderer, mesh);
-
-        // Apply our states - modulated by any enforced by the pass
-        applyRenderStates(renderer, mesh);
-
     }
 
     protected void startPass(final Renderer renderer) {

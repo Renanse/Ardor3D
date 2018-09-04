@@ -6,7 +6,7 @@ techniques:
         attributes:
           - key: vertex
         uniforms: 
-          - builtIn: defaultMatrices
+          - builtIn: [model, view, projection]
         shaders: 
           Vertex: 
             program: |

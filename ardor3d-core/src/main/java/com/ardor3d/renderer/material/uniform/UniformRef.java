@@ -23,22 +23,35 @@ public class UniformRef implements Savable {
     protected UniformType _type = UniformType.Float1;
     protected UniformSource _source = UniformSource.Value;
     protected Object _value = null;
+    protected Object _extra = null;
 
     public UniformRef() {}
 
     public UniformRef(final String shaderVariableName, final UniformType type, final UniformSource source,
             final Object value) {
+        this(shaderVariableName, type, source, value, null);
+    }
+
+    public UniformRef(final String shaderVariableName, final UniformType type, final UniformSource source,
+            final Object value, final Object extra) {
         _shaderVariableName = shaderVariableName;
         _type = type;
         _source = source;
         _value = value;
+        _extra = extra;
     }
 
     public UniformRef(final int location, final UniformType type, final UniformSource source, final Object value) {
+        this(location, type, source, value, null);
+    }
+
+    public UniformRef(final int location, final UniformType type, final UniformSource source, final Object value,
+            final Object extra) {
         _location = location;
         _type = type;
         _source = source;
         _value = value;
+        _extra = extra;
 
         _shaderVariableName = null;
     }
@@ -63,6 +76,10 @@ public class UniformRef implements Savable {
         return _value;
     }
 
+    public Object getExtra() {
+        return _extra;
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////
@@ -79,7 +96,7 @@ public class UniformRef implements Savable {
         capsule.write(_type, "type", UniformType.Float1);
         capsule.write(_source, "source", UniformSource.Value);
 
-        // TODO: Store value
+        // TODO: Store value and extra
     }
 
     @Override
@@ -88,5 +105,7 @@ public class UniformRef implements Savable {
         _location = capsule.readInt("location", -1);
         _type = capsule.readEnum("type", UniformType.class, UniformType.Float1);
         _source = capsule.readEnum("source", UniformSource.class, UniformSource.Value);
+
+        // TODO: Read value and extra
     }
 }

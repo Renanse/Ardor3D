@@ -8,7 +8,7 @@ techniques:
           - key: color
           - key: uv0
         uniforms: 
-          - builtIn: defaultMatrices
+          - builtIn: [model, view, projection]
         shaders: 
           Vertex: 
             source: unlit/textured/vertexcolor.vert

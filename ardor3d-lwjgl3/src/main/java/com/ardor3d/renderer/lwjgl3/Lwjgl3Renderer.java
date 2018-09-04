@@ -367,50 +367,19 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 Lwjgl3ZBufferStateUtil.apply((ZBufferState) state);
                 return;
 
-            // XXX: The following are not core compatible states - we'll need to do them in shader?
+            // The following are not core compatible states - we'll need to do them in shader.
             case Light:
-                // LwjglLightStateUtil.apply((LightState) state);
-                return;
             case Fog:
-                // LwjglFogStateUtil.apply((FogState) state);
-                return;
             case Clip:
-                // LwjglClipStateUtil.apply((ClipState) state);
-                return;
             case Material:
-                // LwjglMaterialStateUtil.apply((MaterialState) state);
+            case Shading: {
+                final RenderContext context = ContextManager.getCurrentContext();
+                context.setCurrentState(state.getType(), state);
                 return;
-            case Shading:
-                // LwjglShadingStateUtil.apply((ShadingState) state);
-                return;
+            }
         }
         throw new IllegalArgumentException("Unknown state: " + state);
     }
-
-//    @Override
-//    public void applyMatrices(final ReadOnlyTransform worldTransform, final ShaderState currentShader) {
-//        final RenderContext context = ContextManager.getCurrentContext();
-//        final int programId = currentShader.getProgramId(context.getGlContextRep());
-//
-//        try (MemoryStack stack = MemoryStack.stackPush()) {
-//            final FloatBuffer buff = stack.callocFloat(16);
-//            final int modelLoc = GL20C.glGetUniformLocation(programId, "model");
-//            worldTransform.getHomogeneousMatrix(null).toFloatBuffer(buff, true);
-//            buff.rewind();
-//            GL20C.glUniformMatrix4fv(modelLoc, true, buff);
-//
-//            final Camera cam = Camera.getCurrentCamera();
-//            final int viewLoc = GL20C.glGetUniformLocation(programId, "view");
-//            cam.getModelViewMatrix().toFloatBuffer(buff, false);
-//            buff.rewind();
-//            GL20C.glUniformMatrix4fv(viewLoc, true, buff);
-//
-//            final int projLoc = GL20C.glGetUniformLocation(programId, "projection");
-//            cam.getProjectionMatrix().toFloatBuffer(buff, false);
-//            buff.rewind();
-//            GL20C.glUniformMatrix4fv(projLoc, true, buff);
-//        }
-//    }
 
     @Override
     public void drawArrays(final int start, final int count, final IndexMode mode) {

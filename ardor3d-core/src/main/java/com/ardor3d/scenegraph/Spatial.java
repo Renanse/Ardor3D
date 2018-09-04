@@ -1075,7 +1075,7 @@ public abstract class Spatial implements Savable, Hintable {
      */
     @SuppressWarnings("unchecked")
     public <T> T getProperty(final String key) {
-        return (T) _properties.getOrDefault(PKEY_USER_DATA, null);
+        return (T) _properties.getOrDefault(key, null);
     }
 
     public void setProperty(final String key, final Object value) {

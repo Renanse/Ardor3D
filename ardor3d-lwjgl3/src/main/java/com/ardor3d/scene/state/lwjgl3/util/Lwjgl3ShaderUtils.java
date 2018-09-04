@@ -32,7 +32,18 @@ import org.lwjgl.opengl.GL32C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.system.MemoryStack;
 
+import com.ardor3d.light.Light;
+import com.ardor3d.light.PointLight;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Matrix4;
+import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.Vector2;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -42,6 +53,9 @@ import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.material.uniform.RenderStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
+import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.renderer.state.LightState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
@@ -215,10 +229,10 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     value = _renderer.getMatrix(type);
                     break;
                 case SpatialProperty:
-                    value = (Buffer) mesh.getProperty((String) uniform.getValue());
+                    value = getBuffer(uniform.getType(), mesh.getProperty(uniform.getValue().toString()), stack);
                     break;
                 case RenderState:
-                    value = getValue(mesh, (RenderStateProperty) uniform.getValue(), stack);
+                    value = getValue(mesh, (RenderStateProperty) uniform.getValue(), uniform.getExtra(), stack);
                     break;
                 case Function:
                     value = ((Function<Mesh, Buffer>) uniform.getValue()).apply(mesh);
@@ -226,6 +240,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 default:
                     logger.log(Level.SEVERE, "Unhandled uniform source type: " + uniform.getSource());
                     return;
+            }
+
+            if (value == null) {
+                logger.log(Level.SEVERE, "Uniform value was null: " + uniform.getShaderVariableName());
+                return;
             }
 
             value.rewind();
@@ -335,21 +354,204 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     GL20C.glUniformMatrix4fv(location, false, (FloatBuffer) value);
                     break;
                 default:
-                    break;
+                    logger.log(Level.SEVERE, "Unhandled uniform type: " + uniform.getType());
 
             }
         }
     }
 
-    public static Buffer getValue(final Mesh mesh, final RenderStateProperty propertyType, final MemoryStack stack) {
+    private Buffer getBuffer(final UniformType type, final Object value, final MemoryStack stack) {
+        switch (type) {
+            case Double1:
+                if (value instanceof Number) {
+                    return stack.mallocDouble(1).put(((Number) value).doubleValue()).flip();
+                }
+                return (DoubleBuffer) value;
+            case Double2:
+                if (value instanceof Vector2) {
+                    final Vector2 vec = (Vector2) value;
+                    return stack.mallocDouble(2).put(vec.getX()).put(vec.getY()).flip();
+                }
+                return (DoubleBuffer) value;
+            case Double3:
+                if (value instanceof Vector3) {
+                    final Vector3 vec = (Vector3) value;
+                    return stack.mallocDouble(3).put(vec.getX()).put(vec.getY()).put(vec.getZ()).flip();
+                }
+                return (DoubleBuffer) value;
+            case Double4:
+                if (value instanceof Vector4) {
+                    final Vector4 vec = (Vector4) value;
+                    return stack.mallocDouble(4).put(vec.getX()).put(vec.getY()).put(vec.getZ()).put(vec.getW()).flip();
+                }
+                return (DoubleBuffer) value;
+            case Float1:
+                if (value instanceof Number) {
+                    return stack.mallocFloat(1).put(((Number) value).floatValue()).flip();
+                }
+                return (FloatBuffer) value;
+            case Float2:
+                if (value instanceof Vector2) {
+                    final Vector2 vec = (Vector2) value;
+                    return stack.mallocFloat(2).put(vec.getXf()).put(vec.getYf()).flip();
+                }
+                return (FloatBuffer) value;
+            case Float3:
+                if (value instanceof Vector3) {
+                    final Vector3 vec = (Vector3) value;
+                    return stack.mallocFloat(3).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).flip();
+                }
+                return (FloatBuffer) value;
+            case Float4:
+                if (value instanceof Vector4) {
+                    final Vector4 vec = (Vector4) value;
+                    return stack.mallocFloat(4).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf())
+                            .flip();
+                }
+                if (value instanceof Quaternion) {
+                    final Quaternion vec = (Quaternion) value;
+                    return stack.mallocFloat(4).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf())
+                            .flip();
+                }
+                return (FloatBuffer) value;
+            case Int1:
+            case UInt1:
+                if (value instanceof Number) {
+                    return stack.mallocInt(1).put(((Number) value).intValue()).flip();
+                }
+                return (IntBuffer) value;
+            case Int2:
+            case UInt2:
+                return (IntBuffer) value;
+            case Int3:
+            case UInt3:
+                return (IntBuffer) value;
+            case Int4:
+            case UInt4:
+                return (IntBuffer) value;
+            case Matrix2x2:
+                return (FloatBuffer) value;
+            case Matrix2x2D:
+                return (DoubleBuffer) value;
+            case Matrix2x3:
+                return (FloatBuffer) value;
+            case Matrix2x3D:
+                return (DoubleBuffer) value;
+            case Matrix2x4:
+                return (FloatBuffer) value;
+            case Matrix2x4D:
+                return (DoubleBuffer) value;
+            case Matrix3x2:
+                return (FloatBuffer) value;
+            case Matrix3x2D:
+                return (DoubleBuffer) value;
+            case Matrix3x3:
+                if (value instanceof Matrix3) {
+                    final Matrix3 mat = (Matrix3) value;
+                    final FloatBuffer buff = stack.mallocFloat(9);
+                    mat.toFloatBuffer(buff);
+                    return buff.flip();
+                }
+                return (FloatBuffer) value;
+            case Matrix3x3D:
+                if (value instanceof Matrix3) {
+                    final Matrix3 mat = (Matrix3) value;
+                    final DoubleBuffer buff = stack.mallocDouble(9);
+                    mat.toDoubleBuffer(buff);
+                    return buff.flip();
+                }
+                return (DoubleBuffer) value;
+            case Matrix3x4:
+                return (FloatBuffer) value;
+            case Matrix3x4D:
+                return (DoubleBuffer) value;
+            case Matrix4x2:
+                return (FloatBuffer) value;
+            case Matrix4x2D:
+                return (DoubleBuffer) value;
+            case Matrix4x3:
+                return (FloatBuffer) value;
+            case Matrix4x3D:
+                return (DoubleBuffer) value;
+            case Matrix4x4:
+                if (value instanceof Matrix4) {
+                    final Matrix4 mat = (Matrix4) value;
+                    final FloatBuffer buff = stack.mallocFloat(16);
+                    mat.toFloatBuffer(buff);
+                    return buff.flip();
+                }
+                return (FloatBuffer) value;
+            case Matrix4x4D:
+                if (value instanceof Matrix4) {
+                    final Matrix4 mat = (Matrix4) value;
+                    final DoubleBuffer buff = stack.mallocDouble(16);
+                    mat.toDoubleBuffer(buff);
+                    return buff.flip();
+                }
+                return (DoubleBuffer) value;
+            default:
+                logger.log(Level.SEVERE, "Unhandled uniform type: " + type);
+                return null;
+        }
+    }
+
+    public static Buffer getValue(final Mesh mesh, final RenderStateProperty propertyType, final Object extra,
+            final MemoryStack stack) {
         switch (propertyType) {
-            case MeshDefaultColorRGBA:
-                final FloatBuffer buffer = stack.mallocFloat(4);
+            case MeshDefaultColorRGB:
+            case MeshDefaultColorRGBA: {
+                final FloatBuffer buffer = stack
+                        .mallocFloat(propertyType == RenderStateProperty.MeshDefaultColorRGB ? 3 : 4);
                 final ReadOnlyColorRGBA color = mesh.getDefaultColor();
-                buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue()).put(color.getAlpha());
+                buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
+                if (propertyType == RenderStateProperty.MeshDefaultColorRGBA) {
+                    buffer.put(color.getAlpha());
+                }
                 buffer.rewind();
                 return buffer;
+            }
 
+            case CurrentCameraLocation: {
+                final FloatBuffer buffer = stack.mallocFloat(3);
+                final Camera cam = Camera.getCurrentCamera();
+                final ReadOnlyVector3 loc = cam.getLocation();
+                buffer.put(loc.getXf()).put(loc.getYf()).put(loc.getZf());
+                buffer.rewind();
+                return buffer;
+            }
+
+            case LightPosition: {
+                final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
+                final RenderContext context = ContextManager.getCurrentContext();
+                final LightState ls = (LightState) context.getCurrentState(StateType.Light);
+                final Light light = ls.get(index);
+                ReadOnlyVector3 position = Vector3.ZERO;
+                if (light instanceof PointLight) {
+                    position = ((PointLight) light).getLocation();
+                }
+
+                final FloatBuffer buffer = stack.mallocFloat(3);
+                buffer.put(position.getXf()).put(position.getYf()).put(position.getZf());
+                buffer.rewind();
+                return buffer;
+            }
+
+            case LightColorRGB:
+            case LightColorRGBA: {
+                final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
+                final RenderContext context = ContextManager.getCurrentContext();
+                final LightState ls = (LightState) context.getCurrentState(StateType.Light);
+                final Light light = ls.get(index);
+                final ReadOnlyColorRGBA color = light == null ? ColorRGBA.BLACK_NO_ALPHA : light.getDiffuse();
+
+                final FloatBuffer buffer = stack.mallocFloat(propertyType == RenderStateProperty.LightColorRGB ? 3 : 4);
+                buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
+                if (propertyType == RenderStateProperty.LightColorRGBA) {
+                    buffer.put(color.getAlpha());
+                }
+                buffer.rewind();
+                return buffer;
+            }
         }
         throw new Ardor3dException("Unhandled uniform source - RenderStateProperty type: " + propertyType);
     }
