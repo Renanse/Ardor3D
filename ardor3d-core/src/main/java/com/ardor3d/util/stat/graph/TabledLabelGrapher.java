@@ -206,13 +206,13 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
             _textureRenderer.render(_bgQuad, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
 
             // - Now, draw to texture via a TextureRenderer
-            _textureRenderer.render(_graphRoot, _texture, Renderer.BUFFER_NONE);
+            _textureRenderer.renderSpatial(_graphRoot, _texture, Renderer.BUFFER_NONE);
         } else {
             bgColor.setAlpha(1);
             _textureRenderer.setBackgroundColor(bgColor);
 
             // - Now, draw to texture via a TextureRenderer
-            _textureRenderer.render(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+            _textureRenderer.renderSpatial(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
         }
         ColorRGBA.releaseTempInstance(bgColor);
 

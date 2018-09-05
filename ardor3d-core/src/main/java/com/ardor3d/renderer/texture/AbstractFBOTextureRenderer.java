@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -27,6 +26,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 
 public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
@@ -94,7 +94,8 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         return _backgroundColor;
     }
 
-    public void render(final Spatial toDraw, final Texture tex, final int clear) {
+    @Override
+    public void render(final Renderable toDraw, final Texture tex, final int clear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
@@ -120,7 +121,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         }
     }
 
-    public void render(final Scene toDraw, final Texture tex, final int clear) {
+    public void render(final List<? extends Renderable> toDraw, final Texture tex, final int clear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
@@ -142,11 +143,13 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
             ContextManager.getCurrentContext().popFBOTextureRenderer();
         } catch (final Exception e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception", e);
+            logger.logp(Level.SEVERE, this.getClass().toString(), "render(List<Spatial>, Texture, boolean)",
+                    "Exception", e);
         }
     }
 
-    public void render(final List<? extends Spatial> toDraw, final Texture tex, final int clear) {
+    @Override
+    public void renderSpatial(final Spatial toDraw, final Texture tex, final int clear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
@@ -157,7 +160,33 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
             }
 
             switchCameraIn(clear);
-            doDraw(toDraw);
+            doDrawSpatial(toDraw);
+            switchCameraOut();
+
+            if (_samples > 0 && _supportsMultisample) {
+                blitMSFBO();
+            }
+
+            takedownForSingleTexDraw(tex);
+
+            ContextManager.getCurrentContext().popFBOTextureRenderer();
+        } catch (final Exception e) {
+            logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception", e);
+        }
+    }
+
+    public void renderSpatials(final List<? extends Spatial> toDraw, final Texture tex, final int clear) {
+        try {
+            ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
+
+            setupForSingleTexDraw(tex);
+
+            if (_samples > 0 && _supportsMultisample) {
+                setMSFBO();
+            }
+
+            switchCameraIn(clear);
+            doDrawSpatials(toDraw);
             switchCameraOut();
 
             if (_samples > 0 && _supportsMultisample) {
@@ -216,7 +245,17 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         _parentRenderer.getQueue().popBuckets();
     }
 
-    protected void doDraw(final Spatial spat) {
+    protected void doDraw(final Renderable toDraw) {
+        toDraw.render(_parentRenderer);
+    }
+
+    protected void doDraw(final List<? extends Renderable> toDraw) {
+        for (int x = 0, max = toDraw.size(); x < max; x++) {
+            doDraw(toDraw.get(x));
+        }
+    }
+
+    protected void doDrawSpatial(final Spatial spat) {
         // Override parent's last frustum test to avoid accidental incorrect cull
         if (spat.getParent() != null) {
             spat.getParent().setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
@@ -226,15 +265,10 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         spat.onDraw(_parentRenderer);
     }
 
-    protected void doDraw(final List<? extends Spatial> toDraw) {
+    protected void doDrawSpatials(final List<? extends Spatial> toDraw) {
         for (int x = 0, max = toDraw.size(); x < max; x++) {
-            final Spatial spat = toDraw.get(x);
-            doDraw(spat);
+            doDrawSpatial(toDraw.get(x));
         }
-    }
-
-    protected void doDraw(final Scene toDraw) {
-        toDraw.renderUnto(_parentRenderer);
     }
 
     public int getWidth() {
@@ -247,10 +281,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     public Renderer getParentRenderer() {
         return _parentRenderer;
-    }
-
-    public void setMultipleTargets(final boolean multi) {
-        // ignore. Does not matter to FBO.
     }
 
     public void enforceState(final RenderState state) {

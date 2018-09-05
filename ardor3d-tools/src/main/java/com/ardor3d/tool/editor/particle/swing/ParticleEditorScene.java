@@ -88,7 +88,7 @@ class ParticleEditorScene implements Scene, Updater {
     }
 
     @Override
-    public boolean renderUnto(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
 
         if (Constants.stats && labGraph == null) {
             setupStatGraphs(renderer);

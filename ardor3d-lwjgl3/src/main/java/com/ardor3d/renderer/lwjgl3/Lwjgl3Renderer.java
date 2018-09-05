@@ -225,7 +225,9 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public void draw(final Renderable renderable) {
-        renderable.render(this);
+        if (renderable != null) {
+            renderable.render(this);
+        }
     }
 
     @Override

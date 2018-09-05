@@ -191,7 +191,7 @@ public class JoglBasicExample implements Scene {
 
     // ------ Scene methods ------
 
-    public boolean renderUnto(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
         if (!_canvas.isClosing()) {
 
             // Draw the root and all its children.

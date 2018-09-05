@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
@@ -21,7 +22,6 @@ import org.lwjgl.opengl.GL14C;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
 
-import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
 import com.ardor3d.image.TextureCubeMap;
@@ -39,6 +39,7 @@ import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
 import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
+import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
@@ -54,6 +55,13 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     private static final Logger logger = Logger.getLogger(Lwjgl3TextureRenderer.class.getName());
+
+    private final Consumer<Renderable> drawRendConsumer = (final Renderable r) -> this.doDraw(r);
+    private final Consumer<List<? extends Renderable>> drawRendListConsumer = (
+            final List<? extends Renderable> list) -> this.doDraw(list);
+    private final Consumer<Spatial> drawSpatConsumer = (final Spatial s) -> doDrawSpatial(s);
+    private final Consumer<List<? extends Spatial>> drawSpatListConsumer = (
+            final List<? extends Spatial> list) -> doDrawSpatials(list);
 
     public Lwjgl3TextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
@@ -122,21 +130,27 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
     }
 
-    public void render(final Spatial spat, final List<Texture> texs, final int clear) {
-        render(null, spat, null, texs, clear);
-    }
-
-    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
-        render(spat, null, null, texs, clear);
+    @Override
+    public void render(final Renderable renderable, final List<Texture> texs, final int clear) {
+        render(renderable, drawRendConsumer, texs, clear);
     }
 
     @Override
-    public void render(final Scene scene, final List<Texture> texs, final int clear) {
-        render(null, null, scene, texs, clear);
+    public void render(final List<? extends Renderable> renderables, final List<Texture> texs, final int clear) {
+        render(renderables, drawRendListConsumer, texs, clear);
     }
 
-    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
-            final List<Texture> texs, final int clear) {
+    @Override
+    public void renderSpatial(final Spatial spat, final List<Texture> texs, final int clear) {
+        render(spat, drawSpatConsumer, texs, clear);
+    }
+
+    @Override
+    public void renderSpatials(final List<? extends Spatial> spats, final List<Texture> texs, final int clear) {
+        render(spats, drawSpatListConsumer, texs, clear);
+    }
+
+    protected <T> void render(final T toRender, final Consumer<T> consumer, final List<Texture> texs, final int clear) {
 
         final int maxDrawBuffers = ContextManager.getCurrentContext().getCapabilities().getMaxFBOColorAttachments();
 
@@ -155,12 +169,8 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     }
 
                     switchCameraIn(clear);
-                    if (toDrawA != null) {
-                        doDraw(toDrawA);
-                    } else if (toDrawB != null) {
-                        doDraw(toDrawB);
-                    } else {
-                        doDraw(toDrawC);
+                    if (toRender != null) {
+                        consumer.accept(toRender);
                     }
                     switchCameraOut();
 
@@ -241,13 +251,9 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 checkFBOComplete(_fboID);
 
                 switchCameraIn(clear);
-
-                if (toDrawA != null) {
-                    doDraw(toDrawA);
-                } else {
-                    doDraw(toDrawB);
+                if (toRender != null) {
+                    consumer.accept(toRender);
                 }
-
                 switchCameraOut();
             }
 

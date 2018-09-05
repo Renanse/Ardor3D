@@ -704,7 +704,7 @@ public abstract class Spatial implements Savable, Hintable {
 
     /**
      * <code>draw</code> abstract method that handles drawing data to the renderer if it is geometry and passing the
-     * call to it's children if it is a node.
+     * call to its children if it is a node.
      *
      * @param renderer
      *            the renderer used for display.

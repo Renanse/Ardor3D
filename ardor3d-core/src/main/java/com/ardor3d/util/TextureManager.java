@@ -23,7 +23,7 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.image.util.ImageLoaderUtil;
+import com.ardor3d.image.loader.ImageLoaderUtil;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;

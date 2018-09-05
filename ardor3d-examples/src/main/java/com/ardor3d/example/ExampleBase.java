@@ -192,6 +192,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                     ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/models/")));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, new SimpleResourceLocator(
                     ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/material")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL,
+                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ExampleBase.class,
+                            "com/ardor3d/example/media/materials/")));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
                     ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/shader")));
             MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
@@ -274,7 +277,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     }
 
     @MainThread
-    public boolean renderUnto(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
         // Execute renderQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.RENDER)
                 .execute(renderer);

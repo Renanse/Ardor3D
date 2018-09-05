@@ -208,10 +208,10 @@ public class Line extends Mesh {
     }
 
     @Override
-    public void render(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
         renderer.setupLineParameters(getLineWidth(), isAntialiased());
 
-        super.render(renderer);
+        return super.render(renderer);
     }
 
 }

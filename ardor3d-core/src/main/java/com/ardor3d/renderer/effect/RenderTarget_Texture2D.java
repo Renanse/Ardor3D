@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -75,9 +75,9 @@ public class RenderTarget_Texture2D implements RenderTarget {
 
         // draw to texture
         if (spatial != null) {
-            texRend.render(spatial, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+            texRend.renderSpatial(spatial, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
         } else {
-            texRend.render(spatials, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+            texRend.renderSpatials(spatials, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
         }
 
         texRend.clearEnforcedStates();

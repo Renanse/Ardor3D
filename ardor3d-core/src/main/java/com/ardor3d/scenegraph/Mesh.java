@@ -235,20 +235,23 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         return store;
     }
 
-    public void render(final Renderer renderer) {
+    @Override
+    public boolean render(final Renderer renderer) {
         if (isVisible()) {
-            render(renderer, getMeshData());
+            return render(renderer, getMeshData());
         }
+
+        return false;
     }
 
-    protected void render(final Renderer renderer, final MeshData meshData) {
+    protected boolean render(final Renderer renderer, final MeshData meshData) {
 
         // Grab our proper RenderTechnique
         final MaterialTechnique technique = MaterialManager.INSTANCE.chooseTechnique(this);
 
         // No technique? Can't render.
         if (technique == null) {
-            return;
+            return false;
         }
 
         // Set our model matrix
@@ -321,6 +324,8 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         // renderVBO(renderer, meshData, instancing.getPrimitiveCount());
         // }
         // }
+
+        return true;
     }
 
     @Override

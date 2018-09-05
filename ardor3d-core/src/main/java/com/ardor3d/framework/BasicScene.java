@@ -42,7 +42,7 @@ public class BasicScene implements Scene {
     }
 
     @Override
-    public boolean renderUnto(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
         // Execute renderQueue item
         GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.RENDER)
                 .execute(renderer);

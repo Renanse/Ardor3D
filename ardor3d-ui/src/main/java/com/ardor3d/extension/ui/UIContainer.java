@@ -454,7 +454,6 @@ public abstract class UIContainer extends UIComponent {
                     renderer, ContextManager.getCurrentContext().getCapabilities());
             if (UIContainer._textureRenderer != null) {
                 UIContainer._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 1f, 0f, 0f));
-                UIContainer._textureRenderer.setMultipleTargets(true);
             } else {
                 // Can't make standin.
                 _useStandin = false;

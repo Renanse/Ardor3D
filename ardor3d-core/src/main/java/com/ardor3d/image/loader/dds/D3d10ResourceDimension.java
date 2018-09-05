@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util.dds;
+package com.ardor3d.image.loader.dds;
 
 enum D3d10ResourceDimension {
     D3D10_RESOURCE_DIMENSION_UNKNOWN(0), //

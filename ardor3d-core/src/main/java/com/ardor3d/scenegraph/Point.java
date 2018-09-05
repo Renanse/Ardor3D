@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -42,8 +42,8 @@ public class Point extends Mesh {
      */
     // XXX: LWJGL requires 4 floats, but only 3 coefficients are mentioned in the specification?
     // JOGL works fine with 3.
-    private final FloatBuffer _attenuationCoefficients = BufferUtils.createFloatBuffer(new float[] { 0.0f, 0f,
-            0.000004f, 0f });
+    private final FloatBuffer _attenuationCoefficients = BufferUtils
+            .createFloatBuffer(new float[] { 0.0f, 0f, 0.000004f, 0f });
     private float _minPointSize = 1.0f;
     private float _maxPointSize = 64.0f;
     private boolean _useDistanceAttenuation = false;
@@ -60,7 +60,7 @@ public class Point extends Mesh {
     /**
      * Constructor instantiates a new <code>Point</code> object with a given set of data. Any data may be null, except
      * the vertex array. If this is null an exception is thrown.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
@@ -83,7 +83,7 @@ public class Point extends Mesh {
     /**
      * Constructor instantiates a new <code>Point</code> object with a given set of data. Any data may be null, except
      * the vertex array. If this is null an exception is thrown.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      * @param vertex
@@ -104,7 +104,7 @@ public class Point extends Mesh {
 
     /**
      * Initialize the meshdata object with data.
-     * 
+     *
      * @param vertices
      * @param normals
      * @param colors
@@ -124,7 +124,7 @@ public class Point extends Mesh {
 
     /**
      * Default attenuation coefficient is calculated to work best with pointSize = 1.
-     * 
+     *
      * @param bool
      */
     public void enableDistanceAttenuation(final boolean bool) {
@@ -144,7 +144,7 @@ public class Point extends Mesh {
      * Derived Size = 1/(0.000004*500^2) = 1<br>
      * 2. A size of 25 pixel at distance of 100 units.<br>
      * 3. A size of 2500 at a distance of 10 units.<br>
-     * 
+     *
      * @see <a href="http://www.opengl.org/registry/specs/ARB/point_parameters.txt">OpenGL specification</a>
      * @param a
      *            constant term in the attenuation equation
@@ -170,7 +170,7 @@ public class Point extends Mesh {
      * Sets whether the point should be antialiased. May decrease performance. If you want to enabled antialiasing, you
      * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
      * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
-     * 
+     *
      * @param antialiased
      *            true if the line should be antialiased.
      */
@@ -196,7 +196,7 @@ public class Point extends Mesh {
     /**
      * Sets the pixel width of the point when drawn. Non anti-aliased point sizes are rounded to the nearest whole
      * number by opengl.
-     * 
+     *
      * @param size
      *            The size to set.
      */
@@ -206,7 +206,7 @@ public class Point extends Mesh {
 
     /**
      * When DistanceAttenuation is enabled, the points maximum size will get clamped to this value.
-     * 
+     *
      * @param maxSize
      */
     public void setMaxPointSize(final float maxSize) {
@@ -215,7 +215,7 @@ public class Point extends Mesh {
 
     /**
      * When DistanceAttenuation is enabled, the points maximum size will get clamped to this value.
-     * 
+     *
      * @param maxSize
      */
     public float getMaxPointSize() {
@@ -224,7 +224,7 @@ public class Point extends Mesh {
 
     /**
      * When DistanceAttenuation is enabled, the points minimum size will get clamped to this value.
-     * 
+     *
      * @param maxSize
      */
     public void setMinPointSize(final float minSize) {
@@ -233,7 +233,7 @@ public class Point extends Mesh {
 
     /**
      * When DistanceAttenuation is enabled, the points minimum size will get clamped to this value.
-     * 
+     *
      * @param maxSize
      */
     public float getMinPointSize() {
@@ -242,7 +242,7 @@ public class Point extends Mesh {
 
     /**
      * Used with Serialization. Do not call this directly.
-     * 
+     *
      * @param s
      * @throws IOException
      * @see java.io.Serializable
@@ -253,7 +253,7 @@ public class Point extends Mesh {
 
     /**
      * Used with Serialization. Do not call this directly.
-     * 
+     *
      * @param s
      * @throws IOException
      * @throws ClassNotFoundException
@@ -310,11 +310,11 @@ public class Point extends Mesh {
     }
 
     @Override
-    public void render(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
         renderer.setupPointParameters(_pointSize, isAntialiased(), isPointSprite(), _useDistanceAttenuation,
                 _attenuationCoefficients, _minPointSize, _maxPointSize);
 
-        super.render(renderer);
+        return super.render(renderer);
     }
 
 }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -36,6 +36,6 @@ public class RenderPass extends Pass {
 
     @Override
     public void doRender(final TextureRenderer r, final int clear, final List<Texture> texs) {
-        r.render(_spatials, texs, clear);
+        r.renderSpatials(_spatials, texs, clear);
     }
 }

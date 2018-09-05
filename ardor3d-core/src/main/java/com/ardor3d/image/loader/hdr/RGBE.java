@@ -1,5 +1,5 @@
 
-package com.ardor3d.image.util.hdr;
+package com.ardor3d.image.loader.hdr;
 
 import java.io.DataInputStream;
 import java.io.IOException;

@@ -8,12 +8,12 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util.dds;
+package com.ardor3d.image.loader.dds;
 
-import static com.ardor3d.image.util.dds.DdsUtils.flipDXT;
-import static com.ardor3d.image.util.dds.DdsUtils.getInt;
-import static com.ardor3d.image.util.dds.DdsUtils.isSet;
-import static com.ardor3d.image.util.dds.DdsUtils.shiftCount;
+import static com.ardor3d.image.loader.dds.DdsUtils.flipDXT;
+import static com.ardor3d.image.loader.dds.DdsUtils.getInt;
+import static com.ardor3d.image.loader.dds.DdsUtils.isSet;
+import static com.ardor3d.image.loader.dds.DdsUtils.shiftCount;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.util.ImageLoader;
+import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.util.LittleEndianDataInput;
 import com.ardor3d.util.geom.BufferUtils;

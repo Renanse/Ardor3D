@@ -189,7 +189,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
         // - Now, draw to texture via a TextureRenderer
         _graphRoot.updateGeometricState(0, true);
-        _textureRenderer.render(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+        _textureRenderer.renderSpatial(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
 
         // Turn stat collection back on.
         StatCollector.resume();

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -359,7 +359,7 @@ public class QuadImposterNode extends Node {
     }
 
     public void renderImposter() {
-        _tRenderer.render(_targetScene, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+        _tRenderer.renderSpatial(_targetScene, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
     }
 
     public Vector3 getWorldUpVector() {

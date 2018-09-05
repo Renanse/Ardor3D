@@ -8,9 +8,9 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util.dds;
+package com.ardor3d.image.loader.dds;
 
-import static com.ardor3d.image.util.dds.DdsUtils.isSet;
+import static com.ardor3d.image.loader.dds.DdsUtils.isSet;
 
 import java.io.IOException;
 import java.util.logging.Logger;

@@ -1,0 +1,58 @@
+--- # Material
+name: rtt_cubemap_example
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+          - key: uv1
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - 
+            shaderKey: diffuse
+            type: Int1
+            value: 0
+          - 
+            shaderKey: reflection
+            type: Int1
+            value: 1
+        shaders: 
+          Vertex: 
+            program: |
+              #version 330 core
+              
+              layout (location = 0) in vec3 vertex;
+              layout (location = 2) in vec2 uv0;
+              
+              uniform mat4 model;
+              uniform mat4 view;
+              uniform mat4 projection;
+              
+              out vec2 TexCoord0;
+              out vec3 LocalPos;
+              
+              void main()
+              {
+                  gl_Position = projection * view * model * vec4(vertex, 1.0);
+                  LocalPos = vertex;
+                  TexCoord0 = uv0;
+              }
+          Fragment: 
+            program: |
+              #version 330 core
+  
+              out vec4 FragColor;
+              
+              in vec2 TexCoord0;
+              in vec3 LocalPos;
+              
+              uniform sampler2D diffuse;
+              uniform samplerCube reflection;
+              
+              void main()
+              {
+                  FragColor = mix(texture(diffuse, TexCoord0), texture(reflection, LocalPos), 0.07);
+              }
+                          
+              

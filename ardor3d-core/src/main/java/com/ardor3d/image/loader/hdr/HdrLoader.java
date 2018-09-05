@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util.hdr;
+package com.ardor3d.image.loader.hdr;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -20,7 +20,7 @@ import java.nio.FloatBuffer;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.util.ImageLoader;
+import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class HdrLoader implements ImageLoader {

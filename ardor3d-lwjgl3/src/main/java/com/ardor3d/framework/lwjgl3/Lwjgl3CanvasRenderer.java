@@ -117,7 +117,7 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
         }
         _renderer.clearBuffers(_frameClear);
 
-        final boolean drew = _scene.renderUnto(_renderer);
+        final boolean drew = _scene.render(_renderer);
         _renderer.flushFrame(drew && _doSwap);
         if (drew && _doSwap) {
             _canvasCallback.doSwap();

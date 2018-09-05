@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.image.util;
+package com.ardor3d.image.loader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
-import com.ardor3d.image.util.dds.DdsLoader;
-import com.ardor3d.image.util.hdr.HdrLoader;
+import com.ardor3d.image.loader.dds.DdsLoader;
+import com.ardor3d.image.loader.hdr.HdrLoader;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.resource.ResourceSource;
 
