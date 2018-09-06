@@ -1,0 +1,37 @@
+--- # Material
+name: untextured pbr with irradiance map
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: uv0
+        uniforms: 
+          - builtIn: [model, view, projection, cameraLoc, lights4]
+          - 
+            shaderKey: albedo
+            type: Float3
+            source: RenderState
+            value: MeshDefaultColorRGB
+          - 
+            shaderKey: metallic
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: roughness
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: ao
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: irradianceMap
+            type: Int1
+            value: 0
+        shaders: 
+          Vertex: 
+            source: pbr/pbr_simple.vert
+          Fragment:
+            source: pbr/pbr_simpleIrradiance.frag

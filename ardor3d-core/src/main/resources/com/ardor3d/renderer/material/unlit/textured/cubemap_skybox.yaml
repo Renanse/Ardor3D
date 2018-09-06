@@ -1,0 +1,54 @@
+--- # Material
+name: equirectangle to CubeMap
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+        uniforms: 
+          - builtIn: [view, projection]
+          - 
+            shaderKey: skyboxMap
+            type: Int1
+            value: 0
+        shaders: 
+          Vertex: 
+            program: |
+              #version 330 core
+              layout (location = 0) in vec3 vertex;
+              
+              uniform mat4 projection;
+              uniform mat4 view;
+              
+              out vec3 WorldPos;
+              
+              void main()
+              {
+                WorldPos = vertex;
+              
+                mat4 rotView = mat4(mat3(view));
+                vec4 clipPos = projection * rotView * vec4(WorldPos, 1.0);
+              
+                gl_Position = clipPos.xyww;
+              }
+              
+          Fragment:
+            program: |
+              #version 330 core
+
+              in vec3 WorldPos;
+              
+              out vec4 FragColor;
+              
+              uniform samplerCube skyboxMap;
+              
+              void main()
+              {   
+                  vec3 envColor = texture(skyboxMap, WorldPos).rgb;
+                  
+                  // HDR tonemap and gamma correct
+                  envColor = envColor / (envColor + vec3(1.0));
+                  envColor = pow(envColor, vec3(1.0/2.2)); 
+                  
+                  FragColor = vec4(envColor, 1.0);
+              }
