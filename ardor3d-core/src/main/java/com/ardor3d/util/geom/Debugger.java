@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -23,7 +23,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -33,7 +32,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -578,8 +576,7 @@ public final class Debugger {
             height = newHeight;
         }
         if (bufTexRend == null) {
-            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, r,
-                    ContextManager.getCurrentContext().getCapabilities());
+            bufTexRend = r.createTextureRenderer(width, height, 0, 0);
             bufTexRend.setupTexture(bufTexture);
         }
         bufTexRend.copyToTexture(bufTexture, 0, 0, width, height, 0, 0);

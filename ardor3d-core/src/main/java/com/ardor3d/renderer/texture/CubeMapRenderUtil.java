@@ -10,100 +10,108 @@
 
 package com.ardor3d.renderer.texture;
 
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 
 public class CubeMapRenderUtil {
     protected TextureRenderer _textureRenderer = null;
+    protected final Renderer _renderer;
+    protected final int _samples;
 
-    protected final DisplaySettings _settings;
-    protected final double _near;
-    protected final double _far;
-
-    public CubeMapRenderUtil(final DisplaySettings settings, final double near, final double far) {
-        _settings = settings;
-        _near = near;
-        _far = far;
+    public CubeMapRenderUtil(final Renderer renderer) {
+        this(renderer, 0);
     }
 
-    public void init(final Renderer renderer) {
-        _textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_settings, renderer,
-                ContextManager.getCurrentContext().getCapabilities());
-
-        _textureRenderer.getCamera().setFrustumPerspective(90.0, 1.0, _near, _far);
+    public CubeMapRenderUtil(final Renderer renderer, final int samples) {
+        _renderer = renderer;
+        _samples = samples;
     }
 
-    public void setupTexture(final TextureCubeMap cubemap) {
-        _textureRenderer.setupTexture(cubemap);
+    public void updateSettings(final int width, final int height, final int depthBits, final double near,
+            final double far) {
+        if (_textureRenderer == null) {
+            _textureRenderer = _renderer.createTextureRenderer(width, height, depthBits, _samples);
+            _textureRenderer.getCamera().setFrustumPerspective(90.0, 1.0, near, far);
+        } else {
+            _textureRenderer.resize(width, height, depthBits);
+
+            final Camera cam = _textureRenderer.getCamera();
+            if (near != cam.getDepthRangeNear() || far != cam.getDepthRangeFar()) {
+                _textureRenderer.getCamera().setFrustumPerspective(90.0, 1.0, near, far);
+            }
+        }
     }
 
     public void renderToCubeMap(final Renderable renderable, final TextureCubeMap cubemap,
             final ReadOnlyVector3 cameraPosition, final int clear) {
+        if (cubemap.getTextureKey() == null) {
+            _textureRenderer.setupTexture(cubemap);
+        }
+
         final Camera cam = _textureRenderer.getCamera();
         cam.setLocation(cameraPosition);
 
-        // render our scene from the sphere's point of view
-        cam.setAxes(Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_X);
-        cubemap.setCurrentRTTFace(Face.NegativeX);
-        _textureRenderer.render(renderable, cubemap, clear);
-
-        cam.setAxes(Vector3.UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.UNIT_X);
-        cubemap.setCurrentRTTFace(Face.PositiveX);
-        _textureRenderer.render(renderable, cubemap, clear);
-
-        cam.setAxes(Vector3.NEG_UNIT_X, Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y);
-        cubemap.setCurrentRTTFace(Face.NegativeY);
-        _textureRenderer.render(renderable, cubemap, clear);
-
-        cam.setAxes(Vector3.NEG_UNIT_X, Vector3.UNIT_Z, Vector3.UNIT_Y);
-        cubemap.setCurrentRTTFace(Face.PositiveY);
-        _textureRenderer.render(renderable, cubemap, clear);
-
-        cam.setAxes(Vector3.UNIT_X, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_Z);
-        cubemap.setCurrentRTTFace(Face.NegativeZ);
-        _textureRenderer.render(renderable, cubemap, clear);
-
-        cam.setAxes(Vector3.NEG_UNIT_X, Vector3.NEG_UNIT_Y, Vector3.UNIT_Z);
-        cubemap.setCurrentRTTFace(Face.PositiveZ);
-        _textureRenderer.render(renderable, cubemap, clear);
+        for (final Face face : Face.values()) {
+            pointAtFace(face, cam);
+            cubemap.setCurrentRTTFace(face);
+            _textureRenderer.render(renderable, cubemap, clear);
+        }
     }
 
     public void renderToCubeMap(final Spatial spatial, final TextureCubeMap cubemap,
             final ReadOnlyVector3 cameraPosition, final int clear) {
+        if (cubemap.getTextureKey() == null) {
+            _textureRenderer.setupTexture(cubemap);
+        }
+
         final Camera cam = _textureRenderer.getCamera();
         cam.setLocation(cameraPosition);
 
-        // render our scene from the sphere's point of view
-        cam.setAxes(Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_X);
-        cubemap.setCurrentRTTFace(Face.NegativeX);
-        _textureRenderer.renderSpatial(spatial, cubemap, clear);
+        for (final Face face : Face.values()) {
+            pointAtFace(face, cam);
+            cubemap.setCurrentRTTFace(face);
+            _textureRenderer.renderSpatial(spatial, cubemap, clear);
+        }
+    }
 
-        cam.setAxes(Vector3.UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.UNIT_X);
-        cubemap.setCurrentRTTFace(Face.PositiveX);
-        _textureRenderer.renderSpatial(spatial, cubemap, clear);
+    public void cleanup() {
+        if (_textureRenderer != null) {
+            _textureRenderer.cleanup();
+            _textureRenderer = null;
+        }
+    }
 
-        cam.setAxes(Vector3.NEG_UNIT_X, Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y);
-        cubemap.setCurrentRTTFace(Face.NegativeY);
-        _textureRenderer.renderSpatial(spatial, cubemap, clear);
+    private void pointAtFace(final Face face, final Camera cam) {
+        switch (face) {
+            case NegativeX:
+                cam.setAxes(Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_X);
+                break;
 
-        cam.setAxes(Vector3.NEG_UNIT_X, Vector3.UNIT_Z, Vector3.UNIT_Y);
-        cubemap.setCurrentRTTFace(Face.PositiveY);
-        _textureRenderer.renderSpatial(spatial, cubemap, clear);
+            case PositiveX:
+                cam.setAxes(Vector3.UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.UNIT_X);
+                break;
 
-        cam.setAxes(Vector3.UNIT_X, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_Z);
-        cubemap.setCurrentRTTFace(Face.NegativeZ);
-        _textureRenderer.renderSpatial(spatial, cubemap, clear);
+            case NegativeY:
+                cam.setAxes(Vector3.NEG_UNIT_X, Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y);
+                break;
 
-        cam.setAxes(Vector3.NEG_UNIT_X, Vector3.NEG_UNIT_Y, Vector3.UNIT_Z);
-        cubemap.setCurrentRTTFace(Face.PositiveZ);
-        _textureRenderer.renderSpatial(spatial, cubemap, clear);
+            case PositiveY:
+                cam.setAxes(Vector3.NEG_UNIT_X, Vector3.UNIT_Z, Vector3.UNIT_Y);
+                break;
+
+            case NegativeZ:
+                cam.setAxes(Vector3.UNIT_X, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_Z);
+                break;
+
+            case PositiveZ:
+                cam.setAxes(Vector3.NEG_UNIT_X, Vector3.NEG_UNIT_Y, Vector3.UNIT_Z);
+                break;
+        }
     }
 }

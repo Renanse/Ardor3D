@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,10 +13,8 @@ package com.ardor3d.renderer.effect;
 import java.util.Iterator;
 import java.util.List;
 
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.google.common.collect.Lists;
 
 public enum TextureRendererPool {
@@ -34,8 +32,7 @@ public enum TextureRendererPool {
         }
 
         // none found, make one
-        return TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, renderer, ContextManager
-                .getCurrentContext().getCapabilities());
+        return renderer.createTextureRenderer(width, height, 0, 0);
     }
 
     public static void release(final TextureRenderer texRend) {

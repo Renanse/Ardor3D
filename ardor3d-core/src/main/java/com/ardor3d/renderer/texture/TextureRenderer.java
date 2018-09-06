@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -24,8 +24,8 @@ import com.ardor3d.scenegraph.Spatial;
 
 /**
  * <code>TextureRenderer</code> defines an abstract class that handles rendering a scene to a buffer and copying it to a
- * texture. Creation of this object is usually handled via a TextureRendererFactory. Note that currently, only Texture2D
- * is supported by Pbuffer versions of this class. Texture2D and TextureCubeMap are supported in FBO mode.
+ * texture. Creation of this object is usually handled via a TextureRendererFactory. Texture2D and TextureCubeMap are
+ * currently supported as render targets.
  */
 public interface TextureRenderer {
 
@@ -213,6 +213,14 @@ public interface TextureRenderer {
     int getHeight();
 
     /**
+     * @return the requested depth buffer bits of this Texture Renderer - may not be the *actual* bits used. Default is
+     *         0, which means to allow OpenGL to choose.
+     */
+    int getDepthBits();
+
+    void resize(int width, int height, int depthBits);
+
+    /**
      * Enforce a particular state whenever this texture renderer is used. In other words, the given state will override
      * any state of the same type set on a scene object rendered with this texture renderer.
      *
@@ -233,4 +241,5 @@ public interface TextureRenderer {
      * Clear all enforced states on this texture renderer.
      */
     void clearEnforcedStates();
+
 }

@@ -12,7 +12,6 @@ package com.ardor3d.example.pbr;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
@@ -105,15 +104,13 @@ public class SimplePbrWithSkyboxExample extends ExampleBase {
         skybox.setRenderMaterial("hdr/equirect_to_cubemap.yaml");
         skybox.updateGeometricState(0);
 
-        final DisplaySettings settings = new DisplaySettings(512, 512, 24, 0, 0, 24, 0, 0, false, false);
-        final CubeMapRenderUtil cubeUtil = new CubeMapRenderUtil(settings, .1, 10);
-        cubeUtil.init(_canvas.getCanvasRenderer().getRenderer());
+        final CubeMapRenderUtil cubeUtil = new CubeMapRenderUtil(_canvas.getCanvasRenderer().getRenderer());
+        cubeUtil.updateSettings(512, 512, 24, .1, 10);
 
         final TextureCubeMap skyboxTex = new TextureCubeMap();
         skyboxTex.setTextureStoreFormat(TextureStoreFormat.RGBA16F);
         skyboxTex.setRenderedTexturePixelDataType(PixelDataType.Float);
         skyboxTex.setWrap(WrapMode.EdgeClamp);
-        cubeUtil.setupTexture(skyboxTex);
         cubeUtil.renderToCubeMap((Renderable) skybox, skyboxTex, skybox.getWorldTranslation(),
                 Renderer.BUFFER_COLOR_AND_DEPTH);
 

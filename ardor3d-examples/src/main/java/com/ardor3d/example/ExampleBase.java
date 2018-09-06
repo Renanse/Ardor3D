@@ -71,15 +71,12 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
-import com.ardor3d.renderer.lwjgl3.Lwjgl3TextureRendererProvider;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
@@ -389,7 +386,6 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                     new DummyControllerWrapper());
             example._mouseManager = new GLFWMouseManager(canvas);
             example._canvas.setMouseManager(example._mouseManager);
-            TextureRendererFactory.INSTANCE.setProvider(new Lwjgl3TextureRendererProvider());
         } else if (prefs.getRenderer().startsWith("JOGL")) {
             final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
             example._canvas = new JoglNewtWindow(canvasRenderer, settings);
@@ -399,7 +395,6 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             example._physicalLayer = new PhysicalLayer(new JoglNewtKeyboardWrapper(canvas),
                     new JoglNewtMouseWrapper(canvas, example._mouseManager), DummyControllerWrapper.INSTANCE,
                     new JoglNewtFocusWrapper(canvas));
-            TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
         }
 
         // setup our ortho camera

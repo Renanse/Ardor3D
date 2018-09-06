@@ -15,7 +15,6 @@ import java.nio.FloatBuffer;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -41,11 +40,13 @@ public abstract class GraphFactory {
      *            the height in pixels of the graph
      * @param quad
      *            the quad on whose surface we'll display our graph.
+     * @param renderer
+     *            the Renderer to use
      * @return the new LineGrapher
      */
     public static LineGrapher makeLineGraph(final int width, final int height, final Quad quad,
-            final Renderer renderer, final ContextCapabilities caps) {
-        final LineGrapher grapher = new LineGrapher(width, height, renderer, caps);
+            final Renderer renderer) {
+        final LineGrapher grapher = new LineGrapher(width, height, renderer);
         grapher.setThreshold(1);
         StatCollector.addStatListener(grapher);
         final Texture2D graphTex = setupGraphTexture(grapher);
@@ -67,11 +68,13 @@ public abstract class GraphFactory {
      *            the height in pixels of the graph
      * @param quad
      *            the quad on whose surface we'll display our graph.
+     * @param renderer
+     *            the Renderer to use
      * @return the new TimedAreaGrapher
      */
     public static TimedAreaGrapher makeTimedGraph(final int width, final int height, final Quad quad,
-            final Renderer renderer, final ContextCapabilities caps) {
-        final TimedAreaGrapher grapher = new TimedAreaGrapher(width, height, renderer, caps);
+            final Renderer renderer) {
+        final TimedAreaGrapher grapher = new TimedAreaGrapher(width, height, renderer);
         grapher.setThreshold(1);
         StatCollector.addStatListener(grapher);
         final Texture2D graphTex = setupGraphTexture(grapher);
@@ -92,11 +95,13 @@ public abstract class GraphFactory {
      *            the height in pixels of the graph
      * @param quad
      *            the quad on whose surface we'll display our graph.
+     * @param renderer
+     *            the Renderer to use
      * @return the new TabledLabelGrapher
      */
     public static TabledLabelGrapher makeTabledLabelGraph(final int width, final int height, final Quad quad,
-            final Renderer renderer, final ContextCapabilities caps) {
-        final TabledLabelGrapher grapher = new TabledLabelGrapher(width, height, renderer, caps);
+            final Renderer renderer) {
+        final TabledLabelGrapher grapher = new TabledLabelGrapher(width, height, renderer);
         grapher.setThreshold(1);
         StatCollector.addStatListener(grapher);
         final Texture2D graphTex = setupGraphTexture(grapher);
@@ -137,7 +142,8 @@ public abstract class GraphFactory {
      * @param maxV
      *            the maximum value along the V axis to use in the texture for UVs
      */
-    private static void setupGraphQuad(final Quad quad, final Texture2D graphTexture, final float maxU, final float maxV) {
+    private static void setupGraphQuad(final Quad quad, final Texture2D graphTexture, final float maxU,
+            final float maxV) {
         quad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
         quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         quad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);

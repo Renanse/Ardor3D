@@ -223,6 +223,8 @@ public abstract class Texture implements Savable {
     private int _textureBaseLevel = 0;
     private int _textureMaxLevel = -1;
 
+    private transient int _rttMipLevel = 0;
+
     /**
      * Constructor instantiates a new <code>Texture</code> object with default attributes.
      */
@@ -515,6 +517,25 @@ public abstract class Texture implements Savable {
      */
     public void setDepthCompareMode(final DepthTextureCompareMode depthCompareMode) {
         _depthCompareMode = depthCompareMode;
+    }
+
+    /**
+     * Set the mip level to write into for the next Render To Texture operation (when used with TextureRenderer.) NB:
+     * This field is transient - not saved by Savable.
+     *
+     * @param level
+     *            the mip level to use. Defaults to 0.
+     */
+    public void setTexRenderMipLevel(final int level) {
+        _rttMipLevel = level;
+    }
+
+    /**
+     * @return the mip level to write into for the next Render To Texture operation (when used with TextureRenderer.)
+     *         Defaults to 0.
+     */
+    public int getTexRenderMipLevel() {
+        return _rttMipLevel;
     }
 
     public void setDirty() {

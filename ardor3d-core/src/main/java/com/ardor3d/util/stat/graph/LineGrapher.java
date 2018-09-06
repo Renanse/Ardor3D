@@ -19,7 +19,6 @@ import java.util.List;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -57,8 +56,8 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
     private BlendState _defBlendState = null;
 
-    public LineGrapher(final int width, final int height, final Renderer renderer, final ContextCapabilities caps) {
-        super(width, height, renderer, caps);
+    public LineGrapher(final int width, final int height, final Renderer renderer) {
+        super(width, height, renderer);
 
         // Setup our static horizontal graph lines
         createHLines();

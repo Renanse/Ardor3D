@@ -23,6 +23,7 @@ import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.texture.ITextureUtils;
+import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
@@ -314,4 +315,15 @@ public interface Renderer {
      */
     IScissorUtils getScissorUtils();
 
+    /**
+     * Creates a TextureRenderer backed by this Renderer. Must have a current context set (see
+     * {@link ContextManager#getCurrentContext()}) so the renderer can query hardware capabilities.
+     *
+     * @param width
+     * @param height
+     * @param depthBits
+     * @param samples
+     * @return the texture renderer
+     */
+    TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits, final int samples);
 }

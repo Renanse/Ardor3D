@@ -16,7 +16,6 @@ import java.util.Iterator;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -54,9 +53,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
 
     private AbstractStatGrapher _linkedGraph;
 
-    public TabledLabelGrapher(final int width, final int height, final Renderer renderer,
-            final ContextCapabilities caps) {
-        super(width, height, renderer, caps);
+    public TabledLabelGrapher(final int width, final int height, final Renderer renderer) {
+        super(width, height, renderer);
 
         _defBlendState = new BlendState();
         _defBlendState.setEnabled(true);

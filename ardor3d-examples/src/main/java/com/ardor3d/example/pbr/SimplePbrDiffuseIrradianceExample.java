@@ -12,7 +12,6 @@ package com.ardor3d.example.pbr;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
@@ -77,7 +76,7 @@ public class SimplePbrDiffuseIrradianceExample extends ExampleBase {
                 mesh.setProperty("metallic", metallic);
                 mesh.setProperty("roughness", roughness);
                 mesh.setProperty("ao", 1.0f);
-                mesh.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+                mesh.setDefaultColor(new ColorRGBA(0.5f, 0f, 0f, 1f));
 
                 _root.attachChild(mesh);
             }
@@ -114,15 +113,13 @@ public class SimplePbrDiffuseIrradianceExample extends ExampleBase {
         skybox.setRenderMaterial("hdr/equirect_to_cubemap.yaml");
         skybox.updateGeometricState(0);
 
-        DisplaySettings settings = new DisplaySettings(512, 512, 24, 0, 0, 24, 0, 0, false, false);
-        CubeMapRenderUtil cubeUtil = new CubeMapRenderUtil(settings, .1, 10);
-        cubeUtil.init(_canvas.getCanvasRenderer().getRenderer());
+        final CubeMapRenderUtil cubeUtil = new CubeMapRenderUtil(_canvas.getCanvasRenderer().getRenderer());
+        cubeUtil.updateSettings(512, 512, 24, .1, 10);
 
         skyboxTex = new TextureCubeMap();
         skyboxTex.setTextureStoreFormat(TextureStoreFormat.RGBA16F);
         skyboxTex.setRenderedTexturePixelDataType(PixelDataType.Float);
         skyboxTex.setWrap(WrapMode.EdgeClamp);
-        cubeUtil.setupTexture(skyboxTex);
         cubeUtil.renderToCubeMap((Renderable) skybox, skyboxTex, skybox.getWorldTranslation(),
                 Renderer.BUFFER_COLOR_AND_DEPTH);
 
@@ -132,15 +129,11 @@ public class SimplePbrDiffuseIrradianceExample extends ExampleBase {
         skybox.setRenderMaterial("pbr/cubemap_to_irradiance.yaml");
         skybox.updateGeometricState(0);
 
-        settings = new DisplaySettings(64, 64, 24, 0, 0, 24, 0, 0, false, false);
-        cubeUtil = new CubeMapRenderUtil(settings, .1, 10);
-        cubeUtil.init(_canvas.getCanvasRenderer().getRenderer());
-
         irradianceTex = new TextureCubeMap();
         irradianceTex.setTextureStoreFormat(TextureStoreFormat.RGBA16F);
         irradianceTex.setRenderedTexturePixelDataType(PixelDataType.Float);
         irradianceTex.setWrap(WrapMode.EdgeClamp);
-        cubeUtil.setupTexture(irradianceTex);
+        cubeUtil.updateSettings(64, 64, 24, .1, 10);
         cubeUtil.renderToCubeMap((Renderable) skybox, irradianceTex, skybox.getWorldTranslation(),
                 Renderer.BUFFER_COLOR_AND_DEPTH);
 

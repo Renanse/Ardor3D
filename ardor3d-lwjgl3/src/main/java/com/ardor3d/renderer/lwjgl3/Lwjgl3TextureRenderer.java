@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
@@ -36,7 +37,6 @@ import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
 import com.ardor3d.scenegraph.Renderable;
@@ -127,7 +127,9 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         Lwjgl3TextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
         Lwjgl3TextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
 
-        logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
+        }
     }
 
     @Override
@@ -211,11 +213,12 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = colors.removeFirst();
                     if (tex.getType() == Type.TwoDimensional) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
-                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()),
+                                tex.getTexRenderMipLevel());
                     } else if (tex.getType() == Type.CubeMap) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
                                 Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
-                                tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                                tex.getTextureIdForContext(context.getGlContextRep()), tex.getTexRenderMipLevel());
                     } else {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
                     }
@@ -228,11 +231,12 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     // Set up our depth texture
                     if (tex.getType() == Type.TwoDimensional) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
-                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()),
+                                tex.getTexRenderMipLevel());
                     } else if (tex.getType() == Type.CubeMap) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
                                 Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
-                                tex.getTextureIdForContext(context.getGlContextRep()), 0);
+                                tex.getTextureIdForContext(context.getGlContextRep()), tex.getTexRenderMipLevel());
                     } else {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
                     }
@@ -285,11 +289,11 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             // Setup depth texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
                 GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL11C.GL_TEXTURE_2D,
-                        textureId, 0);
+                        textureId, tex.getTexRenderMipLevel());
             } else if (tex.getType() == Type.CubeMap) {
                 GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
                         Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
-                        0);
+                        tex.getTexRenderMipLevel());
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
             }
@@ -300,11 +304,11 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             // Set color texture into FBO
             if (tex.getType() == Type.TwoDimensional) {
                 GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0, GL11C.GL_TEXTURE_2D,
-                        textureId, 0);
+                        textureId, tex.getTexRenderMipLevel());
             } else if (tex.getType() == Type.CubeMap) {
                 GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0,
                         Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
-                        0);
+                        tex.getTexRenderMipLevel());
             } else {
                 throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
             }
@@ -363,9 +367,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         GL30C.glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height,
                 GL11C.GL_COLOR_BUFFER_BIT | GL11C.GL_DEPTH_BUFFER_BIT, GL11C.GL_NEAREST);
 
-        GL30C.glBindFramebuffer(GL30C.GL_READ_FRAMEBUFFER, 0);
-        GL30C.glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER, 0);
-        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
+        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, _fboID);
     }
 
     /**
@@ -424,6 +426,41 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     @Override
+    public void resize(final int width, final int height, final int depthBits) {
+        if (_width == width && _height == height && _depthBits == depthBits) {
+            return;
+        }
+
+        _width = width;
+        _height = height;
+        _depthBits = depthBits;
+
+        _camera.resize(_width, _height);
+
+        // if we already have these render buffers, update their storage
+        if (_depthRBID > 0) {
+            GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _depthRBID);
+            GL30C.glRenderbufferStorage(GL30C.GL_RENDERBUFFER, getDepthFormat(), _width, _height);
+            GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
+        }
+
+        if (_samples > 0) {
+            if (_mscolorRBID > 0) {
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _mscolorRBID);
+                GL30C.glRenderbufferStorageMultisample(GL30C.GL_RENDERBUFFER, _samples, GL11C.GL_RGBA, _width, _height);
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
+            }
+
+            if (_msdepthRBID > 0) {
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _msdepthRBID);
+                GL30C.glRenderbufferStorageMultisample(GL30C.GL_RENDERBUFFER, _samples, getDepthFormat(), _width,
+                        _height);
+                GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
+            }
+        }
+    }
+
+    @Override
     public void activate() {
         // Lazy init
         if (_fboID == 0) {
@@ -434,7 +471,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             _fboID = buffer.get(0);
 
             // Create a depth renderbuffer to use for RTT use
-            if (_depthBits != 0) {
+            if (_depthBits >= 0) {
                 GL30C.glGenRenderbuffers(buffer); // generate id
                 _depthRBID = buffer.get(0);
                 GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _depthRBID);
@@ -443,7 +480,6 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
             // unbind...
             GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, 0);
-            GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
 
             // If we support it, rustle up a multisample framebuffer + renderbuffers
             if (_samples != 0 && _supportsMultisample) {
@@ -461,7 +497,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _mscolorRBID);
                 GL30C.glRenderbufferStorageMultisample(GL30C.GL_RENDERBUFFER, _samples, GL11C.GL_RGBA, _width, _height);
 
-                if (_depthBits > 0) {
+                if (_depthBits >= 0) {
                     GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _msdepthRBID);
                     GL30C.glRenderbufferStorageMultisample(GL30C.GL_RENDERBUFFER, _samples, getDepthFormat(), _width,
                             _height);
@@ -481,7 +517,6 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 // release
                 GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
             }
-
         }
 
         if (_active == 0) {

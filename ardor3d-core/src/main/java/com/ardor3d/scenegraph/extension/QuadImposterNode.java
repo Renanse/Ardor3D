@@ -23,13 +23,11 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -165,8 +163,7 @@ public class QuadImposterNode extends Node {
     }
 
     private void init(final Renderer renderer) {
-        _tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_twidth, _theight, _depth, _samples,
-                renderer, ContextManager.getCurrentContext().getCapabilities());
+        _tRenderer = renderer.createTextureRenderer(_twidth, _theight, _depth, _samples);
 
         _tRenderer.setBackgroundColor(new ColorRGBA(0, 0, 0, 0));
         resetTexture();

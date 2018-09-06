@@ -55,18 +55,18 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     public AbstractFBOTextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
+
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Creating FBOTextureRenderer sized: " + _width + " x " + _height);
+        }
+
         _parentRenderer = parentRenderer;
         _samples = Math.min(samples, caps.getMaxFBOSamples());
         _depthBits = depthBits;
         _supportsMultisample = caps.getMaxFBOSamples() != 0;
 
-        final int w = width;
-        final int h = height;
-
-        logger.fine("Creating FBO sized: " + w + " x " + h);
-
-        _width = w;
-        _height = h;
+        _width = width;
+        _height = height;
 
         _camera.resize(_width, _height);
         _camera.setFrustum(1.0f, 1000.0f, -0.50f, 0.50f, 0.50f, -0.50f);
@@ -277,6 +277,11 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     public int getHeight() {
         return _height;
+    }
+
+    @Override
+    public int getDepthBits() {
+        return _depthBits;
     }
 
     public Renderer getParentRenderer() {

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -15,10 +15,8 @@ import java.util.TreeMap;
 
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.util.stat.StatListener;
 import com.ardor3d.util.stat.StatType;
 
@@ -37,15 +35,14 @@ public abstract class AbstractStatGrapher implements StatListener {
 
     /**
      * Must be constructed in the GL thread.
-     * 
+     *
      * @param factory
      */
-    public AbstractStatGrapher(final int width, final int height, final Renderer renderer,
-            final ContextCapabilities caps) {
+    public AbstractStatGrapher(final int width, final int height, final Renderer renderer) {
         _gWidth = width;
         _gHeight = height;
         // prepare our TextureRenderer
-        _textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, renderer, caps);
+        _textureRenderer = renderer.createTextureRenderer(width, height, 0, 0);
 
         if (_textureRenderer != null) {
             _textureRenderer.setBackgroundColor(new ColorRGBA(ColorRGBA.BLACK));
