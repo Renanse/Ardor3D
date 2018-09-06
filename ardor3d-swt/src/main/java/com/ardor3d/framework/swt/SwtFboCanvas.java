@@ -34,7 +34,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ContextGarbageCollector;
@@ -157,8 +156,8 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
             _canvasRenderer.getRenderer().getTextureUtils().deleteTexture(_fboTexture);
         }
 
-        _rtt = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, _canvasRenderer.getRenderer(),
-                _canvasRenderer.getRenderContext().getCapabilities());
+        _rtt = _canvasRenderer.getRenderer().createTextureRenderer(width, height, _settings.getDepthBits(),
+                _settings.getSamples());
 
         // copy our camera settings from the canvas renderer camera.
         _rtt.getCamera().set(_canvasRenderer.getCamera());

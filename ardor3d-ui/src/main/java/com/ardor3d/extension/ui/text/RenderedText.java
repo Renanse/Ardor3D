@@ -111,10 +111,12 @@ public class RenderedText extends Node implements Renderable {
     }
 
     @Override
-    public void render(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
+        boolean rendered = false;
         for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
-            ((TextMesh) _children.get(i)).render(renderer);
+            rendered |= ((TextMesh) _children.get(i)).render(renderer);
         }
+        return rendered;
     }
 
     @Override

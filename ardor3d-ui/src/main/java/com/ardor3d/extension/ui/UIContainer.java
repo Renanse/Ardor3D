@@ -37,7 +37,6 @@ import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -385,7 +384,7 @@ public abstract class UIContainer extends UIComponent {
                 // Set our opacity to 1.0 for the cached texture
                 setOpacity(1.0f);
                 // render the container to a texture
-                UIContainer._textureRenderer.render(this, _fakeTexture, Renderer.BUFFER_COLOR_AND_DEPTH);
+                UIContainer._textureRenderer.renderSpatial(this, _fakeTexture, Renderer.BUFFER_COLOR_AND_DEPTH);
                 // return our old transparency
                 setOpacity(op);
                 UIContainer._drawingStandin = false;
@@ -450,8 +449,7 @@ public abstract class UIContainer extends UIComponent {
             final int maxRBS = ContextManager.getCurrentContext().getCapabilities().getMaxRenderBufferSize();
             final int size = maxRBS > 0 ? Math.min(UIContainer.STANDIN_TEXTURE_SIZE, maxRBS)
                     : UIContainer.STANDIN_TEXTURE_SIZE;
-            UIContainer._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(size, size, 8, 0,
-                    renderer, ContextManager.getCurrentContext().getCapabilities());
+            UIContainer._textureRenderer = renderer.createTextureRenderer(size, size, 16, 0);
             if (UIContainer._textureRenderer != null) {
                 UIContainer._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 1f, 0f, 0f));
             } else {
