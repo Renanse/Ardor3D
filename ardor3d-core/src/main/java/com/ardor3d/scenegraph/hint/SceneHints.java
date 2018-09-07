@@ -34,6 +34,11 @@ public class SceneHints implements Savable {
     protected CullHint _cullHint = CullHint.Inherit;
 
     /**
+     * Flag signaling how spatial properties should be inherited for this node. By default set to INHERIT.
+     */
+    protected PropertyMode _propertyMode = PropertyMode.Inherit;
+
+    /**
      * Flag signaling how lights are combined for this node. By default set to INHERIT.
      */
     protected LightCombineMode _lightCombineMode = LightCombineMode.Inherit;
@@ -80,6 +85,7 @@ public class SceneHints implements Savable {
     public void set(final SceneHints sceneHints) {
         _normalsMode = sceneHints._normalsMode;
         _cullHint = sceneHints._cullHint;
+        _propertyMode = sceneHints._propertyMode;
         _lightCombineMode = sceneHints._lightCombineMode;
         _textureCombineMode = sceneHints._textureCombineMode;
         _renderBucketType = sceneHints._renderBucketType;
@@ -245,6 +251,47 @@ public class SceneHints implements Savable {
     }
 
     /**
+     * Returns this spatial's property mode. If the mode is set to inherit, then the spatial gets its property mode from
+     * its parent.
+     *
+     * @return The spatial's light current combine mode.
+     */
+    public PropertyMode getPropertyMode() {
+        if (_propertyMode != PropertyMode.Inherit) {
+            return _propertyMode;
+        }
+
+        final Hintable parent = _source.getParentHintable();
+        if (parent != null) {
+            return parent.getSceneHints().getPropertyMode();
+        }
+
+        return PropertyMode.UseParentIfNull;
+    }
+
+    /**
+     * @return the propertyMode set on this Spatial
+     */
+    public PropertyMode getLocalPropertyMode() {
+        return _propertyMode;
+    }
+
+    /**
+     * Sets how properties should be looked up for this spatial.
+     *
+     * @param mode
+     *            The property mode for this spatial. {@link PropertyMode#Inherit} is default.
+     * @throws IllegalArgumentException
+     *             if mode is null
+     */
+    public void setPropertyMode(final PropertyMode mode) {
+        if (mode == null) {
+            throw new IllegalArgumentException("mode can not be null.");
+        }
+        _propertyMode = mode;
+    }
+
+    /**
      * Get the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
      * in.
      * <p>
@@ -339,10 +386,9 @@ public class SceneHints implements Savable {
     }
 
     /**
-     * @return a number representing z ordering when used in the Ortho bucket. Higher values are
-     *         "further into the screen" and lower values are "closer". Or in other words, if you draw two quads, one
-     *         with a zorder of 1 and the other with a zorder of 2, the quad with zorder of 2 will be "under" the other
-     *         quad.
+     * @return a number representing z ordering when used in the Ortho bucket. Higher values are "further into the
+     *         screen" and lower values are "closer". Or in other words, if you draw two quads, one with a zorder of 1
+     *         and the other with a zorder of 2, the quad with zorder of 2 will be "under" the other quad.
      */
     public int getOrthoOrder() {
         return _orthoOrder;
@@ -417,6 +463,7 @@ public class SceneHints implements Savable {
         _cullHint = capsule.readEnum("cullMode", CullHint.class, CullHint.Inherit);
         final String bucketTypeName = capsule.readString("renderBucketType", RenderBucketType.Inherit.name());
         _renderBucketType = RenderBucketType.getRenderBucketType(bucketTypeName);
+        _propertyMode = capsule.readEnum("propertyMode", PropertyMode.class, PropertyMode.Inherit);
         _lightCombineMode = capsule.readEnum("lightCombineMode", LightCombineMode.class, LightCombineMode.Inherit);
         _textureCombineMode = capsule.readEnum("textureCombineMode", TextureCombineMode.class,
                 TextureCombineMode.Inherit);
@@ -441,6 +488,7 @@ public class SceneHints implements Savable {
         capsule.write(_orthoOrder, "orthoOrder", 0);
         capsule.write(_cullHint, "cullMode", CullHint.Inherit);
         capsule.write(_renderBucketType.name(), "renderBucketType", RenderBucketType.Inherit.name());
+        capsule.write(_propertyMode, "propertyMode", PropertyMode.Inherit);
         capsule.write(_lightCombineMode, "lightCombineMode", LightCombineMode.Inherit);
         capsule.write(_textureCombineMode, "textureCombineMode", TextureCombineMode.Inherit);
         capsule.write(_normalsMode, "normalsMode", NormalsMode.Inherit);

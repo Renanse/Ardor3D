@@ -43,6 +43,7 @@ import com.ardor3d.scenegraph.event.DirtyEventListener;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.Hintable;
+import com.ardor3d.scenegraph.hint.PropertyMode;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.Constants;
@@ -1075,7 +1076,26 @@ public abstract class Spatial implements Savable, Hintable {
      */
     @SuppressWarnings("unchecked")
     public <T> T getProperty(final String key) {
-        return (T) _properties.getOrDefault(key, null);
+        final PropertyMode mode = getSceneHints().getPropertyMode();
+
+        if (mode == PropertyMode.UseOwn) {
+            return (T) _properties.getOrDefault(key, null);
+        } else if (mode == PropertyMode.UseParentIfNull) {
+            final T property = (T) _properties.getOrDefault(key, null);
+            if (property == null && getParent() != null) {
+                return getParent().getProperty(key);
+            }
+            return property;
+        } else if (mode == PropertyMode.UseOursLast) {
+            if (getParent() != null) {
+                final T property = getParent().getProperty(key);
+                if (property != null) {
+                    return property;
+                }
+            }
+            return (T) _properties.getOrDefault(key, null);
+        }
+        return null;
     }
 
     public void setProperty(final String key, final Object value) {
