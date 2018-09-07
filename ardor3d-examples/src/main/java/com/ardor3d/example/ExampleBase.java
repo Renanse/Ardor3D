@@ -28,8 +28,6 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.jogl.JoglNewtWindow;
 import com.ardor3d.framework.lwjgl3.GLFWCanvas;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.TextureStoreFormat;
@@ -44,10 +42,6 @@ import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.glfw.GLFWKeyboardWrapper;
 import com.ardor3d.input.glfw.GLFWMouseManager;
 import com.ardor3d.input.glfw.GLFWMouseWrapper;
-import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
-import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
-import com.ardor3d.input.jogl.JoglNewtMouseManager;
-import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
@@ -377,7 +371,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         example._settings = settings;
 
         // get our framework
-        if (prefs.getRenderer().startsWith("LWJGL 3")) {
+        if (prefs.getRenderer().startsWith("LWJGL")) {
             Configuration.DEBUG.set(true);
             final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(example);
             final GLFWCanvas canvas = new GLFWCanvas(settings, canvasRenderer);
@@ -386,15 +380,6 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                     new DummyControllerWrapper());
             example._mouseManager = new GLFWMouseManager(canvas);
             example._canvas.setMouseManager(example._mouseManager);
-        } else if (prefs.getRenderer().startsWith("JOGL")) {
-            final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
-            example._canvas = new JoglNewtWindow(canvasRenderer, settings);
-            final JoglNewtWindow canvas = (JoglNewtWindow) example._canvas;
-            example._mouseManager = new JoglNewtMouseManager(canvas);
-            example._canvas.setMouseManager(example._mouseManager);
-            example._physicalLayer = new PhysicalLayer(new JoglNewtKeyboardWrapper(canvas),
-                    new JoglNewtMouseWrapper(canvas, example._mouseManager), DummyControllerWrapper.INSTANCE,
-                    new JoglNewtFocusWrapper(canvas));
         }
 
         // setup our ortho camera

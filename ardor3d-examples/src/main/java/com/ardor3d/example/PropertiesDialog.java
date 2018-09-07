@@ -62,7 +62,8 @@ public final class PropertiesDialog extends JDialog {
     private DisplayMode[] modes = null;
 
     // Array of windowed resolutions
-    private final String[] windowedResolutions = { "640 x 480", "800 x 600", "1024 x 768", "1152 x 864", "1920 x 1080" };
+    private final String[] windowedResolutions = { "640 x 480", "800 x 600", "1024 x 768", "1152 x 864",
+            "1920 x 1080" };
 
     // Array of possible samples
     private final String[] samples = { "0 samples", "1 samples", "2 samples", "4 samples", "8 samples" };
@@ -77,8 +78,6 @@ public final class PropertiesDialog extends JDialog {
     private JComboBox<String> colorDepthCombo = null;
 
     private JComboBox<String> displayFreqCombo = null;
-
-    private JComboBox<String> rendererCombo = null;
 
     private JLabel icon = null;
 
@@ -277,8 +276,6 @@ public final class PropertiesDialog extends JDialog {
                 updateResolutionChoices();
             }
         });
-        rendererCombo = setUpRendererChooser();
-        rendererCombo.addKeyListener(aListener);
 
         updateResolutionChoices();
         displayResCombo.setSelectedItem(source.getWidth() + " x " + source.getHeight());
@@ -290,7 +287,6 @@ public final class PropertiesDialog extends JDialog {
         optionsPanel.add(displayFreqCombo);
         optionsPanel.add(samplesCombo);
         optionsPanel.add(fullscreenBox);
-        optionsPanel.add(rendererCombo);
 
         // Set the button action listeners. Cancel disposes without saving, OK
         // saves.
@@ -362,15 +358,13 @@ public final class PropertiesDialog extends JDialog {
         int samples = -1;
         samples = Integer.parseInt(samplesString.substring(0, samplesString.indexOf(' ')));
 
-        final String renderer = (String) rendererCombo.getSelectedItem();
-
         boolean valid = false;
 
         // test valid display mode when going full screen
         if (!fullscreen) {
             valid = true;
         } else {
-            final ModeValidator validator = new ModeValidator(renderer, width, height, depth, freq, samples);
+            final ModeValidator validator = new ModeValidator("LWJGL", width, height, depth, freq, samples);
             if (mainThreadTasks != null) {
                 mainThreadTasks.add(validator);
             } else {
@@ -387,7 +381,7 @@ public final class PropertiesDialog extends JDialog {
             source.setDepth(depth);
             source.setFrequency(freq);
             source.setFullscreen(fullscreen);
-            source.setRenderer(renderer);
+            source.setRenderer("LWJGL");
             source.setSamples(samples);
             try {
                 source.save();
@@ -420,27 +414,6 @@ public final class PropertiesDialog extends JDialog {
         });
 
         return resolutionBox;
-    }
-
-    /**
-     * <code>setUpRendererChooser</code> sets the list of available renderers. The renderer specified by GameSettings is
-     * used as the default value.
-     *
-     * @return the list of renderers.
-     */
-    private JComboBox<String> setUpRendererChooser() {
-        final JComboBox<String> nameBox = new JComboBox<String>(new String[] { "LWJGL 3.2.0", "JOGL 2.0rc11" });
-        final String old = source.getRenderer();
-        if (old != null) {
-            if (old.startsWith("LWJGL 3")) {
-                nameBox.setSelectedIndex(0);
-            } else if (old.startsWith("LWJGL 2")) {
-                nameBox.setSelectedIndex(1);
-            } else if (old.startsWith("JOGL")) {
-                nameBox.setSelectedIndex(2);
-            }
-        }
-        return nameBox;
     }
 
     private JComboBox<String> setUpSamplesChooser() {
@@ -554,8 +527,9 @@ public final class PropertiesDialog extends JDialog {
             }
 
             final String res = modes[i].getWidth() + " x " + modes[i].getHeight();
-            final String depth = (modes[i].getBitDepth() != DisplayMode.BIT_DEPTH_MULTI) ? modes[i].getBitDepth()
-                    + " bpp" : "? bpp";
+            final String depth = (modes[i].getBitDepth() != DisplayMode.BIT_DEPTH_MULTI)
+                    ? modes[i].getBitDepth() + " bpp"
+                    : "? bpp";
             if (res.equals(resolution) && !depths.contains(depth)) {
                 depths.add(depth);
             }
