@@ -125,7 +125,13 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
             GLFW.glfwSetErrorCallback(_errorCallback = GLFWErrorCallback.createPrint(System.err));
-            _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
+            if (_settings.isFullScreen()) {
+                // TODO: allow choice of monitor
+                final long primary = GLFW.glfwGetPrimaryMonitor();
+                _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", primary, 0);
+            } else {
+                _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
+            }
             updateContentSize();
 
             GLFW.glfwSetWindowFocusCallback(_windowId, _focusCallback = new GLFWWindowFocusCallback() {
@@ -140,7 +146,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwSetWindowSizeCallback(_windowId, _resizeCallback = new GLFWWindowSizeCallbackI() {
                 @Override
                 public void invoke(final long window, final int width, final int height) {
-                    _canvasRenderer.getRenderer().setViewport(0, 0, width, height);
+                    _canvasRenderer.getCamera().setViewPort(0, 0, width, height);
                     updateContentSize();
                 }
             });
