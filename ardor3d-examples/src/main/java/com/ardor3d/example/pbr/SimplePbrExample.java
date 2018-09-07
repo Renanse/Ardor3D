@@ -71,7 +71,7 @@ public class SimplePbrExample extends ExampleBase {
             _lightState.attach(_lights[i]);
         }
 
-        _root.setRenderMaterial("pbr/pbr_simple.yaml");
+        _root.setRenderMaterial("pbr/pbr_untextured_simple.yaml");
     }
 
     @Override

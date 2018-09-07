@@ -118,6 +118,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         // Initialize mipmapping for this texture, if requested
+        // We do this regardless of the EnableMipGeneration flag, to init storage.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
             GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
         }
@@ -261,13 +262,15 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 switchCameraOut();
             }
 
-            // automatically generate mipmaps for our textures.
-            for (int x = 0, max = texs.size(); x < max; x++) {
-                if (texs.get(x).getMinificationFilter().usesMipMapLevels()) {
-                    final Texture tex = texs.get(x);
-                    if (tex.getMinificationFilter().usesMipMapLevels()) {
-                        Lwjgl3TextureStateUtil.doTextureBind(texs.get(x), 0, true);
-                        GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+            if (isEnableMipGeneration()) {
+                // automatically generate mipmaps for our textures that support it.
+                for (int x = 0, max = texs.size(); x < max; x++) {
+                    if (texs.get(x).getMinificationFilter().usesMipMapLevels()) {
+                        final Texture tex = texs.get(x);
+                        if (tex.getMinificationFilter().usesMipMapLevels()) {
+                            Lwjgl3TextureStateUtil.doTextureBind(texs.get(x), 0, true);
+                            GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+                        }
                     }
                 }
             }
@@ -348,10 +351,12 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void takedownForSingleTexDraw(final Texture tex) {
-        // automatically generate mipmaps for our texture.
-        if (tex.getMinificationFilter().usesMipMapLevels()) {
-            Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
-            GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+        if (isEnableMipGeneration()) {
+            // automatically generate mipmaps for our texture, if supported.
+            if (tex.getMinificationFilter().usesMipMapLevels()) {
+                Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
+                GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
+            }
         }
     }
 

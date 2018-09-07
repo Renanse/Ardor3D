@@ -33,6 +33,10 @@ public class CubeMapRenderUtil {
         _samples = samples;
     }
 
+    public TextureRenderer getTextureRenderer() {
+        return _textureRenderer;
+    }
+
     public void updateSettings(final int width, final int height, final int depthBits, final double near,
             final double far) {
         if (_textureRenderer == null) {

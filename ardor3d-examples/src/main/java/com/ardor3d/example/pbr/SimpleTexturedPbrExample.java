@@ -46,7 +46,7 @@ public class SimpleTexturedPbrExample extends ExampleBase {
         _controlHandle.setMoveSpeed(10.0);
 
         final TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/pbr/rustediron1-alt2/basecolor.png",
+        ts.setTexture(TextureManager.load("images/pbr/rustediron1-alt2/albedo.png",
                 Texture.MinificationFilter.Trilinear, true), 0);
         ts.setTexture(TextureManager.load("images/pbr/rustediron1-alt2/normal.png",
                 Texture.MinificationFilter.Trilinear, true), 1);
@@ -80,7 +80,7 @@ public class SimpleTexturedPbrExample extends ExampleBase {
             _lightState.attach(_lights[i]);
         }
 
-        _root.setRenderMaterial("pbr/pbr_simpleTextured.yaml");
+        _root.setRenderMaterial("pbr/pbr_textured_simple.yaml");
     }
 
     @Override

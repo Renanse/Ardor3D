@@ -213,6 +213,19 @@ public interface TextureRenderer {
     int getHeight();
 
     /**
+     * @param enable
+     *            true (the default) if we should automatically generate mipmaps for textures that have minification
+     *            levels that support mipmapping.
+     */
+    void setEnableMipGeneration(boolean enable);
+
+    /**
+     * @return true (the default) if we automatically generate mipmaps for textures that have minification levels that
+     *         support mipmapping.
+     */
+    boolean isEnableMipGeneration();
+
+    /**
      * @return the requested depth buffer bits of this Texture Renderer - may not be the *actual* bits used. Default is
      *         0, which means to allow OpenGL to choose.
      */

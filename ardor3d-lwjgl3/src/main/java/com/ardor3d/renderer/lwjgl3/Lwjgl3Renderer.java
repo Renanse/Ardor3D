@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL31C;
+import org.lwjgl.opengl.GL32C;
 import org.lwjgl.opengl.GLUtil;
 
 import com.ardor3d.image.ImageDataFormat;
@@ -82,6 +83,10 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         _textureUtils = new Lwjgl3TextureUtils();
         _scissorUtils = new Lwjgl3ScissorUtils();
         GLUtil.setupDebugMessageCallback();
+
+        // Right now, we are deciding that we always want this. If someone comes up with a reason they don't want this,
+        // we can look into making it part of Texture/TextureState.
+        GL11C.glEnable(GL32C.GL_TEXTURE_CUBE_MAP_SEAMLESS);
     }
 
     @Override

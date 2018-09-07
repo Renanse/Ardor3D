@@ -44,7 +44,7 @@ techniques:
               
               void main()
               {   
-                  vec3 envColor = texture(skyboxMap, WorldPos).rgb;
+                  vec3 envColor = texture(skyboxMap, WorldPos).rgb; 
                   
                   // HDR tonemap and gamma correct
                   envColor = envColor / (envColor + vec3(1.0));

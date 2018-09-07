@@ -1,0 +1,48 @@
+--- # Material
+name: untextured pbr
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: uv0
+        uniforms: 
+          - builtIn: [model, view, projection, cameraLoc, lights4]
+          - 
+            shaderKey: irradianceMap
+            type: Int1
+            value: 0
+          - 
+            shaderKey: prefilterMap
+            type: Int1
+            value: 1
+          - 
+            shaderKey: brdfLUT
+            type: Int1
+            value: 2
+          - 
+            shaderKey: albedoMap
+            type: Int1
+            value: 3
+          - 
+            shaderKey: normalMap
+            type: Int1
+            value: 4
+          - 
+            shaderKey: metallicMap
+            type: Int1
+            value: 5
+          - 
+            shaderKey: roughnessMap
+            type: Int1
+            value: 6
+          - 
+            shaderKey: aoMap
+            type: Int1
+            value: 7
+        shaders: 
+          Vertex: 
+            source: pbr/pbr_simple.vert
+          Fragment:
+            source: pbr/pbr_textured_ibl.frag

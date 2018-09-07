@@ -93,7 +93,7 @@ public class SimplePbrDiffuseIrradianceExample extends ExampleBase {
         ts.setTexture(irradianceTex);
         _root.setRenderState(ts);
 
-        _root.setRenderMaterial("pbr/pbr_simple_irradiance.yaml");
+        _root.setRenderMaterial("pbr/pbr_untextured_irradiance.yaml");
     }
 
     private void buildSkybox() {

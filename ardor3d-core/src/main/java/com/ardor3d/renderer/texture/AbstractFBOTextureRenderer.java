@@ -49,7 +49,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     protected IntBuffer _attachBuffer = null;
     protected boolean _usingDepthRB = false;
     protected final boolean _supportsMultisample;
-    protected boolean _neededClip;
+    protected boolean _neededClip, _enableMipMapGeneration = true;
 
     protected final Renderer _parentRenderer;
 
@@ -282,6 +282,16 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     @Override
     public int getDepthBits() {
         return _depthBits;
+    }
+
+    @Override
+    public void setEnableMipGeneration(final boolean enable) {
+        _enableMipMapGeneration = enable;
+    }
+
+    @Override
+    public boolean isEnableMipGeneration() {
+        return _enableMipMapGeneration;
     }
 
     public Renderer getParentRenderer() {
