@@ -260,7 +260,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         // Walk through the passes of the technique and draw this mesh for each
         for (final TechniquePass pass : technique.getPasses()) {
             // setup for drawing this pass - shaders, data, states, etc.
-            pass.setupForDraw(renderer, this);
+            pass.setupForDraw(renderer, this, meshData);
 
             // Now we draw ourselves - (TODO: Instancing support)
             final IndexMode[] modes = meshData.getIndexModes();
@@ -561,6 +561,8 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
         mesh.setDefaultColor(_defaultColor);
         mesh.setVisible(_isVisible);
+        mesh.setRenderMaterial(_material);
+        mesh._properties.putAll(_properties);
 
         // return
         return mesh;

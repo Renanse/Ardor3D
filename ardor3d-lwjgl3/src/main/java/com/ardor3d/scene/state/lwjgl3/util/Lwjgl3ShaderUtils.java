@@ -449,7 +449,15 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 if (value instanceof Matrix3) {
                     final Matrix3 mat = (Matrix3) value;
                     final FloatBuffer buff = stack.mallocFloat(9);
-                    mat.toFloatBuffer(buff);
+                    mat.toFloatBuffer(buff, false);
+                    return buff.flip();
+                }
+                if (value instanceof Matrix3[]) {
+                    final Matrix3[] mats = (Matrix3[]) value;
+                    final FloatBuffer buff = stack.mallocFloat(9 * mats.length);
+                    for (final Matrix3 mat : mats) {
+                        mat.toFloatBuffer(buff, false);
+                    }
                     return buff.flip();
                 }
                 return (FloatBuffer) value;
@@ -457,7 +465,15 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 if (value instanceof Matrix3) {
                     final Matrix3 mat = (Matrix3) value;
                     final DoubleBuffer buff = stack.mallocDouble(9);
-                    mat.toDoubleBuffer(buff);
+                    mat.toDoubleBuffer(buff, false);
+                    return buff.flip();
+                }
+                if (value instanceof Matrix3[]) {
+                    final Matrix3[] mats = (Matrix3[]) value;
+                    final DoubleBuffer buff = stack.mallocDouble(9 * mats.length);
+                    for (final Matrix3 mat : mats) {
+                        mat.toDoubleBuffer(buff, false);
+                    }
                     return buff.flip();
                 }
                 return (DoubleBuffer) value;
@@ -477,7 +493,15 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 if (value instanceof Matrix4) {
                     final Matrix4 mat = (Matrix4) value;
                     final FloatBuffer buff = stack.mallocFloat(16);
-                    mat.toFloatBuffer(buff);
+                    mat.toFloatBuffer(buff, false);
+                    return buff.flip();
+                }
+                if (value instanceof Matrix4[]) {
+                    final Matrix4[] mats = (Matrix4[]) value;
+                    final FloatBuffer buff = stack.mallocFloat(16 * mats.length);
+                    for (final Matrix4 mat : mats) {
+                        mat.toFloatBuffer(buff, false);
+                    }
                     return buff.flip();
                 }
                 return (FloatBuffer) value;
@@ -485,7 +509,15 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 if (value instanceof Matrix4) {
                     final Matrix4 mat = (Matrix4) value;
                     final DoubleBuffer buff = stack.mallocDouble(16);
-                    mat.toDoubleBuffer(buff);
+                    mat.toDoubleBuffer(buff, false);
+                    return buff.flip();
+                }
+                if (value instanceof Matrix4[]) {
+                    final Matrix4[] mats = (Matrix4[]) value;
+                    final DoubleBuffer buff = stack.mallocDouble(16 * mats.length);
+                    for (final Matrix4 mat : mats) {
+                        mat.toDoubleBuffer(buff, false);
+                    }
                     return buff.flip();
                 }
                 return (DoubleBuffer) value;

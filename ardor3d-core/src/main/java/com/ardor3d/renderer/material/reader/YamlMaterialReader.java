@@ -241,15 +241,25 @@ public class YamlMaterialReader {
         // prepare our return value
         final List<String> rVal = new ArrayList<>();
 
-        // ****** READ OUR DEFINES
+        // ****** READ OUR INJECTIONS
+        final String injSingle = getString(properties, "inject", null);
+        final List<String> injects = new ArrayList<>();
+        if (injSingle != null) {
+            injects.add(injSingle);
+        }
+        final List<Object> injObjs = getList(properties.get("injects"), false);
+        if (injObjs != null) {
+            injObjs.forEach((final Object o) -> injects.add(o.toString()));
+        }
+
+        // ****** READ OUR DEFINES - SPECIAL KIND OF INJECT
         final String defSingle = getString(properties, "define", null);
-        final List<String> defines = new ArrayList<>();
         if (defSingle != null) {
-            defines.add(defSingle);
+            injects.add("#define " + defSingle);
         }
         final List<Object> defObjs = getList(properties.get("defines"), false);
         if (defObjs != null) {
-            defObjs.forEach((final Object o) -> defines.add(o.toString()));
+            defObjs.forEach((final Object o) -> injects.add("#define " + o.toString()));
         }
 
         // ****** READ OUR INLINE PROGRAM(S)
@@ -265,7 +275,7 @@ public class YamlMaterialReader {
 
         // walk through our programs and inject defines, if the program starts with #version
         programs.forEach((final String prg) -> {
-            rVal.add(injectDefines(prg, defines));
+            rVal.add(inject(prg, injects));
         });
 
         // ****** READ OUR EXTERNALLY DEFINED PROGRAM(S)
@@ -296,14 +306,14 @@ public class YamlMaterialReader {
                 return;
             }
 
-            rVal.add(injectDefines(text, defines));
+            rVal.add(inject(text, injects));
         });
 
         return rVal;
     }
 
-    private static String injectDefines(final String program, final List<String> defines) {
-        if (defines.isEmpty() || !program.startsWith("#version")) {
+    private static String inject(final String program, final List<String> injects) {
+        if (injects.isEmpty() || !program.startsWith("#version")) {
             return program;
         }
 
@@ -314,8 +324,9 @@ public class YamlMaterialReader {
         }
         sb.append(program.substring(0, firstLF));
         sb.append('\n');
-        defines.forEach((final String define) -> sb.append(define).append('\n'));
+        injects.forEach((final String inj) -> sb.append(inj).append('\n'));
         sb.append(program.substring(firstLF + 1));
+        System.err.println(sb);
         return sb.toString();
     }
 

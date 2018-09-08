@@ -151,7 +151,7 @@ public class TechniquePass implements Savable {
         }
     }
 
-    public void setupForDraw(final Renderer renderer, final Mesh mesh) {
+    public void setupForDraw(final Renderer renderer, final Mesh mesh, final MeshData data) {
         // Apply our states - modulated by any enforced by the pass
         applyRenderStates(renderer, mesh);
 
@@ -159,7 +159,7 @@ public class TechniquePass implements Savable {
         startPass(renderer);
 
         // Setup our vertex attributes using mesh data
-        setupAttributes(renderer, mesh);
+        setupAttributes(renderer, mesh, data);
 
         // Setup our uniforms using spatial and current scene information
         setupUniforms(renderer, mesh);
@@ -179,8 +179,7 @@ public class TechniquePass implements Savable {
         renderer.getShaderUtils().useShaderProgram(id, context);
     }
 
-    protected void setupAttributes(final Renderer renderer, final Mesh mesh) {
-        final MeshData data = mesh.getMeshData();
+    protected void setupAttributes(final Renderer renderer, final Mesh mesh, final MeshData data) {
         final RenderContext context = ContextManager.getCurrentContext();
 
         // Make sure our meshdata has a VAO bound
