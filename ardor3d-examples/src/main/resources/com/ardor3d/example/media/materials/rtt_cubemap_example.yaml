@@ -29,14 +29,14 @@ techniques:
               uniform mat4 view;
               uniform mat4 projection;
               
-              out vec2 TexCoord0;
+              out vec2 TexCoords;
               out vec3 LocalPos;
               
               void main()
               {
                   gl_Position = projection * view * model * vec4(vertex, 1.0);
                   LocalPos = vertex;
-                  TexCoord0 = uv0;
+                  TexCoords = uv0;
               }
           Fragment: 
             program: |
@@ -44,7 +44,7 @@ techniques:
   
               out vec4 FragColor;
               
-              in vec2 TexCoord0;
+              in vec2 TexCoords;
               in vec3 LocalPos;
               
               uniform sampler2D diffuse;
@@ -52,7 +52,7 @@ techniques:
               
               void main()
               {
-                  FragColor = mix(texture(diffuse, TexCoord0), texture(reflection, LocalPos), 0.07);
+                  FragColor = mix(texture(diffuse, TexCoords), texture(reflection, LocalPos), 0.07);
               }
                           
               

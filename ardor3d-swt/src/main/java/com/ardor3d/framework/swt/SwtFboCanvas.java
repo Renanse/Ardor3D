@@ -29,12 +29,12 @@ import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.input.MouseManager;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ContextGarbageCollector;
 
@@ -122,11 +122,13 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         // tell our parent to lay us out so we have the right starting size.
         getParent().layout();
 
-        _quad = new Quad("Quad", 128f, 128f);
+        _quad = new Quad("fsq", 2, 2);
+        _quad.setRenderMaterial("unlit/textured/fsq.yaml");
+
         _quad.setModelBound(new BoundingBox());
         _quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        _quad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-        _quad.setSolidColor(ColorRGBA.WHITE);
+        _quad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        _quad.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
 
         checkRTT();
 
@@ -175,11 +177,8 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         screen.setEnabled(true);
 
         _quad.setRenderState(screen);
-        _quad.updateWorldRenderStates(false);
 
-        _quad.resize(width, height);
-        _quad.setTranslation(width / 2f, height / 2f, 0);
-        _quad.updateWorldTransform(false);
+        _quad.updateGeometricState(0);
     }
 
     @Override

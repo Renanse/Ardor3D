@@ -177,23 +177,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
 
         AWTImageLoader.registerLoader();
 
-        try {
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(
-                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/")));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(
-                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/models/")));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, new SimpleResourceLocator(
-                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/material")));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL,
-                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ExampleBase.class,
-                            "com/ardor3d/example/media/materials/")));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
-                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/shader")));
-            MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
-                    .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        }
+        addDefaultResourceLocators();
 
         /**
          * Create a ZBuffer to display pixels closest to the camera above farther ones.
@@ -581,5 +565,25 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
         camera.resize(newWidth, newHeight);
         camera.setFrustumPerspective(camera.getFovY(), (float) newWidth / (float) newHeight, camera.getFrustumNear(),
                 camera.getFrustumFar());
+    }
+
+    public static void addDefaultResourceLocators() {
+        try {
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/models/")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/material")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL,
+                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ExampleBase.class,
+                            "com/ardor3d/example/media/materials/")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/shader")));
+            MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
+                    .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
+        } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
+        }
     }
 }

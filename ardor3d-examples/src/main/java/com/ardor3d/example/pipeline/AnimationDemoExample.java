@@ -37,7 +37,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Node;
@@ -52,7 +53,6 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.jogamp.opengl.util.glsl.ShaderState;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
@@ -69,6 +69,8 @@ public class AnimationDemoExample extends ExampleBase {
     private final List<AnimationManager> managers = Lists.newArrayList();
     private final List<AnimationInfo> animInfo = Lists.newArrayList();
     private final Map<SkeletonPose, SkinnedMesh> poseToMesh = Maps.newIdentityHashMap();
+
+    private RenderMaterial matGPU;
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
@@ -127,6 +129,9 @@ public class AnimationDemoExample extends ExampleBase {
     private SkinnedMesh loadMainSkeleton() {
         SkinnedMesh skeleton = null;
         try {
+            SkinnedMesh.addDefaultResourceLocators();
+            matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
+
             final long time = System.currentTimeMillis();
             final ColladaImporter colladaImporter = new ColladaImporter();
 
@@ -140,22 +145,6 @@ public class AnimationDemoExample extends ExampleBase {
 
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
-
-            final ShaderState gpuShader = new ShaderState();
-            gpuShader.setEnabled(true);
-            try {
-                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert",
-                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
-                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag",
-                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
-                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
-
-                gpuShader.setUniform("texture", 0);
-                gpuShader.setUniform("lightDirection", new Vector3(1, 1, 1).normalizeLocal());
-            } catch (final IOException ioe) {
-                ioe.printStackTrace();
-            }
 
             // OPTIMIZATION: SkinnedMesh combining... Useful in our case because the skeleton model is composed of 2
             // separate meshes.
@@ -185,7 +174,10 @@ public class AnimationDemoExample extends ExampleBase {
             cullState.setCullFace(Face.Back);
             skeleton.setRenderState(cullState);
 
-            skeleton.setGPUShader(gpuShader);
+            skeleton.setProperty("metallic", 0.25f);
+            skeleton.setProperty("roughness", 0.25f);
+            skeleton.setProperty("ao", 1.0f);
+            skeleton.setRenderMaterial(matGPU);
             skeleton.setUseGPU(true);
 
         } catch (final Exception ex) {

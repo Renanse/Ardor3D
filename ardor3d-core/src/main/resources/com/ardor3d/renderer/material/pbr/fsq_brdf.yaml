@@ -16,22 +16,11 @@ techniques:
             shaderKey: roughness
             type: Float1
             source: SpatialProperty
+
         shaders: 
           Vertex: 
-            program: |
-              #version 330 core
-
-              layout (location = 0) in vec3 vertex;
-              layout (location = 1) in vec2 uv0;
-              
-              out vec2 TexCoords;
-              
-              void main()
-              {
-                  TexCoords = uv0;
-                  gl_Position = vec4(vertex, 1.0);
-              }
-
+            source: unlit/textured/fsq.vert
+            
           Fragment:
             program: |
               #version 330 core

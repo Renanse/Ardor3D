@@ -1,0 +1,14 @@
+--- # textured, full screen quad
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+
+        shaders: 
+          Vertex: 
+            source: unlit/textured/fsq.vert
+            
+          Fragment:
+            source: unlit/textured/basic.frag

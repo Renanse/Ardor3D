@@ -9,11 +9,11 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec4 DiffuseColor;
-out vec2 TexCoord0;
+out vec2 TexCoords;
 
 void main()
 {
     gl_Position = projection * view * model * vec4(vertex, 1.0);
     DiffuseColor = color;
-    TexCoord0 = uv0;
+    TexCoords = uv0;
 }

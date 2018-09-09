@@ -41,7 +41,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
-import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
@@ -79,6 +78,7 @@ public class RotatingCubeGame implements Updater {
         // add a rotating controller to the cube
         // add a light
         box = new Box("The cube", new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
+        box.setRenderMaterial("unlit/textured/basic.yaml");
 
         final ZBufferState buf = new ZBufferState();
         buf.setEnabled(true);
@@ -117,9 +117,6 @@ public class RotatingCubeGame implements Updater {
         scene.getRoot().attachChild(box);
 
         registerInputTriggers();
-
-        final BasicText text = BasicText.createDefaultTextLabel("test", "Hello World!");
-        scene.getRoot().attachChild(text);
 
         inited = true;
     }

@@ -10,7 +10,6 @@
 
 package com.ardor3d.example.canvas;
 
-import java.net.URISyntaxException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
@@ -24,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.CanvasRenderer;
@@ -44,23 +44,21 @@ import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
-import com.ardor3d.renderer.lwjgl3.Lwjgl3TextureRendererProvider;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas via off-screen FBO rendering.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglHeadlessSwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
+        maxHeapMemory = 64)
 public class LwjglHeadlessSwtExample {
     private static final Logger logger = Logger.getLogger(LwjglHeadlessSwtExample.class.toString());
     private static RotatingCubeGame game;
 
     public static void main(final String[] args) {
+        ExampleBase.addDefaultResourceLocators();
+
         final Timer timer = new Timer();
         final FrameHandler frameWork = new FrameHandler(timer);
         final LogicalLayer logicalLayer = new LogicalLayer();
@@ -78,15 +76,6 @@ public class LwjglHeadlessSwtExample {
 
         // Setup AWT image loader to load our ardor3d logo and font texture.
         AWTImageLoader.registerLoader();
-
-        // Tell ardor3d where to look for scene texture resources
-        try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    LwjglSwtExample.class, "com/ardor3d/example/media/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        }
 
         // add our canvas to the shell, using the scene we've setup and our logic layer
         addNewFBOCanvas(shell, scene, frameWork, logicalLayer);
@@ -112,9 +101,6 @@ public class LwjglHeadlessSwtExample {
     private static void addNewFBOCanvas(final Shell shell, final BasicScene scene, final FrameHandler frameWork,
             final LogicalLayer logicalLayer) {
         logger.info("Adding canvas");
-
-        // setup the texture renderer type to be used by the SwtFboCanvas
-        TextureRendererFactory.INSTANCE.setProvider(new Lwjgl3TextureRendererProvider());
 
         // Display settings to use for canvas - width/height will be updated when canvas is displayed.
         final DisplaySettings settings = new DisplaySettings(32, 32, 32, 16);
