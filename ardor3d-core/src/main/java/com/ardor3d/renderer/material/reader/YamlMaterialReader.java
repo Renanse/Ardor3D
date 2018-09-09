@@ -326,7 +326,6 @@ public class YamlMaterialReader {
         sb.append('\n');
         injects.forEach((final String inj) -> sb.append(inj).append('\n'));
         sb.append(program.substring(firstLF + 1));
-        System.err.println(sb);
         return sb.toString();
     }
 

@@ -169,9 +169,12 @@ public class SkeletalDebugger {
 
         if (showLabels) {
             final Camera current = Camera.getCurrentCamera();
-            SkeletalDebugger.orthoCam.resize(current.getWidth(), current.getHeight());
-            SkeletalDebugger.orthoCam.setFrustumRight(current.getWidth());
-            SkeletalDebugger.orthoCam.setFrustumTop(current.getHeight());
+            if (SkeletalDebugger.orthoCam.getWidth() != current.getWidth()
+                    || SkeletalDebugger.orthoCam.getHeight() != current.getHeight()) {
+                SkeletalDebugger.orthoCam.resize(current.getWidth(), current.getHeight());
+                SkeletalDebugger.orthoCam.setFrustumRight(current.getWidth());
+                SkeletalDebugger.orthoCam.setFrustumTop(current.getHeight());
+            }
             SkeletalDebugger.orthoCam.apply(renderer);
             final Transform store = Transform.fetchTempInstance();
             final Vector3 point = Vector3.fetchTempInstance();
