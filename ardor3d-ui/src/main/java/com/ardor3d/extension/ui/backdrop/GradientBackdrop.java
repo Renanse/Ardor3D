@@ -155,6 +155,8 @@ public class GradientBackdrop extends UIBackdrop {
 
     private static Mesh createMesh() {
         final Mesh mesh = new Mesh();
+        mesh.setRenderMaterial("ui/untextured/vertex_color.yaml");
+
         final MeshData meshData = mesh.getMeshData();
         meshData.setVertexBuffer(BufferUtils.createVector3Buffer(4));
         meshData.getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);

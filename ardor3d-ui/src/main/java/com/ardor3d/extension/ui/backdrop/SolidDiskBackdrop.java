@@ -33,6 +33,9 @@ public class SolidDiskBackdrop extends UIBackdrop {
     protected final ColorRGBA _color = new ColorRGBA(ColorRGBA.GRAY);
     /** The disk used across all disk backdrops to render with. */
     private static UIDisk _standin = SolidDiskBackdrop.createStandinDisk();
+    static {
+        SolidDiskBackdrop._standin.setRenderMaterial("ui/untextured/default_color.yaml");
+    }
 
     /**
      * Construct this backdrop, using the given color.

@@ -75,7 +75,7 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         setTextureData();
         setIndexData();
 
-        setRenderMaterial("bmtext.yaml");
+        setRenderMaterial("ui/textured/default_color.yaml");
 
         // -- add self as change listener
         _text.addChangeListener(this);

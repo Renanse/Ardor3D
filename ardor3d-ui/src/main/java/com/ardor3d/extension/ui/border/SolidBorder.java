@@ -21,8 +21,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.renderer.state.ShadingState;
-import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -203,6 +201,8 @@ public class SolidBorder extends UIBorder {
     private static Mesh createMesh() {
         // create a triangle strip of 8 triangles.
         final Mesh mesh = new Mesh();
+        mesh.setRenderMaterial("ui/untextured/vertex_color_flat.yaml");
+
         mesh.getMeshData().setVertexCoords(new FloatBufferData(BufferUtils.createVector2Buffer(8), 2));
         mesh.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(8));
         mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -216,12 +216,6 @@ public class SolidBorder extends UIBorder {
         blend.setSourceFunction(SourceFunction.SourceAlpha);
         blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         mesh.setRenderState(blend);
-
-        // use flat shade so our borders will have a solid color.
-        final ShadingState shading = new ShadingState();
-        shading.setShadingMode(ShadingMode.Flat);
-        mesh.setRenderState(shading);
-
         mesh.updateWorldRenderStates(false);
 
         return mesh;

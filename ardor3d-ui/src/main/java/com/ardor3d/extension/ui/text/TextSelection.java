@@ -414,6 +414,8 @@ public abstract class TextSelection {
 
     protected Mesh createSelectionMesh() {
         final Mesh mesh = new Mesh("selectionMesh");
+        mesh.setRenderMaterial("ui/untextured/default_color.yaml");
+
         final MeshData mData = mesh.getMeshData();
         mData.setVertexBuffer(BufferUtils.createVector3Buffer(6));
         mData.setIndexMode(IndexMode.Triangles);

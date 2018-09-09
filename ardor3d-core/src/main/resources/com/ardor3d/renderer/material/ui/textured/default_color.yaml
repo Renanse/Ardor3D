@@ -1,0 +1,22 @@
+--- # ui elements that are textured and apply default color
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+          
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - shaderKey: defaultColor
+            type: Float4
+            source: RenderState
+            value: MeshDefaultColorRGBA
+
+        shaders: 
+          Vertex: 
+            source: ui/ui_textured.vert
+
+          Fragment:
+            source: ui/ui_textured.frag
+            

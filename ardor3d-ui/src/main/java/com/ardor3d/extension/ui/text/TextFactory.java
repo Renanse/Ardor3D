@@ -286,6 +286,7 @@ public enum TextFactory {
             inverseTextureWidth = 1f / tex.getImage().getWidth();
 
             final TextMesh tMesh = new TextMesh();
+            tMesh.setRenderMaterial("ui/textured/vertex_color.yaml");
 
             // apply render states
             applyStates(tMesh, tex);

@@ -31,6 +31,9 @@ public class SolidBackdrop extends UIBackdrop {
     private final ColorRGBA _color = new ColorRGBA(ColorRGBA.GRAY);
     /** The quad used across all solid backdrops to render with. */
     private static UIQuad _standin = SolidBackdrop.createStandinQuad();
+    static {
+        SolidBackdrop._standin.setRenderMaterial("ui/untextured/default_color.yaml");
+    }
 
     /**
      * Construct this backdrop, using the given color.

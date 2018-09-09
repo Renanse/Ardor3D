@@ -212,7 +212,7 @@ public class BMText extends Mesh {
         // triangles now
         getMeshData().setIndexMode(IndexMode.Triangles);
 
-        setRenderMaterial("bmtext.yaml");
+        setRenderMaterial("ui/textured/default_color.yaml");
 
         setText(text);
 

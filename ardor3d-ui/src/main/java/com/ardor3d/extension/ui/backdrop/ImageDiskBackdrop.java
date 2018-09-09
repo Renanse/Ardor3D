@@ -31,6 +31,9 @@ public class ImageDiskBackdrop extends SolidDiskBackdrop {
 
     /** The disk used across all disk backdrops to render with. */
     private static UIDisk _standin = SolidDiskBackdrop.createStandinDisk();
+    static {
+        ImageDiskBackdrop._standin.setRenderMaterial("ui/textured/default_color.yaml");
+    }
 
     /**
      * Construct this back drop, using the given image.

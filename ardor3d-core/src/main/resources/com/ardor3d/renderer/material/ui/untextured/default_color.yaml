@@ -1,0 +1,22 @@
+--- # Material
+name: unlit, textured, vertex color
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - shaderKey: defaultColor
+            type: Float4
+            source: RenderState
+            value: MeshDefaultColorRGBA
+
+        shaders: 
+          Vertex: 
+            source: ui/ui_untextured.vert
+
+          Fragment:
+            source: ui/ui_untextured.frag
+            

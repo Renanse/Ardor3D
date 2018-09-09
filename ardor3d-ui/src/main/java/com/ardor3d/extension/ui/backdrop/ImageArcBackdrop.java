@@ -27,6 +27,9 @@ public class ImageArcBackdrop extends SolidArcBackdrop {
 
     /** The arc used across all arc backdrops to render with. */
     private static UIArc _standin = SolidArcBackdrop.createStandinArc();
+    static {
+        ImageArcBackdrop._standin.setRenderMaterial("ui/textured/default_color.yaml");
+    }
 
     /**
      * Construct this back drop, using the given image.

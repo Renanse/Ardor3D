@@ -460,6 +460,8 @@ public abstract class UIContainer extends UIComponent {
         }
 
         _standin = new UIQuad("container_standin", 1, 1);
+        _standin.setRenderMaterial("ui/textured/default_color.yaml");
+
         // no frustum culling checks
         _standin.getSceneHints().setCullHint(CullHint.Never);
         // no lighting

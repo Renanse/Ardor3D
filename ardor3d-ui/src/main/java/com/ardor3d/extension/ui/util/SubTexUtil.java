@@ -411,6 +411,8 @@ public class SubTexUtil {
 
     private static Mesh createMesh() {
         final Mesh mesh = new Mesh();
+        mesh.setRenderMaterial("ui/textured/default_color.yaml");
+
         final MeshData meshData = mesh.getMeshData();
         meshData.setVertexCoords(new FloatBufferData(BufferUtils.createVector2Buffer(4), 2));
         meshData.setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
@@ -424,7 +426,6 @@ public class SubTexUtil {
         blend.setSourceFunction(SourceFunction.SourceAlpha);
         blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         mesh.setRenderState(blend);
-
         mesh.updateWorldRenderStates(false);
 
         return mesh;

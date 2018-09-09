@@ -1,0 +1,22 @@
+--- # Material
+name: unlit, textured, vertex color
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: color
+          - key: uv0
+          
+        uniforms: 
+          - builtIn: [model, view, projection]
+
+        shaders: 
+          Vertex: 
+            source: ui/ui_textured.vert
+            define: VERTEX_COLORS
+
+          Fragment:
+            source: ui/ui_textured.frag
+            define: VERTEX_COLORS
+            

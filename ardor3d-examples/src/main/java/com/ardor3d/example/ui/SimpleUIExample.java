@@ -67,8 +67,8 @@ import com.ardor3d.util.TextureManager;
  * Illustrates how to display GUI primitives (e.g. RadioButton, Label, TabbedPane) on a canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.SimpleUIExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_SimpleUIExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_SimpleUIExample.jpg", //
+        maxHeapMemory = 64)
 public class SimpleUIExample extends ExampleBase {
     UIHud hud;
     private UIFrame frame;
@@ -87,6 +87,7 @@ public class SimpleUIExample extends ExampleBase {
         final Box box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
         box.setModelBound(new BoundingBox());
         box.setTranslation(new Vector3(0, 0, -15));
+        box.setRenderMaterial("unlit/textured/basic.yaml");
         box.addController(new SpatialController<Box>() {
             private final Matrix3 rotate = new Matrix3();
             private double angle = 0;
@@ -132,7 +133,7 @@ public class SimpleUIExample extends ExampleBase {
         frame.setContentPanel(pane);
         frame.pack();
 
-        frame.setUseStandin(false);
+        frame.setUseStandin(true);
         frame.setOpacity(1f);
         frame.setName("sample");
 

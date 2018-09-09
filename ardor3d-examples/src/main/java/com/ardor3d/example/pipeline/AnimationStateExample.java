@@ -54,10 +54,10 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
@@ -68,7 +68,6 @@ import com.ardor3d.util.geom.MeshCombiner;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
-import com.jogamp.opengl.util.glsl.ShaderState;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
@@ -92,9 +91,8 @@ public class AnimationStateExample extends ExampleBase {
 
     private UIButton runWalkButton, punchButton, playPauseButton, stopButton;
 
-    private ShaderState gpuShader;
-
     private final Node skNode = new Node("model");
+    private RenderMaterial matCPU, matGPU;
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationStateExample.class);
@@ -237,11 +235,10 @@ public class AnimationStateExample extends ExampleBase {
                         if (spatial instanceof SkinnedMesh) {
                             final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
                             if (gpuSkinningCheck.isSelected()) {
-                                skinnedSpatial.setGPUShader(gpuShader);
+                                skinnedSpatial.setRenderMaterial(matGPU);
                                 skinnedSpatial.setUseGPU(true);
                             } else {
-                                skinnedSpatial.setGPUShader(null);
-                                skinnedSpatial.clearRenderState(StateType.Shader);
+                                skinnedSpatial.setRenderMaterial(matCPU);
                                 skinnedSpatial.setUseGPU(false);
                             }
                         }
@@ -292,6 +289,10 @@ public class AnimationStateExample extends ExampleBase {
 
     private void createCharacter() {
         try {
+            SkinnedMesh.addDefaultResourceLocators();
+            matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
+            matCPU = MaterialManager.INSTANCE.findMaterial("pbr/pbr_untextured_simple.yaml");
+
             skNode.detachAllChildren();
             _root.attachChild(skNode);
 
@@ -312,22 +313,6 @@ public class AnimationStateExample extends ExampleBase {
 
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
-
-            gpuShader = new ShaderState();
-            gpuShader.setEnabled(true);
-            try {
-                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert",
-                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
-                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag",
-                        ResourceLocatorTool.getClassPathResourceAsString(ExampleBase.class,
-                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
-
-                gpuShader.setUniform("texture", 0);
-                gpuShader.setUniform("lightDirection", new Vector3(1, 1, 1).normalizeLocal());
-            } catch (final IOException ioe) {
-                ioe.printStackTrace();
-            }
 
             // OPTIMIZATION: SkinnedMesh combining... Useful in our case because the skeleton model is composed of 2
             // separate meshes.
@@ -356,6 +341,11 @@ public class AnimationStateExample extends ExampleBase {
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
             primeModel.setRenderState(cullState);
+
+            primeModel.setProperty("metallic", 0.25f);
+            primeModel.setProperty("roughness", 0.25f);
+            primeModel.setProperty("ao", 1.0f);
+            primeModel.setRenderMaterial(matCPU);
 
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
