@@ -25,6 +25,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
+import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
@@ -87,7 +88,7 @@ import com.ardor3d.util.stat.StatCollector;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
-public abstract class ExampleBase implements Runnable, Updater, Scene {
+public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasListener {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
 
     /** If true (the default) we will call System.exit on end of demo. */
@@ -300,6 +301,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         renderer.renderBuckets();
         _orthoCam.apply(renderer);
         _orthoRoot.onDraw(renderer);
+        renderer.renderBuckets();
+        _canvas.getCanvasRenderer().getCamera().apply(renderer);
     }
 
     protected void renderDebug(final Renderer renderer) {
@@ -393,6 +396,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         // register our native canvas
         example._frameHandler.addCanvas(example._canvas);
+
+        // add resize handler
+        example._canvas.addListener(example);
 
         new Thread(example).start();
     }
@@ -563,5 +569,17 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             }
         }));
 
+    }
+
+    @Override
+    public void onResize(final int newWidth, final int newHeight) {
+        final Camera camera = _canvas.getCanvasRenderer().getCamera();
+        if (camera == null) {
+            return;
+        }
+
+        camera.resize(newWidth, newHeight);
+        camera.setFrustumPerspective(camera.getFovY(), (float) newWidth / (float) newHeight, camera.getFrustumNear(),
+                camera.getFrustumFar());
     }
 }

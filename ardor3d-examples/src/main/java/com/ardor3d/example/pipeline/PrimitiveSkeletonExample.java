@@ -10,8 +10,6 @@
 
 package com.ardor3d.example.pipeline;
 
-import java.io.IOException;
-
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.Joint;
@@ -25,36 +23,38 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * A demonstration of combining the skeletal animation classes with OpenGL Shading Language.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.PrimitiveSkeletonExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_PrimitiveSkeletonExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_PrimitiveSkeletonExample.jpg", //
+        maxHeapMemory = 64)
 public class PrimitiveSkeletonExample extends ExampleBase {
 
     private boolean runAnimation = true;
     private boolean showSkeleton = false;
-    private boolean useGPU = false;
+    private boolean useGPU = true;
 
-    private SkeletonPose pose1, pose2;
-    private SkinnedMesh arm, arm1, arm2;
+    private SkeletonPose pose;
+    private SkinnedMesh arm;
     private BasicText t1, t2, t3;
+
+    private RenderMaterial matCPU, matGPU;
 
     public static void main(final String[] args) {
         ExampleBase.start(PrimitiveSkeletonExample.class);
@@ -62,6 +62,13 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        _canvas.setTitle("Simple example of skinned mesh");
+        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 1.0f));
+
+        _lightState.get(0).setDiffuse(new ColorRGBA(300, 300, 300, 1));
+
+        SkinnedMesh.addDefaultResourceLocators();
+
         final Transform j1Transform = new Transform();
         j1Transform.setTranslation(0, 0, -5);
         j1Transform.invert(j1Transform);
@@ -78,21 +85,29 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
         final Skeleton sk = new Skeleton("arm sk", new Joint[] { j1, j2 });
 
-        pose1 = new SkeletonPose(sk);
-        pose1.updateTransforms();
-        pose2 = new SkeletonPose(sk);
-        pose2.updateTransforms();
+        matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
+        matCPU = MaterialManager.INSTANCE.findMaterial("pbr/pbr_untextured_simple.yaml");
+
+        pose = new SkeletonPose(sk);
+        pose.updateTransforms();
 
         arm = new SkinnedMesh("arm");
+        arm.setRenderMaterial(useGPU ? matGPU : matCPU);
         final Cylinder cy = new Cylinder("cylinder", 3, 8, 1, 10);
         arm.setBindPoseData(cy.getMeshData());
-        arm.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(cy.getMeshData().getVertexBuffer().capacity()));
+        arm.getMeshData().setVertexBuffer(BufferUtils.clone(cy.getMeshData().getVertexBuffer()));
         arm.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(cy.getMeshData().getNormalBuffer().capacity()));
         arm.getMeshData().setIndices(BufferUtils.clone(cy.getMeshData().getIndices()));
         arm.getMeshData().setTextureBuffer(BufferUtils.clone(cy.getMeshData().getTextureBuffer(0)), 0);
         arm.setTranslation(0, 0, -10);
+        arm.updateModelBound();
         arm.getSceneHints().setCullHint(CullHint.Dynamic);
 
+        arm.setProperty("metallic", 0.25f);
+        arm.setProperty("roughness", 0.25f);
+        arm.setProperty("ao", 1.0f);
+
+        arm.setDefaultColor(ColorRGBA.LIGHT_GRAY);
         arm.setWeightsPerVert(4);
 
         final float[] weights = { //
@@ -137,49 +152,30 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         }
         arm.setJointIndices(indices);
 
-        final ShaderState gpuShader = new ShaderState();
-        gpuShader.setEnabled(useGPU);
-        try {
-            gpuShader.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
-                    PrimitiveSkeletonExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
-            gpuShader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
-                    PrimitiveSkeletonExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
-        } catch (final IOException ioe) {
-            ioe.printStackTrace();
-        }
-        arm.setGPUShader(gpuShader);
         arm.setUseGPU(useGPU);
 
-        arm1 = arm.makeCopy(true);
-        arm2 = arm.makeCopy(true);
+        arm.setCurrentPose(pose);
 
-        arm1.setCurrentPose(pose1);
-        arm2.setCurrentPose(pose2);
-
-        arm1.addTranslation(1, 0, 0);
-        arm2.addTranslation(-1, 0, 0);
-
-        _root.attachChild(arm1);
-        _root.attachChild(arm2);
+        _root.attachChild(arm);
 
         t1 = BasicText.createDefaultTextLabel("Text1", "[SPACE] Pause joint animation.");
-        t1.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t1.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t1.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t1.setTranslation(new Vector3(5, 2 * (t1.getHeight() + 5) + 10, 0));
-        _root.attachChild(t1);
+        _orthoRoot.attachChild(t1);
 
         t2 = BasicText.createDefaultTextLabel("Text2", "[G] GPU Skinning is " + (useGPU ? "ON." : "OFF."));
-        t2.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t2.setTranslation(new Vector3(5, 1 * (t1.getHeight() + 5) + 10, 0));
-        _root.attachChild(t2);
+        _orthoRoot.attachChild(t2);
 
         t3 = BasicText.createDefaultTextLabel("Text3", "[K] Show Skeleton.");
-        t3.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t3.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t3.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t3.setTranslation(new Vector3(5, 0 * (t1.getHeight() + 5) + 10, 0));
-        _root.attachChild(t3);
-        _root.getSceneHints().setCullHint(CullHint.Never);
+        _orthoRoot.attachChild(t3);
+        _orthoRoot.getSceneHints().setCullHint(CullHint.Never);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -195,10 +191,8 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 useGPU = !useGPU;
-                arm1.getGPUShader().setEnabled(useGPU);
-                arm1.setUseGPU(useGPU);
-                arm2.getGPUShader().setEnabled(useGPU);
-                arm2.setUseGPU(useGPU);
+                arm.setUseGPU(useGPU);
+                arm.setRenderMaterial(useGPU ? matGPU : matCPU);
                 if (useGPU) {
                     t2.setText("[G] GPU Skinning is ON.");
                 } else {
@@ -249,21 +243,15 @@ public class PrimitiveSkeletonExample extends ExampleBase {
             angle %= 360;
 
             // move the end of the arm up and down.
-            final Transform t1 = pose1.getLocalJointTransforms()[1];
-            t1.setTranslation(t1.getTranslation().getX(), Math.sin(angle * MathUtils.DEG_TO_RAD) * 2, t1
-                    .getTranslation().getZ());
+            final Transform t1 = pose.getLocalJointTransforms()[1];
+            t1.setTranslation(t1.getTranslation().getX(), Math.sin(angle * MathUtils.DEG_TO_RAD) * 2,
+                    t1.getTranslation().getZ());
 
-            final Transform t2 = pose2.getLocalJointTransforms()[1];
-            t2.setTranslation(t2.getTranslation().getX(), Math.cos(angle * MathUtils.DEG_TO_RAD) * 2, t2
-                    .getTranslation().getZ());
-
-            pose1.updateTransforms();
-            pose2.updateTransforms();
+            pose.updateTransforms();
 
             if (!useGPU) {
                 // no point to updating the model bound in gpu mode
-                arm1.updateModelBound();
-                arm2.updateModelBound();
+                arm.updateModelBound();
             }
         }
     }

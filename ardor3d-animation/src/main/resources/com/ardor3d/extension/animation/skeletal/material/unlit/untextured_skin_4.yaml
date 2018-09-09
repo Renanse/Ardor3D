@@ -1,15 +1,20 @@
 --- # Material
-name: untextured pbr
+name: skinned mesh
 techniques: 
   passes: 
       - 
         attributes:
           - key: vertex
           - key: normal
-          - key: uv0
-          
+          - key: weights
+          - key: jointIds
+
         uniforms: 
           - builtIn: [model, view, projection, cameraLoc, lights4]
+          - 
+            shaderKey: jointPalette
+            type: Matrix4x4
+            source: SpatialProperty
           - 
             shaderKey: albedo
             type: Float3
@@ -27,8 +32,10 @@ techniques:
             shaderKey: ao
             type: Float1
             source: SpatialProperty
+
         shaders: 
           Vertex: 
-            source: pbr/pbr_simple.vert
+            source: unlit/skinned_mesh.vert
+
           Fragment:
             source: pbr/pbr_simple.frag

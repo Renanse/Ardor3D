@@ -146,7 +146,6 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwSetWindowSizeCallback(_windowId, _resizeCallback = new GLFWWindowSizeCallbackI() {
                 @Override
                 public void invoke(final long window, final int width, final int height) {
-                    _canvasRenderer.getCamera().setViewPort(0, 0, width, height);
                     updateContentSize();
                 }
             });

@@ -953,6 +953,10 @@ public class Camera implements Savable, Externalizable {
      *            the view height
      */
     public void resize(final int width, final int height) {
+        if (_width == width && _height == height) {
+            return;
+        }
+
         _width = width;
         _height = height;
         onViewPortChange();
@@ -1435,7 +1439,7 @@ public class Camera implements Savable, Externalizable {
      */
     public void apply(final Renderer renderer) {
         if (Camera.getCurrentCamera() != this) {
-            update();
+            _frustumDirty = _viewPortDirty = _frameDirty = true;
             ContextManager.getCurrentContext().setCurrentCamera(this);
         }
         if (_depthRangeDirty) {
