@@ -32,6 +32,6 @@ techniques:
             value: 0
         shaders: 
           Vertex: 
-            source: pbr/pbr_simple.vert
+            source: pbr/pbr.vert
           Fragment:
             source: pbr/pbr_simpleIrradiance.frag

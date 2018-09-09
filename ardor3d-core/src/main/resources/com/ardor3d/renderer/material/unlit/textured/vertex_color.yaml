@@ -11,6 +11,6 @@ techniques:
           - builtIn: [model, view, projection]
         shaders: 
           Vertex: 
-            source: unlit/textured/vertexcolor.vert
+            source: unlit/textured/vertex_color.vert
           Fragment:
             source: unlit/textured/diffuse.frag

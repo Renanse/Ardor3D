@@ -77,7 +77,7 @@ public class BoxExample extends ExampleBase {
         // Give the box some nice colors.
         box.setRandomColors();
         // Set the box's material
-        box.setRenderMaterial("unlit/textured/vertexcolor.yaml");
+        box.setRenderMaterial("unlit/textured/vertex_color.yaml");
         // Attach the box to the scenegraph root.
         _root.attachChild(box);
 
