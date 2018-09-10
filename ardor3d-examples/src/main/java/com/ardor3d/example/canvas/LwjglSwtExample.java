@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.example.canvas;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,6 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
@@ -71,15 +71,14 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicates;
 
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglSwtExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
+        maxHeapMemory = 64)
 public class LwjglSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
@@ -92,6 +91,8 @@ public class LwjglSwtExample {
 
     public static void main(final String[] args) {
         System.setProperty("ardor3d.useMultipleContexts", "true");
+        AWTImageLoader.registerLoader();
+        ExampleBase.addDefaultResourceLocators();
 
         final Timer timer = new Timer();
         final FrameHandler frameWork = new FrameHandler(timer);
@@ -132,16 +133,6 @@ public class LwjglSwtExample {
         });
         item.setText("Add &3d Canvas");
         item.setAccelerator(SWT.MOD1 + '3');
-
-        AWTImageLoader.registerLoader();
-
-        try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    LwjglSwtExample.class, "com/ardor3d/example/media/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        }
 
         addNewCanvas(tabFolder, scene, frameWork, logicalLayer);
 
@@ -307,11 +298,11 @@ public class LwjglSwtExample {
         logicalLayer.registerTrigger(new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(
                 MouseButton.LEFT, 500, 5), new GestureEventCondition(LongPressGestureEvent.class)),
                 new TriggerAction() {
-                    @Override
+                            @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        game.toggleRotation();
-                    }
-                }));
+                                game.toggleRotation();
+                            }
+                        }));
 
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
         try {
