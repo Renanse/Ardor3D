@@ -217,6 +217,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     @SuppressWarnings("unchecked")
     @Override
     public void sendUniformValue(final int location, final UniformRef uniform, final Mesh mesh) {
+        // TODO: check if we already have a given uniform value set.
         // Determine our value.
         try (MemoryStack stack = MemoryStack.stackPush()) {
             Buffer value;

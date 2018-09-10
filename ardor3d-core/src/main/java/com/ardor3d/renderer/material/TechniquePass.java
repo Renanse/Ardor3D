@@ -250,15 +250,16 @@ public class TechniquePass implements Savable {
         final int programId = getProgramId(context);
         for (int i = 0; i < _uniforms.size(); i++) {
             final UniformRef uniform = _uniforms.get(i);
-            int location = uniform.getLocation();
+            int location = uniform.getCachedLocation() >= 0 ? uniform.getCachedLocation() : uniform.getLocation();
             if (location < 0) {
                 // Use the name to find our location
                 location = shaderUtils.findUniformLocation(programId, uniform.getShaderVariableName());
-            }
-
-            if (location < 0) {
-                // still less than 0? might have been removed during compilation
-                continue;
+                if (location < 0) {
+                    // still less than 0? might have been removed during compilation
+                    continue;
+                } else {
+                    uniform.setCachedLocation(location);
+                }
             }
 
             shaderUtils.sendUniformValue(location, uniform, mesh);
