@@ -12,7 +12,6 @@ package com.ardor3d.renderer.queue;
 
 import java.util.Comparator;
 
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Spatial;
 
 public class OrthoOrderRenderBucket extends AbstractRenderBucket {

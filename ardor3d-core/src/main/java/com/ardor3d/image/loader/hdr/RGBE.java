@@ -121,6 +121,7 @@ public class RGBE {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static Header readHeader(final DataInputStream in) throws IOException {
         int valid = 0;
         String programType = null;
@@ -288,7 +289,6 @@ public class RGBE {
     /** Standard conversion from float pixels to rgbe pixels. */
     public static void float2rgbe(final byte[] rgbe, final float red, final float green, final float blue) {
         float v;
-        final int e;
 
         v = red;
         if (green > v) {

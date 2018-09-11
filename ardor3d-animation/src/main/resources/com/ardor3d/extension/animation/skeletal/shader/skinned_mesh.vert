@@ -50,7 +50,7 @@ void main()
     mat4 weightMat = calculateWeightMatrix();
 
     WorldPos = vec3(model * weightMat * vec4(vertex, 1.0));
-    Normal = mat3(model) * (mat3(weightMat[0].xyz,weightMat[1].xyz,weightMat[2].xyz) * normal);
+    Normal = mat3(model) * (mat3(weightMat[0].xyz, weightMat[1].xyz, weightMat[2].xyz) * normal);
      
     TexCoords = uv0;
 

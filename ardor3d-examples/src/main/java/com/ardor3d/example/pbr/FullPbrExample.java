@@ -278,7 +278,6 @@ public class FullPbrExample extends ExampleBase {
         cubeUtil.updateSettings(512, 512, 24, .1, 10);
         cubeUtil.getTextureRenderer().setupTexture(brdfTex);
         cubeUtil.getTextureRenderer().render(quad, brdfTex, Renderer.BUFFER_COLOR_AND_DEPTH);
-
     }
 
     @Override
