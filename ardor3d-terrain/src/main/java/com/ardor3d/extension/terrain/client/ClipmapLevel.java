@@ -21,9 +21,11 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -96,11 +98,6 @@ public class ClipmapLevel extends Mesh {
     private final Vector3 transformedFrustumPos = new Vector3();
 
     /**
-     * Should the clipmap generate per vertex normals
-     */
-    private final boolean generateNormals = false;
-
-    /**
      * Bounding box used for culling
      */
     private final BoundingBox frustumCheckBounds = new BoundingBox();
@@ -157,6 +154,8 @@ public class ClipmapLevel extends Mesh {
         clipRegion = new Region(0, 0, (clipSideSize - 1) * vertexDistance, (clipSideSize - 1) * vertexDistance);
         intersectionRegion = new Region(0, 0, clipSideSize * vertexDistance, clipSideSize * vertexDistance);
 
+        setProperty("vertexDistance", vertexDistance);
+
         // Initialize the vertices
         initialize();
     }
@@ -165,25 +164,23 @@ public class ClipmapLevel extends Mesh {
      * Initializes the vertices and indices.
      */
     private void initialize() {
-        getMeshData().setIndexMode(IndexMode.TriangleStrip);
+        final MeshData meshData = getMeshData();
+
+        meshData.setIndexMode(IndexMode.TriangleStrip);
 
         // clipSideSize is the number of vertices per clipmapside, so number of all vertices is clipSideSize *
         // clipSideSize
-        final FloatBuffer vertices = BufferUtils.createVector4Buffer(clipSideSize * clipSideSize);
-        getMeshData().setVertexCoords(new FloatBufferData(vertices, 4));
-
-        if (generateNormals) {
-            final FloatBuffer normals = BufferUtils.createVector3Buffer(clipSideSize * clipSideSize);
-            getMeshData().setNormalCoords(new FloatBufferData(normals, 3));
-        }
-
-        // final FloatBuffer textureCoords = BufferUtils.createVector2Buffer(N * N);
-        // getMeshData().setTextureBuffer(textureCoords, 0);
+        final FloatBufferData vertices = new FloatBufferData(
+                BufferUtils.createVector4Buffer(clipSideSize * clipSideSize), 4);
+        vertices.setVboAccessMode(VBOAccessMode.DynamicDraw);
+        meshData.setVertexCoords(vertices);
 
         final int indicesSize = 4 * (3 * frameSize * frameSize + clipSideSize * clipSideSize / 2 + 4 * frameSize - 10);
-        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(indicesSize, vertices.capacity() - 1);
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(indicesSize,
+                vertices.getBufferCapacity() - 1);
+        indices.setVboAccessMode(VBOAccessMode.DynamicDraw);
         tmpIndices = new int[indicesSize];
-        getMeshData().setIndices(indices);
+        meshData.setIndices(indices);
 
         // Go through all rows and fill them with vertexindices.
         for (int z = 0; z < clipSideSize - 1; z++) {
@@ -282,7 +279,8 @@ public class ClipmapLevel extends Mesh {
         final int zmin = clipRegion.getTop() / vertexDistance;
         final int zmax = clipRegion.getBottom() / vertexDistance;
 
-        final FloatBuffer vertices = getMeshData().getVertexBuffer();
+        final MeshData meshData = getMeshData();
+        final FloatBuffer vertices = meshData.getVertexBuffer();
 
         // Update the L shaped region.
         // This replaces the old data with the new one.
@@ -305,6 +303,7 @@ public class ClipmapLevel extends Mesh {
                 cache.updateRegion(vertices, xmin, zmin, xmax - xmin + 1, -dz + 1);
             }
         }
+        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
         markDirty(DirtyType.Bounding);
     }
 
@@ -320,16 +319,16 @@ public class ClipmapLevel extends Mesh {
         stripIndex = 0;
 
         // MxM Block 1
-        fillBlock(clipRegion.getLeft(), clipRegion.getLeft() + frameDistance, clipRegion.getTop(), clipRegion.getTop()
-                + frameDistance);
+        fillBlock(clipRegion.getLeft(), clipRegion.getLeft() + frameDistance, clipRegion.getTop(),
+                clipRegion.getTop() + frameDistance);
 
         // MxM Block 2
         fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getLeft() + 2 * frameDistance, clipRegion.getTop(),
                 clipRegion.getTop() + frameDistance);
 
         // MxM Block 3
-        fillBlock(clipRegion.getRight() - 2 * frameDistance, clipRegion.getRight() - frameDistance,
-                clipRegion.getTop(), clipRegion.getTop() + frameDistance);
+        fillBlock(clipRegion.getRight() - 2 * frameDistance, clipRegion.getRight() - frameDistance, clipRegion.getTop(),
+                clipRegion.getTop() + frameDistance);
 
         // MxM Block 4
         fillBlock(clipRegion.getRight() - frameDistance, clipRegion.getRight(), clipRegion.getTop(),
@@ -344,12 +343,12 @@ public class ClipmapLevel extends Mesh {
                 clipRegion.getTop() + 2 * frameDistance);
 
         // MxM Block 7
-        fillBlock(clipRegion.getLeft(), clipRegion.getLeft() + frameDistance, clipRegion.getBottom() - 2
-                * frameDistance, clipRegion.getBottom() - frameDistance);
+        fillBlock(clipRegion.getLeft(), clipRegion.getLeft() + frameDistance,
+                clipRegion.getBottom() - 2 * frameDistance, clipRegion.getBottom() - frameDistance);
 
         // MxM Block 8
-        fillBlock(clipRegion.getRight() - frameDistance, clipRegion.getRight(), clipRegion.getBottom() - 2
-                * frameDistance, clipRegion.getBottom() - frameDistance);
+        fillBlock(clipRegion.getRight() - frameDistance, clipRegion.getRight(),
+                clipRegion.getBottom() - 2 * frameDistance, clipRegion.getBottom() - frameDistance);
 
         // MxM Block 9
         fillBlock(clipRegion.getLeft(), clipRegion.getLeft() + frameDistance, clipRegion.getBottom() - frameDistance,
@@ -368,20 +367,22 @@ public class ClipmapLevel extends Mesh {
                 clipRegion.getBottom());
 
         // Fixup Top
-        fillBlock(clipRegion.getLeft() + 2 * frameDistance, clipRegion.getLeft() + 2 * frameDistance
-                + doubleVertexDistance, clipRegion.getTop(), clipRegion.getTop() + frameDistance);
+        fillBlock(clipRegion.getLeft() + 2 * frameDistance,
+                clipRegion.getLeft() + 2 * frameDistance + doubleVertexDistance, clipRegion.getTop(),
+                clipRegion.getTop() + frameDistance);
 
         // Fixup Left
         fillBlock(clipRegion.getLeft(), clipRegion.getLeft() + frameDistance, clipRegion.getTop() + 2 * frameDistance,
                 clipRegion.getTop() + 2 * frameDistance + doubleVertexDistance);
 
         // Fixup Right
-        fillBlock(clipRegion.getRight() - frameDistance, clipRegion.getRight(),
-                clipRegion.getTop() + 2 * frameDistance, clipRegion.getTop() + 2 * frameDistance + doubleVertexDistance);
+        fillBlock(clipRegion.getRight() - frameDistance, clipRegion.getRight(), clipRegion.getTop() + 2 * frameDistance,
+                clipRegion.getTop() + 2 * frameDistance + doubleVertexDistance);
 
         // Fixup Bottom
-        fillBlock(clipRegion.getLeft() + 2 * frameDistance, clipRegion.getLeft() + 2 * frameDistance
-                + doubleVertexDistance, clipRegion.getBottom() - frameDistance, clipRegion.getBottom());
+        fillBlock(clipRegion.getLeft() + 2 * frameDistance,
+                clipRegion.getLeft() + 2 * frameDistance + doubleVertexDistance, clipRegion.getBottom() - frameDistance,
+                clipRegion.getBottom());
 
         if (nextFinerLevel != null) {
             if ((nextFinerLevel.clipRegion.getX() - clipRegion.getX()) / vertexDistance == frameSize) {
@@ -392,21 +393,22 @@ public class ClipmapLevel extends Mesh {
                     fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getRight() - frameDistance,
                             clipRegion.getTop() + frameDistance, clipRegion.getTop() + frameDistance + vertexDistance);
                     // Left
-                    fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getLeft() + frameDistance
-                            + vertexDistance, clipRegion.getTop() + frameDistance + vertexDistance,
+                    fillBlock(clipRegion.getLeft() + frameDistance,
+                            clipRegion.getLeft() + frameDistance + vertexDistance,
+                            clipRegion.getTop() + frameDistance + vertexDistance,
                             clipRegion.getBottom() - frameDistance);
                 } else {
                     // Lower Left L Shape
 
                     // Left
-                    fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getLeft() + frameDistance
-                            + vertexDistance, clipRegion.getTop() + frameDistance, clipRegion.getBottom()
-                            - frameDistance - vertexDistance);
+                    fillBlock(clipRegion.getLeft() + frameDistance,
+                            clipRegion.getLeft() + frameDistance + vertexDistance, clipRegion.getTop() + frameDistance,
+                            clipRegion.getBottom() - frameDistance - vertexDistance);
 
                     // Bottom
                     fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getRight() - frameDistance,
-                            clipRegion.getBottom() - frameDistance - vertexDistance, clipRegion.getBottom()
-                            - frameDistance);
+                            clipRegion.getBottom() - frameDistance - vertexDistance,
+                            clipRegion.getBottom() - frameDistance);
                 }
             } else {
                 if ((nextFinerLevel.clipRegion.getY() - clipRegion.getY()) / vertexDistance == frameSize) {
@@ -416,21 +418,21 @@ public class ClipmapLevel extends Mesh {
                     fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getRight() - frameDistance,
                             clipRegion.getTop() + frameDistance, clipRegion.getTop() + frameDistance + vertexDistance);
                     // Right
-                    fillBlock(clipRegion.getRight() - frameDistance - vertexDistance, clipRegion.getRight()
-                            - frameDistance, clipRegion.getTop() + frameDistance + vertexDistance,
+                    fillBlock(clipRegion.getRight() - frameDistance - vertexDistance,
+                            clipRegion.getRight() - frameDistance, clipRegion.getTop() + frameDistance + vertexDistance,
                             clipRegion.getBottom() - frameDistance);
                 } else {
                     // Lower Right L Shape
 
                     // Right
-                    fillBlock(clipRegion.getRight() - frameDistance - vertexDistance, clipRegion.getRight()
-                            - frameDistance, clipRegion.getTop() + frameDistance, clipRegion.getBottom()
-                            - frameDistance - vertexDistance);
+                    fillBlock(clipRegion.getRight() - frameDistance - vertexDistance,
+                            clipRegion.getRight() - frameDistance, clipRegion.getTop() + frameDistance,
+                            clipRegion.getBottom() - frameDistance - vertexDistance);
 
                     // Bottom
                     fillBlock(clipRegion.getLeft() + frameDistance, clipRegion.getRight() - frameDistance,
-                            clipRegion.getBottom() - frameDistance - vertexDistance, clipRegion.getBottom()
-                            - frameDistance);
+                            clipRegion.getBottom() - frameDistance - vertexDistance,
+                            clipRegion.getBottom() - frameDistance);
                 }
             }
         }
@@ -450,14 +452,16 @@ public class ClipmapLevel extends Mesh {
                     clipRegion.getTop() + frameDistance + clipSideSize / 2, clipRegion.getBottom() - frameDistance);
         }
 
-        final IndexBufferData<?> indices = getMeshData().getIndices();
+        final MeshData meshData = getMeshData();
+        final IndexBufferData<?> indices = meshData.getIndices();
         indices.clear();
         indices.put(tmpIndices, 0, getStripIndex());
         indices.flip();
+        meshData.markIndicesDirty();
     }
 
     /**
-     * Fills a specified area to indexarray. This will be added only after a bounding test pass.
+     * Does a quick frustum check, then fills a specified area of our indices.
      *
      * @param left
      * @param right

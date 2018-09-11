@@ -10,14 +10,12 @@
 
 package com.ardor3d.extension.terrain.client;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
@@ -35,11 +33,8 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -60,11 +55,11 @@ public class TextureClipmap {
     private float scale = 1f;
 
     private Texture3D textureClipmap;
-    private ShaderState textureClipmapShader;
 
     private final List<LevelData> levelDataList = Lists.newArrayList();
 
     private final FloatBuffer sliceDataBuffer;
+    private final FloatBuffer sliceDataCopy;
 
     private final Vector3 eyePosition = new Vector3();
 
@@ -123,6 +118,7 @@ public class TextureClipmap {
         TextureClipmap.logger.info("3D Texture depth: " + textureLevels);
 
         sliceDataBuffer = BufferUtils.createFloatBuffer(textureLevels * 2);
+        sliceDataCopy = BufferUtils.createFloatBuffer(textureLevels * 2);
 
         for (int i = 0; i < validLevels; i++) {
             levelDataList.add(new LevelData(i, textureSize));
@@ -133,13 +129,26 @@ public class TextureClipmap {
 
     private final List<Long> timers = Lists.newArrayList();
 
-    public void update(final Renderer renderer, final ReadOnlyVector3 position) {
+    public void prepareToDrawClips(final Terrain terrain) {
+        sliceDataCopy.clear();
+        sliceDataCopy.put(sliceDataBuffer);
+        terrain.setProperty("sliceOffset", sliceDataBuffer.clear());
+
+        terrain.setProperty("minLevel", currentShownLevels);
+        terrain.setProperty("scale", 1f / getScale());
+        terrain.setProperty("textureSize", (float) getTextureSize());
+        terrain.setProperty("texelSize", 1f / getTextureSize());
+        terrain.setProperty("levels", (float) getTextureLevels());
+        terrain.setProperty("validLevels", (float) getValidLevels() - 1);
+        terrain.setProperty("showDebug", isShowDebug() ? 1.0f : 0.0f);
+    }
+
+    public void update(final Renderer renderer, final ReadOnlyVector3 eyePos) {
         if (!isEnabled()) {
             return;
         }
 
-        eyePosition.set(position);
-        textureClipmapShader.setUniform("eyePosition", eyePosition);
+        eyePosition.set(eyePos);
         eyePosition.multiplyLocal(textureSize / (scale * 4f * 32f));
 
         for (int unit = minVisibleLevel; unit < validLevels; unit++) {
@@ -161,8 +170,6 @@ public class TextureClipmap {
         // }
         // }
         // }
-
-        textureClipmapShader.setUniform("minLevel", (float) currentShownLevels);
 
         if (timers.size() < currentShownLevels) {
             for (int unit = 0; unit < currentShownLevels; unit++) {
@@ -243,7 +250,6 @@ public class TextureClipmap {
         }
 
         sliceDataBuffer.rewind();
-        textureClipmapShader.setUniform("sliceOffset", sliceDataBuffer, 2);
 
         updateFromMailbox(renderer);
     }
@@ -327,8 +333,8 @@ public class TextureClipmap {
 
                 // TODO: only update subpart
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, 0, unit, textureSize, textureSize, 1,
-                        imageDestination, 0, 0, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, 0, unit, textureSize, textureSize,
+                        1, imageDestination, 0, 0, 0, textureSize, textureSize);
             }
         }
         updateTimer %= updateThreshold;
@@ -407,8 +413,8 @@ public class TextureClipmap {
             cache.updateRegion(imageDestination, sX, sY, dX, dY, width, height);
 
             imageDestination.rewind();
-            renderer.updateTexture3DSubImage(textureClipmap, 0, 0, unit, textureSize, textureSize, 1, imageDestination,
-                    0, 0, 0, textureSize, textureSize);
+            renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, 0, unit, textureSize, textureSize, 1,
+                    imageDestination, 0, 0, 0, textureSize, textureSize);
         } else if (diffX != 0 && diffY != 0) {
             // Copy three rectangles. Horizontal, vertical and corner
 
@@ -431,19 +437,19 @@ public class TextureClipmap {
                 int width1 = textureSize - dX;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
                         imageDestination, dX1, 0, 0, textureSize, textureSize);
 
                 dX1 = 0;
                 width1 = width - width1;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
                         imageDestination, dX1, 0, 0, textureSize, textureSize);
             } else {
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX, 0, unit, width, textureSize, 1, imageDestination,
-                        dX, 0, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, dX, 0, unit, width, textureSize, 1,
+                        imageDestination, dX, 0, 0, textureSize, textureSize);
             }
 
             sX = tmpSX;
@@ -465,19 +471,19 @@ public class TextureClipmap {
                 int height1 = textureSize - dY;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1, 1,
-                        imageDestination, 0, dY1, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1,
+                        1, imageDestination, 0, dY1, 0, textureSize, textureSize);
 
                 dY1 = 0;
                 height1 = height - height1;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1, 1,
-                        imageDestination, 0, dY1, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1,
+                        1, imageDestination, 0, dY1, 0, textureSize, textureSize);
             } else {
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, dY, unit, textureSize, height, 1, imageDestination,
-                        0, dY, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, dY, unit, textureSize, height, 1,
+                        imageDestination, 0, dY, 0, textureSize, textureSize);
             }
         } else if (diffX != 0) {
             // Copy vertical only
@@ -495,19 +501,19 @@ public class TextureClipmap {
                 int width1 = textureSize - dX;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
                         imageDestination, dX1, 0, 0, textureSize, textureSize);
 
                 dX1 = 0;
                 width1 = width - width1;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
                         imageDestination, dX1, 0, 0, textureSize, textureSize);
             } else {
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX, 0, unit, width, textureSize, 1, imageDestination,
-                        dX, 0, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, dX, 0, unit, width, textureSize, 1,
+                        imageDestination, dX, 0, 0, textureSize, textureSize);
             }
         } else if (diffY != 0) {
             // Copy horizontal only
@@ -525,60 +531,25 @@ public class TextureClipmap {
                 int height1 = textureSize - dY;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1, 1,
-                        imageDestination, 0, dY1, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1,
+                        1, imageDestination, 0, dY1, 0, textureSize, textureSize);
 
                 dY1 = 0;
                 height1 = height - height1;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1, 1,
-                        imageDestination, 0, dY1, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, dY1, unit, textureSize, height1,
+                        1, imageDestination, 0, dY1, 0, textureSize, textureSize);
             } else {
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, 0, dY, unit, textureSize, height, 1, imageDestination,
-                        0, dY, 0, textureSize, textureSize);
+                renderer.getTextureUtils().updateTexture3DSubImage(textureClipmap, 0, dY, unit, textureSize, height, 1,
+                        imageDestination, 0, dY, 0, textureSize, textureSize);
             }
         }
     }
 
     public Texture getTexture() {
         return textureClipmap;
-    }
-
-    public void reloadShader() {
-        textureClipmapShader = new ShaderState();
-        try {
-            textureClipmapShader.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
-                    TextureClipmap.class, "com/ardor3d/extension/terrain/textureClipmapShader.vert"));
-            textureClipmapShader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
-                    TextureClipmap.class, "com/ardor3d/extension/terrain/textureClipmapShader.frag"));
-        } catch (final IOException ex) {
-            TextureClipmap.logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.",
-                    ex);
-        }
-        textureClipmapShader.setUniform("texture", 0);
-
-        textureClipmapShader.setUniform("scale", 1f / scale);
-        textureClipmapShader.setUniform("textureSize", (float) textureSize);
-        textureClipmapShader.setUniform("texelSize", 1f / textureSize);
-
-        textureClipmapShader.setUniform("levels", (float) textureLevels);
-        textureClipmapShader.setUniform("validLevels", (float) validLevels - 1);
-        textureClipmapShader.setUniform("minLevel", 0f);
-
-        textureClipmapShader.setUniform("showDebug", showDebug ? 1.0f : 0.0f);
-    }
-
-    public ShaderState getShaderState() {
-        if (textureClipmapShader == null) {
-            reloadShader();
-        }
-        return textureClipmapShader;
-    }
-
-    public void setShaderState(final ShaderState textureClipmapShader) {
-        this.textureClipmapShader = textureClipmapShader;
     }
 
     public static int clamp(final int x, final int low, final int high) {
@@ -589,8 +560,6 @@ public class TextureClipmap {
         textureClipmap = new Texture3D();
         textureClipmap.setMinificationFilter(MinificationFilter.NearestNeighborNoMipMaps);
         textureClipmap.setMagnificationFilter(MagnificationFilter.NearestNeighbor);
-        // textureClipmap.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
-        // textureClipmap.setMagnificationFilter(MagnificationFilter.Bilinear);
         final Image img = new Image();
         img.setWidth(textureSize);
         img.setHeight(textureSize);

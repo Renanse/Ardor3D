@@ -1,0 +1,41 @@
+--- # Material
+name: skinned mesh
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - 
+            shaderKey: eyePosition
+            type: Float3
+            source: SpatialProperty
+          - 
+            shaderKey: scale
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: vertexDistance
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: clipSideSize
+            type: Float1
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            source: clipmap/terrain.vert
+
+          Fragment:
+            program: |
+                #version 330 core
+
+                out vec4 FragColor;
+                
+                void main()
+                {
+                    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+                }
