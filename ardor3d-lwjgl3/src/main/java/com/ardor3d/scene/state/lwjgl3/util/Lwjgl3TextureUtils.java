@@ -12,6 +12,7 @@ package com.ardor3d.scene.state.lwjgl3.util;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.lwjgl.opengl.ARBShadow;
 import org.lwjgl.opengl.EXTTextureCompressionLATC;
@@ -36,15 +37,18 @@ import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.texture.ITextureUtils;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
+import com.ardor3d.util.Ardor3dException;
 
 public class Lwjgl3TextureUtils implements ITextureUtils {
 
+    private static final Logger logger = Logger.getLogger(Lwjgl3TextureUtils.class.getName());
+
     @Override
     public void loadTexture(final Texture texture, final int unit) {
-        // TODO Auto-generated method stub
-
+        Lwjgl3TextureStateUtil.load(texture, unit);
     }
 
     @Override
@@ -54,23 +58,21 @@ public class Lwjgl3TextureUtils implements ITextureUtils {
 
     @Override
     public void deleteTextureIds(final Collection<Integer> ids) {
-        // TODO Auto-generated method stub
-
+        Lwjgl3TextureStateUtil.deleteTextureIds(ids);
     }
 
     @Override
     public void updateTexture1DSubImage(final Texture1D destination, final int dstOffsetX, final int dstWidth,
             final ByteBuffer source, final int srcOffsetX) {
-        // TODO Auto-generated method stub
-
+        updateTexSubImage(destination, dstOffsetX, 0, 0, dstWidth, 0, 0, source, srcOffsetX, 0, 0, 0, 0, null);
     }
 
     @Override
     public void updateTexture2DSubImage(final Texture2D destination, final int dstOffsetX, final int dstOffsetY,
             final int dstWidth, final int dstHeight, final ByteBuffer source, final int srcOffsetX,
             final int srcOffsetY, final int srcTotalWidth) {
-        // TODO Auto-generated method stub
-
+        updateTexSubImage(destination, dstOffsetX, dstOffsetY, 0, dstWidth, dstHeight, 0, source, srcOffsetX,
+                srcOffsetY, 0, srcTotalWidth, 0, null);
     }
 
     @Override
@@ -78,16 +80,146 @@ public class Lwjgl3TextureUtils implements ITextureUtils {
             final int dstOffsetZ, final int dstWidth, final int dstHeight, final int dstDepth, final ByteBuffer source,
             final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
             final int srcTotalHeight) {
-        // TODO Auto-generated method stub
-
+        updateTexSubImage(destination, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight, dstDepth, source,
+                srcOffsetX, srcOffsetY, srcOffsetZ, srcTotalWidth, srcTotalHeight, null);
     }
 
     @Override
     public void updateTextureCubeMapSubImage(final TextureCubeMap destination, final Face dstFace, final int dstOffsetX,
             final int dstOffsetY, final int dstWidth, final int dstHeight, final ByteBuffer source,
             final int srcOffsetX, final int srcOffsetY, final int srcTotalWidth) {
-        // TODO Auto-generated method stub
+        updateTexSubImage(destination, dstOffsetX, dstOffsetY, 0, dstWidth, dstHeight, 0, source, srcOffsetX,
+                srcOffsetY, 0, srcTotalWidth, 0, dstFace);
+    }
 
+    private void updateTexSubImage(final Texture destination, final int dstOffsetX, final int dstOffsetY,
+            final int dstOffsetZ, final int dstWidth, final int dstHeight, final int dstDepth, final ByteBuffer source,
+            final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
+            final int srcTotalHeight, final Face dstFace) {
+
+        // Ignore textures that do not have an id set
+        if (destination.getTextureIdForContext(ContextManager.getCurrentContext()) == 0) {
+            logger.warning("Attempting to update a texture that is not currently on the card.");
+            return;
+        }
+
+        // Determine the original texture configuration, so that this method can
+        // restore the texture configuration to its original state.
+        final int origAlignment = GL11C.glGetInteger(GL11C.GL_UNPACK_ALIGNMENT);
+        final int origRowLength = 0;
+        final int origImageHeight = 0;
+        final int origSkipPixels = 0;
+        final int origSkipRows = 0;
+        final int origSkipImages = 0;
+
+        final int alignment = 1;
+
+        int rowLength;
+        if (srcTotalWidth == dstWidth) {
+            // When the row length is zero, then the width parameter is used.
+            // We use zero in these cases in the hope that we can avoid two
+            // unnecessary calls to glPixelStorei.
+            rowLength = 0;
+        } else {
+            // The number of pixels in a row is different than the number of
+            // pixels in the region to be uploaded to the texture.
+            rowLength = srcTotalWidth;
+        }
+
+        int imageHeight;
+        if (srcTotalHeight == dstHeight) {
+            // When the image height is zero, then the height parameter is used.
+            // We use zero in these cases in the hope that we can avoid two
+            // unnecessary calls to glPixelStorei.
+            imageHeight = 0;
+        } else {
+            // The number of pixels in a row is different than the number of
+            // pixels in the region to be uploaded to the texture.
+            imageHeight = srcTotalHeight;
+        }
+
+        // Grab pixel format
+        final int pixelFormat;
+        if (destination.getImage() != null) {
+            pixelFormat = Lwjgl3TextureUtils.getGLPixelFormat(destination.getImage().getDataFormat());
+        } else {
+            pixelFormat = Lwjgl3TextureUtils.getGLPixelFormatFromStoreFormat(destination.getTextureStoreFormat());
+        }
+
+        // bind...
+        Lwjgl3TextureStateUtil.doTextureBind(destination, 0, false);
+
+        // Update the texture configuration (when necessary).
+
+        if (origAlignment != alignment) {
+            GL11C.glPixelStorei(GL11C.GL_UNPACK_ALIGNMENT, alignment);
+        }
+        if (origRowLength != rowLength) {
+            GL11C.glPixelStorei(GL11C.GL_UNPACK_ROW_LENGTH, rowLength);
+        }
+        if (origSkipPixels != srcOffsetX) {
+            GL11C.glPixelStorei(GL11C.GL_UNPACK_SKIP_PIXELS, srcOffsetX);
+        }
+        // NOTE: The below will be skipped for texture types that don't support them because we are passing in 0's.
+        if (origSkipRows != srcOffsetY) {
+            GL11C.glPixelStorei(GL11C.GL_UNPACK_SKIP_ROWS, srcOffsetY);
+        }
+        if (origImageHeight != imageHeight) {
+            GL11C.glPixelStorei(GL12C.GL_UNPACK_IMAGE_HEIGHT, imageHeight);
+        }
+        if (origSkipImages != srcOffsetZ) {
+            GL11C.glPixelStorei(GL12C.GL_UNPACK_SKIP_IMAGES, srcOffsetZ);
+        }
+
+        // Upload the image region into the texture.
+        try {
+            switch (destination.getType()) {
+                case TwoDimensional:
+                    GL11C.glTexSubImage2D(GL11C.GL_TEXTURE_2D, 0, dstOffsetX, dstOffsetY, dstWidth, dstHeight,
+                            pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
+                    break;
+                case OneDimensional:
+                    GL11C.glTexSubImage1D(GL11C.GL_TEXTURE_1D, 0, dstOffsetX, dstWidth, pixelFormat,
+                            GL11C.GL_UNSIGNED_BYTE, source);
+                    break;
+                case ThreeDimensional:
+                    GL12C.glTexSubImage3D(GL12C.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth,
+                            dstHeight, dstDepth, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
+                    break;
+                case CubeMap:
+                    GL11C.glTexSubImage2D(Lwjgl3TextureStateUtil.getGLCubeMapFace(dstFace), 0, dstOffsetX, dstOffsetY,
+                            dstWidth, dstHeight, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
+                    break;
+                default:
+                    throw new Ardor3dException("Unsupported type for updateTextureSubImage: " + destination.getType());
+            }
+        } finally {
+            // Restore the texture configuration (when necessary)...
+            // Restore alignment.
+            if (origAlignment != alignment) {
+                GL11C.glPixelStorei(GL11C.GL_UNPACK_ALIGNMENT, origAlignment);
+            }
+            // Restore row length.
+            if (origRowLength != rowLength) {
+                GL11C.glPixelStorei(GL11C.GL_UNPACK_ROW_LENGTH, origRowLength);
+            }
+            // Restore skip pixels.
+            if (origSkipPixels != srcOffsetX) {
+                GL11C.glPixelStorei(GL11C.GL_UNPACK_SKIP_PIXELS, origSkipPixels);
+            }
+            // Restore skip rows.
+            if (origSkipRows != srcOffsetY) {
+                GL11C.glPixelStorei(GL11C.GL_UNPACK_SKIP_ROWS, origSkipRows);
+            }
+            // Restore image height.
+            if (origImageHeight != imageHeight) {
+                GL11C.glPixelStorei(GL12C.GL_UNPACK_IMAGE_HEIGHT, origImageHeight);
+            }
+            // Restore skip images.
+            if (origSkipImages != srcOffsetZ) {
+                GL11C.glPixelStorei(GL12C.GL_UNPACK_SKIP_IMAGES, origSkipImages);
+            }
+        }
     }
 
     public static int getGLInternalFormat(final TextureStoreFormat format) {
