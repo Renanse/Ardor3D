@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 public abstract class RenderState implements Savable {
 
     public enum StateType {
-        Blend, Fog, Light, Material, Shading, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Clip, Offset;
+        Blend, Fog, Light, Material, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Clip, Offset;
 
         // cached
         public static StateType[] values = values();
@@ -78,7 +78,6 @@ public abstract class RenderState implements Savable {
         _quickCompare.add(StateType.Blend);
         _quickCompare.add(StateType.Fog);
         _quickCompare.add(StateType.Material);
-        _quickCompare.add(StateType.Shading);
         _quickCompare.add(StateType.ZBuffer);
         _quickCompare.add(StateType.Cull);
         _quickCompare.add(StateType.ColorMask);
@@ -252,8 +251,6 @@ public abstract class RenderState implements Savable {
                 return new MaterialState();
             case Offset:
                 return new OffsetState();
-            case Shading:
-                return new ShadingState();
             case Stencil:
                 return new StencilState();
             case Texture:

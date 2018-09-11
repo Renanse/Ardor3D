@@ -378,8 +378,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             case Light:
             case Fog:
             case Clip:
-            case Material:
-            case Shading: {
+            case Material: {
                 final RenderContext context = ContextManager.getCurrentContext();
                 context.setCurrentState(state.getType(), state);
                 return;
