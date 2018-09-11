@@ -593,9 +593,8 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     public int setupBufferObject(final AbstractBufferData<? extends Buffer> buffer, final boolean isEBO,
             final RenderContext context) {
 
-        final Object glContextRep = context.getGlContextRep();
-        int id = buffer.getBufferId(glContextRep);
-        if (id != 0 && buffer.isBufferClean(glContextRep)) {
+        int id = buffer.getBufferId(context);
+        if (id != 0 && buffer.isBufferClean(context)) {
             return id;
         }
 
@@ -607,7 +606,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
             if (newBuffer) {
                 id = GL15C.glGenBuffers();
-                buffer.setBufferId(glContextRep, id);
+                buffer.setBufferId(context, id);
             }
 
             final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
@@ -627,7 +626,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 GL15C.glBufferSubData(target, 0, (ShortBuffer) dataBuffer);
             }
 
-            buffer.markClean(glContextRep);
+            buffer.markClean(context);
 
         } else {
             throw new Ardor3dException("Attempting to create a buffer object with no Buffer value.");
@@ -696,7 +695,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
             return;
         }
 
-        final int id = buffer.removeBufferId(ContextManager.getCurrentContext().getGlContextRep());
+        final int id = buffer.removeBufferId(ContextManager.getCurrentContext());
         if (id == 0) {
             // Not on card... return.
             return;
@@ -728,7 +727,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
             return;
         }
 
-        final int id = data.removeVAOID(ContextManager.getCurrentContext().getGlContextRep());
+        final int id = data.removeVAOID(ContextManager.getCurrentContext());
         if (id == 0) {
             // Not on card... return.
             return;

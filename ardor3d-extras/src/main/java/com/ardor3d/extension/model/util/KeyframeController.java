@@ -402,7 +402,8 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
             dstInds.put(srcInds);
             dstInds.flip();
-            srcInds.markDirty();
+            dstMeshData.markIndicesDirty();
+
         }
         if (srcMeshData.getTextureCoords(0) != null) {
             FloatBuffer dstTexs = dstMeshData.getTextureCoords(0).getBuffer();

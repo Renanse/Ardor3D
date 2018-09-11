@@ -117,7 +117,7 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         indices.put(13).put(12).put(9).put(8).put(5).put(4);
         _meshData.setIndexLengths(new int[] { 4, 6, 6, 6, 6 });
         _meshData.setIndexMode(IndexMode.TriangleStrip);
-        indices.markDirty();
+        _meshData.markIndicesDirty();
     }
 
     private void setTextureData() {

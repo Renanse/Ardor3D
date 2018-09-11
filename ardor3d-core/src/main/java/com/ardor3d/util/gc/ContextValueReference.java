@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ardor3d.renderer.RenderContext.RenderContextRef;
 import com.ardor3d.util.Constants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -35,7 +36,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
      */
     private static final List<ContextValueReference<?, ?>> REFS = Lists.newLinkedList();
 
-    private final Map<Object, U> _valueCache;
+    private final Map<RenderContextRef, U> _valueCache;
     private U _singleContextValue;
 
     public ContextValueReference(final T reference, final ReferenceQueue<? super T> queue) {
@@ -48,7 +49,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
         REFS.add(this);
     }
 
-    public boolean containsKey(final Object glContext) {
+    public boolean containsKey(final RenderContextRef glContext) {
         if (Constants.useMultipleContexts) {
             return _valueCache.containsKey(glContext);
         } else {
@@ -56,7 +57,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
         }
     }
 
-    public U getValue(final Object glContext) {
+    public U getValue(final RenderContextRef glContext) {
         if (Constants.useMultipleContexts) {
             return _valueCache.get(glContext);
         } else {
@@ -64,7 +65,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
         }
     }
 
-    public U removeValue(final Object glContext) {
+    public U removeValue(final RenderContextRef glContext) {
         if (Constants.useMultipleContexts) {
             return _valueCache.remove(glContext);
         } else {
@@ -74,7 +75,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
         }
     }
 
-    public void put(final Object glContext, final U value) {
+    public void put(final RenderContextRef glContext, final U value) {
         if (Constants.useMultipleContexts) {
             _valueCache.put(glContext, value);
         } else {
@@ -82,7 +83,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
         }
     }
 
-    public Set<Object> getContextObjects() {
+    public Set<RenderContextRef> getContextRefs() {
         if (Constants.useMultipleContexts) {
             return _valueCache.keySet();
         } else {

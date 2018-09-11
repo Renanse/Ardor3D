@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -12,6 +12,7 @@ package com.ardor3d.util;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.RenderContext.RenderContextRef;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -56,15 +58,15 @@ final public class TextureKey implements Savable {
     protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
 
     /**
-     * In multi-context rendering, this is used to track if this texture is in need of updating. An entry in this list
-     * means yes for the given Object (usually a RenderContext's glContextRep).
+     * list of OpenGL contexts we believe have up to date values from all buffers and indices. For use in multi-context
+     * mode.
      */
-    private final List<WeakReference<Object>> _dirtyContexts;
+    protected transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
 
     /**
      * In single-context rendering this is used to track if this texture is in need of updating.
      */
-    private boolean _dirty;
+    private boolean _uploaded;
 
     /** cache of OpenGL context specific texture ids for the associated texture. */
     protected final transient ContextValueReference<TextureKey, Integer> _idCache = ContextValueReference
@@ -84,9 +86,7 @@ final public class TextureKey implements Savable {
     /** DO NOT USE. FOR INTERNAL USE ONLY */
     protected TextureKey() {
         if (Constants.useMultipleContexts) {
-            _dirtyContexts = Lists.newArrayList();
-        } else {
-            _dirtyContexts = null;
+            _uploadedContexts = new HashSet<>();
         }
     }
 
@@ -95,71 +95,56 @@ final public class TextureKey implements Savable {
         return new TextureKey();
     }
 
-    public void setDirty() {
+    public void markDirty() {
         if (Constants.useMultipleContexts) {
-            synchronized (_dirtyContexts) {
-                _dirtyContexts.clear();
-                // grab all contexts we currently have ids for and add them all as dirty
-                for (final Object context : _idCache.getContextObjects()) {
-                    final WeakReference<Object> ref = new WeakReference<Object>(context);
-                    _dirtyContexts.add(ref);
-                }
+            synchronized (_uploadedContexts) {
+                _uploadedContexts.clear();
             }
         } else {
-            _dirty = true;
+            _uploaded = false;
         }
     }
 
-    public boolean isDirty(final Object glContext) {
+    public boolean isDirty(final RenderContext context) {
         if (Constants.useMultipleContexts) {
-            synchronized (_dirtyContexts) {
+            synchronized (_uploadedContexts) {
                 // check if we are empty...
-                if (_dirtyContexts.isEmpty()) {
-                    return false;
-                } else {
-                    WeakReference<Object> ref;
-                    Object check;
-                    // look for a matching reference
-                    for (final Iterator<WeakReference<Object>> it = _dirtyContexts.iterator(); it.hasNext();) {
-                        ref = it.next();
-                        check = ref.get();
-                        if (check == null) {
-                            // found empty, clean up
-                            it.remove();
-                            continue;
-                        }
+                if (_uploadedContexts.isEmpty()) {
+                    return true;
+                }
 
-                        if (check.equals(glContext)) {
-                            // found match, return true
-                            return true;
-                        }
+                WeakReference<RenderContextRef> ref;
+                RenderContextRef check;
+                // look for a matching reference and clean out all weak references that have expired
+                boolean uploaded = false;
+                for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
+                    ref = it.next();
+                    check = ref.get();
+                    if (check == null) {
+                        // found empty, clean up
+                        it.remove();
+                        continue;
+                    }
+
+                    if (!uploaded && check.equals(context.getGlContextRef())) {
+                        // found match, return false
+                        uploaded = true;
                     }
                 }
-                return false;
+                return !uploaded;
             }
         } else {
-            return _dirty;
+            return !_uploaded;
         }
     }
 
-    public void setClean(final Object glContext) {
+    public void markClean(final RenderContext context) {
         if (Constants.useMultipleContexts) {
-            synchronized (_dirtyContexts) {
-                if (!_dirtyContexts.isEmpty()) {
-                    WeakReference<Object> ref;
-                    Object check;
-                    for (final Iterator<WeakReference<Object>> it = _dirtyContexts.iterator(); it.hasNext();) {
-                        ref = it.next();
-                        check = ref.get();
-                        if (check != null && check.equals(glContext)) {
-                            it.remove();
-                            return;
-                        }
-                    }
-                }
+            synchronized (_uploadedContexts) {
+                _uploadedContexts.add(new WeakReference<>(context.getGlContextRef()));
             }
         } else {
-            _dirty = false;
+            _uploaded = true;
         }
     }
 
@@ -235,14 +220,23 @@ final public class TextureKey implements Savable {
     }
 
     /**
-     * @param glContext
-     *            the object representing the OpenGL context a texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context a texture belongs to.
      * @return the texture id of a texture in the given context. If the texture is not found in the given context, 0 is
      *         returned.
      */
-    public Integer getTextureIdForContext(final Object glContext) {
-        final Integer id = _idCache.getValue(glContext);
+    public Integer getTextureIdForContext(final RenderContext context) {
+        return getTextureIdForContextRef(context.getGlContextRef());
+    }
+
+    /**
+     * @param context
+     *            the reference to a shared OpenGL context that a texture belongs to.
+     * @return the texture id of a texture in the given context. If the texture is not found in the given context, 0 is
+     *         returned.
+     */
+    public Integer getTextureIdForContextRef(final RenderContextRef contextRef) {
+        final Integer id = _idCache.getValue(contextRef);
         if (id != null) {
             return id;
         }
@@ -252,8 +246,8 @@ final public class TextureKey implements Savable {
     /**
      * @return a Set of context objects that currently reference this texture.
      */
-    public Set<Object> getContextObjects() {
-        return _idCache.getContextObjects();
+    public Set<RenderContextRef> getContextRefs() {
+        return _idCache.getContextRefs();
     }
 
     /**
@@ -265,12 +259,29 @@ final public class TextureKey implements Savable {
      * from the card.
      * </p>
      *
-     * @param glContext
-     *            the object representing the OpenGL context this texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context this texture belongs to.
+     * @return the id removed, or 0 if not found.
      */
-    public void removeFromIdCache(final Object glContext) {
-        _idCache.removeValue(glContext);
+    public int removeFromIdCache(final RenderContext context) {
+        final Integer id = _idCache.removeValue(context.getGlContextRef());
+        if (Constants.useMultipleContexts) {
+            synchronized (_uploadedContexts) {
+                WeakReference<RenderContextRef> ref;
+                RenderContextRef check;
+                for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
+                    ref = it.next();
+                    check = ref.get();
+                    if (check == null || check.equals(context.getGlContextRef())) {
+                        it.remove();
+                        continue;
+                    }
+                }
+            }
+        } else {
+            _uploaded = false;
+        }
+        return id != null ? id.intValue() : 0;
     }
 
     /**
@@ -282,27 +293,27 @@ final public class TextureKey implements Savable {
      * from the card.
      * </p>
      */
-    public void removeFromIdCache() {
+    public void clearIdCache() {
         _idCache.clear();
+        markDirty();
     }
 
     /**
      * Sets the id for a texture in regards to the given OpenGL context.
      *
-     * @param glContext
-     *            the object representing the OpenGL context a texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context a texture belongs to.
      * @param textureId
      *            the texture id of a texture. To be valid, this must not be 0.
      * @throws IllegalArgumentException
      *             if textureId is equal to 0.
      */
-    public void setTextureIdForContext(final Object glContext, final int textureId) {
+    public void setTextureIdForContext(final RenderContext context, final int textureId) {
         if (textureId == 0) {
             throw new IllegalArgumentException("textureId must != 0");
         }
 
-        _idCache.put(glContext, textureId);
+        _idCache.put(context.getGlContextRef(), textureId);
     }
 
     @Override

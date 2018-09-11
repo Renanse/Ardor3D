@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -304,40 +304,37 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * @param glContext
-     *            the object representing the OpenGL context this texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context this texture belongs to.
      * @return the texture id of this texture in the given context. If the texture is not found in the given context, 0
      *         is returned.
      */
-    public int getTextureIdForContext(final Object glContext) {
-        return _key.getTextureIdForContext(glContext);
+    public int getTextureIdForContext(final RenderContext context) {
+        return _key.getTextureIdForContext(context);
     }
 
     /**
-     * @param glContext
-     *            the object representing the OpenGL context this texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context this texture belongs to.
      * @return the texture id of this texture in the given context as an Integer object. If the texture is not found in
      *         the given context, a 0 integer is returned.
      */
-    public Integer getTextureIdForContextAsInteger(final Object glContext) {
-        return _key.getTextureIdForContext(glContext);
+    public Integer getTextureIdForContextAsInteger(final RenderContext context) {
+        return _key.getTextureIdForContext(context);
     }
 
     /**
      * Sets the id for this texture in regards to the given OpenGL context.
      *
-     * @param glContext
-     *            the object representing the OpenGL context this texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context this texture belongs to.
      * @param textureId
      *            the texture id of this texture. To be valid, this must be greater than 0.
      * @throws IllegalArgumentException
      *             if textureId is less than or equal to 0.
      */
-    public void setTextureIdForContext(final Object glContext, final int textureId) {
-        _key.setTextureIdForContext(glContext, textureId);
+    public void setTextureIdForContext(final RenderContext context, final int textureId) {
+        _key.setTextureIdForContext(context, textureId);
     }
 
     /**
@@ -349,12 +346,12 @@ public abstract class Texture implements Savable {
      * from the card.
      * </p>
      *
-     * @param glContext
-     *            the object representing the OpenGL context this texture belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context this texture belongs to.
+     * @return the id removed, or 0 if not found.
      */
-    public void removeFromIdCache(final Object glContext) {
-        _key.removeFromIdCache(glContext);
+    public int removeFromIdCache(final RenderContext context) {
+        return _key.removeFromIdCache(context);
     }
 
     /**
@@ -540,12 +537,12 @@ public abstract class Texture implements Savable {
 
     public void setDirty() {
         if (_key != null) {
-            _key.setDirty();
+            _key.markDirty();
         }
     }
 
-    public boolean isDirty(final Object glContext) {
-        return _key.isDirty(glContext);
+    public boolean isDirty(final RenderContext context) {
+        return _key.isDirty(context);
     }
 
     @Override

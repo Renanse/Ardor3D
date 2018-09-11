@@ -80,7 +80,7 @@ public abstract class Lwjgl3TextureStateUtil {
         if (cached == null) {
             TextureManager.addToCache(texture);
         } else {
-            final int textureId = cached.getTextureIdForContext(context.getGlContextRep());
+            final int textureId = cached.getTextureIdForContext(context);
             if (textureId != 0) {
                 doTextureBind(cached, unit, false);
                 return;
@@ -94,7 +94,7 @@ public abstract class Lwjgl3TextureStateUtil {
         final int textureId = id.get(0);
 
         // store the new id by our current gl context.
-        texture.setTextureIdForContext(context.getGlContextRep(), textureId);
+        texture.setTextureIdForContext(context, textureId);
 
         update(texture, unit);
     }
@@ -106,7 +106,7 @@ public abstract class Lwjgl3TextureStateUtil {
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
 
-        texture.getTextureKey().setClean(context.getGlContextRep());
+        texture.getTextureKey().markClean(context);
 
         // our texture type:
         final Texture.Type type = texture.getType();
@@ -136,13 +136,15 @@ public abstract class Lwjgl3TextureStateUtil {
 
             if (actualWidth > maxSize || actualHeight > maxSize) {
                 if (actualWidth > maxSize || actualHeight > maxSize) {
-                    logger.warning("(card unsupported) Attempted to apply texture with size bigger than max texture size ["
-                            + maxSize + "]: " + image.getWidth() + " x " + image.getHeight());
+                    logger.warning(
+                            "(card unsupported) Attempted to apply texture with size bigger than max texture size ["
+                                    + maxSize + "]: " + image.getWidth() + " x " + image.getHeight());
                     return;
                 }
             }
 
-            if (!texture.getMinificationFilter().usesMipMapLevels() && !texture.getTextureStoreFormat().isCompressed()) {
+            if (!texture.getMinificationFilter().usesMipMapLevels()
+                    && !texture.getTextureStoreFormat().isCompressed()) {
 
                 // Load textures which do not need mipmap auto-generating and
                 // which aren't using compressed images.
@@ -292,7 +294,8 @@ public abstract class Lwjgl3TextureStateUtil {
                 GL30C.glGenerateMipmap(getGLType(type));
 
                 if (texture.getTextureMaxLevel() >= 0) {
-                    GL11C.glTexParameteri(GL11C.GL_TEXTURE_2D, GL12C.GL_TEXTURE_MAX_LEVEL, texture.getTextureMaxLevel());
+                    GL11C.glTexParameteri(GL11C.GL_TEXTURE_2D, GL12C.GL_TEXTURE_MAX_LEVEL,
+                            texture.getTextureMaxLevel());
                 }
             } else {
                 // Here we handle textures that are either compressed or have predefined mipmaps.
@@ -437,6 +440,9 @@ public abstract class Lwjgl3TextureStateUtil {
                                             Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
                                 }
                                 break;
+                            case CubeMap:
+                                // handled above
+                                break;
                         }
                         pos += mipSizes[m];
                     }
@@ -469,7 +475,7 @@ public abstract class Lwjgl3TextureStateUtil {
                 texture = state.getTexture(i);
 
                 // pull our texture id for this texture, for this context.
-                int textureId = texture != null ? texture.getTextureIdForContext(context.getGlContextRep()) : 0;
+                int textureId = texture != null ? texture.getTextureIdForContext(context) : 0;
 
                 // check for invalid textures - ones that have no opengl id and
                 // no image data
@@ -485,13 +491,13 @@ public abstract class Lwjgl3TextureStateUtil {
                     // texture not yet loaded.
                     // this will load and bind and set the records...
                     load(texture, i);
-                    textureId = texture.getTextureIdForContext(context.getGlContextRep());
+                    textureId = texture.getTextureIdForContext(context);
                     if (textureId == 0) {
                         continue;
                     }
-                } else if (texture.isDirty(context.getGlContextRep())) {
+                } else if (texture.isDirty(context)) {
                     update(texture, i);
-                    textureId = texture.getTextureIdForContext(context.getGlContextRep());
+                    textureId = texture.getTextureIdForContext(context);
                     if (textureId == 0) {
                         continue;
                     }
@@ -509,7 +515,7 @@ public abstract class Lwjgl3TextureStateUtil {
 
                 // Use the Java Integer object for the getTextureRecord call to avoid
                 // boxing/unboxing ints for map lookups.
-                final Integer textureIdInteger = texture.getTextureIdForContextAsInteger(context.getGlContextRep());
+                final Integer textureIdInteger = texture.getTextureIdForContextAsInteger(context);
 
                 // Grab our record for this texture
                 texRecord = record.getTextureRecord(textureIdInteger, texture.getType());
@@ -585,7 +591,8 @@ public abstract class Lwjgl3TextureStateUtil {
     }
 
     // If we support multi-texturing, specify the unit we are affecting.
-    public static void checkAndSetUnit(final int unit, final TextureStateRecord record, final ContextCapabilities caps) {
+    public static void checkAndSetUnit(final int unit, final TextureStateRecord record,
+            final ContextCapabilities caps) {
         // No need to worry about valid record, since invalidate sets record's
         // currentUnit to -1.
         if (record.currentUnit != unit) {
@@ -808,7 +815,7 @@ public abstract class Lwjgl3TextureStateUtil {
         final RenderContext context = ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
 
-        final Integer id = texture.getTextureIdForContextAsInteger(context.getGlContextRep());
+        final Integer id = texture.getTextureIdForContextAsInteger(context);
         if (id.intValue() == 0) {
             // Not on card... return.
             return;
@@ -820,7 +827,7 @@ public abstract class Lwjgl3TextureStateUtil {
         idBuffer.rewind();
         GL11C.glDeleteTextures(idBuffer);
         record.removeTextureRecord(id);
-        texture.removeFromIdCache(context.getGlContextRep());
+        texture.removeFromIdCache(context);
     }
 
     public static void deleteTextureIds(final Collection<Integer> ids) {
@@ -856,7 +863,7 @@ public abstract class Lwjgl3TextureStateUtil {
         }
         checkAndSetUnit(unit, record, caps);
 
-        final int id = texture.getTextureIdForContext(context.getGlContextRep());
+        final int id = texture.getTextureIdForContext(context);
         GL11C.glBindTexture(getGLType(texture.getType()), id);
         if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);

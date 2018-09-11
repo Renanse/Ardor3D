@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -12,6 +12,7 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -20,6 +21,7 @@ import java.nio.ShortBuffer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +37,7 @@ import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.RenderContext.RenderContextRef;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.util.Ardor3dException;
@@ -92,12 +95,23 @@ public class MeshData implements Savable {
     protected IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
 
     protected transient ContextValueReference<MeshData, Integer> _vaoIdCache;
-    protected transient ContextValueReference<MeshData, Boolean> _buffersCleanCache;
+
+    /**
+     * list of OpenGL contexts we believe have up to date values from all buffers and indices. For use in multi-context
+     * mode.
+     */
+    protected transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
+
+    /** if true, we believe we are fully uploaded to OpenGL. For use in single-context mode. */
+    protected transient boolean _uploaded;
 
     private InstancingManager _instancingManager;
 
     public MeshData() {
         _identityCache.put(this, STATIC_REF);
+        if (Constants.useMultipleContexts) {
+            _uploadedContexts = new HashSet<>();
+        }
     }
 
     /**
@@ -110,14 +124,22 @@ public class MeshData implements Savable {
     }
 
     /**
-     * @param glContext
-     *            the object representing the OpenGL context a vao belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context a vao belongs to.
      * @return the id of a vao in the given context. If the vao is not found in the given context, 0 is returned.
      */
-    public int getVAOID(final Object glContext) {
+    public int getVAOID(final RenderContext context) {
+        return getVAOIDByRef(context.getGlContextRef());
+    }
+
+    /**
+     * @param contextRef
+     *            the reference to a shared OpenGL context a vao belongs to.
+     * @return the id of a vao in the given context. If the vao is not found in the given context, 0 is returned.
+     */
+    public int getVAOIDByRef(final RenderContextRef contextRef) {
         if (_vaoIdCache != null) {
-            final Integer id = _vaoIdCache.getValue(glContext);
+            final Integer id = _vaoIdCache.getValue(contextRef);
             if (id != null) {
                 return id.intValue();
             }
@@ -128,31 +150,42 @@ public class MeshData implements Savable {
     /**
      * Removes any vao id from this buffer's data for the given OpenGL context.
      *
-     * @param glContext
-     *            the object representing the OpenGL context a vao would belong to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context a vao would belong to.
      * @return the id removed or 0 if not found.
      */
-    public int removeVAOID(final Object glContext) {
-        if (_vaoIdCache != null) {
-            return _vaoIdCache.removeValue(glContext);
+    public int removeVAOID(final RenderContext context) {
+        final Integer id = _vaoIdCache.removeValue(context.getGlContextRef());
+        if (Constants.useMultipleContexts) {
+            synchronized (_uploadedContexts) {
+                WeakReference<RenderContextRef> ref;
+                RenderContextRef check;
+                for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
+                    ref = it.next();
+                    check = ref.get();
+                    if (check == null || check.equals(context.getGlContextRef())) {
+                        it.remove();
+                        continue;
+                    }
+                }
+            }
         } else {
-            return 0;
+            _uploaded = false;
         }
+        return id != null ? id.intValue() : 0;
     }
 
     /**
      * Sets the id for a vao based on this data in regards to the given OpenGL context.
      *
-     * @param glContextRep
-     *            the object representing the OpenGL context a vao belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context a vao belongs to.
      * @param id
      *            the id of a vao. To be valid, this must be not equal to 0.
      * @throws IllegalArgumentException
      *             if id is less than or equal to 0.
      */
-    public void setVAOID(final Object glContextRep, final int id) {
+    public void setVAOID(final RenderContext context, final int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("id must be > 0");
         }
@@ -160,12 +193,12 @@ public class MeshData implements Savable {
         if (_vaoIdCache == null) {
             _vaoIdCache = ContextValueReference.newReference(this, _vaoRefQueue);
         }
-        _vaoIdCache.put(glContextRep, id);
+        _vaoIdCache.put(context.getGlContextRef(), id);
     }
 
     /**
      * Mark a specific data buffer as dirty in this MeshData. Also calls {@link #markBuffersDirty()}
-     * 
+     *
      * @param key
      *            the key of the buffer to mark dirty.
      * @throws Ardor3DException
@@ -182,21 +215,55 @@ public class MeshData implements Savable {
     }
 
     /**
-     * @param glContext
-     *            the object representing the OpenGL context a buffer belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * Marks the indices as dirty in this MeshData. Also calls {@link #markBuffersDirty()}
+     *
+     * @throws Ardor3DException
+     *             if buffer is not found
+     */
+    public void markIndicesDirty() {
+        final AbstractBufferData<?> data = getIndices();
+
+        data.markDirty();
+        markBuffersDirty();
+    }
+
+    /**
+     * @param context
+     *            the RenderContext to check our state for.
      * @return false if the MeshData has at least one dirty buffer for the given context or we don't have the given a
      *         record of it in memory.
      */
-    public boolean isBuffersClean(final Object glContext) {
-        if (_buffersCleanCache != null) {
-            final Boolean value = _buffersCleanCache.getValue(glContext);
-            if (value != null) {
-                return value.booleanValue();
-            }
-        }
+    public boolean isBuffersClean(final RenderContext context) {
+        if (Constants.useMultipleContexts) {
+            synchronized (_uploadedContexts) {
+                // check if we are empty...
+                if (_uploadedContexts.isEmpty()) {
+                    return false;
+                }
 
-        return false;
+                WeakReference<RenderContextRef> ref;
+                RenderContextRef check;
+                // look for a matching reference and clean out all weak references that have expired
+                boolean uploaded = false;
+                for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
+                    ref = it.next();
+                    check = ref.get();
+                    if (check == null) {
+                        // found empty, clean up
+                        it.remove();
+                        continue;
+                    }
+
+                    if (!uploaded && check.equals(context.getGlContextRef())) {
+                        // found match, return false
+                        uploaded = true;
+                    }
+                }
+                return uploaded;
+            }
+        } else {
+            return _uploaded;
+        }
     }
 
     /**
@@ -204,25 +271,29 @@ public class MeshData implements Savable {
      * separately via {@link AbstractBufferData#markDirty()}
      */
     public void markBuffersDirty() {
-        if (_buffersCleanCache == null) {
-            return;
+        if (Constants.useMultipleContexts) {
+            synchronized (_uploadedContexts) {
+                _uploadedContexts.clear();
+            }
+        } else {
+            _uploaded = false;
         }
-        // we assume an entry is to mark us clean
-        _buffersCleanCache.clear();
     }
 
     /**
      * Mark this MeshData as having sent all of its buffers to the given context.
      *
-     * @param glContext
-     *            the object representing the OpenGL context a buffer belongs to. See
-     *            {@link RenderContext#getGlContextRep()}
+     * @param context
+     *            the OpenGL context our buffers belong to.
      */
-    public void markBuffersClean(final Object glContext) {
-        if (_buffersCleanCache == null) {
-            _buffersCleanCache = ContextValueReference.newReference(this, null);
+    public void markBuffersClean(final RenderContext context) {
+        if (Constants.useMultipleContexts) {
+            synchronized (_uploadedContexts) {
+                _uploadedContexts.add(new WeakReference<>(context.getGlContextRef()));
+            }
+        } else {
+            _uploaded = true;
         }
-        _buffersCleanCache.put(glContext, true);
     }
 
     /**
@@ -1257,7 +1328,7 @@ public class MeshData implements Savable {
     }
 
     public static void cleanAllVertexArrays(final IShaderUtils utils) {
-        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+        final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vaos... these don't exist in our cache
         gatherGCdIds(idMap);
@@ -1266,13 +1337,13 @@ public class MeshData implements Savable {
         for (final MeshData data : _identityCache.keySet()) {
             if (data._vaoIdCache != null) {
                 if (Constants.useMultipleContexts) {
-                    final Set<Object> contextObjects = data._vaoIdCache.getContextObjects();
-                    for (final Object o : contextObjects) {
+                    final Set<RenderContextRef> renderRefs = data._vaoIdCache.getContextRefs();
+                    for (final RenderContextRef renderRef : renderRefs) {
                         // Add id to map
-                        idMap.put(o, data.getVAOID(o));
+                        idMap.put(renderRef, data.getVAOIDByRef(renderRef));
                     }
                 } else {
-                    idMap.put(ContextManager.getCurrentContext().getGlContextRep(), data.getVAOID(null));
+                    idMap.put(ContextManager.getCurrentContext().getGlContextRef(), data.getVAOIDByRef(null));
                 }
                 data._vaoIdCache.clear();
             }
@@ -1282,19 +1353,19 @@ public class MeshData implements Savable {
     }
 
     public static void cleanAllVertexArrays(final IShaderUtils utils, final RenderContext context) {
-        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+        final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vaos... these don't exist in our cache
         gatherGCdIds(idMap);
 
-        final Object glRep = context.getGlContextRep();
+        final RenderContextRef glRef = context.getGlContextRef();
         // Walk through the cached items and delete those too.
         for (final MeshData data : _identityCache.keySet()) {
             // only worry about data that have received ids.
             if (data._vaoIdCache != null) {
-                final Integer id = data._vaoIdCache.removeValue(glRep);
+                final Integer id = data._vaoIdCache.removeValue(glRef);
                 if (id != null && id.intValue() != 0) {
-                    idMap.put(context.getGlContextRep(), id);
+                    idMap.put(context.getGlContextRef(), id);
                 }
             }
         }
@@ -1303,20 +1374,20 @@ public class MeshData implements Savable {
     }
 
     @SuppressWarnings("unchecked")
-    private static final Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
+    private static final Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
         // Pull all expired vaos from ref queue and add to an id multimap.
         ContextValueReference<MeshData, Integer> ref;
         while ((ref = (ContextValueReference<MeshData, Integer>) _vaoRefQueue.poll()) != null) {
             if (Constants.useMultipleContexts) {
-                final Set<Object> contextObjects = ref.getContextObjects();
-                for (final Object o : contextObjects) {
+                final Set<RenderContextRef> contextRefs = ref.getContextRefs();
+                for (final RenderContextRef rep : contextRefs) {
                     // Add id to map
-                    final Integer id = ref.getValue(o);
+                    final Integer id = ref.getValue(rep);
                     if (id != null) {
                         if (store == null) { // lazy init
                             store = ArrayListMultimap.create();
                         }
-                        store.put(o, id);
+                        store.put(rep, id);
                     }
                 }
             } else {
@@ -1325,7 +1396,7 @@ public class MeshData implements Savable {
                     if (store == null) { // lazy init
                         store = ArrayListMultimap.create();
                     }
-                    store.put(ContextManager.getCurrentContext().getGlContextRep(), id);
+                    store.put(ContextManager.getCurrentContext().getGlContextRef(), id);
                 }
             }
             ref.clear();
@@ -1334,24 +1405,24 @@ public class MeshData implements Savable {
         return store;
     }
 
-    private static void handleVAODelete(final IShaderUtils utils, final Multimap<Object, Integer> idMap) {
-        Object currentGLRef = null;
+    private static void handleVAODelete(final IShaderUtils utils, final Multimap<RenderContextRef, Integer> idMap) {
+        RenderContextRef currentGLRef = null;
         // Grab the current context, if any.
         if (utils != null && ContextManager.getCurrentContext() != null) {
-            currentGLRef = ContextManager.getCurrentContext().getGlContextRep();
+            currentGLRef = ContextManager.getCurrentContext().getGlContextRef();
         }
         // For each affected context...
-        for (final Object glref : idMap.keySet()) {
+        for (final RenderContextRef ref : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
-            if (utils != null && glref.equals(currentGLRef)) {
-                utils.deleteVertexArrays(idMap.get(glref));
+            if (utils != null && ref.equals(currentGLRef)) {
+                utils.deleteVertexArrays(idMap.get(ref));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref))
+                GameTaskQueueManager.getManager(ContextManager.getContextForRef(ref))
                         .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().getShaderUtils().deleteVertexArrays(idMap.get(glref));
+                                getRenderer().getShaderUtils().deleteVertexArrays(idMap.get(ref));
                                 return null;
                             }
                         });

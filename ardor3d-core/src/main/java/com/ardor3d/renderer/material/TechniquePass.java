@@ -58,9 +58,9 @@ public class TechniquePass implements Savable {
     /** Information about the Uniforms we care about in this pass. */
     protected List<UniformRef> _uniforms = new ArrayList<>();
 
-    public int getProgramId(final Object glContext) {
+    public int getProgramId(final RenderContext context) {
         if (_shaderIdCache != null) {
-            final Integer id = _shaderIdCache.getValue(glContext);
+            final Integer id = _shaderIdCache.getValue(context.getGlContextRef());
             if (id != null) {
                 return id.intValue();
             }
@@ -68,7 +68,7 @@ public class TechniquePass implements Savable {
         return 0;
     }
 
-    public void setProgramId(final Object glContextRep, final int id) {
+    public void setProgramId(final RenderContext context, final int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("id must be > 0");
         }
@@ -76,7 +76,7 @@ public class TechniquePass implements Savable {
         if (_shaderIdCache == null) {
             _shaderIdCache = ContextValueReference.newReference(this, _shaderRefQueue);
         }
-        _shaderIdCache.put(glContextRep, id);
+        _shaderIdCache.put(context.getGlContextRef(), id);
     }
 
     public void setName(final String name) {
@@ -184,10 +184,10 @@ public class TechniquePass implements Savable {
 
         // Make sure our meshdata has a VAO bound
         final IShaderUtils shaderUtils = renderer.getShaderUtils();
-        int vaoID = data.getVAOID(context.getGlContextRep());
+        int vaoID = data.getVAOID(context);
         if (vaoID <= 0) {
             vaoID = shaderUtils.createVertexArrayObject(context);
-            data.setVAOID(context.getGlContextRep(), vaoID);
+            data.setVAOID(context, vaoID);
             shaderUtils.setBoundVAO(vaoID, context);
         } else {
             shaderUtils.setBoundVAO(vaoID, context);

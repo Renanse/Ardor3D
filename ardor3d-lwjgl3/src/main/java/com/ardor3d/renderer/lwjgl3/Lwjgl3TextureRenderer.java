@@ -90,7 +90,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         // check if we are already setup... if so, throw error.
         if (tex.getTextureKey() == null) {
             tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
-        } else if (tex.getTextureIdForContext(context.getGlContextRep()) != 0) {
+        } else if (tex.getTextureIdForContext(context) != 0) {
             throw new Ardor3dException("Texture is already setup and has id.");
         }
 
@@ -98,7 +98,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
         GL11C.glGenTextures(ibuf);
         final int textureId = ibuf.get(0);
-        tex.setTextureIdForContext(context.getGlContextRep(), textureId);
+        tex.setTextureIdForContext(context, textureId);
 
         Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
 
@@ -214,12 +214,11 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = colors.removeFirst();
                     if (tex.getType() == Type.TwoDimensional) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
-                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()),
-                                tex.getTexRenderMipLevel());
+                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
                     } else if (tex.getType() == Type.CubeMap) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
                                 Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
-                                tex.getTextureIdForContext(context.getGlContextRep()), tex.getTexRenderMipLevel());
+                                tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
                     } else {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
                     }
@@ -232,12 +231,11 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                     // Set up our depth texture
                     if (tex.getType() == Type.TwoDimensional) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
-                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()),
-                                tex.getTexRenderMipLevel());
+                                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
                     } else if (tex.getType() == Type.CubeMap) {
                         GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
                                 Lwjgl3TextureStateUtil.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
-                                tex.getTextureIdForContext(context.getGlContextRep()), tex.getTexRenderMipLevel());
+                                tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
                     } else {
                         throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
                     }
@@ -275,6 +273,10 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 }
             }
 
+            for (int x = 0, max = texs.size(); x < max; x++) {
+                texs.get(x).getTextureKey().markClean(context);
+            }
+
         } finally {
             ContextManager.getCurrentContext().popFBOTextureRenderer();
         }
@@ -283,7 +285,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     @Override
     protected void setupForSingleTexDraw(final Texture tex) {
         final RenderContext context = ContextManager.getCurrentContext();
-        final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
+        final int textureId = tex.getTextureIdForContext(context);
 
         if (tex.getTextureStoreFormat().isDepthFormat()) {
             // No color buffer
@@ -358,6 +360,8 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
                 GL30C.glGenerateMipmap(Lwjgl3TextureStateUtil.getGLType(tex.getType()));
             }
         }
+
+        tex.getTextureKey().markClean(ContextManager.getCurrentContext());
     }
 
     @Override

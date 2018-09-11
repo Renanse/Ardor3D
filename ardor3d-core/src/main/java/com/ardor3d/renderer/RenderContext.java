@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -26,6 +26,8 @@ import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
  */
 public class RenderContext {
 
+    public class RenderContextRef extends Object {}
+
     /** List of states that override any set states on a spatial if not null. */
     protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates = new EnumMap<RenderState.StateType, RenderState>(
             RenderState.StateType.class);
@@ -45,7 +47,7 @@ public class RenderContext {
     protected final RendererRecord _rendererRecord = createRendererRecord();
 
     /** Basically this object represents the sharable portion of a GL context... Textures, displayLists, etc. */
-    protected final Object _glContextRep;
+    protected final RenderContextRef _glContextRef;
 
     protected final ContextCapabilities _capabilities;
 
@@ -62,7 +64,7 @@ public class RenderContext {
         _contextKey = key;
         _capabilities = caps;
         setupRecords();
-        _glContextRep = (shared == null) ? new Object() : shared._glContextRep;
+        _glContextRef = (shared == null) ? new RenderContextRef() : shared._glContextRef;
     }
 
     protected RendererRecord createRendererRecord() {
@@ -106,7 +108,7 @@ public class RenderContext {
      * Enforce a particular state. In other words, the given state will override any state of the same type set on a
      * scene object. Remember to clear the state when done enforcing. Very useful for multipass techniques where
      * multiple sets of states need to be applied to a scenegraph drawn multiple times.
-     * 
+     *
      * @param state
      *            state to enforce
      */
@@ -123,7 +125,7 @@ public class RenderContext {
 
     /**
      * Clears an enforced render state index by setting it to null. This allows object specific states to be used.
-     * 
+     *
      * @param type
      *            The type of RenderState to clear enforcement on.
      */
@@ -181,8 +183,8 @@ public class RenderContext {
         _currentCamera = cam;
     }
 
-    public Object getGlContextRep() {
-        return _glContextRep;
+    public RenderContextRef getGlContextRef() {
+        return _glContextRef;
     }
 
     /**
@@ -194,7 +196,7 @@ public class RenderContext {
 
     /**
      * Restores the enforced states from the stack. Any states enforced or cleared since the last push are reverted.
-     * 
+     *
      * @throws EmptyStackException
      *             if this method is called without first calling {@link #pushEnforcedStates()}
      */
