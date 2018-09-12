@@ -112,7 +112,7 @@ public class InteractRing extends Mesh {
         // mark our data as needing updates
         meshData.markBufferDirty(MeshData.KEY_VertexCoords);
         meshData.markBufferDirty(MeshData.KEY_NormalCoords);
-        meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
 
         updateModelBound();
     }

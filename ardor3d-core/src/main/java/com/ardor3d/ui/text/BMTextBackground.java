@@ -143,7 +143,7 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
         coords.put(_textureBorderOffsets.getXf()).put(1);
         coords.put(1f - _textureBorderOffsets.getZf()).put(1);
         coords.put(1).put(1);
-        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
     }
 
     public void setBackgroundColor(final ReadOnlyColorRGBA color) {

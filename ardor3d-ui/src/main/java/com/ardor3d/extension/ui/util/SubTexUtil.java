@@ -291,7 +291,7 @@ public class SubTexUtil {
 
         // draw mesh
         meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
         SubTexUtil._mesh.render(renderer);
     }
 
@@ -405,7 +405,7 @@ public class SubTexUtil {
 
         // draw mesh
         meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
         SubTexUtil._mesh.render(renderer);
     }
 

@@ -261,7 +261,7 @@ public class UIArc extends Mesh {
         }
 
         _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
         _meshData.markIndicesDirty();
     }
 

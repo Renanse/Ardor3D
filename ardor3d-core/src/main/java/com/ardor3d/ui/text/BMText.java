@@ -709,7 +709,7 @@ public class BMText extends Mesh {
         _meshData.updateVertexCount();
 
         _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
 
         // -- notify listeners
         for (final BMTextChangeListener listener : _listeners) {

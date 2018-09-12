@@ -113,7 +113,7 @@ public class UIDisk extends Mesh {
         }
 
         _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        _meshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+        _meshData.markBufferDirty(MeshData.KEY_TextureCoords0);
     }
 
     private void setIndexData() {

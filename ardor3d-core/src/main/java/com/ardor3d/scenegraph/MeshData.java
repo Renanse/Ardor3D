@@ -63,6 +63,10 @@ public class MeshData implements Savable {
     public final static String KEY_ColorCoords = "color";
     public final static String KEY_TangentCoords = "tangent";
     public final static String KEY_TextureCoordsPrefix = "uv";
+    public final static String KEY_TextureCoords0 = KEY_TextureCoordsPrefix + 0;
+    public final static String KEY_TextureCoords1 = KEY_TextureCoordsPrefix + 1;
+    public final static String KEY_TextureCoords2 = KEY_TextureCoordsPrefix + 2;
+    public final static String KEY_TextureCoords3 = KEY_TextureCoordsPrefix + 3;
 
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());

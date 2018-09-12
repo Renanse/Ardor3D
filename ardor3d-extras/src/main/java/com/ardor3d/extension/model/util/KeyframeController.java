@@ -420,7 +420,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
             dstTexs.put(srcTexs);
             dstTexs.flip();
-            dstMeshData.markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+            dstMeshData.markBufferDirty(MeshData.KEY_TextureCoords0);
         }
     }
 
@@ -567,7 +567,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
                     texts.put(i * 2 + x,
                             (float) ((1f - delta) * oldtexts.get(i * 2 + x) + delta * newtexts.get(i * 2 + x)));
                 }
-                _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_TextureCoordsPrefix + 0);
+                _morphMesh.getMeshData().markBufferDirty(MeshData.KEY_TextureCoords0);
             }
 
             if (colors != null && oldcolors != null && newcolors != null) {
