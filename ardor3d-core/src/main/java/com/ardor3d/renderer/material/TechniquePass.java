@@ -22,7 +22,6 @@ import java.util.Map;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.uniform.RenderStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
@@ -110,36 +109,8 @@ public class TechniquePass implements Savable {
         _attributes.add(attribute);
     }
 
-    public void addDefaultPositionAttribute() {
-        addAttribute(new VertexAttributeRef(MeshData.KEY_VertexCoords));
-    }
-
-    public void addDefaultNormalAttribute() {
-        addAttribute(new VertexAttributeRef(MeshData.KEY_NormalCoords));
-    }
-
-    public void addDefaultColorAttribute() {
-        addAttribute(new VertexAttributeRef(MeshData.KEY_ColorCoords));
-    }
-
-    public void addDefaultTangentAttribute() {
-        addAttribute(new VertexAttributeRef(MeshData.KEY_TangentCoords));
-    }
-
-    public void addDefaultTextureCoordsAttribute(final int uvIndex) {
-        addAttribute(new VertexAttributeRef(MeshData.KEY_TextureCoordsPrefix + uvIndex));
-    }
-
     public void addUniform(final UniformRef uniform) {
         _uniforms.add(uniform);
-    }
-
-    public void addDefaultMatrixUniforms() {
-        addUniform(
-                new UniformRef("model", UniformType.Matrix4x4, UniformSource.RendererMatrix, RenderMatrixType.Model));
-        addUniform(new UniformRef("view", UniformType.Matrix4x4, UniformSource.RendererMatrix, RenderMatrixType.View));
-        addUniform(new UniformRef("projection", UniformType.Matrix4x4, UniformSource.RendererMatrix,
-                RenderMatrixType.Projection));
     }
 
     public void addLightInfoUniforms(final int maxLights) {
