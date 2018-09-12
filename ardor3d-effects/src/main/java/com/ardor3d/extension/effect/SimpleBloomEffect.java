@@ -12,7 +12,6 @@ package com.ardor3d.extension.effect;
 
 import java.util.List;
 
-import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.renderer.effect.EffectManager;
@@ -23,7 +22,6 @@ import com.ardor3d.renderer.effect.RenderEffect;
 import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
@@ -117,14 +115,10 @@ public class SimpleBloomEffect extends RenderEffect {
     protected ShaderState getExtractionShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "bloom_extract.frag"));
+            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
+                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "bloom_extract.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -135,14 +129,10 @@ public class SimpleBloomEffect extends RenderEffect {
     protected ShaderState getBlurHorizShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "gausian_blur_horizontal9.frag"));
+            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+                    SimpleBloomEffect.class, shaderDirectory + "gausian_blur_horizontal9.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -153,14 +143,10 @@ public class SimpleBloomEffect extends RenderEffect {
     protected ShaderState getBlurVertShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "gausian_blur_vertical9.frag"));
+            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+                    SimpleBloomEffect.class, shaderDirectory + "gausian_blur_vertical9.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -171,14 +157,10 @@ public class SimpleBloomEffect extends RenderEffect {
     protected ShaderState getBlendShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    ResourceLocatorTool.getClassPathResourceAsString(BloomRenderPass.class, shaderDirectory
-                            + "add2textures.frag"));
+            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
+                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "add2textures.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }

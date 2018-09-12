@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -136,16 +136,19 @@ public class ProjectedGrid extends Mesh {
     }
 
     @Override
-    public void render(final Renderer renderer) {
+    public boolean render(final Renderer renderer) {
         final boolean doDraw = update();
+        boolean drew = false;
         if (doDraw) {
-            super.render(renderer);
+            drew = super.render(renderer);
         }
 
         if (drawDebug) {
             Debugger.drawCameraFrustum(renderer, mainCamera, new ColorRGBA(1, 0, 0, 1), (short) 0xFFFF, true);
             Debugger.drawCameraFrustum(renderer, projectorCamera, new ColorRGBA(0, 1, 1, 1), (short) 0xFFFF, true);
         }
+
+        return drew;
     }
 
     public boolean update() {
@@ -214,10 +217,10 @@ public class ProjectedGrid extends Mesh {
         // force the projector to point at the plane
         if (projectorCamera.getLocation().getY() > 0.0 && projectorCamera.getDirection().getY() > 0.0
                 || projectorCamera.getLocation().getY() < 0.0 && projectorCamera.getDirection().getY() < 0.0) {
-            projectorCamera.setDirection(new Vector3(projectorCamera.getDirection().getX(), -projectorCamera
-                    .getDirection().getY(), projectorCamera.getDirection().getZ()));
-            projectorCamera.setUp(projectorCamera.getDirection().cross(projectorCamera.getLeft(), null)
-                    .normalizeLocal());
+            projectorCamera.setDirection(new Vector3(projectorCamera.getDirection().getX(),
+                    -projectorCamera.getDirection().getY(), projectorCamera.getDirection().getZ()));
+            projectorCamera
+                    .setUp(projectorCamera.getDirection().cross(projectorCamera.getLeft(), null).normalizeLocal());
         }
 
         // find the plane intersection point
@@ -498,7 +501,7 @@ public class ProjectedGrid extends Mesh {
      * <code>getSurfaceNormal</code> returns the normal of an arbitrary point on the terrain. The normal is linearly
      * interpreted from the normals of the 4 nearest defined points. If the point provided is not within the bounds of
      * the height map, null is returned.
-     * 
+     *
      * @param position
      *            the vector representing the location to find a normal at.
      * @param store
@@ -513,7 +516,7 @@ public class ProjectedGrid extends Mesh {
      * <code>getSurfaceNormal</code> returns the normal of an arbitrary point on the terrain. The normal is linearly
      * interpreted from the normals of the 4 nearest defined points. If the point provided is not within the bounds of
      * the height map, null is returned.
-     * 
+     *
      * @param position
      *            the vector representing the location to find a normal at. Only the x and z values are used.
      * @param store
@@ -528,7 +531,7 @@ public class ProjectedGrid extends Mesh {
      * <code>getSurfaceNormal</code> returns the normal of an arbitrary point on the terrain. The normal is linearly
      * interpreted from the normals of the 4 nearest defined points. If the point provided is not within the bounds of
      * the height map, null is returned.
-     * 
+     *
      * @param x
      *            the x coordinate to check.
      * @param z
@@ -550,7 +553,8 @@ public class ProjectedGrid extends Mesh {
             store = new Vector3();
         }
 
-        final Vector3 topLeft = store, topRight = new Vector3(), bottomLeft = new Vector3(), bottomRight = new Vector3();
+        final Vector3 topLeft = store, topRight = new Vector3(), bottomLeft = new Vector3(),
+                bottomRight = new Vector3();
 
         final int focalSpot = (int) (col + row * sizeX);
 

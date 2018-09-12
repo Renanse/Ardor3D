@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,7 +21,6 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
@@ -36,8 +35,8 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the SwitchNode class; used to control which Node to actively display from a set of Nodes.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.SwitchNodeExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_SwitchNodeExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_SwitchNodeExample.jpg", //
+        maxHeapMemory = 64)
 public class SwitchNodeExample extends ExampleBase {
     public static void main(final String[] args) {
         start(SwitchNodeExample.class);
@@ -48,10 +47,9 @@ public class SwitchNodeExample extends ExampleBase {
         _canvas.setTitle("SwitchNode - Example");
 
         final BasicText t = BasicText.createDefaultTextLabel("Text", "[SPACE] Switch to next child");
-        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
-        _root.attachChild(t);
+        _orthoRoot.attachChild(t);
 
         final SwitchNode switchNode = new SwitchNode();
 

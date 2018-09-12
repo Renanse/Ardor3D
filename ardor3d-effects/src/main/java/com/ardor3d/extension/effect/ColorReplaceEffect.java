@@ -18,7 +18,6 @@ import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class ColorReplaceEffect extends RenderEffect {
@@ -37,16 +36,10 @@ public class ColorReplaceEffect extends RenderEffect {
     private ShaderState getColorizeShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    "fsq",
-                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    "color_replace",
-                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
-                            + "color_replace.frag"));
+            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
+                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, "color_replace", ResourceLocatorTool
+                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "color_replace.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }

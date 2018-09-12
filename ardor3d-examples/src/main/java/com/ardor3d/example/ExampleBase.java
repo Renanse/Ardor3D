@@ -206,6 +206,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
         _root.setRenderState(_wireframeState);
 
         _root.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
+        _orthoRoot.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
 
         initExample();
 

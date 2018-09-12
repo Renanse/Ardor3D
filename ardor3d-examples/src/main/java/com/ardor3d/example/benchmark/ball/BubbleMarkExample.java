@@ -10,16 +10,12 @@
 
 package com.ardor3d.example.benchmark.ball;
 
-import java.net.URISyntaxException;
-import java.util.concurrent.Callable;
-
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
-import com.ardor3d.framework.jogl.JoglCanvas;
-import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.lwjgl3.GLFWCanvas;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.Texture;
@@ -28,19 +24,16 @@ import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ContextGarbageCollector;
-import com.ardor3d.util.GameTaskQueue;
-import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>
@@ -62,8 +55,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </p>
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.benchmark.ball.BubbleMarkExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
+        maxHeapMemory = 64)
 public class BubbleMarkExample implements Scene {
 
     // Our native window, not the gl surface itself.
@@ -82,17 +75,20 @@ public class BubbleMarkExample implements Scene {
 
     private BasicText frameRateLabel;
 
-    private static final int width = (System.getProperty("width") != null ? Integer.parseInt(System
-            .getProperty("width")) : 1920);
-    private static final int height = (System.getProperty("height") != null ? Integer.parseInt(System
-            .getProperty("height")) : 1080);
+    private static final int width = (System.getProperty("width") != null
+            ? Integer.parseInt(System.getProperty("width"))
+            : 1920);
+    private static final int height = (System.getProperty("height") != null
+            ? Integer.parseInt(System.getProperty("height"))
+            : 1080);
 
     private final boolean skipBallCollide = ("true".equalsIgnoreCase(System.getProperty("noBallCollide")));
 
     private boolean adaptiveStable = !("true".equalsIgnoreCase(System.getProperty("adaptive")));
 
-    private static final int adaptiveTargetFPS = (System.getProperty("targetFPS") != null ? Integer.parseInt(System
-            .getProperty("targetFPS")) : 200);
+    private static final int adaptiveTargetFPS = (System.getProperty("targetFPS") != null
+            ? Integer.parseInt(System.getProperty("targetFPS"))
+            : 200);
 
     private int frames = 0;
     private long startTime = System.currentTimeMillis();
@@ -138,34 +134,21 @@ public class BubbleMarkExample implements Scene {
      * @return the canvas.
      */
     private NativeCanvas initCanvas() {
-        if ("true".equalsIgnoreCase(System.getProperty("jogl"))) {
-            final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(this);
-            final DisplaySettings settings = new DisplaySettings(width, height, 24, 0, 0, 8, 0, 0, false, false);
-            return new JoglCanvas(canvasRenderer, settings);
-        } else {
-            final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(this);
-            final DisplaySettings settings = new DisplaySettings(width, height, 24, 0, 0, 8, 0, 0, false, false);
-            return new GLFWCanvas(settings, canvasRenderer);
-        }
+        final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(this);
+        final DisplaySettings settings = new DisplaySettings(width, height, 24, 0, 0, 8, 0, 0, false, false);
+        return new GLFWCanvas(settings, canvasRenderer);
     }
 
     /**
      * Initialize our scene.
      */
     private void initExample() {
+        ExampleBase.addDefaultResourceLocators();
+
         canvas.setTitle("BubbleMarkExample - close window to exit");
 
         // Add our awt based image loader.
         AWTImageLoader.registerLoader();
-
-        // Set the location of our example resources.
-        try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    BubbleMarkExample.class, "com/ardor3d/example/media/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        }
 
         // Create a texture for our balls to use.
         final TextureState ts = new TextureState();
@@ -184,18 +167,15 @@ public class BubbleMarkExample implements Scene {
         blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         root.setRenderState(blend);
 
+        root.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+        root.setRenderMaterial("unlit/textured/basic.yaml");
+
         // setup scene
         // Add background
         final CanvasRenderer canvasRenderer = canvas.getCanvasRenderer();
-        final RenderContext renderContext = canvasRenderer.getRenderContext();
+        canvasRenderer.setCamera(Camera.newOrthoCamera(canvas));
         final Renderer renderer = canvasRenderer.getRenderer();
-        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                renderer.setBackgroundColor(ColorRGBA.WHITE);
-                return null;
-            }
-        });
+        renderer.setBackgroundColor(ColorRGBA.WHITE);
 
         int ballCount = 16;
         if (System.getProperty("balls") != null) {
@@ -257,8 +237,8 @@ public class BubbleMarkExample implements Scene {
                 } else if (ratio > 4.0) {
                     ratio = 4.0;
                 }
-                final int newN = Math.max(1, (ratio > 1.1 || ratio < 0.9) ? (int) (N * ratio) : (ratio > 1.025) ? N + 1
-                        : (ratio < 0.975) ? N - 1 : N);
+                final int newN = Math.max(1, (ratio > 1.1 || ratio < 0.9) ? (int) (N * ratio)
+                        : (ratio > 1.025) ? N + 1 : (ratio < 0.975) ? N - 1 : N);
                 if (newN != N) {
                     resetBalls(newN);
                 } else {

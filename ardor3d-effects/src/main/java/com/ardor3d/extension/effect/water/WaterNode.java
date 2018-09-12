@@ -36,10 +36,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.FogState;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -194,22 +192,20 @@ public class WaterNode extends Node {
 
         final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
 
-        if (useRefraction && useProjectedShader && caps.getNumberOfFragmentTextureUnits() < 6 || useRefraction
-                && caps.getNumberOfFragmentTextureUnits() < 5) {
+        if (useRefraction && useProjectedShader && caps.getNumberOfFragmentTextureUnits() < 6
+                || useRefraction && caps.getNumberOfFragmentTextureUnits() < 5) {
             useRefraction = false;
             logger.info("Not enough textureunits, falling back to non refraction water");
         }
 
-        tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer( //
+        tRenderer = r.createTextureRenderer( //
                 cam.getWidth() / renderScale, // width
                 cam.getHeight() / renderScale, // height
-                8, // Depth bits... TODO: Make configurable?
-                0, // Samples... TODO: Make configurable?
-                r, caps);
+                24, // Depth bits... TODO: Make configurable?
+                0); // Samples... TODO: Make configurable?
 
         // blurSampleDistance = 1f / ((float) cam.getHeight() / renderScale);
 
-        tRenderer.setMultipleTargets(true);
         tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
         tRenderer.getCamera().setFrustum(cam.getFrustumNear(), cam.getFrustumFar(), cam.getFrustumLeft(),
                 cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
@@ -221,7 +217,7 @@ public class WaterNode extends Node {
 
         fullScreenQuad = new Quad("FullScreenQuad", cam.getWidth() / 4, cam.getHeight() / 4);
         fullScreenQuad.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
-        fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         fullScreenQuad.getSceneHints().setCullHint(CullHint.Never);
         fullScreenQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
         fullScreenQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
@@ -343,8 +339,8 @@ public class WaterNode extends Node {
         }
 
         if (useRefraction && aboveWater) {
-            clipPlane.set(-waterPlane.getNormal().getX(), -waterPlane.getNormal().getY(), -waterPlane.getNormal()
-                    .getZ(), -waterPlane.getConstant());
+            clipPlane.set(-waterPlane.getNormal().getX(), -waterPlane.getNormal().getY(),
+                    -waterPlane.getNormal().getZ(), -waterPlane.getConstant());
             renderRefraction(clipPlane);
         }
 
@@ -492,7 +488,7 @@ public class WaterNode extends Node {
 
         tRenderer.getCamera().setProjectionMode(ProjectionMode.Custom);
         tRenderer.getCamera().setProjectionMatrix(cam.getProjectionMatrix());
-        tRenderer.render(skyBox, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
+        tRenderer.renderSpatial(skyBox, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
 
         if (skyBox != null) {
             skyBox.getSceneHints().setCullHint(CullHint.Always);
@@ -500,7 +496,7 @@ public class WaterNode extends Node {
 
         modifyProjectionMatrix(clipPlane);
 
-        tRenderer.render(renderList, texArray, Renderer.BUFFER_NONE);
+        tRenderer.renderSpatials(renderList, texArray, Renderer.BUFFER_NONE);
 
         if (doBlurReflection) {
             blurReflectionTexture();
@@ -553,7 +549,7 @@ public class WaterNode extends Node {
         tRenderer.getCamera().getViewMatrix();
         tRenderer.getCamera().getProjectionMatrix();
 
-        tRenderer.render(renderList, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
+        tRenderer.renderSpatials(renderList, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
 
         if (skyBox != null) {
             skyBox.getSceneHints().setCullHint(cullMode);

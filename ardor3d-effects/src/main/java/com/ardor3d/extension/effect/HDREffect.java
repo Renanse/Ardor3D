@@ -24,7 +24,6 @@ import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class HDREffect extends RenderEffect {
@@ -97,16 +96,10 @@ public class HDREffect extends RenderEffect {
     private RenderState getLuminanceExtractionShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    "fsq",
-                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    "luminance",
-                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
-                            + "luminance.frag"));
+            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
+                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, "luminance", ResourceLocatorTool
+                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "luminance.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -117,16 +110,10 @@ public class HDREffect extends RenderEffect {
     private RenderState getBrightMapShader() {
         final ShaderState shader = new ShaderState();
         try {
-            shader.setShader(
-                    ShaderType.Vertex,
-                    "fsq",
-                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
-                            + "fsq.vert"));
-            shader.setShader(
-                    ShaderType.Fragment,
-                    "brightmap",
-                    ResourceLocatorTool.getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory
-                            + "brightmap.frag"));
+            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
+                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
+            shader.setShader(ShaderType.Fragment, "brightmap", ResourceLocatorTool
+                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "brightmap.frag"));
         } catch (final Exception e) {
             e.printStackTrace();
         }

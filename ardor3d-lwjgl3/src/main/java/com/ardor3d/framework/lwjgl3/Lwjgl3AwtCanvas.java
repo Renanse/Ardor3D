@@ -13,6 +13,7 @@ package com.ardor3d.framework.lwjgl3;
 import static org.lwjgl.system.jawt.JAWTFunctions.JAWT_VERSION_1_4;
 
 import java.awt.Canvas;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.lwjgl.system.jawt.JAWT;
@@ -24,6 +25,7 @@ import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.MouseManager;
+import com.google.common.collect.Lists;
 
 public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrapper {
 
@@ -35,6 +37,10 @@ public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrappe
 
     private final DisplaySettings _settings;
     private final boolean _inited = false;
+
+    protected int _contentWidth, _contentHeight;
+
+    protected List<ICanvasListener> _listeners = Lists.newArrayList();
 
     /**
      * If true, we will not try to drop and reclaim the context on each frame.
@@ -156,26 +162,22 @@ public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrappe
     }
 
     @Override
-    public int getContentWidth() {
-        // TODO Auto-generated method stub
-        return 0;
+    public int getContentHeight() {
+        return _contentHeight;
     }
 
     @Override
-    public int getContentHeight() {
-        // TODO Auto-generated method stub
-        return 0;
+    public int getContentWidth() {
+        return _contentWidth;
     }
 
     @Override
     public void addListener(final ICanvasListener listener) {
-        // TODO Auto-generated method stub
-
+        _listeners.add(listener);
     }
 
     @Override
     public boolean removeListener(final ICanvasListener listener) {
-        // TODO Auto-generated method stub
-        return false;
+        return _listeners.remove(listener);
     }
 }

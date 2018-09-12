@@ -32,8 +32,6 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.ShadingState;
-import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Mesh;
@@ -89,11 +87,6 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
         BufferUtils.setInBuffer(ColorRGBA.CYAN, colors, 12);
         BufferUtils.setInBuffer(ColorRGBA.YELLOW, colors, 16);
         BufferUtils.setInBuffer(ColorRGBA.YELLOW, colors, 20);
-
-        // set flat shading
-        final ShadingState shade = new ShadingState();
-        shade.setShadingMode(ShadingMode.Flat);
-        grip.setRenderState(shade);
 
         // setup a material state to use the colors from the vertices.
         final MaterialState material = new MaterialState();

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,11 +20,10 @@ import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.MaterialFace;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -37,8 +36,8 @@ import com.ardor3d.util.TextureManager;
  * A demonstration on how to determine if collisions exist between two nodes.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.collision.ManyCollisionsExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/collision_ManyCollisionsExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/collision_ManyCollisionsExample.jpg", //
+        maxHeapMemory = 64)
 public class ManyCollisionsExample extends ExampleBase {
 
     private final Matrix3 rotation = new Matrix3();
@@ -88,10 +87,9 @@ public class ManyCollisionsExample extends ExampleBase {
         _canvas.setTitle("ManyCollisionsExample");
 
         t = BasicText.createDefaultTextLabel("Text", "");
-        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
-        _root.attachChild(t);
+        _orthoRoot.attachChild(t);
 
         final CullState cs = new CullState();
         cs.setCullFace(CullState.Face.Back);
@@ -115,8 +113,8 @@ public class ManyCollisionsExample extends ExampleBase {
         for (int i = 0; i < 200; i++) {
             final Mesh sm = sphere.makeCopy(true);
 
-            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
-                    .nextDouble() * 100.0 - 50.0));
+            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
+                    rand.nextDouble() * 100.0 - 50.0));
             sm.setRenderState(ts);
             n1.attachChild(sm);
         }
@@ -129,12 +127,13 @@ public class ManyCollisionsExample extends ExampleBase {
         n2.setRenderState(ms);
 
         _root.attachChild(n2);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         for (int i = 0; i < 200; i++) {
             final Mesh sm = sphere.makeCopy(true);
 
-            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
-                    .nextDouble() * 100.0 - 50.0));
+            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
+                    rand.nextDouble() * 100.0 - 50.0));
             sm.setRenderState(ts);
             n2.attachChild(sm);
         }

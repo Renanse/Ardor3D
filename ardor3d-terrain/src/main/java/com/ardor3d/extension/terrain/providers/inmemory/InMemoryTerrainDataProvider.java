@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -61,15 +61,15 @@ public class InMemoryTerrainDataProvider implements TerrainDataProvider {
         if (generateNormalMap) {
             try {
                 final Image normalImage = NormalMapUtil.constructNormalMap(inMemoryTerrainData.getHeightData(),
-                        inMemoryTerrainData.getSide(), inMemoryTerrainData.getMaxHeight(), inMemoryTerrainData
-                                .getScale().getX(), inMemoryTerrainData.getScale().getY());
+                        inMemoryTerrainData.getSide(), inMemoryTerrainData.getMaxHeight(),
+                        inMemoryTerrainData.getScale().getX(), inMemoryTerrainData.getScale().getY());
 
                 final List<Integer> heightMapSizes = Lists.newArrayList();
                 int currentSize = inMemoryTerrainData.getSide();
                 heightMapSizes.add(currentSize);
                 for (int i = 0; i < inMemoryTerrainData.getClipmapLevels(); i++) {
                     currentSize /= 2;
-                    heightMapSizes.add(currentSize);
+                    heightMapSizes.add(0, currentSize);
                 }
                 return new ImageTextureSource(tileSize, normalImage, heightMapSizes);
             } catch (final Exception e) {

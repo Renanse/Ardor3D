@@ -31,7 +31,7 @@ public class BallSprite extends Quad {
         _ball = new Ball(scale);
         _ball.setRandomPositionIn(_areaWidth, _areaHeight);
         setTranslation(_ball._x + _ball.getCurrentRadius(), _ball._y + _ball.getCurrentRadius(), 0);
-        getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         setModelBound(null);
         getSceneHints().setCullHint(CullHint.Never);
     }
