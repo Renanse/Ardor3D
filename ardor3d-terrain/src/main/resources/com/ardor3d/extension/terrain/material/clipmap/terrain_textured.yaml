@@ -24,18 +24,38 @@ techniques:
             shaderKey: clipSideSize
             type: Float1
             source: SpatialProperty
+          - 
+            shaderKey: levels
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: minLevel
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: validLevels
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: textureSize
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: texelSize
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: showDebug
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: sliceOffset
+            type: Float2
+            source: SpatialProperty
 
         shaders: 
           Vertex: 
             source: clipmap/terrain.vert
 
           Fragment:
-            program: |
-                #version 330 core
-
-                out vec4 FragColor;
-                
-                void main()
-                {
-                    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-                }
+            source: clipmap/terrain.frag

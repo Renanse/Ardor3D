@@ -32,6 +32,7 @@ import com.ardor3d.image.Texture3D;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
@@ -145,6 +146,10 @@ public class TextureClipmap {
 
     public void update(final Renderer renderer, final ReadOnlyVector3 eyePos) {
         if (!isEnabled()) {
+            return;
+        }
+
+        if (textureClipmap.getTextureIdForContext(ContextManager.getCurrentContext()) == 0) {
             return;
         }
 

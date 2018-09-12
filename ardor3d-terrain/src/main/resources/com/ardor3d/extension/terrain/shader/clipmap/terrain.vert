@@ -3,7 +3,6 @@
 in vec4 vertex;
  
 out vec2 vVertex;
-out vec3 EyeSpacePosition;
  
 uniform mat4 model;
 uniform mat4 view;
@@ -14,7 +13,7 @@ uniform float scale;
 uniform float vertexDistance;
 uniform float clipSideSize;
 
-vec4 applyTerrainBlending(vec4 position)
+void applyTerrainBlending(inout vec4 position)
 {
     float scaledClipSideSize = clipSideSize * vertexDistance * 0.5;
     vec2 viewDistance = abs(position.xz - eyePosition.xz);
@@ -23,16 +22,13 @@ vec4 applyTerrainBlending(vec4 position)
 
     position.y = mix(position.y, position.w, blend);
     position.w = 1.0;
-    
-    return position;
 }
 
 void main() 
 {
 	vVertex = (vertex.xz - eyePosition.xz) * vec2(scale/32.0);
     
-    vec4 position = applyTerrainBlending(vertex);
-	vec4 eyeViewSpacePos = view * model * position;
-    EyeSpacePosition = eyeViewSpacePos.xyz;
-    gl_Position =  projection * eyeViewSpacePos;
+    vec4 position = vertex;
+    applyTerrainBlending(position);
+    gl_Position = projection * view * model * position;
 }
