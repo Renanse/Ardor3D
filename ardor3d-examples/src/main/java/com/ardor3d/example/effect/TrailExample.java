@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -41,8 +41,8 @@ import com.ardor3d.util.TextureManager;
  * An example of using TrailMesh.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.TrailExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_TrailExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_TrailExample.jpg", //
+        maxHeapMemory = 64)
 public class TrailExample extends ExampleBase {
 
     private Sphere sphere;
@@ -101,10 +101,10 @@ public class TrailExample extends ExampleBase {
         _canvas.setTitle("Trail Example");
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(150, 150, 0));
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(0, 0, 1), Vector3.UNIT_Y);
-        _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(
-                65.0,
+        _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(65.0,
                 (float) _canvas.getCanvasRenderer().getCamera().getWidth()
-                        / _canvas.getCanvasRenderer().getCamera().getHeight(), 1, 1000);
+                        / _canvas.getCanvasRenderer().getCamera().getHeight(),
+                1, 1000);
 
         // Create the trail
         trailMesh = new TrailMesh("TrailMesh", 100);
@@ -155,8 +155,8 @@ public class TrailExample extends ExampleBase {
 
         // Setup labels for presenting example info.
         final Node textNodes = new Node("Text");
-        _root.attachChild(textNodes);
-        textNodes.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _orthoRoot.attachChild(textNodes);
+        textNodes.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
         final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() - 20;

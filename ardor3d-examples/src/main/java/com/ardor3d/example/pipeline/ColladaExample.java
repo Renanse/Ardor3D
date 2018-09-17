@@ -127,11 +127,13 @@ public class ColladaExample extends ExampleBase {
 
     private void createHUD() {
         final BasicText t1 = BasicText.createDefaultTextLabel("Text1", "Seymour.dae");
-        t1.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t1.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t1.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t1.setTranslation(new Vector3(5, 0 * (t1.getHeight() + 5) + 10, 0));
-        _root.attachChild(t1);
+        _orthoRoot.attachChild(t1);
+        _orthoRoot.getSceneHints().setCullHint(CullHint.Never);
         _root.getSceneHints().setCullHint(CullHint.Never);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         hud = new UIHud(_canvas);
         hud.setupInput(_physicalLayer, _logicalLayer);

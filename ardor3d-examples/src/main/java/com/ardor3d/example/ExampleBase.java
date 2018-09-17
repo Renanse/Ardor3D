@@ -581,6 +581,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
                             "com/ardor3d/example/media/materials/")));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
                     ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/shader")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/shaders/")));
             MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
                     .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
         } catch (final URISyntaxException ex) {

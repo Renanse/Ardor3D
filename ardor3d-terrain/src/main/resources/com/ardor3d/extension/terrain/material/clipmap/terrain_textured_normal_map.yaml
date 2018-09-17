@@ -1,0 +1,69 @@
+--- # Material
+name: skinned mesh
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - 
+            shaderKey: normalMap
+            type: Int1
+            source: SpatialProperty
+          - 
+            shaderKey: lightDir
+            type: Float3
+            source: SpatialProperty
+          - 
+            shaderKey: eyePosition
+            type: Float3
+            source: SpatialProperty
+          - 
+            shaderKey: scale
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: vertexDistance
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: clipSideSize
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: levels
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: minLevel
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: validLevels
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: textureSize
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: texelSize
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: showDebug
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: sliceOffset
+            type: Float2
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            source: clipmap/terrain.vert
+
+          Fragment:
+            source: clipmap/terrain_normalMap.frag

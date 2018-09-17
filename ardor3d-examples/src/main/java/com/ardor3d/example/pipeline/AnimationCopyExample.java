@@ -13,7 +13,6 @@ package com.ardor3d.example.pipeline;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -55,24 +54,20 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.visitor.Visitor;
-import com.ardor3d.util.GameTaskQueue;
-import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.MeshCombiner;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
-import com.jogamp.opengl.util.glsl.ShaderState;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
@@ -96,8 +91,7 @@ public class AnimationCopyExample extends ExampleBase {
     private SkeletonPose pose;
 
     private UIButton runWalkButton, punchButton;
-
-    private ShaderState gpuShader;
+    private RenderMaterial matCPU, matGPU;
 
     private final Node skNode = new Node("skeletons");
 
@@ -109,15 +103,8 @@ public class AnimationCopyExample extends ExampleBase {
     protected void initExample() {
         _canvas.setTitle("Ardor3D - Animation Copy Example - 100 Skeleton copies");
         final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
-        final RenderContext renderContext = canvasRenderer.getRenderContext();
         final Renderer renderer = canvasRenderer.getRenderer();
-        GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                renderer.setBackgroundColor(ColorRGBA.BLACK);
-                return null;
-            }
-        });
+        renderer.setBackgroundColor(ColorRGBA.BLACK);
 
         // set camera
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
@@ -214,11 +201,10 @@ public class AnimationCopyExample extends ExampleBase {
                         if (spatial instanceof SkinnedMesh) {
                             final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
                             if (gpuSkinningCheck.isSelected()) {
-                                skinnedSpatial.setGPUShader(gpuShader);
+                                skinnedSpatial.setRenderMaterial(matGPU);
                                 skinnedSpatial.setUseGPU(true);
                             } else {
-                                skinnedSpatial.setGPUShader(null);
-                                skinnedSpatial.clearRenderState(StateType.Shader);
+                                skinnedSpatial.setRenderMaterial(matCPU);
                                 skinnedSpatial.setUseGPU(false);
                             }
                         }
@@ -269,6 +255,10 @@ public class AnimationCopyExample extends ExampleBase {
 
     private void createCharacter() {
         try {
+            SkinnedMesh.addDefaultResourceLocators();
+            matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
+            matCPU = MaterialManager.INSTANCE.findMaterial("unlit/textured/basic.yaml");
+
             skNode.detachAllChildren();
             _root.attachChild(skNode);
 
@@ -289,22 +279,6 @@ public class AnimationCopyExample extends ExampleBase {
 
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
-
-            gpuShader = new ShaderState();
-            gpuShader.setEnabled(true);
-            try {
-                gpuShader.setShader(ShaderType.Vertex, "skinning_gpu_texture.vert",
-                        ResourceLocatorTool.getClassPathResourceAsString(AnimationCopyExample.class,
-                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.vert"));
-                gpuShader.setShader(ShaderType.Fragment, "skinning_gpu_texture.frag",
-                        ResourceLocatorTool.getClassPathResourceAsString(AnimationCopyExample.class,
-                                "com/ardor3d/extension/animation/skeletal/skinning_gpu_texture.frag"));
-
-                gpuShader.setUniform("texture", 0);
-                gpuShader.setUniform("lightDirection", new Vector3(1, 1, 1).normalizeLocal());
-            } catch (final IOException ioe) {
-                ioe.printStackTrace();
-            }
 
             // OPTIMIZATION: SkinnedMesh combining... Useful in our case because the skeleton model is composed of 2
             // separate meshes.
@@ -333,6 +307,11 @@ public class AnimationCopyExample extends ExampleBase {
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
             primeModel.setRenderState(cullState);
+
+            primeModel.setProperty("metallic", 0.25f);
+            primeModel.setProperty("roughness", 0.25f);
+            primeModel.setProperty("ao", 1.0f);
+            primeModel.setRenderMaterial(matCPU);
 
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {

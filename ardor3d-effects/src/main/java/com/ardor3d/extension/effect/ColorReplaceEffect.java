@@ -16,9 +16,6 @@ import com.ardor3d.renderer.effect.EffectManager;
 import com.ardor3d.renderer.effect.EffectStep_RenderScreenOverlay;
 import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
-import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class ColorReplaceEffect extends RenderEffect {
 
@@ -33,23 +30,23 @@ public class ColorReplaceEffect extends RenderEffect {
         _colorRampTexture.setWrap(WrapMode.EdgeClamp);
     }
 
-    private ShaderState getColorizeShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
-                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, "color_replace", ResourceLocatorTool
-                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "color_replace.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("inputTex", 0);
-        shader.setUniform("colorRampTex", 1);
-        shader.setUniform("redWeight", _redWeight);
-        shader.setUniform("greenWeight", _greenWeight);
-        shader.setUniform("blueWeight", _blueWeight);
-        return shader;
-    }
+//    private ShaderState getColorizeShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
+//                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, "color_replace", ResourceLocatorTool
+//                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "color_replace.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("inputTex", 0);
+//        shader.setUniform("colorRampTex", 1);
+//        shader.setUniform("redWeight", _redWeight);
+//        shader.setUniform("greenWeight", _greenWeight);
+//        shader.setUniform("blueWeight", _blueWeight);
+//        return shader;
+//    }
 
     @Override
     public void prepare(final EffectManager manager) {
@@ -59,7 +56,7 @@ public class ColorReplaceEffect extends RenderEffect {
         final EffectStep_RenderScreenOverlay colorizeStep = new EffectStep_RenderScreenOverlay();
         colorizeStep.getTextureState().setTexture(_colorRampTexture, 1);
         colorizeStep.getTargetMap().put("*Previous", 0);
-        colorizeStep.getEnforcedStates().put(StateType.Shader, getColorizeShader());
+//        colorizeStep.getEnforcedStates().put(StateType.Shader, getColorizeShader());
         _steps.add(colorizeStep);
 
         super.prepare(manager);

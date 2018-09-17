@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -10,18 +10,12 @@
 
 package com.ardor3d.example.renderer;
 
-import java.io.IOException;
-
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * <p>
@@ -36,11 +30,9 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
  * </p>
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.GLSLRibbonExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GLSLRibbonExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GLSLRibbonExample.jpg", //
+        maxHeapMemory = 64)
 public class GLSLRibbonExample extends ExampleBase {
-
-    private ShaderState _shader;
 
     public static void main(final String[] args) {
         start(GLSLRibbonExample.class);
@@ -51,25 +43,14 @@ public class GLSLRibbonExample extends ExampleBase {
         _canvas.setTitle("'To The Road Of Ribbon' by TX95 - rendered in Ardor3D");
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
 
-        _shader = new ShaderState();
-        try {
-            _shader.setShader(ShaderType.Fragment, "road_ribbon", ResourceLocatorTool.getClassPathResourceAsString(
-                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/road_ribbon.frag"));
-            _shader.setUniform("time", 0f);
-            _shader.setUniform("resolution", new Vector2(cam.getWidth(), cam.getHeight()));
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
-
-        final Quad q = new Quad("fsq", cam.getWidth(), cam.getHeight());
-        q.setRenderState(_shader);
-        q.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
-        q.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-        _root.attachChild(q);
+        final Quad q = Quad.newFullScreenQuad();
+        q.setRenderMaterial("road_ribbon_example.yaml");
+        q.setProperty("resolution", new Vector2(cam.getWidth(), cam.getHeight()));
+        _orthoRoot.attachChild(q);
     }
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
-        _shader.setUniform("time", (float) timer.getTimeInSeconds());
+        _orthoRoot.setProperty("time", (float) timer.getTimeInSeconds());
     }
 }

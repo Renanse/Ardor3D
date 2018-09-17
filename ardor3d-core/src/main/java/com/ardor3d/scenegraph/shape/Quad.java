@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,7 +13,12 @@ package com.ardor3d.scenegraph.shape;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.SceneHints;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -31,7 +36,7 @@ public class Quad extends Mesh {
 
     /**
      * Constructor creates a new <code>Quad</code> object.
-     * 
+     *
      * @param name
      *            the name of this <code>Quad</code>.
      */
@@ -41,7 +46,7 @@ public class Quad extends Mesh {
 
     /**
      * Constructor creates a new <code>Quade</code> object with the provided width and height.
-     * 
+     *
      * @param name
      *            the name of the <code>Quad</code>.
      * @param width
@@ -56,7 +61,7 @@ public class Quad extends Mesh {
 
     /**
      * <code>resize</code> changes the width and height of the given quad by altering its vertices.
-     * 
+     *
      * @param width
      *            the new width of the <code>Quad</code>.
      * @param height
@@ -75,7 +80,7 @@ public class Quad extends Mesh {
 
     /**
      * <code>initialize</code> builds the data for the <code>Quad</code> object.
-     * 
+     *
      * @param width
      *            the width of the <code>Quad</code>.
      * @param height
@@ -113,5 +118,15 @@ public class Quad extends Mesh {
 
     public double getHeight() {
         return _height;
+    }
+
+    public static Quad newFullScreenQuad() {
+        final Quad quad = new Quad("fsq", 2, 2);
+        final SceneHints sceneHints = quad.getSceneHints();
+        sceneHints.setCullHint(CullHint.Never);
+        sceneHints.setRenderBucketType(RenderBucketType.OrthoOrder);
+        sceneHints.setLightCombineMode(LightCombineMode.Off);
+        sceneHints.setTextureCombineMode(TextureCombineMode.Replace);
+        return quad;
     }
 }

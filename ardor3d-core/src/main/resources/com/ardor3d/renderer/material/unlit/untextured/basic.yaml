@@ -1,0 +1,17 @@
+--- # Simple, default color, material
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - shaderKey: defaultColor
+            type: Float4
+            source: RenderState
+            value: MeshDefaultColorRGBA
+        shaders: 
+          Vertex: 
+            source: unlit/untextured/basic.vert
+          Fragment:
+            source: unlit/untextured/default_color.frag

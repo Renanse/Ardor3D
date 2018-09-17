@@ -34,7 +34,6 @@ import com.ardor3d.math.functions.Functions;
 import com.ardor3d.math.functions.MandelbrotFunction3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -44,8 +43,8 @@ import com.ardor3d.util.TextureKey;
  * Illustrates the MandelbrotFunction3D class, which allow for procedural creation of the famous Mandelbrot set.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MandelbrotExplorerExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MandelbrotExplorerExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MandelbrotExplorerExample.jpg", //
+        maxHeapMemory = 64)
 public class MandelbrotExplorerExample extends ExampleBase {
 
     private final Quad display = new Quad("display");
@@ -68,8 +67,7 @@ public class MandelbrotExplorerExample extends ExampleBase {
         display.resize(cam.getWidth(), cam.getHeight());
         display.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
         display.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        display.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-        _root.attachChild(display);
+        _orthoRoot.attachChild(display);
 
         // set up our color map
         colors[0] = ColorRGBA.BLUE;
@@ -83,8 +81,10 @@ public class MandelbrotExplorerExample extends ExampleBase {
         // set up the texture
         final TextureState ts = new TextureState();
         ts.setTexture(tex);
-        _root.setRenderState(ts);
+        _orthoRoot.setRenderState(ts);
         updateTexture();
+
+        _orthoRoot.setRenderMaterial("unlit/textured/basic.yaml");
     }
 
     @Override
@@ -95,36 +95,36 @@ public class MandelbrotExplorerExample extends ExampleBase {
     @Override
     protected void registerInputTriggers() {
         super.registerInputTriggers();
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                // zoom in
-                final MouseState mouse = inputState.getCurrent().getMouseState();
-                final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
-                        * display.getHeight());
-                add.multiplyLocal(scale).multiplyLocal(
-                        new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
-                trans.addLocal(add.getX(), add.getY());
-                scale.multiplyLocal(0.5);
-                updateTexture();
-                iterations *= 1.1f;
-            }
-        }));
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.RIGHT),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                // zoom out
-                final MouseState mouse = inputState.getCurrent().getMouseState();
-                final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
-                        * display.getHeight());
-                add.multiplyLocal(scale).multiplyLocal(
-                        new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
-                trans.addLocal(add.getX(), add.getY());
-                scale.multiplyLocal(1 / .5);
-                updateTexture();
-                iterations /= 1.1f;
-            }
-        }));
+        _logicalLayer.registerTrigger(
+                new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                        // zoom in
+                        final MouseState mouse = inputState.getCurrent().getMouseState();
+                        final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(),
+                                mouse.getY() - .5 * display.getHeight());
+                        add.multiplyLocal(scale)
+                                .multiplyLocal(new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
+                        trans.addLocal(add.getX(), add.getY());
+                        scale.multiplyLocal(0.5);
+                        updateTexture();
+                        iterations *= 1.1f;
+                    }
+                }));
+        _logicalLayer.registerTrigger(
+                new InputTrigger(new MouseButtonReleasedCondition(MouseButton.RIGHT), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                        // zoom out
+                        final MouseState mouse = inputState.getCurrent().getMouseState();
+                        final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(),
+                                mouse.getY() - .5 * display.getHeight());
+                        add.multiplyLocal(scale)
+                                .multiplyLocal(new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
+                        trans.addLocal(add.getX(), add.getY());
+                        scale.multiplyLocal(1 / .5);
+                        updateTexture();
+                        iterations /= 1.1f;
+                    }
+                }));
     }
 
     private void updateTexture() {

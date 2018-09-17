@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -35,7 +35,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState;
@@ -53,8 +52,8 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
  * A demonstration of procedurally updating a texture.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.UpdateTextureExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_UpdateTextureExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_UpdateTextureExample.jpg", //
+        maxHeapMemory = 64)
 public class UpdateTextureExample extends ExampleBase {
     private Mesh t;
     private final Matrix3 rotate = new Matrix3();
@@ -79,8 +78,8 @@ public class UpdateTextureExample extends ExampleBase {
                 imageBuffer.flip();
                 final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
                         .getTexture();
-                renderer.updateTexture2DSubImage((Texture2D) prevTexture, 0, 0, img.getWidth(), img.getHeight(),
-                        imageBuffer, 0, 0, img.getWidth());
+                renderer.getTextureUtils().updateTexture2DSubImage((Texture2D) prevTexture, 0, 0, img.getWidth(),
+                        img.getHeight(), imageBuffer, 0, 0, img.getWidth());
                 break;
             }
             case 1: {
@@ -89,8 +88,8 @@ public class UpdateTextureExample extends ExampleBase {
                 imageBuffer.flip();
                 final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
                         .getTexture();
-                renderer.updateTexture2DSubImage((Texture2D) prevTexture, 100, 50, 100, 100, imageBuffer, 100, 50, img
-                        .getWidth());
+                renderer.getTextureUtils().updateTexture2DSubImage((Texture2D) prevTexture, 100, 50, 100, 100,
+                        imageBuffer, 100, 50, img.getWidth());
                 break;
             }
             case 2: {
@@ -141,10 +140,9 @@ public class UpdateTextureExample extends ExampleBase {
         _canvas.setTitle("Update texture - Example");
 
         final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Updating existing texture...");
-        keyText.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         keyText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         keyText.setTranslation(new Vector3(10, 10, 0));
-        _root.attachChild(keyText);
+        _orthoRoot.attachChild(keyText);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -181,10 +179,11 @@ public class UpdateTextureExample extends ExampleBase {
         _root.setRenderState(ms);
 
         _root.setRenderState(ts);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         try {
-            img = ImageIO.read(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE,
-                    "images/ardor3d_white_256.jpg").openStream());
+            img = ImageIO.read(ResourceLocatorTool
+                    .locateResource(ResourceLocatorTool.TYPE_TEXTURE, "images/ardor3d_white_256.jpg").openStream());
             // FIXME: Check if this is a int[] or byte[]
             final byte data[] = AWTImageLoader.asByteArray(img);
             imageBuffer = BufferUtils.createByteBuffer(data.length);

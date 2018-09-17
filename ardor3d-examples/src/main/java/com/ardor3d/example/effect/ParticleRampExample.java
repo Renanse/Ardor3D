@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -31,8 +31,8 @@ import com.ardor3d.util.TextureManager;
  * color) change over time.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleRampExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleRampExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleRampExample.jpg", //
+        maxHeapMemory = 64)
 public class ParticleRampExample extends ExampleBase {
 
     public static void main(final String[] args) {

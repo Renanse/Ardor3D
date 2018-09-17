@@ -245,6 +245,8 @@ public interface Renderer {
 
     void setMatrix(RenderMatrixType type, ReadOnlyTransform transform);
 
+    void computeNormalMatrix(boolean modelIsUniformScale);
+
     void setViewport(int x, int y, int width, int height);
 
     void setDepthRange(double depthRangeNear, double depthRangeFar);
@@ -326,4 +328,5 @@ public interface Renderer {
      * @return the texture renderer
      */
     TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits, final int samples);
+
 }

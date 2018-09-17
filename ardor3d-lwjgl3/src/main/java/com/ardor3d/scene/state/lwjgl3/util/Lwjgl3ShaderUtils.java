@@ -414,6 +414,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     return stack.mallocFloat(4).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf())
                             .flip();
                 }
+                if (value instanceof ReadOnlyColorRGBA) {
+                    final ReadOnlyColorRGBA vec = (ReadOnlyColorRGBA) value;
+                    return stack.mallocFloat(4).put(vec.getRed()).put(vec.getGreen()).put(vec.getBlue())
+                            .put(vec.getAlpha()).flip();
+                }
                 return (FloatBuffer) value;
             case Int1:
             case UInt1:

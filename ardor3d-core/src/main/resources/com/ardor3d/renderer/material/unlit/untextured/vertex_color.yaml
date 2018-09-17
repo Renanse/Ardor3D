@@ -1,0 +1,14 @@
+--- # Unlit, untextured, vertex color material
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: color
+        uniforms: 
+          - builtIn: [model, view, projection]
+        shaders: 
+          Vertex: 
+            source: unlit/untextured/vertex_color.vert
+          Fragment:
+            source: unlit/untextured/vertex_color.frag

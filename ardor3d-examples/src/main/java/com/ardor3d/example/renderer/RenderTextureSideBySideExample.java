@@ -19,12 +19,9 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.renderer.texture.TextureRendererFactory;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -36,8 +33,8 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the TextureRenderer class; which renders a scene to a buffer and copying it to a texture.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.RenderTextureSideBySideExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_RenderTextureSideBySideExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_RenderTextureSideBySideExample.jpg", //
+        maxHeapMemory = 64)
 public class RenderTextureSideBySideExample extends ExampleBase {
     private final Quaternion rotQuat = new Quaternion();
     private double angle = 0;
@@ -110,15 +107,14 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     private void initRtt(final Renderer renderer) {
         inited = true;
 
-        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_settings, renderer, ContextManager
-                .getCurrentContext().getCapabilities());
+        textureRenderer = renderer.createTextureRenderer(_settings.getWidth(), _settings.getHeight(),
+                _settings.getDepthBits(), _settings.getSamples());
 
         if (textureRenderer == null) {
             final BasicText t = BasicText.createDefaultTextLabel("Text", "RTT not supported on this computer.");
-            t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
             t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
             t.setTranslation(new Vector3(0, 20, 0));
-            _root.attachChild(t);
+            _orthoRoot.attachChild(t);
         } else {
             textureRenderer.getCamera().setLocation(new Vector3(-10, 0, 15));
             textureRenderer.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1));
@@ -152,5 +148,6 @@ public class RenderTextureSideBySideExample extends ExampleBase {
                 TextureStoreFormat.GuessCompressedFormat, true));
 
         _root.setRenderState(ts);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
     }
 }

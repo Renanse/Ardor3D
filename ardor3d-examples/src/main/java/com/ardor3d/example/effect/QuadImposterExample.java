@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -22,10 +22,9 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.extension.QuadImposterNode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -40,8 +39,8 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the QuadImposterNode class; which sets the texture level of detail for a Node.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.QuadImposterExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_QuadImposterExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_QuadImposterExample.jpg", //
+        maxHeapMemory = 64)
 public class QuadImposterExample extends ExampleBase {
     private boolean showImposter = true;
 
@@ -57,10 +56,9 @@ public class QuadImposterExample extends ExampleBase {
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(), Vector3.UNIT_Y);
 
         final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Switch imposters off");
-        keyText.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         keyText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         keyText.setTranslation(new Vector3(0, 20, 0));
-        _root.attachChild(keyText);
+        _orthoRoot.attachChild(keyText);
 
         final Box box = new Box("Box", new Vector3(), 150, 1, 150);
         box.setModelBound(new BoundingBox());

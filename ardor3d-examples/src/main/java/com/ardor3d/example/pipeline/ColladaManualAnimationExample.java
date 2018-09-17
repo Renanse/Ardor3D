@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -55,8 +55,8 @@ import com.ardor3d.util.ReadOnlyTimer;
  * Illustrates loading a model from Collada and procedurally animating its joints.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ColladaManualAnimationExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ColladaManualAnimationExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ColladaManualAnimationExample.jpg", //
+        maxHeapMemory = 64)
 public class ColladaManualAnimationExample extends ExampleBase {
 
     private static final boolean UPDATE_BOUNDS = false;
@@ -192,6 +192,7 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
             colladaStorage = colladaImporter.load("collada/sony/Seymour.dae");
             colladaNode = colladaStorage.getScene();
+            colladaNode.setRenderMaterial("unlit/textured/basic.yaml");
 
             System.err.println("took " + (System.currentTimeMillis() - time) + " ms");
 
@@ -218,17 +219,18 @@ public class ColladaManualAnimationExample extends ExampleBase {
         });
 
         final BasicText t1 = BasicText.createDefaultTextLabel("Text1", "[K] Show Skeleton.");
-        t1.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t1.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t1.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t1.setTranslation(new Vector3(5, 0 * (t1.getHeight() + 5) + 10, 0));
-        _root.attachChild(t1);
-        _root.getSceneHints().setCullHint(CullHint.Never);
+        _orthoRoot.attachChild(t1);
+        _orthoRoot.getSceneHints().setCullHint(CullHint.Never);
 
         final BasicText t2 = BasicText.createDefaultTextLabel("Text2", "[M] Hide Mesh.");
-        t2.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t2.setTranslation(new Vector3(5, 1 * (t1.getHeight() + 5) + 10, 0));
-        _root.attachChild(t2);
+        _orthoRoot.attachChild(t2);
+
         _root.getSceneHints().setCullHint(CullHint.Never);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K), new TriggerAction() {
@@ -282,13 +284,11 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
             _canvas.getCanvasRenderer().getCamera().setLocation(vec);
             _canvas.getCanvasRenderer().getCamera().lookAt(center, Vector3.UNIT_Y);
-            _canvas.getCanvasRenderer()
-                    .getCamera()
-                    .setFrustumPerspective(
-                            50.0,
+            _canvas.getCanvasRenderer().getCamera()
+                    .setFrustumPerspective(50.0,
                             (float) _canvas.getCanvasRenderer().getCamera().getWidth()
-                                    / _canvas.getCanvasRenderer().getCamera().getHeight(), 1.0f,
-                            Math.max(radius * 3, 10000.0));
+                                    / _canvas.getCanvasRenderer().getCamera().getHeight(),
+                            1.0f, Math.max(radius * 3, 10000.0));
 
             _controlHandle.setMoveSpeed(radius / 1.0);
         }

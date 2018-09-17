@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.effect.particle.ParticleController;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
@@ -67,8 +68,8 @@ import com.ardor3d.util.TextureManager;
  * Another particle demonstration, this one showing a smoking rocket following the cursor around the screen.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.NewDynamicSmokerExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_NewDynamicSmokerExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_NewDynamicSmokerExample.jpg", //
+        maxHeapMemory = 64)
 public class NewDynamicSmokerExample extends ExampleBase {
 
     private static double ROCKET_TURN_SPEED = 5;
@@ -91,6 +92,8 @@ public class NewDynamicSmokerExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        ParticleController.addDefaultResourceLocators();
+
         _canvas.setTitle("Smoking Rocket");
         final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
         final RenderContext renderContext = canvasRenderer.getRenderContext();
@@ -179,12 +182,12 @@ public class NewDynamicSmokerExample extends ExampleBase {
         rocketEntityNode.setRotation(currentOrient);
 
         // propel forward
-        rocketEntityNode.addTranslation(currentOrient.apply(Vector3.NEG_UNIT_Z, null).multiplyLocal(
-                ROCKET_PROPEL_SPEED * tpf));
+        rocketEntityNode
+                .addTranslation(currentOrient.apply(Vector3.NEG_UNIT_Z, null).multiplyLocal(ROCKET_PROPEL_SPEED * tpf));
 
         if (stayIn2DPlane) {
-            rocketEntityNode.setTranslation(rocketEntityNode.getTranslation().getX(), rocketEntityNode.getTranslation()
-                    .getY(), 0);
+            rocketEntityNode.setTranslation(rocketEntityNode.getTranslation().getX(),
+                    rocketEntityNode.getTranslation().getY(), 0);
         }
     }
 
@@ -223,7 +226,7 @@ public class NewDynamicSmokerExample extends ExampleBase {
 
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/flare.png", Texture.MinificationFilter.Trilinear,
-                TextureStoreFormat.GuessCompressedFormat, true));
+                TextureStoreFormat.GuessNoCompressedFormat, true));
         ts.getTexture().setWrap(WrapMode.BorderClamp);
         ts.setEnabled(true);
         smoke.setRenderState(ts);

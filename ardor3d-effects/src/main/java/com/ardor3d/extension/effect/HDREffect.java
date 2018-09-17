@@ -21,10 +21,6 @@ import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
 import com.ardor3d.renderer.effect.RenderTarget;
 import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
-import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 
 public class HDREffect extends RenderEffect {
     private String shaderDirectory = "com/ardor3d/extension/effect/";
@@ -58,7 +54,7 @@ public class HDREffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_LUM64x64));
             final EffectStep_RenderScreenOverlay extract64 = new EffectStep_RenderScreenOverlay();
-            extract64.getEnforcedStates().put(StateType.Shader, getLuminanceExtractionShader());
+//            extract64.getEnforcedStates().put(StateType.Shader, getLuminanceExtractionShader());
             extract64.getTargetMap().put(RT_DOWNSAMPLED, 0);
             _steps.add(extract64);
 
@@ -77,7 +73,7 @@ public class HDREffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_BRIGHTMAP));
             final EffectStep_RenderScreenOverlay bright = new EffectStep_RenderScreenOverlay();
-            bright.getEnforcedStates().put(StateType.Shader, getBrightMapShader());
+//            bright.getEnforcedStates().put(StateType.Shader, getBrightMapShader());
             bright.getTargetMap().put(RT_DOWNSAMPLED, 0);
             bright.getTargetMap().put(RT_LUM1x1, 1);
             _steps.add(bright);
@@ -93,36 +89,36 @@ public class HDREffect extends RenderEffect {
         super.prepare(manager);
     }
 
-    private RenderState getLuminanceExtractionShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
-                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, "luminance", ResourceLocatorTool
-                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "luminance.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("inputTex", 0);
-        return shader;
-    }
+//    private RenderState getLuminanceExtractionShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
+//                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, "luminance", ResourceLocatorTool
+//                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "luminance.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("inputTex", 0);
+//        return shader;
+//    }
 
-    private RenderState getBrightMapShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
-                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, "brightmap", ResourceLocatorTool
-                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "brightmap.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("inputTex", 0);
-        shader.setUniform("lum1x1Tex", 1);
-        shader.setUniform("exposurePow", 3.0f);
-        shader.setUniform("exposureCutoff", 0.0f);
-        return shader;
-    }
+//    private RenderState getBrightMapShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, "fsq", ResourceLocatorTool
+//                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, "brightmap", ResourceLocatorTool
+//                    .getClassPathResourceAsString(ColorReplaceEffect.class, shaderDirectory + "brightmap.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("inputTex", 0);
+//        shader.setUniform("lum1x1Tex", 1);
+//        shader.setUniform("exposurePow", 3.0f);
+//        shader.setUniform("exposureCutoff", 0.0f);
+//        return shader;
+//    }
 
     private void initTargets(final EffectManager manager) {
         final DisplaySettings canvas = manager.getCanvasSettings();

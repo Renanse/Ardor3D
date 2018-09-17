@@ -29,7 +29,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -104,7 +103,6 @@ public class ViewportExample extends ExampleBase {
 
         // A text to check aspect ratio of 2D objects
         quad = new Quad("test quad", 100, 20);
-        quad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         // if we don't explicitly update model bounds, quad will keep its default infinite bounding sphere, so it will
         // always display (and it will prevent rootnode from culling)
@@ -112,7 +110,7 @@ public class ViewportExample extends ExampleBase {
         // Attach children
         _root.attachChild(box1);
         _root.attachChild(box2);
-        _root.attachChild(quad);
+        _orthoRoot.attachChild(quad);
     }
 
     @Override

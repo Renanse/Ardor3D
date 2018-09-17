@@ -1,0 +1,25 @@
+--- # Material
+name: rtt_cubemap_example
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+          - key: uv1
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - 
+            shaderKey: resolution
+            type: Float2
+            source: SpatialProperty
+          - 
+            shaderKey: time
+            type: Float1
+            source: SpatialProperty
+        shaders: 
+          Vertex: 
+            source: unlit/textured/fsq.vert
+
+          Fragment: 
+            source: road_ribbon.frag

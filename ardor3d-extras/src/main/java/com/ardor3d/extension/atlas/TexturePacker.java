@@ -28,6 +28,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -45,11 +46,11 @@ import com.google.common.collect.Maps;
  * <pre>
  * // Create a texture atlas packer with maximum atlas size of 256x256
  * final TexturePacker packer = new TexturePacker(256, 256);
- * 
+ *
  * // Add meshes into atlas (lots of different ways of doing this if you have other source/target texture indices)
  * packer.insert(mesh1);
  * packer.insert(mesh2);
- * 
+ *
  * // Create all the atlases (also possible to set filters etc here through the AtlasTextureParameter)
  * packer.createAtlases();
  * </pre>
@@ -107,8 +108,8 @@ public class TexturePacker {
         }
         final ImageDataFormat format = parameterObject.getTexture().getImage().getDataFormat();
         if (format != ImageDataFormat.RGB && format != ImageDataFormat.RGBA) {
-            TexturePacker.logger.warning("Skipping mesh! - Only RGB and RGBA texture formats supported currently: "
-                    + parameterObject);
+            TexturePacker.logger.warning(
+                    "Skipping mesh! - Only RGB and RGBA texture formats supported currently: " + parameterObject);
             return;
         }
 
@@ -126,6 +127,7 @@ public class TexturePacker {
                 destination.put(i, destination.get(i) * diffX + offsetX);
                 destination.put(i + 1, destination.get(i + 1) * diffY + offsetY);
             }
+            parameterObject.getMesh().getMeshData().markBufferDirty(MeshData.KEY_TextureCoords0);
 
             parameterObject.setAtlasIndex(cachedParameter.getAtlasIndex());
 
@@ -228,6 +230,7 @@ public class TexturePacker {
             destination.put(i, destination.get(i) * diffX + offsetX);
             destination.put(i + 1, destination.get(i + 1) * diffY + offsetY);
         }
+        parameterObject.getMesh().getMeshData().markBufferDirty(MeshData.KEY_TextureCoords0);
     }
 
     private void repeat(final ByteBuffer data, final Rectangle2 rectangle, final int textureWidth,
@@ -334,9 +337,8 @@ public class TexturePacker {
         fillDataBuffer(dataAsFloatBuffer, dataAsFloatBuffer, sourceIndex, targetIndex, useAlpha);
     }
 
-    private void setDataPixel(final Rectangle2 rectangle, final int width, final int height,
-            final ByteBuffer lightData, final ByteBuffer dataAsFloatBuffer, final int y, final int x,
-            final boolean sourceAlpha) {
+    private void setDataPixel(final Rectangle2 rectangle, final int width, final int height, final ByteBuffer lightData,
+            final ByteBuffer dataAsFloatBuffer, final int y, final int x, final boolean sourceAlpha) {
         final int componentsSource = sourceAlpha ? 4 : 3;
         final int componentsTarget = useAlpha ? 4 : 3;
 

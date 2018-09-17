@@ -265,7 +265,7 @@ public class FullPbrExample extends ExampleBase {
         _root.attachChild(skybox);
 
         // render our BRDF texture
-        final Quad quad = new Quad("fsq", 2, 2);
+        final Quad quad = Quad.newFullScreenQuad();
         quad.setRenderMaterial("pbr/fsq_brdf.yaml");
         quad.updateGeometricState(0);
 

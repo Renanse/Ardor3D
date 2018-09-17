@@ -22,7 +22,6 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
@@ -43,8 +42,8 @@ import com.ardor3d.util.stat.StatType;
  * An example showing use of MeshCombiner to weld together a bunch of boxes into a single mesh.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.CombinerExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_CombinerExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_CombinerExample.jpg", //
+        maxHeapMemory = 64)
 public class CombinerExample extends ExampleBase {
 
     private final Node origNode = new Node("orig");
@@ -115,10 +114,9 @@ public class CombinerExample extends ExampleBase {
         // make some text labels...
         for (int i = 0; i < text.length; i++) {
             text[i] = BasicText.createDefaultTextLabel("Text" + i, "", 16);
-            text[i].getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
             text[i].getSceneHints().setLightCombineMode(LightCombineMode.Off);
             text[i].setTranslation(new Vector3(10, 10 + i * 25, 0));
-            _root.attachChild(text[i]);
+            _orthoRoot.attachChild(text[i]);
         }
 
         // Update text on the labels

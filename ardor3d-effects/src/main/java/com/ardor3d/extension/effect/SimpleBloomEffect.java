@@ -20,10 +20,7 @@ import com.ardor3d.renderer.effect.EffectStep_RenderSpatials;
 import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
 import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
-import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 
 public class SimpleBloomEffect extends RenderEffect {
@@ -34,12 +31,12 @@ public class SimpleBloomEffect extends RenderEffect {
     protected final List<Spatial> _bloomItems = Lists.newArrayList();
 
     protected float _downsampleRatio = .33f;
-    private final ShaderState _extractionShader, _blurHorizShader, _blurVertShader;
+//    private final ShaderState _extractionShader, _blurHorizShader, _blurVertShader;
 
     public SimpleBloomEffect() {
-        _extractionShader = getExtractionShader();
-        _blurHorizShader = getBlurHorizShader();
-        _blurVertShader = getBlurVertShader();
+//        _extractionShader = getExtractionShader();
+//        _blurHorizShader = getBlurHorizShader();
+//        _blurVertShader = getBlurVertShader();
         setExposureIntensity(1.3f);
         setExposureCutoff(0.15f);
         setSampleDistance(0.02f);
@@ -64,7 +61,7 @@ public class SimpleBloomEffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_SECONDARY));
             final EffectStep_RenderScreenOverlay extract = new EffectStep_RenderScreenOverlay();
-            extract.getEnforcedStates().put(StateType.Shader, _extractionShader);
+//            extract.getEnforcedStates().put(StateType.Shader, _extractionShader);
             extract.getTargetMap().put(useBloomItems ? RT_MAIN : "*Previous", 0);
             _steps.add(extract);
         }
@@ -73,13 +70,13 @@ public class SimpleBloomEffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_MAIN));
             final EffectStep_RenderScreenOverlay blurHoriz = new EffectStep_RenderScreenOverlay();
-            blurHoriz.getEnforcedStates().put(StateType.Shader, _blurHorizShader);
+//            blurHoriz.getEnforcedStates().put(StateType.Shader, _blurHorizShader);
             blurHoriz.getTargetMap().put(RT_SECONDARY, 0);
             _steps.add(blurHoriz);
 
             _steps.add(new EffectStep_SetRenderTarget(RT_SECONDARY));
             final EffectStep_RenderScreenOverlay blurVert = new EffectStep_RenderScreenOverlay();
-            blurVert.getEnforcedStates().put(StateType.Shader, _blurVertShader);
+//            blurVert.getEnforcedStates().put(StateType.Shader, _blurVertShader);
             blurVert.getTargetMap().put(RT_MAIN, 0);
             _steps.add(blurVert);
         }
@@ -88,7 +85,7 @@ public class SimpleBloomEffect extends RenderEffect {
         _steps.add(new EffectStep_SetRenderTarget("*Next"));
 
         final EffectStep_RenderScreenOverlay blendOverlay = new EffectStep_RenderScreenOverlay();
-        blendOverlay.getEnforcedStates().put(StateType.Shader, getBlendShader());
+//        blendOverlay.getEnforcedStates().put(StateType.Shader, getBlendShader());
         blendOverlay.getTargetMap().put("*Previous", 0);
         blendOverlay.getTargetMap().put(RT_SECONDARY, 1);
         _steps.add(blendOverlay);
@@ -112,74 +109,74 @@ public class SimpleBloomEffect extends RenderEffect {
         manager.getRenderTargetMap().put(RT_SECONDARY, secondary);
     }
 
-    protected ShaderState getExtractionShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
-                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
-                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "bloom_extract.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("inputTex", 0);
-        return shader;
-    }
-
-    protected ShaderState getBlurHorizShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
-                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
-                    SimpleBloomEffect.class, shaderDirectory + "gausian_blur_horizontal9.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("inputTex", 0);
-        return shader;
-    }
-
-    protected ShaderState getBlurVertShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
-                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
-                    SimpleBloomEffect.class, shaderDirectory + "gausian_blur_vertical9.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("inputTex", 0);
-        return shader;
-    }
-
-    protected ShaderState getBlendShader() {
-        final ShaderState shader = new ShaderState();
-        try {
-            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
-                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
-            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
-                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "add2textures.frag"));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        shader.setUniform("tex1", 0);
-        shader.setUniform("tex2", 1);
-        return shader;
-    }
+//    protected ShaderState getExtractionShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
+//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "bloom_extract.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("inputTex", 0);
+//        return shader;
+//    }
+//
+//    protected ShaderState getBlurHorizShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+//                    SimpleBloomEffect.class, shaderDirectory + "gausian_blur_horizontal9.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("inputTex", 0);
+//        return shader;
+//    }
+//
+//    protected ShaderState getBlurVertShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+//                    SimpleBloomEffect.class, shaderDirectory + "gausian_blur_vertical9.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("inputTex", 0);
+//        return shader;
+//    }
+//
+//    protected ShaderState getBlendShader() {
+//        final ShaderState shader = new ShaderState();
+//        try {
+//            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
+//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
+//            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
+//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "add2textures.frag"));
+//        } catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        shader.setUniform("tex1", 0);
+//        shader.setUniform("tex2", 1);
+//        return shader;
+//    }
 
     public void setExposureIntensity(final float value) {
-        _extractionShader.setUniform("exposureIntensity", value);
+//        _extractionShader.setUniform("exposureIntensity", value);
     }
 
     public void setExposureCutoff(final float value) {
-        _extractionShader.setUniform("exposureCutoff", value);
+//        _extractionShader.setUniform("exposureCutoff", value);
     }
 
     public void setSampleDistance(final float value) {
-        _blurHorizShader.setUniform("sampleDist", value);
-        _blurVertShader.setUniform("sampleDist", value);
+//        _blurHorizShader.setUniform("sampleDist", value);
+//        _blurVertShader.setUniform("sampleDist", value);
     }
 
     public float getDownsampleRatio() {

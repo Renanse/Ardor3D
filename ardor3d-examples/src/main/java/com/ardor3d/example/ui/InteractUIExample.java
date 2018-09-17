@@ -47,7 +47,6 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
@@ -82,8 +81,8 @@ import com.google.common.collect.Lists;
  * An example illustrating the use of the interact framework.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.interact.InteractUIExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractUIExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractUIExample.jpg", //
+        maxHeapMemory = 64)
 public class InteractUIExample extends ExampleBase {
 
     private UIHud hud;
@@ -135,19 +134,6 @@ public class InteractUIExample extends ExampleBase {
         // create a few way-markers to start things off
         initPath();
 
-        // manager.addUpdateLogic(new UpdateLogic() {
-        //
-        // @Override
-        // public void update(final double time, final InteractManager manager) {
-        // manager.fireTargetDataUpdated();
-        // }
-        // });
-
-        // disable auto-repeat in jogl, if we're using that, so that spacebar can be held down
-        if (_physicalLayer.getKeyboardWrapper() instanceof JoglNewtKeyboardWrapper) {
-            final JoglNewtKeyboardWrapper key = (JoglNewtKeyboardWrapper) _physicalLayer.getKeyboardWrapper();
-            key.setSkipAutoRepeatEvents(true);
-        }
     }
 
     private void addFloor() {
@@ -158,6 +144,7 @@ public class InteractUIExample extends ExampleBase {
         floor.setRenderState(ts);
         floor.getSceneHints().setPickingHint(PickingHint.Pickable, false);
         floor.setModelBound(new BoundingBox());
+        floor.setRenderMaterial("unlit/textured/basic.yaml");
         _root.attachChild(floor);
         _root.updateGeometricState(0);
     }
@@ -217,6 +204,7 @@ public class InteractUIExample extends ExampleBase {
                 }
             }
         });
+        t.setRenderMaterial("unlit/untextured/basic.yaml");
         _root.attachChild(t);
         path.add(t);
         return t;
@@ -296,37 +284,37 @@ public class InteractUIExample extends ExampleBase {
         manager.setActiveWidget(moveWidget);
 
         // add triggers to change which widget is active
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.ONE), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.ONE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(moveWidget);
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.TWO), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.TWO), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(insertWidget);
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.THREE), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.THREE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(colorWidget);
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.FOUR), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.FOUR), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(pulseWidget);
                     }
                 }));
 
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonLongPressedCondition(MouseButton.LEFT, 1500, 5),
-                new TriggerAction() {
+        _logicalLayer.registerTrigger(
+                new InputTrigger(new MouseButtonLongPressedCondition(MouseButton.LEFT, 1500, 5), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
@@ -334,15 +322,15 @@ public class InteractUIExample extends ExampleBase {
                     }
                 }));
 
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         showMenu();
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.SPACE), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.SPACE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         hideMenu();
@@ -583,8 +571,8 @@ public class InteractUIExample extends ExampleBase {
             centerPanel.setBackdrop(new EmptyBackdrop());
             centerPanel.setLayoutData(BorderLayoutData.CENTER);
 
-            final UIComboBox combo = new UIComboBox(new DefaultComboBoxModel("White", "Black", "Red", "Green", "Blue",
-                    "Yellow", "Magenta", "Cyan"));
+            final UIComboBox combo = new UIComboBox(
+                    new DefaultComboBoxModel("White", "Black", "Red", "Green", "Blue", "Yellow", "Magenta", "Cyan"));
             combo.setMinimumContentWidth(100);
             combo.addSelectionListener(new SelectionListener<UIComboBox>() {
                 @Override

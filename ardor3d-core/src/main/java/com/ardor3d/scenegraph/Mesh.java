@@ -256,6 +256,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
         // Set our model matrix
         renderer.setMatrix(RenderMatrixType.Model, getWorldTransform());
+        renderer.computeNormalMatrix(getWorldTransform().isUniformScale());
 
         // Walk through the passes of the technique and draw this mesh for each
         for (final TechniquePass pass : technique.getPasses()) {

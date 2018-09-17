@@ -13,6 +13,7 @@ package com.ardor3d.math.type;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
@@ -102,4 +103,6 @@ public interface ReadOnlyMatrix4 {
     double getM32();
 
     double getM33();
+
+    void toMatrix3(final Matrix3 store);
 }

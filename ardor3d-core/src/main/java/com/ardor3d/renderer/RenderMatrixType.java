@@ -11,5 +11,5 @@
 package com.ardor3d.renderer;
 
 public enum RenderMatrixType {
-    Model, View, Projection
+    Model, View, Projection, Normal
 }

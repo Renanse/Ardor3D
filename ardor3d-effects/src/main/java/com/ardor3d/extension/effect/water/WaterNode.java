@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.effect.water;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +29,6 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.CullState;
@@ -41,11 +38,8 @@ import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 
 /**
@@ -73,7 +67,6 @@ public class WaterNode extends Node {
     protected ArrayList<Texture> texArray = Lists.newArrayList();
     protected Node skyBox;
 
-    protected ShaderState waterShader;
     protected CullState cullBackFace;
     protected TextureState textureState;
 
@@ -116,7 +109,6 @@ public class WaterNode extends Node {
     protected String foamMapTextureString = "";
     protected String fallbackMapTextureString = "";
 
-    private ShaderState blurShaderVertical = null;
     private float blurSampleDistance = 0.002f;
     private Quad fullScreenQuad = null;
     private boolean doBlurReflection = true;
@@ -171,9 +163,6 @@ public class WaterNode extends Node {
         this.renderScale = renderScale;
         resetParameters();
 
-        waterShader = new ShaderState();
-        blurShaderVertical = new ShaderState();
-
         cullBackFace = new CullState();
         cullBackFace.setEnabled(true);
         cullBackFace.setCullFace(CullState.Face.None);
@@ -215,16 +204,12 @@ public class WaterNode extends Node {
 
         setupTextures();
 
-        fullScreenQuad = new Quad("FullScreenQuad", cam.getWidth() / 4, cam.getHeight() / 4);
-        fullScreenQuad.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
-        fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-        fullScreenQuad.getSceneHints().setCullHint(CullHint.Never);
-        fullScreenQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-        fullScreenQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        fullScreenQuad = Quad.newFullScreenQuad();
+
         final TextureState ts = new TextureState();
         ts.setTexture(textureReflect);
         fullScreenQuad.setRenderState(ts);
-        fullScreenQuad.setRenderState(blurShaderVertical);
+
         fullScreenQuad.updateWorldRenderStates(false);
 
         noFog = new FogState();
@@ -313,20 +298,20 @@ public class WaterNode extends Node {
         final double camWaterDist = waterPlane.pseudoDistance(cam.getLocation());
         aboveWater = camWaterDist >= 0;
 
-        waterShader.setUniform("tangent", tangent);
-        waterShader.setUniform("binormal", binormal);
-        waterShader.setUniform("useFadeToFogColor", useFadeToFogColor);
-        waterShader.setUniform("waterColor", waterColorStart);
-        waterShader.setUniform("waterColorEnd", waterColorEnd);
-        waterShader.setUniform("normalTranslation", (float) normalTranslation);
-        waterShader.setUniform("refractionTranslation", (float) refractionTranslation);
-        waterShader.setUniform("abovewater", aboveWater);
+        setProperty("tangent", tangent);
+        setProperty("binormal", binormal);
+        setProperty("useFadeToFogColor", useFadeToFogColor ? 1.0f : 0.0f);
+        setProperty("waterColor", waterColorStart);
+        setProperty("waterColorEnd", waterColorEnd);
+        setProperty("normalTranslation", (float) normalTranslation);
+        setProperty("refractionTranslation", (float) refractionTranslation);
+        setProperty("abovewater", aboveWater);
         if (useProjectedShader) {
-            waterShader.setUniform("cameraPos", cam.getLocation());
-            waterShader.setUniform("waterHeight", (float) waterPlane.getConstant());
-            waterShader.setUniform("amplitude", (float) waterMaxAmplitude);
-            waterShader.setUniform("heightFalloffStart", (float) heightFalloffStart);
-            waterShader.setUniform("heightFalloffSpeed", (float) heightFalloffSpeed);
+            setProperty("cameraPos", cam.getLocation());
+            setProperty("waterHeight", (float) waterPlane.getConstant());
+            setProperty("amplitude", (float) waterMaxAmplitude);
+            setProperty("heightFalloffStart", (float) heightFalloffStart);
+            setProperty("heightFalloffSpeed", (float) heightFalloffSpeed);
         }
 
         final double heightTotal = clipBias + waterMaxAmplitude - waterPlane.getConstant();
@@ -367,42 +352,42 @@ public class WaterNode extends Node {
             }
         }
 
-        try {
-            logger.info("loading " + currentShaderStr);
-            waterShader.setShader(ShaderType.Vertex,
-                    ResourceLocatorTool.getClassPathResourceAsString(WaterNode.class, currentShaderStr + ".vert"));
-            waterShader.setShader(ShaderType.Fragment,
-                    ResourceLocatorTool.getClassPathResourceAsString(WaterNode.class, currentShaderStr + ".frag"));
-        } catch (final IOException e) {
-            logger.log(Level.WARNING, "Error loading shader", e);
-            return;
-        }
+//        try {
+//            logger.info("loading " + currentShaderStr);
+//            waterShader.setShader(ShaderType.Vertex,
+//                    ResourceLocatorTool.getClassPathResourceAsString(WaterNode.class, currentShaderStr + ".vert"));
+//            waterShader.setShader(ShaderType.Fragment,
+//                    ResourceLocatorTool.getClassPathResourceAsString(WaterNode.class, currentShaderStr + ".frag"));
+//        } catch (final IOException e) {
+//            logger.log(Level.WARNING, "Error loading shader", e);
+//            return;
+//        }
 
-        waterShader.setUniform("normalMap", 0);
-        waterShader.setUniform("reflection", 1);
-        waterShader.setUniform("dudvMap", 2);
+        setProperty("normalMap", 0);
+        setProperty("reflection", 1);
+        setProperty("dudvMap", 2);
         if (useRefraction) {
-            waterShader.setUniform("refraction", 3);
-            waterShader.setUniform("depthMap", 4);
+            setProperty("refraction", 3);
+            setProperty("depthMap", 4);
         }
         if (useProjectedShader) {
             if (useRefraction) {
-                waterShader.setUniform("foamMap", 5);
+                setProperty("foamMap", 5);
             } else {
-                waterShader.setUniform("foamMap", 3);
+                setProperty("foamMap", 3);
             }
         }
 
-        try {
-            blurShaderVertical.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
-                    WaterNode.class, "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
-            blurShaderVertical.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
-                    WaterNode.class, "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
-        } catch (final IOException ex) {
-            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-        }
-        blurShaderVertical.setUniform("RT", 0);
-        blurShaderVertical.setUniform("sampleDist", blurSampleDistance);
+//        try {
+//            blurShaderVertical.setShader(ShaderType.Vertex, ResourceLocatorTool.getClassPathResourceAsString(
+//                    WaterNode.class, "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
+//            blurShaderVertical.setShader(ShaderType.Fragment, ResourceLocatorTool.getClassPathResourceAsString(
+//                    WaterNode.class, "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
+//        } catch (final IOException ex) {
+//            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+//        }
+        setProperty("RT", 0);
+        setProperty("sampleDist", blurSampleDistance);
 
         logger.info("Shader reloaded...");
     }
@@ -416,7 +401,6 @@ public class WaterNode extends Node {
     public void setWaterEffectOnSpatial(final Spatial spatial) {
         spatial.setRenderState(cullBackFace);
         // spatial.setRenderBucketType(RenderBucketType.Skip);
-        spatial.setRenderState(waterShader);
         spatial.setRenderState(textureState);
     }
 

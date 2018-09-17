@@ -33,7 +33,6 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
@@ -55,8 +54,8 @@ import com.google.common.collect.Lists;
  * with the MeshCombiner.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.AtlasExampleMultiTextured", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
+        maxHeapMemory = 64)
 public class AtlasExampleMultiTextured extends ExampleBase {
 
     /** Text fields used to present info about the example. */
@@ -90,13 +89,13 @@ public class AtlasExampleMultiTextured extends ExampleBase {
         // Use a separate node for packing/combining, otherwise we will get the text packed as well
         boxNode = new Node("boxes");
         _root.attachChild(boxNode);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         resetBoxes();
 
         // Setup text labels for presenting example info.
         final Node textNodes = new Node("Text");
-        _root.attachChild(textNodes);
-        textNodes.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _orthoRoot.attachChild(textNodes);
         textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
         final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() - 20;
@@ -209,8 +208,8 @@ public class AtlasExampleMultiTextured extends ExampleBase {
         // Create box
         final Box box = new Box("Box", new Vector3(0, 0, 0), 1, 1, 1);
         box.setModelBound(new BoundingBox());
-        box.setTranslation(new Vector3(MathUtils.rand.nextInt(40) - 20, MathUtils.rand.nextInt(40) - 20, MathUtils.rand
-                .nextInt(40) - 100));
+        box.setTranslation(new Vector3(MathUtils.rand.nextInt(40) - 20, MathUtils.rand.nextInt(40) - 20,
+                MathUtils.rand.nextInt(40) - 100));
         parentNode.attachChild(box);
 
         setupStates(box, textureName1, textureName2, mode);
@@ -218,7 +217,8 @@ public class AtlasExampleMultiTextured extends ExampleBase {
         return box;
     }
 
-    private void setupStates(final Mesh mesh, final String textureName1, final String textureName2, final WrapMode mode) {
+    private void setupStates(final Mesh mesh, final String textureName1, final String textureName2,
+            final WrapMode mode) {
         // Add a texture to the mesh.
         final TextureState ts = new TextureState();
 

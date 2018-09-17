@@ -1,11 +1,11 @@
+#version 330 core
+
 // 'To The Road Of Ribbon' by TX95 (2008)
 // Based on a production from the demoscene, the 1k intro by FRequency (http://www.pouet.net/prod.php?which=53939).
 // It made 2nd position in the Main demoparty held in France
 // Adapted from demo at http://iquilezles.org/apps/shadertoy/
 
-#ifdef GL_ES
-precision highp float;
-#endif
+out vec4 FragColor;
 
 uniform vec2 resolution;
 uniform float time;
@@ -69,5 +69,5 @@ void main(void)
 
  //Final Color
  vec4 fcolor = ((c+vec4(f))+(1.-min(pp.y+1.9,1.))*vec4(1.,.8,.7,1.))*min(time*.5,1.);
- gl_FragColor=vec4(fcolor.xyz,1.0);
+ FragColor=vec4(fcolor.xyz,1.0);
 }

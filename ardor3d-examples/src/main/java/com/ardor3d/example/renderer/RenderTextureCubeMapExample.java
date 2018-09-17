@@ -12,7 +12,6 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.math.MathUtils;
@@ -52,12 +51,10 @@ public class RenderTextureCubeMapExample extends ExampleBase {
         sp.getMeshData().copyTextureCoordinates(0, 1, 1f);
         _root.attachChild(sp);
 
-        final DisplaySettings settings = new DisplaySettings(512, 512, 24, 0, 0, 24, 0, 0, false, false);
-        cubeUtil = new CubeMapRenderUtil(settings, .1, 10);
-        cubeUtil.init(_canvas.getCanvasRenderer().getRenderer());
+        cubeUtil = new CubeMapRenderUtil(_canvas.getCanvasRenderer().getRenderer());
+        cubeUtil.updateSettings(512, 512, 24, .1, 10);
 
         texture = new TextureCubeMap();
-        cubeUtil.setupTexture(texture);
 
         final TextureState ts = new TextureState();
         // add base texture to unit 0

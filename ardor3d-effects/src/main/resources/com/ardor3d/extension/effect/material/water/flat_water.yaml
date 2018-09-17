@@ -1,0 +1,16 @@
+--- # Material for rendering a textured, vertex colored particle mesh
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: uv0
+        uniforms: 
+          - builtIn: [model, view, projection]
+        shaders: 
+          Vertex: 
+            source: water/flat_water.vert
+            
+          Fragment:
+            source: water/flat_water.frag

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -64,6 +64,7 @@ public class ParticleMesh extends ParticleSystem {
 
     @Override
     protected void initializeParticles(final int numParticles) {
+        setRenderMaterial("particles/particle_mesh.yaml");
 
         if (_particleMesh != null) {
             detachChild(_particleMesh);
@@ -94,7 +95,8 @@ public class ParticleMesh extends ParticleSystem {
         switch (getParticleType()) {
             case GeomMesh:
             case Triangle:
-                sharedTextureData = new Vector2[] { new Vector2(2.0, 0.0), new Vector2(0.0, 2.0), new Vector2(0.0, 0.0) };
+                sharedTextureData = new Vector2[] { new Vector2(2.0, 0.0), new Vector2(0.0, 2.0),
+                        new Vector2(0.0, 0.0) };
                 meshData.setIndexMode(IndexMode.Triangles);
                 break;
             default:
@@ -121,11 +123,12 @@ public class ParticleMesh extends ParticleSystem {
                 if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
                     final MeshEmitter source = (MeshEmitter) getParticleEmitter();
                     final Mesh sourceMesh = source.getSource();
-                    final int index = sourceMesh.getMeshData().getIndices() != null ? sourceMesh.getMeshData()
-                            .getIndices().get(ind) : ind;
-                            BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
-                                    index);
-                            BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
+                    final int index = sourceMesh.getMeshData().getIndices() != null
+                            ? sourceMesh.getMeshData().getIndices().get(ind)
+                            : ind;
+                    BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
+                            index);
+                    BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
                 } else {
                     BufferUtils.setInBuffer(sharedTextureData[a], meshData.getTextureCoords(0).getBuffer(), ind);
                 }

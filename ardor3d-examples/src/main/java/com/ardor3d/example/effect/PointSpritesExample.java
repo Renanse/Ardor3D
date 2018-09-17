@@ -16,9 +16,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Point;
@@ -34,12 +32,11 @@ import com.ardor3d.util.geom.BufferUtils;
  * A demonstration of using PointType.PointSprite. (Example requires GLSL shader support.)
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.PointSpritesExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_PointSpritesExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_PointSpritesExample.jpg", //
+        maxHeapMemory = 64)
 public class PointSpritesExample extends ExampleBase {
     private final int _spriteCount = 60000;
     private Point _pointSprites;
-    private ShaderState _pointSpriteShaderState;
 
     private final Matrix3 rotation = new Matrix3();
 
@@ -49,7 +46,7 @@ public class PointSpritesExample extends ExampleBase {
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
-        _pointSpriteShaderState.setUniform("time", (float) timer.getTimeInSeconds());
+//        _pointSpriteShaderState.setUniform("time", (float) timer.getTimeInSeconds());
 
         rotation.fromAngles(0.0 * timer.getTimeInSeconds(), 0.1 * timer.getTimeInSeconds(),
                 0.0 * timer.getTimeInSeconds());
@@ -74,23 +71,23 @@ public class PointSpritesExample extends ExampleBase {
         cam.setLocation(new Vector3(0, 30, 40));
         cam.lookAt(new Vector3(0, 0, 0), Vector3.UNIT_Y);
 
-        buildShader();
+//        buildShader();
 
         buildPointSprites();
     }
-
-    private void buildShader() {
-        _pointSpriteShaderState = new ShaderState();
-        _pointSpriteShaderState.setShader(ShaderType.Vertex, s_vert_pointsprite);
-        _pointSpriteShaderState.setShader(ShaderType.Fragment, s_frag_pointsprite);
-        _pointSpriteShaderState.setUniform("texture", 0);
-        _pointSpriteShaderState.setUniform("time", 0f);
-    }
+//
+//    private void buildShader() {
+//        _pointSpriteShaderState = new ShaderState();
+//        _pointSpriteShaderState.setShader(ShaderType.Vertex, s_vert_pointsprite);
+//        _pointSpriteShaderState.setShader(ShaderType.Fragment, s_frag_pointsprite);
+//        _pointSpriteShaderState.setUniform("texture", 0);
+//        _pointSpriteShaderState.setUniform("time", 0f);
+//    }
 
     private void buildPointSprites() {
         _pointSprites = new Point(PointType.PointSprite);
         _pointSprites.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        _pointSprites.setRenderState(_pointSpriteShaderState);
+//        _pointSprites.setRenderState(_pointSpriteShaderState);
         _pointSprites.setPointSize(12);
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/flare.png", Texture.MinificationFilter.NearestNeighborNoMipMaps,
@@ -148,8 +145,7 @@ public class PointSpritesExample extends ExampleBase {
 
     private static final String s_vert_pointsprite = "uniform float time;" + "const float a = 3.1415/20.0;"
             + "void main()" + "{" + "  float radius = gl_Color.a;" + "  gl_FrontColor.rgb = gl_Color.rgb;"
-            + "  gl_FrontColor.a = 1.0 - 0.02*radius;"
-            + "  gl_Position=gl_ModelViewProjectionMatrix*vec4(gl_Vertex.x, "
+            + "  gl_FrontColor.a = 1.0 - 0.02*radius;" + "  gl_Position=gl_ModelViewProjectionMatrix*vec4(gl_Vertex.x, "
             + "                                                gl_Vertex.y + (10.0-0.3*radius)*cos(time+a*radius), "
             + "                                                gl_Vertex.z, 1.0);" + "}";
 

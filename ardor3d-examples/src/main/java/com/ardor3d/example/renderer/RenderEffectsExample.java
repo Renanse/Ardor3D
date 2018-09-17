@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -14,7 +14,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.ColorReplaceEffect;
-import com.ardor3d.extension.effect.SimpleBloomEffect;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -47,8 +46,8 @@ import com.ardor3d.util.resource.URLResourceSource;
  * A simple example illustrating use of RenderEffects
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.RenderEffectsExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_RenderEffectsExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_RenderEffectsExample.jpg", //
+        maxHeapMemory = 64)
 public class RenderEffectsExample extends ExampleBase {
 
     private EffectManager effectManager;
@@ -99,13 +98,13 @@ public class RenderEffectsExample extends ExampleBase {
         effectManager.addEffect(new SpatialRTTEffect("*Next", null, _root));
 
         // Add a bloom effect
-        final SimpleBloomEffect bloomEffect = new SimpleBloomEffect();
-        effectManager.addEffect(bloomEffect);
+//        final SimpleBloomEffect bloomEffect = new SimpleBloomEffect();
+//        effectManager.addEffect(bloomEffect);
 
         // Add a sepia tone post effect
-        final Texture sepiaTexture = TextureManager.load(
-                new URLResourceSource(ResourceLocatorTool.getClassPathResource(ColorReplaceEffect.class,
-                        "com/ardor3d/extension/effect/sepiatone.png")), Texture.MinificationFilter.Trilinear, true);
+        final Texture sepiaTexture = TextureManager.load(new URLResourceSource(ResourceLocatorTool
+                .getClassPathResource(ColorReplaceEffect.class, "com/ardor3d/extension/effect/sepiatone.png")),
+                Texture.MinificationFilter.Trilinear, true);
         final ColorReplaceEffect sepiaEffect = new ColorReplaceEffect(sepiaTexture);
         effectManager.addEffect(sepiaEffect);
 
@@ -125,8 +124,8 @@ public class RenderEffectsExample extends ExampleBase {
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE), new TriggerAction() {
             @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                bloomEffect.setEnabled(!bloomEffect.isEnabled());
-                updateText();
+//                bloomEffect.setEnabled(!bloomEffect.isEnabled());
+//                updateText();
             }
         }));
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.TWO), new TriggerAction() {
@@ -140,8 +139,8 @@ public class RenderEffectsExample extends ExampleBase {
         // setup text labels
         for (int i = 0; i < exampleInfo.length; i++) {
             exampleInfo[i] = BasicText.createDefaultTextLabel("Text", "", 16);
-            exampleInfo[i].setTranslation(new Vector3(10, _canvas.getCanvasRenderer().getCamera().getHeight() - (i + 1)
-                    * 20, 0));
+            exampleInfo[i].setTranslation(
+                    new Vector3(10, _canvas.getCanvasRenderer().getCamera().getHeight() - (i + 1) * 20, 0));
             textNodes.attachChild(exampleInfo[i]);
         }
 
@@ -159,7 +158,7 @@ public class RenderEffectsExample extends ExampleBase {
      * Update text information.
      */
     private void updateText() {
-        exampleInfo[0].setText("[1] Bloom effect: " + effectManager.getEffects().get(1).isEnabled());
-        exampleInfo[1].setText("[2] Sepia effect: " + effectManager.getEffects().get(2).isEnabled());
+//        exampleInfo[0].setText("[1] Bloom effect: " + effectManager.getEffects().get(1).isEnabled());
+//        exampleInfo[1].setText("[2] Sepia effect: " + effectManager.getEffects().get(2).isEnabled());
     }
 }

@@ -1,0 +1,91 @@
+--- # Material
+name: rtt_cubemap_example
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+        uniforms: 
+          - builtIn: [model, view, projection]
+          - 
+            shaderKey: factor
+            type: Float1
+            source: SpatialProperty
+          - 
+            shaderKey: scale
+            type: Float2
+            source: SpatialProperty
+          - 
+            shaderKey: wireColor
+            type: Float4
+            source: SpatialProperty
+          - 
+            shaderKey: faceColor
+            type: Float4
+            source: SpatialProperty
+        shaders: 
+          Vertex: 
+            program: |
+              #version 330 core
+
+              in vec3 vertex;
+
+              uniform mat4 model;
+              uniform mat4 view;
+              uniform mat4 projection;
+              
+              void main()
+              {
+                  gl_Position = projection * view * model * vec4(vertex, 1.0);
+              }
+
+          Geometry:
+            program: |
+              #version 330 core
+
+              layout(triangles) in;
+              layout(triangle_strip, max_vertices = 3) out;
+              
+              uniform vec2 scale;
+              
+              out vec3 dist;
+              
+              void main()
+              {
+                vec2 p0 = scale * gl_in[0].gl_Position.xy/gl_in[0].gl_Position.w;
+                vec2 p1 = scale * gl_in[1].gl_Position.xy/gl_in[1].gl_Position.w;
+                vec2 p2 = scale * gl_in[2].gl_Position.xy/gl_in[2].gl_Position.w;
+              
+                vec2 v0 = p2-p1;
+                vec2 v1 = p2-p0;
+                vec2 v2 = p1-p0;
+                float area = abs(v1.x*v2.y - v1.y*v2.x);
+                dist = vec3(area/length(v0),0,0);
+                gl_Position = gl_in[0].gl_Position; EmitVertex();
+                dist = vec3(0,area/length(v1),0);
+                gl_Position = gl_in[1].gl_Position; EmitVertex();
+                dist = vec3(0,0,area/length(v2));
+                gl_Position = gl_in[2].gl_Position; EmitVertex();
+                EndPrimitive();
+              }
+              
+          Fragment: 
+            program: |
+              #version 330 core
+
+              in vec3 dist;
+
+              out vec4 FragColor;
+
+              uniform vec4 wireColor;
+              uniform vec4 faceColor;
+              uniform float factor;
+  
+              void main()
+              {
+                float d = min(dist[0], min(dist[1], dist[2]));
+                float I = exp2(-factor * d * d);
+                FragColor = I * wireColor + (1.0 - I) * faceColor;
+              }
+
+              

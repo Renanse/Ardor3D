@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.extension.effect.particle;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <code>ParticleController</code> controls and maintains the parameters of a particle system over time.
@@ -71,7 +74,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
     /**
      * Update the particles managed by this manager. If any particles are "dead" recreate them at the origin position
      * (which may be a point, line or rectangle.)
-     * 
+     *
      * @param secondsPassed
      *            double precision time
      * @param particles
@@ -87,8 +90,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
         // If instructed, check to see if our last frustum check passed
         if (isUpdateOnlyInView()) {
-            final Camera cam = _viewCamera != null ? _viewCamera : ContextManager.getCurrentContext()
-                    .getCurrentCamera();
+            final Camera cam = _viewCamera != null ? _viewCamera
+                    : ContextManager.getCurrentContext().getCurrentCamera();
             if (cam != null) {
                 final int state = cam.getPlaneState();
                 final boolean out = cam.contains(particles.getWorldBound()).equals(FrustumIntersect.Outside);
@@ -127,8 +130,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
                 // is added to any current value Note this is a double value,
                 // so we will keep adding up partial particles
 
-                _releaseParticles += (particles.getReleaseRate() * _timePassed * (1.0 + _releaseVariance
-                        * (MathUtils.nextRandomFloat() - 0.5)));
+                _releaseParticles += (particles.getReleaseRate() * _timePassed
+                        * (1.0 + _releaseVariance * (MathUtils.nextRandomFloat() - 0.5)));
 
                 // Try to create all "whole" particles we have added up
                 _particlesToCreate = (int) _releaseParticles;
@@ -240,17 +243,18 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
             } else {
                 // if not dead make sure our particles refresh their vbos, etc.
                 final MeshData md = particles.getParticleGeometry().getMeshData();
-                md.getVertexCoords().setNeedsRefresh(true);
-                md.getColorCoords().setNeedsRefresh(true);
-                md.getTextureCoords(0).setNeedsRefresh(true);
+                md.markBufferDirty(MeshData.KEY_VertexCoords);
+                md.markBufferDirty(MeshData.KEY_ColorCoords);
+                md.markBufferDirty(MeshData.KEY_TextureCoords0);
             }
 
             // If we have any live particles and are offscreen, update it
             if (anyAlive) {
                 boolean updateMB = true;
                 final Camera cam = _viewCamera != null ? _viewCamera
-                        : (ContextManager.getCurrentContext() != null ? ContextManager.getCurrentContext()
-                                .getCurrentCamera() : null);
+                        : (ContextManager.getCurrentContext() != null
+                                ? ContextManager.getCurrentContext().getCurrentCamera()
+                                : null);
                 if (cam != null) {
                     final int state = cam.getPlaneState();
                     updateMB = cam.contains(particles.getWorldBound()).equals(FrustumIntersect.Outside);
@@ -266,7 +270,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Get how soon after the last update the manager will send updates to the particles.
-     * 
+     *
      * @return The precision.
      */
     public double getPrecision() {
@@ -278,7 +282,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
      * <br>
      * This means that if an update is called every 2ms (e.g. running at 500 FPS) the particles position and stats will
      * be updated every fifth frame with the elapsed time (in this case, 10ms) since previous update.
-     * 
+     *
      * @param precision
      *            in seconds
      */
@@ -289,7 +293,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
     /**
      * Get the variance possible on the release rate. 0.0f = no variance 0.5f = between releaseRate / 2f and 1.5f *
      * releaseRate
-     * 
+     *
      * @return release variance as a percent.
      */
     public double getReleaseVariance() {
@@ -298,7 +302,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Set the variance possible on the release rate.
-     * 
+     *
      * @param variance
      *            release rate +/- variance as a percent (eg. .5 = 50%)
      */
@@ -308,7 +312,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Does this manager regulate the particle flow?
-     * 
+     *
      * @return true if this manager regulates how many particles per sec are emitted.
      */
     public boolean isControlFlow() {
@@ -317,7 +321,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Set the regulate flow property on the manager.
-     * 
+     *
      * @param regulate
      *            regulate particle flow.
      */
@@ -327,7 +331,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Does this manager use the particle's bounding volume to limit updates?
-     * 
+     *
      * @return true if this manager only updates the particles when they are in view.
      */
     public boolean isUpdateOnlyInView() {
@@ -336,7 +340,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Set the updateOnlyInView property on the manager.
-     * 
+     *
      * @param updateOnlyInView
      *            use the particle's bounding volume to limit updates.
      */
@@ -363,7 +367,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Return the number this manager has warmed up
-     * 
+     *
      * @return int
      */
     public int getIterations() {
@@ -372,7 +376,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Sets the iterations for the warmup and calls warmUp with the number of iterations as the argument
-     * 
+     *
      * @param iterations
      */
     public void setIterations(final int iterations) {
@@ -381,7 +385,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Add an external influence to this particle controller.
-     * 
+     *
      * @param influence
      *            ParticleInfluence
      */
@@ -394,7 +398,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Remove an influence from this particle controller.
-     * 
+     *
      * @param influence
      *            ParticleInfluence
      * @return true if found and removed.
@@ -408,7 +412,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Returns the list of influences acting on this particle controller.
-     * 
+     *
      * @return ArrayList
      */
     public List<ParticleInfluence> getInfluences() {
@@ -423,7 +427,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Subscribe a listener to receive mouse events. Enable event generation.
-     * 
+     *
      * @param listener
      *            to be subscribed
      */
@@ -437,7 +441,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Unsubscribe a listener. Disable event generation if no more listeners.
-     * 
+     *
      * @param listener
      *            to be unsuscribed
      * @see #addListener(ParticleControllerListener)
@@ -459,7 +463,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Check if a listener is allready added to this ParticleController
-     * 
+     *
      * @param listener
      *            listener to check for
      * @return true if listener is contained in the listenerlist
@@ -473,7 +477,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     /**
      * Get all added ParticleController listeners
-     * 
+     *
      * @return ArrayList of listeners added to this ParticleController
      */
     public List<ParticleControllerListener> getListeners() {
@@ -483,7 +487,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
     /**
      * Runs the update method of this particle manager X number of times passing .1 seconds for each call. This is used
      * to "warm up" and get the particle manager going.
-     * 
+     *
      * @param iterations
      *            The number of iterations to warm up.
      */
@@ -526,5 +530,18 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     public void setSpawnEnabled(final boolean spawnEnabled) {
         _spawnEnabled = spawnEnabled;
+    }
+
+    public static void addDefaultResourceLocators() {
+        try {
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL,
+                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ParticleController.class,
+                            "com/ardor3d/extension/effect/material")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER,
+                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ParticleController.class,
+                            "com/ardor3d/extension/effect/shader")));
+        } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
+        }
     }
 }

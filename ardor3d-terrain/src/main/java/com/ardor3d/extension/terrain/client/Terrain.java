@@ -61,7 +61,7 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     /** Reference to normal map */
     private TextureClipmap _normalClipmap;
-    private int _normalUnit = 5;
+    private int _normalUnit;
 
     private final Vector3 transformedFrustumPos = new Vector3();
 
@@ -132,6 +132,7 @@ public class Terrain extends Node implements Pickable, Runnable {
         setHeightRange(terrainConfiguration.getHeightRangeMin(), terrainConfiguration.getHeightRangeMax());
 
         setProperty("clipSideSize", _clipSideSize);
+        setNormalUnit(5);
 
         this.updateWorldRenderStates(true);
     }

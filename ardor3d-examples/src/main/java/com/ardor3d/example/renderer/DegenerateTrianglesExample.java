@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -25,7 +25,6 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -41,8 +40,8 @@ import com.ardor3d.util.geom.BufferUtils;
  * Illustrates two techniques for creating a triangle strip (i.e. series of connected triangles).
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.DegenerateTrianglesExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_DegenerateTrianglesExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_DegenerateTrianglesExample.jpg", //
+        maxHeapMemory = 64)
 public class DegenerateTrianglesExample extends ExampleBase {
 
     private BasicText t;
@@ -76,10 +75,9 @@ public class DegenerateTrianglesExample extends ExampleBase {
         _canvas.setTitle("Degenerate vs MultiStrip Example");
 
         t = BasicText.createDefaultTextLabel("Text", "[SPACE] MultiStrip Mesh");
-        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
-        _root.attachChild(t);
+        _orthoRoot.attachChild(t);
 
         final TextureState ts = new TextureState();
         ts.setEnabled(true);

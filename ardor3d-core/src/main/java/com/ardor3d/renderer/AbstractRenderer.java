@@ -20,6 +20,8 @@ import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -54,9 +56,10 @@ public abstract class AbstractRenderer implements Renderer {
             RenderState.StateType.class);
 
     public AbstractRenderer() {
-        for (final RenderMatrixType type : RenderMatrixType.values()) {
-            _matrixStore.put(type, BufferUtils.createFloatBuffer(16));
-        }
+        _matrixStore.put(RenderMatrixType.Model, BufferUtils.createFloatBuffer(16));
+        _matrixStore.put(RenderMatrixType.View, BufferUtils.createFloatBuffer(16));
+        _matrixStore.put(RenderMatrixType.Projection, BufferUtils.createFloatBuffer(16));
+        _matrixStore.put(RenderMatrixType.Normal, BufferUtils.createFloatBuffer(9));
 
         for (final RenderState.StateType type : RenderState.StateType.values()) {
             final RenderState state = RenderState.createState(type);
@@ -217,5 +220,32 @@ public abstract class AbstractRenderer implements Renderer {
         final FloatBuffer dst = _matrixStore.get(type);
         dst.clear();
         transform.getGLApplyMatrix(dst);
+    }
+
+    @Override
+    public void computeNormalMatrix(final boolean modelIsUniformScale) {
+        final Matrix3 normal = Matrix3.fetchTempInstance();
+        final FloatBuffer dst = _matrixStore.get(RenderMatrixType.Normal);
+        dst.clear();
+
+        final Matrix4 model = Matrix4.fetchTempInstance();
+        final FloatBuffer modelBuff = _matrixStore.get(RenderMatrixType.Model);
+        modelBuff.clear();
+        model.fromFloatBuffer(modelBuff);
+
+        final Matrix4 view = Matrix4.fetchTempInstance();
+        final FloatBuffer viewBuff = _matrixStore.get(RenderMatrixType.View);
+        viewBuff.clear();
+        view.fromFloatBuffer(viewBuff);
+
+        if (modelIsUniformScale) {
+            // normal matrix is just the 3x3 of the model view matrix
+            model.multiplyLocal(view).toMatrix3(normal);
+        } else {
+            // normal matrix is the inverse transpose of the 3x3 model view matrix
+            model.multiplyLocal(view).toMatrix3(normal);
+            normal.invertLocal().transposeLocal();
+        }
+        normal.toFloatBuffer(dst);
     }
 }

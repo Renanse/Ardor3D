@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -30,7 +30,7 @@ import com.ardor3d.util.export.Savable;
 /**
  * Matrix4 represents a double precision 4x4 matrix and contains a flag, set at object creation, indicating if the given
  * Matrix4 object is mutable.
- * 
+ *
  * Note: some algorithms in this class were ported from Eberly, Wolfram, Game Gems and others to Java.
  */
 public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatrix4, Poolable {
@@ -65,7 +65,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Constructs a new matrix set to the given matrix values. (names are mRC = m[ROW][COL])
-     * 
+     *
      * @param m00
      * @param m01
      * @param m02
@@ -107,7 +107,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Constructs a new matrix set to the values of the given matrix.
-     * 
+     *
      * @param source
      */
     public Matrix4(final ReadOnlyMatrix4 source) {
@@ -336,7 +336,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Same as set(IDENTITY)
-     * 
+     *
      * @return this matrix for chaining
      */
     public Matrix4 setIdentity() {
@@ -353,7 +353,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Sets the value of this matrix at row, column to the given value.
-     * 
+     *
      * @param row
      * @param column
      * @param value
@@ -448,7 +448,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Sets the values of this matrix to the values given.
-     * 
+     *
      * @param m00
      * @param m01
      * @param m02
@@ -493,7 +493,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Sets the values of this matrix to the values of the provided source matrix.
-     * 
+     *
      * @param source
      * @return this matrix for chaining
      * @throws NullPointerException
@@ -525,7 +525,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Sets the 3x3 rotation part of this matrix to the values of the provided source matrix.
-     * 
+     *
      * @param source
      * @return this matrix for chaining
      * @throws NullPointerException
@@ -547,7 +547,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Sets the values of this matrix to the rotational value of the given quaternion. Only modifies the 3x3 rotation
      * part of this matrix.
-     * 
+     *
      * @param quaternion
      * @return this matrix for chaining
      */
@@ -613,7 +613,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Note: data is cast to floats.
-     * 
+     *
      * @param store
      *            the buffer to read our matrix data from.
      * @return this matrix for chaining.
@@ -624,7 +624,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Note: data is cast to floats.
-     * 
+     *
      * @param store
      *            the buffer to read our matrix data from.
      * @param rowMajor
@@ -673,7 +673,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Sets the values of this matrix to the values of the provided double array.
-     * 
+     *
      * @param source
      * @return this matrix for chaining
      * @throws NullPointerException
@@ -687,7 +687,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Sets the values of this matrix to the values of the provided double array.
-     * 
+     *
      * @param source
      * @param rowMajor
      * @return this matrix for chaining
@@ -737,7 +737,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Replaces a column in this matrix with the values of the given array.
-     * 
+     *
      * @param columnIndex
      * @param columnData
      * @return this matrix for chaining
@@ -782,7 +782,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Replaces a row in this matrix with the values of the given array.
-     * 
+     *
      * @param rowIndex
      * @param rowData
      * @return this matrix for chaining
@@ -829,7 +829,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * Sets the 3x3 rotation portion of this matrix to the rotation indicated by the given angle and axis of rotation.
      * Note: This method creates an object, so use fromAngleNormalAxis when possible, particularly if your axis is
      * already normalized.
-     * 
+     *
      * @param angle
      *            the angle to rotate (in radians).
      * @param axis
@@ -849,7 +849,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Sets the 3x3 rotation portion of this matrix to the rotation indicated by the given angle and a unit-length axis
      * of rotation.
-     * 
+     *
      * @param angle
      *            the angle to rotate (in radians).
      * @param axis
@@ -887,9 +887,9 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     public Matrix4 applyRotation(final double angle, final double x, final double y, final double z) {
         final double m00 = _m00, m01 = _m01, m02 = _m02, //
-        m10 = _m10, m11 = _m11, m12 = _m12, //
-        m20 = _m20, m21 = _m21, m22 = _m22, //
-        m30 = _m30, m31 = _m31, m32 = _m32;
+                m10 = _m10, m11 = _m11, m12 = _m12, //
+                m20 = _m20, m21 = _m21, m22 = _m22, //
+                m30 = _m30, m31 = _m31, m32 = _m32;
 
         final double cosAngle = Math.cos(angle);
         final double sinAngle = Math.sin(angle);
@@ -936,9 +936,9 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     public Matrix4 applyRotationX(final double angle) {
         final double m01 = _m01, m02 = _m02, //
-        m11 = _m11, m12 = _m12, //
-        m21 = _m21, m22 = _m22, //
-        m31 = _m31, m32 = _m32;
+                m11 = _m11, m12 = _m12, //
+                m21 = _m21, m22 = _m22, //
+                m31 = _m31, m32 = _m32;
 
         final double cosAngle = Math.cos(angle);
         final double sinAngle = Math.sin(angle);
@@ -960,9 +960,9 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     public Matrix4 applyRotationY(final double angle) {
         final double m00 = _m00, m02 = _m02, //
-        m10 = _m10, m12 = _m12, //
-        m20 = _m20, m22 = _m22, //
-        m30 = _m30, m32 = _m32;
+                m10 = _m10, m12 = _m12, //
+                m20 = _m20, m22 = _m22, //
+                m30 = _m30, m32 = _m32;
 
         final double cosAngle = Math.cos(angle);
         final double sinAngle = Math.sin(angle);
@@ -984,9 +984,9 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     public Matrix4 applyRotationZ(final double angle) {
         final double m00 = _m00, m01 = _m01, //
-        m10 = _m10, m11 = _m11, //
-        m20 = _m20, m21 = _m21, //
-        m30 = _m30, m31 = _m31;
+                m10 = _m10, m11 = _m11, //
+                m20 = _m20, m21 = _m21, //
+                m30 = _m30, m31 = _m31;
 
         final double cosAngle = Math.cos(angle);
         final double sinAngle = Math.sin(angle);
@@ -1008,7 +1008,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * M*T
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -1025,7 +1025,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * T*M
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -1133,6 +1133,23 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * @param store
+     *            the Matrix to store our 3x3 portion to
+     */
+    @Override
+    public void toMatrix3(final Matrix3 store) {
+        store._m00 = _m00;
+        store._m01 = _m01;
+        store._m02 = _m02;
+        store._m10 = _m10;
+        store._m11 = _m11;
+        store._m12 = _m12;
+        store._m20 = _m20;
+        store._m21 = _m21;
+        store._m22 = _m22;
+    }
+
+    /**
+     * @param store
      *            the buffer to store our matrix data in. Must not be null. Data is entered starting at current buffer
      * @return matrix data as a DoubleBuffer in row major order. The position is at the end of the inserted data.
      * @throws NullPointerException
@@ -1200,7 +1217,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Note: data is cast to floats.
-     * 
+     *
      * @param store
      *            the buffer to store our matrix data in. Must not be null. Data is entered starting at current buffer
      * @return matrix data as a FloatBuffer in row major order. The position is at the end of the inserted data.
@@ -1216,7 +1233,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Note: data is cast to floats.
-     * 
+     *
      * @param store
      *            the buffer to store our matrix data in. Must not be null. Data is entered starting at current buffer
      * @param rowMajor
@@ -1340,7 +1357,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Multiplies this matrix by the diagonal matrix formed by the given vector (v^D * M). If supplied, the result is
      * stored into the supplied "store" matrix.
-     * 
+     *
      * @param vec
      * @param store
      *            a matrix to store the result in. If store is null, a new matrix is created. Note that it IS safe for
@@ -1368,7 +1385,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Multiplies this matrix by the diagonal matrix formed by the given vector (M * v^D). If supplied, the result is
      * stored into the supplied "store" matrix.
-     * 
+     *
      * @param vec
      * @param store
      *            a matrix to store the result in. If store is null, a new matrix is created. Note that it IS safe for
@@ -1419,41 +1436,41 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
             result = new Matrix4();
         }
 
-        final double temp00 = _m00 * matrix.getM00() + _m01 * matrix.getM10() + _m02 * matrix.getM20() + _m03
-                * matrix.getM30();
-        final double temp01 = _m00 * matrix.getM01() + _m01 * matrix.getM11() + _m02 * matrix.getM21() + _m03
-                * matrix.getM31();
-        final double temp02 = _m00 * matrix.getM02() + _m01 * matrix.getM12() + _m02 * matrix.getM22() + _m03
-                * matrix.getM32();
-        final double temp03 = _m00 * matrix.getM03() + _m01 * matrix.getM13() + _m02 * matrix.getM23() + _m03
-                * matrix.getM33();
+        final double temp00 = _m00 * matrix.getM00() + _m01 * matrix.getM10() + _m02 * matrix.getM20()
+                + _m03 * matrix.getM30();
+        final double temp01 = _m00 * matrix.getM01() + _m01 * matrix.getM11() + _m02 * matrix.getM21()
+                + _m03 * matrix.getM31();
+        final double temp02 = _m00 * matrix.getM02() + _m01 * matrix.getM12() + _m02 * matrix.getM22()
+                + _m03 * matrix.getM32();
+        final double temp03 = _m00 * matrix.getM03() + _m01 * matrix.getM13() + _m02 * matrix.getM23()
+                + _m03 * matrix.getM33();
 
-        final double temp10 = _m10 * matrix.getM00() + _m11 * matrix.getM10() + _m12 * matrix.getM20() + _m13
-                * matrix.getM30();
-        final double temp11 = _m10 * matrix.getM01() + _m11 * matrix.getM11() + _m12 * matrix.getM21() + _m13
-                * matrix.getM31();
-        final double temp12 = _m10 * matrix.getM02() + _m11 * matrix.getM12() + _m12 * matrix.getM22() + _m13
-                * matrix.getM32();
-        final double temp13 = _m10 * matrix.getM03() + _m11 * matrix.getM13() + _m12 * matrix.getM23() + _m13
-                * matrix.getM33();
+        final double temp10 = _m10 * matrix.getM00() + _m11 * matrix.getM10() + _m12 * matrix.getM20()
+                + _m13 * matrix.getM30();
+        final double temp11 = _m10 * matrix.getM01() + _m11 * matrix.getM11() + _m12 * matrix.getM21()
+                + _m13 * matrix.getM31();
+        final double temp12 = _m10 * matrix.getM02() + _m11 * matrix.getM12() + _m12 * matrix.getM22()
+                + _m13 * matrix.getM32();
+        final double temp13 = _m10 * matrix.getM03() + _m11 * matrix.getM13() + _m12 * matrix.getM23()
+                + _m13 * matrix.getM33();
 
-        final double temp20 = _m20 * matrix.getM00() + _m21 * matrix.getM10() + _m22 * matrix.getM20() + _m23
-                * matrix.getM30();
-        final double temp21 = _m20 * matrix.getM01() + _m21 * matrix.getM11() + _m22 * matrix.getM21() + _m23
-                * matrix.getM31();
-        final double temp22 = _m20 * matrix.getM02() + _m21 * matrix.getM12() + _m22 * matrix.getM22() + _m23
-                * matrix.getM32();
-        final double temp23 = _m20 * matrix.getM03() + _m21 * matrix.getM13() + _m22 * matrix.getM23() + _m23
-                * matrix.getM33();
+        final double temp20 = _m20 * matrix.getM00() + _m21 * matrix.getM10() + _m22 * matrix.getM20()
+                + _m23 * matrix.getM30();
+        final double temp21 = _m20 * matrix.getM01() + _m21 * matrix.getM11() + _m22 * matrix.getM21()
+                + _m23 * matrix.getM31();
+        final double temp22 = _m20 * matrix.getM02() + _m21 * matrix.getM12() + _m22 * matrix.getM22()
+                + _m23 * matrix.getM32();
+        final double temp23 = _m20 * matrix.getM03() + _m21 * matrix.getM13() + _m22 * matrix.getM23()
+                + _m23 * matrix.getM33();
 
-        final double temp30 = _m30 * matrix.getM00() + _m31 * matrix.getM10() + _m32 * matrix.getM20() + _m33
-                * matrix.getM30();
-        final double temp31 = _m30 * matrix.getM01() + _m31 * matrix.getM11() + _m32 * matrix.getM21() + _m33
-                * matrix.getM31();
-        final double temp32 = _m30 * matrix.getM02() + _m31 * matrix.getM12() + _m32 * matrix.getM22() + _m33
-                * matrix.getM32();
-        final double temp33 = _m30 * matrix.getM03() + _m31 * matrix.getM13() + _m32 * matrix.getM23() + _m33
-                * matrix.getM33();
+        final double temp30 = _m30 * matrix.getM00() + _m31 * matrix.getM10() + _m32 * matrix.getM20()
+                + _m33 * matrix.getM30();
+        final double temp31 = _m30 * matrix.getM01() + _m31 * matrix.getM11() + _m32 * matrix.getM21()
+                + _m33 * matrix.getM31();
+        final double temp32 = _m30 * matrix.getM02() + _m31 * matrix.getM12() + _m32 * matrix.getM22()
+                + _m33 * matrix.getM32();
+        final double temp33 = _m30 * matrix.getM03() + _m31 * matrix.getM13() + _m32 * matrix.getM23()
+                + _m33 * matrix.getM33();
 
         result._m00 = temp00;
         result._m01 = temp01;
@@ -1477,7 +1494,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Internally scales all values of this matrix by the given scalar.
-     * 
+     *
      * @param scalar
      * @return this matrix for chaining.
      */
@@ -1541,7 +1558,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Internally adds the values of the given matrix to this matrix.
-     * 
+     *
      * @param matrix
      *            the matrix to add to this.
      * @return this matrix for chaining
@@ -1591,7 +1608,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Internally subtracts the values of the given matrix from this matrix.
-     * 
+     *
      * @param matrix
      *            the matrix to subtract from this.
      * @return this matrix for chaining
@@ -1604,7 +1621,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Applies the given scale to this matrix and returns the result as a new matrix
-     * 
+     *
      * @param scale
      * @param store
      *            a matrix to store the result in. If store is null, a new matrix is created.
@@ -1628,7 +1645,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Applies the given scale to this matrix values internally
-     * 
+     *
      * @param scale
      * @return this matrix for chaining.
      * @throws NullPointerException
@@ -1640,7 +1657,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * transposes this matrix as a new matrix, basically flipping it across the diagonal
-     * 
+     *
      * @param store
      *            a matrix to store the result in. If store is null, a new matrix is created. It is NOT safe for store
      *            to == this.
@@ -1676,7 +1693,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * transposes this matrix in place
-     * 
+     *
      * @return this matrix for chaining.
      * @see <a href="http://en.wikipedia.org/wiki/Transpose">wikipedia.org-Transpose</a>
      */
@@ -1761,7 +1778,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * inverts this matrix locally.
-     * 
+     *
      * @return this matrix inverted internally.
      * @throws ArithmeticException
      *             if this matrix can not be inverted.
@@ -1846,7 +1863,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Multiplies the given vector by this matrix (v * M). If supplied, the result is stored into the supplied "store"
      * vector.
-     * 
+     *
      * @param vector
      *            the vector to multiply this matrix by.
      * @param store
@@ -1878,7 +1895,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Multiplies the given vector by this matrix (M * v). If supplied, the result is stored into the supplied "store"
      * vector.
-     * 
+     *
      * @param vector
      *            the vector to multiply this matrix by.
      * @param store
@@ -1910,7 +1927,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Multiplies the given point by this matrix (M * p). If supplied, the result is stored into the supplied "store"
      * vector.
-     * 
+     *
      * @param point
      *            the point to multiply against this matrix.
      * @param store
@@ -1940,7 +1957,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Multiplies the given vector by this matrix (M * v). If supplied, the result is stored into the supplied "store"
      * vector.
-     * 
+     *
      * @param vector
      *            the vector to multiply this matrix by.
      * @param store
@@ -1969,7 +1986,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Check a matrix... if it is null or its doubles are NaN or infinite, return false. Else return true.
-     * 
+     *
      * @param matrix
      *            the vector to check
      * @return true or false as stated above.
@@ -2356,7 +2373,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param in
      *            ObjectInput
      * @throws IOException
@@ -2384,7 +2401,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param out
      *            ObjectOutput
      * @throws IOException
@@ -2428,7 +2445,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Releases a Matrix4 back to be used by a future call to fetchTempInstance. TAKE CARE: this Matrix4 object should
      * no longer have other classes referencing it or "Bad Things" will happen.
-     * 
+     *
      * @param mat
      *            the Matrix4 to release.
      */

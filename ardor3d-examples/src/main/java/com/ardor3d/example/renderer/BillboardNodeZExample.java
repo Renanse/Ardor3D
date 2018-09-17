@@ -25,7 +25,6 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
@@ -40,8 +39,8 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the BillboardNode class - but using a Z-up camera.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.BillboardNodeZExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_BillboardNodeZExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_BillboardNodeZExample.jpg", //
+        maxHeapMemory = 64)
 public class BillboardNodeZExample extends ExampleBase {
 
     private static final int BB_SPACING = 10;
@@ -88,10 +87,9 @@ public class BillboardNodeZExample extends ExampleBase {
         _canvas.setTitle("BillboardNodeZ - Example");
 
         text = BasicText.createDefaultTextLabel("Text", "[SPACE] " + StartingAlignment);
-        text.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         text.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         text.setTranslation(new Vector3(5, 20, 0));
-        _root.attachChild(text);
+        _orthoRoot.attachChild(text);
 
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
         cam.setAxes(new Vector3(Vector3.UNIT_X), _worldUp, Vector3.UNIT_Y);

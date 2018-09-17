@@ -10,7 +10,6 @@
 
 package com.ardor3d.example.renderer;
 
-import java.io.IOException;
 import java.util.Random;
 
 import com.ardor3d.bounding.BoundingSphere;
@@ -24,26 +23,23 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.ShaderState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * Demonstrates the use of geometry instancing and compares it to VBO.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.GeometryInstancingExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GeometryInstancingExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GeometryInstancingExample.jpg", //
+        maxHeapMemory = 64)
 public class GeometryInstancingExample extends ExampleBase {
 
     private BasicText frameRateLabel;
@@ -52,7 +48,6 @@ public class GeometryInstancingExample extends ExampleBase {
 
     private boolean instancingEnabled = true;
 
-    private ShaderState _shader;
     private Node _base;
 
     public static void main(final String[] args) {
@@ -84,16 +79,16 @@ public class GeometryInstancingExample extends ExampleBase {
         _canvas.setTitle("GeometryInstancingExample");
 
         final BasicText t = BasicText.createDefaultTextLabel("Text", "[V] VBO Off");
-        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
-        _root.attachChild(t);
+        _orthoRoot.attachChild(t);
 
         final BasicText t2 = BasicText.createDefaultTextLabel("Text", "[I] Instancing On");
-        t2.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t2.setTranslation(new Vector3(0, 50, 0));
-        _root.attachChild(t2);
+        _orthoRoot.attachChild(t2);
 
         final CullState cs = new CullState();
         cs.setCullFace(CullState.Face.Back);
@@ -104,34 +99,34 @@ public class GeometryInstancingExample extends ExampleBase {
         ms.setColorMaterial(ColorMaterial.Diffuse);
         _root.setRenderState(ms);
 
-        _shader = new ShaderState();
-        try {
-            _shader.setShader(ShaderType.Vertex, "geometryBasic", ResourceLocatorTool.getClassPathResourceAsString(
-                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.vert.glsl"));
-            _shader.setShader(ShaderType.Fragment, "geometryBasic", ResourceLocatorTool.getClassPathResourceAsString(
-                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.frag.glsl"));
-
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
+//        _shader = new ShaderState();
+//        try {
+//            _shader.setShader(ShaderType.Vertex, "geometryBasic", ResourceLocatorTool.getClassPathResourceAsString(
+//                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.vert.glsl"));
+//            _shader.setShader(ShaderType.Fragment, "geometryBasic", ResourceLocatorTool.getClassPathResourceAsString(
+//                    GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.frag.glsl"));
+//
+//        } catch (final IOException ex) {
+//            ex.printStackTrace();
+//        }
 
         _base = new Node("node");
         _root.attachChild(_base);
 
         final Node instancedBase = new Node("instancedBase");
-        instancedBase.setRenderState(_shader);
+//        instancedBase.setRenderState(_shader);
         _base.attachChild(instancedBase);
         instancedBase.getSceneHints().setCullHint(CullHint.Dynamic);
 
         final Node unInstancedBase = new Node("unInstancedBase");
-        unInstancedBase.setRenderState(_shader);
+//        unInstancedBase.setRenderState(_shader);
         _base.attachChild(unInstancedBase);
         unInstancedBase.getSceneHints().setCullHint(CullHint.Always);
 
         final int nrOfObjects = 500;
 
-        generateSpheres(instancedBase, true, nrOfObjects);
-        generateSpheres(unInstancedBase, false, nrOfObjects);
+//        generateSpheres(instancedBase, true, nrOfObjects);
+//        generateSpheres(unInstancedBase, false, nrOfObjects);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), new TriggerAction() {
 
@@ -173,8 +168,8 @@ public class GeometryInstancingExample extends ExampleBase {
             }
             sphere.setRandomColors();
             sphere.setModelBound(new BoundingSphere());
-            sphere.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
-                    .nextDouble() * 100.0 - 250.0));
+            sphere.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
+                    rand.nextDouble() * 100.0 - 250.0));
             sphere.getSceneHints().setCullHint(CullHint.Dynamic);
             modelBase.attachChild(sphere);
         }

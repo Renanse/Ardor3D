@@ -1147,9 +1147,9 @@ public class Camera implements Savable, Externalizable {
     }
 
     /**
-     * Updates the value of our model view matrix.
+     * Updates the value of our view matrix.
      */
-    protected void updateModelViewMatrix() {
+    protected void updateViewMatrix() {
         _view.setIdentity();
         _view.setM00(-_left.getX());
         _view.setM10(-_left.getY());
@@ -1169,7 +1169,7 @@ public class Camera implements Savable, Externalizable {
     }
 
     /**
-     * @return this camera's 4x4 model view matrix.
+     * @return this camera's 4x4 view matrix.
      */
     public ReadOnlyMatrix4 getViewMatrix() {
         checkModelView();
@@ -1372,7 +1372,7 @@ public class Camera implements Savable, Externalizable {
      */
     private void checkModelView() {
         if (_updateMVMatrix) {
-            updateModelViewMatrix();
+            updateViewMatrix();
             _updateMVMatrix = false;
         }
     }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -24,10 +24,9 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -39,8 +38,8 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the ProjectedGrid class; used to efficiently determine which vertices's in a terrain to draw.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ProjectedGridExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ProjectedGridExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ProjectedGridExample.jpg", //
+        maxHeapMemory = 64)
 public class ProjectedGridExample extends ExampleBase {
     /** The Projected Grid mesh */
     private ProjectedGrid projectedGrid;
@@ -85,10 +84,10 @@ public class ProjectedGridExample extends ExampleBase {
         _controlHandle.setMoveSpeed(200);
 
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 100, 200));
-        _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(
-                40.0,
+        _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(40.0,
                 (float) _canvas.getCanvasRenderer().getCamera().getWidth()
-                        / (float) _canvas.getCanvasRenderer().getCamera().getHeight(), 1.0, 5000);
+                        / (float) _canvas.getCanvasRenderer().getCamera().getHeight(),
+                1.0, 5000);
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(0, 0, 0), Vector3.UNIT_Y);
 
         projectedGrid = new ProjectedGrid("ProjectedGrid", externalCamera, 100, 70, 0.01f, new WaterHeightGenerator(),
@@ -141,8 +140,7 @@ public class ProjectedGridExample extends ExampleBase {
 
         // Setup textfields for presenting example info.
         final Node textNodes = new Node("Text");
-        _root.attachChild(textNodes);
-        textNodes.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        _orthoRoot.attachChild(textNodes);
         textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
         final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
