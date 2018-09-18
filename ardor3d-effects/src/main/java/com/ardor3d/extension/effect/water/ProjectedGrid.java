@@ -34,6 +34,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.ExtendedCamera;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
@@ -343,6 +344,10 @@ public class ProjectedGrid extends Mesh {
 
         normBuf.rewind();
         normBuf.put(normBufArray);
+
+        getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+        getMeshData().markBufferDirty(MeshData.KEY_NormalCoords);
+        getMeshData().markBufferDirty(MeshData.KEY_TextureCoords0);
 
         return true;
     }

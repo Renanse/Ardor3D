@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,10 +13,12 @@ package com.ardor3d.example.effect;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.effect.EffectUtils;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.SwarmInfluence;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -33,8 +35,8 @@ import com.ardor3d.util.TextureManager;
  * Example showing a particle system using the particle SwarmInfluence.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleSwarmExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleSwarmExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleSwarmExample.jpg", //
+        maxHeapMemory = 64)
 public class ParticleSwarmExample extends ExampleBase {
 
     private ParticleSystem particles;
@@ -66,6 +68,8 @@ public class ParticleSwarmExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        EffectUtils.addDefaultResourceLocators();
+
         _canvas.setTitle("Particle System - Swarming Influence");
         _lightState.setEnabled(false);
 
@@ -102,6 +106,7 @@ public class ParticleSwarmExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
                 TextureStoreFormat.GuessCompressedFormat, true));
+        ts.getTexture().setWrap(WrapMode.BorderClamp);
         ts.setEnabled(true);
         particles.setRenderState(ts);
 
@@ -113,5 +118,6 @@ public class ParticleSwarmExample extends ExampleBase {
 
         _root.attachChild(particles);
         _root.attachChild(sphere);
+        _root.setRenderMaterial("unlit/untextured/basic.yaml");
     }
 }

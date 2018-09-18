@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -15,7 +15,7 @@ import java.util.concurrent.Callable;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.extension.effect.particle.ParticleController;
+import com.ardor3d.extension.effect.EffectUtils;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
@@ -92,7 +92,7 @@ public class NewDynamicSmokerExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        ParticleController.addDefaultResourceLocators();
+        EffectUtils.addDefaultResourceLocators();
 
         _canvas.setTitle("Smoking Rocket");
         final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
@@ -196,6 +196,7 @@ public class NewDynamicSmokerExample extends ExampleBase {
         rocket.setRotation(new Quaternion().fromAngleAxis(MathUtils.DEG_TO_RAD * -90, Vector3.UNIT_X));
         rocketEntityNode.attachChild(rocket);
         _root.attachChild(rocketEntityNode);
+        rocket.setRenderMaterial("unlit/untextured/basic.yaml");
     }
 
     private void addEngineSmoke() {

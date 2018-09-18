@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,11 +13,12 @@ package com.ardor3d.example.effect;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.effect.EffectUtils;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -32,8 +33,8 @@ import com.ardor3d.util.TextureManager;
  * color) change over time.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleSystemExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
+        maxHeapMemory = 64)
 public class ParticleSystemExample extends ExampleBase {
 
     private ParticleSystem particles;
@@ -79,6 +80,8 @@ public class ParticleSystemExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        EffectUtils.addDefaultResourceLocators();
+
         _canvas.setTitle("Particle System - Example");
         _lightState.setEnabled(false);
 

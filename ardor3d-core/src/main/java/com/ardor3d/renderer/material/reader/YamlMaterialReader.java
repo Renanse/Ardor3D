@@ -435,7 +435,7 @@ public class YamlMaterialReader {
     }
 
     private static void addDefaultUniform(final String type, final TechniquePass pass) {
-        switch (type.toLowerCase()) {
+        switch (type) {
             case "view":
                 pass.addUniform(new UniformRef("view", UniformType.Matrix4x4, UniformSource.RendererMatrix,
                         RenderMatrixType.View));
@@ -448,11 +448,11 @@ public class YamlMaterialReader {
                 pass.addUniform(new UniformRef("projection", UniformType.Matrix4x4, UniformSource.RendererMatrix,
                         RenderMatrixType.Projection));
                 return;
-            case "normal":
-                pass.addUniform(new UniformRef("normal", UniformType.Matrix3x3, UniformSource.RendererMatrix,
+            case "normalMat":
+                pass.addUniform(new UniformRef("normalMat", UniformType.Matrix3x3, UniformSource.RendererMatrix,
                         RenderMatrixType.Normal));
                 return;
-            case "cameraloc":
+            case "cameraLoc":
                 pass.addUniform(new UniformRef("cameraLoc", UniformType.Float3, UniformSource.RenderState,
                         RenderStateProperty.CurrentCameraLocation));
                 return;

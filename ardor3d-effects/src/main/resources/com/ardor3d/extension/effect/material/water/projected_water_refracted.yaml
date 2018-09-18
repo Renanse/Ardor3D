@@ -8,7 +8,7 @@ techniques:
           - key: uv0
           
         uniforms: 
-          - builtIn: [model, view, projection, normalMat]
+          - builtIn: [model, view, projection, cameraLoc]
           -  
             shaderKey: reflectMat
             type: Matrix4x4
@@ -35,6 +35,18 @@ techniques:
             shaderKey: dudvMap
             type: Int1
             value: 2
+          -
+            shaderKey: refraction
+            type: Int1
+            value: 3
+          -
+            shaderKey: depthMap
+            type: Int1
+            value: 4
+          -
+            shaderKey: foamMap
+            type: Int1
+            value: 5
           -
             shaderKey: tangent
             type: Float3
@@ -67,10 +79,26 @@ techniques:
             shaderKey: useFadeToFogColor
             type: Int1
             source: SpatialProperty
+          -
+            shaderKey: waterHeight
+            type: Float1
+            source: SpatialProperty
+          -
+            shaderKey: heightFalloffStart
+            type: Float1
+            source: SpatialProperty
+          -
+            shaderKey: heightFalloffSpeed
+            type: Float1
+            source: SpatialProperty
+          -
+            shaderKey: amplitude
+            type: Float1
+            source: SpatialProperty
           
         shaders: 
           Vertex: 
-            source: water/flat_water.vert
+            source: water/projected_water.vert
             
           Fragment:
-            source: water/flat_water.frag
+            source: water/projected_water_refracted.frag

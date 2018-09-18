@@ -183,6 +183,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         if (success == GL11C.GL_FALSE) {
             final String log = GL20C.glGetShaderInfoLog(shaderId);
 
+            System.err.println(info);
             throw new Ardor3dException("Error compiling " + type.name() + " shader: " + log);
         }
 

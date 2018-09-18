@@ -54,13 +54,10 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
     protected volatile boolean _focusLost = false;
 
-    @SuppressWarnings("unused")
     protected GLFWWindowFocusCallback _focusCallback;
 
-    @SuppressWarnings("unused")
     protected GLFWErrorCallback _errorCallback;
 
-    @SuppressWarnings("unused")
     protected GLFWWindowSizeCallbackI _resizeCallback;
 
     protected int _contentWidth, _contentHeight;

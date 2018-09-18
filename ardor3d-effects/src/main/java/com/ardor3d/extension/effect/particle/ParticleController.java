@@ -11,7 +11,6 @@
 package com.ardor3d.extension.effect.particle;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +22,6 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <code>ParticleController</code> controls and maintains the parameters of a particle system over time.
@@ -530,18 +527,5 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     public void setSpawnEnabled(final boolean spawnEnabled) {
         _spawnEnabled = spawnEnabled;
-    }
-
-    public static void addDefaultResourceLocators() {
-        try {
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL,
-                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ParticleController.class,
-                            "com/ardor3d/extension/effect/material")));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER,
-                    new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ParticleController.class,
-                            "com/ardor3d/extension/effect/shader")));
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        }
     }
 }

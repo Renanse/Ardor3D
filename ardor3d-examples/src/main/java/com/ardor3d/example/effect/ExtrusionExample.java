@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -28,8 +28,8 @@ import com.google.common.collect.Lists;
  * A demonstration of the Extrusion class - showing how a set of point can be converted into a 3d shape.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ExtrusionExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_QuadImposterExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_QuadImposterExample.jpg", //
+        maxHeapMemory = 64)
 public class ExtrusionExample extends ExampleBase {
     public static void main(final String[] args) {
         start(ExtrusionExample.class);
@@ -74,11 +74,13 @@ public class ExtrusionExample extends ExampleBase {
         final Extrusion extrusion3 = new Extrusion("Extrusion", lineLoop, path, Vector3.UNIT_Y);
         extrusion3.setTranslation(10, 20, 0);
         _root.attachChild(extrusion3);
+
+        _root.setRenderMaterial("unlit/untextured/basic.yaml");
     }
 
     private Line createLines() {
         final ReadOnlyVector3[] vectors = { //
-        new Vector3(0, 0, 0), //
+                new Vector3(0, 0, 0), //
                 new Vector3(5, 0, 0), //
                 new Vector3(5, 0, 0), //
                 new Vector3(5, 5, 0), //
@@ -97,8 +99,8 @@ public class ExtrusionExample extends ExampleBase {
 
     private Line createLineStrip(final boolean loop) {
         // Create a line with our example "makeLine" method. See method below.
-        final ReadOnlyVector3[] vectors = { // 
-        new Vector3(0, 0, 0), //
+        final ReadOnlyVector3[] vectors = { //
+                new Vector3(0, 0, 0), //
                 new Vector3(5, 0, 0), //
                 new Vector3(5, 5, 0), //
                 new Vector3(-5, 5, 0), //

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -54,6 +54,7 @@ public class QuadImposterExample extends ExampleBase {
 
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 60, 80));
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(), Vector3.UNIT_Y);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Switch imposters off");
         keyText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
@@ -65,7 +66,7 @@ public class QuadImposterExample extends ExampleBase {
         box.setTranslation(new Vector3(0, -10, 0));
         _root.attachChild(box);
 
-        final QuadImposterNode imposter0 = new QuadImposterNode("Imposter1", 256, 256, _settings.getDepthBits(),
+        final QuadImposterNode imposter0 = new QuadImposterNode("Imposter1", 512, 512, _settings.getDepthBits(),
                 _settings.getSamples(), _timer);
         imposter0.setRedrawRate(0.0); // No timed update
         imposter0.setCameraAngleThreshold(1.0 * MathUtils.DEG_TO_RAD);
@@ -76,7 +77,7 @@ public class QuadImposterExample extends ExampleBase {
         scene1.setTranslation(0, 0, 0);
         imposter0.attachChild(scene1);
 
-        final QuadImposterNode imposter1 = new QuadImposterNode("Imposter1", 128, 128, _settings.getDepthBits(),
+        final QuadImposterNode imposter1 = new QuadImposterNode("Imposter1", 256, 256, _settings.getDepthBits(),
                 _settings.getSamples(), _timer);
         imposter1.setRedrawRate(0.0); // No timed update
         imposter1.setCameraAngleThreshold(1.0 * MathUtils.DEG_TO_RAD);
@@ -87,7 +88,7 @@ public class QuadImposterExample extends ExampleBase {
         scene2.setTranslation(-15, 0, -25);
         imposter1.attachChild(scene2);
 
-        final QuadImposterNode imposter2 = new QuadImposterNode("Imposter2", 64, 64, _settings.getDepthBits(),
+        final QuadImposterNode imposter2 = new QuadImposterNode("Imposter2", 128, 128, _settings.getDepthBits(),
                 _settings.getSamples(), _timer);
         imposter2.setRedrawRate(0.0); // No timed update
         imposter2.setCameraAngleThreshold(1.0 * MathUtils.DEG_TO_RAD);

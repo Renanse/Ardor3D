@@ -26,7 +26,7 @@ import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.state.loader.InputStore;
 import com.ardor3d.extension.animation.skeletal.state.loader.JSLayerImporter;
 import com.ardor3d.extension.animation.skeletal.util.MissingCallback;
-import com.ardor3d.extension.effect.particle.ParticleController;
+import com.ardor3d.extension.effect.EffectUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.util.nvtristrip.NvTriangleStripper;
@@ -83,7 +83,7 @@ public class AnimationDemoExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        ParticleController.addDefaultResourceLocators();
+        EffectUtils.addDefaultResourceLocators();
 
         _canvas.setTitle("Ardor3D - Animation Demo Example - Skeletons Patrol!");
         final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();

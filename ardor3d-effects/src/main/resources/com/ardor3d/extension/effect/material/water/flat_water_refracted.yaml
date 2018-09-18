@@ -36,6 +36,14 @@ techniques:
             type: Int1
             value: 2
           -
+            shaderKey: refraction
+            type: Int1
+            value: 3
+          -
+            shaderKey: depthMap
+            type: Int1
+            value: 4
+          -
             shaderKey: tangent
             type: Float3
             source: SpatialProperty
@@ -73,4 +81,4 @@ techniques:
             source: water/flat_water.vert
             
           Fragment:
-            source: water/flat_water.frag
+            source: water/flat_water_refracted.frag

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -93,6 +93,7 @@ public class ProjectedGridExample extends ExampleBase {
         projectedGrid = new ProjectedGrid("ProjectedGrid", externalCamera, 100, 70, 0.01f, new WaterHeightGenerator(),
                 _timer);
         _root.attachChild(projectedGrid);
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {

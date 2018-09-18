@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -98,6 +98,8 @@ public class TrailExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        _root.setRenderMaterial("unlit/textured/basic.yaml");
+
         _canvas.setTitle("Trail Example");
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(150, 150, 0));
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(0, 0, 1), Vector3.UNIT_Y);

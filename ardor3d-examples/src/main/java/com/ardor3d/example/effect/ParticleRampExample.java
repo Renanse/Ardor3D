@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -13,10 +13,12 @@ package com.ardor3d.example.effect;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.effect.EffectUtils;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.RampEntry;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -41,6 +43,8 @@ public class ParticleRampExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        EffectUtils.addDefaultResourceLocators();
+
         _canvas.setTitle("Particle System - Example");
         _lightState.setEnabled(false);
 
@@ -89,6 +93,7 @@ public class ParticleRampExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
                 TextureStoreFormat.GuessCompressedFormat, true));
+        ts.getTexture().setWrap(WrapMode.BorderClamp);
         ts.setEnabled(true);
         particles.setRenderState(ts);
 
