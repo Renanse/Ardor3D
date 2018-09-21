@@ -319,7 +319,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     public void setupPointParameters(final float pointSize, final boolean antialiased, final boolean isSprite,
             final boolean useDistanceAttenuation, final FloatBuffer attenuationCoefficients, final float minPointSize,
             final float maxPointSize) {
-        final RenderContext context = ContextManager.getCurrentContext();
+//        final RenderContext context = ContextManager.getCurrentContext();
 
         // TODO: make a record for point states
         GL11C.glPointSize(pointSize);

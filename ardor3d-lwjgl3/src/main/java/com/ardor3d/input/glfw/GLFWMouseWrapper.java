@@ -94,8 +94,8 @@ public class GLFWMouseWrapper implements MouseWrapper {
                 // Add our new state
                 final int x = _lastState != null ? _lastState.getX() : 0;
                 final int y = _lastState != null ? _lastState.getY() : 0;
-                addNextState(new MouseState(x, y, 0, 0, 0, Maps.newEnumMap(_lastButtonState), _sendClickState
-                        && !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null));
+                addNextState(new MouseState(x, y, 0, 0, 0, Maps.newEnumMap(_lastButtonState),
+                        _sendClickState && !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null));
             }
         });
 
@@ -140,7 +140,6 @@ public class GLFWMouseWrapper implements MouseWrapper {
                 final int x = _lastState != null ? _lastState.getX() : 0;
                 final int y = _lastState != null ? _lastState.getY() : 0;
                 final MouseState event = new MouseState(x, y, 0, 0, dw, Maps.newEnumMap(_lastButtonState), null);
-                System.err.println(dw);
                 addNextState(event);
             }
         });

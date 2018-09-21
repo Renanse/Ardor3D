@@ -258,7 +258,7 @@ public class FullPbrExample extends ExampleBase {
         }
 
         // clear our set property
-        skybox.setProperty("roughness", null);
+        skybox.removeProperty("roughness");
 
         // reuse our skybox for the scene now by updating our material and attaching to root
         skybox.setRenderMaterial("unlit/textured/cubemap_skybox.yaml");

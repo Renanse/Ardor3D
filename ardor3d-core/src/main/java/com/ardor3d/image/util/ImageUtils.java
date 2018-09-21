@@ -22,7 +22,8 @@ public abstract class ImageUtils {
     }
 
     public static final TextureStoreFormat getTextureStoreFormat(final TextureStoreFormat format, final Image image) {
-        if (format != TextureStoreFormat.GuessCompressedFormat && format != TextureStoreFormat.GuessNoCompressedFormat) {
+        if (format != TextureStoreFormat.GuessCompressedFormat
+                && format != TextureStoreFormat.GuessNoCompressedFormat) {
             return format;
         }
         if (image == null) {
@@ -122,6 +123,7 @@ public abstract class ImageUtils {
                         break;
                 }
                 break;
+            case Alpha:
             case Green:
             case Blue:
             case StencilIndex:

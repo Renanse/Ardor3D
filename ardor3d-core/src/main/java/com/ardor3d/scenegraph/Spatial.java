@@ -110,7 +110,7 @@ public abstract class Spatial implements Savable, Hintable {
     protected static final EnumSet<DirtyType> ON_DIRTY_ATTACHED = EnumSet.of(DirtyType.Transform, DirtyType.RenderState,
             DirtyType.Bounding);
 
-    protected static final String PKEY_USER_DATA = "_userdata";
+    public static final String KEY_UserData = "_userdata";
 
     /**
      * Constructs a new Spatial. Initializes the transform fields.
@@ -1046,12 +1046,15 @@ public abstract class Spatial implements Savable, Hintable {
     }
 
     /**
-     * Gets the Spatial specific user data.
+     * Gets the Spatial specific user data. Note that this is mapped to getLocalProperty(KEY_UserData) to maintain the
+     * "local only" behavior of the older API.
      *
      * @return the user data
+     * @deprecated Use {@link #getProperty(String)} instead.
      */
+    @Deprecated
     public Object getUserData() {
-        return getProperty(PKEY_USER_DATA);
+        return getLocalProperty(KEY_UserData);
     }
 
     /**
@@ -1060,28 +1063,30 @@ public abstract class Spatial implements Savable, Hintable {
      * @param userData
      *            Some Spatial specific user data. Note: If this object is not explicitly of type Savable, it will be
      *            ignored during read/write.
+     * @deprecated Use {@link #setProperty(String, Object)} instead.
      */
+    @Deprecated
     public void setUserData(final Object userData) {
-        setProperty(PKEY_USER_DATA, userData);
+        setProperty(KEY_UserData, userData);
     }
 
     /**
-     * Get a property from this spatial, or null if the property is not set.
+     * Get a property from this spatial, optionally inheriting values from higher in the scenegraph based upon the
+     * {@link PropertyMode} set in our scene hints.
      *
      * @param key
      *            property key
-     * @return the property, cast to T
+     * @return the found property, cast to T
      * @throws ClassCastException
      *             if property is not correct type
      */
-    @SuppressWarnings("unchecked")
     public <T> T getProperty(final String key) {
         final PropertyMode mode = getSceneHints().getPropertyMode();
 
         if (mode == PropertyMode.UseOwn) {
-            return (T) _properties.getOrDefault(key, null);
+            return getLocalProperty(key);
         } else if (mode == PropertyMode.UseParentIfNull) {
-            final T property = (T) _properties.getOrDefault(key, null);
+            final T property = getLocalProperty(key);
             if (property == null && getParent() != null) {
                 return getParent().getProperty(key);
             }
@@ -1093,17 +1098,56 @@ public abstract class Spatial implements Savable, Hintable {
                     return property;
                 }
             }
-            return (T) _properties.getOrDefault(key, null);
+            return getLocalProperty(key);
         }
         return null;
     }
 
+    /**
+     * Get a property locally set on this spatial by key. Does not check the scene or respect {@link PropertyMode}.
+     *
+     * @param key
+     *            property key
+     * @return the found property, cast to T
+     * @throws ClassCastException
+     *             if property is not correct type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getLocalProperty(final String key) {
+        return (T) _properties.getOrDefault(key, null);
+    }
+
+    /**
+     * Set a property on this Spatial
+     *
+     * @param key
+     *            property key
+     * @param value
+     *            property value
+     */
     public void setProperty(final String key, final Object value) {
-        if (value == null) {
-            _properties.remove(key);
-        } else {
-            _properties.put(key, value);
-        }
+        _properties.put(key, value);
+    }
+
+    /**
+     * Remove a property on this Spatial by a given key.
+     *
+     * @param key
+     *            property key
+     * @return the value previously set for this key, or null if the key is not found. Note that a returned value of
+     *         null might also mean that null was previously set for the given key.
+     */
+    public Object removeProperty(final String key) {
+        return _properties.remove(key);
+    }
+
+    /**
+     * @param key
+     *            property key
+     * @return true if we locally have the given key in our property map, even if the associated value is null.
+     */
+    public boolean hasLocalProperty(final String key) {
+        return _properties.containsKey(key);
     }
 
     /**
