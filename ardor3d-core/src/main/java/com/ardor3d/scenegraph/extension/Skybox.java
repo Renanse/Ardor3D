@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -18,7 +18,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.FogState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
@@ -63,7 +62,7 @@ public class Skybox extends Node {
 
     /**
      * Creates a new skybox. The size of the skybox and name is specified here. By default, no textures are set.
-     * 
+     *
      * @param name
      *            The name of the skybox.
      * @param xExtent
@@ -85,7 +84,7 @@ public class Skybox extends Node {
 
     /**
      * Set the texture to be displayed on the given face of the skybox. Replaces any existing texture on that face.
-     * 
+     *
      * @param face
      *            the face to set
      * @param texture
@@ -105,7 +104,7 @@ public class Skybox extends Node {
     /**
      * Set the texture to be displayed on the given side of the skybox. Only replaces the texture at the index specified
      * by textureUnit.
-     * 
+     *
      * @param face
      *            the face to set
      * @param texture
@@ -167,8 +166,8 @@ public class Skybox extends Node {
                 .setRotation(new Matrix3().fromAngles(Math.toRadians(90), Math.toRadians(270), 0));
         _skyboxQuads[Face.Up.ordinal()].setTranslation(new Vector3(0, _yExtent, 0));
         _skyboxQuads[Face.Down.ordinal()] = new Quad("down", _xExtent * 2, _zExtent * 2);
-        _skyboxQuads[Face.Down.ordinal()].setRotation(new Matrix3().fromAngles(Math.toRadians(270),
-                Math.toRadians(270), 0));
+        _skyboxQuads[Face.Down.ordinal()]
+                .setRotation(new Matrix3().fromAngles(Math.toRadians(270), Math.toRadians(270), 0));
         _skyboxQuads[Face.Down.ordinal()].setTranslation(new Vector3(0, -_yExtent, 0));
 
         // We don't want the light to effect our skybox
@@ -179,10 +178,6 @@ public class Skybox extends Node {
         final ZBufferState zbuff = new ZBufferState();
         zbuff.setEnabled(false);
         setRenderState(zbuff);
-
-        final FogState fs = new FogState();
-        fs.setEnabled(false);
-        setRenderState(fs);
 
         // We don't want it making our skybox disapear, so force view
         getSceneHints().setCullHint(CullHint.Never);
@@ -207,7 +202,7 @@ public class Skybox extends Node {
 
     /**
      * Retrieve the quad indicated by the given side.
-     * 
+     *
      * @param face
      *            One of Skybox.Face.North, Skybox.Face.South, and so on...
      * @return The Quad that makes up that side of the Skybox.

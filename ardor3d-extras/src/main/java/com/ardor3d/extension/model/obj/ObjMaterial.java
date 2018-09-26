@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,9 +13,10 @@ package com.ardor3d.extension.model.obj;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.renderer.material.uniform.BlinnPhongKeys;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.Spatial;
 
 public class ObjMaterial {
     private final String name;
@@ -60,27 +61,23 @@ public class ObjMaterial {
         return null;
     }
 
-    public MaterialState getMaterialState() {
+    public void applyMaterialProperties(final Spatial spat) {
         if (Ka != null || Kd != null || Ks != null || d != -1 || Ns != -1) {
-            final MaterialState material = new MaterialState();
             final float alpha = d != -1 ? MathUtils.clamp(d, 0, 1) : 1;
             if (Ka != null) {
-                material.setAmbient(new ColorRGBA(Ka[0], Ka[1], Ka[2], alpha));
+                spat.setProperty(BlinnPhongKeys.AmbientColor, new ColorRGBA(Ka[0], Ka[1], Ka[2], alpha));
             }
             if (Kd != null) {
-                material.setDiffuse(new ColorRGBA(Kd[0], Kd[1], Kd[2], alpha));
+                spat.setProperty(BlinnPhongKeys.DiffuseColor, new ColorRGBA(Kd[0], Kd[1], Kd[2], alpha));
             }
             if (Ks != null) {
-                material.setSpecular(new ColorRGBA(Ks[0], Ks[1], Ks[2], alpha));
+                spat.setProperty(BlinnPhongKeys.SpecularColor, new ColorRGBA(Ks[0], Ks[1], Ks[2], alpha));
             }
 
             if (Ns != -1) {
-                material.setShininess(Ns);
+                spat.setProperty(BlinnPhongKeys.Shininess, Ns);
             }
-
-            return material;
         }
-        return null;
     }
 
     public String getName() {

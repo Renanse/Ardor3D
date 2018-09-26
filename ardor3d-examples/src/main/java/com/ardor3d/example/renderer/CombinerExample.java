@@ -22,8 +22,6 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -64,6 +62,7 @@ public class CombinerExample extends ExampleBase {
         final Node scene = new Node();
         scene.getSceneHints().setCullHint(CullHint.Dynamic);
         _root.attachChild(scene);
+        _root.setRenderMaterial("unlit/textured/vertex_color.yaml");
 
         // Generate many boxes and place them in a 2D grid pattern, under the origNode.
         Mesh mesh;
@@ -85,11 +84,6 @@ public class CombinerExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         scene.setRenderState(ts);
-
-        // set a material state that applies our vertex coloring to the lighting equation
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
-        scene.setRenderState(ms);
 
         // position our camera to take in all of the mesh
         _canvas.getCanvasRenderer().getCamera().setLocation(edge / 2, edge / 2, 2 * edge);
@@ -129,7 +123,7 @@ public class CombinerExample extends ExampleBase {
 
     private void updateMergedLabel() {
         if (showMerged) {
-            text[2].setText("Showing a single, merged Mesh.  [M] to un-merge.  [V] to enable VBO");
+            text[2].setText("Showing a single, merged Mesh.  [M] to un-merge.");
         } else {
             text[2].setText("Showing " + (edge * edge) + " individual Meshes.  [M] to merge.");
         }

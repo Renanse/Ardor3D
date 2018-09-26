@@ -19,7 +19,7 @@ public enum PropertyMode {
     UseOwn,
 
     /** If we do not have a given property, check our parent. */
-    UseParentIfNull,
+    UseParentIfUnset,
 
     /** Only use our property if we ask our parent first and it gives us null. */
     UseOursLast,

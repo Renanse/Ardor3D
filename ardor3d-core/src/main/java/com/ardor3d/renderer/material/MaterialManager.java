@@ -10,9 +10,18 @@
 
 package com.ardor3d.renderer.material;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.scenegraph.Mesh;
@@ -22,6 +31,9 @@ import com.ardor3d.util.resource.ResourceSource;
 public enum MaterialManager {
 
     INSTANCE;
+
+    /** Our class logger */
+    private static final Logger logger = Logger.getLogger(MaterialManager.class.getName());
 
     private RenderMaterial _defaultMaterial = null;
     private final Map<ResourceSource, RenderMaterial> _materialCache = new HashMap<>();
@@ -91,6 +103,86 @@ public enum MaterialManager {
 
         return best;
 
+    }
+
+    public static String ImportMarker = "@import";
+
+    public static String inflateShaderImports(final String shaderText) {
+        return inflateShaderImports(shaderText, new Stack<>());
+    }
+
+    protected static String inflateShaderImports(final String shaderText, final Stack<String> history) {
+        final StringBuilder builder = new StringBuilder();
+        // Read Standard Input:
+        try (final BufferedReader in = new BufferedReader(new StringReader(shaderText))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith(ImportMarker)) {
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("found import: " + line);
+                    }
+                    final String sourceUrl = line.substring(ImportMarker.length()).trim();
+                    final String text = getShaderText(sourceUrl, true, history);
+                    if (text != null) {
+                        builder.append(text);
+                    }
+                } else {
+                    builder.append(line);
+                }
+                builder.append("\n");
+            }
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
+        return builder.toString();
+    }
+
+    public static String getShaderText(final String sourceUrl, final boolean processImports) {
+        return getShaderText(sourceUrl, processImports, new Stack<>());
+    }
+
+    protected static String getShaderText(final String sourceUrl, final boolean processImports,
+            final Stack<String> history) {
+        if (history.contains(sourceUrl)) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("already seen: " + sourceUrl);
+            }
+            return null;
+        }
+
+        final ResourceSource src = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_SHADER, sourceUrl);
+        if (src == null) {
+            return null;
+        }
+
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("loaded shader: " + sourceUrl);
+        }
+
+        final CharBuffer buf = CharBuffer.allocate(2048);
+        String text = null;
+        try (final Reader reader = new InputStreamReader(src.openStream())) {
+            final StringBuilder build = new StringBuilder();
+            while (reader.read(buf) != -1) {
+                buf.flip();
+                build.append(buf);
+                buf.clear();
+            }
+            text = build.toString();
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, MaterialManager.class.getName(), "getShaderText(String, boolean)",
+                    "Failed to read a shader source: " + sourceUrl + " Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        if (text != null && processImports) {
+            history.push(sourceUrl);
+            text = inflateShaderImports(text, history);
+            history.pop();
+        }
+
+        return text;
     }
 
 }

@@ -24,6 +24,7 @@ public class UniformRef implements Savable {
     protected UniformSource _source = UniformSource.Value;
     protected Object _value = null;
     protected Object _extra = null;
+    protected Object _defaultValue = null;
 
     protected transient int _cachedLocation = -1;
 
@@ -31,29 +32,31 @@ public class UniformRef implements Savable {
 
     public UniformRef(final String shaderVariableName, final UniformType type, final UniformSource source,
             final Object value) {
-        this(shaderVariableName, type, source, value, null);
+        this(shaderVariableName, type, source, value, null, null);
     }
 
     public UniformRef(final String shaderVariableName, final UniformType type, final UniformSource source,
-            final Object value, final Object extra) {
+            final Object value, final Object extra, final Object defaultValue) {
         _shaderVariableName = shaderVariableName;
         _type = type;
         _source = source;
         _value = value;
         _extra = extra;
+        _defaultValue = defaultValue;
     }
 
     public UniformRef(final int location, final UniformType type, final UniformSource source, final Object value) {
-        this(location, type, source, value, null);
+        this(location, type, source, value, null, null);
     }
 
     public UniformRef(final int location, final UniformType type, final UniformSource source, final Object value,
-            final Object extra) {
+            final Object extra, final Object defaultValue) {
         _location = location;
         _type = type;
         _source = source;
         _value = value;
         _extra = extra;
+        _defaultValue = defaultValue;
 
         _shaderVariableName = null;
     }
@@ -88,6 +91,10 @@ public class UniformRef implements Savable {
 
     public Object getExtra() {
         return _extra;
+    }
+
+    public Object getDefaultValue() {
+        return _defaultValue;
     }
 
     // /////////////////

@@ -266,7 +266,7 @@ public class SceneHints implements Savable {
             return parent.getSceneHints().getPropertyMode();
         }
 
-        return PropertyMode.UseParentIfNull;
+        return PropertyMode.UseParentIfUnset;
     }
 
     /**

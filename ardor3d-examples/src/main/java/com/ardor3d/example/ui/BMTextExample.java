@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -24,8 +24,6 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
@@ -40,8 +38,8 @@ import com.ardor3d.util.GameTaskQueueManager;
  * Illustrates how to modify text properties (e.g. font, color, alignment) and display on a canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.BMTextExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_BMTextExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_BMTextExample.jpg", //
+        maxHeapMemory = 64)
 public class BMTextExample extends ExampleBase {
 
     private final Matrix3 rotate = new Matrix3();
@@ -65,15 +63,11 @@ public class BMTextExample extends ExampleBase {
             }
         });
 
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.Diffuse);
-        _root.setRenderState(ms);
-
         addTextTestNodes(_root);
     }
 
     /**
-     * 
+     *
      * @param topNode
      */
     // -----------------------------------------------------
@@ -159,7 +153,7 @@ public class BMTextExample extends ExampleBase {
     }
 
     /**
-     * 
+     *
      * @param text
      *            the text object
      * @return the proper contents to use for our text object.
@@ -175,7 +169,7 @@ public class BMTextExample extends ExampleBase {
     }
 
     /**
-     * 
+     *
      */
     // -----------------------------------------------------
     SpatialController<BMText> createFontChanger() {
@@ -209,7 +203,7 @@ public class BMTextExample extends ExampleBase {
     }
 
     /**
-     * 
+     *
      */
     // -----------------------------------------------------
     private SpatialController<Node> createNodeMover() {
@@ -229,7 +223,7 @@ public class BMTextExample extends ExampleBase {
     }
 
     /**
-     * 
+     *
      */
     // -----------------------------------------------------
     void newBox(final Node parent, final double x, final double y, final double z) {

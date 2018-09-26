@@ -11,8 +11,6 @@
 package com.ardor3d.renderer.material.reader;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.Buffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
@@ -28,12 +26,13 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 
 import com.ardor3d.renderer.RenderMatrixType;
+import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.MaterialTechnique;
 import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.material.TechniquePass;
 import com.ardor3d.renderer.material.VertexAttributeRef;
-import com.ardor3d.renderer.material.uniform.RenderStateProperty;
+import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
@@ -41,7 +40,6 @@ import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.common.io.CharStreams;
 
 public class YamlMaterialReader {
 
@@ -262,57 +260,42 @@ public class YamlMaterialReader {
             defObjs.forEach((final Object o) -> injects.add("#define " + o.toString()));
         }
 
-        // ****** READ OUR INLINE PROGRAM(S)
-        final String prgSingle = getString(properties, "program", null);
-        final List<String> programs = new ArrayList<>();
-        if (prgSingle != null) {
-            programs.add(prgSingle);
-        }
-        final List<Object> prgObjs = getList(properties.get("programs"), false);
-        if (prgObjs != null) {
-            prgObjs.forEach((final Object o) -> programs.add(o.toString()));
-        }
-
-        // walk through our programs and inject defines, if the program starts with #version
-        programs.forEach((final String prg) -> {
-            rVal.add(inject(prg, injects));
-        });
-
-        // ****** READ OUR EXTERNALLY DEFINED PROGRAM(S)
+        final String program = getString(properties, "program", null);
         final String srcSingle = getString(properties, "source", null);
+        final List<Object> srcObjs = getList(properties.get("sources"), false);
+        if (program != null && (srcSingle != null || srcObjs != null)) {
+            logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "readShaderPrograms(Object)",
+                    "Found both program and source nodes in pass.  There can be only one.  Ignoring source.");
+        }
+
+        // ****** HANDLE INLINE PROGRAM IF ANY
+        if (program != null) {
+            // inflate any import statements we find
+            final String text = MaterialManager.inflateShaderImports(program);
+            rVal.add(inject(text, injects));
+            return rVal;
+        }
+
+        // ****** OTHERWISE, HANDLE EXTERNALLY DEFINED PROGRAM(S)
         final List<String> sources = new ArrayList<>();
         if (srcSingle != null) {
             sources.add(srcSingle);
         }
-        final List<Object> srcObjs = getList(properties.get("sources"), false);
         if (srcObjs != null) {
             srcObjs.forEach((final Object o) -> sources.add(o.toString()));
         }
 
         // walk through our programs, read them and inject defines, if the program starts with #version
         sources.forEach((final String source) -> {
-            final ResourceSource src = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_SHADER, source);
-            if (src == null) {
-                return;
-            }
-
-            String text = null;
-            try (final Reader reader = new InputStreamReader(src.openStream())) {
-                text = CharStreams.toString(reader);
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, YamlMaterialReader.class.getName(), "readShaderPrograms(Object)",
-                        "Failed to read a shader source: " + source + " Error: " + ex.getMessage());
-                ex.printStackTrace();
-                return;
-            }
-
+            final String text = MaterialManager.getShaderText(source, true);
             rVal.add(inject(text, injects));
         });
 
         return rVal;
     }
 
-    private static String inject(final String program, final List<String> injects) {
+    private static String inject(String program, final List<String> injects) {
+        program = program.trim();
         if (injects.isEmpty() || !program.startsWith("#version")) {
             return program;
         }
@@ -422,16 +405,19 @@ public class YamlMaterialReader {
         // determine any extra
         final Object extra = properties.get("extra");
 
+        // determine any default value
+        final Object defaultValue = getBufferForType(properties.get("defaultValue"), type);
+
         // determine our value
         final Object value = readUniformValue(properties.get("value"), type, source, shaderKey);
 
         // Figure out which key type we are
         final int location = getInt(properties, "location", -1);
         if (location >= 0) {
-            return new UniformRef(location, type, source, value, extra);
+            return new UniformRef(location, type, source, value, extra, defaultValue);
         }
 
-        return new UniformRef(shaderKey, type, source, value, extra);
+        return new UniformRef(shaderKey, type, source, value, extra, defaultValue);
     }
 
     private static void addDefaultUniform(final String type, final TechniquePass pass) {
@@ -453,8 +439,16 @@ public class YamlMaterialReader {
                         RenderMatrixType.Normal));
                 return;
             case "cameraLoc":
-                pass.addUniform(new UniformRef("cameraLoc", UniformType.Float3, UniformSource.RenderState,
-                        RenderStateProperty.CurrentCameraLocation));
+                pass.addUniform(new UniformRef("cameraLoc", UniformType.Float3, UniformSource.Ardor3dState,
+                        Ardor3dStateProperty.CurrentCameraLocation));
+                return;
+            case "defaultColor":
+                pass.addUniform(new UniformRef("defaultColor", UniformType.Float4, UniformSource.Ardor3dState,
+                        Ardor3dStateProperty.MeshDefaultColorRGBA));
+                return;
+            case "defaultColorRGB":
+                pass.addUniform(new UniformRef("defaultColorRGB", UniformType.Float3, UniformSource.Ardor3dState,
+                        Ardor3dStateProperty.MeshDefaultColorRGB));
                 return;
             case "lights1":
                 pass.addLightInfoUniforms(1);
@@ -476,8 +470,8 @@ public class YamlMaterialReader {
     private static Object readUniformValue(final Object doc, final UniformType type, final UniformSource source,
             final String shaderKey) {
         switch (source) {
-            case RenderState:
-                return Enum.valueOf(RenderStateProperty.class, getString(doc));
+            case Ardor3dState:
+                return Enum.valueOf(Ardor3dStateProperty.class, getString(doc));
 
             case RendererMatrix:
                 return Enum.valueOf(RenderMatrixType.class, getString(doc));

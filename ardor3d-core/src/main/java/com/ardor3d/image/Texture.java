@@ -13,9 +13,7 @@ package com.ardor3d.image;
 import java.io.IOException;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureKey;
@@ -201,8 +199,6 @@ public abstract class Texture implements Savable {
     // texture attributes.
     private Image _image = null;
     private final ColorRGBA _borderColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
-
-    private final Matrix4 _texMatrix = new Matrix4();
 
     private float _anisotropicFilterPercent = 0.0f;
     private float _lodBias = 0.0f;
@@ -597,19 +593,10 @@ public abstract class Texture implements Savable {
         rVal.setMinificationFilter(_minificationFilter);
         rVal.setMagnificationFilter(_magnificationFilter);
         rVal.setStoreImage(_storeImage);
-        rVal.setTextureMatrix(_texMatrix);
         if (getTextureKey() != null) {
             rVal.setTextureKey(getTextureKey());
         }
         return rVal;
-    }
-
-    public ReadOnlyMatrix4 getTextureMatrix() {
-        return _texMatrix;
-    }
-
-    public void setTextureMatrix(final ReadOnlyMatrix4 matrix) {
-        _texMatrix.set(matrix);
     }
 
     public void write(final OutputCapsule capsule) throws IOException {
@@ -617,7 +604,6 @@ public abstract class Texture implements Savable {
             capsule.write(_image, "image", null);
         }
         capsule.write(_borderColor, "borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
-        capsule.write(_texMatrix, "texMatrix", new Matrix4(Matrix4.IDENTITY));
         capsule.write(_hasBorder, "hasBorder", false);
         capsule.write(_anisotropicFilterPercent, "anisotropicFilterPercent", 0.0f);
         capsule.write(_lodBias, "lodBias", 0.0f);
@@ -649,7 +635,6 @@ public abstract class Texture implements Savable {
         }
 
         _borderColor.set((ColorRGBA) capsule.readSavable("borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
-        _texMatrix.set((Matrix4) capsule.readSavable("texMatrix", new Matrix4(Matrix4.IDENTITY)));
         _hasBorder = capsule.readBoolean("hasBorder", false);
         _anisotropicFilterPercent = capsule.readFloat("anisotropicFilterPercent", 0.0f);
         _lodBias = capsule.readFloat("lodBias", 0.0f);

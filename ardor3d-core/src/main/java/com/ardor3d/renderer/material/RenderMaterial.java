@@ -32,6 +32,10 @@ public class RenderMaterial implements Savable {
         return _techniques;
     }
 
+    public void addTechnique(final MaterialTechnique technique) {
+        _techniques.add(technique);
+    }
+
     public void setName(final String name) {
         _name = name;
     }

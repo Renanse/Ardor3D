@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -19,7 +19,7 @@ import java.nio.ShortBuffer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +51,7 @@ import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3Renderer;
 import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.renderer.material.ShaderType;
-import com.ardor3d.renderer.material.uniform.RenderStateProperty;
+import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.renderer.state.LightState;
@@ -61,6 +61,7 @@ import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
 public class Lwjgl3ShaderUtils implements IShaderUtils {
@@ -182,7 +183,6 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         final int success = GL20C.glGetShaderi(shaderId, GL20C.GL_COMPILE_STATUS);
         if (success == GL11C.GL_FALSE) {
             final String log = GL20C.glGetShaderInfoLog(shaderId);
-
             System.err.println(info);
             throw new Ardor3dException("Error compiling " + type.name() + " shader: " + log);
         }
@@ -227,17 +227,24 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     value = (Buffer) uniform.getValue();
                     break;
                 case RendererMatrix:
+                    // default has no place here
                     final RenderMatrixType type = (RenderMatrixType) uniform.getValue();
                     value = _renderer.getMatrix(type);
                     break;
                 case SpatialProperty:
-                    value = getBuffer(uniform.getType(), mesh.getProperty(uniform.getValue().toString()), stack);
+                    // use default in getProperty
+                    value = getBuffer(uniform.getType(),
+                            mesh.getProperty(uniform.getValue().toString(), uniform.getDefaultValue()), stack);
                     break;
-                case RenderState:
-                    value = getValue(mesh, (RenderStateProperty) uniform.getValue(), uniform.getExtra(), stack);
+                case Ardor3dState:
+                    // use default in getValue
+                    value = getValue(mesh, (Ardor3dStateProperty) uniform.getValue(), uniform.getExtra(),
+                            uniform.getDefaultValue(), stack);
                     break;
                 case Function:
-                    value = ((Function<Mesh, Buffer>) uniform.getValue()).apply(mesh);
+                    // send default to function
+                    value = ((BiFunction<Mesh, Object, Buffer>) uniform.getValue()).apply(mesh,
+                            uniform.getDefaultValue());
                     break;
                 default:
                     logger.log(Level.SEVERE, "Unhandled uniform source type: " + uniform.getSource());
@@ -362,7 +369,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
     }
 
-    private Buffer getBuffer(final UniformType type, final Object value, final MemoryStack stack) {
+    private static Buffer getBuffer(final UniformType type, final Object value, final MemoryStack stack) {
         switch (type) {
             case Double1:
                 if (value instanceof Number) {
@@ -402,6 +409,10 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 if (value instanceof Vector3) {
                     final Vector3 vec = (Vector3) value;
                     return stack.mallocFloat(3).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).flip();
+                }
+                if (value instanceof ReadOnlyColorRGBA) {
+                    final ReadOnlyColorRGBA vec = (ReadOnlyColorRGBA) value;
+                    return stack.mallocFloat(4).put(vec.getRed()).put(vec.getGreen()).put(vec.getBlue()).flip();
                 }
                 return (FloatBuffer) value;
             case Float4:
@@ -534,20 +545,26 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
     }
 
-    public static Buffer getValue(final Mesh mesh, final RenderStateProperty propertyType, final Object extra,
-            final MemoryStack stack) {
+    private static Buffer getValue(final Mesh mesh, final Ardor3dStateProperty propertyType, final Object extra,
+            final Object defaultValue, final MemoryStack stack) {
         switch (propertyType) {
             case MeshDefaultColorRGB:
             case MeshDefaultColorRGBA: {
-                final FloatBuffer buffer = stack
-                        .mallocFloat(propertyType == RenderStateProperty.MeshDefaultColorRGB ? 3 : 4);
-                final ReadOnlyColorRGBA color = mesh.getDefaultColor();
-                buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
-                if (propertyType == RenderStateProperty.MeshDefaultColorRGBA) {
-                    buffer.put(color.getAlpha());
+                final ReadOnlyColorRGBA color = mesh.getProperty(Spatial.KEY_DefaultColor, null);
+                if (color != null) {
+                    final FloatBuffer buffer = stack
+                            .mallocFloat(propertyType == Ardor3dStateProperty.MeshDefaultColorRGB ? 3 : 4);
+                    buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
+                    if (propertyType == Ardor3dStateProperty.MeshDefaultColorRGBA) {
+                        buffer.put(color.getAlpha());
+                    }
+                    buffer.rewind();
+                    return buffer;
+                } else if (defaultValue != null) {
+                    return getBuffer(propertyType == Ardor3dStateProperty.MeshDefaultColorRGB ? UniformType.Float3
+                            : UniformType.Float4, defaultValue, stack);
                 }
-                buffer.rewind();
-                return buffer;
+                break;
             }
 
             case CurrentCameraLocation: {
@@ -563,16 +580,21 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
                 final RenderContext context = ContextManager.getCurrentContext();
                 final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                final Light light = ls.get(index);
-                ReadOnlyVector3 position = Vector3.ZERO;
-                if (light instanceof PointLight) {
-                    position = ((PointLight) light).getLocation();
-                }
+                if (ls.getNumberOfChildren() > index) {
+                    final Light light = ls.get(index);
+                    ReadOnlyVector3 position = Vector3.ZERO;
+                    if (light instanceof PointLight) {
+                        position = ((PointLight) light).getLocation();
+                    }
 
-                final FloatBuffer buffer = stack.mallocFloat(3);
-                buffer.put(position.getXf()).put(position.getYf()).put(position.getZf());
-                buffer.rewind();
-                return buffer;
+                    final FloatBuffer buffer = stack.mallocFloat(3);
+                    buffer.put(position.getXf()).put(position.getYf()).put(position.getZf());
+                    buffer.rewind();
+                    return buffer;
+                } else if (defaultValue != null) {
+                    return getBuffer(UniformType.Float3, defaultValue, stack);
+                }
+                break;
             }
 
             case LightColorRGB:
@@ -580,19 +602,30 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
                 final RenderContext context = ContextManager.getCurrentContext();
                 final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                final Light light = ls.get(index);
-                final ReadOnlyColorRGBA color = light == null ? ColorRGBA.BLACK_NO_ALPHA : light.getDiffuse();
+                if (ls.getNumberOfChildren() > index) {
+                    final Light light = ls.get(index);
+                    final ReadOnlyColorRGBA color = light == null ? ColorRGBA.BLACK_NO_ALPHA : light.getDiffuse();
 
-                final FloatBuffer buffer = stack.mallocFloat(propertyType == RenderStateProperty.LightColorRGB ? 3 : 4);
-                buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
-                if (propertyType == RenderStateProperty.LightColorRGBA) {
-                    buffer.put(color.getAlpha());
+                    final FloatBuffer buffer = stack
+                            .mallocFloat(propertyType == Ardor3dStateProperty.LightColorRGB ? 3 : 4);
+                    buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
+                    if (propertyType == Ardor3dStateProperty.LightColorRGBA) {
+                        buffer.put(color.getAlpha());
+                    }
+                    buffer.rewind();
+                    return buffer;
+                } else if (defaultValue != null) {
+                    return getBuffer(propertyType == Ardor3dStateProperty.LightColorRGB ? UniformType.Float3
+                            : UniformType.Float4, defaultValue, stack);
                 }
-                buffer.rewind();
-                return buffer;
+                break;
             }
+            default:
+                throw new Ardor3dException("Unhandled uniform source - RenderStateProperty type: " + propertyType);
         }
-        throw new Ardor3dException("Unhandled uniform source - RenderStateProperty type: " + propertyType);
+
+        // We are here if we were given a handled type, but had no data or defaultValue to send back.
+        return null;
     }
 
     @Override
@@ -613,6 +646,9 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
             if (newBuffer) {
                 id = GL15C.glGenBuffers();
                 buffer.setBufferId(context, id);
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("generated new buffer: " + id);
+                }
             }
 
             final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
@@ -708,6 +744,9 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
 
         GL15C.glDeleteBuffers(id);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("deleting buffer " + id);
+        }
     }
 
     @Override
@@ -724,6 +763,9 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
             if (idBuffer.remaining() > 0) {
                 GL15C.glDeleteBuffers(idBuffer);
             }
+        }
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("deleting buffers");
         }
     }
 

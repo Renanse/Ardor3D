@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -47,7 +47,7 @@ public class Sphere extends Mesh {
 
     /**
      * Constructs a sphere. By default the Sphere has not geometry data or center.
-     * 
+     *
      * @param name
      *            The name of the sphere.
      */
@@ -57,7 +57,7 @@ public class Sphere extends Mesh {
 
     /**
      * Constructs a sphere with center at the origin. For details, see the other constructor.
-     * 
+     *
      * @param name
      *            Name of sphere.
      * @param zSamples
@@ -75,7 +75,7 @@ public class Sphere extends Mesh {
     /**
      * Constructs a sphere. All geometry data buffers are updated automatically. Both zSamples and radialSamples
      * increase the quality of the generated sphere.
-     * 
+     *
      * @param name
      *            Name of the sphere.
      * @param center
@@ -96,7 +96,7 @@ public class Sphere extends Mesh {
     /**
      * Constructs a sphere. All geometry data buffers are updated automatically. Both zSamples and radialSamples
      * increase the quality of the generated sphere.
-     * 
+     *
      * @param name
      *            Name of the sphere.
      * @param center
@@ -119,7 +119,7 @@ public class Sphere extends Mesh {
 
     /**
      * Changes the information of the sphere into the given values.
-     * 
+     *
      * @param center
      *            The new center of the sphere.
      * @param zSamples
@@ -129,7 +129,8 @@ public class Sphere extends Mesh {
      * @param radius
      *            The new radius of the sphere.
      */
-    public void setData(final ReadOnlyVector3 center, final int zSamples, final int radialSamples, final double radius) {
+    public void setData(final ReadOnlyVector3 center, final int zSamples, final int radialSamples,
+            final double radius) {
         _center.set(center);
         _zSamples = zSamples;
         _radialSamples = radialSamples;
@@ -150,6 +151,7 @@ public class Sphere extends Mesh {
             _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
         } else {
             vertsData.setBuffer(BufferUtils.createVector3Buffer(vertsData.getBuffer(), verts));
+            vertsData.markDirty();
         }
 
         // allocate normals if requested
@@ -158,6 +160,7 @@ public class Sphere extends Mesh {
             _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
         } else {
             normsData.setBuffer(BufferUtils.createVector3Buffer(normsData.getBuffer(), verts));
+            normsData.markDirty();
         }
 
         // allocate texture coordinates
@@ -166,7 +169,10 @@ public class Sphere extends Mesh {
             _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
         } else {
             texData.setBuffer(BufferUtils.createVector2Buffer(texData.getBuffer(), verts));
+            texData.markDirty();
         }
+
+        _meshData.markBuffersDirty();
 
         // generate geometry
         final double fInvRS = 1.0 / _radialSamples;
@@ -300,7 +306,11 @@ public class Sphere extends Mesh {
         // allocate connectivity
         final int verts = (_zSamples - 2) * (_radialSamples + 1) + 2;
         final int tris = 2 * (_zSamples - 2) * _radialSamples;
-        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
+        if (_meshData.getIndices() == null || _meshData.getIndexBuffer().capacity() != 3 * tris) {
+            _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
+        } else {
+            _meshData.getIndexBuffer().rewind();
+        }
 
         // generate connectivity
         for (int iZ = 0, iZStart = 0; iZ < (_zSamples - 3); iZ++) {
@@ -361,7 +371,7 @@ public class Sphere extends Mesh {
 
     /**
      * Returns the center of this sphere.
-     * 
+     *
      * @return The sphere's center.
      */
     public Vector3 getCenter() {
@@ -369,7 +379,7 @@ public class Sphere extends Mesh {
     }
 
     /**
-     * 
+     *
      * @return true if the normals are inverted to point into the sphere so that the face is oriented for a viewer
      *         inside the sphere. false (the default) for exterior viewing.
      */
@@ -378,7 +388,7 @@ public class Sphere extends Mesh {
     }
 
     /**
-     * 
+     *
      * @param viewInside
      *            if true, the normals are inverted to point into the sphere so that the face is oriented for a viewer
      *            inside the sphere. Default is false (for outside viewing)

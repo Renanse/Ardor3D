@@ -20,9 +20,8 @@ import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.material.uniform.BlinnPhongKeys;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -121,10 +120,7 @@ public class ManyCollisionsExample extends ExampleBase {
 
         n2 = new Node("n2");
         n2.setTranslation(new Vector3(0, 0, -200));
-
-        final MaterialState ms = new MaterialState();
-        ms.setDiffuse(MaterialFace.FrontAndBack, ColorRGBA.RED);
-        n2.setRenderState(ms);
+        n2.setProperty(BlinnPhongKeys.DiffuseColor, ColorRGBA.RED);
 
         _root.attachChild(n2);
         _root.setRenderMaterial("unlit/textured/basic.yaml");

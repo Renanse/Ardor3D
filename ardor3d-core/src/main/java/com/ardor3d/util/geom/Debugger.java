@@ -179,7 +179,6 @@ public final class Debugger {
     static {
         normalLines.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         normalLines.setRenderState(new ZBufferState());
-        normalLines.setLineWidth(3.0f);
         normalLines.getMeshData().setIndexMode(IndexMode.Lines);
         normalLines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
         normalLines.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(500));
@@ -629,7 +628,6 @@ public final class Debugger {
             lineFrustum.getMeshData().setIndexModes(
                     new IndexMode[] { IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines });
             lineFrustum.getMeshData().setIndexLengths(new int[] { 4, 4, 8, 8 });
-            lineFrustum.setLineWidth(2);
             lineFrustum.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
             final BlendState lineBlendState = new BlendState();

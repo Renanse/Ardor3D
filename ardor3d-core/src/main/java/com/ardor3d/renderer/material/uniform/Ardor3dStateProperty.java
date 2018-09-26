@@ -10,7 +10,7 @@
 
 package com.ardor3d.renderer.material.uniform;
 
-public enum RenderStateProperty {
+public enum Ardor3dStateProperty {
     /** A Float4 color pulled from Mesh._defaultColor. */
     MeshDefaultColorRGBA,
 

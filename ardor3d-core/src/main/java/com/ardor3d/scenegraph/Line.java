@@ -149,14 +149,14 @@ public class Line extends Mesh {
     }
 
     /**
-     * @return true if points are to be drawn antialiased
+     * @return true if lines are to be drawn antialiased
      */
     public boolean isAntialiased() {
         return _antialiased;
     }
 
     /**
-     * Sets whether the point should be antialiased. May decrease performance. If you want to enabled antialiasing, you
+     * Sets whether the line should be antialiased. May decrease performance. If you want to enabled antialiasing, you
      * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
      * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
      *
@@ -177,6 +177,9 @@ public class Line extends Mesh {
     /**
      * Sets the width of the line when drawn. Non anti-aliased line widths are rounded to the nearest whole number by
      * opengl.
+     *
+     * Note that only a width of 1.0 is guaranteed to work. All other values may generate an error or be ignored or
+     * both.
      *
      * @param lineWidth
      *            The lineWidth to set.

@@ -39,8 +39,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.controller.SpatialController;
@@ -52,8 +50,8 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the use of Popup and Pie menus.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.PopOverUIExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_PopOverUIExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_PopOverUIExample.jpg", //
+        maxHeapMemory = 64)
 public class PopOverUIExample extends ExampleBase implements ActionListener {
     private static final String[] COLORS = new String[] { "Red", "White", "Blue", "Black" };
     private static final String[] SPINS = new String[] { "None", "Around X", "Around Y", "Around Z" };
@@ -79,10 +77,6 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         box.setTranslation(new Vector3(0, 0, -15));
         _root.attachChild(box);
 
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.Diffuse);
-        box.setRenderState(ms);
-
         setTexture("Logo");
         setSpin("Around Y");
 
@@ -104,8 +98,8 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
 
         final UIButton pieButton = new UIButton("Pie Menu");
         pieButton.setPadding(new Insets(6, 15, 6, 15));
-        pieButton.setHudXY(9 * hud.getWidth() / 10 - pieButton.getLocalComponentWidth() / 2, hud.getHeight()
-                - pieButton.getLocalComponentHeight() - 5);
+        pieButton.setHudXY(9 * hud.getWidth() / 10 - pieButton.getLocalComponentWidth() / 2,
+                hud.getHeight() - pieButton.getLocalComponentHeight() - 5);
         pieButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
@@ -201,8 +195,8 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
     private void AddMenuItems(final UIPopupMenu parent, final String actionCommand, final boolean pie,
             final String[] colors) {
         for (final String color : colors) {
-            final UIMenuItem item = pie ? new UIPieMenuItem(color, null, true, this) : new UIMenuItem(color, null,
-                    true, this);
+            final UIMenuItem item = pie ? new UIPieMenuItem(color, null, true, this)
+                    : new UIMenuItem(color, null, true, this);
             item.setActionCommand(actionCommand);
             parent.addItem(item);
         }

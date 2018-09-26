@@ -3,17 +3,17 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.image.util;
 
-import com.ardor3d.image.Texture;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.scenegraph.Spatial;
 
 public class TextureProjector extends Camera {
 
@@ -27,11 +27,13 @@ public class TextureProjector extends Camera {
         super(1, 1);
     }
 
-    public void updateTextureMatrix(final Texture texture) {
-        final Matrix4 texMat = Matrix4.fetchTempInstance();
+    public void updateTextureMatrix(final Spatial store, final String key) {
+        Matrix4 texMat = store.getProperty(key, null);
+        if (texMat == null) {
+            texMat = new Matrix4();
+            store.setProperty(key, texMat);
+        }
         updateTextureMatrix(texMat);
-        texture.setTextureMatrix(texMat);
-        Matrix4.releaseTempInstance(texMat);
     }
 
     public void updateTextureMatrix(final Matrix4 matrixStore) {

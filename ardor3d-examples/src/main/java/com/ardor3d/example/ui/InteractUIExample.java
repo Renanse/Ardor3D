@@ -63,8 +63,6 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -184,17 +182,15 @@ public class InteractUIExample extends ExampleBase {
         t.updateGeometricState(0);
         t.addTranslation(0, .25, 0);
         t.getSceneHints().setPickingHint(PickingHint.Pickable, true);
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
-        t.setRenderState(ms);
         final MarkerData data = new MarkerData();
-        t.setUserData(data);
+        t.setProperty("markerData", data);
         t.addController(new SpatialController<Spatial>() {
             private double _scaleTime = 0;
 
             public void update(final double time, final Spatial caller) {
                 // update our rotation
-                final double pulseSpeed = ((MarkerData) t.getUserData()).pulseSpeed;
+                final MarkerData data = t.getProperty("markerData", null);
+                final double pulseSpeed = data.pulseSpeed;
                 if (pulseSpeed != 0.0) {
                     _scaleTime = _scaleTime + (_timer.getTimePerFrame() * pulseSpeed);
                     final double scale = MathUtils.sin(_scaleTime) * .99 + 1.0;
@@ -763,8 +759,8 @@ public class InteractUIExample extends ExampleBase {
         @Override
         public void applyState(final Spatial target) {
             super.applyState(target);
-            if (target.getUserData() instanceof MarkerData) {
-                final MarkerData tData = (MarkerData) target.getUserData();
+            if (target.hasLocalProperty("markerData")) {
+                final MarkerData tData = target.getLocalProperty("markerData", null);
                 if (tData.pulseSpeed != data.pulseSpeed) {
                     tData.pulseSpeed = data.pulseSpeed;
                 }
@@ -788,8 +784,9 @@ public class InteractUIExample extends ExampleBase {
         @Override
         public void copyState(final Spatial source) {
             super.copyState(source);
-            if (source.getUserData() instanceof MarkerData) {
-                data.copy((MarkerData) source.getUserData());
+            if (source.hasLocalProperty("markerData")) {
+                final MarkerData tData = source.getLocalProperty("markerData", null);
+                data.copy(tData);
             }
         }
     }

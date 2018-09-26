@@ -1,5 +1,4 @@
---- # Material
-name: basic white
+---
 techniques: 
   passes: 
       - 
@@ -12,11 +11,9 @@ techniques:
             program: |
                 #version 330 core
                 
-                layout (location = 0) in vec3 vertex;
+                in vec3 vertex;
                 
-                uniform mat4 model;
-                uniform mat4 view;
-                uniform mat4 projection;
+                uniform mat4 model, view, projection;
                 
                 void main()
                 {

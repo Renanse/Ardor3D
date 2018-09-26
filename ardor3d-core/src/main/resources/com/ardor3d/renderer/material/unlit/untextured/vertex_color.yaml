@@ -5,8 +5,10 @@ techniques:
         attributes:
           - key: vertex
           - key: color
+          
         uniforms: 
           - builtIn: [model, view, projection]
+
         shaders: 
           Vertex: 
             source: unlit/untextured/vertex_color.vert

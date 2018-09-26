@@ -375,10 +375,7 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 return;
 
             // The following are not core compatible states - we'll need to do them in shader.
-            case Light:
-            case Fog:
-            case Clip:
-            case Material: {
+            case Light: {
                 final RenderContext context = ContextManager.getCurrentContext();
                 context.setCurrentState(state.getType(), state);
                 return;

@@ -21,8 +21,6 @@ import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.StereoCamera;
 import com.ardor3d.renderer.state.ColorMaskState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
@@ -36,8 +34,8 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the StereoCamera class, which allows for your stereo viewing pleasures.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.StereoExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_StereoExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_StereoExample.jpg", //
+        maxHeapMemory = 64)
 public class StereoExample extends ExampleBase {
 
     private StereoCamera _camera;
@@ -107,10 +105,6 @@ public class StereoExample extends ExampleBase {
         ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         _root.setRenderState(ts);
-
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.Diffuse);
-        _root.setRenderState(ms);
 
         _root.setTranslation(0, -1, 0);
     }

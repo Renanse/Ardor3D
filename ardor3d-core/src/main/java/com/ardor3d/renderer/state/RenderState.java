@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 public abstract class RenderState implements Savable {
 
     public enum StateType {
-        Blend, Fog, Light, Material, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Clip, Offset;
+        Blend, Light, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Offset;
 
         // cached
         public static StateType[] values = values();
@@ -58,10 +58,7 @@ public abstract class RenderState implements Savable {
      * DEFAULTS:
      * <ul>
      * <li>Blend: true</li>
-     * <li>Fog: true</li>
      * <li>Light: false - because you can change a light object directly without telling the state</li>
-     * <li>Material: true</li>
-     * <li>Shading: true</li>
      * <li>Texture: false - because you can change a texture object directly without telling the state</li>
      * <li>Wireframe: false - because line attributes can change when drawing regular lines, affecting wireframe
      * lines</li>
@@ -69,15 +66,12 @@ public abstract class RenderState implements Savable {
      * <li>Cull: true</li>
      * <li>Stencil: false</li>
      * <li>ColorMask: true</li>
-     * <li>Clip: true</li>
      * <li>Offset: true</li>
      * </ul>
      */
     public static final EnumSet<StateType> _quickCompare = EnumSet.noneOf(StateType.class);
     static {
         _quickCompare.add(StateType.Blend);
-        _quickCompare.add(StateType.Fog);
-        _quickCompare.add(StateType.Material);
         _quickCompare.add(StateType.ZBuffer);
         _quickCompare.add(StateType.Cull);
         _quickCompare.add(StateType.ColorMask);
@@ -237,18 +231,12 @@ public abstract class RenderState implements Savable {
         switch (type) {
             case Blend:
                 return new BlendState();
-            case Clip:
-                return new ClipState();
             case ColorMask:
                 return new ColorMaskState();
             case Cull:
                 return new CullState();
-            case Fog:
-                return new FogState();
             case Light:
                 return new LightState();
-            case Material:
-                return new MaterialState();
             case Offset:
                 return new OffsetState();
             case Stencil:

@@ -22,7 +22,6 @@ import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitiveKey;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
@@ -68,9 +67,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     /** The compiled lightState for this mesh */
     protected transient LightState _lightState;
-
-    /** Default color to use when no per vertex colors are set */
-    protected ColorRGBA _defaultColor = new ColorRGBA(ColorRGBA.WHITE);
 
     /** Visibility setting that can be used after the scenegraph hierarchical culling */
     protected boolean _isVisible = true;
@@ -379,36 +375,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     }
 
     /**
-     * <code>setDefaultColor</code> sets the color to be used if no per vertex color buffer is set.
-     *
-     * @param color
-     */
-    public void setDefaultColor(final ReadOnlyColorRGBA color) {
-        _defaultColor.set(color);
-    }
-
-    /**
-     * <code>setDefaultColor</code> sets the color to be used if no per vertex color buffer is set.
-     *
-     * @param r
-     * @param g
-     * @param b
-     * @param a
-     */
-    public void setDefaultColor(final float r, final float g, final float b, final float a) {
-        _defaultColor.set(r, g, b, a);
-    }
-
-    /**
-     *
-     * @param store
-     * @return
-     */
-    public ReadOnlyColorRGBA getDefaultColor() {
-        return _defaultColor;
-    }
-
-    /**
      * @param type
      *            StateType of RenderState we want to grab
      * @return the compiled RenderState for this Mesh, either from RenderStates applied locally or those inherited from
@@ -560,7 +526,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
         // copy our basic properties
         mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
-        mesh.setDefaultColor(_defaultColor);
         mesh.setVisible(_isVisible);
         mesh.setRenderMaterial(_material);
         mesh._properties.putAll(_properties);
@@ -577,7 +542,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         }
         mesh.setMeshData(_meshData);
         mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
-        mesh._defaultColor = _defaultColor;
         mesh.setVisible(_isVisible);
         return mesh;
     }
@@ -689,7 +653,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         super.write(capsule);
         capsule.write(_meshData, "meshData", null);
         capsule.write(_modelBound, "modelBound", null);
-        capsule.write(_defaultColor, "defaultColor", new ColorRGBA(ColorRGBA.WHITE));
         capsule.write(_isVisible, "visible", true);
     }
 
@@ -698,7 +661,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         super.read(capsule);
         _meshData = (MeshData) capsule.readSavable("meshData", null);
         _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);
-        _defaultColor = (ColorRGBA) capsule.readSavable("defaultColor", new ColorRGBA(ColorRGBA.WHITE));
         _isVisible = capsule.readBoolean("visible", true);
     }
 }

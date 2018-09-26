@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.model.util.KeyframeController;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.material.uniform.BlinnPhongKeys;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
@@ -167,26 +167,24 @@ public class ObjExporter {
                     mtlPw.println("# Ardor3D 1.0 MTL file");
                 }
                 final ObjMaterial currentMtl = new ObjMaterial(null);
-                final MaterialState mtlState = (MaterialState) mesh.getLocalRenderState(StateType.Material);
-                if (mtlState != null) {
-                    final ReadOnlyColorRGBA ambientColor = mtlState.getAmbient();
-                    if (ambientColor != null) {
-                        currentMtl.d = ambientColor.getAlpha();
-                        currentMtl.Ka = new float[] { ambientColor.getRed(), ambientColor.getGreen(),
-                                ambientColor.getBlue(), ambientColor.getAlpha() };
-                    }
-                    final ReadOnlyColorRGBA diffuseColor = mtlState.getDiffuse();
-                    if (diffuseColor != null) {
-                        currentMtl.Kd = new float[] { diffuseColor.getRed(), diffuseColor.getGreen(),
-                                diffuseColor.getBlue(), diffuseColor.getAlpha() };
-                    }
-                    final ReadOnlyColorRGBA specularColor = mtlState.getSpecular();
-                    if (specularColor != null) {
-                        currentMtl.Ks = new float[] { specularColor.getRed(), specularColor.getGreen(),
-                                specularColor.getBlue(), specularColor.getAlpha() };
-                    }
-                    currentMtl.Ns = mtlState.getShininess();
+                final ReadOnlyColorRGBA ambientColor = mesh.getLocalProperty(BlinnPhongKeys.AmbientColor, null);
+                if (ambientColor != null) {
+                    currentMtl.d = ambientColor.getAlpha();
+                    currentMtl.Ka = new float[] { ambientColor.getRed(), ambientColor.getGreen(),
+                            ambientColor.getBlue(), ambientColor.getAlpha() };
                 }
+                final ReadOnlyColorRGBA diffuseColor = mesh.getLocalProperty(BlinnPhongKeys.DiffuseColor, null);
+                if (diffuseColor != null) {
+                    currentMtl.Kd = new float[] { diffuseColor.getRed(), diffuseColor.getGreen(),
+                            diffuseColor.getBlue(), diffuseColor.getAlpha() };
+                }
+                final ReadOnlyColorRGBA specularColor = mesh.getLocalProperty(BlinnPhongKeys.SpecularColor, null);
+                if (specularColor != null) {
+                    currentMtl.Ks = new float[] { specularColor.getRed(), specularColor.getGreen(),
+                            specularColor.getBlue(), specularColor.getAlpha() };
+                }
+                currentMtl.Ns = mesh.getLocalProperty(BlinnPhongKeys.Shininess, 0f);
+
                 if (customTextureName == null) {
                     currentMtl.textureName = getLocalMeshTextureName(mesh);
                 } else {
@@ -311,7 +309,8 @@ public class ObjExporter {
                     case TriangleFan:
                     case Triangles:
                     case TriangleStrip:
-                        for (int primIndex = 0, primCount = meshData.getPrimitiveCount(sectionIndex); primIndex < primCount; primIndex++) {
+                        for (int primIndex = 0, primCount = meshData
+                                .getPrimitiveCount(sectionIndex); primIndex < primCount; primIndex++) {
                             meshData.getPrimitiveIndices(primIndex, sectionIndex, indices);
                             objPw.print("f");
                             for (int vertexIndex = 0; vertexIndex < indices.length; vertexIndex++) {
@@ -393,9 +392,9 @@ public class ObjExporter {
                 final int tupleSize = data.getValuesPerTuple();
                 final int tupleCount = data.getTupleCount();
                 if (tupleCount < expectedTupleCount) {
-                    throw new IllegalArgumentException("[" + keyword
-                            + "] not enough data to match with the vertex count: " + tupleCount + " < "
-                            + expectedTupleCount);
+                    throw new IllegalArgumentException(
+                            "[" + keyword + "] not enough data to match with the vertex count: " + tupleCount + " < "
+                                    + expectedTupleCount);
                 } else {
                     if (tupleCount > expectedTupleCount) {
                         ObjExporter.logger.warning("[" + keyword + "] too much data to match with the vertex count: "

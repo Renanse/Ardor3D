@@ -12,7 +12,7 @@ techniques:
           - 
             shaderKey: albedo
             type: Float3
-            source: RenderState
+            source: Ardor3dState
             value: MeshDefaultColorRGB
           - 
             shaderKey: metallic

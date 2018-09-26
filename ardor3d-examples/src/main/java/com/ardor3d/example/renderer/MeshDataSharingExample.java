@@ -17,11 +17,8 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -33,8 +30,8 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and sharing of mesh data.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MeshDataSharingExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
+        maxHeapMemory = 64)
 public class MeshDataSharingExample extends ExampleBase {
 
     public static void main(final String[] args) {
@@ -84,17 +81,13 @@ public class MeshDataSharingExample extends ExampleBase {
         for (int i = 0; i < 500; i++) {
             final Mesh sm = sphere.makeCopy(true);
 
-            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
-                    .nextDouble() * 100.0 - 50.0));
+            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
+                    rand.nextDouble() * 100.0 - 50.0));
             n1.attachChild(sm);
         }
 
         final Node n2 = n1.makeCopy(true);
         n2.setTranslation(new Vector3(50, 0, -200));
-
-        final MaterialState ms = new MaterialState();
-        ms.setDiffuse(MaterialFace.FrontAndBack, ColorRGBA.RED);
-        n2.setRenderState(ms);
 
         _root.attachChild(n2);
     }

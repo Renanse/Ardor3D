@@ -540,10 +540,6 @@ public abstract class Lwjgl3TextureStateUtil {
                     // Set our texture lod bias, if needed.
                     applyLodBias(texture, unitRecord, i, record, caps);
 
-                    // Now time to play with texture matrices
-                    // Determine which transforms to do.
-                    applyTextureTransforms(texture, i, record, caps);
-
                     // all states have now been applied for a tex record, so we
                     // can safely make it valid
                     if (!texRecord.isValid()) {
@@ -581,13 +577,6 @@ public abstract class Lwjgl3TextureStateUtil {
                     TextureRecord.colorBuffer);
             texRecord.borderColor.set(texBorder);
         }
-    }
-
-    public static void applyTextureTransforms(final Texture texture, final int unit, final TextureStateRecord record,
-            final ContextCapabilities caps) {
-        final TextureUnitRecord textureUnitRecord = record.units[unit];
-        textureUnitRecord.identityMatrix = texture.getTextureMatrix().isIdentity();
-        textureUnitRecord.texMatrix.set(texture.getTextureMatrix());
     }
 
     // If we support multi-texturing, specify the unit we are affecting.

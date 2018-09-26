@@ -25,8 +25,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -78,12 +76,6 @@ public class GeometryInstancingExample extends ExampleBase {
     protected void initExample() {
         _canvas.setTitle("GeometryInstancingExample");
 
-        final BasicText t = BasicText.createDefaultTextLabel("Text", "[V] VBO Off");
-        t.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-        t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        t.setTranslation(new Vector3(0, 20, 0));
-        _orthoRoot.attachChild(t);
-
         final BasicText t2 = BasicText.createDefaultTextLabel("Text", "[I] Instancing On");
         t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
@@ -94,10 +86,6 @@ public class GeometryInstancingExample extends ExampleBase {
         cs.setCullFace(CullState.Face.Back);
         cs.setEnabled(true);
         _root.setRenderState(cs);
-
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.Diffuse);
-        _root.setRenderState(ms);
 
 //        _shader = new ShaderState();
 //        try {

@@ -67,8 +67,6 @@ import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
-import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.base.Predicates;
@@ -274,20 +272,19 @@ public class LwjglSwtExample {
         final Matrix4 rotate = new Matrix4(Matrix4.IDENTITY);
         final Matrix4 pivot = new Matrix4(Matrix4.IDENTITY).applyTranslationPost(-0.5, -0.5, 0);
         final Matrix4 pivotInv = new Matrix4(Matrix4.IDENTITY).applyTranslationPost(0.5, 0.5, 0);
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(RotateGestureEvent.class),
-                new TriggerAction() {
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(RotateGestureEvent.class), new TriggerAction() {
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(RotateGestureEvent.class);
                         rotate.applyRotationZ(-event.getDeltaRadians());
-                        final TextureState ts = (TextureState) game.getBox().getLocalRenderState(StateType.Texture);
                         pivotInv.multiply(rotate, null).multiply(pivot, matrix).transposeLocal();
-                        ts.getTexture().setTextureMatrix(matrix);
+                        game.getBox().setProperty("textureMatrix", matrix);
                     }
                 }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class),
-                new TriggerAction() {
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class), new TriggerAction() {
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(SwipeGestureEvent.class);
@@ -295,11 +292,12 @@ public class LwjglSwtExample {
                     }
                 }));
 
-        logicalLayer.registerTrigger(new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(
-                MouseButton.LEFT, 500, 5), new GestureEventCondition(LongPressGestureEvent.class)),
-                new TriggerAction() {
+        logicalLayer.registerTrigger(
+                new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(MouseButton.LEFT, 500, 5),
+                        new GestureEventCondition(LongPressGestureEvent.class)), new TriggerAction() {
                             @Override
-                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                            public void perform(final Canvas source, final TwoInputStates inputStates,
+                                    final double tpf) {
                                 game.toggleRotation();
                             }
                         }));
@@ -336,8 +334,8 @@ public class LwjglSwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(
-                ResourceLocatorTool.getClassPathResourceAsStream(LwjglSwtExample.class, resourceName), false);
+        final com.ardor3d.image.Image image = awtImageLoader
+                .load(ResourceLocatorTool.getClassPathResourceAsStream(LwjglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

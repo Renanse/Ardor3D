@@ -33,8 +33,6 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -215,11 +213,6 @@ public class AtlasExample extends ExampleBase {
         texture.setBorderColor(ColorRGBA.RED);
         ts.setTexture(texture);
         mesh.setRenderState(ts);
-
-        // Add a material to the mesh, to show both vertex color and lighting/shading.
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.Diffuse);
-        mesh.setRenderState(ms);
     }
 
     public void debugDumpAtlases(final TexturePacker packer) {

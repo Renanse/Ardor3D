@@ -29,8 +29,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -82,23 +80,18 @@ public class ViewportExample extends ExampleBase {
             }
         });
 
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
-
         // A box to check aspect ratio of 3D objects
         box1 = new Box("test box 1", new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
         box1.setTranslation(0, 5, 0);
         box1.setRotation(new Quaternion().fromEulerAngles(MathUtils.DEG_TO_RAD * 45, MathUtils.DEG_TO_RAD * 60,
                 MathUtils.DEG_TO_RAD * 30));
         box1.setSolidColor(ColorRGBA.GREEN);
-        box1.setRenderState(ms);
         box1.updateModelBound();
 
         // Another one, not rotated
         box2 = new Box("test box 2", new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
         box2.setTranslation(0, -5, 0);
         box2.setSolidColor(ColorRGBA.RED);
-        box2.setRenderState(ms);
         box2.updateModelBound();
 
         // A text to check aspect ratio of 2D objects
@@ -111,6 +104,8 @@ public class ViewportExample extends ExampleBase {
         _root.attachChild(box1);
         _root.attachChild(box2);
         _orthoRoot.attachChild(quad);
+
+        _root.setRenderMaterial("unlit/untextured/vertex_color.yaml");
     }
 
     @Override
@@ -135,6 +130,7 @@ public class ViewportExample extends ExampleBase {
 
         final Camera camera = Camera.getCurrentCamera();
         camera.setViewPort(vpLeft, vpRight, vpBottom, vpTop);
+        _orthoCam.setViewPort(vpLeft, vpRight, vpBottom, vpTop);
 
         fullViewport = full;
     }

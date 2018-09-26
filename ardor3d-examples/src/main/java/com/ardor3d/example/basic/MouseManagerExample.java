@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -32,8 +32,6 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
@@ -46,8 +44,8 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
  * mouse.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.MouseManagerExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
+        maxHeapMemory = 64)
 public class MouseManagerExample extends ExampleBase {
 
     private Mesh t;
@@ -84,6 +82,7 @@ public class MouseManagerExample extends ExampleBase {
         final Vector3 min = new Vector3(-5, -5, -5);
 
         t = new Box("Box", min, max);
+        t.setRenderMaterial("unlit/textured/vertex_color.yaml");
         t.setModelBound(new BoundingBox());
         t.setTranslation(new Vector3(0, 0, -15));
         _root.attachChild(t);
@@ -93,10 +92,6 @@ public class MouseManagerExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
-
-        final MaterialState ms = new MaterialState();
-        ms.setColorMaterial(ColorMaterial.Diffuse);
-        _root.setRenderState(ms);
 
         _root.setRenderState(ts);
 
@@ -130,16 +125,16 @@ public class MouseManagerExample extends ExampleBase {
                 }
             }));
 
-            _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
-                    new TriggerAction() {
+            _logicalLayer.registerTrigger(
+                    new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
                         public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                             if (_mouseManager.isSetGrabbedSupported()) {
                                 _mouseManager.setGrabbed(GrabbedState.GRABBED);
                             }
                         }
                     }));
-            _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
-                    new TriggerAction() {
+            _logicalLayer.registerTrigger(
+                    new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
                         public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                             if (_mouseManager.isSetGrabbedSupported()) {
                                 _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
@@ -155,8 +150,8 @@ public class MouseManagerExample extends ExampleBase {
 
     private MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final Image image = awtImageLoader.load(ResourceLocatorTool.getClassPathResourceAsStream(
-                MouseManagerExample.class, resourceName), true);
+        final Image image = awtImageLoader
+                .load(ResourceLocatorTool.getClassPathResourceAsStream(MouseManagerExample.class, resourceName), true);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

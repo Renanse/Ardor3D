@@ -27,8 +27,8 @@ public enum UniformSource {
     Function,
 
     /**
-     * Uniform Value is an RenderStateProperty enum value, indicating a value to pull from the current Spatial being
-     * drawn.
+     * Uniform Value is an Ardor3dStateProperty enum value, indicating a value to pull from the current state of the
+     * engine, or current spatial being drawn.
      */
-    RenderState,
+    Ardor3dState,
 }

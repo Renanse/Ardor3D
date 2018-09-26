@@ -4,12 +4,10 @@ techniques:
       - 
         attributes:
           - key: vertex
+
         uniforms: 
-          - builtIn: [model, view, projection]
-          - shaderKey: defaultColor
-            type: Float4
-            source: RenderState
-            value: MeshDefaultColorRGBA
+          - builtIn: [model, view, projection, defaultColor]
+
         shaders: 
           Vertex: 
             source: unlit/untextured/basic.vert

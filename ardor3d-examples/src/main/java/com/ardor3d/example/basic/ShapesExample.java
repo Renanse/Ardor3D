@@ -26,14 +26,13 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -97,7 +96,9 @@ public class ShapesExample extends ExampleBase {
 
         wrapCount = 5;
         addMesh(new Arrow("Arrow", 3, 1));
-        addMesh(new AxisRods("AxisRods", true, 3, 0.5));
+        final AxisRods rods = new AxisRods("AxisRods", true, 3, 0.5);
+        rods.setRenderMaterial("unlit/untextured/basic.yaml");
+        addMesh(rods);
         addMesh(new Box("Box", new Vector3(), 3, 3, 3));
         addMesh(new Capsule("Capsule", 5, 5, 5, 2, 5));
         addMesh(new Cone("Cone", 8, 8, 2, 4));
@@ -142,24 +143,19 @@ public class ShapesExample extends ExampleBase {
         // Set up picked pulse
         _pickedControl = new SpatialController<Spatial>() {
             ColorRGBA curr = new ColorRGBA();
-            float val = 0;
-            boolean add = true;
+            double t = 0;
 
             @Override
             public void update(final double time, final Spatial caller) {
-                val += time * (add ? 1 : -1);
-                if (val < 0) {
-                    val = -val;
-                    add = true;
-                } else if (val > 1) {
-                    val = 1 - (val - (int) val);
-                    add = false;
-                }
+                t += time;
+
+                final float val = (float) MathUtils.sin(t * 2) * .25f + .75f;
 
                 curr.set(val, val, val, 1.0f);
 
-                final MaterialState ms = (MaterialState) caller.getLocalRenderState(StateType.Material);
-                ms.setAmbient(curr);
+                if (caller instanceof Mesh) {
+                    ((Mesh) caller).setDefaultColor(curr);
+                }
             }
         };
     }
@@ -241,8 +237,9 @@ public class ShapesExample extends ExampleBase {
 
             private void clearPicked() {
                 if (_picked != null) {
-                    final MaterialState ms = (MaterialState) _picked.getLocalRenderState(StateType.Material);
-                    ms.setAmbient(ColorRGBA.DARK_GRAY);
+                    if (_picked instanceof Mesh) {
+                        ((Mesh) _picked).setDefaultColor(ColorRGBA.WHITE);
+                    }
                     _picked.removeController(_pickedControl);
                 }
                 _picked = null;
@@ -269,7 +266,6 @@ public class ShapesExample extends ExampleBase {
         // textures on this Line to prevent bleeding of texture coordinates from other shapes.
         line.getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
         line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        line.setLineWidth(2);
         line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
         return line;
@@ -280,9 +276,6 @@ public class ShapesExample extends ExampleBase {
         if (spatial instanceof Mesh) {
             ((Mesh) spatial).updateModelBound();
         }
-        final MaterialState ms = new MaterialState();
-        ms.setAmbient(ColorRGBA.DARK_GRAY);
-        spatial.setRenderState(ms);
         _root.attachChild(spatial);
         index++;
     }

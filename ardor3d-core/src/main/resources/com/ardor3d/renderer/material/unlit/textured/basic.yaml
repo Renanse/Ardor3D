@@ -7,7 +7,7 @@ techniques:
           - key: vertex
           - key: uv0
         uniforms: 
-          - builtIn: [model, view, projection]
+          - builtIn: [model, view, projection, defaultColor]
         shaders: 
           Vertex: 
             source: unlit/textured/basic.vert

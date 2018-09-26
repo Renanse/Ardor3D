@@ -13,7 +13,7 @@ package com.ardor3d.renderer.material;
 import java.io.IOException;
 import java.util.List;
 
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -29,6 +29,10 @@ public class MaterialTechnique implements Savable {
         return _passes;
     }
 
+    public void addPass(final TechniquePass pass) {
+        _passes.add(pass);
+    }
+
     public void setName(final String name) {
         _name = name;
     }
@@ -37,7 +41,7 @@ public class MaterialTechnique implements Savable {
         return _name;
     }
 
-    public int getScore(final Mesh mesh) {
+    public int getScore(final Renderable renderable) {
         // TODO Auto-generated method stub
         return 0;
     }

@@ -43,7 +43,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.pass.Pass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.LightState;
@@ -122,9 +121,6 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /** The state applying the shadow map. */
     private final TextureState _shadowTextureState;
-
-    /** Don't perform any plane clipping when rendering the shadowed scene. */
-    private final ClipState _noClip;
 
     /** True once the pass has been initialized. */
     protected boolean _initialised = false;
@@ -233,8 +229,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         setNumOfSplits(numOfSplits);
         _pssmCam = new PSSMCamera();
 
-        _noClip = new ClipState();
-        _noClip.setEnabled(false);
         _noTexture = new TextureState();
         _noTexture.setEnabled(false);
         _colorDisabled = new ColorMaskState();
@@ -343,7 +337,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowMapRenderer = r.createTextureRenderer(_shadowMapSize, _shadowMapSize, 24, 0);
 
         // Enforce performance enhancing states on the renderer.
-        _shadowMapRenderer.enforceState(_noClip);
+//        _shadowMapRenderer.enforceState(_noClip);
         _shadowMapRenderer.enforceState(_colorDisabled);
         if (!_useObjectCullFace) {
             _shadowMapRenderer.enforceState(_cullFrontFace);
@@ -804,7 +798,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowMatrix.set(cam.getViewMatrix()).invertLocal();
         _shadowMatrix.multiplyLocal(_shadowMapRenderer.getCamera().getModelViewProjectionMatrix())
                 .multiplyLocal(SCALE_BIAS_MATRIX);
-        _shadowMapTexture[index].setTextureMatrix(_shadowMatrix);
+//        _shadowMapTexture[index].setTextureMatrix(_shadowMatrix);
     }
 
     /**
@@ -1253,7 +1247,6 @@ public class ParallelSplitShadowMapPass extends Pass {
             lineFrustum.getMeshData().setIndexModes(
                     new IndexMode[] { IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines });
             lineFrustum.getMeshData().setIndexLengths(new int[] { 4, 4, 8, 8 });
-            lineFrustum.setLineWidth(2);
             lineFrustum.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
             final BlendState lineBlendState = new BlendState();

@@ -20,7 +20,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
@@ -185,8 +184,8 @@ public class ObjGeometryStore {
             }
 
             final Point points = new Point(name, vertices, null, null, null);
-            final IndexBufferData<? extends Buffer> indexBuffer = BufferUtils.createIndexBufferData(_pointManager
-                    .getIndices().size(), vertices.length - 1);
+            final IndexBufferData<? extends Buffer> indexBuffer = BufferUtils
+                    .createIndexBufferData(_pointManager.getIndices().size(), vertices.length - 1);
             for (final int index : _pointManager.getIndices()) {
                 indexBuffer.put(index);
             }
@@ -226,8 +225,8 @@ public class ObjGeometryStore {
             }
 
             final Line line = new Line(name, vertices, null, null, hasUVs ? uvs : null);
-            final IndexBufferData<? extends Buffer> indexBuffer = BufferUtils.createIndexBufferData(_lineManager
-                    .getIndices().size(), vertices.length - 1);
+            final IndexBufferData<? extends Buffer> indexBuffer = BufferUtils
+                    .createIndexBufferData(_lineManager.getIndices().size(), vertices.length - 1);
             for (final int index : _lineManager.getIndices()) {
                 indexBuffer.put(index);
             }
@@ -302,8 +301,8 @@ public class ObjGeometryStore {
                 mesh.getMeshData().setTextureBuffer(uvs, 0);
             }
 
-            final IndexBufferData<? extends Buffer> indexBuffer = BufferUtils.createIndexBufferData(_meshManager
-                    .getIndices().size(), _meshManager.getStore().size() - 1);
+            final IndexBufferData<? extends Buffer> indexBuffer = BufferUtils
+                    .createIndexBufferData(_meshManager.getIndices().size(), _meshManager.getStore().size() - 1);
             for (final int index : _meshManager.getIndices()) {
                 indexBuffer.put(index);
             }
@@ -333,10 +332,7 @@ public class ObjGeometryStore {
     }
 
     private void applyCurrentMaterial(final Spatial target) {
-        final MaterialState material = _currentMaterial.getMaterialState();
-        if (material != null) {
-            target.setRenderState(material);
-        }
+        _currentMaterial.applyMaterialProperties(target);
 
         final TextureState tState = _currentMaterial.getTextureState();
         if (tState != null) {

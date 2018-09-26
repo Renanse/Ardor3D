@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.uniform.RenderStateProperty;
+import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
@@ -115,10 +117,10 @@ public class TechniquePass implements Savable {
 
     public void addLightInfoUniforms(final int maxLights) {
         for (int i = 0; i < maxLights; i++) {
-            addUniform(new UniformRef("lightPositions[" + i + "]", UniformType.Float3, UniformSource.RenderState,
-                    RenderStateProperty.LightPosition, i));
-            addUniform(new UniformRef("lightColors[" + i + "]", UniformType.Float3, UniformSource.RenderState,
-                    RenderStateProperty.LightColorRGB, i));
+            addUniform(new UniformRef("lightPositions[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.LightPosition, i, Vector3.ZERO));
+            addUniform(new UniformRef("lightColors[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.LightColorRGB, i, ColorRGBA.WHITE));
         }
     }
 

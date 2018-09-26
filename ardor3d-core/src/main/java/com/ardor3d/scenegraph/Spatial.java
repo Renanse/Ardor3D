@@ -22,11 +22,13 @@ import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.ValidatingTransform;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -110,7 +112,8 @@ public abstract class Spatial implements Savable, Hintable {
     protected static final EnumSet<DirtyType> ON_DIRTY_ATTACHED = EnumSet.of(DirtyType.Transform, DirtyType.RenderState,
             DirtyType.Bounding);
 
-    public static final String KEY_UserData = "_userdata";
+    public static final String KEY_UserData = "_userData";
+    public static final String KEY_DefaultColor = "_defaultColor";
 
     /**
      * Constructs a new Spatial. Initializes the transform fields.
@@ -1054,7 +1057,7 @@ public abstract class Spatial implements Savable, Hintable {
      */
     @Deprecated
     public Object getUserData() {
-        return getLocalProperty(KEY_UserData);
+        return getLocalProperty(KEY_UserData, null);
     }
 
     /**
@@ -1080,27 +1083,30 @@ public abstract class Spatial implements Savable, Hintable {
      * @throws ClassCastException
      *             if property is not correct type
      */
-    public <T> T getProperty(final String key) {
+    public <T> T getProperty(final String key, final T defaultValue) {
         final PropertyMode mode = getSceneHints().getPropertyMode();
 
         if (mode == PropertyMode.UseOwn) {
-            return getLocalProperty(key);
-        } else if (mode == PropertyMode.UseParentIfNull) {
-            final T property = getLocalProperty(key);
-            if (property == null && getParent() != null) {
-                return getParent().getProperty(key);
-            }
-            return property;
-        } else if (mode == PropertyMode.UseOursLast) {
-            if (getParent() != null) {
-                final T property = getParent().getProperty(key);
-                if (property != null) {
-                    return property;
-                }
-            }
-            return getLocalProperty(key);
+            return getLocalProperty(key, defaultValue);
         }
-        return null;
+
+        final Node parent = getParent();
+        if (mode == PropertyMode.UseParentIfUnset) {
+            if (hasLocalProperty(key)) {
+                return getLocalProperty(key, defaultValue);
+            }
+
+            return parent != null ? parent.getProperty(key, defaultValue) : defaultValue;
+        }
+
+        if (mode == PropertyMode.UseOursLast) {
+            if (parent.hasProperty(key)) {
+                return parent.getProperty(key, defaultValue);
+            }
+
+            return getLocalProperty(key, defaultValue);
+        }
+        return defaultValue;
     }
 
     /**
@@ -1108,13 +1114,15 @@ public abstract class Spatial implements Savable, Hintable {
      *
      * @param key
      *            property key
+     * @param defaultValue
+     *            a value to return if the given key is not found locally.
      * @return the found property, cast to T
      * @throws ClassCastException
      *             if property is not correct type
      */
     @SuppressWarnings("unchecked")
-    public <T> T getLocalProperty(final String key) {
-        return (T) _properties.getOrDefault(key, null);
+    public <T> T getLocalProperty(final String key, final T defaultValue) {
+        return (T) _properties.getOrDefault(key, defaultValue);
     }
 
     /**
@@ -1148,6 +1156,49 @@ public abstract class Spatial implements Savable, Hintable {
      */
     public boolean hasLocalProperty(final String key) {
         return _properties.containsKey(key);
+    }
+
+    /**
+     * @param key
+     *            property key
+     * @return true if we have the given key somewhere reachable in the scenegraph, based on our SceneHints.
+     */
+    public boolean hasProperty(final String key) {
+        final PropertyMode mode = getSceneHints().getPropertyMode();
+        final boolean hasLocal = hasLocalProperty(key);
+
+        if (mode == PropertyMode.UseOwn) {
+            return hasLocal;
+        }
+
+        final Node parent = getParent();
+        if (mode == PropertyMode.UseParentIfUnset) {
+            return hasLocal || parent != null && parent.hasProperty(key);
+        }
+
+        if (mode == PropertyMode.UseOursLast) {
+            final boolean parentHasProperty = parent != null && parent.hasProperty(key);
+            return parentHasProperty || hasLocal;
+        }
+
+        return false;
+    }
+
+    public void setDefaultColor(final ReadOnlyColorRGBA color) {
+        setDefaultColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+    }
+
+    public void setDefaultColor(final float r, final float g, final float b, final float a) {
+        final ColorRGBA store = getLocalProperty(KEY_DefaultColor, null);
+        if (store != null) {
+            store.set(r, g, b, a);
+        } else {
+            setProperty(KEY_DefaultColor, new ColorRGBA(r, g, b, a));
+        }
+    }
+
+    public ReadOnlyColorRGBA getDefaultColor() {
+        return getProperty(KEY_DefaultColor, ColorRGBA.WHITE);
     }
 
     /**

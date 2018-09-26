@@ -30,9 +30,7 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.FogState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Node;
@@ -75,7 +73,6 @@ public class WaterNode extends Node {
     private Texture foamTexture;
 
     protected BlendState as1;
-    protected FogState noFog;
 
     protected Plane waterPlane;
     protected Vector3 tangent;
@@ -210,9 +207,6 @@ public class WaterNode extends Node {
         fullScreenQuad.setRenderState(ts);
         fullScreenQuad.updateWorldRenderStates(false);
         fullScreenQuad.setRenderMaterial("bloom/fsq_blur_vertical5_down.yaml");
-
-        noFog = new FogState();
-        noFog.setEnabled(false);
 
         getSceneHints().setCullHint(CullHint.Never);
 
@@ -570,12 +564,6 @@ public class WaterNode extends Node {
      *            Handle to a node to use as skybox
      */
     public void setSkybox(final Node skyBox) {
-        if (skyBox != null) {
-            final ClipState skyboxClipState = new ClipState();
-            skyboxClipState.setEnabled(false);
-            skyBox.setRenderState(skyboxClipState);
-        }
-
         this.skyBox = skyBox;
     }
 
