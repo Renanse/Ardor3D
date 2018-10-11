@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -24,12 +24,12 @@ import com.ardor3d.util.export.Savable;
  * by specific lighting types. A light will illuminate portions of the scene by assigning its properties to the objects
  * in the scene. This will affect the objects color values, depending on the color of the ambient, diffuse and specular
  * light components.
- * 
+ *
  * Ambient light defines the general light of the scene, that is the intensity and color of lighting if no particular
  * lights are affecting it.
- * 
+ *
  * Diffuse lighting defines the reflection of light on matte surfaces.
- * 
+ *
  * Specular lighting defines the reflection of light on shiny surfaces.
  */
 public abstract class Light implements Serializable, Savable {
@@ -65,9 +65,6 @@ public abstract class Light implements Serializable, Savable {
     private float _linear;
     private float _quadratic;
 
-    private int _lightMask = 0;
-    private int _backLightMask = 0;
-
     private boolean _enabled;
 
     private String _name;
@@ -77,21 +74,21 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * Constructor instantiates a new <code>Light</code> object. All light color values are set to white.
-     * 
+     *
      */
     public Light() {}
 
     /**
-     * 
+     *
      * <code>getType</code> returns the type of the light that has been created.
-     * 
+     *
      * @return the type of light that has been created.
      */
     public abstract Type getType();
 
     /**
      * <code>getConstant</code> returns the value for the constant attenuation.
-     * 
+     *
      * @return the value for the constant attenuation.
      */
     public float getConstant() {
@@ -100,7 +97,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setConstant</code> sets the value for the constant attentuation.
-     * 
+     *
      * @param constant
      *            the value for the constant attenuation.
      */
@@ -110,7 +107,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>getLinear</code> returns the value for the linear attenuation.
-     * 
+     *
      * @return the value for the linear attenuation.
      */
     public float getLinear() {
@@ -119,7 +116,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setLinear</code> sets the value for the linear attentuation.
-     * 
+     *
      * @param linear
      *            the value for the linear attenuation.
      */
@@ -129,7 +126,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>getQuadratic</code> returns the value for the quadratic attentuation.
-     * 
+     *
      * @return the value for the quadratic attenuation.
      */
     public float getQuadratic() {
@@ -138,7 +135,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setQuadratic</code> sets the value for the quadratic attenuation.
-     * 
+     *
      * @param quadratic
      *            the value for the quadratic attenuation.
      */
@@ -148,7 +145,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>isAttenuate</code> returns true if attenuation is to be used for this light.
-     * 
+     *
      * @return true if attenuation is to be used, false otherwise.
      */
     public boolean isAttenuate() {
@@ -157,7 +154,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setAttenuate</code> sets if attenuation is to be used. True sets it on, false otherwise.
-     * 
+     *
      * @param attenuate
      *            true to use attenuation, false not to.
      */
@@ -166,9 +163,9 @@ public abstract class Light implements Serializable, Savable {
     }
 
     /**
-     * 
+     *
      * <code>isEnabled</code> returns true if the light is enabled, false otherwise.
-     * 
+     *
      * @return true if the light is enabled, false if it is not.
      */
     public boolean isEnabled() {
@@ -176,9 +173,9 @@ public abstract class Light implements Serializable, Savable {
     }
 
     /**
-     * 
+     *
      * <code>setEnabled</code> sets the light on or off. True turns it on, false turns it off.
-     * 
+     *
      * @param value
      *            true to turn the light on, false to turn it off.
      */
@@ -188,7 +185,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>getSpecular</code> returns the specular color value for this light.
-     * 
+     *
      * @return the specular color value of the light.
      */
     public ReadOnlyColorRGBA getSpecular() {
@@ -197,17 +194,17 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setSpecular</code> sets the specular color value for this light.
-     * 
+     *
      * @param specular
      *            the specular color value of the light.
      */
     public void setSpecular(final ReadOnlyColorRGBA specular) {
-        this._specular.set(specular);
+        _specular.set(specular);
     }
 
     /**
      * <code>getDiffuse</code> returns the diffuse color value for this light.
-     * 
+     *
      * @return the diffuse color value for this light.
      */
     public ReadOnlyColorRGBA getDiffuse() {
@@ -216,17 +213,17 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setDiffuse</code> sets the diffuse color value for this light.
-     * 
+     *
      * @param diffuse
      *            the diffuse color value for this light.
      */
     public void setDiffuse(final ReadOnlyColorRGBA diffuse) {
-        this._diffuse.set(diffuse);
+        _diffuse.set(diffuse);
     }
 
     /**
      * <code>getAmbient</code> returns the ambient color value for this light.
-     * 
+     *
      * @return the ambient color value for this light.
      */
     public ReadOnlyColorRGBA getAmbient() {
@@ -235,47 +232,12 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * <code>setAmbient</code> sets the ambient color value for this light.
-     * 
+     *
      * @param ambient
      *            the ambient color value for this light.
      */
     public void setAmbient(final ReadOnlyColorRGBA ambient) {
-        this._ambient.set(ambient);
-    }
-
-    /**
-     * @return Returns the lightMask - default is 0 or not masked.
-     */
-    public int getLightMask() {
-        return _lightMask;
-    }
-
-    /**
-     * <code>setLightMask</code> sets what attributes of this light to apply as an int comprised of bitwise |'ed values
-     * from LightState.Mask_XXXX. LightMask.MASK_GLOBALAMBIENT is ignored.
-     * 
-     * @param lightMask
-     *            The lightMask to set.
-     */
-    public void setLightMask(final int lightMask) {
-        _lightMask = lightMask;
-    }
-
-    /**
-     * Saves the light mask to a back store. That backstore is recalled with popLightMask. Despite the name, this is not
-     * a stack and additional pushes will simply overwrite the backstored value.
-     */
-    public void pushLightMask() {
-        _backLightMask = _lightMask;
-    }
-
-    /**
-     * Recalls the light mask from a back store or 0 if none was pushed.
-     * 
-     * @see com.ardor3d.light.Light#pushLightMask()
-     */
-    public void popLightMask() {
-        _lightMask = _backLightMask;
+        _ambient.set(ambient);
     }
 
     /**
@@ -295,7 +257,7 @@ public abstract class Light implements Serializable, Savable {
 
     /**
      * Copies the light values from the given light into this Light.
-     * 
+     *
      * @param light
      *            the Light to copy from.
      */
@@ -316,7 +278,7 @@ public abstract class Light implements Serializable, Savable {
     }
 
     public void setName(final String name) {
-        this._name = name;
+        _name = name;
     }
 
     public void write(final OutputCapsule capsule) throws IOException {
@@ -327,8 +289,6 @@ public abstract class Light implements Serializable, Savable {
         capsule.write(_constant, "constant", 1);
         capsule.write(_linear, "linear", 0);
         capsule.write(_quadratic, "quadratic", 0);
-        capsule.write(_lightMask, "lightMask", 0);
-        capsule.write(_backLightMask, "backLightMask", 0);
         capsule.write(_enabled, "enabled", false);
         capsule.write(_shadowCaster, "shadowCaster", false);
         capsule.write(_name, "name", null);
@@ -342,8 +302,6 @@ public abstract class Light implements Serializable, Savable {
         _constant = capsule.readFloat("constant", 1);
         _linear = capsule.readFloat("linear", 0);
         _quadratic = capsule.readFloat("quadratic", 0);
-        _lightMask = capsule.readInt("lightMask", 0);
-        _backLightMask = capsule.readInt("backLightMask", 0);
         _enabled = capsule.readBoolean("enabled", false);
         _shadowCaster = capsule.readBoolean("shadowCaster", false);
         _name = capsule.readString("name", null);

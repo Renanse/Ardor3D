@@ -32,8 +32,10 @@ import org.lwjgl.opengl.GL32C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.system.MemoryStack;
 
+import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.light.Light;
 import com.ardor3d.light.PointLight;
+import com.ardor3d.light.SpotLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
@@ -576,19 +578,26 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 return buffer;
             }
 
+            case LightDirection:
             case LightPosition: {
                 final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
                 final RenderContext context = ContextManager.getCurrentContext();
                 final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                if (ls.getNumberOfChildren() > index) {
+                if (ls.count() > index) {
                     final Light light = ls.get(index);
-                    ReadOnlyVector3 position = Vector3.ZERO;
-                    if (light instanceof PointLight) {
-                        position = ((PointLight) light).getLocation();
+                    ReadOnlyVector3 vector = Vector3.ZERO;
+                    if (light instanceof PointLight && propertyType == Ardor3dStateProperty.LightPosition) {
+                        vector = ((PointLight) light).getLocation();
+                    } else if (propertyType == Ardor3dStateProperty.LightDirection) {
+                        if (light instanceof DirectionalLight) {
+                            vector = ((DirectionalLight) light).getDirection();
+                        } else if (light instanceof SpotLight) {
+                            vector = ((SpotLight) light).getDirection();
+                        }
                     }
 
                     final FloatBuffer buffer = stack.mallocFloat(3);
-                    buffer.put(position.getXf()).put(position.getYf()).put(position.getZf());
+                    buffer.put(vector.getXf()).put(vector.getYf()).put(vector.getZf());
                     buffer.rewind();
                     return buffer;
                 } else if (defaultValue != null) {
@@ -597,26 +606,31 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 break;
             }
 
-            case LightColorRGB:
-            case LightColorRGBA: {
+            case LightSpecular:
+            case LightAmbient:
+            case LightDiffuse: {
                 final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
                 final RenderContext context = ContextManager.getCurrentContext();
                 final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                if (ls.getNumberOfChildren() > index) {
+                if (ls.count() > index) {
                     final Light light = ls.get(index);
-                    final ReadOnlyColorRGBA color = light == null ? ColorRGBA.BLACK_NO_ALPHA : light.getDiffuse();
-
-                    final FloatBuffer buffer = stack
-                            .mallocFloat(propertyType == Ardor3dStateProperty.LightColorRGB ? 3 : 4);
-                    buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
-                    if (propertyType == Ardor3dStateProperty.LightColorRGBA) {
-                        buffer.put(color.getAlpha());
+                    ReadOnlyColorRGBA color = ColorRGBA.BLACK_NO_ALPHA;
+                    if (light != null) {
+                        if (propertyType == Ardor3dStateProperty.LightSpecular) {
+                            color = light.getSpecular();
+                        } else if (propertyType == Ardor3dStateProperty.LightDiffuse) {
+                            color = light.getDiffuse();
+                        } else if (propertyType == Ardor3dStateProperty.LightAmbient) {
+                            color = light.getAmbient();
+                        }
                     }
+
+                    final FloatBuffer buffer = stack.mallocFloat(4);
+                    buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue()).put(color.getAlpha());
                     buffer.rewind();
                     return buffer;
                 } else if (defaultValue != null) {
-                    return getBuffer(propertyType == Ardor3dStateProperty.LightColorRGB ? UniformType.Float3
-                            : UniformType.Float4, defaultValue, stack);
+                    return getBuffer(UniformType.Float4, defaultValue, stack);
                 }
                 break;
             }

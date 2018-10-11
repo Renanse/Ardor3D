@@ -21,21 +21,33 @@ public enum Ardor3dStateProperty {
     CurrentCameraLocation,
 
     /**
-     * A Float3 vector pulled from rgb color of a light in the current LightState. The light index comes from the extra
-     * field of the uniform, which must be of type Integer. Returns 0,0,0 if no light in this position.
+     * A Float4 vector pulled from rgba diffuse color of a light in the current LightState. The light index comes from
+     * the extra field of the uniform, which must be of type Integer. Returns 0,0,0,0 if no light in this position.
      */
-    LightColorRGB,
+    LightDiffuse,
 
     /**
-     * A Float4 vector pulled from rgba color of a light in the current LightState. The light index comes from the extra
-     * field of the uniform, which must be of type Integer. Returns 0,0,0,0 if no light in this position.
+     * A Float4 vector pulled from rgba ambient color of a light in the current LightState. The light index comes from
+     * the extra field of the uniform, which must be of type Integer. Returns 0,0,0,0 if no light in this position.
      */
-    LightColorRGBA,
+    LightAmbient,
+
+    /**
+     * A Float4 vector pulled from rgba specular color of a light in the current LightState. The light index comes from
+     * the extra field of the uniform, which must be of type Integer. Returns 0,0,0,0 if no light in this position.
+     */
+    LightSpecular,
 
     /**
      * A Float3 vector pulled from position of a light in the current LightState. The light index comes from the extra
      * field of the uniform, which must be of type Integer. Returns 0,0,0 if no light in this position.
      */
     LightPosition,
+
+    /**
+     * A Float3 vector pulled from direction of a light in the current LightState. The light index comes from the extra
+     * field of the uniform, which must be of type Integer. Returns 0,0,0 if no light in this position.
+     */
+    LightDirection,
 
 }

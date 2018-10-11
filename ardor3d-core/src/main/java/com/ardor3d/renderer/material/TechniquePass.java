@@ -117,10 +117,16 @@ public class TechniquePass implements Savable {
 
     public void addLightInfoUniforms(final int maxLights) {
         for (int i = 0; i < maxLights; i++) {
-            addUniform(new UniformRef("lightPositions[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+            addUniform(new UniformRef("lightPosition[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
                     Ardor3dStateProperty.LightPosition, i, Vector3.ZERO));
-            addUniform(new UniformRef("lightColors[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
-                    Ardor3dStateProperty.LightColorRGB, i, ColorRGBA.WHITE));
+            addUniform(new UniformRef("lightDirection[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.LightDirection, i, ColorRGBA.WHITE));
+            addUniform(new UniformRef("lightAmbient[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.LightAmbient, i, ColorRGBA.WHITE));
+            addUniform(new UniformRef("lightColor[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.LightDiffuse, i, ColorRGBA.WHITE));
+            addUniform(new UniformRef("lightSpecular[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.LightSpecular, i, ColorRGBA.WHITE));
         }
     }
 

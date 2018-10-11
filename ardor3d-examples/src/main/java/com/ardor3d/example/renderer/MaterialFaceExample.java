@@ -34,8 +34,6 @@ public class MaterialFaceExample extends ExampleBase {
     public void initExample() {
         _root.attachChild(createFloor());
         _root.attachChild(createSky());
-
-        _lightState.setTwoSidedLighting(true);
     }
 
     private Mesh createFloor() {

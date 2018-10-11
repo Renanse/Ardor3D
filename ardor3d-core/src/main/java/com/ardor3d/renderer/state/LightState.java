@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Stack;
 
 import com.ardor3d.light.Light;
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.record.LightStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
@@ -44,58 +42,14 @@ public class LightState extends RenderState {
      */
     public static final int MAX_LIGHTS_ALLOWED = 8;
 
-    /**
-     * When applied to lightMask, implies ambient light should be set to 0 for this lightstate
-     */
-    public static final int MASK_AMBIENT = 1;
-
-    /**
-     * When applied to lightMask, implies diffuse light should be set to 0 for this lightstate
-     */
-    public static final int MASK_DIFFUSE = 2;
-
-    /**
-     * When applied to lightMask, implies specular light should be set to 0 for this lightstate
-     */
-    public static final int MASK_SPECULAR = 4;
-
-    /**
-     * When applied to lightMask, implies global ambient light should be set to 0 for this lightstate
-     */
-    public static final int MASK_GLOBALAMBIENT = 8;
-
     // holds the lights
     private List<Light> lightList;
-
-    // mask value - default is no masking
-    protected int lightMask = 0;
-
-    // mask value stored by pushLightMask, retrieved by popLightMask
-    protected int backLightMask = 0;
-
-    /** When true, both sides of the model will be lighted. */
-    protected boolean twoSidedOn = true;
-
-    protected ColorRGBA _globalAmbient = new ColorRGBA(DEFAULT_GLOBAL_AMBIENT);
-
-    public static final ReadOnlyColorRGBA DEFAULT_GLOBAL_AMBIENT = new ColorRGBA(0, 0, 0, 1);
-
-    /**
-     * When true, the eye position (as opposed to just the view direction) will be taken into account when computing
-     * specular reflections.
-     */
-    protected boolean localViewerOn;
-
-    /**
-     * When true, specular highlights will be computed separately and added to fragments after texturing.
-     */
-    protected boolean separateSpecularOn;
 
     /**
      * Constructor instantiates a new <code>LightState</code> object. Initially there are no lights set.
      */
     public LightState() {
-        lightList = new ArrayList<Light>();
+        lightList = new ArrayList<>();
     }
 
     @Override
@@ -169,149 +123,22 @@ public class LightState extends RenderState {
     }
 
     /**
-     *
-     * <code>getNumberOfChildren</code> returns the number of lights currently in the queue.
-     *
-     * @return the number of lights currently in the queue.
+     * @return the number of lights currently in this state.
      */
-    public int getNumberOfChildren() {
+    public int count() {
         return lightList.size() > MAX_LIGHTS_ALLOWED ? MAX_LIGHTS_ALLOWED : lightList.size();
-    }
-
-    /**
-     * Sets if two sided lighting should be enabled for this LightState. Two sided lighting will cause the back of
-     * surfaces to be colored using the inverse of the surface normal as well as the Material properties set for
-     * MaterialFace.Back.
-     *
-     * @param twoSidedOn
-     *            If true, two sided lighting is enabled.
-     */
-    public void setTwoSidedLighting(final boolean twoSidedOn) {
-        this.twoSidedOn = twoSidedOn;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * Returns the current state of two sided lighting for this LightState. By default, it is off.
-     *
-     * @return True if two sided lighting is enabled.
-     */
-    public boolean getTwoSidedLighting() {
-        return twoSidedOn;
-    }
-
-    /**
-     * Sets if local viewer mode should be enabled for this LightState.
-     *
-     * @param localViewerOn
-     *            If true, local viewer mode is enabled.
-     */
-    public void setLocalViewer(final boolean localViewerOn) {
-        this.localViewerOn = localViewerOn;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * Returns the current state of local viewer mode for this LightState. By default, it is off.
-     *
-     * @return True if local viewer mode is enabled.
-     */
-    public boolean getLocalViewer() {
-        return localViewerOn;
-    }
-
-    /**
-     * Sets if separate specular mode should be enabled for this LightState.
-     *
-     * @param separateSpecularOn
-     *            If true, separate specular mode is enabled.
-     */
-    public void setSeparateSpecular(final boolean separateSpecularOn) {
-        this.separateSpecularOn = separateSpecularOn;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * Returns the current state of separate specular mode for this LightState. By default, it is off.
-     *
-     * @return True if separate specular mode is enabled.
-     */
-    public boolean getSeparateSpecular() {
-        return separateSpecularOn;
-    }
-
-    public void setGlobalAmbient(final ReadOnlyColorRGBA color) {
-        _globalAmbient.set(color);
-        setNeedsRefresh(true);
-    }
-
-    /**
-     *
-     * @param store
-     * @return
-     */
-    public ReadOnlyColorRGBA getGlobalAmbient() {
-        return _globalAmbient;
-    }
-
-    /**
-     * @return Returns the lightMask - default is 0 or not masked.
-     */
-    public int getLightMask() {
-        return lightMask;
-    }
-
-    /**
-     * <code>setLightMask</code> sets what attributes of this lightstate to apply as an int comprised of bitwise or'ed
-     * values.
-     *
-     * @param lightMask
-     *            The lightMask to set.
-     */
-    public void setLightMask(final int lightMask) {
-        this.lightMask = lightMask;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * Saves the light mask to a back store. That backstore is recalled with popLightMask. Despite the name, this is not
-     * a stack and additional pushes will simply overwrite the backstored value.
-     */
-    public void pushLightMask() {
-        backLightMask = lightMask;
-    }
-
-    /**
-     * Recalls the light mask from a back store or 0 if none was pushed.
-     *
-     * @see com.ardor3d.renderer.state.LightState#pushLightMask()
-     */
-    public void popLightMask() {
-        lightMask = backLightMask;
     }
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.writeSavableList(lightList, "lightList", new ArrayList<Light>());
-        capsule.write(lightMask, "lightMask", 0);
-        capsule.write(backLightMask, "backLightMask", 0);
-        capsule.write(twoSidedOn, "twoSidedOn", false);
-        capsule.write(_globalAmbient, "globalAmbient", new ColorRGBA(DEFAULT_GLOBAL_AMBIENT));
-        capsule.write(localViewerOn, "localViewerOn", false);
-        capsule.write(separateSpecularOn, "separateSpecularOn", false);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         lightList = capsule.readSavableList("lightList", new ArrayList<Light>());
-        lightMask = capsule.readInt("lightMask", 0);
-        backLightMask = capsule.readInt("backLightMask", 0);
-        twoSidedOn = capsule.readBoolean("twoSidedOn", false);
-        _globalAmbient = (ColorRGBA) capsule.readSavable("globalAmbient", new ColorRGBA(DEFAULT_GLOBAL_AMBIENT));
-        localViewerOn = capsule.readBoolean("localViewerOn", false);
-        separateSpecularOn = capsule.readBoolean("separateSpecularOn", false);
     }
 
     @Override
@@ -378,12 +205,7 @@ public class LightState extends RenderState {
     }
 
     private static void copyLightState(final LightState source, final LightState destination) {
-        destination.setTwoSidedLighting(source.getTwoSidedLighting());
-        destination.setLocalViewer(source.getLocalViewer());
-        destination.setSeparateSpecular(source.getSeparateSpecular());
         destination.setEnabled(source.isEnabled());
-        destination.setGlobalAmbient(source.getGlobalAmbient());
-        destination.setLightMask(source.getLightMask());
         destination.setNeedsRefresh(true);
 
         for (int i = 0, maxL = source.getLightList().size(); i < maxL; i++) {
