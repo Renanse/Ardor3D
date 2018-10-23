@@ -12,6 +12,7 @@ package com.ardor3d.renderer.material.uniform;
 
 import java.io.IOException;
 
+import com.ardor3d.renderer.material.IUniformSupplier;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -27,6 +28,7 @@ public class UniformRef implements Savable {
     protected Object _defaultValue = null;
 
     protected transient int _cachedLocation = -1;
+    public transient IUniformSupplier _cachedSupplier;
 
     public UniformRef() {}
 

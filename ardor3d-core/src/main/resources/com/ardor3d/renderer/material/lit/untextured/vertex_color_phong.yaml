@@ -1,0 +1,17 @@
+--- # Untextured, vertex color material
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: color
+          
+        uniforms: 
+          - builtIn: [model, view, projection, cameraLoc, lights4, colorSurface]
+            
+        shaders: 
+          Vertex: 
+            source: phong/untextured/vertex_color.vert
+          Fragment:
+            source: phong/untextured/phong_untextured.frag

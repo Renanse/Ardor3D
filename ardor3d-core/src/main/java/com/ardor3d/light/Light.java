@@ -12,9 +12,16 @@ package com.ardor3d.light;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.material.IUniformSupplier;
+import com.ardor3d.renderer.material.uniform.UniformRef;
+import com.ardor3d.renderer.material.uniform.UniformSource;
+import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -32,9 +39,11 @@ import com.ardor3d.util.export.Savable;
  *
  * Specular lighting defines the reflection of light on shiny surfaces.
  */
-public abstract class Light implements Serializable, Savable {
+public abstract class Light implements Serializable, Savable, IUniformSupplier {
 
     private static final long serialVersionUID = 1L;
+
+    protected final List<UniformRef> cachedUniforms = new ArrayList<>();
 
     /**
      * dark grey (.4, .4, .4, 1)
@@ -60,11 +69,6 @@ public abstract class Light implements Serializable, Savable {
     private final ColorRGBA _diffuse = new ColorRGBA(DEFAULT_DIFFUSE);
     private final ColorRGBA _specular = new ColorRGBA(DEFAULT_SPECULAR);
 
-    private boolean _attenuate;
-    private float _constant = 1;
-    private float _linear;
-    private float _quadratic;
-
     private boolean _enabled;
 
     private String _name;
@@ -76,7 +80,16 @@ public abstract class Light implements Serializable, Savable {
      * Constructor instantiates a new <code>Light</code> object. All light color values are set to white.
      *
      */
-    public Light() {}
+    public Light() {
+        cachedUniforms
+                .add(new UniformRef("type", UniformType.Int1, UniformSource.Supplier, (Supplier<Type>) this::getType));
+        cachedUniforms.add(new UniformRef("ambient", UniformType.Float3, UniformSource.Supplier,
+                (Supplier<ReadOnlyColorRGBA>) this::getAmbient));
+        cachedUniforms.add(new UniformRef("diffuse", UniformType.Float3, UniformSource.Supplier,
+                (Supplier<ReadOnlyColorRGBA>) this::getDiffuse));
+        cachedUniforms.add(new UniformRef("specular", UniformType.Float3, UniformSource.Supplier,
+                (Supplier<ReadOnlyColorRGBA>) this::getSpecular));
+    }
 
     /**
      *
@@ -85,82 +98,6 @@ public abstract class Light implements Serializable, Savable {
      * @return the type of light that has been created.
      */
     public abstract Type getType();
-
-    /**
-     * <code>getConstant</code> returns the value for the constant attenuation.
-     *
-     * @return the value for the constant attenuation.
-     */
-    public float getConstant() {
-        return _constant;
-    }
-
-    /**
-     * <code>setConstant</code> sets the value for the constant attentuation.
-     *
-     * @param constant
-     *            the value for the constant attenuation.
-     */
-    public void setConstant(final float constant) {
-        _constant = constant;
-    }
-
-    /**
-     * <code>getLinear</code> returns the value for the linear attenuation.
-     *
-     * @return the value for the linear attenuation.
-     */
-    public float getLinear() {
-        return _linear;
-    }
-
-    /**
-     * <code>setLinear</code> sets the value for the linear attentuation.
-     *
-     * @param linear
-     *            the value for the linear attenuation.
-     */
-    public void setLinear(final float linear) {
-        _linear = linear;
-    }
-
-    /**
-     * <code>getQuadratic</code> returns the value for the quadratic attentuation.
-     *
-     * @return the value for the quadratic attenuation.
-     */
-    public float getQuadratic() {
-        return _quadratic;
-    }
-
-    /**
-     * <code>setQuadratic</code> sets the value for the quadratic attenuation.
-     *
-     * @param quadratic
-     *            the value for the quadratic attenuation.
-     */
-    public void setQuadratic(final float quadratic) {
-        _quadratic = quadratic;
-    }
-
-    /**
-     * <code>isAttenuate</code> returns true if attenuation is to be used for this light.
-     *
-     * @return true if attenuation is to be used, false otherwise.
-     */
-    public boolean isAttenuate() {
-        return _attenuate;
-    }
-
-    /**
-     * <code>setAttenuate</code> sets if attenuation is to be used. True sets it on, false otherwise.
-     *
-     * @param attenuate
-     *            true to use attenuation, false not to.
-     */
-    public void setAttenuate(final boolean attenuate) {
-        _attenuate = attenuate;
-    }
 
     /**
      *
@@ -255,24 +192,6 @@ public abstract class Light implements Serializable, Savable {
         _shadowCaster = mayCastShadows;
     }
 
-    /**
-     * Copies the light values from the given light into this Light.
-     *
-     * @param light
-     *            the Light to copy from.
-     */
-    public void copyFrom(final Light light) {
-        _ambient.set(light._ambient);
-        _attenuate = light._attenuate;
-        _constant = light._constant;
-        _diffuse.set(light._diffuse);
-        _enabled = light._enabled;
-        _linear = light._linear;
-        _quadratic = light._quadratic;
-        _shadowCaster = light._shadowCaster;
-        _specular.set(light._specular);
-    }
-
     public String getName() {
         return _name;
     }
@@ -281,14 +200,15 @@ public abstract class Light implements Serializable, Savable {
         _name = name;
     }
 
+    @Override
+    public List<UniformRef> getUniforms() {
+        return cachedUniforms;
+    }
+
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
         capsule.write(_diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
         capsule.write(_specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
-        capsule.write(_attenuate, "attenuate", false);
-        capsule.write(_constant, "constant", 1);
-        capsule.write(_linear, "linear", 0);
-        capsule.write(_quadratic, "quadratic", 0);
         capsule.write(_enabled, "enabled", false);
         capsule.write(_shadowCaster, "shadowCaster", false);
         capsule.write(_name, "name", null);
@@ -298,10 +218,6 @@ public abstract class Light implements Serializable, Savable {
         _ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
         _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
         _specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));
-        _attenuate = capsule.readBoolean("attenuate", false);
-        _constant = capsule.readFloat("constant", 1);
-        _linear = capsule.readFloat("linear", 0);
-        _quadratic = capsule.readFloat("quadratic", 0);
         _enabled = capsule.readBoolean("enabled", false);
         _shadowCaster = capsule.readBoolean("shadowCaster", false);
         _name = capsule.readString("name", null);

@@ -64,7 +64,6 @@ public class ManyLightsExample extends ExampleBase {
 
         // Create a new point light and fill out the properties
         final PointLight pointLight = new PointLight();
-        pointLight.setAttenuate(true);
         pointLight.setConstant(.01f);
         pointLight.setLinear(.001f);
         pointLight.setQuadratic(.1f);

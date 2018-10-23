@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -29,6 +27,7 @@ import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -117,16 +116,8 @@ public class TechniquePass implements Savable {
 
     public void addLightInfoUniforms(final int maxLights) {
         for (int i = 0; i < maxLights; i++) {
-            addUniform(new UniformRef("lightPosition[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
-                    Ardor3dStateProperty.LightPosition, i, Vector3.ZERO));
-            addUniform(new UniformRef("lightDirection[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
-                    Ardor3dStateProperty.LightDirection, i, ColorRGBA.WHITE));
-            addUniform(new UniformRef("lightAmbient[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
-                    Ardor3dStateProperty.LightAmbient, i, ColorRGBA.WHITE));
-            addUniform(new UniformRef("lightColor[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
-                    Ardor3dStateProperty.LightDiffuse, i, ColorRGBA.WHITE));
-            addUniform(new UniformRef("lightSpecular[" + i + "]", UniformType.Float3, UniformSource.Ardor3dState,
-                    Ardor3dStateProperty.LightSpecular, i, ColorRGBA.WHITE));
+            addUniform(new UniformRef("light[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
+                    Ardor3dStateProperty.Light, i, null));
         }
     }
 
@@ -228,22 +219,81 @@ public class TechniquePass implements Savable {
         final IShaderUtils shaderUtils = renderer.getShaderUtils();
         final int programId = getProgramId(context);
         for (int i = 0; i < _uniforms.size(); i++) {
-            final UniformRef uniform = _uniforms.get(i);
-            int location = uniform.getCachedLocation() >= 0 ? uniform.getCachedLocation() : uniform.getLocation();
-            if (location < 0) {
-                // Use the name to find our location
-                location = shaderUtils.findUniformLocation(programId, uniform.getShaderVariableName());
-                if (location < 0) {
-                    // still less than 0? might have been removed during compilation
-                    continue;
-                } else {
-                    uniform.setCachedLocation(location);
+            setupUniform(mesh, shaderUtils, programId, _uniforms.get(i), "");
+        }
+    }
+
+    private void setupUniform(final Mesh mesh, final IShaderUtils shaderUtils, final int programId,
+            final UniformRef uniform, final String namePrepend) {
+        // If we are a UniformSupplier, pull uniforms out and set them up instead.
+        if (uniform.getType() == UniformType.UniformSupplier) {
+            final List<UniformRef> srcUniforms = getUniformsFromSupplier(uniform, mesh);
+            if (srcUniforms != null) {
+                final String prepend = namePrepend + uniform.getShaderVariableName() + ".";
+                for (int i = 0; i < srcUniforms.size(); i++) {
+                    setupUniform(mesh, shaderUtils, programId, srcUniforms.get(i), prepend);
                 }
             }
-
-            shaderUtils.sendUniformValue(location, uniform, mesh);
+            return;
         }
 
+        // Set up non-bundle uniform
+        int location = uniform.getCachedLocation() >= 0 ? uniform.getCachedLocation() : uniform.getLocation();
+        if (location < 0) {
+            // Use the name to find our location
+            location = shaderUtils.findUniformLocation(programId, namePrepend + uniform.getShaderVariableName());
+            if (location < 0) {
+                return;
+            } else {
+                uniform.setCachedLocation(location);
+            }
+        }
+
+        shaderUtils.sendUniformValue(location, uniform, mesh);
+    }
+
+    private List<UniformRef> getUniformsFromSupplier(final UniformRef uniform, final Mesh mesh) {
+        Object supplier = uniform._cachedSupplier;
+        String clazzName = null;
+        if (supplier == null) {
+            switch (uniform.getSource()) {
+                case SpatialProperty:
+                    supplier = mesh.getProperty(uniform.getValue().toString(), uniform.getDefaultValue());
+                    clazzName = uniform.getExtra() != null ? uniform.getExtra().toString() : null;
+                    break;
+                case Ardor3dState:
+                    final Ardor3dStateProperty prop = Ardor3dStateProperty.valueOf(uniform.getValue().toString());
+                    if (prop == Ardor3dStateProperty.Light) {
+                        // grab the appropriate light
+                        final int index = (!(uniform.getExtra() instanceof Integer)) ? 0
+                                : ((Integer) uniform.getExtra()).intValue();
+                        final RenderContext context = ContextManager.getCurrentContext();
+                        final LightState ls = (LightState) context.getCurrentState(StateType.Light);
+                        if (ls.count() > index) {
+                            supplier = ls.get(index);
+                        }
+                        clazzName = "com.ardor3d.light.PointLight";
+                    } else {
+                        throw new Ardor3dException(
+                                "Uniform type 'UniformSupplier' can not be used with Ardor3dState." + prop);
+                    }
+                    break;
+                default:
+                    throw new Ardor3dException("Unsupported Uniform Source type '" + uniform.getSource()
+                            + "' for use with UniformSupplier.");
+            }
+        }
+
+        if (supplier instanceof IUniformSupplier) {
+            return ((IUniformSupplier) supplier).getUniforms();
+        } else if (supplier == null && clazzName != null) {
+            final IUniformSupplier prov = IUniformSupplier.getDefaultProvider(clazzName);
+            if (prov != null) {
+                uniform._cachedSupplier = prov;
+                return prov.getUniforms();
+            }
+        }
+        return null;
     }
 
     protected void applyRenderStates(final Renderer renderer, final Mesh mesh) {

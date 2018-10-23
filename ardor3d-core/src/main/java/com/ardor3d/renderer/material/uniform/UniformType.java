@@ -112,4 +112,7 @@ public enum UniformType {
 
     /** */
     Matrix4x4D,
+
+    /** This uniform's value is an object that supplies other uniforms. */
+    UniformSupplier
 }

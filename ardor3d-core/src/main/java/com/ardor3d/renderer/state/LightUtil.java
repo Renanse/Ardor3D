@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -71,17 +71,14 @@ public abstract class LightUtil {
         if (val == null) {
             return 0;
         }
-        if (l.isAttenuate()) {
-            final ReadOnlyVector3 location = l.getLocation();
-            final double dist = val.distanceTo(location);
 
-            final double color = getColorValue(l);
-            final double amlat = l.getConstant() + l.getLinear() * dist + l.getQuadratic() * dist * dist;
+        final ReadOnlyVector3 location = l.getLocation();
+        final double dist = val.distanceTo(location);
 
-            return color / amlat;
-        }
+        final double color = getColorValue(l);
+        final double amlat = l.getConstant() + l.getLinear() * dist + l.getQuadratic() * dist * dist;
 
-        return getColorValue(l);
+        return color / amlat;
     }
 
     protected static double getValueFor(final SpotLight l, final BoundingVolume val) {
@@ -104,7 +101,7 @@ public abstract class LightUtil {
     }
 
     protected static double strength(final ReadOnlyColorRGBA color) {
-        return Math.sqrt(color.getRed() * color.getRed() + color.getGreen() * color.getGreen() + color.getBlue()
-                * color.getBlue());
+        return Math.sqrt(color.getRed() * color.getRed() + color.getGreen() * color.getGreen()
+                + color.getBlue() * color.getBlue());
     }
 }

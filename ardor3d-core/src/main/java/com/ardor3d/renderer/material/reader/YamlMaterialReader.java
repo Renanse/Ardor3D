@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.MaterialTechnique;
@@ -444,11 +445,15 @@ public class YamlMaterialReader {
                 return;
             case "defaultColor":
                 pass.addUniform(new UniformRef("defaultColor", UniformType.Float4, UniformSource.Ardor3dState,
-                        Ardor3dStateProperty.MeshDefaultColorRGBA));
+                        Ardor3dStateProperty.MeshDefaultColorRGBA, null, ColorRGBA.WHITE));
                 return;
             case "defaultColorRGB":
                 pass.addUniform(new UniformRef("defaultColorRGB", UniformType.Float3, UniformSource.Ardor3dState,
                         Ardor3dStateProperty.MeshDefaultColorRGB));
+                return;
+            case "colorSurface":
+                pass.addUniform(new UniformRef("surface", UniformType.UniformSupplier, UniformSource.SpatialProperty,
+                        "surface", "com.ardor3d.surface.ColorSurface", null));
                 return;
             case "lights1":
                 pass.addLightInfoUniforms(1);
@@ -485,6 +490,7 @@ public class YamlMaterialReader {
                 return getBufferForType(doc, type);
 
             case Function:
+            case Supplier:
             default:
                 throw new Ardor3dException("unhandled UniformSource: " + source);
 
@@ -492,6 +498,10 @@ public class YamlMaterialReader {
     }
 
     private static Buffer getBufferForType(final Object doc, final UniformType type) {
+        if (doc == null) {
+            return null;
+        }
+
         switch (type) {
             case Double1:
                 return getDoubleBuffer(doc, 1);

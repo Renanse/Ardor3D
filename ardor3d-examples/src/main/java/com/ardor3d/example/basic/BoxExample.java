@@ -64,7 +64,7 @@ public class BoxExample extends ExampleBase {
     @Override
     protected void initExample() {
         _canvas.setTitle("Box Example");
-        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.BLUE);
+        _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.BLACK);
 
         // Create a new box centered at (0,0,0) with width/height/depth of size 10.
         box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
@@ -75,7 +75,7 @@ public class BoxExample extends ExampleBase {
         // Give the box some nice colors.
         box.setRandomColors();
         // Set the box's material
-        box.setRenderMaterial("unlit/textured/vertex_color.yaml");
+        box.setRenderMaterial("lit/untextured/vertex_color_phong.yaml");
         // Attach the box to the scenegraph root.
         _root.attachChild(box);
 

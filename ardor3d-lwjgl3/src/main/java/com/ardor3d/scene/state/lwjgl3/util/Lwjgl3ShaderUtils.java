@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,11 +33,6 @@ import org.lwjgl.opengl.GL32C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.system.MemoryStack;
 
-import com.ardor3d.light.DirectionalLight;
-import com.ardor3d.light.Light;
-import com.ardor3d.light.PointLight;
-import com.ardor3d.light.SpotLight;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Quaternion;
@@ -56,8 +52,6 @@ import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformType;
-import com.ardor3d.renderer.state.LightState;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
@@ -226,7 +220,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
             Buffer value;
             switch (uniform.getSource()) {
                 case Value:
-                    value = (Buffer) uniform.getValue();
+                    value = getBuffer(uniform.getType(), uniform.getValue(), stack);
                     break;
                 case RendererMatrix:
                     // default has no place here
@@ -245,8 +239,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     break;
                 case Function:
                     // send default to function
-                    value = ((BiFunction<Mesh, Object, Buffer>) uniform.getValue()).apply(mesh,
-                            uniform.getDefaultValue());
+                    value = getBuffer(uniform.getType(), ((BiFunction<Mesh, Object, Object>) uniform.getValue())
+                            .apply(mesh, uniform.getDefaultValue()), stack);
+                    break;
+                case Supplier:
+                    value = getBuffer(uniform.getType(), ((Supplier<Object>) uniform.getValue()).get(), stack);
                     break;
                 default:
                     logger.log(Level.SEVERE, "Unhandled uniform source type: " + uniform.getSource());
@@ -439,6 +436,9 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 if (value instanceof Number) {
                     return stack.mallocInt(1).put(((Number) value).intValue()).flip();
                 }
+                if (value instanceof Enum<?>) {
+                    return stack.mallocInt(1).put(((Enum<?>) value).ordinal()).flip();
+                }
                 return (IntBuffer) value;
             case Int2:
             case UInt2:
@@ -578,64 +578,13 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 return buffer;
             }
 
-            case LightDirection:
-            case LightPosition: {
-                final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
-                final RenderContext context = ContextManager.getCurrentContext();
-                final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                if (ls.count() > index) {
-                    final Light light = ls.get(index);
-                    ReadOnlyVector3 vector = Vector3.ZERO;
-                    if (light instanceof PointLight && propertyType == Ardor3dStateProperty.LightPosition) {
-                        vector = ((PointLight) light).getLocation();
-                    } else if (propertyType == Ardor3dStateProperty.LightDirection) {
-                        if (light instanceof DirectionalLight) {
-                            vector = ((DirectionalLight) light).getDirection();
-                        } else if (light instanceof SpotLight) {
-                            vector = ((SpotLight) light).getDirection();
-                        }
-                    }
-
-                    final FloatBuffer buffer = stack.mallocFloat(3);
-                    buffer.put(vector.getXf()).put(vector.getYf()).put(vector.getZf());
-                    buffer.rewind();
-                    return buffer;
-                } else if (defaultValue != null) {
-                    return getBuffer(UniformType.Float3, defaultValue, stack);
-                }
-                break;
+            case Light: {
+                throw new Ardor3dException(
+                        "Uniform of source Ardor3dStateProperty+Light must be of type 'UniformSupplier'.");
             }
 
-            case LightSpecular:
-            case LightAmbient:
-            case LightDiffuse: {
-                final int index = (!(extra instanceof Integer)) ? 0 : ((Integer) extra).intValue();
-                final RenderContext context = ContextManager.getCurrentContext();
-                final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                if (ls.count() > index) {
-                    final Light light = ls.get(index);
-                    ReadOnlyColorRGBA color = ColorRGBA.BLACK_NO_ALPHA;
-                    if (light != null) {
-                        if (propertyType == Ardor3dStateProperty.LightSpecular) {
-                            color = light.getSpecular();
-                        } else if (propertyType == Ardor3dStateProperty.LightDiffuse) {
-                            color = light.getDiffuse();
-                        } else if (propertyType == Ardor3dStateProperty.LightAmbient) {
-                            color = light.getAmbient();
-                        }
-                    }
-
-                    final FloatBuffer buffer = stack.mallocFloat(4);
-                    buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue()).put(color.getAlpha());
-                    buffer.rewind();
-                    return buffer;
-                } else if (defaultValue != null) {
-                    return getBuffer(UniformType.Float4, defaultValue, stack);
-                }
-                break;
-            }
             default:
-                throw new Ardor3dException("Unhandled uniform source - RenderStateProperty type: " + propertyType);
+                throw new Ardor3dException("Unhandled uniform source - Ardor3dStateProperty type: " + propertyType);
         }
 
         // We are here if we were given a handled type, but had no data or defaultValue to send back.
