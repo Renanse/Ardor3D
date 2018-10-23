@@ -28,7 +28,7 @@ public class UniformRef implements Savable {
     protected Object _defaultValue = null;
 
     protected transient int _cachedLocation = -1;
-    public transient IUniformSupplier _cachedSupplier;
+    public transient IUniformSupplier _cachedDefaultSupplier;
 
     public UniformRef() {}
 

@@ -1,5 +1,7 @@
 #version 330 core
 
+@import include/light.glsl
+
 out vec4 FragColor;
 
 in vec3 WorldPos;
@@ -13,8 +15,7 @@ uniform float roughness;
 uniform float ao;
 
 // lights
-uniform vec3 lightPositions[4];
-uniform vec4 lightColors[4];
+uniform Light light[4];
 
 uniform vec3 cameraLoc;
 
@@ -75,11 +76,11 @@ void main()
     for(int i = 0; i < 4; ++i) 
     {
         // calculate per-light radiance
-        vec3 L = normalize(lightPositions[i] - WorldPos);
+        vec3 L = normalize(light[i].position - WorldPos);
         vec3 H = normalize(V + L);
-        float distance = length(lightPositions[i] - WorldPos);
+        float distance = length(light[i].position - WorldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = lightColors[i].rgb * attenuation;
+        vec3 radiance = light[i].diffuse * attenuation;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   

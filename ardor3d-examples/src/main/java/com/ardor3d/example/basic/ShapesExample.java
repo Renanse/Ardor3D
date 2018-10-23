@@ -40,8 +40,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Arrow;
 import com.ardor3d.scenegraph.shape.AxisRods;
 import com.ardor3d.scenegraph.shape.Box;
@@ -132,7 +130,7 @@ public class ShapesExample extends ExampleBase {
         _root.setRenderState(bs);
 
         // Our shapes material
-        _root.setRenderMaterial("unlit/textured/basic.yaml");
+        _root.setRenderMaterial("lit/textured/basic_phong.yaml");
 
         // Set up a reusable pick results
         _pickResults = new BoundingPickResults();
@@ -262,11 +260,8 @@ public class ShapesExample extends ExampleBase {
         verts.put(5).put(5).put(0);
         verts.put(0).put(5).put(0);
         final Line line = new Line("Lines", verts, null, null, null);
-        // since we do not set texture coords, but we'll have a texture state applied at root, we need to turn off
-        // textures on this Line to prevent bleeding of texture coordinates from other shapes.
-        line.getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
         line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        line.setRenderMaterial("unlit/untextured/basic.yaml");
 
         return line;
     }

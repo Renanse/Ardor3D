@@ -1,0 +1,17 @@
+--- # Simple, default color, material
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, cameraLoc, defaultColor, lights4, colorSurface]
+            
+        shaders: 
+          Vertex: 
+            source: phong/textured/default_color.vert
+          Fragment:
+            source: phong/textured/phong_textured.frag

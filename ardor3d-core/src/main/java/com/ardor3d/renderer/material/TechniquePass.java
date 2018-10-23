@@ -253,44 +253,46 @@ public class TechniquePass implements Savable {
     }
 
     private List<UniformRef> getUniformsFromSupplier(final UniformRef uniform, final Mesh mesh) {
-        Object supplier = uniform._cachedSupplier;
+        Object supplier = null;
         String clazzName = null;
-        if (supplier == null) {
-            switch (uniform.getSource()) {
-                case SpatialProperty:
-                    supplier = mesh.getProperty(uniform.getValue().toString(), uniform.getDefaultValue());
-                    clazzName = uniform.getExtra() != null ? uniform.getExtra().toString() : null;
-                    break;
-                case Ardor3dState:
-                    final Ardor3dStateProperty prop = Ardor3dStateProperty.valueOf(uniform.getValue().toString());
-                    if (prop == Ardor3dStateProperty.Light) {
-                        // grab the appropriate light
-                        final int index = (!(uniform.getExtra() instanceof Integer)) ? 0
-                                : ((Integer) uniform.getExtra()).intValue();
-                        final RenderContext context = ContextManager.getCurrentContext();
-                        final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-                        if (ls.count() > index) {
-                            supplier = ls.get(index);
-                        }
-                        clazzName = "com.ardor3d.light.PointLight";
-                    } else {
-                        throw new Ardor3dException(
-                                "Uniform type 'UniformSupplier' can not be used with Ardor3dState." + prop);
+        switch (uniform.getSource()) {
+            case SpatialProperty:
+                supplier = mesh.getProperty(uniform.getValue().toString(), uniform.getDefaultValue());
+                clazzName = uniform.getExtra() != null ? uniform.getExtra().toString() : null;
+                break;
+            case Ardor3dState:
+                final Ardor3dStateProperty prop = Ardor3dStateProperty.valueOf(uniform.getValue().toString());
+                if (prop == Ardor3dStateProperty.Light) {
+                    // grab the appropriate light
+                    final int index = (!(uniform.getExtra() instanceof Integer)) ? 0
+                            : ((Integer) uniform.getExtra()).intValue();
+                    final RenderContext context = ContextManager.getCurrentContext();
+                    final LightState ls = (LightState) context.getCurrentState(StateType.Light);
+                    if (ls.count() > index) {
+                        supplier = ls.get(index);
                     }
-                    break;
-                default:
-                    throw new Ardor3dException("Unsupported Uniform Source type '" + uniform.getSource()
-                            + "' for use with UniformSupplier.");
-            }
+                    clazzName = "com.ardor3d.light.PointLight";
+                } else {
+                    throw new Ardor3dException(
+                            "Uniform type 'UniformSupplier' can not be used with Ardor3dState." + prop);
+                }
+                break;
+            default:
+                throw new Ardor3dException(
+                        "Unsupported Uniform Source type '" + uniform.getSource() + "' for use with UniformSupplier.");
         }
 
         if (supplier instanceof IUniformSupplier) {
             return ((IUniformSupplier) supplier).getUniforms();
         } else if (supplier == null && clazzName != null) {
-            final IUniformSupplier prov = IUniformSupplier.getDefaultProvider(clazzName);
-            if (prov != null) {
-                uniform._cachedSupplier = prov;
-                return prov.getUniforms();
+            if (uniform._cachedDefaultSupplier != null) {
+                return uniform._cachedDefaultSupplier.getUniforms();
+            } else {
+                final IUniformSupplier prov = IUniformSupplier.getDefaultProvider(clazzName);
+                if (prov != null) {
+                    uniform._cachedDefaultSupplier = prov;
+                    return prov.getUniforms();
+                }
             }
         }
         return null;
