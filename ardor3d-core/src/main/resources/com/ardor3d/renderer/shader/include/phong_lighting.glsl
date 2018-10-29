@@ -3,16 +3,23 @@
 
 @import include/light.glsl
 
-vec3 calcDirectionalLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+vec3 calcDirectionalLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
 {
     vec3 lightDir = normalize(-light.direction);
     
     // diffuse shading
     float diff = max(dot(worldNormal, lightDir), 0.0);
     
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, worldNormal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess);
+    float spec = 0.0;
+    if (useBlinnPhong) {
+	    // blinn phong
+	    vec3 halfwayDir = normalize(lightDir + viewDir);  
+        spec = pow(max(dot(worldNormal, halfwayDir), 0.0), surface.shininess);
+    } else {
+	    // phong
+	    vec3 reflectDir = reflect(-lightDir, worldNormal);
+	    spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess / 4.0);
+	}
 
     // combine results
     vec3 ambient  = light.ambient  * surface.ambient;
@@ -21,17 +28,25 @@ vec3 calcDirectionalLight(Light light, const vec3 worldPos, const vec3 worldNorm
     return (ambient + diffuse + specular);
 }
 
-vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
 {
     vec3 lightDir = normalize(light.position - worldPos);
     
     // diffuse shading
     float diff = max(dot(worldNormal, lightDir), 0.0);
-    
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, worldNormal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess);
 
+	// specular component
+    float spec = 0.0;
+    if (useBlinnPhong) {
+	    // blinn phong
+	    vec3 halfwayDir = normalize(lightDir + viewDir);  
+        spec = pow(max(dot(worldNormal, halfwayDir), 0.0), surface.shininess);
+    } else {
+	    // phong
+	    vec3 reflectDir = reflect(-lightDir, worldNormal);
+	    spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess / 4.0);
+	}
+	
     // attenuation
     float distance    = length(light.position - worldPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
@@ -47,16 +62,23 @@ vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, co
     return (ambient + diffuse + specular);
 }
 
-vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec2 texCoord, const vec3 viewDir, const TextureSurface surface)
+vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec2 texCoord, const vec3 viewDir, const TextureSurface surface, const bool useBlinnPhong)
 {
     vec3 lightDir = normalize(light.position - worldPos);
     
     // diffuse shading
     float diff = max(dot(worldNormal, lightDir), 0.0);
     
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, worldNormal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess);
+    float spec = 0.0;
+    if (useBlinnPhong) {
+	    // blinn phong
+	    vec3 halfwayDir = normalize(lightDir + viewDir);  
+        spec = pow(max(dot(worldNormal, halfwayDir), 0.0), surface.shininess);
+    } else {
+	    // phong
+	    vec3 reflectDir = reflect(-lightDir, worldNormal);
+	    spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess / 4.0);
+	}
 
     // attenuation
     float distance    = length(light.position - worldPos);
@@ -73,16 +95,23 @@ vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, co
     return (ambient + diffuse + specular);
 }
 
-vec3 calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+vec3 calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
 {
     vec3 lightDir = normalize(light.position - worldPos);
     
     // diffuse shading
     float diff = max(dot(worldNormal, lightDir), 0.0);
     
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, worldNormal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess);
+    float spec = 0.0;
+    if (useBlinnPhong) {
+	    // blinn phong
+	    vec3 halfwayDir = normalize(lightDir + viewDir);  
+        spec = pow(max(dot(worldNormal, halfwayDir), 0.0), surface.shininess);
+    } else {
+	    // phong
+	    vec3 reflectDir = reflect(-lightDir, worldNormal);
+	    spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess / 4.0);
+	}
 
     // attenuation
     float distance    = length(light.position - worldPos);
@@ -104,19 +133,24 @@ vec3 calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, con
     return (ambient + diffuse + specular);
 }
 
-vec3 calcLighting(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+vec3 calcLighting(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
 {
 	switch (light.type)
 	{
 		case 0: // Directional
-			return calcDirectionalLight(light, worldPos, worldNormal, viewDir, surface);
+			return calcDirectionalLight(light, worldPos, worldNormal, viewDir, surface, useBlinnPhong);
 		case 1: // Point
-			return calcPointLight(light, worldPos, worldNormal, viewDir, surface);
+			return calcPointLight(light, worldPos, worldNormal, viewDir, surface, useBlinnPhong);
 		case 2: // Spot
-			return calcSpotLight(light, worldPos, worldNormal, viewDir, surface);
+			return calcSpotLight(light, worldPos, worldNormal, viewDir, surface, useBlinnPhong);
 	}
 	
 	return vec3(1);
+}
+
+vec3 calcLighting(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+{
+	return calcLighting(light, worldPos, worldNormal, viewDir, surface, true);
 }
 
 #endif

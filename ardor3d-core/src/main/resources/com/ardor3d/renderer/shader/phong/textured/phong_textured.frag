@@ -7,6 +7,10 @@
 #define NR_LIGHTS 4
 #endif
 
+#ifndef USE_BLINN_PHONG
+#define USE_BLINN_PHONG true
+#endif
+
 out vec4 FragColor;
 
 in vec4 DiffuseColor;
@@ -25,7 +29,7 @@ void main()
     vec3 V = normalize(cameraLoc - WorldPos);
     vec3 lighting = vec3(0);
     for(int i = 0; i < NR_LIGHTS; i++)
-    	lighting += calcLighting(light[i], WorldPos, Normal, V, surface);
+    	lighting += calcLighting(light[i], WorldPos, Normal, V, surface, USE_BLINN_PHONG);
     	
     FragColor = DiffuseColor * texture(tex0, TexCoords) * vec4(lighting, 1.0);
 }

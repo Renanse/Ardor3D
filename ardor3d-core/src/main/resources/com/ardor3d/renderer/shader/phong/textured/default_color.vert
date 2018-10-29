@@ -7,6 +7,7 @@ in vec2 uv0;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat3 normalMat;
 uniform vec4 defaultColor;
 
 out vec3 WorldPos;
@@ -17,7 +18,7 @@ out vec2 TexCoords;
 void main()
 {
     WorldPos = vec3(model * vec4(vertex, 1.0));
-    Normal = mat3(model) * normal;
+    Normal = normalMat * normal;
     DiffuseColor = defaultColor;   
     TexCoords = uv0;
 
