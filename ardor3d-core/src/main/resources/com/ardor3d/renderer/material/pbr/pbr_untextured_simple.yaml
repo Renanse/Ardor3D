@@ -9,24 +9,8 @@ techniques:
           - key: uv0
           
         uniforms: 
-          - builtIn: [model, view, projection, cameraLoc, lights4]
-          - 
-            shaderKey: albedo
-            type: Float3
-            source: Ardor3dState
-            value: MeshDefaultColorRGB
-          - 
-            shaderKey: metallic
-            type: Float1
-            source: SpatialProperty
-          - 
-            shaderKey: roughness
-            type: Float1
-            source: SpatialProperty
-          - 
-            shaderKey: ao
-            type: Float1
-            source: SpatialProperty
+          - builtIn: [model, view, projection, cameraLoc, pbrSurface, lights4]
+
         shaders: 
           Vertex: 
             source: pbr/pbr.vert

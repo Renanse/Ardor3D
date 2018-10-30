@@ -1,8 +1,6 @@
 #ifndef LIGHT_INC
 #define LIGHT_INC
 
-@import include/surface.glsl
-
 struct Light {
 	int type;
 	

@@ -16,4 +16,21 @@ struct TextureSurface {
     float shininess;
 };
 
+// com.ardor3d.surface.PbrSurface
+struct PbrSurface {
+    vec3 albedo;
+    float metallic;
+    float roughness;
+    float ao;
+};
+
+// com.ardor3d.surface.PbrTexturedSurface
+struct PbrTexturedSurface {
+    sampler2D albedoMap;
+    sampler2D normalMap;
+    sampler2D metallicMap;
+    sampler2D roughnessMap;
+    sampler2D aoMap;
+};
+
 #endif

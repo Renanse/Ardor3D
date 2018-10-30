@@ -8,27 +8,7 @@ techniques:
           - key: normal
           - key: uv0
         uniforms: 
-          - builtIn: [model, view, projection, cameraLoc, lights4]
-          - 
-            shaderKey: albedoMap
-            type: Int1
-            value: 0
-          - 
-            shaderKey: normalMap
-            type: Int1
-            value: 1
-          - 
-            shaderKey: metallicMap
-            type: Int1
-            value: 2
-          - 
-            shaderKey: roughnessMap
-            type: Int1
-            value: 3
-          - 
-            shaderKey: aoMap
-            type: Int1
-            value: 4
+          - builtIn: [model, view, projection, cameraLoc, pbrTexturedSurface, lights4]
         shaders: 
           Vertex: 
             source: pbr/pbr.vert

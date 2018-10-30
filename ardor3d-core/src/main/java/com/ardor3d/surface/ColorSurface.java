@@ -23,48 +23,61 @@ import com.ardor3d.renderer.material.uniform.UniformType;
 
 public class ColorSurface implements IUniformSupplier {
 
-    public final ColorRGBA ambient = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+    protected final ColorRGBA _ambient = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+    protected final ColorRGBA _diffuse = new ColorRGBA(.5f, .5f, .5f, 1f);
+    protected final ColorRGBA _specular = new ColorRGBA(1f, 1f, 1f, 1f);
+    protected float _shininess = 32f;
 
-    public final ColorRGBA diffuse = new ColorRGBA(.5f, .5f, .5f, 1f);
-
-    public final ColorRGBA specular = new ColorRGBA(1f, 1f, 1f, 1f);
-
-    public float shininess = 32f;
-
-    protected final List<UniformRef> cachedUniforms = new ArrayList<>();
+    protected final List<UniformRef> _cachedUniforms = new ArrayList<>();
 
     public ColorSurface() {
-        cachedUniforms.add(new UniformRef("ambient", UniformType.Float3, UniformSource.Supplier,
+        _cachedUniforms.add(new UniformRef("ambient", UniformType.Float3, UniformSource.Supplier,
                 (Supplier<ReadOnlyColorRGBA>) this::getAmbient));
-        cachedUniforms.add(new UniformRef("diffuse", UniformType.Float3, UniformSource.Supplier,
+        _cachedUniforms.add(new UniformRef("diffuse", UniformType.Float3, UniformSource.Supplier,
                 (Supplier<ReadOnlyColorRGBA>) this::getDiffuse));
-        cachedUniforms.add(new UniformRef("specular", UniformType.Float3, UniformSource.Supplier,
+        _cachedUniforms.add(new UniformRef("specular", UniformType.Float3, UniformSource.Supplier,
                 (Supplier<ReadOnlyColorRGBA>) this::getSpecular));
-        cachedUniforms.add(new UniformRef("shininess", UniformType.Float1, UniformSource.Supplier,
+        _cachedUniforms.add(new UniformRef("shininess", UniformType.Float1, UniformSource.Supplier,
                 (Supplier<Float>) this::getShininess));
     }
 
     @Override
     public void applyDefaultUniformValues() {}
 
-    public ColorRGBA getAmbient() {
-        return ambient;
+    public void setAmbient(final ReadOnlyColorRGBA color) {
+        _ambient.set(color);
     }
 
-    public ColorRGBA getDiffuse() {
-        return diffuse;
+    public ReadOnlyColorRGBA getAmbient() {
+        return _ambient;
     }
 
-    public ColorRGBA getSpecular() {
-        return specular;
+    public void getDiffuse(final ReadOnlyColorRGBA color) {
+        _diffuse.set(color);
+    }
+
+    public ReadOnlyColorRGBA getDiffuse() {
+        return _diffuse;
+    }
+
+    public void setSpecular(final ReadOnlyColorRGBA color) {
+        _specular.set(color);
+    }
+
+    public ReadOnlyColorRGBA getSpecular() {
+        return _specular;
+    }
+
+    public void setShininess(final float shininess) {
+        _shininess = shininess;
     }
 
     public float getShininess() {
-        return shininess;
+        return _shininess;
     }
 
     @Override
     public List<UniformRef> getUniforms() {
-        return cachedUniforms;
+        return _cachedUniforms;
     }
 }

@@ -18,6 +18,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Teapot;
+import com.ardor3d.surface.PbrSurface;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
@@ -55,10 +56,7 @@ public class SimplePbrExample extends ExampleBase {
 
                 final Mesh mesh = master.makeCopy(true);
                 mesh.setTranslation(vec);
-                mesh.setProperty("metallic", metallic);
-                mesh.setProperty("roughness", roughness);
-                mesh.setProperty("ao", 1.0f);
-                mesh.setDefaultColor(new ColorRGBA(0.5f, 0f, 0f, 1f));
+                mesh.setProperty("surface", new PbrSurface(new ColorRGBA(0.5f, 0f, 0f, 1f), metallic, roughness, 1.0f));
 
                 _root.attachChild(mesh);
             }

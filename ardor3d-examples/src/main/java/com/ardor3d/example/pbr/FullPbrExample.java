@@ -34,6 +34,7 @@ import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Teapot;
+import com.ardor3d.surface.PbrTexturedSurface;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
@@ -80,6 +81,13 @@ public class FullPbrExample extends ExampleBase {
         _root.setRenderState(ts);
 
         _root.setRenderMaterial("pbr/pbr_textured_ibl.yaml");
+        final PbrTexturedSurface surface = new PbrTexturedSurface();
+        surface.setAlbedoMap(3);
+        surface.setNormalMap(4);
+        surface.setMetallicMap(5);
+        surface.setRoughnessMap(6);
+        surface.setAoMap(7);
+        _root.setProperty("surface", surface);
     }
 
     private void addTeapots() {
