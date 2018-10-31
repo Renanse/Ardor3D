@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -23,7 +23,7 @@ import com.ardor3d.scenegraph.controller.ComplexSpatialController;
  * Implementation note: This class is comprised of quite a few protected methods, this is mainly to allow maximum
  * flexibility for overriding classes.
  * </p>
- * 
+ *
  * @param <C>
  *            The control 'points' being interpolated, for example Vectors or Quaternions.
  * @param <T>
@@ -54,7 +54,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
     /**
      * This method is automatically called by {@link #update(double, Spatial)} from this controller.
-     * 
+     *
      * @param from
      *            The control to interpolate from.
      * @param to
@@ -73,7 +73,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      * It will only update the given object if this controller is {@link #isActive() active}, caller isn't
      * <code>null</code> and it's {@link #getSpeed() speed} is greater than zero.
      * </p>
-     * 
+     *
      * @param time
      *            The passed since this controller was last called.
      * @param caller
@@ -92,7 +92,8 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
             clampIndex();
 
-            assert (getIndex() < getControls().size()) : "_index was greater than the number of controls, clampIndex() has probably been overriden incorrectly";
+            assert (getIndex() < getControls()
+                    .size()) : "_index was greater than the number of controls, clampIndex() has probably been overriden incorrectly";
             assert (getIndex() >= 0) : "_index was negative, clampIndex() has probably been overriden incorrectly";
 
             interpolate(getControlFrom(), getControlTo(), getDelta(), caller);
@@ -139,7 +140,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      *            The new values to set, can not be <code>null</code> or size 0.
      * @see #getControls()
      */
-    public void setControls(final C... controlArray) {
+    public void setControls(final C[] controlArray) {
         if (null == controlArray) {
             throw new IllegalArgumentException("controlArray can not be null!");
         }
@@ -153,14 +154,15 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      */
     public List<C> getControls() {
         assert (null != _controls) : "_controls was null, it must be set before use!";
-        assert (!_controls.isEmpty()) : "_controls was empty, it must contain at least 1 element for this class to work!";
+        assert (!_controls
+                .isEmpty()) : "_controls was empty, it must contain at least 1 element for this class to work!";
 
         return _controls;
     }
 
     /**
      * Updates the {@link #getDelta() delta} and {@link #getIndex() index}.
-     * 
+     *
      * @param time
      *            The raw time since this was last called.
      */
@@ -224,7 +226,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
     /**
      * This method assumes the {@link #getIndex() index} has already been {@link #clampIndex() clamped} correctly.
-     * 
+     *
      * @return The control to interpolate from, will not be <code>null</code>.
      * @see #getControlTo()
      */
@@ -254,7 +256,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
     /**
      * This method assumes the {@link #getIndex() index} has already been {@link #clampIndex() clamped} correctly.
-     * 
+     *
      * @return The control to interpolate to, will not be <code>null</code>.
      * @see #getControlFrom()
      */
@@ -288,7 +290,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
     /**
      * Increments the index by 1.
-     * 
+     *
      * @return The new index value as a convenience.
      */
     protected int incrementIndex() {
@@ -297,7 +299,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
     /**
      * Decrements the index by 1.
-     * 
+     *
      * @return The new index value as a convenience.
      */
     protected int decrementIndex() {
@@ -386,7 +388,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
     /**
      * Also {@link #reset() resets} this controller for safety, because changing the repeat type part way through an
      * interpolation can cause problems.
-     * 
+     *
      * @param repeatType
      *            The new repeat type to use.
      */

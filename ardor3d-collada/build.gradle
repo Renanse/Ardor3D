@@ -3,6 +3,6 @@ description = 'Ardor 3D Collada Importer'
 dependencies {
   compile project(':ardor3d-core')
   compile project(':ardor3d-animation')
-    compile group: 'org.jdom', name: 'jdom2', version:'2.0.4'
-    compile group: 'jaxen', name: 'jaxen', version:'1.1.4'
+    compile group: 'org.jdom', name: 'jdom2', version:'2.0.6'
+    compile group: 'jaxen', name: 'jaxen', version:'1.1.6'
 }
