@@ -1,4 +1,4 @@
---- # Unlit, untextured, vertex color material
+---
 techniques: 
   passes: 
       - 
@@ -13,4 +13,4 @@ techniques:
           Vertex: 
             source: unlit/untextured/vertex_color.vert
           Fragment:
-            source: unlit/untextured/vertex_color.frag
+            source: unlit/untextured/untextured.frag

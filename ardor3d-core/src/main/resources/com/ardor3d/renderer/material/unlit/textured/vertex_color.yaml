@@ -1,5 +1,4 @@
---- # Material
-name: unlit, textured, vertex color
+---
 techniques: 
   passes: 
       - 
@@ -7,10 +6,12 @@ techniques:
           - key: vertex
           - key: color
           - key: uv0
+          
         uniforms: 
           - builtIn: [model, view, projection]
+          
         shaders: 
           Vertex: 
             source: unlit/textured/vertex_color.vert
           Fragment:
-            source: unlit/textured/diffuse.frag
+            source: unlit/textured/textured.frag

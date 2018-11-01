@@ -1,4 +1,4 @@
---- # Simple, default color, material
+---
 techniques: 
   passes: 
       - 
@@ -10,6 +10,6 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: unlit/untextured/basic.vert
+            source: unlit/untextured/default_color.vert
           Fragment:
-            source: unlit/untextured/default_color.frag
+            source: unlit/untextured/untextured.frag

@@ -1,15 +1,16 @@
---- # Material
-name: unlit, textured, vertex color
+---
 techniques: 
   passes: 
       - 
         attributes:
           - key: vertex
           - key: uv0
+
         uniforms: 
           - builtIn: [model, view, projection, defaultColor]
+            
         shaders: 
           Vertex: 
-            source: unlit/textured/basic.vert
+            source: unlit/textured/default_color.vert
           Fragment:
-            source: unlit/textured/basic.frag
+            source: unlit/textured/textured.frag

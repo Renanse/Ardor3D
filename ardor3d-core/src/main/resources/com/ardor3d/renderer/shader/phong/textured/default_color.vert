@@ -22,5 +22,5 @@ void main()
     DiffuseColor = defaultColor;   
     TexCoords = uv0;
 
-    gl_Position =  projection * view * vec4(WorldPos, 1.0);
+    gl_Position = projection * view * vec4(WorldPos, 1.0);
 }

@@ -1,4 +1,4 @@
---- # Untextured, vertex color material
+---
 techniques: 
   passes: 
       - 
