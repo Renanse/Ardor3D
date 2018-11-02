@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.lang.ref.ReferenceQueue;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,8 @@ public class TechniquePass implements Savable {
 
     /** Information about the Uniforms we care about in this pass. */
     protected List<UniformRef> _uniforms = new ArrayList<>();
+
+    protected Map<UniformRef, Integer> _cachedLocations = new IdentityHashMap<>();
 
     public int getProgramId(final RenderContext context) {
         if (_shaderIdCache != null) {
@@ -238,14 +241,14 @@ public class TechniquePass implements Savable {
         }
 
         // Set up non-bundle uniform
-        int location = uniform.getCachedLocation() >= 0 ? uniform.getCachedLocation() : uniform.getLocation();
+        int location = _cachedLocations.containsKey(uniform) ? _cachedLocations.get(uniform) : uniform.getLocation();
         if (location < 0) {
             // Use the name to find our location
             location = shaderUtils.findUniformLocation(programId, namePrepend + uniform.getShaderVariableName());
             if (location < 0) {
                 return;
             } else {
-                uniform.setCachedLocation(location);
+                _cachedLocations.put(uniform, location);
             }
         }
 

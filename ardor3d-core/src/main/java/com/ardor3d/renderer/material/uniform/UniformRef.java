@@ -27,7 +27,6 @@ public class UniformRef implements Savable {
     protected Object _extra = null;
     protected Object _defaultValue = null;
 
-    protected transient int _cachedLocation = -1;
     public transient IUniformSupplier _cachedDefaultSupplier;
 
     public UniformRef() {}
@@ -65,14 +64,6 @@ public class UniformRef implements Savable {
 
     public int getLocation() {
         return _location;
-    }
-
-    public int getCachedLocation() {
-        return _cachedLocation;
-    }
-
-    public void setCachedLocation(final int location) {
-        _cachedLocation = location;
     }
 
     public String getShaderVariableName() {
