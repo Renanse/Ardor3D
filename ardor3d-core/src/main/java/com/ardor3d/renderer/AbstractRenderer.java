@@ -233,17 +233,12 @@ public abstract class AbstractRenderer implements Renderer {
         modelBuff.clear();
         model.fromFloatBuffer(modelBuff);
 
-        final Matrix4 view = Matrix4.fetchTempInstance();
-        final FloatBuffer viewBuff = _matrixStore.get(RenderMatrixType.View);
-        viewBuff.clear();
-        view.fromFloatBuffer(viewBuff);
-
         if (modelIsUniformScale) {
-            // normal matrix is just the 3x3 of the model view matrix
-            model.multiplyLocal(view).toMatrix3(normal);
+            // normal matrix is just the 3x3 of the model matrix
+            model.toMatrix3(normal);
         } else {
-            // normal matrix is the inverse transpose of the 3x3 model view matrix
-            model.multiplyLocal(view).toMatrix3(normal);
+            // normal matrix is the inverse transpose of the 3x3 model matrix
+            model.toMatrix3(normal);
             normal.invertLocal().transposeLocal();
         }
         normal.toFloatBuffer(dst);
