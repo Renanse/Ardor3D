@@ -296,6 +296,10 @@ public class YamlMaterialReader {
     }
 
     private static String inject(String program, final List<String> injects) {
+        if (program == null) {
+            return null;
+        }
+
         program = program.trim();
         if (injects.isEmpty() || !program.startsWith("#version")) {
             return program;
