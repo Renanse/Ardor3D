@@ -290,8 +290,8 @@ public class AnimationStateExample extends ExampleBase {
     private void createCharacter() {
         try {
             SkinnedMesh.addDefaultResourceLocators();
-            matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
-            matCPU = MaterialManager.INSTANCE.findMaterial("pbr/pbr_untextured_simple.yaml");
+            matGPU = MaterialManager.INSTANCE.findMaterial("lit/textured/basic_skinmesh_phong.yaml");
+            matCPU = MaterialManager.INSTANCE.findMaterial("lit/textured/basic_phong.yaml");
 
             skNode.detachAllChildren();
             _root.attachChild(skNode);
@@ -341,10 +341,6 @@ public class AnimationStateExample extends ExampleBase {
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
             primeModel.setRenderState(cullState);
-
-            primeModel.setProperty("metallic", 0.25f);
-            primeModel.setProperty("roughness", 0.25f);
-            primeModel.setProperty("ao", 1.0f);
             primeModel.setRenderMaterial(matCPU);
 
             for (int i = 0; i < 10; i++) {

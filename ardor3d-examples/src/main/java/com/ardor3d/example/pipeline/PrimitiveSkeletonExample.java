@@ -85,8 +85,8 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
         final Skeleton sk = new Skeleton("arm sk", new Joint[] { j1, j2 });
 
-        matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
-        matCPU = MaterialManager.INSTANCE.findMaterial("pbr/pbr_untextured_simple.yaml");
+        matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured/basic_skinmesh.yaml");
+        matCPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured/basic.yaml");
 
         pose = new SkeletonPose(sk);
         pose.updateTransforms();
@@ -102,10 +102,6 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.setTranslation(0, 0, -10);
         arm.updateModelBound();
         arm.getSceneHints().setCullHint(CullHint.Dynamic);
-
-        arm.setProperty("metallic", 0.25f);
-        arm.setProperty("roughness", 0.25f);
-        arm.setProperty("ao", 1.0f);
 
         arm.setDefaultColor(ColorRGBA.LIGHT_GRAY);
         arm.setWeightsPerVert(4);

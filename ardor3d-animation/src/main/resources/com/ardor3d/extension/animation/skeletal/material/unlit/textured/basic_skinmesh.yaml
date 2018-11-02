@@ -1,0 +1,23 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: weights
+          - key: jointIds
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor]
+          - 
+            shaderKey: jointPalette
+            type: Matrix4x4
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            source: skinned_mesh.vert
+
+          Fragment:
+            source: unlit/textured/textured.frag

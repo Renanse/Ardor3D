@@ -108,9 +108,9 @@ public class AnimationCopyExample extends ExampleBase {
 
         // set camera
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        cam.setLocation(280, 372, -280);
-        cam.lookAt(new Vector3(250, 350, -280), Vector3.UNIT_Y);
-        cam.setFrustumPerspective(50.0, cam.getWidth() / (double) cam.getHeight(), .25, 900);
+        cam.setLocation(0, 0, 0);
+        cam.lookAt(new Vector3(-100, 0, 0), Vector3.UNIT_Y);
+        cam.setFrustumPerspective(50.0, cam.getWidth() / (double) cam.getHeight(), .25, 1100);
 
         // speed up wasd control a little
         _controlHandle.setMoveSpeed(200);
@@ -119,7 +119,7 @@ public class AnimationCopyExample extends ExampleBase {
         final DirectionalLight light = new DirectionalLight();
         light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
         light.setAmbient(new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
-        light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
+        light.setDirection(new Vector3(-1, 0, 0).normalizeLocal());
         light.setEnabled(true);
         _lightState.attach(light);
 
@@ -256,8 +256,8 @@ public class AnimationCopyExample extends ExampleBase {
     private void createCharacter() {
         try {
             SkinnedMesh.addDefaultResourceLocators();
-            matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
-            matCPU = MaterialManager.INSTANCE.findMaterial("unlit/textured/basic.yaml");
+            matGPU = MaterialManager.INSTANCE.findMaterial("lit/textured/basic_skinmesh_phong.yaml");
+            matCPU = MaterialManager.INSTANCE.findMaterial("lit/textured/basic_phong.yaml");
 
             skNode.detachAllChildren();
             _root.attachChild(skNode);
@@ -308,9 +308,6 @@ public class AnimationCopyExample extends ExampleBase {
             cullState.setCullFace(Face.Back);
             primeModel.setRenderState(cullState);
 
-            primeModel.setProperty("metallic", 0.25f);
-            primeModel.setProperty("roughness", 0.25f);
-            primeModel.setProperty("ao", 1.0f);
             primeModel.setRenderMaterial(matCPU);
 
             for (int i = 0; i < 10; i++) {

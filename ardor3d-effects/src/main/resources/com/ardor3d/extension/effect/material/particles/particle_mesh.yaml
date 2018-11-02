@@ -13,4 +13,4 @@ techniques:
             source: unlit/textured/vertex_color.vert
             
           Fragment:
-            source: unlit/textured/diffuse.frag
+            source: unlit/textured/textured.frag

@@ -1,0 +1,24 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: weights
+          - key: jointIds
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights4, colorSurface]
+          - 
+            shaderKey: jointPalette
+            type: Matrix4x4
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            source: skinned_mesh.vert
+
+          Fragment:
+            source: phong/textured/phong_textured.frag

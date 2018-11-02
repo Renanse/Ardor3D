@@ -133,7 +133,7 @@ public class AnimationDemoExample extends ExampleBase {
         SkinnedMesh skeleton = null;
         try {
             SkinnedMesh.addDefaultResourceLocators();
-            matGPU = MaterialManager.INSTANCE.findMaterial("unlit/untextured_skin_4.yaml");
+            matGPU = MaterialManager.INSTANCE.findMaterial("lit/textured/basic_skinmesh_phong.yaml");
 
             final long time = System.currentTimeMillis();
             final ColladaImporter colladaImporter = new ColladaImporter();
@@ -176,10 +176,6 @@ public class AnimationDemoExample extends ExampleBase {
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
             skeleton.setRenderState(cullState);
-
-            skeleton.setProperty("metallic", 0.25f);
-            skeleton.setProperty("roughness", 0.25f);
-            skeleton.setProperty("ao", 1.0f);
             skeleton.setRenderMaterial(matGPU);
             skeleton.setUseGPU(true);
 
