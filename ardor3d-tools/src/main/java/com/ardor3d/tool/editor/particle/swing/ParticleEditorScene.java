@@ -21,7 +21,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -184,8 +183,7 @@ class ParticleEditorScene implements Scene, Updater {
                 StatCollector.resume();
             }
         };
-        tgrapher = GraphFactory.makeTabledLabelGraph((width / 3), (height / 3), labGraph, renderer, ContextManager
-                .getCurrentContext().getCapabilities());
+        tgrapher = GraphFactory.makeTabledLabelGraph((width / 3), (height / 3), labGraph, renderer);
         tgrapher.setMinimalBackground(true);
         tgrapher.setColumns(1);
         labGraph.setTranslation((width * 5 / 6), (height * 1 / 6), 0);

@@ -112,8 +112,8 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         _prefs = prefs;
         setLayout(new GridBagLayout());
 
-        _geomTypeBox = new JComboBox<ParticleType>(new ParticleType[] { ParticleType.Triangle, ParticleType.Line,
-                ParticleType.Point });
+        _geomTypeBox = new JComboBox<ParticleType>(
+                new ParticleType[] { ParticleType.Triangle, ParticleType.Line, ParticleType.Point });
         _geomTypeBox.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 changeParticleType((ParticleType) _geomTypeBox.getSelectedItem());
@@ -262,9 +262,11 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
 
         final JPanel rampPanel = new JPanel(new GridBagLayout());
         rampPanel.setBorder(createTitledBorder("APPEARANCE TIMELINE"));
-        rampPanel.add(new JScrollPane(_rampList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), new GridBagConstraints(1, 0, 1, 6, 1.0, 1.0,
-                        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        rampPanel.add(
+                new JScrollPane(_rampList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                new GridBagConstraints(1, 0, 1, 6, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
+                        new Insets(5, 5, 5, 5), 0, 0));
         rampPanel.add(_rampAddButton, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
                 GridBagConstraints.HORIZONTAL, new Insets(5, 5, 0, 5), 0, 0));
         rampPanel.add(_rampRemoveButton, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
@@ -365,9 +367,11 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
 
         final JPanel animPanel = new JPanel(new GridBagLayout());
         animPanel.setBorder(createTitledBorder("ANIMATION TIMELINE"));
-        animPanel.add(new JScrollPane(_animList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), new GridBagConstraints(1, 0, 1, 6, 1.0, 1.0,
-                        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        animPanel.add(
+                new JScrollPane(_animList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                new GridBagConstraints(1, 0, 1, 6, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
+                        new Insets(5, 5, 5, 5), 0, 0));
         animPanel.add(_animAddButton, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
                 GridBagConstraints.HORIZONTAL, new Insets(5, 5, 0, 5), 0, 0));
         animPanel.add(_animRemoveButton, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHWEST,
@@ -626,7 +630,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         // TextureManager.clearCache();
         ts.setTexture(TextureManager.load(new URLResourceSource(_newTexture.toURI().toURL()),
                 Texture.MinificationFilter.BilinearNearestMipMap, TextureStoreFormat.GuessCompressedFormat, true));
-        ts.getTexture().setWrap(WrapMode.Clamp);
+        ts.getTexture().setWrap(WrapMode.BorderClamp);
         ts.setEnabled(true);
         getEdittedParticles().setRenderState(ts);
         _newTexture = null;
@@ -642,8 +646,8 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
             blend.setTestFunction(BlendState.TestFunction.GreaterThan);
             getEdittedParticles().setRenderState(blend);
         }
-        blend.setDestinationFunction(additive ? BlendState.DestinationFunction.One
-                : BlendState.DestinationFunction.OneMinusSourceAlpha);
+        blend.setDestinationFunction(
+                additive ? BlendState.DestinationFunction.One : BlendState.DestinationFunction.OneMinusSourceAlpha);
     }
 
     @Override
@@ -661,16 +665,16 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         updateVisibleControls();
 
         final BlendState as = (BlendState) system.getLocalRenderState(StateType.Blend);
-        _additiveBlendingBox.setSelected(as == null
-                || as.getDestinationFunctionRGB() == BlendState.DestinationFunction.One);
+        _additiveBlendingBox
+                .setSelected(as == null || as.getDestinationFunctionRGB() == BlendState.DestinationFunction.One);
         if (getTexturePanel().isVisible()) {
             Texture tex = null;
             try {
                 tex = ((TextureState) system.getLocalRenderState(StateType.Texture)).getTexture();
                 if (tex != null) {
                     if (tex.getTextureKey() != null && tex.getTextureKey().getSource() != null) {
-                        _imageLabel.setIcon(new ImageIcon(((URLResourceSource) tex.getTextureKey().getSource())
-                                .getURL()));
+                        _imageLabel
+                                .setIcon(new ImageIcon(((URLResourceSource) tex.getTextureKey().getSource()).getURL()));
                     }
                 } else {
                     _imageLabel.setIcon(null);

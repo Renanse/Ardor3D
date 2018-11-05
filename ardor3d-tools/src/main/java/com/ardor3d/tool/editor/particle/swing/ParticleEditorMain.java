@@ -16,18 +16,10 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import com.ardor3d.scene.state.lwjgl.util.SharedLibraryLoader;
-
 public class ParticleEditorMain {
     private static final Logger logger = Logger.getLogger(ParticleEditorMain.class.getName());
 
     public static void main(final String[] args) {
-        try {
-            SharedLibraryLoader.load(true);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {

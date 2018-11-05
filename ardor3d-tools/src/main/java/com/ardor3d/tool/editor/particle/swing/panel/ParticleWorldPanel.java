@@ -37,8 +37,9 @@ public class ParticleWorldPanel extends ParticleEditPanel {
     private final JLabel _countLabel;
     private final ValuePanel _speedPanel = new ValuePanel("Time Modifier: ", "x", 0.0, Double.MAX_VALUE, 0.01);
     private final ValuePanel _precisionPanel = new ValuePanel("Precision: ", "s", 0.0, Double.MAX_VALUE, 0.001);
-    private final JComboBox<RenderBucketType> _renderBucketCB = new JComboBox<RenderBucketType>(new RenderBucketType[] {
-            RenderBucketType.Inherit, RenderBucketType.Transparent, RenderBucketType.Opaque, RenderBucketType.Ortho });
+    private final JComboBox<RenderBucketType> _renderBucketCB = new JComboBox<RenderBucketType>(
+            new RenderBucketType[] { RenderBucketType.Inherit, RenderBucketType.Transparent, RenderBucketType.Opaque,
+                    RenderBucketType.OrthoOrder });
 
     public ParticleWorldPanel() {
         super();
@@ -80,8 +81,8 @@ public class ParticleWorldPanel extends ParticleEditPanel {
 
         _renderBucketCB.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                getEdittedParticles().getSceneHints().setRenderBucketType(
-                        (RenderBucketType) _renderBucketCB.getSelectedItem());
+                getEdittedParticles().getSceneHints()
+                        .setRenderBucketType((RenderBucketType) _renderBucketCB.getSelectedItem());
             }
         });
         final JPanel queuePanel = new JPanel(new GridBagLayout());

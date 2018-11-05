@@ -21,8 +21,6 @@ subprojects {
 	artifacts.archives packageSources
 	repositories {
     	mavenCentral()
-		
-		maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 		maven { url "http://repo.maven.apache.org/maven2" }
 	}
 
