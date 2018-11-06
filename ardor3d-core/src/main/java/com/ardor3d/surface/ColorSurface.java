@@ -52,7 +52,7 @@ public class ColorSurface implements IUniformSupplier {
         return _ambient;
     }
 
-    public void getDiffuse(final ReadOnlyColorRGBA color) {
+    public void setDiffuse(final ReadOnlyColorRGBA color) {
         _diffuse.set(color);
     }
 

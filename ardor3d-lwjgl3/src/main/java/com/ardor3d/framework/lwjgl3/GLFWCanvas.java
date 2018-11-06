@@ -12,6 +12,7 @@ package com.ardor3d.framework.lwjgl3;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -40,7 +41,6 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
-import com.google.common.collect.Lists;
 
 public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     private static final Logger logger = Logger.getLogger(GLFWCanvas.class.getName());
@@ -62,7 +62,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
     protected int _contentWidth, _contentHeight;
 
-    protected List<ICanvasListener> _listeners = Lists.newArrayList();
+    protected List<ICanvasListener> _listeners = new ArrayList<>();
 
     /**
      * If true, we will not try to drop and reclaim the context on each frame.
