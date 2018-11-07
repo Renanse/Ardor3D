@@ -62,39 +62,6 @@ vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, co
     return (ambient + diffuse + specular);
 }
 
-vec3 calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec2 texCoord, const vec3 viewDir, const TextureSurface surface, const bool useBlinnPhong)
-{
-    vec3 lightDir = normalize(light.position - worldPos);
-    
-    // diffuse shading
-    float diff = max(dot(worldNormal, lightDir), 0.0);
-    
-    float spec = 0.0;
-    if (useBlinnPhong) {
-	    // blinn phong
-	    vec3 halfwayDir = normalize(lightDir + viewDir);  
-        spec = pow(max(dot(worldNormal, halfwayDir), 0.0), surface.shininess);
-    } else {
-	    // phong
-	    vec3 reflectDir = reflect(-lightDir, worldNormal);
-	    spec = pow(max(dot(viewDir, reflectDir), 0.0), surface.shininess / 4.0);
-	}
-
-    // attenuation
-    float distance    = length(light.position - worldPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + 
-  			     light.quadratic * (distance * distance));    
-
-    // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(surface.diffuse, texCoord));
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(surface.diffuse, texCoord));
-    vec3 specular = light.specular * spec * vec3(texture(surface.specular, texCoord));
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
-    specular *= attenuation;
-    return (ambient + diffuse + specular);
-}
-
 vec3 calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
 {
     vec3 lightDir = normalize(light.position - worldPos);

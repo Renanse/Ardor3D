@@ -25,6 +25,7 @@ public class ColorSurface implements IUniformSupplier {
 
     protected final ColorRGBA _ambient = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
     protected final ColorRGBA _diffuse = new ColorRGBA(.5f, .5f, .5f, 1f);
+    protected final ColorRGBA _emissive = new ColorRGBA(0f, 0f, 0f, 1f);
     protected final ColorRGBA _specular = new ColorRGBA(1f, 1f, 1f, 1f);
     protected float _shininess = 32f;
 
@@ -35,6 +36,8 @@ public class ColorSurface implements IUniformSupplier {
                 (Supplier<ReadOnlyColorRGBA>) this::getAmbient));
         _cachedUniforms.add(new UniformRef("diffuse", UniformType.Float3, UniformSource.Supplier,
                 (Supplier<ReadOnlyColorRGBA>) this::getDiffuse));
+        _cachedUniforms.add(new UniformRef("emissive", UniformType.Float3, UniformSource.Supplier,
+                (Supplier<ReadOnlyColorRGBA>) this::getEmissive));
         _cachedUniforms.add(new UniformRef("specular", UniformType.Float3, UniformSource.Supplier,
                 (Supplier<ReadOnlyColorRGBA>) this::getSpecular));
         _cachedUniforms.add(new UniformRef("shininess", UniformType.Float1, UniformSource.Supplier,
@@ -58,6 +61,14 @@ public class ColorSurface implements IUniformSupplier {
 
     public ReadOnlyColorRGBA getDiffuse() {
         return _diffuse;
+    }
+
+    public void setEmissive(final ReadOnlyColorRGBA color) {
+        _emissive.set(color);
+    }
+
+    public ReadOnlyColorRGBA getEmissive() {
+        return _emissive;
     }
 
     public void setSpecular(final ReadOnlyColorRGBA color) {

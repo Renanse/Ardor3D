@@ -31,5 +31,5 @@ void main()
     for(int i = 0; i < NR_LIGHTS; i++)
     	lighting += calcLighting(light[i], WorldPos, Normal, V, surface, USE_BLINN_PHONG);
     	
-    FragColor = DiffuseColor * texture(tex0, TexCoords) * vec4(lighting, 1.0);
+    FragColor = clamp(DiffuseColor * texture(tex0, TexCoords) * vec4(surface.emissive + lighting, 1.0), 0.0, 1.0);
 }
