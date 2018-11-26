@@ -11,6 +11,7 @@ uniform mat3 normalMat;
 uniform vec4 defaultColor;
 
 out vec3 WorldPos;
+out vec4 ViewPos;
 out vec3 Normal;
 out vec4 DiffuseColor;
 out vec2 TexCoords;
@@ -18,9 +19,10 @@ out vec2 TexCoords;
 void main()
 {
     WorldPos = vec3(model * vec4(vertex, 1.0));
+    ViewPos = view * vec4(WorldPos, 1.0);
     Normal = normalMat * normal;
     DiffuseColor = defaultColor;   
     TexCoords = uv0;
 
-    gl_Position = projection * view * vec4(WorldPos, 1.0);
+    gl_Position = projection * ViewPos;
 }

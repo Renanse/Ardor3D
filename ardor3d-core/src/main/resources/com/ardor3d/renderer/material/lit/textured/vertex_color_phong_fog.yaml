@@ -13,6 +13,9 @@ techniques:
             
         shaders: 
           Vertex: 
-            source: phong/textured/vertex_color_fog.vert
+            source: phong/textured/vertex_color.vert
+            
           Fragment:
-            source: phong/textured/phong_textured_fog.frag
+            source: phong/textured/phong_textured.frag
+            define: USE_FOG
+            
