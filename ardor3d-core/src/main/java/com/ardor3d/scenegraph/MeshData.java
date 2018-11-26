@@ -851,7 +851,7 @@ public class MeshData implements Savable {
      * @param section
      *            the section
      *
-     * @return the number of primitives (triangles, quads, lines, points, etc.) on a given section of this mesh data.
+     * @return the number of primitives (triangles, lines, points, etc.) on a given section of this mesh data.
      */
     public int getPrimitiveCount(final int section) {
         return _primitiveCounts[section];
@@ -861,7 +861,7 @@ public class MeshData implements Savable {
      * Returns the vertex indices of a specified primitive.
      *
      * @param primitiveIndex
-     *            which triangle, quad, etc
+     *            which triangle, line, etc
      * @param section
      *            which section to pull from (corresponds to array position in indexmodes and lengths)
      * @param store
@@ -993,9 +993,9 @@ public class MeshData implements Savable {
      * Gets the vertex index.
      *
      * @param primitiveIndex
-     *            which triangle, quad, etc.
+     *            which triangle, line, etc.
      * @param point
-     *            which point on the triangle, quad, etc. (triangle has three points, so this would be 0-2, etc.)
+     *            which point on the triangle, line, etc. (triangle has three points, so this would be 0-2, etc.)
      * @param section
      *            which section to pull from (corresponds to array position in indexmodes and lengths)
      *

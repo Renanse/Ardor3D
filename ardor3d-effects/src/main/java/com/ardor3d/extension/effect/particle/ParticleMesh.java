@@ -101,7 +101,7 @@ public class ParticleMesh extends ParticleSystem {
                 break;
             default:
                 throw new IllegalStateException(
-                        "Particle Mesh may only have particle type of ParticleType.Quad, ParticleType.GeomMesh or ParticleType.Triangle");
+                        "Particle Mesh may only have particle type of ParticleType.GeomMesh or ParticleType.Triangle");
         }
 
         final int verts = getVertsForParticleType(getParticleType());

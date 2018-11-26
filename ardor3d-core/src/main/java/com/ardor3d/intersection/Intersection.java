@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -28,9 +28,6 @@ public abstract class Intersection {
                         // Triangle on Triangle
                         return TriangleTriangleIntersect.intersectTriTri(verticesA[0], verticesA[1], verticesA[2],
                                 verticesB[0], verticesB[1], verticesB[2]);
-                    case 4:
-                        // TODO: Triangle on Quad
-                        return false;
                     case 2:
                         // TODO: Triangle on Line
                         return false;
@@ -38,28 +35,10 @@ public abstract class Intersection {
                         // TODO: Triangle on Point
                         return false;
                 }
-            case 4:
-                switch (verticesB.length) {
-                    case 3:
-                        // TODO: Quad on Triangle
-                        return false;
-                    case 4:
-                        // TODO: Quad on Quad
-                        return false;
-                    case 2:
-                        // TODO: Quad on Line
-                        return false;
-                    case 1:
-                        // TODO: Quad on Point
-                        return false;
-                }
             case 2:
                 switch (verticesB.length) {
                     case 3:
                         // TODO: Line on Triangle
-                        return false;
-                    case 4:
-                        // TODO: Line on Quad
                         return false;
                     case 2:
                         // TODO: Line on Line
@@ -72,9 +51,6 @@ public abstract class Intersection {
                 switch (verticesB.length) {
                     case 3:
                         // TODO: Point on Triangle
-                        return false;
-                    case 4:
-                        // TODO: Point on Quad
                         return false;
                     case 2:
                         // TODO: Point on Line

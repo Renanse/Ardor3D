@@ -592,21 +592,21 @@ public abstract class ParticleSystem extends Node {
     }
 
     /**
-     * Get which emittype method is being used by the underlying system. One of ParticleType.Quad,
-     * ParticleType.Triangle, ParticleType.Point, ParticleType.Line, ParticleType.GeomMesh
+     * Get which particle type is being used by the underlying system. One of ParticleType.Triangle, ParticleType.Point,
+     * ParticleType.Line, ParticleType.GeomMesh
      *
-     * @return An int representing the type of particle we are emitting.
+     * @return An enum representing the type of particle we are emitting.
      */
     public ParticleType getParticleType() {
         return _particleType;
     }
 
     /**
-     * Set what type of particle to emit from this sytem. Does not have an effect unless recreate is called.
+     * Set what type of particle to emit from this system. Does not have an effect unless recreate is called.
      *
      * @param type
-     *            particle type to use, should be one of ParticleType.Quad, ParticleType.Triangle, ParticleType.Point,
-     *            ParticleType.Line, ParticleType.GeomMesh
+     *            particle type to use, should be one of ParticleType.Triangle, ParticleType.Point, ParticleType.Line,
+     *            ParticleType.GeomMesh
      */
     public void setParticleType(final ParticleType type) {
         _particleType = type;
@@ -658,8 +658,8 @@ public abstract class ParticleSystem extends Node {
                 vertices[x] = new Vector3();
 
                 final int vertIndex = mData.getVertexIndex(index, x, 0);
-                BufferUtils.populateFromBuffer(vertices[x], mData.getVertexBuffer(), mData.getIndices() != null ? mData
-                        .getIndices().get(vertIndex) : vertIndex);
+                BufferUtils.populateFromBuffer(vertices[x], mData.getVertexBuffer(),
+                        mData.getIndices() != null ? mData.getIndices().get(vertIndex) : vertIndex);
             }
             Triangle t = p.getTriangleModel();
             if (t == null) {
@@ -934,8 +934,8 @@ public abstract class ParticleSystem extends Node {
         if (isRotateWithScene()) {
             // XXX: Perhaps we can avoid this special case via an addition to the interface?
             if (getParticleEmitter() instanceof MeshEmitter) {
-                ((MeshEmitter) getParticleEmitter()).getSource().getWorldRotation()
-                        .applyPost(_emissionDirection, _worldEmit);
+                ((MeshEmitter) getParticleEmitter()).getSource().getWorldRotation().applyPost(_emissionDirection,
+                        _worldEmit);
             } else {
                 getWorldRotation().applyPost(_emissionDirection, _worldEmit);
             }
