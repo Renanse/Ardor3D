@@ -10,6 +10,7 @@
 
 package com.ardor3d.util.geom;
 
+import java.nio.FloatBuffer;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -235,5 +237,44 @@ public final class GeometryTool {
                 spatial.removeFromParent();
             }
         }
+    }
+
+    public static FloatBufferData convertQuadVerticesToTriangles(final FloatBufferData vertices) {
+        final int dims = vertices.getValuesPerTuple();
+        if (dims != 2 && dims != 3) {
+            throw new IllegalArgumentException(
+                    "Only 2d and 3d quad data can be supported.  Vertices had tuple size of " + dims);
+        }
+
+        final FloatBuffer srcBuffer = vertices.getBuffer();
+        final int qVerts = vertices.getTupleCount();
+
+        // write our quads as 2 individual triangles
+        if (qVerts < 4 || (qVerts % 4) != 0) {
+            throw new IllegalArgumentException("Quad data should have 4*N verts where N=[1,R]");
+        }
+        final int quads = qVerts / 4;
+        final int tris = 2 * quads;
+        final int tVerts = tris * 3;
+
+        final FloatBufferData rVal = new FloatBufferData(tVerts * dims, dims);
+        final FloatBuffer dstBuffer = rVal.getBuffer();
+
+        // write our new data by walking through our quads
+        for (int q = 0; q < quads; q++) {
+            final int offsetSrc = q * 4 * dims;
+            final int offsetDst = q * 6 * dims;
+            // 0 1 2
+            BufferUtils.copy(srcBuffer, offsetSrc + 0 * dims, dstBuffer, offsetDst + 0 * dims, dims);
+            BufferUtils.copy(srcBuffer, offsetSrc + 1 * dims, dstBuffer, offsetDst + 1 * dims, dims);
+            BufferUtils.copy(srcBuffer, offsetSrc + 2 * dims, dstBuffer, offsetDst + 2 * dims, dims);
+
+            // 2 1 3
+            BufferUtils.copy(srcBuffer, offsetSrc + 2 * dims, dstBuffer, offsetDst + 3 * dims, dims);
+            BufferUtils.copy(srcBuffer, offsetSrc + 1 * dims, dstBuffer, offsetDst + 4 * dims, dims);
+            BufferUtils.copy(srcBuffer, offsetSrc + 3 * dims, dstBuffer, offsetDst + 5 * dims, dims);
+        }
+
+        return rVal;
     }
 }
