@@ -79,6 +79,10 @@ public class BoxExample extends ExampleBase {
         // Attach the box to the scenegraph root.
         _root.attachChild(box);
 
+        // XXX: try out fog by uncommenting below
+        // box.setRenderMaterial("lit/textured/vertex_color_phong_fog.yaml");
+        // box.setProperty("fogParams", new FogParams(50f, 100f));
+
         // Add a texture to the box.
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));

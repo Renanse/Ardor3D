@@ -1,0 +1,18 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: color
+          - key: uv0
+          
+        uniforms: 
+          - builtIn: [model, view, projection, normalMat, cameraLoc, lights4, colorSurface, fogParams]
+            
+        shaders: 
+          Vertex: 
+            source: phong/textured/vertex_color_fog.vert
+          Fragment:
+            source: phong/textured/phong_textured_fog.frag

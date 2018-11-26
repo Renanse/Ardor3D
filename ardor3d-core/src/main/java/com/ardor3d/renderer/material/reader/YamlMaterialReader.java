@@ -467,6 +467,10 @@ public class YamlMaterialReader {
                 pass.addUniform(new UniformRef("surface", UniformType.UniformSupplier, UniformSource.SpatialProperty,
                         "surface", "com.ardor3d.surface.PbrTexturedSurface", null));
                 return;
+            case "fogParams":
+                pass.addUniform(new UniformRef("fogParams", UniformType.UniformSupplier, UniformSource.SpatialProperty,
+                        "fogParams", "com.ardor3d.renderer.material.fog.FogParams", null));
+                return;
             case "lights1":
                 pass.addLightInfoUniforms(1);
                 return;

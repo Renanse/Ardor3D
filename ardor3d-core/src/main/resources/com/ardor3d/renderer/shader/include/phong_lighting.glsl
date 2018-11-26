@@ -3,7 +3,7 @@
 
 @import include/light.glsl
 
-vec3 calcDirectionalLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
+vec3 calcDirectionalLight(Light light, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface, const bool useBlinnPhong)
 {
     vec3 lightDir = normalize(-light.direction);
     
@@ -105,7 +105,7 @@ vec3 calcLighting(Light light, const vec3 worldPos, const vec3 worldNormal, cons
 	switch (light.type)
 	{
 		case 0: // Directional
-			return calcDirectionalLight(light, worldPos, worldNormal, viewDir, surface, useBlinnPhong);
+			return calcDirectionalLight(light, worldNormal, viewDir, surface, useBlinnPhong);
 		case 1: // Point
 			return calcPointLight(light, worldPos, worldNormal, viewDir, surface, useBlinnPhong);
 		case 2: // Spot
