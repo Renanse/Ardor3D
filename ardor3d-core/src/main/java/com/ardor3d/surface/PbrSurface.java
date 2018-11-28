@@ -23,6 +23,8 @@ import com.ardor3d.renderer.material.uniform.UniformType;
 
 public class PbrSurface implements IUniformSupplier {
 
+    public static final String DefaultPropertyKey = "surface";
+
     protected final ColorRGBA _albedo = new ColorRGBA(1f, 1f, 1f, 1f);
     protected float _metallic = .5f;
     protected float _roughness = .5f;

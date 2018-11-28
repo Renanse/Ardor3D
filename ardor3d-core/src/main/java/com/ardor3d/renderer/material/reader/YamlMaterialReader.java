@@ -33,10 +33,14 @@ import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.material.TechniquePass;
 import com.ardor3d.renderer.material.VertexAttributeRef;
+import com.ardor3d.renderer.material.fog.FogParams;
 import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.surface.ColorSurface;
+import com.ardor3d.surface.PbrSurface;
+import com.ardor3d.surface.PbrTexturedSurface;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -456,20 +460,24 @@ public class YamlMaterialReader {
                         Ardor3dStateProperty.MeshDefaultColorRGB));
                 return;
             case "colorSurface":
-                pass.addUniform(new UniformRef("surface", UniformType.UniformSupplier, UniformSource.SpatialProperty,
-                        "surface", "com.ardor3d.surface.ColorSurface", null));
+                pass.addUniform(new UniformRef(ColorSurface.DefaultPropertyKey, UniformType.UniformSupplier,
+                        UniformSource.SpatialProperty, ColorSurface.DefaultPropertyKey,
+                        "com.ardor3d.surface.ColorSurface", null));
                 return;
             case "pbrSurface":
-                pass.addUniform(new UniformRef("surface", UniformType.UniformSupplier, UniformSource.SpatialProperty,
-                        "surface", "com.ardor3d.surface.PbrSurface", null));
+                pass.addUniform(new UniformRef(PbrSurface.DefaultPropertyKey, UniformType.UniformSupplier,
+                        UniformSource.SpatialProperty, PbrSurface.DefaultPropertyKey, "com.ardor3d.surface.PbrSurface",
+                        null));
                 return;
             case "pbrTexturedSurface":
-                pass.addUniform(new UniformRef("surface", UniformType.UniformSupplier, UniformSource.SpatialProperty,
-                        "surface", "com.ardor3d.surface.PbrTexturedSurface", null));
+                pass.addUniform(new UniformRef(PbrTexturedSurface.DefaultPropertyKey, UniformType.UniformSupplier,
+                        UniformSource.SpatialProperty, PbrTexturedSurface.DefaultPropertyKey,
+                        "com.ardor3d.surface.PbrTexturedSurface", null));
                 return;
             case "fogParams":
-                pass.addUniform(new UniformRef("fogParams", UniformType.UniformSupplier, UniformSource.SpatialProperty,
-                        "fogParams", "com.ardor3d.renderer.material.fog.FogParams", null));
+                pass.addUniform(new UniformRef(FogParams.DefaultPropertyKey, UniformType.UniformSupplier,
+                        UniformSource.SpatialProperty, FogParams.DefaultPropertyKey,
+                        "com.ardor3d.renderer.material.fog.FogParams", null));
                 return;
             case "lights1":
                 pass.addLightInfoUniforms(1);

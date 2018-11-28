@@ -23,6 +23,8 @@ import com.ardor3d.renderer.material.uniform.UniformType;
 
 public class FogParams implements IUniformSupplier {
 
+    public static final String DefaultPropertyKey = "fogParams";
+
     public enum DensityFunction {
         /**
          * The fog blending function defined as: (end - z) / (end - start).

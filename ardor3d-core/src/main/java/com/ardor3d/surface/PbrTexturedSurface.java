@@ -21,6 +21,8 @@ import com.ardor3d.renderer.material.uniform.UniformType;
 
 public class PbrTexturedSurface implements IUniformSupplier {
 
+    public static final String DefaultPropertyKey = "surface";
+
     protected int _albedoMap = 0;
     protected int _normalMap = 1;
     protected int _metallicMap = 2;

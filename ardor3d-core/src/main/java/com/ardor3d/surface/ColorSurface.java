@@ -23,6 +23,8 @@ import com.ardor3d.renderer.material.uniform.UniformType;
 
 public class ColorSurface implements IUniformSupplier {
 
+    public static final String DefaultPropertyKey = "surface";
+
     protected final ColorRGBA _ambient = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
     protected final ColorRGBA _diffuse = new ColorRGBA(.5f, .5f, .5f, 1f);
     protected final ColorRGBA _emissive = new ColorRGBA(0f, 0f, 0f, 1f);

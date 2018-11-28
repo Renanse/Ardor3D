@@ -81,7 +81,7 @@ public class BoxExample extends ExampleBase {
 
         // XXX: try out fog by uncommenting below
         // box.setRenderMaterial("lit/textured/vertex_color_phong_fog.yaml");
-        // box.setProperty("fogParams", new FogParams(50f, 100f));
+        // box.setProperty(FogParams.DefaultPropertyKey, new FogParams(50f, 100f));
 
         // Add a texture to the box.
         final TextureState ts = new TextureState();
