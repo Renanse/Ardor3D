@@ -82,6 +82,10 @@ public class UniformRef implements Savable {
         return _value;
     }
 
+    public void setValue(final Object value) {
+        _value = value;
+    }
+
     public Object getExtra() {
         return _extra;
     }

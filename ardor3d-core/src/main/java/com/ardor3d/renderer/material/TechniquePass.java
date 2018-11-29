@@ -117,6 +117,22 @@ public class TechniquePass implements Savable {
         _uniforms.add(uniform);
     }
 
+    /**
+     * Set the value of a particular shader uniform, by shaderVariableName (which should, in theory, be unique)
+     * 
+     * @param shaderVarName
+     *            Variable name in the shader that this uniform will connect to.
+     * @param value
+     *            the Value of the uniform.
+     */
+    public void setUniformValue(final String shaderVarName, final Object value) {
+        _uniforms.forEach(u -> {
+            if (shaderVarName.compareTo(u.getShaderVariableName()) == 0) {
+                u.setValue(value);
+            }
+        });
+    }
+
     public void addLightInfoUniforms(final int maxLights) {
         for (int i = 0; i < maxLights; i++) {
             addUniform(new UniformRef("light[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
