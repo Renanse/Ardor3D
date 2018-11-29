@@ -125,8 +125,8 @@ public final class GeometryTool {
             long group;
             for (int x = 0, max = verts.length; x < max; x++) {
                 group = groupData.getGroupForVertex(x);
-                final VertKey vkey = new VertKey(verts[x], norms != null ? norms[x] : null, colors != null ? colors[x]
-                        : null, getTexs(tex, x), groupData.getGroupConditions(group), group);
+                final VertKey vkey = new VertKey(verts[x], norms != null ? norms[x] : null,
+                        colors != null ? colors[x] : null, getTexs(tex, x), groupData.getGroupConditions(group), group);
                 // if we've already seen it, swap it for the max, and decrease max.
                 if (store.containsKey(vkey)) {
                     final int newInd = store.get(vkey);
@@ -273,6 +273,46 @@ public final class GeometryTool {
             BufferUtils.copy(srcBuffer, offsetSrc + 2 * dims, dstBuffer, offsetDst + 3 * dims, dims);
             BufferUtils.copy(srcBuffer, offsetSrc + 1 * dims, dstBuffer, offsetDst + 4 * dims, dims);
             BufferUtils.copy(srcBuffer, offsetSrc + 3 * dims, dstBuffer, offsetDst + 5 * dims, dims);
+        }
+
+        return rVal;
+    }
+
+    public static IndexBufferData<?> convertQuadIndicesToTriangles(final IndexBufferData<?> quadIndices,
+            final int vertexCount) {
+        final int[] indices = new int[quadIndices.getBufferLimit()];
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = quadIndices.get(i);
+        }
+
+        return convertQuadIndicesToTriangles(indices, vertexCount);
+    }
+
+    public static IndexBufferData<?> convertQuadIndicesToTriangles(final int[] quadIndices, final int vertexCount) {
+        final int qIndices = quadIndices.length;
+
+        if (qIndices < 4 || (qIndices % 4) != 0) {
+            throw new IllegalArgumentException("Quad data should have 4*N indices where N=[1,R]");
+        }
+        final int quads = qIndices / 4;
+        final int tris = 2 * quads;
+        final int tVerts = tris * 3;
+
+        final IndexBufferData<?> rVal = BufferUtils.createIndexBufferData(tVerts, vertexCount - 1);
+
+        // write our new data by walking through our quads
+        for (int q = 0; q < quads; q++) {
+            final int offsetSrc = q * 4;
+
+            // 0 1 2
+            rVal.put(quadIndices[offsetSrc + 0]);
+            rVal.put(quadIndices[offsetSrc + 1]);
+            rVal.put(quadIndices[offsetSrc + 2]);
+
+            // 2 1 3
+            rVal.put(quadIndices[offsetSrc + 2]);
+            rVal.put(quadIndices[offsetSrc + 1]);
+            rVal.put(quadIndices[offsetSrc + 3]);
         }
 
         return rVal;
