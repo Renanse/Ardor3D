@@ -76,7 +76,7 @@ public class RotatingCubeGame implements Updater {
         // add a rotating controller to the cube
         // add a light
         box = new Box("The cube", new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
-        box.setRenderMaterial("unlit/textured/basic.yaml");
+        box.setRenderMaterial("lit/textured/basic_phong.yaml");
 
         final ZBufferState buf = new ZBufferState();
         buf.setEnabled(true);
