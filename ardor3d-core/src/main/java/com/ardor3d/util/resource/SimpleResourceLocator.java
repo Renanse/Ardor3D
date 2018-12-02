@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -27,7 +27,7 @@ public class SimpleResourceLocator implements ResourceLocator {
 
     /**
      * Construct a new SimpleResourceLocator using the given URI as our context.
-     * 
+     *
      * @param baseDir
      *            our base context. This is meant to be a "directory" wherein we will search for resources. Therefore,
      *            if it does not end in /, a / will be added to ensure we are talking about children of the given
@@ -52,7 +52,7 @@ public class SimpleResourceLocator implements ResourceLocator {
 
     /**
      * Construct a new SimpleResourceLocator using the given URL as our context.
-     * 
+     *
      * @param baseDir
      *            our base context. This is converted to a URI. This is meant to be a "directory" wherein we will search
      *            for resources. Therefore, if it does not end in /, a / will be added to ensure we are talking about
@@ -85,6 +85,18 @@ public class SimpleResourceLocator implements ResourceLocator {
         }
 
         // Try to locate using resourceName as is.
+        try {
+            final URL rVal = new URL(_baseDir.toURL(), resourceName);
+            // open a stream to see if this is a valid resource
+            rVal.openStream().close();
+            return new URLResourceSource(rVal);
+        } catch (final IOException e) {
+            // URL wasn't valid in some way, so try up a path.
+        } catch (final IllegalArgumentException e) {
+            // URL wasn't valid in some way, so try up a path.
+        }
+
+        // Now try url encoding
         try {
             String spec = URLEncoder.encode(resourceName, "UTF-8");
             // this fixes a bug in JRE1.5 (file handler does not decode "+" to spaces)
