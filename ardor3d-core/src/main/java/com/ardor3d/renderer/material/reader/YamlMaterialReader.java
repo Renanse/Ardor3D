@@ -11,6 +11,7 @@
 package com.ardor3d.renderer.material.reader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
@@ -93,6 +94,33 @@ public class YamlMaterialReader {
         }
 
         return load(source);
+    }
+
+    public static RenderMaterial load(final InputStream stream) {
+        try {
+            return loadChecked(stream);
+        } catch (final IOException ex) {
+            logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(String)",
+                    "Unable to read from stream. " + ex.getMessage());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static RenderMaterial loadChecked(final InputStream stream) throws IOException {
+
+        if (stream == null) {
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
+                        "stream was null.  Returning null.");
+            }
+
+            return null;
+        }
+
+        final Yaml yamlDoc = new Yaml();
+        final Object doc = yamlDoc.load(new UnicodeReader(stream));
+        return readMaterial(doc);
     }
 
     public static RenderMaterial load(final ResourceSource source) {
