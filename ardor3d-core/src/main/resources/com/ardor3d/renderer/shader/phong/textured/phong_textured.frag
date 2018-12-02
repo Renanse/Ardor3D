@@ -20,7 +20,12 @@ out vec4 FragColor;
 in vec3 WorldPos;
 in vec4 ViewPos;
 in vec3 Normal;
+#ifdef FLAT_COLORS
+flat in vec4 DiffuseColor;
+#else
 in vec4 DiffuseColor;
+#endif
+
 in vec2 TexCoords;
 
 uniform Light light[NR_LIGHTS];

@@ -13,7 +13,12 @@ uniform mat3 normalMat;
 out vec3 WorldPos;
 out vec4 ViewPos;
 out vec3 Normal;
+#ifdef FLAT_COLORS
+flat out vec4 DiffuseColor;
+#else
 out vec4 DiffuseColor;
+#endif
+
 out vec2 TexCoords;
 
 void main()
