@@ -8,7 +8,9 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: unlit/textured/fsq.vert
+            source: unlit/fsq.vert
+            define: UV_COUNT 1
             
           Fragment:
-            source: unlit/textured/textured.frag
+            source: unlit/unlit_modulate.frag
+            define: UV_COUNT 1

@@ -5,8 +5,6 @@ techniques:
       - 
         attributes:
           - key: vertex
-          - key: uv0
-          - key: uv1
         uniforms: 
           - builtIn: [model, view, projection]
           - 
@@ -19,7 +17,7 @@ techniques:
             source: SpatialProperty
         shaders: 
           Vertex: 
-            source: unlit/textured/fsq.vert
+            source: unlit/fsq.vert
 
           Fragment: 
             source: road_ribbon.frag

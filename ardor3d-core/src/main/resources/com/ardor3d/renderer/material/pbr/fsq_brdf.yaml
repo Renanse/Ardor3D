@@ -19,13 +19,14 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: unlit/textured/fsq.vert
+            source: unlit/fsq.vert
+            define: UV_COUNT 1 
             
           Fragment:
             program: |
               #version 330 core
               
-              in vec2 TexCoords;
+              in vec2 TexCoords0;
 
               out vec2 FragColor;
               
@@ -135,6 +136,6 @@ techniques:
               // ----------------------------------------------------------------------------
               void main() 
               {
-                  vec2 integratedBRDF = IntegrateBRDF(TexCoords.x, TexCoords.y);
+                  vec2 integratedBRDF = IntegrateBRDF(TexCoords0.x, TexCoords0.y);
                   FragColor = integratedBRDF;
               }

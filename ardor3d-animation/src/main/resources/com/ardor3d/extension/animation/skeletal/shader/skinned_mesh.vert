@@ -15,7 +15,7 @@ in vec4 jointIds;
 out vec3 WorldPos;
 out vec3 Normal;
 out vec4 DiffuseColor;
-out vec2 TexCoords;
+out vec2 TexCoords0;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -55,7 +55,7 @@ void main()
     WorldPos = vec3(model * weightMat * vec4(vertex, 1.0));
     Normal = normalMat * (mat3(weightMat[0].xyz, weightMat[1].xyz, weightMat[2].xyz) * normal);
     DiffuseColor = defaultColor;
-    TexCoords = uv0;
+    TexCoords0 = uv0;
 
     gl_Position =  projection * view * vec4(WorldPos, 1.0);
 }

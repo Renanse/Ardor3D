@@ -6,11 +6,16 @@ techniques:
           - key: vertex
           - key: color
           - key: uv0
+          
         uniforms: 
           - builtIn: [model, view, projection]
+
         shaders: 
           Vertex: 
-            source: unlit/textured/vertex_color.vert
+            source: unlit/unlit.vert
+            defines: [VERT_COLORS, UV_COUNT 1]
             
           Fragment:
-            source: unlit/textured/textured.frag
+            source: unlit/unlit_modulate.frag
+            define: UV_COUNT 1
+            

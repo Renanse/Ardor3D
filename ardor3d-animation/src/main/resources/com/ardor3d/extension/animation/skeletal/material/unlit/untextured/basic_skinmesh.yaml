@@ -19,4 +19,4 @@ techniques:
             source: skinned_mesh.vert
 
           Fragment:
-            source: unlit/untextured/untextured.frag
+            source: unlit/unlit.frag

@@ -10,6 +10,6 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: unlit/untextured/default_color.vert
+            source: unlit/unlit.vert
           Fragment:
-            source: unlit/untextured/untextured.frag
+            source: unlit/unlit_modulate.frag

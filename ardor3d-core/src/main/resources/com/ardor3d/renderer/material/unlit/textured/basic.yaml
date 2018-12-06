@@ -11,6 +11,9 @@ techniques:
             
         shaders: 
           Vertex: 
-            source: unlit/textured/default_color.vert
+            source: unlit/unlit.vert
+            define: UV_COUNT 1
+                        
           Fragment:
-            source: unlit/textured/textured.frag
+            source: unlit/unlit_modulate.frag
+            define: UV_COUNT 1

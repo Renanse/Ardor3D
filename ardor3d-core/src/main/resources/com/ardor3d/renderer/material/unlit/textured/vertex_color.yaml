@@ -12,6 +12,9 @@ techniques:
           
         shaders: 
           Vertex: 
-            source: unlit/textured/vertex_color.vert
-          Fragment:
-            source: unlit/textured/textured.frag
+            source: unlit/unlit.vert
+            defines: [UV_COUNT 1, VERT_COLORS]
+            
+          Fragment: 
+            source: unlit/unlit_modulate.frag
+            define: UV_COUNT 1

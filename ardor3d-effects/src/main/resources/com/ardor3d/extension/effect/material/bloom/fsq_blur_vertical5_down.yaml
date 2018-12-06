@@ -14,7 +14,8 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: unlit/textured/fsq.vert
+            source: unlit/fsq.vert
+            define: UV_COUNT 1
             
           Fragment:
             source: bloom/bloom_blur_vertical5_down.frag
