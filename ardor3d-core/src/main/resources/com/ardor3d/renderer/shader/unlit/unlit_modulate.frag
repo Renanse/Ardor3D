@@ -52,6 +52,4 @@ void main()
 #else
     FragColor = color;
 #endif
-
-	FragColor = color;
 }
