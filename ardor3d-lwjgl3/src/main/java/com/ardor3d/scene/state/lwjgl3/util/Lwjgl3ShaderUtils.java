@@ -170,7 +170,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         final int shaderId = GL20C.glCreateShader(Lwjgl3ShaderUtils.getGLShaderType(type));
 
         // provide our source code
-        GL20C.glShaderSource(shaderId, info.toArray(new String[info.size()]));
+        try {
+            GL20C.glShaderSource(shaderId, info.toArray(new String[info.size()]));
+        } catch (final NullPointerException ex) {
+            throw new Ardor3dException("Shader of type '" + type.name() + "' was null.");
+        }
 
         // compile
         GL20C.glCompileShader(shaderId);
