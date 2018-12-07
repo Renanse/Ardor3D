@@ -239,7 +239,11 @@ public abstract class AbstractRenderer implements Renderer {
         } else {
             // normal matrix is the inverse transpose of the 3x3 model matrix
             model.toMatrix3(normal);
-            normal.invertLocal().transposeLocal();
+            try {
+                normal.invertLocal().transposeLocal();
+            } catch (final ArithmeticException ex) {
+                // silently ignore for now - non invertable
+            }
         }
         normal.toFloatBuffer(dst);
     }
