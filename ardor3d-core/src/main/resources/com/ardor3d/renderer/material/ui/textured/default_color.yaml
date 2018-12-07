@@ -11,8 +11,10 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: ui/ui_textured.vert
+            source: unlit/unlit.vert
+            defines: [UV_COUNT 1]
 
           Fragment:
-            source: ui/ui_textured.frag
+            source: unlit/unlit_modulate.frag
+            defines: [UV_COUNT 1]
             

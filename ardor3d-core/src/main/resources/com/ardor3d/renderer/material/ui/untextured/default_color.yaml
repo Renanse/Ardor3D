@@ -11,8 +11,7 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: ui/ui_untextured.vert
+            source: unlit/unlit.vert
 
           Fragment:
-            source: ui/ui_untextured.frag
-            
+            source: unlit/unlit_modulate.frag

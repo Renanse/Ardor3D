@@ -12,10 +12,8 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: ui/ui_untextured.vert
-            define: VERTEX_COLORS
-            
+            source: unlit/unlit.vert
+            defines: [VERT_COLORS]
+
           Fragment:
-            source: ui/ui_untextured.frag
-            define: VERTEX_COLORS
-            
+            source: unlit/unlit_modulate.frag
