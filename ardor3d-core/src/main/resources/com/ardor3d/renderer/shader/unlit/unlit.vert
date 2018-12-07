@@ -13,7 +13,12 @@ in vec4 color;
 #endif
 
 out vec3 WorldPos;
+
+#ifdef FLAT_COLORS
+flat out vec4 DiffuseColor;
+#else
 out vec4 DiffuseColor;
+#endif
 
 #ifdef UV_COUNT
 	#if UV_COUNT > 0

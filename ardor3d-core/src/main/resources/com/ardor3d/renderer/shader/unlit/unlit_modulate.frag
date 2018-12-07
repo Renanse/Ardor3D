@@ -2,7 +2,11 @@
 
 out vec4 FragColor;
 
+#ifdef FLAT_COLORS
+flat in vec4 DiffuseColor;
+#else
 in vec4 DiffuseColor;
+#endif
 
 #ifdef UV_COUNT 
 	#if UV_COUNT > 0
