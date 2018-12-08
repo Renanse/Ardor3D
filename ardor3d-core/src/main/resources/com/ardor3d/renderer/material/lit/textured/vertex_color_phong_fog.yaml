@@ -13,9 +13,10 @@ techniques:
             
         shaders: 
           Vertex: 
-            source: phong/textured/vertex_color.vert
+            source: phong/phong.vert
+            defines: [UV_COUNT 1, VERT_COLORS]
             
           Fragment:
-            source: phong/textured/phong_textured.frag
-            define: USE_FOG
+            source: phong/phong_modulate.frag
+            defines: [UV_COUNT 1, USE_FOG]
             

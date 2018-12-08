@@ -1,5 +1,9 @@
 #version 330 core
 
+#ifdef USE_FOG
+@import include/fog.glsl
+#endif
+
 out vec4 FragColor;
 
 #ifdef FLAT_COLORS

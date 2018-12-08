@@ -13,9 +13,9 @@ techniques:
             
         shaders: 
           Vertex: 
-            source: phong/textured/vertex_color.vert
-            defines: [FLAT_COLORS]
+            source: phong/phong.vert
+            defines: [FLAT_COLORS, UV_COUNT 1, VERT_COLORS]
             
           Fragment:
-            source: phong/textured/phong_textured.frag
-            defines: [FLAT_COLORS]
+            source: phong/phong_modulate.frag
+            defines: [FLAT_COLORS, UV_COUNT 1]

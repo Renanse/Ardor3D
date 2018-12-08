@@ -5,16 +5,17 @@ techniques:
         attributes:
           - key: vertex
           - key: normal
-          - key: uv0
-
+          - key: color
+          
         uniforms: 
-          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights4, colorSurface]
+          - builtIn: [model, view, projection, normalMat, cameraLoc, lights4, colorSurface, fogParams]
             
         shaders: 
           Vertex: 
             source: phong/phong.vert
-            define: UV_COUNT 1 
+            defines: [VERT_COLORS]
+            
           Fragment:
             source: phong/phong_modulate.frag
-            define: UV_COUNT 1
+            defines: [USE_FOG]
             

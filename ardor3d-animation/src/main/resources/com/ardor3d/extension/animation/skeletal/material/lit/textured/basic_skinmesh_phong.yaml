@@ -21,4 +21,5 @@ techniques:
             source: skinned_mesh.vert
 
           Fragment:
-            source: phong/textured/phong_textured.frag
+            source: phong/phong_modulate.frag
+            define: UV_COUNT 1

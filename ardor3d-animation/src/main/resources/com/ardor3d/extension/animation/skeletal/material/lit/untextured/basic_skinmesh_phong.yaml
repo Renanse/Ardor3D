@@ -20,4 +20,4 @@ techniques:
             source: skinned_mesh.vert
 
           Fragment:
-            source: phong/untextured/phong_untextured.frag
+            source: phong/phong_modulate.frag

@@ -1,16 +1,22 @@
 #version 330 core
 
 in vec3 vertex;
+in vec3 normal;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat3 normalMat;
 
 #ifndef VERT_COLORS
 uniform vec4 defaultColor;
 #else
 in vec4 color;
 #endif
+
+out vec3 WorldPos;
+out vec4 ViewPos;
+out vec3 Normal;
 
 #ifdef FLAT_COLORS
 flat out vec4 DiffuseColor;
@@ -39,6 +45,10 @@ out vec4 DiffuseColor;
 
 void main()
 {
+    WorldPos = vec3(model * vec4(vertex, 1.0));
+    ViewPos = view * vec4(WorldPos, 1.0);
+    Normal = normalMat * normal;
+
 #ifndef VERT_COLORS
     DiffuseColor = defaultColor;
 #else
@@ -60,5 +70,5 @@ void main()
 	#endif
 #endif
 
-    gl_Position = projection * view * model * vec4(vertex, 1.0);
+    gl_Position = projection * ViewPos;
 }

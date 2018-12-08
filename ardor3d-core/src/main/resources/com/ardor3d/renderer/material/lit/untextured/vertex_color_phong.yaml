@@ -12,6 +12,7 @@ techniques:
             
         shaders: 
           Vertex: 
-            source: phong/untextured/vertex_color.vert
+            source: phong/phong.vert
+            defines: [VERT_COLORS]
           Fragment:
-            source: phong/untextured/phong_untextured.frag
+            source: phong/phong_modulate.frag
