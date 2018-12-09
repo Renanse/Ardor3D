@@ -358,6 +358,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
 
         example._settings = settings;
 
+        System.gc();
+        System.gc();
+
         // get our framework
         if (prefs.getRenderer().startsWith("LWJGL")) {
             Configuration.DEBUG.set(true);
