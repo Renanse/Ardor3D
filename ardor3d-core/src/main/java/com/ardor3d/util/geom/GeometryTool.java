@@ -127,8 +127,13 @@ public final class GeometryTool {
                 group = groupData.getGroupForVertex(x);
                 final VertKey vkey = new VertKey(verts[x], norms != null ? norms[x] : null,
                         colors != null ? colors[x] : null, getTexs(tex, x), groupData.getGroupConditions(group), group);
+                // Store if we have not already seen it
+                if (store.putIfAbsent(vkey, x) == null) {
+                    good++;
+                }
+
                 // if we've already seen it, swap it for the max, and decrease max.
-                if (store.containsKey(vkey)) {
+                else {
                     final int newInd = store.get(vkey);
                     if (indexRemap.containsKey(x)) {
                         indexRemap.put(max, newInd);
@@ -156,12 +161,6 @@ public final class GeometryTool {
                     } else {
                         verts[max] = null;
                     }
-                }
-
-                // otherwise just store it
-                else {
-                    store.put(vkey, x);
-                    good++;
                 }
             }
 
