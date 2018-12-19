@@ -28,17 +28,10 @@ vec4 texture3DBilinear( const in sampler3D textureSampler, const in vec3 uv)
     return mix( tA, tB, f.y ); // will interpolate the green dot in the image
 }
 
-void main()
-{  
-	float unit = (max(abs(vVertex.x), abs(vVertex.y)));
-	
-	unit = floor(unit);
-	unit = log2(unit);
-	unit = floor(unit);
-	
-	unit = min(unit, validLevels);
-    unit = max(unit, minLevel);
-	
+/**
+ * lookup fragment color in texture clipmap
+ */
+vec4 clipTexColor(float unit) {
 	vec2 offset = sliceOffset[int(unit)];	
 	float frac = unit;
 	frac = exp2(frac);	
@@ -59,7 +52,7 @@ void main()
 	texCoord2 += vec2(0.5);
 	texCoord2 *= vec2(1.0 - texelSize);
 	texCoord2 += offset2;
-	  	
+	
 	unit /= levels;	
 	unit = clamp(unit, 0.0, 0.99);
 
@@ -74,6 +67,19 @@ void main()
 	float fadeVal = max(fadeVal1, fadeVal2);
 	fadeVal = max(0.0, fadeVal-0.8)*5.0;
 	fadeVal = min(1.0, fadeVal);
-    FragColor = mix(tex, tex2, fadeVal) + vec4(fadeVal * showDebug);
-        
+    return mix(tex, tex2, fadeVal) + vec4(fadeVal*showDebug);
+}
+
+void main()
+{  
+	float unit = (max(abs(vVertex.x), abs(vVertex.y)));
+	
+	unit = floor(unit);
+	unit = log2(unit);
+	unit = floor(unit);
+	
+	unit = min(unit, validLevels);
+    unit = max(unit, minLevel);
+	
+    FragColor = clipTexColor(unit);
 }
