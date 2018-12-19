@@ -545,9 +545,15 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             GL11C.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                     _backgroundColor.getAlpha());
             GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, _fboID);
+
+            // Set our enforced states
             ContextManager.getCurrentContext().pushEnforcedStates();
             ContextManager.getCurrentContext().clearEnforcedStates();
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);
+
+            // Set our enforced material
+            ContextManager.getCurrentContext().pushEnforcedMaterial();
+            ContextManager.getCurrentContext().enforceMaterial(_enforcedMaterial);
         }
         _active++;
     }
@@ -578,6 +584,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
 
             ContextManager.getCurrentContext().popEnforcedStates();
+            ContextManager.getCurrentContext().popEnforcedMaterial();
 
             if (_neededClip) {
                 _parentRenderer.getScissorUtils().popClip();

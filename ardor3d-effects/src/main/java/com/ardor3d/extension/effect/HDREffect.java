@@ -16,11 +16,11 @@ import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.effect.EffectManager;
-import com.ardor3d.renderer.effect.EffectStep_RenderScreenOverlay;
-import com.ardor3d.renderer.effect.EffectStep_SetRenderTarget;
 import com.ardor3d.renderer.effect.RenderEffect;
-import com.ardor3d.renderer.effect.RenderTarget;
-import com.ardor3d.renderer.effect.RenderTarget_Texture2D;
+import com.ardor3d.renderer.effect.rendertarget.RenderTarget;
+import com.ardor3d.renderer.effect.rendertarget.RenderTarget_Texture2D;
+import com.ardor3d.renderer.effect.step.EffectStep_RenderScreenOverlay;
+import com.ardor3d.renderer.effect.step.EffectStep_SetRenderTarget;
 
 public class HDREffect extends RenderEffect {
     private String shaderDirectory = "com/ardor3d/extension/effect/";
@@ -46,7 +46,7 @@ public class HDREffect extends RenderEffect {
         {
             _steps.add(new EffectStep_SetRenderTarget(RT_DOWNSAMPLED));
             final EffectStep_RenderScreenOverlay downsample = new EffectStep_RenderScreenOverlay();
-            downsample.getTargetMap().put("*Previous", 0);
+            downsample.getTargetMap().put(EffectManager.RT_PREVIOUS, 0);
             _steps.add(downsample);
         }
 
@@ -80,7 +80,7 @@ public class HDREffect extends RenderEffect {
         }
 
         // finally: draw bloom texture and previous texture on fsq, blended.
-        _steps.add(new EffectStep_SetRenderTarget("*Next"));
+        _steps.add(new EffectStep_SetRenderTarget(EffectManager.RT_NEXT));
 
         final EffectStep_RenderScreenOverlay blendOverlay = new EffectStep_RenderScreenOverlay();
         blendOverlay.getTargetMap().put(RT_BRIGHTMAP, 0);

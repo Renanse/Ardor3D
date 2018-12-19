@@ -1,0 +1,16 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor, fogParams]
+
+        shaders: 
+          Vertex: 
+            source: unlit/unlit.vert
+          Fragment:
+            source: unlit/unlit_modulate.frag
+            defines: [USE_FOG]

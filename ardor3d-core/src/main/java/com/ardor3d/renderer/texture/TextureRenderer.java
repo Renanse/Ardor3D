@@ -17,6 +17,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Renderable;
@@ -255,4 +256,5 @@ public interface TextureRenderer {
      */
     void clearEnforcedStates();
 
+    void enforceMaterial(RenderMaterial material);
 }

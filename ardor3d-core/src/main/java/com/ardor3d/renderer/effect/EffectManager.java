@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,28 +16,32 @@ import java.util.Map;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.effect.rendertarget.RenderTarget;
+import com.ardor3d.renderer.effect.rendertarget.RenderTarget_Framebuffer;
+import com.ardor3d.renderer.effect.rendertarget.RenderTarget_Texture2D;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.scenegraph.shape.Quad;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class EffectManager {
+
+    public final static String RT_PREVIOUS = "*Previous";
+    public final static String RT_NEXT = "*Next";
+    public final static String RT_FRAMEBUFFER = "*Framebuffer";
 
     protected final DisplaySettings _canvasSettings;
     protected final List<RenderEffect> _effects = Lists.newArrayList();
     protected final Map<String, RenderTarget> _renderTargetMap = Maps.newHashMap();
     protected Renderer _currentRenderer = null;
     protected RenderTarget _currentRenderTarget = null;
-    protected Camera _fsqCamera, _sceneCamera;
+    protected Camera _sceneCamera;
     protected Mesh _fsq;
     protected RenderTarget _inOutTargetA, _inOutTargetB;
     protected boolean _swapTargets = false;
@@ -45,10 +49,6 @@ public class EffectManager {
 
     public EffectManager(final DisplaySettings settings, final TextureStoreFormat outputformat) {
         _canvasSettings = settings;
-        _fsqCamera = new Camera(settings.getWidth(), settings.getHeight());
-        _fsqCamera.setFrustum(-1, 1, -1, 1, 1, -1);
-        _fsqCamera.setProjectionMode(ProjectionMode.Orthographic);
-        _fsqCamera.setAxes(Vector3.NEG_UNIT_X, Vector3.UNIT_Y, Vector3.NEG_UNIT_Z);
 
         _outputFormat = outputformat;
         setupDefaultTargets(outputformat);
@@ -61,7 +61,7 @@ public class EffectManager {
     }
 
     protected void setupDefaultTargets(final TextureStoreFormat outputformat) {
-        _renderTargetMap.put("*Framebuffer", new RenderTarget_Framebuffer());
+        _renderTargetMap.put(EffectManager.RT_FRAMEBUFFER, new RenderTarget_Framebuffer());
         _inOutTargetA = new RenderTarget_Texture2D(_canvasSettings.getWidth(), _canvasSettings.getHeight(),
                 outputformat);
         _inOutTargetB = new RenderTarget_Texture2D(_canvasSettings.getWidth(), _canvasSettings.getHeight(),
@@ -108,9 +108,9 @@ public class EffectManager {
 
     public RenderTarget getRenderTarget(final String name) {
         // Check for reserved words
-        if ("*Previous".equals(name)) {
+        if (RT_PREVIOUS.equals(name)) {
             return _swapTargets ? _inOutTargetB : _inOutTargetA;
-        } else if ("*Next".equals(name)) {
+        } else if (RT_NEXT.equals(name)) {
             return _swapTargets ? _inOutTargetA : _inOutTargetB;
         } else {
             return _renderTargetMap.get(name);
@@ -126,9 +126,10 @@ public class EffectManager {
         return false;
     }
 
-    public void renderFullScreenQuad(final EnumMap<StateType, RenderState> enforcedStates) {
+    public void renderFullScreenQuad(final RenderMaterial enforcedMaterial,
+            final EnumMap<StateType, RenderState> enforcedStates) {
         // render our -1,1 quad
-        _currentRenderTarget.render(this, _fsqCamera, getFullScreenQuad(), enforcedStates);
+        _currentRenderTarget.render(this, getSceneCamera(), getFullScreenQuad(), enforcedMaterial, enforcedStates);
     }
 
     protected Mesh getFullScreenQuad() {
@@ -136,13 +137,7 @@ public class EffectManager {
             return _fsq;
         }
 
-        _fsq = new Mesh("fsq");
-        _fsq.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(-1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1));
-        _fsq.getMeshData().setTextureBuffer(BufferUtils.createFloatBuffer(0, 0, 1, 0, 1, 1, 0, 1), 0);
-        _fsq.getMeshData().setIndices(BufferUtils.createIndexBufferData(new int[] { 0, 1, 3, 1, 2, 3 }, 3));
-
-        _fsq.getSceneHints().setCullHint(CullHint.Never);
-        _fsq.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        _fsq = Quad.newFullScreenQuad();
 
         final ZBufferState zState = new ZBufferState();
         zState.setEnabled(false);

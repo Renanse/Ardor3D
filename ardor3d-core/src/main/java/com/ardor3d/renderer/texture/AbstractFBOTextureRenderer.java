@@ -24,6 +24,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Renderable;
@@ -33,8 +34,10 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     private static final Logger logger = Logger.getLogger(AbstractFBOTextureRenderer.class.getName());
 
     /** List of states that override any set states on a spatial if not null. */
-    protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates = new EnumMap<RenderState.StateType, RenderState>(
+    protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates = new EnumMap<>(
             RenderState.StateType.class);
+
+    protected RenderMaterial _enforcedMaterial;
 
     protected final Camera _camera = new Camera(1, 1);
 
@@ -312,5 +315,10 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     public void clearEnforcedStates() {
         _enforcedStates.clear();
+    }
+
+    @Override
+    public void enforceMaterial(final RenderMaterial material) {
+        _enforcedMaterial = material;
     }
 }

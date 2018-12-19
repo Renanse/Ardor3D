@@ -305,7 +305,7 @@ public class YamlMaterialReader {
         if (program != null) {
             // inflate any import statements we find
             final String text = MaterialManager.inflateShaderImports(program);
-            rVal.add(inject(text, injects));
+            rVal.add(MaterialManager.inject(text, injects));
             return rVal;
         }
 
@@ -321,32 +321,10 @@ public class YamlMaterialReader {
         // walk through our programs, read them and inject defines, if the program starts with #version
         sources.forEach((final String source) -> {
             final String text = MaterialManager.getShaderText(source, true);
-            rVal.add(inject(text, injects));
+            rVal.add(MaterialManager.inject(text, injects));
         });
 
         return rVal;
-    }
-
-    private static String inject(String program, final List<String> injects) {
-        if (program == null) {
-            return null;
-        }
-
-        program = program.trim();
-        if (injects.isEmpty() || !program.startsWith("#version")) {
-            return program;
-        }
-
-        final StringBuilder sb = new StringBuilder();
-        int firstLF = program.indexOf('\n');
-        if (firstLF == -1) {
-            firstLF = program.indexOf('\r');
-        }
-        sb.append(program.substring(0, firstLF));
-        sb.append('\n');
-        injects.forEach((final String inj) -> sb.append(inj).append('\n'));
-        sb.append(program.substring(firstLF + 1));
-        return sb.toString();
     }
 
     private static void readAttributes(final Object doc, final TechniquePass pass) {

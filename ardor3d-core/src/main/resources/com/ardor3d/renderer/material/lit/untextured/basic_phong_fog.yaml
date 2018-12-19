@@ -1,0 +1,17 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+
+        uniforms: 
+          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights4, colorSurface, fogParams]
+            
+        shaders: 
+          Vertex: 
+            source: phong/phong.vert
+          Fragment:
+            source: phong/phong_modulate.frag
+            defines: [USE_FOG]

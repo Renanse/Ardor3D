@@ -13,7 +13,6 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.extension.effect.ColorReplaceEffect;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -26,8 +25,10 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.effect.ColorReplaceEffect;
 import com.ardor3d.renderer.effect.EffectManager;
 import com.ardor3d.renderer.effect.FrameBufferOutputEffect;
+import com.ardor3d.renderer.effect.SimpleBloomEffect;
 import com.ardor3d.renderer.effect.SpatialRTTEffect;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
@@ -89,24 +90,25 @@ public class RenderEffectsExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         sphere.setRenderState(ts);
+        sphere.setRenderMaterial("lit/textured/basic_phong.yaml");
 
         // Setup our manager
         effectManager = new EffectManager(_settings, TextureStoreFormat.RGBA8);
         effectManager.setSceneCamera(_canvas.getCanvasRenderer().getCamera());
 
         // Add a step to draw our scene to our scene texture.
-        effectManager.addEffect(new SpatialRTTEffect("*Next", null, _root));
-
-        // Add a bloom effect
-//        final SimpleBloomEffect bloomEffect = new SimpleBloomEffect();
-//        effectManager.addEffect(bloomEffect);
+        effectManager.addEffect(new SpatialRTTEffect(EffectManager.RT_NEXT, null, _root));
 
         // Add a sepia tone post effect
         final Texture sepiaTexture = TextureManager.load(new URLResourceSource(ResourceLocatorTool
-                .getClassPathResource(ColorReplaceEffect.class, "com/ardor3d/extension/effect/sepiatone.png")),
+                .getClassPathResource(ColorReplaceEffect.class, "com/ardor3d/renderer/texture/sepiatone.png")),
                 Texture.MinificationFilter.Trilinear, true);
         final ColorReplaceEffect sepiaEffect = new ColorReplaceEffect(sepiaTexture);
         effectManager.addEffect(sepiaEffect);
+
+        // Add a bloom effect
+        final SimpleBloomEffect bloomEffect = new SimpleBloomEffect();
+        effectManager.addEffect(bloomEffect);
 
         // Finally, add a step to draw the result to the framebuffer
         final FrameBufferOutputEffect out = new FrameBufferOutputEffect();
@@ -124,41 +126,44 @@ public class RenderEffectsExample extends ExampleBase {
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE), new TriggerAction() {
             @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//                bloomEffect.setEnabled(!bloomEffect.isEnabled());
-//                updateText();
+                sepiaEffect.setEnabled(!sepiaEffect.isEnabled());
+                updateText();
             }
         }));
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.TWO), new TriggerAction() {
             @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                sepiaEffect.setEnabled(!sepiaEffect.isEnabled());
+                bloomEffect.setEnabled(!bloomEffect.isEnabled());
                 updateText();
             }
         }));
 
         // setup text labels
         for (int i = 0; i < exampleInfo.length; i++) {
-            exampleInfo[i] = BasicText.createDefaultTextLabel("Text", "", 16);
+            exampleInfo[i] = BasicText.createDefaultTextLabel("Text", "...", 16);
             exampleInfo[i].setTranslation(
                     new Vector3(10, _canvas.getCanvasRenderer().getCamera().getHeight() - (i + 1) * 20, 0));
             textNodes.attachChild(exampleInfo[i]);
         }
 
-        textNodes.updateGeometricState(0.0);
+        _orthoRoot.attachChild(textNodes);
         updateText();
     }
 
     @Override
     protected void renderExample(final Renderer renderer) {
         effectManager.renderEffects(renderer);
-        textNodes.onDraw(renderer);
+        _orthoCam.apply(renderer);
+        _orthoRoot.onDraw(renderer);
+        renderer.renderBuckets();
+        _canvas.getCanvasRenderer().getCamera().apply(renderer);
     }
 
     /**
      * Update text information.
      */
     private void updateText() {
-//        exampleInfo[0].setText("[1] Bloom effect: " + effectManager.getEffects().get(1).isEnabled());
-//        exampleInfo[1].setText("[2] Sepia effect: " + effectManager.getEffects().get(2).isEnabled());
+        exampleInfo[0].setText("[1] Sepia effect: " + effectManager.getEffects().get(1).isEnabled());
+        exampleInfo[1].setText("[2] Bloom effect: " + effectManager.getEffects().get(2).isEnabled());
     }
 }

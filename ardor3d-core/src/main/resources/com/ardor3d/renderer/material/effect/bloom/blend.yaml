@@ -1,0 +1,28 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor]
+          - 
+            shaderKey: scene
+            type: Int1
+            value: 0
+          - 
+            shaderKey: bloomBlur
+            type: Int1
+            value: 1
+          # NOTE: exposure will be injected
+          
+            
+        shaders: 
+          Vertex: 
+            source: unlit/fsq.vert
+            define: UV_COUNT 1
+                        
+          Fragment:
+            source: effect/bloom/blend.frag

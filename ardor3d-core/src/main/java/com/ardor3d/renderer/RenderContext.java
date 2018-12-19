@@ -14,6 +14,7 @@ import java.util.EmptyStackException;
 import java.util.EnumMap;
 import java.util.Stack;
 
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.LineRecord;
@@ -42,6 +43,9 @@ public class RenderContext {
 
     protected final EnumMap<RenderState.StateType, StateRecord> _stateRecords = new EnumMap<RenderState.StateType, StateRecord>(
             RenderState.StateType.class);
+
+    protected RenderMaterial _enforcedMaterial = null;
+    protected Stack<RenderMaterial> _materialBackStack = new Stack<>();
 
     protected final LineRecord _lineRecord = new LineRecord();
     protected final RendererRecord _rendererRecord = createRendererRecord();
@@ -167,6 +171,14 @@ public class RenderContext {
         return _currentStates.get(type);
     }
 
+    public void enforceMaterial(final RenderMaterial material) {
+        _enforcedMaterial = material;
+    }
+
+    public RenderMaterial getEnforcedMaterial() {
+        return _enforcedMaterial;
+    }
+
     public Object getContextKey() {
         return _contextKey;
     }
@@ -203,6 +215,14 @@ public class RenderContext {
     public void popEnforcedStates() {
         _enforcedStates.clear();
         _enforcedStates.putAll(_enforcedBackStack.pop());
+    }
+
+    public void pushEnforcedMaterial() {
+        _materialBackStack.push(_enforcedMaterial);
+    }
+
+    public void popEnforcedMaterial() {
+        _enforcedMaterial = _materialBackStack.pop();
     }
 
     public void pushFBOTextureRenderer(final AbstractFBOTextureRenderer top) {

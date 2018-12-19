@@ -1,26 +1,30 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.renderer.effect;
+package com.ardor3d.renderer.effect.step;
 
 import java.util.EnumMap;
 import java.util.Map;
 
+import com.ardor3d.renderer.effect.EffectManager;
+import com.ardor3d.renderer.effect.rendertarget.RenderTarget;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.TextureState;
 import com.google.common.collect.Maps;
 
 public class EffectStep_RenderScreenOverlay implements EffectStep {
 
     private final EnumMap<StateType, RenderState> _states = Maps.newEnumMap(StateType.class);
+    private RenderMaterial _enforcedMaterial;
     private final TextureState _texState = new TextureState();
     private final Map<String, Integer> _targetMap = Maps.newHashMap();
 
@@ -38,7 +42,7 @@ public class EffectStep_RenderScreenOverlay implements EffectStep {
         }
 
         // render a quad to the screen using our states.
-        manager.renderFullScreenQuad(_states);
+        manager.renderFullScreenQuad(_enforcedMaterial, _states);
     }
 
     public TextureState getTextureState() {
@@ -47,6 +51,22 @@ public class EffectStep_RenderScreenOverlay implements EffectStep {
 
     public EnumMap<StateType, RenderState> getEnforcedStates() {
         return _states;
+    }
+
+    public void setEnforcedState(final RenderState state) {
+        _states.put(state.getType(), state);
+    }
+
+    public void clearEnforcedState(final StateType type) {
+        _states.remove(type);
+    }
+
+    public void setEnforcedMaterial(final RenderMaterial enforcedMaterial) {
+        _enforcedMaterial = enforcedMaterial;
+    }
+
+    public RenderMaterial getEnforcedMaterial() {
+        return _enforcedMaterial;
     }
 
     public Map<String, Integer> getTargetMap() {

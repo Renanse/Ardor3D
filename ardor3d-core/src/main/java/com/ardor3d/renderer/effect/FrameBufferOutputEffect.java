@@ -1,8 +1,19 @@
+/**
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ */
 
 package com.ardor3d.renderer.effect;
 
+import com.ardor3d.renderer.effect.step.EffectStep_RenderScreenOverlay;
+import com.ardor3d.renderer.effect.step.EffectStep_SetRenderTarget;
+import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.RenderState.StateType;
 
 public class FrameBufferOutputEffect extends RenderEffect {
 
@@ -11,11 +22,14 @@ public class FrameBufferOutputEffect extends RenderEffect {
     @Override
     public void prepare(final EffectManager manager) {
         _steps.clear();
-        _steps.add(new EffectStep_SetRenderTarget("*Framebuffer"));
+        _steps.add(new EffectStep_SetRenderTarget(EffectManager.RT_FRAMEBUFFER));
 
         final EffectStep_RenderScreenOverlay drawStep = new EffectStep_RenderScreenOverlay();
-        drawStep.getTargetMap().put("*Previous", 0);
-        drawStep.getEnforcedStates().put(StateType.Blend, _blend);
+        drawStep.getTargetMap().put(EffectManager.RT_PREVIOUS, 0);
+        if (_blend != null) {
+            drawStep.setEnforcedState(_blend);
+        }
+        drawStep.setEnforcedMaterial(MaterialManager.INSTANCE.findMaterial("unlit/textured/fsq.yaml"));
         _steps.add(drawStep);
 
         super.prepare(manager);

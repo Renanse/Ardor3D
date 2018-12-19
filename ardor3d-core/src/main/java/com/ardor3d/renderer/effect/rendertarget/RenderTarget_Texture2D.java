@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.renderer.effect;
+package com.ardor3d.renderer.effect.rendertarget;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -19,6 +19,9 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.effect.EffectManager;
+import com.ardor3d.renderer.effect.TextureRendererPool;
+import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.texture.TextureRenderer;
@@ -43,18 +46,19 @@ public class RenderTarget_Texture2D implements RenderTarget {
 
     @Override
     public void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
-            final EnumMap<StateType, RenderState> enforcedStates) {
-        render(effectManager.getCurrentRenderer(), camera, spatials, null, enforcedStates);
+            final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+        render(effectManager.getCurrentRenderer(), camera, spatials, null, enforcedMaterial, enforcedStates);
     }
 
     @Override
     public void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
-            final EnumMap<StateType, RenderState> enforcedStates) {
-        render(effectManager.getCurrentRenderer(), camera, null, spatial, enforcedStates);
+            final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+        render(effectManager.getCurrentRenderer(), camera, null, spatial, enforcedMaterial, enforcedStates);
     }
 
     protected void render(final Renderer renderer, final Camera camera, final List<Spatial> spatials,
-            final Spatial spatial, final EnumMap<StateType, RenderState> enforcedStates) {
+            final Spatial spatial, final RenderMaterial enforcedMaterial,
+            final EnumMap<StateType, RenderState> enforcedStates) {
         final TextureRenderer texRend = TextureRendererPool.fetch(_width, _height, renderer);
         if (!_texSetup) {
             texRend.setupTexture(_texture);
@@ -71,6 +75,7 @@ public class RenderTarget_Texture2D implements RenderTarget {
             texRend.getCamera().setProjectionMode(camera.getProjectionMode());
         }
 
+        texRend.enforceMaterial(enforcedMaterial);
         texRend.enforceStates(enforcedStates);
 
         // draw to texture
@@ -81,6 +86,7 @@ public class RenderTarget_Texture2D implements RenderTarget {
         }
 
         texRend.clearEnforcedStates();
+        texRend.enforceMaterial(null);
         TextureRendererPool.release(texRend);
     }
 

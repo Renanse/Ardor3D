@@ -23,6 +23,8 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -66,7 +68,9 @@ public enum MaterialManager {
     public MaterialTechnique chooseTechnique(final Mesh mesh) {
 
         // find the local or inherited material for the given mesh
-        RenderMaterial material = mesh.getWorldRenderMaterial();
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RenderMaterial enforced = context.getEnforcedMaterial();
+        RenderMaterial material = enforced != null ? enforced : mesh.getWorldRenderMaterial();
 
         // if we have no material, use any set default
         if (material == null) {
@@ -185,4 +189,48 @@ public enum MaterialManager {
         return text;
     }
 
+    public static String inject(String program, final Iterable<String> injects) {
+        if (program == null) {
+            return null;
+        }
+
+        program = program.trim();
+        if (injects == null || !program.startsWith("#version")) {
+            return program;
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        int firstLF = program.indexOf('\n');
+        if (firstLF == -1) {
+            firstLF = program.indexOf('\r');
+        }
+        sb.append(program.substring(0, firstLF));
+        sb.append('\n');
+        injects.forEach((final String inj) -> sb.append(inj).append('\n'));
+        sb.append(program.substring(firstLF + 1));
+        return sb.toString();
+    }
+
+    public static String inject(String program, final String line) {
+        if (program == null) {
+            return null;
+        }
+
+        program = program.trim();
+        if (line == null || !program.startsWith("#version")) {
+            return program;
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        int firstLF = program.indexOf('\n');
+        if (firstLF == -1) {
+            firstLF = program.indexOf('\r');
+        }
+        sb.append(program.substring(0, firstLF));
+        sb.append('\n');
+        sb.append(line);
+        sb.append('\n');
+        sb.append(program.substring(firstLF + 1));
+        return sb.toString();
+    }
 }

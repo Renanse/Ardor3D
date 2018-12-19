@@ -1,0 +1,13 @@
+--- # untextured, full screen quad
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+
+        shaders: 
+          Vertex: 
+            source: unlit/fsq.vert
+            
+          Fragment:
+            source: unlit/unlit_modulate.frag

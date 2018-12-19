@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2018 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,7 @@ package com.ardor3d.renderer.effect;
 
 import java.util.List;
 
+import com.ardor3d.renderer.effect.step.EffectStep;
 import com.google.common.collect.Lists;
 
 /**
@@ -28,14 +29,14 @@ public abstract class RenderEffect {
 
     /**
      * Do any setup necessary for our effect prior. This should be called only once, or on changes to the effect chain.
-     * 
+     *
      * @param manager
      */
     public void prepare(final EffectManager manager) {}
 
     /**
      * Render this effect.
-     * 
+     *
      * @param manager
      */
     public void render(final EffectManager manager) {

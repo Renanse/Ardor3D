@@ -1,0 +1,23 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor]
+          - 
+            shaderKey: inputTex
+            type: Int1
+            value: 0
+            
+        shaders: 
+          Vertex: 
+            source: unlit/fsq.vert
+            define: UV_COUNT 1
+                        
+          Fragment:
+            source: effect/bloom/blur_5x5.frag
+            define: HORIZONTAL false
