@@ -145,21 +145,6 @@ public class SimpleBloomEffect extends RenderEffect {
         manager.getRenderTargetMap().put(RT_SECONDARY, secondary);
     }
 
-//    protected ShaderState getBlendShader() {
-//        final ShaderState shader = new ShaderState();
-//        try {
-//            shader.setShader(ShaderType.Vertex, ResourceLocatorTool
-//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "fsq.vert"));
-//            shader.setShader(ShaderType.Fragment, ResourceLocatorTool
-//                    .getClassPathResourceAsString(SimpleBloomEffect.class, shaderDirectory + "add2textures.frag"));
-//        } catch (final Exception e) {
-//            e.printStackTrace();
-//        }
-//        shader.setUniform("tex1", 0);
-//        shader.setUniform("tex2", 1);
-//        return shader;
-//    }
-
     public void setExposureIntensity(final float value) {
         _exposureIntensity = value;
     }
