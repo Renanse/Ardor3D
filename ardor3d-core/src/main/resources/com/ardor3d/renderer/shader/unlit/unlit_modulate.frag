@@ -6,6 +6,9 @@
 
 out vec4 FragColor;
 
+in vec3 WorldPos;
+in vec4 ViewPos;
+
 #ifdef FLAT_COLORS
 flat in vec4 DiffuseColor;
 #else

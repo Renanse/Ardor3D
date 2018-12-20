@@ -43,7 +43,7 @@ void main()
   
 	//-- lookup clip colors
     vec4 texCol  = clipTexColor(texture,   unit1, unit2, texCoord1, texCoord2, offset1, offset2, fadeCoord, textureSize, texelSize, showDebug);
-    vec4 normCol = clipTexColor(normalMap, unit1, unit2, texCoord1, texCoord2, offset1, offset2, fadeCoord, textureSize, texelSize, showDebug) * vec4(2.0) - vec4(1.0);
+    vec4 normCol = clipTexColor(normalMap, unit1, unit2, texCoord1, texCoord2, offset1, offset2, fadeCoord, textureSize, texelSize, 0) * vec4(2.0) - vec4(1.0);
 
     vec3 nLightDir = normalize(-lightDir.xyz);
     vec3 n = normalize(normCol.xyz);

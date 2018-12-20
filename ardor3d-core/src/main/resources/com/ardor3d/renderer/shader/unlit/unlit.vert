@@ -12,6 +12,9 @@ uniform vec4 defaultColor;
 in vec4 color;
 #endif
 
+out vec3 WorldPos;
+out vec4 ViewPos;
+
 #ifdef FLAT_COLORS
 flat out vec4 DiffuseColor;
 #else
@@ -39,6 +42,9 @@ out vec4 DiffuseColor;
 
 void main()
 {
+    WorldPos = vec3(model * vec4(vertex, 1.0));
+    ViewPos = view * vec4(WorldPos, 1.0);
+    
 #ifndef VERT_COLORS
     DiffuseColor = defaultColor;
 #else
