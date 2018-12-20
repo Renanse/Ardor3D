@@ -137,11 +137,9 @@ public class TextureClipmap {
 
         terrain.setProperty("minLevel", currentShownLevels);
         terrain.setProperty("scale", 1f / getScale());
-        terrain.setProperty("textureSize", (float) getTextureSize());
-        terrain.setProperty("texelSize", 1f / getTextureSize());
-        terrain.setProperty("levels", (float) getTextureLevels());
-        terrain.setProperty("validLevels", (float) getValidLevels() - 1);
-        terrain.setProperty("showDebug", isShowDebug() ? 1.0f : 0.0f);
+        terrain.setProperty("levels", getTextureLevels());
+        terrain.setProperty("validLevels", getValidLevels() - 1);
+        terrain.setProperty("showDebug", isShowDebug() ? 1 : 0);
     }
 
     public void update(final Renderer renderer, final ReadOnlyVector3 eyePos) {

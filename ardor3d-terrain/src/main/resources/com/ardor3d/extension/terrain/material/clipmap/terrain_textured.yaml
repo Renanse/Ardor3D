@@ -7,7 +7,7 @@ techniques:
           - key: vertex
 
         uniforms: 
-          - builtIn: [model, view, projection]
+          - builtIn: [model, view, projection, fogParams]
           - 
             shaderKey: eyePosition
             type: Float3
@@ -18,35 +18,27 @@ techniques:
             source: SpatialProperty
           - 
             shaderKey: vertexDistance
-            type: Float1
+            type: Int1
             source: SpatialProperty
           - 
             shaderKey: clipSideSize
-            type: Float1
+            type: Int1
             source: SpatialProperty
           - 
             shaderKey: levels
-            type: Float1
+            type: Int1
             source: SpatialProperty
           - 
             shaderKey: minLevel
-            type: Float1
+            type: Int1
             source: SpatialProperty
           - 
             shaderKey: validLevels
-            type: Float1
-            source: SpatialProperty
-          - 
-            shaderKey: textureSize
-            type: Float1
-            source: SpatialProperty
-          - 
-            shaderKey: texelSize
-            type: Float1
+            type: Int1
             source: SpatialProperty
           - 
             shaderKey: showDebug
-            type: Float1
+            type: Int1
             source: SpatialProperty
           - 
             shaderKey: sliceOffset
@@ -59,3 +51,4 @@ techniques:
 
           Fragment:
             source: clipmap/terrain.frag
+            defines: [USE_FOG]
