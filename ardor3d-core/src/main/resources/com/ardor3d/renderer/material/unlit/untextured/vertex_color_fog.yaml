@@ -1,0 +1,20 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: color
+          
+        uniforms: 
+          - builtIn: [model, view, projection]
+
+        shaders: 
+          Vertex: 
+            source: unlit/unlit.vert
+            define: VERT_COLORS
+            
+          Fragment:
+            source: unlit/unlit_modulate.frag
+            defines: [USE_FOG]
+            

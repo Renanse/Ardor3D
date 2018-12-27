@@ -1,0 +1,19 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor]
+            
+        shaders: 
+          Vertex: 
+            source: unlit/unlit.vert
+            define: UV_COUNT 1
+                        
+          Fragment:
+            source: unlit/unlit_modulate.frag
+            defines: [UV_COUNT 1, USE_FOG]
