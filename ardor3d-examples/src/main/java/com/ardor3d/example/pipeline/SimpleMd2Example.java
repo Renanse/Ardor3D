@@ -23,6 +23,7 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.resource.MultiFormatResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 
@@ -62,6 +63,8 @@ public class SimpleMd2Example extends ExampleBase {
         model.setRotation(new Quaternion().fromAngleAxis(-MathUtils.HALF_PI, Vector3.UNIT_X));
         // attack to root
         _root.attachChild(model);
+        _root.updateWorldRenderStates(true);
+        MaterialUtil.autoMaterials(_root);
 
         // speed us up a little
         final KeyframeController<Mesh> controller = storage.getController();
