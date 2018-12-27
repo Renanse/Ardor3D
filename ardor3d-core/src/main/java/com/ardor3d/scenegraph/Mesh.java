@@ -380,8 +380,9 @@ public class Mesh extends Spatial implements Renderable, Pickable {
      * @return the compiled RenderState for this Mesh, either from RenderStates applied locally or those inherited from
      *         this Mesh's ancestors. May be null if a state of the given type was never applied in either place.
      */
-    public RenderState getWorldRenderState(final StateType type) {
-        return _states.get(type);
+    @SuppressWarnings("unchecked")
+    public <T extends RenderState> T getWorldRenderState(final StateType type) {
+        return (T) _states.get(type);
     }
 
     /**
