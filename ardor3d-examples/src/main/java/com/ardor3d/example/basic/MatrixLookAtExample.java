@@ -24,6 +24,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
@@ -95,5 +96,7 @@ public class MatrixLookAtExample extends ExampleBase {
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
 
         _root.setRenderState(ts);
+        _root.updateWorldRenderStates(true);
+        MaterialUtil.autoMaterials(_root);
     }
 }
