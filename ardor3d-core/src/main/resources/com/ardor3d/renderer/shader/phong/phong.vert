@@ -47,7 +47,7 @@ void main()
 {
     WorldPos = vec3(model * vec4(vertex, 1.0));
     ViewPos = view * vec4(WorldPos, 1.0);
-    Normal = normalMat * normal;
+    Normal = normalize(normalMat * normal);
 
 #ifndef VERT_COLORS
     DiffuseColor = defaultColor;
