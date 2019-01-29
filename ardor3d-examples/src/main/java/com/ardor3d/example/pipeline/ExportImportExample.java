@@ -31,6 +31,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.binary.BinaryExporter;
@@ -44,8 +45,8 @@ import com.ardor3d.util.geom.BufferUtils;
  * stream.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ExportImportExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
+        maxHeapMemory = 64)
 public class ExportImportExample extends ExampleBase {
     private static final Logger logger = Logger.getLogger(ExportImportExample.class.getName());
 
@@ -115,6 +116,10 @@ public class ExportImportExample extends ExampleBase {
         originalNode.attachChild(multiStrip);
         originalNode.attachChild(teapot);
 
+        // attach and set material
+        _root.attachChild(originalNode);
+        MaterialUtil.autoMaterials(originalNode);
+
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             new BinaryExporter().save(originalNode, bos);
@@ -123,7 +128,6 @@ public class ExportImportExample extends ExampleBase {
         }
 
         originalNode.setTranslation(new Vector3(-80, 0, -400));
-        _root.attachChild(originalNode);
 
         try {
             binaryImportedNode = (Node) new BinaryImporter().load(bos.toByteArray());

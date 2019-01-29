@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,8 @@
 package com.ardor3d.util.export.binary;
 
 public class BinaryClassField {
+
+    public static final byte UNHANDLED = -1;
 
     public static final byte BYTE = 0;
     public static final byte BYTE_1D = 1;
@@ -56,6 +58,7 @@ public class BinaryClassField {
 
     public static final byte SAVABLE_MAP = 105;
     public static final byte STRING_SAVABLE_MAP = 106;
+    public static final byte STRING_OBJECT_MAP = 107;
 
     public static final byte FLOATBUFFER_ARRAYLIST = 110;
     public static final byte BYTEBUFFER_ARRAYLIST = 111;

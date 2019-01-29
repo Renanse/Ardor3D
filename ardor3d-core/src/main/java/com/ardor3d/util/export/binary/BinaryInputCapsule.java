@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -23,6 +23,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,172 +55,12 @@ public class BinaryInputCapsule implements InputCapsule {
 
             try {
                 final byte type = _cObj._aliasFields.get(alias)._type;
-                Object value = null;
-
-                switch (type) {
-                    case BinaryClassField.BITSET: {
-                        value = readBitSet(content);
-                        break;
-                    }
-                    case BinaryClassField.BOOLEAN: {
-                        value = readBoolean(content);
-                        break;
-                    }
-                    case BinaryClassField.BOOLEAN_1D: {
-                        value = readBooleanArray(content);
-                        break;
-                    }
-                    case BinaryClassField.BOOLEAN_2D: {
-                        value = readBooleanArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.BYTE: {
-                        value = readByte(content);
-                        break;
-                    }
-                    case BinaryClassField.BYTE_1D: {
-                        value = readByteArray(content);
-                        break;
-                    }
-                    case BinaryClassField.BYTE_2D: {
-                        value = readByteArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.BYTEBUFFER: {
-                        value = readByteBuffer(content);
-                        break;
-                    }
-                    case BinaryClassField.DOUBLE: {
-                        value = readDouble(content);
-                        break;
-                    }
-                    case BinaryClassField.DOUBLE_1D: {
-                        value = readDoubleArray(content);
-                        break;
-                    }
-                    case BinaryClassField.DOUBLE_2D: {
-                        value = readDoubleArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.FLOAT: {
-                        value = readFloat(content);
-                        break;
-                    }
-                    case BinaryClassField.FLOAT_1D: {
-                        value = readFloatArray(content);
-                        break;
-                    }
-                    case BinaryClassField.FLOAT_2D: {
-                        value = readFloatArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.FLOATBUFFER: {
-                        value = readFloatBuffer(content);
-                        break;
-                    }
-                    case BinaryClassField.FLOATBUFFER_ARRAYLIST: {
-                        value = readFloatBufferArrayList(content);
-                        break;
-                    }
-                    case BinaryClassField.BYTEBUFFER_ARRAYLIST: {
-                        value = readByteBufferArrayList(content);
-                        break;
-                    }
-                    case BinaryClassField.INT: {
-                        value = readInt(content);
-                        break;
-                    }
-                    case BinaryClassField.INT_1D: {
-                        value = readIntArray(content);
-                        break;
-                    }
-                    case BinaryClassField.INT_2D: {
-                        value = readIntArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.INTBUFFER: {
-                        value = readIntBuffer(content);
-                        break;
-                    }
-                    case BinaryClassField.LONG: {
-                        value = readLong(content);
-                        break;
-                    }
-                    case BinaryClassField.LONG_1D: {
-                        value = readLongArray(content);
-                        break;
-                    }
-                    case BinaryClassField.LONG_2D: {
-                        value = readLongArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE: {
-                        value = readSavable(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE_1D: {
-                        value = readSavableArray(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE_2D: {
-                        value = readSavableArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE_ARRAYLIST: {
-                        value = readSavableArray(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE_ARRAYLIST_1D: {
-                        value = readSavableArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE_ARRAYLIST_2D: {
-                        value = readSavableArray3D(content);
-                        break;
-                    }
-                    case BinaryClassField.SAVABLE_MAP: {
-                        value = readSavableMap(content);
-                        break;
-                    }
-                    case BinaryClassField.STRING_SAVABLE_MAP: {
-                        value = readStringSavableMap(content);
-                        break;
-                    }
-                    case BinaryClassField.SHORT: {
-                        value = readShort(content);
-                        break;
-                    }
-                    case BinaryClassField.SHORT_1D: {
-                        value = readShortArray(content);
-                        break;
-                    }
-                    case BinaryClassField.SHORT_2D: {
-                        value = readShortArray2D(content);
-                        break;
-                    }
-                    case BinaryClassField.SHORTBUFFER: {
-                        value = readShortBuffer(content);
-                        break;
-                    }
-                    case BinaryClassField.STRING: {
-                        value = readString(content);
-                        break;
-                    }
-                    case BinaryClassField.STRING_1D: {
-                        value = readStringArray(content);
-                        break;
-                    }
-                    case BinaryClassField.STRING_2D: {
-                        value = readStringArray2D(content);
-                        break;
-                    }
-
-                    default:
-                        // skip put statement
-                        continue;
+                final AtomicReference<Object> reference = new AtomicReference<>(null);
+                if (!readContentOfType(content, type, reference)) {
+                    continue;
                 }
 
-                _fieldData.put(alias, value);
+                _fieldData.put(alias, reference.get());
 
             } catch (final IOException e) {
                 logger.logp(Level.SEVERE, this.getClass().toString(), "setContent(byte[] content)", "Exception", e);
@@ -516,7 +357,7 @@ public class BinaryInputCapsule implements InputCapsule {
         if (savables == null) {
             return null;
         }
-        final List<Savable> list = new ArrayList<Savable>(savables.length);
+        final List<Savable> list = new ArrayList<>(savables.length);
         for (int x = 0; x < savables.length; x++) {
             list.add(savables[x]);
         }
@@ -528,7 +369,7 @@ public class BinaryInputCapsule implements InputCapsule {
         if (savables == null) {
             return null;
         }
-        final Map<Savable, Savable> map = new HashMap<Savable, Savable>(savables.length);
+        final Map<Savable, Savable> map = new HashMap<>(savables.length);
         for (int x = 0; x < savables.length; x++) {
             map.put(savables[x][0], savables[x][1]);
         }
@@ -543,6 +384,19 @@ public class BinaryInputCapsule implements InputCapsule {
         final Map<String, Savable> map = new HashMap<String, Savable>(keys.length);
         for (int x = 0; x < keys.length; x++) {
             map.put(keys[x], values[x]);
+        }
+
+        return map;
+    }
+
+    private Map<String, Object> stringObjectMapFromKV(final StringObjectMap mapItems) {
+        if (mapItems == null || mapItems.keys == null || mapItems.values == null) {
+            return null;
+        }
+
+        final Map<String, Object> map = new HashMap<>(mapItems.keys.length);
+        for (int x = 0; x < mapItems.keys.length; x++) {
+            map.put(mapItems.keys[x], mapItems.values[x]);
         }
 
         return map;
@@ -634,6 +488,7 @@ public class BinaryInputCapsule implements InputCapsule {
         return (Map<K, V>) value;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <V extends Savable> Map<String, V> readStringSavableMap(final String name, final Map<String, V> defVal)
             throws IOException {
@@ -650,6 +505,23 @@ public class BinaryInputCapsule implements InputCapsule {
             _fieldData.put(field._alias, value);
         }
         return (Map<String, V>) value;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> readStringObjectMap(final String name, final Map<String, Object> defVal)
+            throws IOException {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
+            return defVal;
+        }
+        Object value = _fieldData.get(field._alias);
+        if (value instanceof StringObjectMap) {
+            // read and convert to Map values
+            value = stringObjectMapFromKV((StringObjectMap) value);
+            _fieldData.put(field._alias, value);
+        }
+        return (Map<String, Object>) value;
     }
 
     public short readShort(final String name, final short defVal) throws IOException {
@@ -941,13 +813,13 @@ public class BinaryInputCapsule implements InputCapsule {
 
     /*
      * UTF-8 crash course:
-     * 
+     *
      * UTF-8 codepoints map to UTF-16 codepoints and vv, which is what Java uses for it's Strings. (so a UTF-8 codepoint
      * can contain all possible values for a Java char)
-     * 
+     *
      * A UTF-8 codepoint can be 1, 2 or 3 bytes long. How long a codepoint is can be told by reading the first byte: b <
      * 0x80, 1 byte (b & 0xC0) == 0xC0, 2 bytes (b & 0xE0) == 0xE0, 3 bytes
-     * 
+     *
      * However there is an additional restriction to UTF-8, to enable you to find the start of a UTF-8 codepoint, if you
      * start reading at a random point in a UTF-8 byte stream. That's why UTF-8 requires for the second and third byte
      * of a multibyte codepoint: (b & 0x80) == 0x80 (in other words, first bit must be 1)
@@ -968,30 +840,30 @@ public class BinaryInputCapsule implements InputCapsule {
         /*
          * We'll transfer the bytes into a separate byte array. While we do that we'll take the opportunity to check if
          * the byte data is valid UTF-8.
-         * 
+         *
          * If it is not UTF-8 it is most likely saved with the BinaryOutputCapsule bug, that saves Strings using their
          * native encoding. Unfortunatly there is no way to know what encoding was used, so we'll parse using the most
          * common one in that case; latin-1 aka ISO8859_1
-         * 
+         *
          * Encoding of "low" ASCII codepoint (in plain speak: when no special characters are used) will usually look the
          * same for UTF-8 and the other 1 byte codepoint encodings (espc true for numbers and regular letters of the
          * alphabet). So these are valid UTF-8 and will give the same result (at most a few charakters will appear
          * different, such as the euro sign).
-         * 
+         *
          * However, when "high" codepoints are used (any codepoint that over 0x7F, in other words where the first bit is
          * a 1) it's a different matter and UTF-8 and the 1 byte encoding greatly will differ, as well as most 1 byte
          * encodings relative to each other.
-         * 
+         *
          * It is impossible to detect which one-byte encoding is used. Since UTF8 and practically all 1-byte encodings
          * share the most used characters (the "none-high" ones) parsing them will give the same result. However, not
          * all byte sequences are legal in UTF-8 (see explantion above). If not UTF-8 encoded content is detected we
          * therefor fallback on latin1. We also log a warning.
-         * 
+         *
          * By this method we detect all use of 1 byte encoding if they: - use a "high" codepoint after a "low" codepoint
          * or a sequence of codepoints that is valid as UTF-8 bytes, that starts with 1000 - use a "low" codepoint after
          * a "high" codepoint - use a "low" codepoint after "high" codepoint, after a "high" codepoint that starts with
          * 1110
-         * 
+         *
          * In practice this means that unless 2 or 3 "high" codepoints are used after each other in proper order, we'll
          * detect the string was not originally UTF-8 encoded.
          */
@@ -1051,8 +923,7 @@ public class BinaryInputCapsule implements InputCapsule {
             // JavaDoc is vague about what happens when a decoding a String that contains un undecodable sequence
             // it also doesn't specify which encodings have to be supported (though UTF-8 and ISO8859 have been in the
             // SUN JRE since at least 1.1)
-            logger.log(
-                    Level.SEVERE,
+            logger.log(Level.SEVERE,
                     "Your export has been saved with an incorrect encoding or your version of Java is unable to decode the stored string. "
                             + "While your export may load correctly by falling back, using it on different platforms or java versions might lead to "
                             + "very strange inconsitenties. You should probably re-export your work.");
@@ -1191,6 +1062,198 @@ public class BinaryInputCapsule implements InputCapsule {
         rVal.keys = keys;
         rVal.values = values;
         return rVal;
+    }
+
+    protected StringObjectMap readStringObjectMap(final byte[] content) throws IOException {
+        final int elements = readInt(content);
+        if (elements == BinaryOutputCapsule.NULL_OBJECT) {
+            return null;
+        }
+        final String[] keys = new String[elements];
+        for (int i = 0; i < keys.length; i++) {
+            keys[i] = readString(content);
+        }
+
+        final Object[] values = new Object[elements];
+        final AtomicReference<Object> reference = new AtomicReference<>(null);
+        for (int i = 0; i < values.length; i++) {
+            reference.set(null);
+            final byte type = readByte(content);
+            readContentOfType(content, type, reference);
+            values[i] = reference.get();
+        }
+
+        final StringObjectMap rVal = new StringObjectMap();
+        rVal.keys = keys;
+        rVal.values = values;
+        return rVal;
+    }
+
+    protected boolean readContentOfType(final byte[] content, final byte type, final AtomicReference<Object> reference)
+            throws IOException {
+        switch (type) {
+            case BinaryClassField.BITSET: {
+                reference.set(readBitSet(content));
+                return true;
+            }
+            case BinaryClassField.BOOLEAN: {
+                reference.set(readBoolean(content));
+                return true;
+            }
+            case BinaryClassField.BOOLEAN_1D: {
+                reference.set(readBooleanArray(content));
+                return true;
+            }
+            case BinaryClassField.BOOLEAN_2D: {
+                reference.set(readBooleanArray2D(content));
+                return true;
+            }
+            case BinaryClassField.BYTE: {
+                reference.set(readByte(content));
+                return true;
+            }
+            case BinaryClassField.BYTE_1D: {
+                reference.set(readByteArray(content));
+                return true;
+            }
+            case BinaryClassField.BYTE_2D: {
+                reference.set(readByteArray2D(content));
+                return true;
+            }
+            case BinaryClassField.BYTEBUFFER: {
+                reference.set(readByteBuffer(content));
+                return true;
+            }
+            case BinaryClassField.DOUBLE: {
+                reference.set(readDouble(content));
+                return true;
+            }
+            case BinaryClassField.DOUBLE_1D: {
+                reference.set(readDoubleArray(content));
+                return true;
+            }
+            case BinaryClassField.DOUBLE_2D: {
+                reference.set(readDoubleArray2D(content));
+                return true;
+            }
+            case BinaryClassField.FLOAT: {
+                reference.set(readFloat(content));
+                return true;
+            }
+            case BinaryClassField.FLOAT_1D: {
+                reference.set(readFloatArray(content));
+                return true;
+            }
+            case BinaryClassField.FLOAT_2D: {
+                reference.set(readFloatArray2D(content));
+                return true;
+            }
+            case BinaryClassField.FLOATBUFFER: {
+                reference.set(readFloatBuffer(content));
+                return true;
+            }
+            case BinaryClassField.FLOATBUFFER_ARRAYLIST: {
+                reference.set(readFloatBufferArrayList(content));
+                return true;
+            }
+            case BinaryClassField.BYTEBUFFER_ARRAYLIST: {
+                reference.set(readByteBufferArrayList(content));
+                return true;
+            }
+            case BinaryClassField.INT: {
+                reference.set(readInt(content));
+                return true;
+            }
+            case BinaryClassField.INT_1D: {
+                reference.set(readIntArray(content));
+                return true;
+            }
+            case BinaryClassField.INT_2D: {
+                reference.set(readIntArray2D(content));
+                return true;
+            }
+            case BinaryClassField.INTBUFFER: {
+                reference.set(readIntBuffer(content));
+                return true;
+            }
+            case BinaryClassField.LONG: {
+                reference.set(readLong(content));
+                return true;
+            }
+            case BinaryClassField.LONG_1D: {
+                reference.set(readLongArray(content));
+                return true;
+            }
+            case BinaryClassField.LONG_2D: {
+                reference.set(readLongArray2D(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE: {
+                reference.set(readSavable(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE_1D: {
+                reference.set(readSavableArray(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE_2D: {
+                reference.set(readSavableArray2D(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE_ARRAYLIST: {
+                reference.set(readSavableArray(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE_ARRAYLIST_1D: {
+                reference.set(readSavableArray2D(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE_ARRAYLIST_2D: {
+                reference.set(readSavableArray3D(content));
+                return true;
+            }
+            case BinaryClassField.SAVABLE_MAP: {
+                reference.set(readSavableMap(content));
+                return true;
+            }
+            case BinaryClassField.STRING_SAVABLE_MAP: {
+                reference.set(readStringSavableMap(content));
+                return true;
+            }
+            case BinaryClassField.STRING_OBJECT_MAP: {
+                reference.set(readStringObjectMap(content));
+                return true;
+            }
+            case BinaryClassField.SHORT: {
+                reference.set(readShort(content));
+                return true;
+            }
+            case BinaryClassField.SHORT_1D: {
+                reference.set(readShortArray(content));
+                return true;
+            }
+            case BinaryClassField.SHORT_2D: {
+                reference.set(readShortArray2D(content));
+                return true;
+            }
+            case BinaryClassField.SHORTBUFFER: {
+                reference.set(readShortBuffer(content));
+                return true;
+            }
+            case BinaryClassField.STRING: {
+                reference.set(readString(content));
+                return true;
+            }
+            case BinaryClassField.STRING_1D: {
+                reference.set(readStringArray(content));
+                return true;
+            }
+            case BinaryClassField.STRING_2D: {
+                reference.set(readStringArray2D(content));
+                return true;
+            }
+        }
+        return false;
     }
 
     // ArrayList<FloatBuffer>
@@ -1387,6 +1450,11 @@ public class BinaryInputCapsule implements InputCapsule {
     static private class StringIDMap {
         public String[] keys;
         public ID[] values;
+    }
+
+    static private class StringObjectMap {
+        public String[] keys;
+        public Object[] values;
     }
 
     public <T extends Enum<T>> T readEnum(final String name, final Class<T> enumType, final T defVal)

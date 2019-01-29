@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -38,6 +38,7 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.export.binary.BinaryClassField;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
@@ -771,8 +772,8 @@ public class DOMInputCapsule implements InputCapsule {
         return ret;
     }
 
-    private Savable readSavableFromCurrentElem(final Savable defVal) throws InstantiationException,
-            ClassNotFoundException, IOException, IllegalAccessException {
+    private Savable readSavableFromCurrentElem(final Savable defVal)
+            throws InstantiationException, ClassNotFoundException, IOException, IllegalAccessException {
         Savable ret = defVal;
         Savable tmp = null;
 
@@ -801,21 +802,15 @@ public class DOMInputCapsule implements InputCapsule {
                             (Object[]) null);
                 }
             } catch (final InstantiationException e) {
-                Logger.getLogger(getClass().getName()).logp(
-                        Level.SEVERE,
-                        this.getClass().toString(),
+                Logger.getLogger(getClass().getName()).logp(Level.SEVERE, this.getClass().toString(),
                         "readSavableFromCurrentElem(Savable)",
                         "Could not access constructor of class '" + className + "'! \n"
                                 + "Some types may require the annotation SavableFactory.  Please double check.");
                 throw new Ardor3dException(e);
             } catch (final NoSuchMethodException e) {
-                Logger.getLogger(getClass().getName())
-                        .logp(Level.SEVERE,
-                                this.getClass().toString(),
-                                "readSavableFromCurrentElem(Savable)",
-                                e.getMessage()
-                                        + " \n"
-                                        + "Method specified in annotation does not appear to exist or has an invalid method signature.");
+                Logger.getLogger(getClass().getName()).logp(Level.SEVERE, this.getClass().toString(),
+                        "readSavableFromCurrentElem(Savable)", e.getMessage() + " \n"
+                                + "Method specified in annotation does not appear to exist or has an invalid method signature.");
                 throw new Ardor3dException(e);
             } catch (final Exception e) {
                 Logger.getLogger(getClass().getName()).logp(Level.SEVERE, this.getClass().toString(),
@@ -1120,6 +1115,204 @@ public class DOMInputCapsule implements InputCapsule {
         }
         _currentElem = (Element) tempEl.getParentNode();
         return ret;
+    }
+
+    public Map<String, Object> readStringObjectMap(final String name, final Map<String, Object> defVal)
+            throws IOException {
+        Map<String, Object> ret = null;
+        Element tempEl;
+
+        if (name != null) {
+            tempEl = findChildElement(_currentElem, name);
+        } else {
+            tempEl = _currentElem;
+        }
+        if (tempEl != null) {
+            ret = new HashMap<>();
+
+            final NodeList nodes = tempEl.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node n = nodes.item(i);
+                if (n instanceof Element && n.getNodeName().equals("MapEntry")) {
+                    final Element elem = (Element) n;
+                    _currentElem = elem;
+                    final String key = _currentElem.getAttribute("key");
+                    final Object val = tryToReadValue("value");
+                    ret.put(key, val);
+                }
+            }
+        } else {
+            return defVal;
+        }
+        _currentElem = (Element) tempEl.getParentNode();
+        return ret;
+    }
+
+    private Object tryToReadValue(final String string) throws IOException {
+        final byte type = readByte("type", (byte) -1);
+        switch (type) {
+            case BinaryClassField.BITSET: {
+                return readBitSet("value", null);
+
+            }
+            case BinaryClassField.BOOLEAN: {
+                return readBoolean("value", false);
+
+            }
+            case BinaryClassField.BOOLEAN_1D: {
+                return readBooleanArray("value", null);
+
+            }
+            case BinaryClassField.BOOLEAN_2D: {
+                return readBooleanArray2D("value", null);
+
+            }
+            case BinaryClassField.BYTE: {
+                return readByte("value", (byte) 0);
+
+            }
+            case BinaryClassField.BYTE_1D: {
+                return readByteArray("value", null);
+
+            }
+            case BinaryClassField.BYTE_2D: {
+                return readByteArray2D("value", null);
+
+            }
+            case BinaryClassField.BYTEBUFFER: {
+                return readByteBuffer("value", null);
+
+            }
+            case BinaryClassField.DOUBLE: {
+                return readDouble("value", 0.0);
+
+            }
+            case BinaryClassField.DOUBLE_1D: {
+                return readDoubleArray("value", null);
+
+            }
+            case BinaryClassField.DOUBLE_2D: {
+                return readDoubleArray2D("value", null);
+
+            }
+            case BinaryClassField.FLOAT: {
+                return readFloat("value", 0f);
+
+            }
+            case BinaryClassField.FLOAT_1D: {
+                return readFloatArray("value", null);
+
+            }
+            case BinaryClassField.FLOAT_2D: {
+                return readFloatArray2D("value", null);
+
+            }
+            case BinaryClassField.FLOATBUFFER: {
+                return readFloatBuffer("value", null);
+
+            }
+            case BinaryClassField.FLOATBUFFER_ARRAYLIST: {
+                return readFloatBufferList("value", null);
+
+            }
+            case BinaryClassField.BYTEBUFFER_ARRAYLIST: {
+                return readByteBufferList("value", null);
+
+            }
+            case BinaryClassField.INT: {
+                return readInt("value", 0);
+
+            }
+            case BinaryClassField.INT_1D: {
+                return readIntArray("value", null);
+
+            }
+            case BinaryClassField.INT_2D: {
+                return readIntArray2D("value", null);
+
+            }
+            case BinaryClassField.INTBUFFER: {
+                return readIntBuffer("value", null);
+
+            }
+            case BinaryClassField.LONG: {
+                return readLong("value", 0L);
+
+            }
+            case BinaryClassField.LONG_1D: {
+                return readLongArray("value", null);
+
+            }
+            case BinaryClassField.LONG_2D: {
+                return readLongArray2D("value", null);
+
+            }
+            case BinaryClassField.SAVABLE: {
+                return readSavable("value", null);
+
+            }
+            case BinaryClassField.SAVABLE_1D: {
+                return readSavableArray("value", null);
+
+            }
+            case BinaryClassField.SAVABLE_2D: {
+                return readSavableArray2D("value", null);
+
+            }
+            case BinaryClassField.SAVABLE_ARRAYLIST: {
+                return readSavableList("value", null);
+
+            }
+            case BinaryClassField.SAVABLE_ARRAYLIST_1D: {
+                return readSavableArray("value", null);
+
+            }
+            case BinaryClassField.SAVABLE_ARRAYLIST_2D: {
+                return readSavableArray2D("value", null);
+
+            }
+            case BinaryClassField.SAVABLE_MAP: {
+                return readSavableMap("value", null);
+
+            }
+            case BinaryClassField.STRING_SAVABLE_MAP: {
+                return readStringSavableMap("value", null);
+
+            }
+            case BinaryClassField.STRING_OBJECT_MAP: {
+                return readStringObjectMap("value", null);
+
+            }
+            case BinaryClassField.SHORT: {
+                return readShort("value", (short) 0);
+
+            }
+            case BinaryClassField.SHORT_1D: {
+                return readShortArray("value", null);
+
+            }
+            case BinaryClassField.SHORT_2D: {
+                return readShortArray2D("value", null);
+
+            }
+            case BinaryClassField.SHORTBUFFER: {
+                return readShortBuffer("value", null);
+
+            }
+            case BinaryClassField.STRING: {
+                return readString("value", null);
+
+            }
+            case BinaryClassField.STRING_1D: {
+                return readStringArray("value", null);
+
+            }
+            case BinaryClassField.STRING_2D: {
+                return readStringArray2D("value", null);
+
+            }
+        }
+        return null;
     }
 
     /**

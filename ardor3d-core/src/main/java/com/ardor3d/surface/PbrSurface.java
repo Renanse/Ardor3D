@@ -10,6 +10,7 @@
 
 package com.ardor3d.surface;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -20,8 +21,11 @@ import com.ardor3d.renderer.material.IUniformSupplier;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
-public class PbrSurface implements IUniformSupplier {
+public class PbrSurface implements IUniformSupplier, Savable {
 
     public static final String DefaultPropertyKey = "surface";
 
@@ -90,5 +94,44 @@ public class PbrSurface implements IUniformSupplier {
     @Override
     public List<UniformRef> getUniforms() {
         return cachedUniforms;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    /**
+     * @see Savable#getClassTag()
+     */
+    public Class<? extends PbrSurface> getClassTag() {
+        return this.getClass();
+    }
+
+    /**
+     * @param capsule
+     *            the input capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#read(InputCapsule)
+     */
+    public void read(final InputCapsule capsule) throws IOException {
+        _albedo.set((ColorRGBA) capsule.readSavable("albedo", (ColorRGBA) ColorRGBA.WHITE));
+        _metallic = capsule.readFloat("metallic", .5f);
+        _roughness = capsule.readFloat("roughness", .5f);
+        _ambientOcclusion = capsule.readFloat("ambientOcclusion", 1f);
+    }
+
+    /**
+     * @param capsule
+     *            the capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#write(OutputCapsule)
+     */
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_albedo, "albedo", (ColorRGBA) ColorRGBA.WHITE);
+        capsule.write(_metallic, "metallic", .5f);
+        capsule.write(_roughness, "roughness", .5f);
+        capsule.write(_ambientOcclusion, "ambientOcclusion", 1f);
     }
 }

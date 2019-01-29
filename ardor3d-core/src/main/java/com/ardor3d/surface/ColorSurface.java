@@ -10,6 +10,7 @@
 
 package com.ardor3d.surface;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -20,8 +21,11 @@ import com.ardor3d.renderer.material.IUniformSupplier;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
-public class ColorSurface implements IUniformSupplier {
+public class ColorSurface implements IUniformSupplier, Savable {
 
     public static final String DefaultPropertyKey = "surface";
 
@@ -92,5 +96,46 @@ public class ColorSurface implements IUniformSupplier {
     @Override
     public List<UniformRef> getUniforms() {
         return _cachedUniforms;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    /**
+     * @see Savable#getClassTag()
+     */
+    public Class<? extends ColorSurface> getClassTag() {
+        return this.getClass();
+    }
+
+    /**
+     * @param capsule
+     *            the input capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#read(InputCapsule)
+     */
+    public void read(final InputCapsule capsule) throws IOException {
+        _ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(0.1f, 0.1f, 0.1f, 1f)));
+        _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(.5f, .5f, .5f, 1f)));
+        _emissive.set((ColorRGBA) capsule.readSavable("emissive", (ColorRGBA) ColorRGBA.BLACK));
+        _specular.set((ColorRGBA) capsule.readSavable("specular", (ColorRGBA) ColorRGBA.WHITE));
+        _shininess = capsule.readFloat("shininess", 32f);
+    }
+
+    /**
+     * @param capsule
+     *            the capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#write(OutputCapsule)
+     */
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_ambient, "ambient", new ColorRGBA(0.1f, 0.1f, 0.1f, 1f));
+        capsule.write(_diffuse, "diffuse", new ColorRGBA(.5f, .5f, .5f, 1f));
+        capsule.write(_emissive, "emissive", (ColorRGBA) ColorRGBA.BLACK);
+        capsule.write(_specular, "specular", (ColorRGBA) ColorRGBA.WHITE);
+        capsule.write(_shininess, "shininess", 32f);
     }
 }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -370,6 +370,15 @@ public class BinaryOutputCapsule implements OutputCapsule {
         }
         writeAlias(name, BinaryClassField.STRING_SAVABLE_MAP);
         writeStringSavableMap(map);
+    }
+
+    public void writeStringObjectMap(final Map<String, Object> map, final String name, final Map<String, Object> defVal)
+            throws IOException {
+        if (map == defVal) {
+            return;
+        }
+        writeAlias(name, BinaryClassField.STRING_OBJECT_MAP);
+        writeStringObjectMap(map);
     }
 
     protected void writeAlias(final String name, final byte fieldType) throws IOException {
@@ -757,31 +766,240 @@ public class BinaryOutputCapsule implements OutputCapsule {
 
     // Map<BinarySavable, BinarySavable>
 
-    protected void writeSavableMap(final Map<? extends Savable, ? extends Savable> array) throws IOException {
-        if (array == null) {
+    protected void writeSavableMap(final Map<? extends Savable, ? extends Savable> map) throws IOException {
+        if (map == null) {
             write(NULL_OBJECT);
             return;
         }
-        write(array.size());
-        for (final Entry<? extends Savable, ? extends Savable> entry : array.entrySet()) {
+        write(map.size());
+        for (final Entry<? extends Savable, ? extends Savable> entry : map.entrySet()) {
             write(new Savable[] { entry.getKey(), entry.getValue() });
         }
     }
 
-    protected void writeStringSavableMap(final Map<String, ? extends Savable> array) throws IOException {
-        if (array == null) {
+    protected void writeStringSavableMap(final Map<String, ? extends Savable> map) throws IOException {
+        if (map == null) {
             write(NULL_OBJECT);
             return;
         }
-        write(array.size());
+        write(map.size());
 
         // write String array for keys
-        final String[] keys = array.keySet().toArray(new String[array.keySet().size()]);
+        final String[] keys = map.keySet().toArray(new String[map.keySet().size()]);
         write(keys);
 
         // write Savable array for values
-        final Savable[] values = array.values().toArray(new Savable[array.values().size()]);
+        final Savable[] values = map.values().toArray(new Savable[map.values().size()]);
         write(values);
+    }
+
+    protected void writeStringObjectMap(final Map<String, Object> map) throws IOException {
+        if (map == null) {
+            write(NULL_OBJECT);
+            return;
+        }
+        write(map.size());
+
+        // write keys
+        final String[] keys = map.keySet().toArray(new String[map.keySet().size()]);
+        for (int x = 0; x < keys.length; x++) {
+            write(keys[x]);
+        }
+
+        // write values - if they are writable types
+        final Object[] values = map.values().toArray(new Object[map.values().size()]);
+        for (int x = 0; x < values.length; x++) {
+            final Object value = values[x];
+            tryToWriteValue(value);
+        }
+    }
+
+    private void tryToWriteValue(final Object value) throws IOException {
+        if (value instanceof BitSet) {
+            write(BinaryClassField.BITSET);
+            write((BitSet) value);
+            return;
+        }
+        if (value instanceof Boolean) {
+            write(BinaryClassField.BOOLEAN);
+            write((Boolean) value);
+            return;
+        }
+        if (value instanceof boolean[]) {
+            write(BinaryClassField.BOOLEAN_1D);
+            write((boolean[]) value);
+            return;
+        }
+        if (value instanceof boolean[][]) {
+            write(BinaryClassField.BOOLEAN_2D);
+            write((boolean[][]) value);
+            return;
+        }
+        if (value instanceof Byte) {
+            write(BinaryClassField.BYTE);
+            write((Byte) value);
+            return;
+        }
+        if (value instanceof byte[]) {
+            write(BinaryClassField.BYTE_1D);
+            write((byte[]) value);
+            return;
+        }
+        if (value instanceof byte[][]) {
+            write(BinaryClassField.BYTE_2D);
+            write((byte[][]) value);
+            return;
+        }
+        if (value instanceof ByteBuffer) {
+            write(BinaryClassField.BYTEBUFFER);
+            write((ByteBuffer) value);
+            return;
+        }
+        if (value instanceof Double) {
+            write(BinaryClassField.DOUBLE);
+            write((Double) value);
+            return;
+        }
+        if (value instanceof double[]) {
+            write(BinaryClassField.DOUBLE_1D);
+            write((double[]) value);
+            return;
+        }
+        if (value instanceof double[][]) {
+            write(BinaryClassField.DOUBLE_2D);
+            write((double[][]) value);
+            return;
+        }
+        if (value instanceof Float) {
+            write(BinaryClassField.FLOAT);
+            write((Float) value);
+            return;
+        }
+        if (value instanceof float[]) {
+            write(BinaryClassField.FLOAT_1D);
+            write((float[]) value);
+            return;
+        }
+        if (value instanceof float[][]) {
+            write(BinaryClassField.FLOAT_2D);
+            write((float[][]) value);
+            return;
+        }
+        if (value instanceof FloatBuffer) {
+            write(BinaryClassField.FLOATBUFFER);
+            write((ByteBuffer) value);
+            return;
+        }
+        if (value instanceof Integer) {
+            write(BinaryClassField.INT);
+            write((Integer) value);
+            return;
+        }
+        if (value instanceof int[]) {
+            write(BinaryClassField.INT_1D);
+            write((int[]) value);
+            return;
+        }
+        if (value instanceof int[][]) {
+            write(BinaryClassField.INT_2D);
+            write((int[][]) value);
+            return;
+        }
+        if (value instanceof IntBuffer) {
+            write(BinaryClassField.INTBUFFER);
+            write((IntBuffer) value);
+            return;
+        }
+        if (value instanceof Long) {
+            write(BinaryClassField.LONG);
+            write((Long) value);
+            return;
+        }
+        if (value instanceof long[]) {
+            write(BinaryClassField.LONG_1D);
+            write((long[]) value);
+            return;
+        }
+        if (value instanceof long[][]) {
+            write(BinaryClassField.LONG_2D);
+            write((long[][]) value);
+            return;
+        }
+        if (value instanceof Savable) {
+            write(BinaryClassField.SAVABLE);
+            write((Savable) value);
+            return;
+        }
+        if (value instanceof Savable[]) {
+            write(BinaryClassField.SAVABLE_1D);
+            write((Savable[]) value);
+            return;
+        }
+        if (value instanceof Savable[][]) {
+            write(BinaryClassField.SAVABLE_2D);
+            write((Savable[][]) value);
+            return;
+        }
+        if (value instanceof Short) {
+            write(BinaryClassField.SHORT);
+            write((Short) value);
+            return;
+        }
+        if (value instanceof short[]) {
+            write(BinaryClassField.SHORT_1D);
+            write((short[]) value);
+            return;
+        }
+        if (value instanceof short[][]) {
+            write(BinaryClassField.SHORT_2D);
+            write((short[][]) value);
+            return;
+        }
+        if (value instanceof ShortBuffer) {
+            write(BinaryClassField.SHORTBUFFER);
+            write((ShortBuffer) value);
+            return;
+        }
+        if (value instanceof String) {
+            write(BinaryClassField.STRING);
+            write((String) value);
+            return;
+        }
+        if (value instanceof String[]) {
+            write(BinaryClassField.STRING_1D);
+            write((String[]) value);
+            return;
+        }
+        if (value instanceof String[][]) {
+            write(BinaryClassField.STRING_2D);
+            write((String[][]) value);
+            return;
+        }
+        if (value instanceof List<?>) {
+            final List<?> list = (List<?>) value;
+            if (list.size() == 0) {
+                write(BinaryClassField.UNHANDLED);
+                return;
+            }
+            final Object first = list.get(0);
+            if (list instanceof ByteBuffer) {
+                write(BinaryClassField.BYTEBUFFER_ARRAYLIST);
+                writeByteBufferArrayList((List<ByteBuffer>) value);
+                return;
+            }
+            if (first instanceof FloatBuffer) {
+                write(BinaryClassField.FLOATBUFFER_ARRAYLIST);
+                writeFloatBufferArrayList((List<FloatBuffer>) value);
+                return;
+            }
+            if (first instanceof Savable) {
+                write(BinaryClassField.SAVABLE_ARRAYLIST);
+                writeSavableArrayList((List<Savable>) value);
+                return;
+            }
+        }
+
+        write(BinaryClassField.UNHANDLED);
     }
 
     // List<FloatBuffer>

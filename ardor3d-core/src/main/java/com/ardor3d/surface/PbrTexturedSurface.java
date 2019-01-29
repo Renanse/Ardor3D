@@ -10,6 +10,7 @@
 
 package com.ardor3d.surface;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -18,8 +19,11 @@ import com.ardor3d.renderer.material.IUniformSupplier;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
-public class PbrTexturedSurface implements IUniformSupplier {
+public class PbrTexturedSurface implements IUniformSupplier, Savable {
 
     public static final String DefaultPropertyKey = "surface";
 
@@ -90,5 +94,46 @@ public class PbrTexturedSurface implements IUniformSupplier {
     @Override
     public List<UniformRef> getUniforms() {
         return cachedUniforms;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    /**
+     * @see Savable#getClassTag()
+     */
+    public Class<? extends PbrTexturedSurface> getClassTag() {
+        return this.getClass();
+    }
+
+    /**
+     * @param capsule
+     *            the input capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#read(InputCapsule)
+     */
+    public void read(final InputCapsule capsule) throws IOException {
+        _albedoMap = capsule.readInt("albedoMap", 0);
+        _normalMap = capsule.readInt("normalMap", 1);
+        _metallicMap = capsule.readInt("metallicMap", 2);
+        _roughnessMap = capsule.readInt("roughnessMap", 3);
+        _aoMap = capsule.readInt("aoMap", 4);
+    }
+
+    /**
+     * @param capsule
+     *            the capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#write(OutputCapsule)
+     */
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_albedoMap, "albedoMap", 0);
+        capsule.write(_normalMap, "normalMap", 1);
+        capsule.write(_metallicMap, "metallicMap", 2);
+        capsule.write(_roughnessMap, "roughnessMap", 3);
+        capsule.write(_aoMap, "aoMap", 4);
     }
 }

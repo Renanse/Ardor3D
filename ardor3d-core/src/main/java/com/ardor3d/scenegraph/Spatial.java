@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -1485,11 +1486,8 @@ public abstract class Spatial implements Savable, Hintable {
         _localTransform.set((Transform) capsule.readSavable("localTransform", new Transform(Transform.IDENTITY)));
         _worldTransform.set((Transform) capsule.readSavable("worldTransform", new Transform(Transform.IDENTITY)));
 
-        final Savable userData = capsule.readSavable("userData", null);
-        // only override set userdata if we have something in the capsule.
-        if (userData != null) {
-            setUserData(userData);
-        }
+        _properties.clear();
+        _properties.putAll(capsule.readStringObjectMap("properties", new HashMap<>()));
 
         final List<Savable> list = capsule.readSavableList("controllers", null);
         if (list != null) {
@@ -1516,11 +1514,7 @@ public abstract class Spatial implements Savable, Hintable {
         capsule.write(_localTransform, "localTransform", new Transform(Transform.IDENTITY));
         capsule.write(_worldTransform, "worldTransform", new Transform(Transform.IDENTITY));
 
-        // FIXME: Needs to handle properties as well. Making it backwards compatible for the time being.
-        final Object userData = getUserData();
-        if (userData instanceof Savable) {
-            capsule.write((Savable) userData, "userData", null);
-        }
+        capsule.writeStringObjectMap(_properties, "properties", new HashMap<>());
 
         if (_controllers != null) {
             final List<Savable> list = new ArrayList<Savable>();
