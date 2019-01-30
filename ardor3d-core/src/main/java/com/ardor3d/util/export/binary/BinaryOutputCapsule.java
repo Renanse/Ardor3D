@@ -814,6 +814,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void tryToWriteValue(final Object value) throws IOException {
         if (value instanceof BitSet) {
             write(BinaryClassField.BITSET);

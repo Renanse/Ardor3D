@@ -396,7 +396,13 @@ public class BinaryInputCapsule implements InputCapsule {
 
         final Map<String, Object> map = new HashMap<>(mapItems.keys.length);
         for (int x = 0; x < mapItems.keys.length; x++) {
-            map.put(mapItems.keys[x], mapItems.values[x]);
+            Object value = mapItems.values[x];
+            if (value instanceof ID) {
+                value = _importer.readObject(((ID) value).id);
+            } else if (value instanceof ID[]) {
+                value = resolveIDs((ID[]) value);
+            }
+            map.put(mapItems.keys[x], value);
         }
 
         return map;
