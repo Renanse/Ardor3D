@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -31,6 +31,10 @@ public abstract class MaterialUtil {
     }
 
     public static void autoMaterials(final Spatial spat, final boolean replaceExisting) {
+        if (spat != null) {
+            spat.updateWorldRenderStates(true);
+        }
+
         final String material = processSpatialMaterial(spat, replaceExisting);
 
         if (material != null) {
@@ -126,7 +130,7 @@ public abstract class MaterialUtil {
 
         material.append(".yaml");
 
-        System.out.println(material);
+        System.out.println(material + " - " + mesh.getName());
 
         return material.toString();
     }

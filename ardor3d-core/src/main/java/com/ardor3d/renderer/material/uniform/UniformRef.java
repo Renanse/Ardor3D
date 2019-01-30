@@ -10,14 +10,9 @@
 
 package com.ardor3d.renderer.material.uniform;
 
-import java.io.IOException;
-
 import com.ardor3d.renderer.material.IUniformSupplier;
-import com.ardor3d.util.export.InputCapsule;
-import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 
-public class UniformRef implements Savable {
+public class UniformRef {
 
     protected String _shaderVariableName;
     protected int _location = -1;
@@ -92,34 +87,5 @@ public class UniformRef implements Savable {
 
     public Object getDefaultValue() {
         return _defaultValue;
-    }
-
-    // /////////////////
-    // Methods for Savable
-    // /////////////////
-
-    @Override
-    public Class<? extends UniformRef> getClassTag() {
-        return this.getClass();
-    }
-
-    @Override
-    public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_shaderVariableName, "name", null);
-        capsule.write(_location, "location", -1);
-        capsule.write(_type, "type", UniformType.Float1);
-        capsule.write(_source, "source", UniformSource.Value);
-
-        // TODO: Store value and extra
-    }
-
-    @Override
-    public void read(final InputCapsule capsule) throws IOException {
-        _shaderVariableName = capsule.readString("name", null);
-        _location = capsule.readInt("location", -1);
-        _type = capsule.readEnum("type", UniformType.class, UniformType.Float1);
-        _source = capsule.readEnum("source", UniformSource.class, UniformSource.Value);
-
-        // TODO: Read value and extra
     }
 }

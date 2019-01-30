@@ -21,15 +21,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.model.util.KeyframeController;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.material.uniform.BlinnPhongKeys;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.util.TextureKey;
 
 /**
@@ -167,23 +166,17 @@ public class ObjExporter {
                     mtlPw.println("# Ardor3D 1.0 MTL file");
                 }
                 final ObjMaterial currentMtl = new ObjMaterial(null);
-                final ReadOnlyColorRGBA ambientColor = mesh.getLocalProperty(BlinnPhongKeys.AmbientColor, null);
-                if (ambientColor != null) {
-                    currentMtl.d = ambientColor.getAlpha();
-                    currentMtl.Ka = new float[] { ambientColor.getRed(), ambientColor.getGreen(),
-                            ambientColor.getBlue(), ambientColor.getAlpha() };
+                final ColorSurface surface = mesh.getLocalProperty(ColorSurface.DefaultPropertyKey, null);
+                if (surface != null) {
+                    currentMtl.d = surface.getAmbient().getAlpha();
+                    currentMtl.Ka = new float[] { surface.getAmbient().getRed(), surface.getAmbient().getGreen(),
+                            surface.getAmbient().getBlue() };
+                    currentMtl.Kd = new float[] { surface.getDiffuse().getRed(), surface.getDiffuse().getGreen(),
+                            surface.getDiffuse().getBlue() };
+                    currentMtl.Ks = new float[] { surface.getSpecular().getRed(), surface.getSpecular().getGreen(),
+                            surface.getSpecular().getBlue() };
+                    currentMtl.Ns = surface.getShininess();
                 }
-                final ReadOnlyColorRGBA diffuseColor = mesh.getLocalProperty(BlinnPhongKeys.DiffuseColor, null);
-                if (diffuseColor != null) {
-                    currentMtl.Kd = new float[] { diffuseColor.getRed(), diffuseColor.getGreen(),
-                            diffuseColor.getBlue(), diffuseColor.getAlpha() };
-                }
-                final ReadOnlyColorRGBA specularColor = mesh.getLocalProperty(BlinnPhongKeys.SpecularColor, null);
-                if (specularColor != null) {
-                    currentMtl.Ks = new float[] { specularColor.getRed(), specularColor.getGreen(),
-                            specularColor.getBlue(), specularColor.getAlpha() };
-                }
-                currentMtl.Ns = mesh.getLocalProperty(BlinnPhongKeys.Shininess, 0f);
 
                 if (customTextureName == null) {
                     currentMtl.textureName = getLocalMeshTextureName(mesh);

@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.lang.ref.ReferenceQueue;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,19 +36,15 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.InputCapsule;
-import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.gc.ContextValueReference;
-import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 
-public class TechniquePass implements Savable {
+public class TechniquePass {
     /** Name of this pass - optional, useful for debug, etc. */
     protected String _name;
 
     /** Our shaders, mapped by their type. */
-    protected Map<ShaderType, List<String>> _shaders = Maps.newEnumMap(ShaderType.class);
+    protected Map<ShaderType, List<String>> _shaders = new EnumMap<>(ShaderType.class);
 
     /** Context specific reference to an id for the shader program used by this pass. */
     protected static ReferenceQueue<TechniquePass> _shaderRefQueue = new ReferenceQueue<TechniquePass>();
@@ -119,7 +116,7 @@ public class TechniquePass implements Savable {
 
     /**
      * Set the value of a particular shader uniform, by shaderVariableName (which should, in theory, be unique)
-     * 
+     *
      * @param shaderVarName
      *            Variable name in the shader that this uniform will connect to.
      * @param value
@@ -322,24 +319,4 @@ public class TechniquePass implements Savable {
             renderer.applyState(type, mesh.getWorldRenderState(type));
         }
     }
-
-    // /////////////////
-    // Methods for Savable
-    // /////////////////
-
-    @Override
-    public Class<? extends TechniquePass> getClassTag() {
-        return this.getClass();
-    }
-
-    @Override
-    public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_name, "name", null);
-    }
-
-    @Override
-    public void read(final InputCapsule capsule) throws IOException {
-        _name = capsule.readString("name", null);
-    }
-
 }

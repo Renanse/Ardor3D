@@ -10,20 +10,16 @@
 
 package com.ardor3d.renderer.material;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.scenegraph.Renderable;
-import com.ardor3d.util.export.InputCapsule;
-import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
 
-public class MaterialTechnique implements Savable {
+public class MaterialTechnique {
 
     protected String _name;
 
-    protected final List<TechniquePass> _passes = Lists.newArrayList();
+    protected final List<TechniquePass> _passes = new ArrayList<>();
 
     public List<TechniquePass> getPasses() {
         return _passes;
@@ -49,31 +45,5 @@ public class MaterialTechnique implements Savable {
     @Override
     public String toString() {
         return "MaterialTechnique: " + getName();
-    }
-
-    // /////////////////
-    // Methods for Savable
-    // /////////////////
-
-    @Override
-    public Class<? extends MaterialTechnique> getClassTag() {
-        return this.getClass();
-    }
-
-    @Override
-    public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_name, "name", null);
-        capsule.writeSavableList(_passes, "passes", null);
-    }
-
-    @Override
-    public void read(final InputCapsule capsule) throws IOException {
-        _name = capsule.readString("name", null);
-
-        final List<TechniquePass> pList = capsule.readSavableList("passes", null);
-        _passes.clear();
-        if (pList != null) {
-            _passes.addAll(pList);
-        }
     }
 }

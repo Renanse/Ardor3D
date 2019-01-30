@@ -24,12 +24,12 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.renderer.material.uniform.BlinnPhongKeys;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceSource;
 
@@ -142,6 +142,8 @@ public class ColladaMaterialUtils {
                 boolean useTransparency = false;
                 String opaqueMode = "A_ONE";
 
+                final ColorSurface surface = new ColorSurface();
+                boolean usedSurface = false;
                 /*
                  * place holder for current property, we import material properties in fixed order (for texture order)
                  */
@@ -152,8 +154,8 @@ public class ColladaMaterialUtils {
                     final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         final ReadOnlyColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                        mesh.setProperty(BlinnPhongKeys.DiffuseColor, color);
-                        mesh.setProperty(BlinnPhongKeys.DiffuseColorBack, color);
+                        surface.setDiffuse(color);
+                        usedSurface = true;
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         diffuseTexture = populateTextureState(mesh, propertyValue, effect, loadedTextures, mInfo,
                                 "diffuse");
@@ -165,8 +167,8 @@ public class ColladaMaterialUtils {
                     final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         final ReadOnlyColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                        mesh.setProperty(BlinnPhongKeys.AmbientColor, color);
-                        mesh.setProperty(BlinnPhongKeys.AmbientColorBack, color);
+                        surface.setAmbient(color);
+                        usedSurface = true;
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         populateTextureState(mesh, propertyValue, effect, loadedTextures, mInfo, "ambient");
                     }
@@ -205,8 +207,8 @@ public class ColladaMaterialUtils {
                     final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         final ReadOnlyColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                        mesh.setProperty(BlinnPhongKeys.EmissiveColor, color);
-                        mesh.setProperty(BlinnPhongKeys.EmissiveColorBack, color);
+                        surface.setEmissive(color);
+                        usedSurface = true;
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         populateTextureState(mesh, propertyValue, effect, loadedTextures, mInfo, "emissive");
                     }
@@ -217,8 +219,8 @@ public class ColladaMaterialUtils {
                     final Element propertyValue = property.getChildren().get(0);
                     if ("color".equals(propertyValue.getName())) {
                         final ReadOnlyColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                        mesh.setProperty(BlinnPhongKeys.SpecularColor, color);
-                        mesh.setProperty(BlinnPhongKeys.SpecularColorBack, color);
+                        surface.setSpecular(color);
+                        usedSurface = true;
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         populateTextureState(mesh, propertyValue, effect, loadedTextures, mInfo, "specular");
                     }
@@ -240,9 +242,8 @@ public class ColladaMaterialUtils {
                             logger.warning("Shininess must be between 0 and 128. Shininess " + oldShininess
                                     + " was clamped to " + shininess);
                         }
-
-                        mesh.setProperty(BlinnPhongKeys.Shininess, shininess);
-                        mesh.setProperty(BlinnPhongKeys.ShininessBack, shininess);
+                        surface.setShininess(shininess);
+                        usedSurface = true;
                     } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                         populateTextureState(mesh, propertyValue, effect, loadedTextures, mInfo, "shininess");
                     }
@@ -280,6 +281,10 @@ public class ColladaMaterialUtils {
 
                         // reflectiveTexture.setConstantColor(new ColorRGBA(1, 1, 1, reflectivity));
                     }
+                }
+
+                if (usedSurface) {
+                    mesh.setProperty(ColorSurface.DefaultPropertyKey, surface);
                 }
 
                 /*

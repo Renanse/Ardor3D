@@ -10,13 +10,7 @@
 
 package com.ardor3d.renderer.material;
 
-import java.io.IOException;
-
-import com.ardor3d.util.export.InputCapsule;
-import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
-
-public class VertexAttributeRef implements Savable {
+public class VertexAttributeRef {
 
     protected String _shaderVariableName;
     protected int _location;
@@ -52,28 +46,5 @@ public class VertexAttributeRef implements Savable {
 
     public String getMeshDataKey() {
         return _meshDataKey;
-    }
-
-    // /////////////////
-    // Methods for Savable
-    // /////////////////
-
-    @Override
-    public Class<? extends VertexAttributeRef> getClassTag() {
-        return this.getClass();
-    }
-
-    @Override
-    public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_shaderVariableName, "name", null);
-        capsule.write(_location, "location", -1);
-        capsule.write(_meshDataKey, "key", null);
-    }
-
-    @Override
-    public void read(final InputCapsule capsule) throws IOException {
-        _shaderVariableName = capsule.readString("name", null);
-        _location = capsule.readInt("location", -1);
-        _meshDataKey = capsule.readString("key", null);
     }
 }
