@@ -12,6 +12,7 @@ package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -23,7 +24,6 @@ import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.Maps;
 
 /**
  * This tool assists in reducing geometry information.<br>
@@ -119,8 +119,11 @@ public final class GeometryTool {
                 tex = new Vector2[0][];
             }
 
-            final Map<VertKey, Integer> store = Maps.newHashMap();
-            final Map<Integer, Integer> indexRemap = Maps.newHashMap();
+            // Use a map of maps - vert has to be equal, so we can reduce the comparisons being made drastically by
+            // reducing down to just same vertices.
+            final Map<Vector3, Map<VertKey, Integer>> vertMap = new HashMap<>();
+            final Map<Integer, Integer> indexRemap = new HashMap<>();
+            Map<VertKey, Integer> store;
             int good = 0;
             long group;
             for (int x = 0, max = verts.length; x < max; x++) {
@@ -128,6 +131,11 @@ public final class GeometryTool {
                 final VertKey vkey = new VertKey(verts[x], norms != null ? norms[x] : null,
                         colors != null ? colors[x] : null, getTexs(tex, x), groupData.getGroupConditions(group), group);
                 // Store if we have not already seen it
+                store = vertMap.get(verts[x]);
+                if (store == null) {
+                    store = new HashMap<>();
+                    vertMap.put(verts[x], store);
+                }
                 if (store.putIfAbsent(vkey, x) == null) {
                     good++;
                 }
