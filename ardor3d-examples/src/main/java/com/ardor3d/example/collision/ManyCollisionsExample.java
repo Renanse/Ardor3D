@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -20,13 +20,13 @@ import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.material.uniform.BlinnPhongKeys;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -120,10 +120,13 @@ public class ManyCollisionsExample extends ExampleBase {
 
         n2 = new Node("n2");
         n2.setTranslation(new Vector3(0, 0, -200));
-        n2.setProperty(BlinnPhongKeys.DiffuseColor, ColorRGBA.RED);
+
+        final ColorSurface surface = new ColorSurface();
+        surface.setDiffuse(ColorRGBA.RED);
+        n2.setProperty(ColorSurface.DefaultPropertyKey, surface);
 
         _root.attachChild(n2);
-        _root.setRenderMaterial("unlit/textured/basic.yaml");
+        _root.setRenderMaterial("lit/textured/basic_phong.yaml");
 
         for (int i = 0; i < 200; i++) {
             final Mesh sm = sphere.makeCopy(true);

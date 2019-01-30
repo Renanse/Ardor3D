@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
@@ -31,6 +32,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
+import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -95,6 +97,9 @@ public class ExportImportExample extends ExampleBase {
         final Torus torus = new Torus("Torus", 50, 50, 10, 25);
         torus.updateModelBound();
         torus.setRenderState(ts);
+        final ColorSurface surface = new ColorSurface();
+        surface.setDiffuse(ColorRGBA.BLUE);
+        torus.setProperty(ColorSurface.DefaultPropertyKey, surface);
 
         final Quad quad = new Quad("Quad");
         quad.resize(150, 120);
@@ -118,7 +123,6 @@ public class ExportImportExample extends ExampleBase {
 
         // attach and set material
         _root.attachChild(originalNode);
-        MaterialUtil.autoMaterials(originalNode);
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -151,10 +155,11 @@ public class ExportImportExample extends ExampleBase {
         } catch (final IOException e) {
             logger.log(Level.SEVERE, "XMLImporter failed to load file", e);
         }
+        MaterialUtil.autoMaterials(_root);
     }
 
     private Mesh createMultiStrip() {
-        final Mesh mesh = new Mesh();
+        final Mesh mesh = new Mesh("ms");
         final MeshData meshData = mesh.getMeshData();
 
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(12);

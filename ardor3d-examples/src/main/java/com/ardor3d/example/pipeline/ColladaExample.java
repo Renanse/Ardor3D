@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -59,6 +59,7 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
@@ -133,7 +134,6 @@ public class ColladaExample extends ExampleBase {
         _orthoRoot.attachChild(t1);
         _orthoRoot.getSceneHints().setCullHint(CullHint.Never);
         _root.getSceneHints().setCullHint(CullHint.Never);
-        _root.setRenderMaterial("unlit/textured/basic.yaml");
 
         hud = new UIHud(_canvas);
         hud.setupInput(_physicalLayer, _logicalLayer);
@@ -233,6 +233,7 @@ public class ColladaExample extends ExampleBase {
 
             // Add colladaNode to root
             _root.attachChild(colladaNode);
+            MaterialUtil.autoMaterials(colladaNode);
 
             // Setup camera
             ReadOnlyVector3 upAxis = Vector3.UNIT_Y;
