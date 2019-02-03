@@ -40,7 +40,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -153,15 +152,11 @@ public class AtlasExample extends ExampleBase {
     private void packIntoAtlas(final Spatial spatial) {
         // Gather up all meshes to do the atlas operation on
         final List<Mesh> meshes = Lists.newArrayList();
-        final Visitor visitor = new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                if (spatial instanceof Mesh) {
-                    meshes.add((Mesh) spatial);
-                }
+        spatial.acceptVisitor((final Spatial spat) -> {
+            if (spat instanceof Mesh) {
+                meshes.add((Mesh) spat);
             }
-        };
-        spatial.acceptVisitor(visitor, false);
+        }, false);
 
         // Create an atlas packer with maximum atlas size of 256x256
         final TexturePacker packer = new TexturePacker(256, 256);

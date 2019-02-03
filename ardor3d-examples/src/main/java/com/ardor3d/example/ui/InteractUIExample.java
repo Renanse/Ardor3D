@@ -70,7 +70,6 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Tube;
-import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.common.collect.Lists;
@@ -767,14 +766,11 @@ public class InteractUIExample extends ExampleBase {
 
                 if (!tData.color.equals(data.color)) {
                     tData.color.set(data.color);
-                    target.acceptVisitor(new Visitor() {
-                        @Override
-                        public void visit(final Spatial spatial) {
-                            if (spatial instanceof Mesh) {
-                                final Mesh mesh = (Mesh) spatial;
-                                mesh.setDefaultColor(tData.color);
-                                mesh.setSolidColor(tData.color);
-                            }
+                    target.acceptVisitor((final Spatial spatial) -> {
+                        if (spatial instanceof Mesh) {
+                            final Mesh mesh = (Mesh) spatial;
+                            mesh.setDefaultColor(tData.color);
+                            mesh.setSolidColor(tData.color);
                         }
                     }, true);
                 }

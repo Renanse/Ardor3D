@@ -39,7 +39,6 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 
 public class RotateWidget extends AbstractInteractWidget {
 
@@ -103,13 +102,10 @@ public class RotateWidget extends AbstractInteractWidget {
     }
 
     protected void updateBlendStates(final Spatial highlight) {
-        _handle.acceptVisitor(new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                final BlendState bs = (BlendState) spatial.getLocalRenderState(StateType.Blend);
-                if (bs != null) {
-                    bs.setSourceFunction(spatial == highlight ? SourceFunction.One : SourceFunction.SourceAlpha);
-                }
+        _handle.acceptVisitor((final Spatial spatial) -> {
+            final BlendState bs = (BlendState) spatial.getLocalRenderState(StateType.Blend);
+            if (bs != null) {
+                bs.setSourceFunction(spatial == highlight ? SourceFunction.One : SourceFunction.SourceAlpha);
             }
         }, true);
         _handle.updateGeometricState(0);
@@ -317,8 +313,8 @@ public class RotateWidget extends AbstractInteractWidget {
 
         // apply to our interact matrix if used
         if (_interactMatrix == InteractMatrix.World) {
-            _rotateStore.multiplyLocal(new Quaternion().fromVectorToVector(_calcVec3A, _calcVec3B).toRotationMatrix(
-                    _calcMat3));
+            _rotateStore.multiplyLocal(
+                    new Quaternion().fromVectorToVector(_calcVec3A, _calcVec3B).toRotationMatrix(_calcMat3));
         }
 
         // convert to target coord space

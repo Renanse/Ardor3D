@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,7 +12,6 @@ package com.ardor3d.extension.animation.skeletal.util;
 
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 
 /**
  * General utility methods useful for Skin manipulation.
@@ -21,28 +20,27 @@ public class SkinUtils {
 
     /**
      * Simple utility to turn on / off bounding volume updating on skinned mesh objects in a given scenegraph.
-     * 
+     *
      * @param root
-     *            the root node on the scenegraph
+     *                     the root node on the scenegraph
      * @param doUpdate
-     *            if true, skinned mesh objects will automatically update their model bounds when applying pose.
+     *                     if true, skinned mesh objects will automatically update their model bounds when applying
+     *                     pose.
      */
     public static void setAutoUpdateBounds(final Spatial root, final boolean doUpdate) {
-        root.acceptVisitor(new Visitor() {
-            public void visit(final Spatial spatial) {
-                // we only care about SkinnedMesh
-                if (spatial instanceof SkinnedMesh) {
-                    ((SkinnedMesh) spatial).setAutoUpdateSkinBounds(doUpdate);
-                }
+        root.acceptVisitor((final Spatial spatial) -> {
+            // we only care about SkinnedMesh
+            if (spatial instanceof SkinnedMesh) {
+                ((SkinnedMesh) spatial).setAutoUpdateSkinBounds(doUpdate);
             }
         }, true);
     }
 
     /**
      * Convert a short array to a float array
-     * 
+     *
      * @param shorts
-     *            the short values
+     *                   the short values
      * @return our new float array
      */
     public static float[] convertToFloat(final short... shorts) {
@@ -55,19 +53,19 @@ public class SkinUtils {
 
     /**
      * Rearrange the data from data per element, to a list of matSide x matSide matrices, output by row as such:
-     * 
+     *
      * row0element0, row0element1, row0element2...<br>
      * row1element0, row1element1, row1element2...<br>
      * row2element0, row2element1, row2element2...<br>
-     * 
+     *
      * If there is not enough values in the source data to fill out a row, 0 is used.
-     * 
+     *
      * @param src
-     *            our source data, stored as element0, element1, etc.
+     *                           our source data, stored as element0, element1, etc.
      * @param srcElementSize
-     *            the number of values per element in our source data
+     *                           the number of values per element in our source data
      * @param matSide
-     *            the size of the matrix edge... eg. 4 would mean a 4x4 matrix.
+     *                           the size of the matrix edge... eg. 4 would mean a 4x4 matrix.
      * @return our new data array.
      */
     public static float[] reorderAndPad(final float[] src, final int srcElementSize, final int matSide) {
@@ -99,13 +97,13 @@ public class SkinUtils {
     /**
      * Expand out our src data so that each attribute is a certain size, padding with 0's as needed. If src is already
      * correct size, we just return that without creating a new data array.
-     * 
+     *
      * @param src
-     *            our source data, stored as element0, element1, etc.
+     *                           our source data, stored as element0, element1, etc.
      * @param srcElementSize
-     *            the number of values per element in our source data
+     *                           the number of values per element in our source data
      * @param attribSize
-     *            the desired size of each element in the return array.
+     *                           the desired size of each element in the return array.
      * @return the padded array.
      */
     public static float[] pad(final float[] src, final int srcElementSize, final int attribSize) {
@@ -130,13 +128,13 @@ public class SkinUtils {
     /**
      * Expand out our src data so that each attribute is a certain size, padding with 0's as needed. If src is already
      * correct size, we just return that without creating a new data array.
-     * 
+     *
      * @param src
-     *            our source data, stored as element0, element1, etc.
+     *                           our source data, stored as element0, element1, etc.
      * @param srcElementSize
-     *            the number of values per element in our source data
+     *                           the number of values per element in our source data
      * @param attribSize
-     *            the desired size of each element in the return array.
+     *                           the desired size of each element in the return array.
      * @return the padded array.
      */
     public static short[] pad(final short[] src, final int srcElementSize, final int attribSize) {

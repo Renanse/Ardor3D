@@ -11,7 +11,6 @@ package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 
 /**
  * A special frame meant to display menu items.
@@ -74,13 +73,10 @@ public class UIPopupMenu extends UIContainer implements IPopOver {
         clearStandin();
 
         // clean up any state
-        acceptVisitor(new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                if (spatial instanceof StateBasedUIComponent) {
-                    final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
-                    comp.switchState(comp.getDefaultState());
-                }
+        acceptVisitor((final Spatial spatial) -> {
+            if (spatial instanceof StateBasedUIComponent) {
+                final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
+                comp.switchState(comp.getDefaultState());
             }
         }, true);
 

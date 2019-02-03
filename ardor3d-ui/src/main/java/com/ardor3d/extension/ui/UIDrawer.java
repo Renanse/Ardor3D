@@ -20,7 +20,6 @@ import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.visitor.Visitor;
 
 /**
  *
@@ -176,13 +175,10 @@ public class UIDrawer extends UIContainer {
         clearStandin();
 
         // clean up any state
-        acceptVisitor(new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                if (spatial instanceof StateBasedUIComponent) {
-                    final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
-                    comp.switchState(comp.getDefaultState());
-                }
+        acceptVisitor((final Spatial spatial) -> {
+            if (spatial instanceof StateBasedUIComponent) {
+                final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
+                comp.switchState(comp.getDefaultState());
             }
         }, true);
 

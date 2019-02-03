@@ -26,7 +26,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -63,12 +62,9 @@ public class MeshCombiner {
 
     public final static Mesh combine(final Spatial source, final MeshCombineLogic logic) {
         final List<Mesh> sources = Lists.newArrayList();
-        source.acceptVisitor(new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                if (spatial instanceof Mesh) {
-                    sources.add((Mesh) spatial);
-                }
+        source.acceptVisitor((final Spatial spatial) -> {
+            if (spatial instanceof Mesh) {
+                sources.add((Mesh) spatial);
             }
         }, true);
 
@@ -313,8 +309,8 @@ class IndexCombiner {
             // walk through each section
             for (int i = 0, maxI = source.getSectionCount(); i < maxI; i++) {
                 // make an int array and populate it.
-                final int size = source.getIndexLengths() != null ? source.getIndexLengths()[i] : source
-                        .getVertexCount();
+                final int size = source.getIndexLengths() != null ? source.getIndexLengths()[i]
+                        : source.getVertexCount();
                 final int[] indices = new int[size];
                 for (int j = 0; j < size; j++) {
                     indices[j] = j + vertexOffset + offset;
@@ -339,8 +335,8 @@ class IndexCombiner {
             // walk through each section
             for (int i = 0, maxI = source.getSectionCount(); i < maxI; i++) {
                 // make an int array and populate it.
-                final int size = source.getIndexLengths() != null ? source.getIndexLengths()[i] : source.getIndices()
-                        .capacity();
+                final int size = source.getIndexLengths() != null ? source.getIndexLengths()[i]
+                        : source.getIndices().capacity();
                 final int[] indices = new int[size];
                 for (int j = 0; j < size; j++) {
                     indices[j] = ib.get(j + offset) + vertexOffset;

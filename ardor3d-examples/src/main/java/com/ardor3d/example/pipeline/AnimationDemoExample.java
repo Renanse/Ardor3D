@@ -44,7 +44,6 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -156,14 +155,11 @@ public class AnimationDemoExample extends ExampleBase {
             // primeModel = colladaNode;
 
             // OPTIMIZATION: turn on the buffers in our skeleton so they can be shared. (reuse ids)
-            skeleton.acceptVisitor(new Visitor() {
-                @Override
-                public void visit(final Spatial spatial) {
-                    if (spatial instanceof SkinnedMesh) {
-                        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
-                        skinnedSpatial.recreateWeightAttributeBuffer();
-                        skinnedSpatial.recreateJointAttributeBuffer();
-                    }
+            skeleton.acceptVisitor((final Spatial spatial) -> {
+                if (spatial instanceof SkinnedMesh) {
+                    final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                    skinnedSpatial.recreateWeightAttributeBuffer();
+                    skinnedSpatial.recreateJointAttributeBuffer();
                 }
             }, true);
 

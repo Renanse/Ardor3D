@@ -62,7 +62,6 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.MeshCombiner;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -195,18 +194,15 @@ public class AnimationCopyExample extends ExampleBase {
         gpuSkinningCheck.setSelected(false);
         gpuSkinningCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                _root.acceptVisitor(new Visitor() {
-                    @Override
-                    public void visit(final Spatial spatial) {
-                        if (spatial instanceof SkinnedMesh) {
-                            final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
-                            if (gpuSkinningCheck.isSelected()) {
-                                skinnedSpatial.setRenderMaterial(matGPU);
-                                skinnedSpatial.setUseGPU(true);
-                            } else {
-                                skinnedSpatial.setRenderMaterial(matCPU);
-                                skinnedSpatial.setUseGPU(false);
-                            }
+                _root.acceptVisitor((final Spatial spatial) -> {
+                    if (spatial instanceof SkinnedMesh) {
+                        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                        if (gpuSkinningCheck.isSelected()) {
+                            skinnedSpatial.setRenderMaterial(matGPU);
+                            skinnedSpatial.setUseGPU(true);
+                        } else {
+                            skinnedSpatial.setRenderMaterial(matCPU);
+                            skinnedSpatial.setUseGPU(false);
                         }
                     }
                 }, true);
@@ -287,14 +283,11 @@ public class AnimationCopyExample extends ExampleBase {
             // primeModel = colladaNode;
 
             // OPTIMIZATION: turn on the buffers in our skeleton so they can be shared. (reuse ids)
-            primeModel.acceptVisitor(new Visitor() {
-                @Override
-                public void visit(final Spatial spatial) {
-                    if (spatial instanceof SkinnedMesh) {
-                        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
-                        skinnedSpatial.recreateWeightAttributeBuffer();
-                        skinnedSpatial.recreateJointAttributeBuffer();
-                    }
+            primeModel.acceptVisitor((final Spatial spatial) -> {
+                if (spatial instanceof SkinnedMesh) {
+                    final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                    skinnedSpatial.recreateWeightAttributeBuffer();
+                    skinnedSpatial.recreateJointAttributeBuffer();
                 }
             }, true);
 

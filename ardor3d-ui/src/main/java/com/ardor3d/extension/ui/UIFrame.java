@@ -19,7 +19,6 @@ import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.visitor.Visitor;
 
 /**
  * A component similar to an inner frame in Swing. It can be dragged around the screen, minimized, expanded, closed, and
@@ -214,13 +213,10 @@ public class UIFrame extends UIContainer {
         clearStandin();
 
         // clean up any state
-        acceptVisitor(new Visitor() {
-            @Override
-            public void visit(final Spatial spatial) {
-                if (spatial instanceof StateBasedUIComponent) {
-                    final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
-                    comp.switchState(comp.getDefaultState());
-                }
+        acceptVisitor((final Spatial spatial) -> {
+            if (spatial instanceof StateBasedUIComponent) {
+                final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
+                comp.switchState(comp.getDefaultState());
             }
         }, true);
 
