@@ -61,6 +61,7 @@ import com.google.common.collect.Maps;
  * Base class for all scenegraph objects.
  */
 public abstract class Spatial implements Savable, Hintable {
+
     private static final Logger logger = Logger.getLogger(Spatial.class.getName());
 
     /** This spatial's name. */
@@ -104,6 +105,9 @@ public abstract class Spatial implements Savable, Hintable {
     /** The local RenderMaterial used by this spatial. Inherited by children if they have none set. */
     protected RenderMaterial _material;
 
+    /** This spatial's layer; defaults to {@link #DEFAULT_LAYER}. */
+    protected String _layer = DEFAULT_LAYER;
+
     public transient double _queueDistance = Double.NEGATIVE_INFINITY;
 
     protected static final EnumSet<DirtyType> ON_DIRTY_TRANSFORM_ONLY = EnumSet.of(DirtyType.Transform);
@@ -115,6 +119,8 @@ public abstract class Spatial implements Savable, Hintable {
 
     public static final String KEY_UserData = "_userData";
     public static final String KEY_DefaultColor = "_defaultColor";
+
+    public static final String DEFAULT_LAYER = "Default";
 
     /**
      * Constructs a new Spatial. Initializes the transform fields.
@@ -153,6 +159,23 @@ public abstract class Spatial implements Savable, Hintable {
      */
     public void setName(final String name) {
         _name = name;
+    }
+
+    /**
+     * @return this Spatial's layer, used for render filtering.
+     */
+    public String getLayer() {
+        return _layer;
+    }
+
+    /**
+     * Sets the layer of this Spatial.
+     *
+     * @param layer
+     *            the new layer value
+     */
+    public void setLayer(final String layer) {
+        _layer = layer;
     }
 
     /**
@@ -1497,6 +1520,8 @@ public abstract class Spatial implements Savable, Hintable {
                 }
             }
         }
+
+        _layer = capsule.readString("layer", DEFAULT_LAYER);
     }
 
     /**
@@ -1525,5 +1550,7 @@ public abstract class Spatial implements Savable, Hintable {
             }
             capsule.writeSavableList(list, "controllers", null);
         }
+
+        capsule.write(_layer, "layer", DEFAULT_LAYER);
     }
 }

@@ -215,9 +215,10 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
     @Override
     public boolean checkAndAdd(final Spatial s) {
-        final RenderBucketType rqMode = s.getSceneHints().getRenderBucketType();
-        if (rqMode != RenderBucketType.Skip) {
-            getQueue().addToQueue(s, rqMode);
+        final RenderBucketType bucketType = s.getSceneHints().getRenderBucketType();
+        final Camera camera = Camera.getCurrentCamera();
+        if (bucketType != RenderBucketType.Skip && camera.checkLayerPasses(s.getLayer())) {
+            getQueue().addToQueue(s, bucketType);
             return true;
         }
         return false;

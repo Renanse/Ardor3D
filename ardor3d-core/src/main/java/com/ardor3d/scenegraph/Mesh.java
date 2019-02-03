@@ -26,6 +26,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.Renderer;
@@ -233,7 +234,8 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     @Override
     public boolean render(final Renderer renderer) {
-        if (isVisible()) {
+        final Camera camera = Camera.getCurrentCamera();
+        if (camera.checkLayerPasses(getLayer()) && isVisible()) {
             return render(renderer, getMeshData());
         }
 

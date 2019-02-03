@@ -16,6 +16,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
@@ -244,6 +246,18 @@ public class Camera implements Savable, Externalizable {
     protected boolean _frameDirty;
 
     /**
+     * A set of layer labels to use for filtering spatials from queuing and rendering. See {@link #_exclusiveLayers} for
+     * more details.
+     */
+    protected Set<String> _layers = new HashSet<>();
+    /**
+     * If true, the _layers set is exclusive - meaning names that appear in the set are excluded from rendering when
+     * this Camera is the current active camera. If false, the set is instead inclusive, meaning that ONLY layers that
+     * appear in the set are allowed to queue and render.
+     */
+    protected boolean _exclusiveLayers = true;
+
+    /**
      * A mask value set during contains() that allows fast culling of a Node's children.
      */
     private int _planeState;
@@ -369,6 +383,7 @@ public class Camera implements Savable, Externalizable {
         onFrustumChange();
         onViewPortChange();
         onFrameChange();
+
     }
 
     public double getDepthRangeFar() {
@@ -898,6 +913,40 @@ public class Camera implements Savable, Externalizable {
         setViewPortRight(right);
         setViewPortBottom(bottom);
         setViewPortTop(top);
+    }
+
+    public Set<String> getLayers() {
+        return _layers;
+    }
+
+    public void setLayers(final Set<String> layers) {
+        _layers.clear();
+        _layers.addAll(layers);
+    }
+
+    public boolean addLayer(final String layerType) {
+        return _layers.add(layerType);
+    }
+
+    public boolean removeLayer(final String layerType) {
+        return _layers.remove(layerType);
+    }
+
+    public boolean checkLayerPasses(final String layerType) {
+        final boolean found = _layers.contains(layerType);
+        if (_exclusiveLayers) {
+            return !found;
+        } else {
+            return found;
+        }
+    }
+
+    public boolean isExclusiveLayers() {
+        return _exclusiveLayers;
+    }
+
+    public void setExclusiveLayers(final boolean exclusiveLayers) {
+        _exclusiveLayers = exclusiveLayers;
     }
 
     /**
@@ -1532,6 +1581,8 @@ public class Camera implements Savable, Externalizable {
         capsule.write(_depthRangeNear, "depthRangeNear", 0.0);
         capsule.write(_depthRangeFar, "depthRangeFar", 1.0);
         capsule.write(_projectionMode, "projectionMode", ProjectionMode.Perspective);
+        capsule.write(_layers.toArray(new String[0]), "layers", new String[0]);
+        capsule.write(_exclusiveLayers, "exclusiveLayers", true);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
@@ -1559,6 +1610,12 @@ public class Camera implements Savable, Externalizable {
         _depthRangeNear = capsule.readDouble("depthRangeNear", 0.0);
         _depthRangeFar = capsule.readDouble("depthRangeFar", 1.0);
         _projectionMode = capsule.readEnum("projectionMode", ProjectionMode.class, ProjectionMode.Perspective);
+        _layers.clear();
+        final String[] buckets = capsule.readStringArray("layers", new String[0]);
+        for (int i = 0; i < buckets.length; i++) {
+            _layers.add(buckets[i]);
+        }
+        _exclusiveLayers = capsule.readBoolean("exclusiveLayers", true);
     }
 
     public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
