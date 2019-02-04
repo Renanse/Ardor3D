@@ -658,13 +658,13 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _weightsPerVert = capsule.readInt("weightsPerVert", 1);
         _jointIndices = capsule.readShortArray("jointIndices", null);
         _weights = capsule.readFloatArray("weights", null);
-        _bindPoseData = (MeshData) capsule.readSavable("bindPoseData", null);
-        _currentPose = (SkeletonPose) capsule.readSavable("currentPose", null);
+        _bindPoseData = capsule.readSavable("bindPoseData", null);
+        _currentPose = capsule.readSavable("currentPose", null);
         _useGPU = capsule.readBoolean("useGPU", false);
         _gpuAttributeSize = capsule.readInt("gpuAttributeSize", 4);
         _gpuUseMatrixAttribute = capsule.readBoolean("gpuUseMatrixAttribute", false);
         _autoUpdateSkinBound = capsule.readBoolean("autoUpdateSkinBound", false);
-        final SkinPoseApplyLogic customApplier = (SkinPoseApplyLogic) capsule.readSavable("customApplier", null);
+        final SkinPoseApplyLogic customApplier = capsule.readSavable("customApplier", null);
         if (customApplier != null) {
             _customApplier = customApplier;
         }

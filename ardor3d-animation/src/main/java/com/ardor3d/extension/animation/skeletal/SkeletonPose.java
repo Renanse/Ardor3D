@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -52,9 +52,9 @@ public class SkeletonPose implements Savable {
 
     /**
      * Construct a new SkeletonPose using the given Skeleton.
-     * 
+     *
      * @param skeleton
-     *            the skeleton to use.
+     *                     the skeleton to use.
      */
     public SkeletonPose(final Skeleton skeleton) {
         assert skeleton != null : "skeleton must not be null.";
@@ -115,9 +115,9 @@ public class SkeletonPose implements Savable {
 
     /**
      * Register a PoseListener on this SkeletonPose.
-     * 
+     *
      * @param listener
-     *            the PoseListener
+     *                     the PoseListener
      */
     public void addPoseListener(final PoseListener listener) {
         _poseListeners.add(listener);
@@ -125,9 +125,9 @@ public class SkeletonPose implements Savable {
 
     /**
      * Remove a PoseListener from this SkeletonPose.
-     * 
+     *
      * @param listener
-     *            the PoseListener
+     *                     the PoseListener
      */
     public void removePoseListener(final PoseListener listener) {
         _poseListeners.remove(listener);
@@ -244,7 +244,7 @@ public class SkeletonPose implements Savable {
     }
 
     public void read(final InputCapsule capsule) throws IOException {
-        final Skeleton skeleton = (Skeleton) capsule.readSavable("skeleton", null);
+        final Skeleton skeleton = capsule.readSavable("skeleton", null);
         final Transform[] localTransforms = CapsuleUtils.asArray(capsule.readSavableArray("localTransforms", null),
                 Transform.class);
         try {

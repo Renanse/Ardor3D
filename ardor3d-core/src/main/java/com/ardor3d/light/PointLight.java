@@ -179,7 +179,7 @@ public class PointLight extends Light {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _location = (Vector3) capsule.readSavable("location", new Vector3(Vector3.ZERO));
+        _location = capsule.readSavable("location", (Vector3) Vector3.ZERO);
         _constant = capsule.readFloat("constant", 1);
         _linear = capsule.readFloat("linear", 0);
         _quadratic = capsule.readFloat("quadratic", 0);

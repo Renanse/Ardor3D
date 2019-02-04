@@ -428,7 +428,7 @@ public class Sphere extends Mesh {
         capsule.write(_zSamples, "zSamples", 0);
         capsule.write(_radialSamples, "radialSamples", 0);
         capsule.write(_radius, "radius", 0);
-        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
+        capsule.write(_center, "center", (Vector3) Vector3.ZERO);
         capsule.write(_textureMode, "textureMode", TextureMode.Linear);
         capsule.write(_viewInside, "viewInside", false);
     }
@@ -439,7 +439,7 @@ public class Sphere extends Mesh {
         _zSamples = capsule.readInt("zSamples", 0);
         _radialSamples = capsule.readInt("radialSamples", 0);
         _radius = capsule.readDouble("radius", 0);
-        _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
+        _center.set(capsule.readSavable("center", (Vector3) Vector3.ZERO));
         _textureMode = capsule.readEnum("textureMode", TextureMode.class, TextureMode.Linear);
         _viewInside = capsule.readBoolean("viewInside", false);
     }

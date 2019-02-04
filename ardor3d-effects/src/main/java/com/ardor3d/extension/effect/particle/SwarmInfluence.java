@@ -163,7 +163,7 @@ public class SwarmInfluence extends ParticleInfluence {
         cap.write(_turnSpeed, "turnSpeed", DEFAULT_TURN_SPEED);
         cap.write(_speedBump, "speedBump", DEFAULT_SPEED_BUMP);
         cap.write(_maxSpeed, "maxSpeed", DEFAULT_MAX_SPEED);
-        cap.write(_swarmOffset, "swarmOffset", new Vector3());
+        cap.write(_swarmOffset, "swarmOffset", (Vector3) Vector3.ZERO);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class SwarmInfluence extends ParticleInfluence {
         _turnSpeed = cap.readDouble("turnSpeed", DEFAULT_TURN_SPEED);
         _speedBump = cap.readDouble("speedBump", DEFAULT_SPEED_BUMP);
         _maxSpeed = cap.readDouble("maxSpeed", DEFAULT_MAX_SPEED);
-        _swarmOffset.set((Vector3) cap.readSavable("swarmOffset", new Vector3()));
+        _swarmOffset.set(cap.readSavable("swarmOffset", (Vector3) Vector3.ZERO));
     }
 
     @Override

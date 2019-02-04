@@ -419,7 +419,7 @@ final public class TextureKey implements Savable {
     }
 
     public void read(final InputCapsule capsule) throws IOException {
-        _source = (ResourceSource) capsule.readSavable("source", null);
+        _source = capsule.readSavable("source", null);
         _flipped = capsule.readBoolean("flipped", false);
         _format = capsule.readEnum("format", TextureStoreFormat.class, TextureStoreFormat.GuessCompressedFormat);
         _minFilter = capsule.readEnum("minFilter", MinificationFilter.class, MinificationFilter.Trilinear);

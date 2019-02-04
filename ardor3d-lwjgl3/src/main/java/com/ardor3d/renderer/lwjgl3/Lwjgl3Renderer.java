@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -82,7 +82,9 @@ public class Lwjgl3Renderer extends AbstractRenderer {
         _shaderUtils = new Lwjgl3ShaderUtils(this);
         _textureUtils = new Lwjgl3TextureUtils();
         _scissorUtils = new Lwjgl3ScissorUtils();
-        GLUtil.setupDebugMessageCallback();
+        if (Constants.logOpenGLDebug) {
+            GLUtil.setupDebugMessageCallback();
+        }
 
         // Right now, we are deciding that we always want this. If someone comes up with a reason they don't want this,
         // we can look into making it part of Texture/TextureState.

@@ -768,7 +768,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
         @Override
         public void read(final InputCapsule capsule) throws IOException {
             _time = capsule.readDouble("time", 0);
-            _newShape = (Mesh) capsule.readSavable("newShape", null);
+            _newShape = capsule.readSavable("newShape", null);
         }
 
         @Override
@@ -804,7 +804,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         _updateBounding = capsule.readBoolean("updateBounding", false);
-        _morphMesh = (Mesh) capsule.readSavable("morphMesh", null);
+        _morphMesh = capsule.readSavable("morphMesh", null);
         _keyframes = (ArrayList<PointInTime>) capsule.readSavableList("keyframes", new ArrayList<PointInTime>());
         _movingForward = true;
     }

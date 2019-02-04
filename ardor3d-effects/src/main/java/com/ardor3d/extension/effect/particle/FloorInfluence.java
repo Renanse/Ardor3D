@@ -123,7 +123,7 @@ public class FloorInfluence extends ParticleInfluence {
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         _bounciness = capsule.readDouble("bounciness", 1.0);
-        _floor.set((Plane) capsule.readSavable("floor", new Plane()));
+        _floor.set(capsule.readSavable("floor", new Plane()));
     }
 
 }

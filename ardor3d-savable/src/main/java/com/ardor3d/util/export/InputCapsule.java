@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -91,11 +91,11 @@ public interface InputCapsule {
 
     // BinarySavable
 
-    public Savable readSavable(String name, Savable defVal) throws IOException;
+    public <E extends Savable> E readSavable(String name, E defVal) throws IOException;
 
-    public Savable[] readSavableArray(String name, Savable[] defVal) throws IOException;
+    public <E extends Savable> E[] readSavableArray(String name, E[] defVal) throws IOException;
 
-    public Savable[][] readSavableArray2D(String name, Savable[][] defVal) throws IOException;
+    public <E extends Savable> E[][] readSavableArray2D(String name, E[][] defVal) throws IOException;
 
     // Lists
 

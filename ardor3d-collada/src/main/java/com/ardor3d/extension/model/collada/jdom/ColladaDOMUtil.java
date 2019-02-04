@@ -23,10 +23,10 @@ import org.jdom2.CDATA;
 import org.jdom2.Comment;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.Text;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.math.ColorRGBA;
@@ -77,11 +77,11 @@ public class ColladaDOMUtil {
      *         {@link CDATA}, {@link Comment}, {@link ProcessingInstruction}, Boolean, Double, or String.
      */
     public List<?> selectNodes(final Element element, final String query) {
-        final XPath xPathExpression = getXPathExpression(query);
+        final XPathExpression<?> xPathExpression = getXPathExpression(query);
 
         try {
-            return xPathExpression.selectNodes(element);
-        } catch (final JDOMException e) {
+            return xPathExpression.evaluate(element);
+        } catch (final Exception e) {
             e.printStackTrace();
         }
         return Collections.emptyList();
@@ -99,11 +99,11 @@ public class ColladaDOMUtil {
      *         <code>null</code> if no item was selected.
      */
     public Object selectSingleNode(final Element element, final String query) {
-        final XPath xPathExpression = getXPathExpression(query);
+        final XPathExpression<?> xPathExpression = getXPathExpression(query);
 
         try {
-            return xPathExpression.selectSingleNode(element);
-        } catch (final JDOMException e) {
+            return xPathExpression.evaluateFirst(element);
+        } catch (final Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -126,16 +126,17 @@ public class ColladaDOMUtil {
      *            XPath query to compile
      * @return new XPath expression object
      */
-    private XPath getXPathExpression(final String query) {
+    private XPathExpression<?> getXPathExpression(final String query) {
 
         if (_dataCache.getxPathExpressions().containsKey(query)) {
             return _dataCache.getxPathExpressions().get(query);
         }
 
-        XPath xPathExpression = null;
+        final XPathFactory xpf = XPathFactory.instance();
+        XPathExpression<?> xPathExpression = null;
         try {
-            xPathExpression = XPath.newInstance(query);
-        } catch (final JDOMException e) {
+            xPathExpression = xpf.compile(query);
+        } catch (final Exception e) {
             e.printStackTrace();
         }
 

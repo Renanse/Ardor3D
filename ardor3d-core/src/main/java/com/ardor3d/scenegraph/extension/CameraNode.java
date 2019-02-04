@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -34,7 +34,7 @@ public class CameraNode extends Node {
 
     /**
      * Constructor instantiates a new <code>CameraNode</code> object setting the camera to use for the frame reference.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      * @param camera
@@ -66,7 +66,7 @@ public class CameraNode extends Node {
 
     /**
      * <code>setCamera</code> sets the camera that this node controls.
-     * 
+     *
      * @param camera
      *            the camera that this node controls.
      */
@@ -76,7 +76,7 @@ public class CameraNode extends Node {
 
     /**
      * <code>getCamera</code> retrieves the camera object that this node controls.
-     * 
+     *
      * @return the camera this node controls.
      */
     public Camera getCamera() {
@@ -107,7 +107,7 @@ public class CameraNode extends Node {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _camera = (Camera) capsule.readSavable("camera", null);
+        _camera = capsule.readSavable("camera", null);
 
     }
 }

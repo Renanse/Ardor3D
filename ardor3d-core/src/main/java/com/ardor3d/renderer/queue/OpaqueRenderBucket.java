@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -58,7 +58,8 @@ public class OpaqueRenderBucket extends AbstractRenderBucket {
                 return 1;
             }
 
-            for (int x = 0, maxIndex = Math.min(ts1.getMaxTextureIndexUsed(), ts2.getMaxTextureIndexUsed()); x <= maxIndex; x++) {
+            for (int x = 0, maxIndex = Math.min(ts1.getMaxTextureIndexUsed(),
+                    ts2.getMaxTextureIndexUsed()); x <= maxIndex; x++) {
 
                 final TextureKey key1 = ts1.getTextureKey(x);
                 final TextureKey key2 = ts2.getTextureKey(x);

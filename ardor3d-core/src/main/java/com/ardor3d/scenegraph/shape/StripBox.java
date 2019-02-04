@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -38,7 +38,7 @@ public class StripBox extends Mesh {
     /**
      * Constructor instantiates a new <code>StripBox</code> object. Center and vertex information must be supplied
      * later.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      */
@@ -50,7 +50,7 @@ public class StripBox extends Mesh {
      * Constructor instantiates a new <code>StripBox</code> object. The minimum and maximum point are provided. These
      * two points define the shape and size of the box, but not it's orientation or position. You should use the
      * <code>setTranslation</code> and <code>setLocalRotation</code> for those attributes.
-     * 
+     *
      * @param name
      *            the name of the scene element. This is required for identification and comparison purposes.
      * @param min
@@ -66,7 +66,7 @@ public class StripBox extends Mesh {
     /**
      * Constructs a new box. The box has the given center and extends in the x, y, and z out from the center (+ and -)
      * by the given amounts. So, for example, a box with extent of .5 would be the unit cube.
-     * 
+     *
      * @param name
      *            Name of the box.
      * @param center
@@ -88,7 +88,7 @@ public class StripBox extends Mesh {
      * Changes the data of the box so that the two opposite corners are minPoint and maxPoint. The other corners are
      * created from those two poitns. If update buffers is flagged as true, the vertex/normal/texture/color/index
      * buffers are updated when the data is changed.
-     * 
+     *
      * @param minPoint
      *            The new minPoint of the box.
      * @param maxPoint
@@ -107,7 +107,7 @@ public class StripBox extends Mesh {
      * Changes the data of the box so that its center is <code>center</code> and it extends in the x, y, and z
      * directions by the given extent. Note that the actual sides will be 2x the given extent values because the box
      * extends in + & - from the center for each extent.
-     * 
+     *
      * @param center
      *            The center of the box.
      * @param xExtent
@@ -134,10 +134,10 @@ public class StripBox extends Mesh {
     }
 
     /**
-     * 
+     *
      * <code>setVertexData</code> sets the vertex positions that define the box. These eight points are determined from
      * the minimum and maximum point.
-     * 
+     *
      */
     private void setVertexData() {
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), 8));
@@ -154,10 +154,10 @@ public class StripBox extends Mesh {
     }
 
     /**
-     * 
+     *
      * <code>setNormalData</code> sets the normals of each of the box's planes.
-     * 
-     * 
+     *
+     *
      */
     private void setNormalData() {
         final Vector3[] vert = computeVertices(); // returns 8
@@ -172,11 +172,11 @@ public class StripBox extends Mesh {
     }
 
     /**
-     * 
+     *
      * <code>setTextureData</code> sets the points that define the texture of the box. It's a one-to-one ratio, where
      * each plane of the box has it's own copy of the texture. That is, the texture is repeated one time for each six
      * faces.
-     * 
+     *
      */
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
@@ -194,10 +194,10 @@ public class StripBox extends Mesh {
     }
 
     /**
-     * 
+     *
      * <code>setIndexData</code> sets the indices into the list of vertices, defining all triangles that constitute the
      * box.
-     * 
+     *
      */
     private void setIndexData() {
         _meshData.setIndexMode(IndexMode.TriangleStrip);
@@ -212,7 +212,7 @@ public class StripBox extends Mesh {
 
     /**
      * <code>clone</code> creates a new StripBox object containing the same data as this one.
-     * 
+     *
      * @return the new StripBox
      */
     @Override
@@ -221,7 +221,7 @@ public class StripBox extends Mesh {
     }
 
     /**
-     * 
+     *
      * @return a size 8 array of Vectors representing the 8 points of the box.
      */
     public Vector3[] computeVertices() {
@@ -247,7 +247,7 @@ public class StripBox extends Mesh {
 
     /**
      * Returns the current center of the box.
-     * 
+     *
      * @return The box's center.
      */
     public Vector3 getCenter() {
@@ -260,7 +260,7 @@ public class StripBox extends Mesh {
         capsule.write(_xExtent, "xExtent", 0);
         capsule.write(_yExtent, "yExtent", 0);
         capsule.write(_zExtent, "zExtent", 0);
-        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
+        capsule.write(_center, "center", (Vector3) Vector3.ZERO);
 
     }
 
@@ -270,6 +270,6 @@ public class StripBox extends Mesh {
         _xExtent = capsule.readDouble("xExtent", 0);
         _yExtent = capsule.readDouble("yExtent", 0);
         _zExtent = capsule.readDouble("zExtent", 0);
-        _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
+        _center.set(capsule.readSavable("center", (Vector3) Vector3.ZERO));
     }
 }

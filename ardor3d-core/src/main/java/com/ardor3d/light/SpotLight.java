@@ -145,7 +145,7 @@ public class SpotLight extends PointLight {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _direction.set((Vector3) capsule.readSavable("direction", new Vector3(Vector3.UNIT_Z)));
+        _direction.set(capsule.readSavable("direction", (Vector3) Vector3.UNIT_Z));
         _angle = capsule.readFloat("angle", 0);
         _innerAngle = capsule.readFloat("innerAngle", 0);
     }

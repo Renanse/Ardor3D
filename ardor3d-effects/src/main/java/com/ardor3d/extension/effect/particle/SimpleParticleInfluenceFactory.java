@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -91,7 +91,7 @@ public final class SimpleParticleInfluenceFactory {
         public void write(final OutputCapsule capsule) throws IOException {
             super.write(capsule);
             capsule.write(_strength, "strength", 1f);
-            capsule.write(_windDirection, "windDirection", new Vector3(Vector3.UNIT_X));
+            capsule.write(_windDirection, "windDirection", (Vector3) Vector3.UNIT_X);
             capsule.write(_random, "random", false);
             capsule.write(_rotateWithScene, "rotateWithScene", true);
         }
@@ -100,7 +100,7 @@ public final class SimpleParticleInfluenceFactory {
         public void read(final InputCapsule capsule) throws IOException {
             super.read(capsule);
             _strength = capsule.readDouble("strength", 1.0);
-            _windDirection.set((Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X)));
+            _windDirection.set(capsule.readSavable("windDirection", (Vector3) Vector3.UNIT_X));
             _random = capsule.readBoolean("random", false);
             _rotateWithScene = capsule.readBoolean("rotateWithScene", true);
         }
@@ -156,14 +156,14 @@ public final class SimpleParticleInfluenceFactory {
         @Override
         public void write(final OutputCapsule capsule) throws IOException {
             super.write(capsule);
-            capsule.write(gravity, "gravity", new Vector3(Vector3.ZERO));
+            capsule.write(gravity, "gravity", (Vector3) Vector3.ZERO);
             capsule.write(rotateWithScene, "rotateWithScene", true);
         }
 
         @Override
         public void read(final InputCapsule capsule) throws IOException {
             super.read(capsule);
-            gravity.set((Vector3) capsule.readSavable("gravity", new Vector3(Vector3.ZERO)));
+            gravity.set(capsule.readSavable("gravity", (Vector3) Vector3.ZERO));
             rotateWithScene = capsule.readBoolean("rotateWithScene", true);
         }
 
@@ -359,7 +359,7 @@ public final class SimpleParticleInfluenceFactory {
             capsule.write(_type, "type", VT_CYLINDER);
             capsule.write(_strength, "strength", 1.0);
             capsule.write(_divergence, "divergence", 0.0);
-            capsule.write(_axis, "axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
+            capsule.write(_axis, "axis", new Line3(Vector3.ZERO, Vector3.UNIT_Y));
             capsule.write(_height, "height", 0.0);
             capsule.write(_radius, "radius", 1.0);
             capsule.write(_random, "random", false);
@@ -372,7 +372,7 @@ public final class SimpleParticleInfluenceFactory {
             _type = capsule.readInt("type", VT_CYLINDER);
             _strength = capsule.readDouble("strength", 1.0);
             _divergence = capsule.readDouble("divergence", 0.0);
-            _axis.set((Line3) capsule.readSavable("axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y))));
+            _axis.set(capsule.readSavable("axis", new Line3(Vector3.ZERO, Vector3.UNIT_Y)));
             _height = capsule.readDouble("height", 0.0);
             _radius = capsule.readDouble("radius", 1.0);
             _random = capsule.readBoolean("random", false);
@@ -392,7 +392,7 @@ public final class SimpleParticleInfluenceFactory {
 
     /**
      * Creates a basic wind that always blows in a single direction.
-     * 
+     *
      * @param windStr
      *            Max strength of wind.
      * @param windDir
@@ -410,7 +410,7 @@ public final class SimpleParticleInfluenceFactory {
 
     /**
      * Create a basic gravitational force.
-     * 
+     *
      * @param rotateWithScene
      *            rotate the gravity vector with the particle system
      * @return ParticleInfluence
@@ -422,7 +422,7 @@ public final class SimpleParticleInfluenceFactory {
     /**
      * Create a basic drag force that will use the given drag coefficient. Drag is determined by figuring the current
      * velocity and reversing it, then multiplying by the drag coefficient and dividing by the particle mass.
-     * 
+     *
      * @param dragCoef
      *            Should be positive. Larger values mean more drag but possibly more instability.
      * @return ParticleInfluence
@@ -433,7 +433,7 @@ public final class SimpleParticleInfluenceFactory {
 
     /**
      * Creates a basic vortex.
-     * 
+     *
      * @param strength
      *            Max strength of vortex.
      * @param divergence

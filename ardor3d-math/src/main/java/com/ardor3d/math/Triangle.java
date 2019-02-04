@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -51,7 +51,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param source
      *            the triangle to copy from.
      */
@@ -61,7 +61,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Construct a new, mutable triangle using the given points and an index of 0.
-     * 
+     *
      * @param pointA
      * @param pointB
      * @param pointC
@@ -72,7 +72,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Constructs a new triangle using the given points and index.
-     * 
+     *
      * @param pointA
      * @param pointB
      * @param pointC
@@ -88,7 +88,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Copies the values of the given source Triangle into this Triangle.
-     * 
+     *
      * @param source
      * @return this Triangle for chaining
      * @throws NullPointerException
@@ -138,7 +138,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     /**
      * Obtains the unit length normal vector of this triangle... Will create and recalculate this normal vector if this
      * is the first request, or if one of the points on the triangle has changed since the last request.
-     * 
+     *
      * @return the normal vector
      * @throws NullPointerException
      *             if store is null.
@@ -165,7 +165,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Sets the index value of this triangle to the given int value.
-     * 
+     *
      * @param index
      */
     public void setIndex(final int index) {
@@ -174,7 +174,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Sets the first point of this triangle to the values of the given vector.
-     * 
+     *
      * @param pointA
      */
     public void setA(final ReadOnlyVector3 pointA) {
@@ -184,7 +184,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Sets the second point of this triangle to the values of the given vector.
-     * 
+     *
      * @param pointB
      */
     public void setB(final ReadOnlyVector3 pointB) {
@@ -194,7 +194,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Sets the third point of this triangle to the values of the given vector.
-     * 
+     *
      * @param pointC
      */
     public void setC(final ReadOnlyVector3 pointC) {
@@ -204,7 +204,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Sets a point to a new value.
-     * 
+     *
      * @param index
      *            the index of the point to set (0-2, corresponding to A-C)
      * @param point
@@ -257,7 +257,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Check a triangle... if it is null or its points are invalid, return false. Else return true.
-     * 
+     *
      * @param triangle
      *            the triangle to check
      * @return true or false as stated above.
@@ -337,17 +337,17 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_pointA, "a", new Vector3(Vector3.ZERO));
-        capsule.write(_pointB, "b", new Vector3(Vector3.ZERO));
-        capsule.write(_pointC, "c", new Vector3(Vector3.ZERO));
+        capsule.write(_pointA, "a", (Vector3) Vector3.ZERO);
+        capsule.write(_pointB, "b", (Vector3) Vector3.ZERO);
+        capsule.write(_pointC, "c", (Vector3) Vector3.ZERO);
         capsule.write(_index, "index", 0);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
-        _pointA.set((Vector3) capsule.readSavable("a", new Vector3(Vector3.ZERO)));
-        _pointB.set((Vector3) capsule.readSavable("b", new Vector3(Vector3.ZERO)));
-        _pointC.set((Vector3) capsule.readSavable("c", new Vector3(Vector3.ZERO)));
+        _pointA.set(capsule.readSavable("a", (Vector3) Vector3.ZERO));
+        _pointB.set(capsule.readSavable("b", (Vector3) Vector3.ZERO));
+        _pointC.set(capsule.readSavable("c", (Vector3) Vector3.ZERO));
         _index = capsule.readInt("index", 0);
     }
 
@@ -357,7 +357,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param in
      *            ObjectInput
      * @throws IOException
@@ -373,7 +373,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param out
      *            ObjectOutput
      * @throws IOException
@@ -405,7 +405,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     /**
      * Releases a Triangle back to be used by a future call to fetchTempInstance. TAKE CARE: this Triangle object should
      * no longer have other classes referencing it or "Bad Things" will happen.
-     * 
+     *
      * @param tri
      *            the Triangle to release.
      */

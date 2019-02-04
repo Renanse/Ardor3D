@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -246,12 +246,12 @@ public class Camera implements Savable, Externalizable {
     protected boolean _frameDirty;
 
     /**
-     * A set of layer labels to use for filtering spatials from queuing and rendering. See {@link #_exclusiveLayers} for
-     * more details.
+     * A set of layers to use for filtering Spatials from queuing and rendering. See {@link #_exclusiveLayers} for more
+     * details.
      */
-    protected Set<String> _layers = new HashSet<>();
+    protected Set<Integer> _layers = new HashSet<>();
     /**
-     * If true, the _layers set is exclusive - meaning names that appear in the set are excluded from rendering when
+     * If true, the _layers set is exclusive - meaning values that appear in the set are excluded from rendering when
      * this Camera is the current active camera. If false, the set is instead inclusive, meaning that ONLY layers that
      * appear in the set are allowed to queue and render.
      */
@@ -915,25 +915,25 @@ public class Camera implements Savable, Externalizable {
         setViewPortTop(top);
     }
 
-    public Set<String> getLayers() {
+    public Set<Integer> getLayers() {
         return _layers;
     }
 
-    public void setLayers(final Set<String> layers) {
+    public void setLayers(final Set<Integer> layers) {
         _layers.clear();
         _layers.addAll(layers);
     }
 
-    public boolean addLayer(final String layerType) {
-        return _layers.add(layerType);
+    public boolean addLayer(final int layer) {
+        return _layers.add(layer);
     }
 
-    public boolean removeLayer(final String layerType) {
-        return _layers.remove(layerType);
+    public boolean removeLayer(final int layer) {
+        return _layers.remove(layer);
     }
 
-    public boolean checkLayerPasses(final String layerType) {
-        final boolean found = _layers.contains(layerType);
+    public boolean checkLayerPasses(final int layer) {
+        final boolean found = _layers.contains(layer);
         if (_exclusiveLayers) {
             return !found;
         } else {
@@ -1581,15 +1581,22 @@ public class Camera implements Savable, Externalizable {
         capsule.write(_depthRangeNear, "depthRangeNear", 0.0);
         capsule.write(_depthRangeFar, "depthRangeFar", 1.0);
         capsule.write(_projectionMode, "projectionMode", ProjectionMode.Perspective);
-        capsule.write(_layers.toArray(new String[0]), "layers", new String[0]);
+        if (_layers.size() > 0) {
+            final int[] layers = new int[_layers.size()];
+            int i = 0;
+            for (final int n : _layers) {
+                layers[i++] = n;
+            }
+            capsule.write(layers, "layers", new int[0]);
+        }
         capsule.write(_exclusiveLayers, "exclusiveLayers", true);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
-        _location.set((Vector3) capsule.readSavable("location", new Vector3(Vector3.ZERO)));
-        _left.set((Vector3) capsule.readSavable("left", new Vector3(Vector3.UNIT_X)));
-        _up.set((Vector3) capsule.readSavable("up", new Vector3(Vector3.UNIT_Y)));
-        _direction.set((Vector3) capsule.readSavable("direction", new Vector3(Vector3.UNIT_Z)));
+        _location.set(capsule.readSavable("location", (Vector3) Vector3.ZERO));
+        _left.set(capsule.readSavable("left", (Vector3) Vector3.UNIT_X));
+        _up.set(capsule.readSavable("up", (Vector3) Vector3.UNIT_Y));
+        _direction.set(capsule.readSavable("direction", (Vector3) Vector3.UNIT_Z));
         _frustumNear = capsule.readDouble("frustumNear", 1);
         _frustumFar = capsule.readDouble("frustumFar", 2);
         _frustumLeft = capsule.readDouble("frustumLeft", -0.5);
@@ -1611,9 +1618,9 @@ public class Camera implements Savable, Externalizable {
         _depthRangeFar = capsule.readDouble("depthRangeFar", 1.0);
         _projectionMode = capsule.readEnum("projectionMode", ProjectionMode.class, ProjectionMode.Perspective);
         _layers.clear();
-        final String[] buckets = capsule.readStringArray("layers", new String[0]);
-        for (int i = 0; i < buckets.length; i++) {
-            _layers.add(buckets[i]);
+        final int[] layers = capsule.readIntArray("layers", new int[0]);
+        for (int i = 0; i < layers.length; i++) {
+            _layers.add(layers[i]);
         }
         _exclusiveLayers = capsule.readBoolean("exclusiveLayers", true);
     }

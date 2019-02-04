@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -44,11 +44,11 @@ public class TransformData implements Savable {
 
     /**
      * Construct a new transform data object, copying the value of the given source.
-     * 
+     *
      * @param source
-     *            our source to copy.
+     *                   our source to copy.
      * @throws NullPointerException
-     *             if source is null.
+     *                                  if source is null.
      */
     public TransformData(final TransformData source) {
         set(source);
@@ -56,11 +56,11 @@ public class TransformData implements Savable {
 
     /**
      * Copy the source's values into this transform data object.
-     * 
+     *
      * @param source
-     *            our source to copy.
+     *                   our source to copy.
      * @throws NullPointerException
-     *             if source is null.
+     *                                  if source is null.
      */
     public void set(final TransformData source) {
         _rotation.set(source.getRotation());
@@ -120,13 +120,13 @@ public class TransformData implements Savable {
 
     /**
      * Blend this transform with the given transform.
-     * 
+     *
      * @param blendTo
-     *            The transform to blend to
+     *                        The transform to blend to
      * @param blendWeight
-     *            The blend weight
+     *                        The blend weight
      * @param store
-     *            The transform store.
+     *                        The transform store.
      * @return The blended transform.
      */
     public TransformData blend(final TransformData blendTo, final double blendWeight, final TransformData store) {
@@ -177,14 +177,14 @@ public class TransformData implements Savable {
     }
 
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_rotation, "rotation", new Quaternion(Quaternion.IDENTITY));
-        capsule.write(_scale, "scale", new Vector3(Vector3.ONE));
-        capsule.write(_translation, "translation", new Vector3(Vector3.ZERO));
+        capsule.write(_rotation, "rotation", (Quaternion) Quaternion.IDENTITY);
+        capsule.write(_scale, "scale", (Vector3) Vector3.ONE);
+        capsule.write(_translation, "translation", (Vector3) Vector3.ZERO);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
-        setRotation((Quaternion) capsule.readSavable("rotation", new Quaternion(Quaternion.IDENTITY)));
-        setScale((Vector3) capsule.readSavable("scale", new Vector3(Vector3.ONE)));
-        setTranslation((Vector3) capsule.readSavable("rotation", new Vector3(Vector3.ZERO)));
+        setRotation(capsule.readSavable("rotation", (Quaternion) Quaternion.IDENTITY));
+        setScale(capsule.readSavable("scale", (Vector3) Vector3.ONE));
+        setTranslation(capsule.readSavable("rotation", (Vector3) Vector3.ZERO));
     }
 }

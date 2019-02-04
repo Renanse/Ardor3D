@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -262,7 +262,8 @@ public class BinaryInputCapsule implements InputCapsule {
         return (long[][]) _fieldData.get(field._alias);
     }
 
-    public Savable readSavable(final String name, final Savable defVal) throws IOException {
+    @SuppressWarnings("unchecked")
+    public <E extends Savable> E readSavable(final String name, final E defVal) throws IOException {
         final BinaryClassField field = _cObj._nameFields.get(name);
         if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
@@ -273,13 +274,14 @@ public class BinaryInputCapsule implements InputCapsule {
         } else if (value instanceof ID) {
             value = _importer.readObject(((ID) value).id);
             _fieldData.put(field._alias, value);
-            return (Savable) value;
+            return (E) value;
         } else {
             return defVal;
         }
     }
 
-    public Savable[] readSavableArray(final String name, final Savable[] defVal) throws IOException {
+    @SuppressWarnings("unchecked")
+    public <E extends Savable> E[] readSavableArray(final String name, final E[] defVal) throws IOException {
         final BinaryClassField field = _cObj._nameFields.get(name);
         if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
@@ -288,7 +290,7 @@ public class BinaryInputCapsule implements InputCapsule {
         if (values instanceof ID[]) {
             values = resolveIDs(values);
             _fieldData.put(field._alias, values);
-            return (Savable[]) values;
+            return (E[]) values;
         } else {
             return defVal;
         }
@@ -307,7 +309,8 @@ public class BinaryInputCapsule implements InputCapsule {
         }
     }
 
-    public Savable[][] readSavableArray2D(final String name, final Savable[][] defVal) throws IOException {
+    @SuppressWarnings("unchecked")
+    public <E extends Savable> E[][] readSavableArray2D(final String name, final E[][] defVal) throws IOException {
         final BinaryClassField field = _cObj._nameFields.get(name);
         if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
@@ -325,7 +328,7 @@ public class BinaryInputCapsule implements InputCapsule {
             values = savables;
             _fieldData.put(field._alias, values);
         }
-        return (Savable[][]) values;
+        return (E[][]) values;
     }
 
     public Savable[][][] readSavableArray3D(final String name, final Savable[][][] defVal) throws IOException {

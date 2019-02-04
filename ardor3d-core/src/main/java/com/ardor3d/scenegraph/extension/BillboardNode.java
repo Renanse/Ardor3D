@@ -136,7 +136,7 @@ public class BillboardNode extends Node {
         return _updateBounds;
     }
 
-    public void setLocalRotation(Matrix3 rot) {
+    public void setLocalRotation(final Matrix3 rot) {
         _localRot = rot;
     }
 
@@ -193,7 +193,7 @@ public class BillboardNode extends Node {
     }
 
     private void rotateNone() {
-        if(_localRot != null) {
+        if (_localRot != null) {
             _orient.set(getRotation());
             _orient.multiplyLocal(_localRot);
             _worldTransform.setRotation(_orient);
@@ -210,8 +210,9 @@ public class BillboardNode extends Node {
         final Vector3 up = Vector3.fetchTempInstance();
         up.set(_look).crossLocal(_left);
         _orient.fromAxes(_left, up, _look);
-        if(_localRot != null)
+        if (_localRot != null) {
             _orient.multiplyLocal(_localRot);
+        }
         _worldTransform.setRotation(_orient);
         Vector3.releaseTempInstance(up);
     }
@@ -224,8 +225,9 @@ public class BillboardNode extends Node {
         _look.set(camera.getDirection()).negateLocal();
         _left.set(camera.getLeft()).negateLocal();
         _orient.fromAxes(_left, camera.getUp(), _look);
-        if(_localRot != null)
+        if (_localRot != null) {
             _orient.multiplyLocal(_localRot);
+        }
         _worldTransform.setRotation(_orient);
     }
 
@@ -304,8 +306,9 @@ public class BillboardNode extends Node {
 
         // The billboard must be oriented to face the camera before it is
         // transformed into the world.
-        if(_localRot != null)
+        if (_localRot != null) {
             _orient.multiplyLocal(_localRot);
+        }
         worldMatrix.multiplyLocal(_orient);
         _worldTransform.setRotation(worldMatrix);
         Matrix3.releaseTempInstance(worldMatrix);
@@ -333,8 +336,8 @@ public class BillboardNode extends Node {
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.write(_orient, "orient", new Matrix3());
-        capsule.write(_look, "look", new Vector3(Vector3.ZERO));
-        capsule.write(_left, "left", new Vector3(Vector3.ZERO));
+        capsule.write(_look, "look", (Vector3) Vector3.ZERO);
+        capsule.write(_left, "left", (Vector3) Vector3.ZERO);
         capsule.write(_alignment, "alignment", BillboardAlignment.ScreenAligned);
         capsule.write(_updateBounds, "updateBounds", true);
     }
@@ -342,9 +345,9 @@ public class BillboardNode extends Node {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _orient.set((Matrix3) capsule.readSavable("orient", new Matrix3(Matrix3.IDENTITY)));
-        _look.set((Vector3) capsule.readSavable("look", new Vector3(Vector3.ZERO)));
-        _left.set((Vector3) capsule.readSavable("left", new Vector3(Vector3.ZERO)));
+        _orient.set(capsule.readSavable("orient", (Matrix3) Matrix3.IDENTITY));
+        _look.set(capsule.readSavable("look", (Vector3) Vector3.ZERO));
+        _left.set(capsule.readSavable("left", (Vector3) Vector3.ZERO));
         _alignment = capsule.readEnum("alignment", BillboardAlignment.class, BillboardAlignment.ScreenAligned);
         _updateBounds = capsule.readBoolean("updateBounds", true);
     }

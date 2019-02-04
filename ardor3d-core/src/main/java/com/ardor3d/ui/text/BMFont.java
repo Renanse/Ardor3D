@@ -910,13 +910,13 @@ public class BMFont implements Savable {
     public void read(final InputCapsule capsule) throws IOException {
         _useMipMaps = capsule.readBoolean("useMipMaps", false);
         _styleName = capsule.readString("styleName", null);
-        _pageTexture = (Texture) capsule.readSavable("pageTexture", null);
+        _pageTexture = capsule.readSavable("pageTexture", null);
         _pageTexture = TextureManager.loadFromImage(_pageTexture.getImage(), _pageTexture.getMinificationFilter());
 
         // Info
-        _info = (Info) capsule.readSavable("info", _info);
+        _info = capsule.readSavable("info", _info);
         // Common
-        _common = (Common) capsule.readSavable("common", _common);
+        _common = capsule.readSavable("common", _common);
         // Pages
         _pages.clear();
         final List<Savable> pages = capsule.readSavableList("pages", new ArrayList<Savable>());

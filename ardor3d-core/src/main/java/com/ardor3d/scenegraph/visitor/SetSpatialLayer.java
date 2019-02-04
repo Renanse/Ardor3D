@@ -13,9 +13,9 @@ package com.ardor3d.scenegraph.visitor;
 import com.ardor3d.scenegraph.Spatial;
 
 public class SetSpatialLayer implements Visitor {
-    private final String _layer;
+    private final int _layer;
 
-    public SetSpatialLayer(final String layer) {
+    public SetSpatialLayer(final int layer) {
         _layer = layer;
     }
 

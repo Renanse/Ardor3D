@@ -20,7 +20,7 @@ import com.ardor3d.util.export.Savable;
 
 /**
  * <code>RampEntry</code> defines an entry for a ParticleAppearanceRamp.
- * 
+ *
  * @see ParticleAppearanceRamp
  */
 public class RampEntry implements Savable {
@@ -41,7 +41,7 @@ public class RampEntry implements Savable {
 
     /**
      * Construct new addition to color ramp
-     * 
+     *
      * @param offset
      *            amount of time (as a percent of total lifetime) between the last appearance and this one.
      */
@@ -122,7 +122,7 @@ public class RampEntry implements Savable {
         _size = capsule.readDouble("size", DEFAULT_SIZE);
         _spin = capsule.readDouble("spin", DEFAULT_SPIN);
         _mass = capsule.readDouble("mass", DEFAULT_MASS);
-        _color = (ColorRGBA) capsule.readSavable("color", DEFAULT_COLOR);
+        _color = capsule.readSavable("color", DEFAULT_COLOR);
     }
 
     public void write(final OutputCapsule capsule) throws IOException {

@@ -256,8 +256,8 @@ public class Particle implements Savable {
         // interpolate colors
         final int verts = ParticleSystem.getVertsForParticleType(type);
         for (int x = 0; x < verts; x++) {
-            BufferUtils.setInBuffer(currColor, parent.getParticleGeometry().getMeshData().getColorBuffer(), startIndex
-                    + x);
+            BufferUtils.setInBuffer(currColor, parent.getParticleGeometry().getMeshData().getColorBuffer(),
+                    startIndex + x);
         }
 
         // check for tex animation
@@ -448,23 +448,23 @@ public class Particle implements Savable {
 
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(startIndex, "startIndex", 0);
-        capsule.write(_position, "position", new Vector3(Vector3.ZERO));
+        capsule.write(_position, "position", (Vector3) Vector3.ZERO);
         capsule.write(status, "status", Status.Available);
         capsule.write(lifeSpan, "lifeSpan", 0);
         capsule.write(currentAge, "currentAge", 0);
         capsule.write(parent, "parent", null);
-        capsule.write(_velocity, "velocity", new Vector3());
+        capsule.write(_velocity, "velocity", (Vector3) Vector3.ZERO);
         capsule.write(type, "type", ParticleSystem.ParticleType.Triangle);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
         startIndex = capsule.readInt("startIndex", 0);
-        _position.set((Vector3) capsule.readSavable("position", new Vector3(Vector3.ZERO)));
+        _position.set(capsule.readSavable("position", (Vector3) Vector3.ZERO));
         status = capsule.readEnum("status", Status.class, Status.Available);
         lifeSpan = capsule.readDouble("lifeSpan", 0);
         currentAge = capsule.readInt("currentAge", 0);
-        parent = (ParticleSystem) capsule.readSavable("parent", null);
-        _velocity.set((Vector3) capsule.readSavable("velocity", new Vector3()));
+        parent = capsule.readSavable("parent", null);
+        _velocity.set(capsule.readSavable("velocity", (Vector3) Vector3.ZERO));
         type = capsule.readEnum("type", ParticleSystem.ParticleType.class, ParticleSystem.ParticleType.Triangle);
     }
 

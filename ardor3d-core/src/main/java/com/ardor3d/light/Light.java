@@ -206,18 +206,18 @@ public abstract class Light implements Serializable, Savable, IUniformSupplier {
     }
 
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
-        capsule.write(_diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
-        capsule.write(_specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
+        capsule.write(_ambient, "ambient", (ColorRGBA) DEFAULT_AMBIENT);
+        capsule.write(_diffuse, "diffuse", (ColorRGBA) DEFAULT_DIFFUSE);
+        capsule.write(_specular, "specular", (ColorRGBA) DEFAULT_SPECULAR);
         capsule.write(_enabled, "enabled", false);
         capsule.write(_shadowCaster, "shadowCaster", false);
         capsule.write(_name, "name", null);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
-        _ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
-        _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
-        _specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));
+        _ambient.set(capsule.readSavable("ambient", (ColorRGBA) DEFAULT_AMBIENT));
+        _diffuse.set(capsule.readSavable("diffuse", (ColorRGBA) DEFAULT_DIFFUSE));
+        _specular.set(capsule.readSavable("specular", (ColorRGBA) DEFAULT_SPECULAR));
         _enabled = capsule.readBoolean("enabled", false);
         _shadowCaster = capsule.readBoolean("shadowCaster", false);
         _name = capsule.readString("name", null);

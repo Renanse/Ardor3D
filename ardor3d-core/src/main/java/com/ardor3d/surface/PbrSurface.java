@@ -115,7 +115,7 @@ public class PbrSurface implements IUniformSupplier, Savable {
      * @see Savable#read(InputCapsule)
      */
     public void read(final InputCapsule capsule) throws IOException {
-        _albedo.set((ColorRGBA) capsule.readSavable("albedo", (ColorRGBA) ColorRGBA.WHITE));
+        _albedo.set(capsule.readSavable("albedo", (ColorRGBA) ColorRGBA.WHITE));
         _metallic = capsule.readFloat("metallic", .5f);
         _roughness = capsule.readFloat("roughness", .5f);
         _ambientOcclusion = capsule.readFloat("ambientOcclusion", 1f);

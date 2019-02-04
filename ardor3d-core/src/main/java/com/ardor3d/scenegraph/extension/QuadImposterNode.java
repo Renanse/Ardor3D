@@ -381,12 +381,12 @@ public class QuadImposterNode extends Node {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _texture = (Texture2D) capsule.readSavable("texture", null);
-        _targetScene = (Node) capsule.readSavable("targetScene", null);
-        _imposterQuad = (Quad) capsule.readSavable("standIn", new Quad("ImposterQuad"));
+        _texture = capsule.readSavable("texture", null);
+        _targetScene = capsule.readSavable("targetScene", null);
+        _imposterQuad = capsule.readSavable("standIn", new Quad("ImposterQuad"));
         _redrawRate = capsule.readFloat("redrawRate", 0.05f);
         _cameraAngleThreshold = capsule.readFloat("cameraThreshold", 0);
-        _worldUpVector = (Vector3) capsule.readSavable("worldUpVector", new Vector3(Vector3.UNIT_Y));
+        _worldUpVector = capsule.readSavable("worldUpVector", (Vector3) Vector3.UNIT_Y);
     }
 
     public Texture getTexture() {

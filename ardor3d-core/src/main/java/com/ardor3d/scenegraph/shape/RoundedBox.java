@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -162,8 +162,8 @@ public class RoundedBox extends Mesh {
     private void setIndexData() {
         if (_meshData.getIndices() == null) {
             final IndexBufferData<?> buff = BufferUtils.createIndexBufferData(180, 48 - 1);
-            final int[] data = new int[] { 0, 4, 1, 1, 4, 5, 1, 5, 3, 3, 5, 7, 3, 7, 2, 2, 7, 6, 2, 6, 0, 0, 6, 4, 4,
-                    6, 5, 5, 6, 7 };
+            final int[] data = new int[] { 0, 4, 1, 1, 4, 5, 1, 5, 3, 3, 5, 7, 3, 7, 2, 2, 7, 6, 2, 6, 0, 0, 6, 4, 4, 6,
+                    5, 5, 6, 7 };
             for (int i = 0; i < 6; i++) {
                 for (int n = 0; n < 30; n++) {
                     buff.put(30 * i + n, 8 * i + data[n]);
@@ -185,101 +185,101 @@ public class RoundedBox extends Mesh {
                 new Vector3(-_extent.getX(), _extent.getY(), -_extent.getZ()), // 6
                 new Vector3(_extent.getX(), _extent.getY(), -_extent.getZ()), // 7
                 // bottom
-                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() - _slope.getY(), _extent.getZ()
-                        - _border.getZ()), // 8 (0)
-                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() - _slope.getY(), _extent.getZ()
-                        - _border.getZ()), // 9
+                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() - _slope.getY(),
+                        _extent.getZ() - _border.getZ()), // 8 (0)
+                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() - _slope.getY(),
+                        _extent.getZ() - _border.getZ()), // 9
                 // (
                 // 1
                 // )
-                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() - _slope.getY(), -_extent.getZ()
-                        + _border.getZ()), // 10 (2)
-                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() - _slope.getY(), -_extent.getZ()
-                        + _border.getZ()), // 11 (3)
+                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() - _slope.getY(),
+                        -_extent.getZ() + _border.getZ()), // 10 (2)
+                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() - _slope.getY(),
+                        -_extent.getZ() + _border.getZ()), // 11 (3)
                 // front
-                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() + _border.getY(), _extent.getZ()
-                        + _slope.getZ()), // 12 (0)
-                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() + _border.getY(), _extent.getZ()
-                        + _slope.getZ()), // 13
+                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() + _border.getY(),
+                        _extent.getZ() + _slope.getZ()), // 12 (0)
+                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() + _border.getY(),
+                        _extent.getZ() + _slope.getZ()), // 13
                 // (
                 // 1
                 // )
-                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() - _border.getY(), _extent.getZ()
-                        + _slope.getZ()), // 14
+                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() - _border.getY(),
+                        _extent.getZ() + _slope.getZ()), // 14
                 // (
                 // 4
                 // )
-                new Vector3(_extent.getX() - _border.getX(), _extent.getY() - _border.getY(), _extent.getZ()
-                        + _slope.getZ()), // 15
+                new Vector3(_extent.getX() - _border.getX(), _extent.getY() - _border.getY(),
+                        _extent.getZ() + _slope.getZ()), // 15
                 // (
                 // 5
                 // )
                 // right
-                new Vector3(_extent.getX() + _slope.getX(), -_extent.getY() + _border.getY(), _extent.getZ()
-                        - _border.getZ()), // 16
+                new Vector3(_extent.getX() + _slope.getX(), -_extent.getY() + _border.getY(),
+                        _extent.getZ() - _border.getZ()), // 16
                 // (
                 // 1
                 // )
-                new Vector3(_extent.getX() + _slope.getX(), -_extent.getY() + _border.getY(), -_extent.getZ()
-                        + _border.getZ()), // 17 (3)
-                new Vector3(_extent.getX() + _slope.getX(), _extent.getY() - _border.getY(), _extent.getZ()
-                        - _border.getZ()), // 18
+                new Vector3(_extent.getX() + _slope.getX(), -_extent.getY() + _border.getY(),
+                        -_extent.getZ() + _border.getZ()), // 17 (3)
+                new Vector3(_extent.getX() + _slope.getX(), _extent.getY() - _border.getY(),
+                        _extent.getZ() - _border.getZ()), // 18
                 // (
                 // 5
                 // )
-                new Vector3(_extent.getX() + _slope.getX(), _extent.getY() - _border.getY(), -_extent.getZ()
-                        + _border.getZ()), // 19
+                new Vector3(_extent.getX() + _slope.getX(), _extent.getY() - _border.getY(),
+                        -_extent.getZ() + _border.getZ()), // 19
                 // (
                 // 7
                 // )
                 // back
-                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() + _border.getY(), -_extent.getZ()
-                        - _slope.getZ()), // 20 (2)
-                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() + _border.getY(), -_extent.getZ()
-                        - _slope.getZ()), // 21 (3)
-                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() - _border.getY(), -_extent.getZ()
-                        - _slope.getZ()), // 22 (6)
-                new Vector3(_extent.getX() - _border.getX(), _extent.getY() - _border.getY(), -_extent.getZ()
-                        - _slope.getZ()), // 23
+                new Vector3(-_extent.getX() + _border.getX(), -_extent.getY() + _border.getY(),
+                        -_extent.getZ() - _slope.getZ()), // 20 (2)
+                new Vector3(_extent.getX() - _border.getX(), -_extent.getY() + _border.getY(),
+                        -_extent.getZ() - _slope.getZ()), // 21 (3)
+                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() - _border.getY(),
+                        -_extent.getZ() - _slope.getZ()), // 22 (6)
+                new Vector3(_extent.getX() - _border.getX(), _extent.getY() - _border.getY(),
+                        -_extent.getZ() - _slope.getZ()), // 23
                 // (
                 // 7
                 // )
                 // left
-                new Vector3(-_extent.getX() - _slope.getX(), -_extent.getY() + _border.getY(), _extent.getZ()
-                        - _border.getZ()), // 24 (0)
-                new Vector3(-_extent.getX() - _slope.getX(), -_extent.getY() + _border.getY(), -_extent.getZ()
-                        + _border.getZ()), // 25 (2)
-                new Vector3(-_extent.getX() - _slope.getX(), _extent.getY() - _border.getY(), _extent.getZ()
-                        - _border.getZ()), // 26
+                new Vector3(-_extent.getX() - _slope.getX(), -_extent.getY() + _border.getY(),
+                        _extent.getZ() - _border.getZ()), // 24 (0)
+                new Vector3(-_extent.getX() - _slope.getX(), -_extent.getY() + _border.getY(),
+                        -_extent.getZ() + _border.getZ()), // 25 (2)
+                new Vector3(-_extent.getX() - _slope.getX(), _extent.getY() - _border.getY(),
+                        _extent.getZ() - _border.getZ()), // 26
                 // (
                 // 4
                 // )
-                new Vector3(-_extent.getX() - _slope.getX(), _extent.getY() - _border.getY(), -_extent.getZ()
-                        + _border.getZ()), // 27 (6)
+                new Vector3(-_extent.getX() - _slope.getX(), _extent.getY() - _border.getY(),
+                        -_extent.getZ() + _border.getZ()), // 27 (6)
                 // top
-                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() + _slope.getY(), _extent.getZ()
-                        - _border.getZ()), // 28
+                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() + _slope.getY(),
+                        _extent.getZ() - _border.getZ()), // 28
                 // (
                 // 4
                 // )
-                new Vector3(_extent.getX() - _border.getX(), _extent.getY() + _slope.getY(), _extent.getZ()
-                        - _border.getZ()), // 29
+                new Vector3(_extent.getX() - _border.getX(), _extent.getY() + _slope.getY(),
+                        _extent.getZ() - _border.getZ()), // 29
                 // (
                 // 5
                 // )
-                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() + _slope.getY(), -_extent.getZ()
-                        + _border.getZ()), // 30 (6)
-                new Vector3(_extent.getX() - _border.getX(), _extent.getY() + _slope.getY(), -_extent.getZ()
-                        + _border.getZ()), // 31
-        // (
-        // 7
-        // )
+                new Vector3(-_extent.getX() + _border.getX(), _extent.getY() + _slope.getY(),
+                        -_extent.getZ() + _border.getZ()), // 30 (6)
+                new Vector3(_extent.getX() - _border.getX(), _extent.getY() + _slope.getY(),
+                        -_extent.getZ() + _border.getZ()), // 31
+                // (
+                // 7
+                // )
         };
     }
 
     /**
      * <code>clone</code> creates a new RoundedBox object containing the same data as this one.
-     * 
+     *
      * @return the new Box
      */
     @Override
@@ -290,16 +290,16 @@ public class RoundedBox extends Mesh {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write(_extent, "extent", new Vector3(Vector3.ZERO));
-        capsule.write(_border, "border", new Vector3(Vector3.ZERO));
-        capsule.write(_slope, "slope", new Vector3(Vector3.ZERO));
+        capsule.write(_extent, "extent", (Vector3) Vector3.ZERO);
+        capsule.write(_border, "border", (Vector3) Vector3.ZERO);
+        capsule.write(_slope, "slope", (Vector3) Vector3.ZERO);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _extent.set((Vector3) capsule.readSavable("extent", new Vector3(Vector3.ZERO)));
-        _border.set((Vector3) capsule.readSavable("border", new Vector3(Vector3.ZERO)));
-        _slope.set((Vector3) capsule.readSavable("slope", new Vector3(Vector3.ZERO)));
+        _extent.set(capsule.readSavable("extent", (Vector3) Vector3.ZERO));
+        _border.set(capsule.readSavable("border", (Vector3) Vector3.ZERO));
+        _slope.set(capsule.readSavable("slope", (Vector3) Vector3.ZERO));
     }
 }

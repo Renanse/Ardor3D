@@ -17,6 +17,8 @@ public class Constants {
 
     public static boolean updateGraphs = false;
 
+    public static final boolean logOpenGLDebug;
+
     public static final boolean strictVertexAttributes;
 
     public static final boolean useStatePools;
@@ -58,6 +60,7 @@ public class Constants {
             useValidatingTransform = (System.getProperty("ardor3d.disableValidatingTransform") == null);
             enableInstancedGeometrySupport = (System.getProperty("ardor3d.enableInstancedGeometrySupport") != null);
             strictVertexAttributes = (System.getProperty("ardor3d.strictVertexAttributes") != null);
+            logOpenGLDebug = (System.getProperty("ardor3d.logOpenGLDebug") != null);
         } else {
             stats = false;
             trackDirectMemory = false;
@@ -68,6 +71,7 @@ public class Constants {
             useValidatingTransform = true;
             enableInstancedGeometrySupport = false;
             strictVertexAttributes = false;
+            logOpenGLDebug = false;
         }
     }
 }

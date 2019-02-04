@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -41,9 +41,9 @@ public class Joint implements Savable {
 
     /**
      * Construct a new Joint object using the given name.
-     * 
+     *
      * @param name
-     *            the name
+     *                 the name
      */
     public Joint(final String name) {
         _name = name;
@@ -69,9 +69,9 @@ public class Joint implements Savable {
 
     /**
      * Set the index of this joint's parent within the containing Skeleton's joint array.
-     * 
+     *
      * @param parentIndex
-     *            the index, or NO_PARENT if this Joint is root (has no parent)
+     *                        the index, or NO_PARENT if this Joint is root (has no parent)
      */
     public void setParentIndex(final short parentIndex) {
         _parentIndex = parentIndex;
@@ -106,7 +106,7 @@ public class Joint implements Savable {
         capsule.write(_name, "name", null);
         capsule.write(_index, "index", (short) 0);
         capsule.write(_parentIndex, "parentIndex", (short) 0);
-        capsule.write(_inverseBindPose, "inverseBindPose", (Savable) Transform.IDENTITY);
+        capsule.write(_inverseBindPose, "inverseBindPose", (Transform) Transform.IDENTITY);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
@@ -122,7 +122,7 @@ public class Joint implements Savable {
         _index = capsule.readShort("index", (short) 0);
         _parentIndex = capsule.readShort("parentIndex", (short) 0);
 
-        setInverseBindPose((ReadOnlyTransform) capsule.readSavable("inverseBindPose", (Savable) Transform.IDENTITY));
+        setInverseBindPose(capsule.readSavable("inverseBindPose", (Transform) Transform.IDENTITY));
     }
 
     public static Joint initSavable() {

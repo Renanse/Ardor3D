@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -105,8 +105,8 @@ public abstract class Spatial implements Savable, Hintable {
     /** The local RenderMaterial used by this spatial. Inherited by children if they have none set. */
     protected RenderMaterial _material;
 
-    /** This spatial's layer; defaults to {@link #DEFAULT_LAYER}. */
-    protected String _layer = DEFAULT_LAYER;
+    /** This spatial's layer; defaults to {@link #LAYER_DEFAULT}. */
+    protected int _layer = LAYER_DEFAULT;
 
     public transient double _queueDistance = Double.NEGATIVE_INFINITY;
 
@@ -120,7 +120,14 @@ public abstract class Spatial implements Savable, Hintable {
     public static final String KEY_UserData = "_userData";
     public static final String KEY_DefaultColor = "_defaultColor";
 
-    public static final String DEFAULT_LAYER = "Default";
+    /** Default layer used by spatials. Most Spatials will be in this layer. */
+    public static final int LAYER_DEFAULT = 0;
+
+    /** Layer for use by UI elements. */
+    public static final int LAYER_UI = 1;
+
+    /** User layers should start at this value. */
+    public static final int LAYER_FIRST_USER_DEFINED = 10;
 
     /**
      * Constructs a new Spatial. Initializes the transform fields.
@@ -164,7 +171,7 @@ public abstract class Spatial implements Savable, Hintable {
     /**
      * @return this Spatial's layer, used for render filtering.
      */
-    public String getLayer() {
+    public int getLayer() {
         return _layer;
     }
 
@@ -174,7 +181,7 @@ public abstract class Spatial implements Savable, Hintable {
      * @param layer
      *            the new layer value
      */
-    public void setLayer(final String layer) {
+    public void setLayer(final int layer) {
         _layer = layer;
     }
 
@@ -1506,8 +1513,8 @@ public abstract class Spatial implements Savable, Hintable {
             }
         }
 
-        _localTransform.set((Transform) capsule.readSavable("localTransform", new Transform(Transform.IDENTITY)));
-        _worldTransform.set((Transform) capsule.readSavable("worldTransform", new Transform(Transform.IDENTITY)));
+        _localTransform.set(capsule.readSavable("localTransform", (Transform) Transform.IDENTITY));
+        _worldTransform.set(capsule.readSavable("worldTransform", (Transform) Transform.IDENTITY));
 
         _properties.clear();
         _properties.putAll(capsule.readStringObjectMap("properties", new HashMap<>()));
@@ -1521,7 +1528,7 @@ public abstract class Spatial implements Savable, Hintable {
             }
         }
 
-        _layer = capsule.readString("layer", DEFAULT_LAYER);
+        _layer = capsule.readInt("layer", LAYER_DEFAULT);
     }
 
     /**
@@ -1551,6 +1558,6 @@ public abstract class Spatial implements Savable, Hintable {
             capsule.writeSavableList(list, "controllers", null);
         }
 
-        capsule.write(_layer, "layer", DEFAULT_LAYER);
+        capsule.write(_layer, "layer", LAYER_DEFAULT);
     }
 }

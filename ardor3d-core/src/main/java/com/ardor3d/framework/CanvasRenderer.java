@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -31,14 +31,14 @@ public interface CanvasRenderer {
     /**
      * Returns the camera being used by this canvas renderer. Modifying the returned {@link Camera} instance effects the
      * view being rendered, so this method can be used to move the camera, etc.
-     * 
+     *
      * @return the camera used by this canvas renderer
      */
     Camera getCamera();
 
     /**
      * Replaces the camera being used by this canvas renderer.
-     * 
+     *
      * @param camera
      *            the camera to use
      */
@@ -46,14 +46,14 @@ public interface CanvasRenderer {
 
     /**
      * Returns the scene being used by this canvas renderer.
-     * 
+     *
      * @return the camera used by this canvas renderer
      */
     Scene getScene();
 
     /**
      * Replaces the scene being used by this canvas renderer.
-     * 
+     *
      * @param scene
      *            the scene to use
      */
@@ -61,21 +61,21 @@ public interface CanvasRenderer {
 
     /**
      * Creates a new renderer for this canvas renderer
-     * 
+     *
      * @return a new renderer
      */
     Renderer createRenderer();
 
     /**
      * Returns the renderer being used by this canvas renderer.
-     * 
+     *
      * @return the renderer used by this canvas renderer
      */
     Renderer getRenderer();
 
     /**
      * Have the CanvasRenderer claim the graphics context.
-     * 
+     *
      * @throws Ardor3dException
      *             if we can not claim the context.
      */

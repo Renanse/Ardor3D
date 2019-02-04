@@ -618,15 +618,15 @@ public class BlendState extends RenderState {
         _destinationFunctionRGB = capsule.readEnum("destinationFunctionRGB", DestinationFunction.class,
                 DestinationFunction.OneMinusSourceAlpha);
         _blendEquationRGB = capsule.readEnum("blendEquationRGB", BlendEquation.class, BlendEquation.Add);
-        _sourceFunctionAlpha = capsule
-                .readEnum("sourceFunctionAlpha", SourceFunction.class, SourceFunction.SourceAlpha);
+        _sourceFunctionAlpha = capsule.readEnum("sourceFunctionAlpha", SourceFunction.class,
+                SourceFunction.SourceAlpha);
         _destinationFunctionAlpha = capsule.readEnum("destinationFunctionAlpha", DestinationFunction.class,
                 DestinationFunction.OneMinusSourceAlpha);
         _blendEquationAlpha = capsule.readEnum("blendEquationAlpha", BlendEquation.class, BlendEquation.Add);
         _testEnabled = capsule.readBoolean("testEnabled", false);
         _testFunction = capsule.readEnum("test", TestFunction.class, TestFunction.GreaterThan);
         _reference = capsule.readFloat("reference", 0);
-        _constantColor = (ColorRGBA) capsule.readSavable("constantColor", null);
+        _constantColor = capsule.readSavable("constantColor", null);
     }
 
     @Override

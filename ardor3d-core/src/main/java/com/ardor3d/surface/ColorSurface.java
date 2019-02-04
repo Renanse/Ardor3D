@@ -117,10 +117,10 @@ public class ColorSurface implements IUniformSupplier, Savable {
      * @see Savable#read(InputCapsule)
      */
     public void read(final InputCapsule capsule) throws IOException {
-        _ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(0.1f, 0.1f, 0.1f, 1f)));
-        _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(.5f, .5f, .5f, 1f)));
-        _emissive.set((ColorRGBA) capsule.readSavable("emissive", (ColorRGBA) ColorRGBA.BLACK));
-        _specular.set((ColorRGBA) capsule.readSavable("specular", (ColorRGBA) ColorRGBA.WHITE));
+        _ambient.set(capsule.readSavable("ambient", new ColorRGBA(0.1f, 0.1f, 0.1f, 1f)));
+        _diffuse.set(capsule.readSavable("diffuse", new ColorRGBA(.5f, .5f, .5f, 1f)));
+        _emissive.set(capsule.readSavable("emissive", (ColorRGBA) ColorRGBA.BLACK));
+        _specular.set(capsule.readSavable("specular", (ColorRGBA) ColorRGBA.WHITE));
         _shininess = capsule.readFloat("shininess", 32f);
     }
 

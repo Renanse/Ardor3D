@@ -294,18 +294,18 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write(_tintColor, "tintColor", new ColorRGBA(ColorRGBA.WHITE));
+        capsule.write(_tintColor, "tintColor", (ColorRGBA) ColorRGBA.WHITE);
         capsule.write(_textureBorderOffsets, "borderCoords", new Vector4(0.25, 0.25, 0.25, 0.25));
-        capsule.write(_contentPadding, "contentPadding", new Vector4());
+        capsule.write(_contentPadding, "contentPadding", (Vector4) Vector4.ZERO);
         capsule.write(_borderScale, "borderScale", 1f);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _tintColor = (ColorRGBA) capsule.readSavable("tintColor", new ColorRGBA(ColorRGBA.WHITE));
-        _textureBorderOffsets = (Vector4) capsule.readSavable("borderCoords", new Vector4(0.25, 0.25, 0.25, 0.25));
-        _contentPadding = (Vector4) capsule.readSavable("contentPadding", new Vector4());
+        _tintColor = capsule.readSavable("tintColor", (ColorRGBA) ColorRGBA.WHITE);
+        _textureBorderOffsets = capsule.readSavable("borderCoords", new Vector4(0.25, 0.25, 0.25, 0.25));
+        _contentPadding.set(capsule.readSavable("contentPadding", (Vector4) Vector4.ZERO));
         _borderScale = capsule.readFloat("borderScale", 1f);
         final TextureState ts = ((TextureState) getLocalRenderState(StateType.Texture));
         if (ts != null) {

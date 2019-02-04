@@ -662,8 +662,8 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _meshData = (MeshData) capsule.readSavable("meshData", null);
-        _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);
+        _meshData = capsule.readSavable("meshData", null);
+        _modelBound = capsule.readSavable("modelBound", null);
         _isVisible = capsule.readBoolean("visible", true);
     }
 }

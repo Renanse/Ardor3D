@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -56,7 +56,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Creates a new OrientedBox with the given name.
-     * 
+     *
      * @param name
      *            The name of the new box.
      */
@@ -268,7 +268,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Returns the center of the box.
-     * 
+     *
      * @return The box's center.
      */
     public Vector3 getCenter() {
@@ -277,7 +277,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Sets the box's center to the given value. Shallow copy only.
-     * 
+     *
      * @param center
      *            The box's new center.
      */
@@ -287,7 +287,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Returns the box's extent vector along the x,y,z.
-     * 
+     *
      * @return The box's extent vector.
      */
     public Vector3 getExtent() {
@@ -296,7 +296,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Sets the box's extent vector to the given value. Shallow copy only.
-     * 
+     *
      * @param extent
      *            The box's new extent.
      */
@@ -306,7 +306,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Returns the x axis of this box.
-     * 
+     *
      * @return This OB's x axis.
      */
     public Vector3 getxAxis() {
@@ -315,7 +315,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Sets the x axis of this OB. Shallow copy.
-     * 
+     *
      * @param xAxis
      *            The new x axis.
      */
@@ -325,7 +325,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Gets the Y axis of this OB.
-     * 
+     *
      * @return This OB's Y axis.
      */
     public Vector3 getYAxis() {
@@ -334,7 +334,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Sets the Y axis of this OB. Shallow copy.
-     * 
+     *
      * @param yAxis
      *            The new Y axis.
      */
@@ -344,7 +344,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Returns the Z axis of this OB.
-     * 
+     *
      * @return The Z axis.
      */
     public Vector3 getZAxis() {
@@ -353,7 +353,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Sets the Z axis of this OB. Shallow copy.
-     * 
+     *
      * @param zAxis
      *            The new Z axis.
      */
@@ -363,7 +363,7 @@ public class OrientedBox extends Mesh {
 
     /**
      * Returns if the corners are set corectly.
-     * 
+     *
      * @return True if the vectorStore is correct.
      */
     public boolean isCorrectCorners() {
@@ -373,11 +373,11 @@ public class OrientedBox extends Mesh {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
-        capsule.write(_xAxis, "_xAxis", new Vector3(Vector3.UNIT_X));
-        capsule.write(_yAxis, "yAxis", new Vector3(Vector3.UNIT_Y));
-        capsule.write(_zAxis, "zAxis", new Vector3(Vector3.UNIT_Z));
-        capsule.write(_extent, "extent", new Vector3(Vector3.ZERO));
+        capsule.write(_center, "center", (Vector3) Vector3.ZERO);
+        capsule.write(_xAxis, "_xAxis", (Vector3) Vector3.UNIT_X);
+        capsule.write(_yAxis, "yAxis", (Vector3) Vector3.UNIT_Y);
+        capsule.write(_zAxis, "zAxis", (Vector3) Vector3.UNIT_Z);
+        capsule.write(_extent, "extent", (Vector3) Vector3.ZERO);
         capsule.write(_texTopRight, "texTopRight", new Vector2(1, 1));
         capsule.write(_texTopLeft, "texTopLeft", new Vector2(1, 0));
         capsule.write(_texBotRight, "texBotRight", new Vector2(0, 1));
@@ -389,15 +389,15 @@ public class OrientedBox extends Mesh {
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _center = (Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO));
-        _xAxis = (Vector3) capsule.readSavable("_xAxis", new Vector3(Vector3.UNIT_X));
-        _yAxis = (Vector3) capsule.readSavable("yAxis", new Vector3(Vector3.UNIT_Y));
-        _zAxis = (Vector3) capsule.readSavable("zAxis", new Vector3(Vector3.UNIT_Z));
-        _extent = (Vector3) capsule.readSavable("extent", new Vector3(Vector3.ZERO));
-        _texTopRight = (Vector2) capsule.readSavable("texTopRight", new Vector2(1, 1));
-        _texTopLeft = (Vector2) capsule.readSavable("texTopLeft", new Vector2(1, 0));
-        _texBotRight = (Vector2) capsule.readSavable("texBotRight", new Vector2(0, 1));
-        _texBotLeft = (Vector2) capsule.readSavable("texBotLeft", new Vector2(0, 0));
+        _center = capsule.readSavable("center", (Vector3) Vector3.ZERO);
+        _xAxis = capsule.readSavable("_xAxis", (Vector3) Vector3.UNIT_X);
+        _yAxis = capsule.readSavable("yAxis", (Vector3) Vector3.UNIT_Y);
+        _zAxis = capsule.readSavable("zAxis", (Vector3) Vector3.UNIT_Z);
+        _extent = capsule.readSavable("extent", (Vector3) Vector3.ZERO);
+        _texTopRight = capsule.readSavable("texTopRight", new Vector2(1, 1));
+        _texTopLeft = capsule.readSavable("texTopLeft", new Vector2(1, 0));
+        _texBotRight = capsule.readSavable("texBotRight", new Vector2(0, 1));
+        _texBotLeft = capsule.readSavable("texBotLeft", new Vector2(0, 0));
         _vectorStore = CapsuleUtils.asArray(capsule.readSavableArray("vectorStore", new Vector3[8]), Vector3.class);
         _correctCorners = capsule.readBoolean("correctCorners", false);
     }

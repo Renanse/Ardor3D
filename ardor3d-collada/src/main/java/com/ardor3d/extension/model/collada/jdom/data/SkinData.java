@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -37,7 +37,7 @@ public class SkinData implements Savable {
 
     /**
      * Construct a new SkinData object.
-     * 
+     *
      * @param name
      *            The name for our skin data store. Should be in the format <i>[controller name][ : ][instance
      *            controller name]</i>. The names of each element should be first the name attribute, if present, or
@@ -102,10 +102,10 @@ public class SkinData implements Savable {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        _skinBaseNode = (Node) capsule.readSavable("baseNode", null);
+        _skinBaseNode = capsule.readSavable("baseNode", null);
         _skins.clear();
         _skins.addAll(capsule.readSavableList("skins", new ArrayList<SkinnedMesh>()));
-        _pose = (SkeletonPose) capsule.readSavable("pose", null);
+        _pose = capsule.readSavable("pose", null);
     }
 
     @Override

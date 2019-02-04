@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -46,7 +46,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param source
      *            the ring to copy from.
      */
@@ -56,7 +56,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * Constructor creates a new <code>Ring</code> with defined center point, up vector, and inner and outer radii.
-     * 
+     *
      * @param center
      *            the center of the ring.
      * @param up
@@ -76,7 +76,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * Copy the value of the given source Ring into this Ring.
-     * 
+     *
      * @param source
      *            the source of the data to copy.
      * @return this ring for chaining
@@ -93,7 +93,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>getCenter</code> returns the center of the ring.
-     * 
+     *
      * @return the center of the ring.
      */
     @Override
@@ -103,7 +103,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>setCenter</code> sets the center of the ring.
-     * 
+     *
      * @param center
      *            the center of the ring.
      */
@@ -113,7 +113,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>getUp</code> returns the ring's up vector.
-     * 
+     *
      * @return the ring's up vector.
      */
     @Override
@@ -123,7 +123,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>setUp</code> sets the ring's up vector.
-     * 
+     *
      * @param up
      *            the ring's up vector.
      */
@@ -133,7 +133,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>getInnerRadius</code> returns the ring's inner radius.
-     * 
+     *
      * @return the ring's inner radius.
      */
     @Override
@@ -143,7 +143,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>setInnerRadius</code> sets the ring's inner radius.
-     * 
+     *
      * @param innerRadius
      *            the ring's inner radius.
      */
@@ -153,7 +153,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>getOuterRadius</code> returns the ring's outer radius.
-     * 
+     *
      * @return the ring's outer radius.
      */
     @Override
@@ -163,7 +163,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * <code>setOuterRadius</code> sets the ring's outer radius.
-     * 
+     *
      * @param outerRadius
      *            the ring's outer radius.
      */
@@ -172,9 +172,9 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
     }
 
     /**
-     * 
+     *
      * <code>random</code> returns a random point within the ring.
-     * 
+     *
      * @param store
      *            Vector to store result in
      * @return a random point within the ring.
@@ -213,7 +213,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
     /**
      * Check a ring... if it is null or its radii, or the doubles of its center or up are NaN or infinite, return false.
      * Else return true.
-     * 
+     *
      * @param ring
      *            the ring to check
      * @return true or false as stated above.
@@ -300,16 +300,16 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
-        capsule.write(_up, "up", new Vector3(Vector3.UNIT_Z));
+        capsule.write(_center, "center", (Vector3) Vector3.ZERO);
+        capsule.write(_up, "up", (Vector3) Vector3.UNIT_Z);
         capsule.write(_innerRadius, "innerRadius", 0.0);
         capsule.write(_outerRadius, "outerRadius", 1.0);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
-        _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
-        _up.set((Vector3) capsule.readSavable("up", new Vector3(Vector3.UNIT_Z)));
+        _center.set(capsule.readSavable("center", (Vector3) Vector3.ZERO));
+        _up.set(capsule.readSavable("up", (Vector3) Vector3.UNIT_Z));
         _innerRadius = capsule.readDouble("innerRadius", 0.0);
         _outerRadius = capsule.readDouble("outerRadius", 1.0);
     }
@@ -320,7 +320,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param in
      *            ObjectInput
      * @throws IOException
@@ -336,7 +336,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param out
      *            ObjectOutput
      * @throws IOException
@@ -368,7 +368,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
     /**
      * Releases a Ring back to be used by a future call to fetchTempInstance. TAKE CARE: this Ring object should no
      * longer have other classes referencing it or "Bad Things" will happen.
-     * 
+     *
      * @param ring
      *            the Ring to release.
      */

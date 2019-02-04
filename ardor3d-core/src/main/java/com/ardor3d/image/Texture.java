@@ -617,10 +617,10 @@ public abstract class Texture implements Savable {
     public void read(final InputCapsule capsule) throws IOException {
         _minificationFilter = capsule.readEnum("minificationFilter", MinificationFilter.class,
                 MinificationFilter.NearestNeighborNoMipMaps);
-        _image = (Image) capsule.readSavable("image", null);
+        _image = capsule.readSavable("image", null);
 
         // pull our key, if exists
-        final TextureKey key = (TextureKey) capsule.readSavable("textureKey", null);
+        final TextureKey key = capsule.readSavable("textureKey", null);
         if (key != null) {
             _key = TextureKey.getKey(key.getSource(), key.isFlipped(), key.getFormat(), key.getId(),
                     key.getMinificationFilter());
@@ -634,7 +634,7 @@ public abstract class Texture implements Savable {
             TextureManager.loadFromKey(_key, null, this);
         }
 
-        _borderColor.set((ColorRGBA) capsule.readSavable("borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
+        _borderColor.set(capsule.readSavable("borderColor", (ColorRGBA) ColorRGBA.BLACK_NO_ALPHA));
         _hasBorder = capsule.readBoolean("hasBorder", false);
         _anisotropicFilterPercent = capsule.readFloat("anisotropicFilterPercent", 0.0f);
         _lodBias = capsule.readFloat("lodBias", 0.0f);

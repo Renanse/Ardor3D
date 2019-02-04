@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -120,7 +120,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     /**
      * Calculates an AABB of the given point values for this OBB.
-     * 
+     *
      * @param points
      *            The points this OBB should contain.
      */
@@ -537,10 +537,10 @@ public class OrientedBoundingBox extends BoundingVolume {
         final int vertsPerPrimitive = data.getIndexMode(section).getVertexCount();
         Vector3[] store = new Vector3[vertsPerPrimitive];
 
-        final Vector3 min = _compVect1
-                .set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        final Vector3 max = _compVect2
-                .set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+        final Vector3 min = _compVect1.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+                Double.POSITIVE_INFINITY);
+        final Vector3 max = _compVect2.set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                Double.NEGATIVE_INFINITY);
 
         Vector3 point;
         for (int i = start; i < end; i++) {
@@ -1305,7 +1305,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     /**
      * <code>clip</code> determines if a line segment intersects the current test plane.
-     * 
+     *
      * @param denom
      *            the denominator of the line segment.
      * @param numer
@@ -1442,19 +1442,19 @@ public class OrientedBoundingBox extends BoundingVolume {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write(_xAxis, "_xAxis", new Vector3(Vector3.UNIT_X));
-        capsule.write(_yAxis, "yAxis", new Vector3(Vector3.UNIT_Y));
-        capsule.write(_zAxis, "zAxis", new Vector3(Vector3.UNIT_Z));
-        capsule.write(_extent, "extent", new Vector3(Vector3.ZERO));
+        capsule.write(_xAxis, "_xAxis", (Vector3) Vector3.UNIT_X);
+        capsule.write(_yAxis, "yAxis", (Vector3) Vector3.UNIT_Y);
+        capsule.write(_zAxis, "zAxis", (Vector3) Vector3.UNIT_Z);
+        capsule.write(_extent, "extent", (Vector3) Vector3.ZERO);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _xAxis.set((Vector3) capsule.readSavable("xAxis", new Vector3(Vector3.UNIT_X)));
-        _yAxis.set((Vector3) capsule.readSavable("yAxis", new Vector3(Vector3.UNIT_Y)));
-        _zAxis.set((Vector3) capsule.readSavable("zAxis", new Vector3(Vector3.UNIT_Z)));
-        _extent.set((Vector3) capsule.readSavable("extent", new Vector3(Vector3.ZERO)));
+        _xAxis.set(capsule.readSavable("xAxis", (Vector3) Vector3.UNIT_X));
+        _yAxis.set(capsule.readSavable("yAxis", (Vector3) Vector3.UNIT_Y));
+        _zAxis.set(capsule.readSavable("zAxis", (Vector3) Vector3.UNIT_Z));
+        _extent.set(capsule.readSavable("extent", (Vector3) Vector3.ZERO));
         correctCorners = false;
     }
 

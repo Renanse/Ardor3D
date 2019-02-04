@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -214,8 +214,8 @@ public class BinaryImporter implements Ardor3dImporter {
             final BinaryClassObject bco = _classes.get(alias);
 
             if (bco == null) {
-                logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)", "NULL class object: "
-                        + alias);
+                logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)",
+                        "NULL class object: " + alias);
                 return null;
             }
 
@@ -240,18 +240,13 @@ public class BinaryImporter implements Ardor3dImporter {
             } catch (final InstantiationException e) {
                 logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int)",
                         "Could not access constructor of class '" + bco._className + "'! \n"
-                                + "Some types may require the annotation SavableFactory.  Please double check.", e);
+                                + "Some types may require the annotation SavableFactory.  Please double check.",
+                        e);
                 throw new Ardor3dException(e);
             } catch (final NoSuchMethodException e) {
-                logger
-                        .logp(
-                                Level.SEVERE,
-                                this.getClass().toString(),
-                                "readObject(int)",
-                                e.getMessage()
-                                        + " \n"
-                                        + "Method specified in annotation does not appear to exist or has an invalid method signature.",
-                                e);
+                logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int)", e.getMessage() + " \n"
+                        + "Method specified in annotation does not appear to exist or has an invalid method signature.",
+                        e);
                 throw new Ardor3dException(e);
             }
 

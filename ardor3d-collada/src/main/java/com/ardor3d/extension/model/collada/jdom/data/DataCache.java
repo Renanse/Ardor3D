@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.jdom2.Element;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathExpression;
 
 import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.Joint;
@@ -41,7 +41,7 @@ public class DataCache {
     private final Map<String, Texture> _textures;
     private final Map<String, Element> _idCache;
     private final Map<String, Element> _sidCache;
-    private final Map<String, XPath> _xPathExpressions;
+    private final Map<String, XPathExpression<?>> _xPathExpressions;
     private final Pattern _pattern;
     private final List<String> _transformTypes;
 
@@ -75,8 +75,8 @@ public class DataCache {
         _xPathExpressions = Maps.newHashMap();
         _pattern = Pattern.compile("\\s");
 
-        _transformTypes = Collections.unmodifiableList(Lists.newArrayList("lookat", "matrix", "rotate", "scale",
-                "scew", "translate"));
+        _transformTypes = Collections
+                .unmodifiableList(Lists.newArrayList("lookat", "matrix", "rotate", "scale", "scew", "translate"));
 
         _floatArrays = Maps.newHashMap();
         _doubleArrays = Maps.newHashMap();
@@ -133,7 +133,7 @@ public class DataCache {
         return _sidCache;
     }
 
-    public Map<String, XPath> getxPathExpressions() {
+    public Map<String, XPathExpression<?>> getxPathExpressions() {
         return _xPathExpressions;
     }
 

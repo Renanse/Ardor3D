@@ -983,9 +983,9 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_matrix, "rotation", new Matrix3(Matrix3.IDENTITY));
-        capsule.write(_scale, "scale", new Vector3(Vector3.ONE));
-        capsule.write(_translation, "translation", new Vector3(Vector3.ZERO));
+        capsule.write(_matrix, "rotation", (Matrix3) Matrix3.IDENTITY);
+        capsule.write(_scale, "scale", (Vector3) Vector3.ONE);
+        capsule.write(_translation, "translation", (Vector3) Vector3.ZERO);
         capsule.write(_identity, "identity", true);
         capsule.write(_rotationMatrix, "rotationMatrix", true);
         capsule.write(_uniformScale, "uniformScale", true);
@@ -993,9 +993,9 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
-        _matrix.set((Matrix3) capsule.readSavable("rotation", new Matrix3(Matrix3.IDENTITY)));
-        _scale.set((Vector3) capsule.readSavable("scale", new Vector3(Vector3.ONE)));
-        _translation.set((Vector3) capsule.readSavable("translation", new Vector3(Vector3.ZERO)));
+        _matrix.set(capsule.readSavable("rotation", (Matrix3) Matrix3.IDENTITY));
+        _scale.set(capsule.readSavable("scale", (Vector3) Vector3.ONE));
+        _translation.set(capsule.readSavable("translation", (Vector3) Vector3.ZERO));
         _identity = capsule.readBoolean("identity", true);
         _rotationMatrix = capsule.readBoolean("rotationMatrix", true);
         _uniformScale = capsule.readBoolean("uniformScale", true);

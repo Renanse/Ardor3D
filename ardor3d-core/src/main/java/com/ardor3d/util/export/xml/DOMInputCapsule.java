@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -740,7 +740,8 @@ public class DOMInputCapsule implements InputCapsule {
         return ret;
     }
 
-    public Savable readSavable(final String name, final Savable defVal) throws IOException {
+    @SuppressWarnings("unchecked")
+    public <E extends Savable> E readSavable(final String name, final E defVal) throws IOException {
         Savable ret = defVal;
 
         try {
@@ -769,7 +770,7 @@ public class DOMInputCapsule implements InputCapsule {
             throw ex;
         }
 
-        return ret;
+        return (E) ret;
     }
 
     private Savable readSavableFromCurrentElem(final Savable defVal)
@@ -875,7 +876,8 @@ public class DOMInputCapsule implements InputCapsule {
         return ret;
     }
 
-    public Savable[] readSavableArray(final String name, final Savable[] defVal) throws IOException {
+    @SuppressWarnings("unchecked")
+    public <E extends Savable> E[] readSavableArray(final String name, final E[] defVal) throws IOException {
         Savable[] ret = defVal;
         try {
             final Element tmpEl = findChildElement(_currentElem, name);
@@ -904,10 +906,11 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        return ret;
+        return (E[]) ret;
     }
 
-    public Savable[][] readSavableArray2D(final String name, final Savable[][] defVal) throws IOException {
+    @SuppressWarnings("unchecked")
+    public <E extends Savable> E[][] readSavableArray2D(final String name, final E[][] defVal) throws IOException {
         Savable[][] ret = defVal;
         try {
             final Element tmpEl = findChildElement(_currentElem, name);
@@ -936,7 +939,7 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        return ret;
+        return (E[][]) ret;
     }
 
     @SuppressWarnings("unchecked")
