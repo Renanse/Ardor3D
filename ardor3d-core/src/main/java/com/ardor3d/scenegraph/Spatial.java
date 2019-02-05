@@ -106,7 +106,7 @@ public abstract class Spatial implements Savable, Hintable {
     protected RenderMaterial _material;
 
     /** This spatial's layer; defaults to {@link #LAYER_DEFAULT}. */
-    protected int _layer = LAYER_DEFAULT;
+    protected int _layer = LAYER_INHERIT;
 
     public transient double _queueDistance = Double.NEGATIVE_INFINITY;
 
@@ -119,6 +119,9 @@ public abstract class Spatial implements Savable, Hintable {
 
     public static final String KEY_UserData = "_userData";
     public static final String KEY_DefaultColor = "_defaultColor";
+
+    /** Use our parent layer. If no parent, we will fall back to {@link #LAYER_DEFAULT}. */
+    public static final int LAYER_INHERIT = -1;
 
     /** Default layer used by spatials. Most Spatials will be in this layer. */
     public static final int LAYER_DEFAULT = 0;
@@ -169,9 +172,15 @@ public abstract class Spatial implements Savable, Hintable {
     }
 
     /**
-     * @return this Spatial's layer, used for render filtering.
+     * @return this Spatial's layer, used for render filtering. Defaults to {@link #LAYER_INHERIT}
      */
     public int getLayer() {
+        if (_layer == LAYER_INHERIT) {
+            if (_parent != null) {
+                return _parent.getLayer();
+            }
+            return LAYER_DEFAULT;
+        }
         return _layer;
     }
 
@@ -1528,7 +1537,7 @@ public abstract class Spatial implements Savable, Hintable {
             }
         }
 
-        _layer = capsule.readInt("layer", LAYER_DEFAULT);
+        _layer = capsule.readInt("layer", LAYER_INHERIT);
     }
 
     /**
@@ -1558,6 +1567,6 @@ public abstract class Spatial implements Savable, Hintable {
             capsule.writeSavableList(list, "controllers", null);
         }
 
-        capsule.write(_layer, "layer", LAYER_DEFAULT);
+        capsule.write(_layer, "layer", LAYER_INHERIT);
     }
 }

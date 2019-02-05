@@ -19,6 +19,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
@@ -82,6 +83,7 @@ public class BasicText extends BMText {
         getSceneHints().setCullHint(CullHint.Never);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        setLayer(Spatial.LAYER_UI);
 
         updateModelBound();
     }
