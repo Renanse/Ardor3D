@@ -15,6 +15,7 @@ import java.io.IOException;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
@@ -220,6 +221,32 @@ public abstract class Texture implements Savable {
     private int _textureMaxLevel = -1;
 
     private transient int _rttMipLevel = 0;
+
+    public final static String KEY_TextureMatrixPrefix = "textureMatrix";
+
+    /**
+     * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 0. See
+     * {@link MeshData#KEY_TextureCoords0}
+     */
+    public final static String KEY_TextureMatrix0 = KEY_TextureMatrixPrefix + 0;
+
+    /**
+     * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 1. See
+     * {@link MeshData#KEY_TextureCoords1}
+     */
+    public final static String KEY_TextureMatrix1 = KEY_TextureMatrixPrefix + 1;
+
+    /**
+     * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 2. See
+     * {@link MeshData#KEY_TextureCoords2}
+     */
+    public final static String KEY_TextureMatrix2 = KEY_TextureMatrixPrefix + 2;
+
+    /**
+     * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 3. See
+     * {@link MeshData#KEY_TextureCoords3}
+     */
+    public final static String KEY_TextureMatrix3 = KEY_TextureMatrixPrefix + 3;
 
     /**
      * Constructor instantiates a new <code>Texture</code> object with default attributes.

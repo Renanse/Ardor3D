@@ -28,18 +28,22 @@ out vec4 DiffuseColor;
 	#if UV_COUNT > 0
 	in vec2 uv0;
 	out vec2 TexCoords0;
+	uniform mat4 textureMatrix0;
 	#endif
 	#if UV_COUNT > 1
 	in vec2 uv1;
 	out vec2 TexCoords1;
+	uniform mat4 textureMatrix1;
 	#endif
 	#if UV_COUNT > 2
 	in vec2 uv2;
 	out vec2 TexCoords2;
+	uniform mat4 textureMatrix2;
 	#endif
 	#if UV_COUNT > 3
 	in vec2 uv3;
 	out vec2 TexCoords3;
+	uniform mat4 textureMatrix3;
 	#endif
 #endif
 
@@ -57,16 +61,16 @@ void main()
 
 #ifdef UV_COUNT 
 	#if UV_COUNT > 0
-	TexCoords0 = uv0;
+    TexCoords0 = vec2(textureMatrix0 * vec4(uv0, 1.0, 1.0));
 	#endif
 	#if UV_COUNT > 1
-	TexCoords1 = uv1;
+    TexCoords0 = vec2(textureMatrix1 * vec4(uv1, 1.0, 1.0));
 	#endif
 	#if UV_COUNT > 2
-	TexCoords2 = uv2;
+    TexCoords0 = vec2(textureMatrix2 * vec4(uv2, 1.0, 1.0));
 	#endif
 	#if UV_COUNT > 3
-	TexCoords3 = uv3;
+    TexCoords3 = vec2(textureMatrix3 * vec4(uv3, 1.0, 1.0));
 	#endif
 #endif
 

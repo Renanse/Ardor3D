@@ -26,7 +26,9 @@ import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 
+import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.MaterialTechnique;
@@ -496,6 +498,22 @@ public class YamlMaterialReader {
                 return;
             case "lights4":
                 pass.addLightInfoUniforms(4);
+                return;
+            case "textureMatrix0":
+                pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix0, UniformType.Matrix4x4,
+                        UniformSource.SpatialProperty, Texture.KEY_TextureMatrix0, null, Matrix4.IDENTITY));
+                return;
+            case "textureMatrix1":
+                pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix1, UniformType.Matrix4x4,
+                        UniformSource.SpatialProperty, Texture.KEY_TextureMatrix1, null, Matrix4.IDENTITY));
+                return;
+            case "textureMatrix2":
+                pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix2, UniformType.Matrix4x4,
+                        UniformSource.SpatialProperty, Texture.KEY_TextureMatrix2, null, Matrix4.IDENTITY));
+                return;
+            case "textureMatrix3":
+                pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix3, UniformType.Matrix4x4,
+                        UniformSource.SpatialProperty, Texture.KEY_TextureMatrix3, null, Matrix4.IDENTITY));
                 return;
             default:
                 throw new Ardor3dException("Unknown default uniform type: " + type);

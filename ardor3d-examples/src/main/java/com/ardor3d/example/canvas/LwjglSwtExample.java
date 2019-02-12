@@ -41,6 +41,7 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
+import com.ardor3d.image.Texture;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.GrabbedState;
@@ -279,7 +280,7 @@ public class LwjglSwtExample {
                                 .first(RotateGestureEvent.class);
                         rotate.applyRotationZ(-event.getDeltaRadians());
                         pivotInv.multiply(rotate, null).multiply(pivot, matrix).transposeLocal();
-                        game.getBox().setProperty("textureMatrix", matrix);
+                        game.getBox().setProperty(Texture.KEY_TextureMatrix0, matrix);
                     }
                 }));
 

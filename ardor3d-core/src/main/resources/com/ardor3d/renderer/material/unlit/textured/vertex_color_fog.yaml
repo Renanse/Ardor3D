@@ -4,16 +4,17 @@ techniques:
       - 
         attributes:
           - key: vertex
+          - key: color
           - key: uv0
-
+          
         uniforms: 
-          - builtIn: [model, view, projection, defaultColor, textureMatrix0]
-            
+          - builtIn: [model, view, projection, fogParams, textureMatrix0]
+          
         shaders: 
           Vertex: 
             source: unlit/unlit.vert
-            define: UV_COUNT 1
-                        
-          Fragment:
+            defines: [UV_COUNT 1, VERT_COLORS]
+            
+          Fragment: 
             source: unlit/unlit_modulate.frag
-            define: UV_COUNT 1
+            define: [UV_COUNT 1, USE_FOG]
