@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -10,11 +10,11 @@
 
 package com.ardor3d.input.logical;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.util.EnumSet;
 import java.util.LinkedList;

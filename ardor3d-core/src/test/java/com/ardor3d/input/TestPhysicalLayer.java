@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -10,10 +10,10 @@
 
 package com.ardor3d.input;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -77,8 +77,8 @@ public class TestPhysicalLayer {
         AdownAup.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
         AdownAup.add(new KeyEvent(Key.A, KeyState.UP, 'a'));
 
-        buttonDown.add(new MouseState(0, 0, 0, 0, 0, MouseButton.makeMap(ButtonState.DOWN, ButtonState.UP,
-                ButtonState.UP), null));
+        buttonDown.add(new MouseState(0, 0, 0, 0, 0,
+                MouseButton.makeMap(ButtonState.DOWN, ButtonState.UP, ButtonState.UP), null));
     }
 
     @After
@@ -357,7 +357,8 @@ public class TestPhysicalLayer {
         assertEquals("mb up", ButtonState.UP, is.getMouseState().getButtonState(MouseButton.LEFT));
     }
 
-    private static class NeverEndingKeyIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
+    private static class NeverEndingKeyIterator extends AbstractIterator<KeyEvent>
+            implements PeekingIterator<KeyEvent> {
         final KeyEvent aUp = new KeyEvent(Key.A, KeyState.UP, 'a');
         final KeyEvent aDown = new KeyEvent(Key.A, KeyState.DOWN, 'a');
 
@@ -375,8 +376,8 @@ public class TestPhysicalLayer {
         }
     }
 
-    private static class NeverEndingMouseIterator extends AbstractIterator<MouseState> implements
-            PeekingIterator<MouseState> {
+    private static class NeverEndingMouseIterator extends AbstractIterator<MouseState>
+            implements PeekingIterator<MouseState> {
         final MouseState m1 = new MouseState(0, 0, 0, 0, 0, null, null);
         final MouseState m2 = new MouseState(0, 1, 2, 0, 0, null, null);
 

@@ -1,26 +1,27 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.input.swt;
 
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Iterator;
 
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Text;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ardor3d.framework.swt.SwtCanvas;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyEvent;
 import com.ardor3d.input.KeyState;
@@ -28,13 +29,13 @@ import com.ardor3d.input.KeyState;
 public class TestSwtKeyboardWrapper {
     SwtKeyboardWrapper kw;
 
-    SwtCanvas control;
+    Control control;
 
     org.eclipse.swt.events.KeyEvent e1, e2;
 
     @Before
     public void setup() throws Exception {
-        control = createMock("control", SwtCanvas.class);
+        control = createMock("text", Text.class);
 
         kw = new SwtKeyboardWrapper(control);
 
