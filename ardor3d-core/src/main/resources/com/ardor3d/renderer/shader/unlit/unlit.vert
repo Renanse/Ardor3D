@@ -60,10 +60,10 @@ void main()
     TexCoords0 = vec2(textureMatrix0 * vec4(uv0, 1.0, 1.0));
 	#endif
 	#if UV_COUNT > 1
-    TexCoords0 = vec2(textureMatrix1 * vec4(uv1, 1.0, 1.0));
+    TexCoords1 = vec2(textureMatrix1 * vec4(uv1, 1.0, 1.0));
 	#endif
 	#if UV_COUNT > 2
-    TexCoords0 = vec2(textureMatrix2 * vec4(uv2, 1.0, 1.0));
+    TexCoords2 = vec2(textureMatrix2 * vec4(uv2, 1.0, 1.0));
 	#endif
 	#if UV_COUNT > 3
     TexCoords3 = vec2(textureMatrix3 * vec4(uv3, 1.0, 1.0));
