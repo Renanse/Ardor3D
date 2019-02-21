@@ -35,6 +35,7 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.MaterialUtil;
 
 public class MoveWidget extends AbstractInteractWidget {
 
@@ -94,6 +95,7 @@ public class MoveWidget extends AbstractInteractWidget {
         final Quaternion rotate = new Quaternion().fromAngleAxis(MathUtils.HALF_PI, Vector3.UNIT_Y);
         _xArrow.setRotation(rotate);
         _handle.attachChild(_xArrow);
+        MaterialUtil.autoMaterials(_xArrow);
         return this;
     }
 
@@ -116,6 +118,7 @@ public class MoveWidget extends AbstractInteractWidget {
         final Quaternion rotate = new Quaternion().fromAngleAxis(MathUtils.HALF_PI, Vector3.NEG_UNIT_X);
         _yArrow.setRotation(rotate);
         _handle.attachChild(_yArrow);
+        MaterialUtil.autoMaterials(_yArrow);
         return this;
     }
 
@@ -136,6 +139,7 @@ public class MoveWidget extends AbstractInteractWidget {
         _zArrow = new InteractArrow("zMoveArrow", scale, width, lengthGap, tipGap);
         _zArrow.setDefaultColor(color);
         _handle.attachChild(_zArrow);
+        MaterialUtil.autoMaterials(_zArrow);
         return this;
     }
 

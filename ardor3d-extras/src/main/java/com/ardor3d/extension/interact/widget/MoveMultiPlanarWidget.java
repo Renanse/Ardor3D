@@ -36,6 +36,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class MoveMultiPlanarWidget extends AbstractInteractWidget {
@@ -73,11 +74,12 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
 
     protected void createDefaultHandle(final double extent) {
         final Box grip = new Box("grip", Vector3.ZERO, extent, extent, extent);
+        grip.setSolidColor(ColorRGBA.WHITE);
         grip.updateModelBound();
         _handle.attachChild(grip);
+        MaterialUtil.autoMaterials(grip);
 
         // setup some colors, just at the corner of the primitives since we will use flat shading.
-        grip.setSolidColor(ColorRGBA.WHITE);
         final FloatBuffer colors = grip.getMeshData().getColorBuffer();
         BufferUtils.setInBuffer(ColorRGBA.MAGENTA, colors, 0);
         BufferUtils.setInBuffer(ColorRGBA.CYAN, colors, 4);

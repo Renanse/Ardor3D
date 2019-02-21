@@ -39,6 +39,7 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.MaterialUtil;
 
 public class RotateWidget extends AbstractInteractWidget {
 
@@ -133,6 +134,7 @@ public class RotateWidget extends AbstractInteractWidget {
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
         _xRing.setRenderState(blend);
+        MaterialUtil.autoMaterials(_xRing);
 
         return this;
     }
@@ -159,6 +161,7 @@ public class RotateWidget extends AbstractInteractWidget {
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
         _yRing.setRenderState(blend);
+        MaterialUtil.autoMaterials(_yRing);
 
         return this;
     }
@@ -182,6 +185,7 @@ public class RotateWidget extends AbstractInteractWidget {
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
         _zRing.setRenderState(blend);
+        MaterialUtil.autoMaterials(_zRing);
 
         return this;
     }

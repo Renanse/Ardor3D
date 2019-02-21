@@ -32,6 +32,7 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Arrow;
+import com.ardor3d.util.MaterialUtil;
 
 public class SimpleScaleWidget extends AbstractInteractWidget {
 
@@ -79,6 +80,7 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
 
         _handle.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
         _handle.updateGeometricState(0);
+        MaterialUtil.autoMaterials(_handle);
         return this;
     }
 
