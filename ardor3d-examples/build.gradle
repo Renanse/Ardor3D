@@ -1,12 +1,14 @@
 
 description = 'Ardor 3D Examples'
+
 dependencies {
-  compile project(':ardor3d-lwjgl3')
-  compile project(':ardor3d-awt')
-  compile project(':ardor3d-swt')
-  compile project(':ardor3d-effects')
-  compile project(':ardor3d-extras')
-  compile project(':ardor3d-collada')
-  compile project(':ardor3d-terrain')
-  compile project(':ardor3d-ui')
+	implementation project(':ardor3d-lwjgl3')
+	implementation project(':ardor3d-lwjgl3-swt')
+	implementation project(':ardor3d-awt')
+	implementation project(':ardor3d-swt')
+	implementation project(':ardor3d-effects')
+	implementation project(':ardor3d-extras')
+	implementation project(':ardor3d-collada')
+	implementation project(':ardor3d-terrain')
+	implementation project(':ardor3d-ui')
 }

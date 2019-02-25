@@ -10,29 +10,26 @@ switch ( OperatingSystem.current() ) {
 		break
 	case OperatingSystem.LINUX:
 		project.ext.lwjglNatives = "natives-linux"
-	break
+		break
 	case OperatingSystem.MAC_OS:
 		project.ext.lwjglNatives = "natives-macos"
 		break
 }
 
-repositories {
-	mavenCentral()
-}
-
 dependencies {
-  compile project(':ardor3d-core')
-	compile "org.lwjgl:lwjgl:$lwjglVersion"
-	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion"
-	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion"
-	compile "org.lwjgl:lwjgl-jawt:$lwjglVersion"
-	compile "org.lwjgl:lwjgl-openal:$lwjglVersion"
-	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion"
-	compile "org.lwjgl:lwjgl-stb:$lwjglVersion"
-	compile "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+	implementation project(':ardor3d-core')
+  	
+	implementation "org.lwjgl:lwjgl:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl-assimp:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl-jawt:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl-openal:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
+	implementation "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
+	implementation "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
+	implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
+	implementation "org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives"
+	implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
+	implementation "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
 }

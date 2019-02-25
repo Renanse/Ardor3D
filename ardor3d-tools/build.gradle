@@ -1,9 +1,10 @@
 
 description = 'Ardor 3D Tools'
+
 dependencies {
-  compile project(':ardor3d-lwjgl3')
-  compile project(':ardor3d-awt')
-  compile project(':ardor3d-effects')
-  compile project(':ardor3d-extras')
-  compile project(':ardor3d-ui')
+	implementation project(':ardor3d-lwjgl3')
+	implementation project(':ardor3d-awt')
+	implementation project(':ardor3d-effects')
+	implementation project(':ardor3d-extras')
+	implementation project(':ardor3d-ui')
 }

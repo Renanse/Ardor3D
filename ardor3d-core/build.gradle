@@ -1,7 +1,12 @@
 
 description = 'Ardor 3D Core'
+
+project.ext.guavaVersion = "27.0.1-jre"
+project.ext.snakeyamlVersion = "1.23"
+
 dependencies {
-  compile project(':ardor3d-math')
-    compile group: 'com.google.guava', name: 'guava', version:'27.0-jre'
-    compile group: 'org.yaml', name: 'snakeyaml', version: '1.23'
+	implementation project(':ardor3d-math')
+	
+	implementation "com.google.guava:guava:$guavaVersion"
+	implementation "org.yaml:snakeyaml:$snakeyamlVersion"
 }

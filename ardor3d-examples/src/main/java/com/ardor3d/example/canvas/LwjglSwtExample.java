@@ -22,7 +22,6 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -32,6 +31,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.lwjgl.opengl.swt.GLData;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -40,7 +40,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
-import com.ardor3d.framework.swt.SwtCanvas;
+import com.ardor3d.framework.lwjgl3.swt.Lwjgl3SwtCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
@@ -175,6 +175,11 @@ public class LwjglSwtExample {
         final GLData data = new GLData();
         data.depthSize = 8;
         data.doubleBuffer = true;
+        data.profile = GLData.Profile.CORE;
+        data.majorVersion = 3;
+        data.minorVersion = 3;
+        data.samples = 4; // 4x multisampling
+        data.swapInterval = 1; // for enabling v-sync (swapbuffers sync'ed to monitor refresh)
 
         final SashForm splitter = new SashForm(canvasParent, SWT.HORIZONTAL);
 
@@ -192,7 +197,7 @@ public class LwjglSwtExample {
 
         canvasParent.layout();
 
-        final SwtCanvas canvas1 = new SwtCanvas(topLeft, SWT.NONE, data);
+        final Lwjgl3SwtCanvas canvas1 = new Lwjgl3SwtCanvas(topLeft, SWT.NONE, data);
         final Lwjgl3CanvasRenderer lwjglCanvasRenderer1 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas1, lwjglCanvasRenderer1);
         canvas1.setCanvasRenderer(lwjglCanvasRenderer1);
@@ -200,21 +205,21 @@ public class LwjglSwtExample {
         canvas1.addControlListener(newResizeHandler(canvas1, lwjglCanvasRenderer1));
         canvas1.setFocus();
 
-        final SwtCanvas canvas2 = new SwtCanvas(bottomLeft, SWT.NONE, data);
+        final Lwjgl3SwtCanvas canvas2 = new Lwjgl3SwtCanvas(bottomLeft, SWT.NONE, data);
         final Lwjgl3CanvasRenderer lwjglCanvasRenderer2 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas2, lwjglCanvasRenderer2);
         canvas2.setCanvasRenderer(lwjglCanvasRenderer2);
         frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, lwjglCanvasRenderer2));
 
-        final SwtCanvas canvas3 = new SwtCanvas(topRight, SWT.NONE, data);
+        final Lwjgl3SwtCanvas canvas3 = new Lwjgl3SwtCanvas(topRight, SWT.NONE, data);
         final Lwjgl3CanvasRenderer lwjglCanvasRenderer3 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas3, lwjglCanvasRenderer3);
         canvas3.setCanvasRenderer(lwjglCanvasRenderer3);
         frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, lwjglCanvasRenderer3));
 
-        final SwtCanvas canvas4 = new SwtCanvas(bottomRight, SWT.NONE, data);
+        final Lwjgl3SwtCanvas canvas4 = new Lwjgl3SwtCanvas(bottomRight, SWT.NONE, data);
         final Lwjgl3CanvasRenderer lwjglCanvasRenderer4 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas4, lwjglCanvasRenderer4);
         canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
@@ -314,7 +319,7 @@ public class LwjglSwtExample {
         _showCursor1.put(canvas1, true);
     }
 
-    private static void addCallback(final SwtCanvas canvas, final Lwjgl3CanvasRenderer renderer) {
+    private static void addCallback(final Lwjgl3SwtCanvas canvas, final Lwjgl3CanvasRenderer renderer) {
         renderer.setCanvasCallback(new Lwjgl3CanvasCallback() {
             @Override
             public void makeCurrent(final boolean force) {
@@ -341,7 +346,7 @@ public class LwjglSwtExample {
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
-    static ControlListener newResizeHandler(final SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
+    static ControlListener newResizeHandler(final Lwjgl3SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
         final ControlListener retVal = new ControlListener() {
             public void controlMoved(final ControlEvent e) {}
 
