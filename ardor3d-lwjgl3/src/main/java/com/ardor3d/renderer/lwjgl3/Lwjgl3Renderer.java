@@ -17,6 +17,7 @@ import java.nio.ShortBuffer;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL31C;
 import org.lwjgl.opengl.GL32C;
 import org.lwjgl.opengl.GLUtil;
@@ -78,7 +79,11 @@ public class Lwjgl3Renderer extends AbstractRenderer {
      * Constructor instantiates a new <code>Lwjgl3Renderer</code> object.
      */
     public Lwjgl3Renderer() {
-        logger.fine("Lwjgl3Renderer created.");
+
+        final int major = GL11C.glGetInteger(GL30C.GL_MAJOR_VERSION);
+        final int minor = GL11C.glGetInteger(GL30C.GL_MINOR_VERSION);
+
+        logger.info(String.format("Lwjgl3Renderer created with a %d.%d context.", major, minor));
         _shaderUtils = new Lwjgl3ShaderUtils(this);
         _textureUtils = new Lwjgl3TextureUtils();
         _scissorUtils = new Lwjgl3ScissorUtils();
