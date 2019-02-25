@@ -3,6 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 description = 'Ardor 3D LWJGL3 SWT'
 
 dependencies {
-	implementation project(':ardor3d-lwjgl3')
-	implementation project(':lwjgl3-swt')
+	api project(':ardor3d-lwjgl3')
+	api project(':lwjgl3-swt')
+	api project(':ardor3d-swt')
 }

@@ -5,8 +5,8 @@ project.ext.jdomVersion = "2.0.6"
 project.ext.jaxenVersion = "1.1.6"
 
 dependencies {
-	implementation project(':ardor3d-core')
-	implementation project(':ardor3d-animation')
+	api project(':ardor3d-core')
+	api project(':ardor3d-animation')
 	
 	implementation "org.jdom:jdom2:$jdomVersion"
 	implementation "jaxen:jaxen:$jaxenVersion"

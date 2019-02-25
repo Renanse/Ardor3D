@@ -2,5 +2,5 @@
 description = 'Ardor 3D Math'
 
 dependencies {
-	implementation project(':ardor3d-savable')
+	api project(':ardor3d-savable')
 }

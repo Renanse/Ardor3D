@@ -17,15 +17,15 @@ switch ( OperatingSystem.current() ) {
 }
 
 dependencies {
-	implementation project(':ardor3d-core')
+	api project(':ardor3d-core')
   	
-	implementation "org.lwjgl:lwjgl:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-assimp:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-jawt:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-openal:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
+	api "org.lwjgl:lwjgl:$lwjglVersion"
+	api "org.lwjgl:lwjgl-assimp:$lwjglVersion"
+	api "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+	api "org.lwjgl:lwjgl-jawt:$lwjglVersion"
+	api "org.lwjgl:lwjgl-openal:$lwjglVersion"
+	api "org.lwjgl:lwjgl-opengl:$lwjglVersion"
+	api "org.lwjgl:lwjgl-stb:$lwjglVersion"
 	implementation "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
 	implementation "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
 	implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"

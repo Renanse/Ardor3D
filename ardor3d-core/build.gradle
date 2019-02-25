@@ -5,8 +5,8 @@ project.ext.guavaVersion = "27.0.1-jre"
 project.ext.snakeyamlVersion = "1.23"
 
 dependencies {
-	implementation project(':ardor3d-math')
+	api project(':ardor3d-math')
 	
-	implementation "com.google.guava:guava:$guavaVersion"
+	api "com.google.guava:guava:$guavaVersion"
 	implementation "org.yaml:snakeyaml:$snakeyamlVersion"
 }

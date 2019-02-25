@@ -17,7 +17,8 @@ switch ( OperatingSystem.current() ) {
 }
 
 dependencies {
-	implementation project(':ardor3d-core')
+	api project(':ardor3d-core')
 	
+	api "org.eclipse.platform:org.eclipse.swt:$swtVersion"
 	implementation "org.eclipse.platform:$swtNatives:$swtVersion"
 }

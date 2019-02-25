@@ -2,6 +2,6 @@
 description = 'Ardor 3D Terrain'
 
 dependencies {
-	implementation project(':ardor3d-core')
+	api project(':ardor3d-core')
 	implementation project(':ardor3d-awt')
 }

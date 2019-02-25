@@ -1,5 +1,6 @@
 allprojects  {
 	apply plugin: 'maven'
+	apply plugin: 'java-library'
 	group = 'com.ardor3d'
 	version = '1.5.0'
 }

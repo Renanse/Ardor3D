@@ -2,5 +2,5 @@
 description = 'Ardor 3D Extras Package'
 
 dependencies {
-	implementation project(':ardor3d-core')
+	api project(':ardor3d-core')
 }
