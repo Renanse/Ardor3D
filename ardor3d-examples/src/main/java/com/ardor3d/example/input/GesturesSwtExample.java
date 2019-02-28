@@ -10,24 +10,21 @@
 
 package com.ardor3d.example.input;
 
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.lwjgl.opengl.swt.GLData;
 
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.benchmark.ball.Ball;
 import com.ardor3d.example.benchmark.ball.BallSprite;
 import com.ardor3d.framework.BasicScene;
@@ -36,7 +33,7 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
-import com.ardor3d.framework.swt.SwtCanvas;
+import com.ardor3d.framework.lwjgl3.swt.Lwjgl3SwtCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
@@ -72,8 +69,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.collect.Lists;
 
 public class GesturesSwtExample implements Updater {
@@ -88,7 +83,7 @@ public class GesturesSwtExample implements Updater {
 
     private boolean inited;
 
-    private SwtCanvas _canvas;
+    private Lwjgl3SwtCanvas _canvas;
 
     private double ballScale = 1.0, workScale = 1.0;
 
@@ -194,13 +189,8 @@ public class GesturesSwtExample implements Updater {
 
         AWTImageLoader.registerLoader();
 
-        try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    GesturesSwtExample.class, "com/ardor3d/example/media/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
-        }
+        ExampleBase.addDefaultResourceLocators();
+        scene.getRoot().setRenderMaterial("unlit/textured/basic.yaml");
 
         game.setupCanvas(shell, left, scene, frameWork, logicalLayer);
 
@@ -237,9 +227,12 @@ public class GesturesSwtExample implements Updater {
             final FrameHandler frameWork, final LogicalLayer logicalLayer) {
         final GLData data = new GLData();
         data.depthSize = 8;
+        data.profile = GLData.Profile.CORE;
+        data.majorVersion = 3;
+        data.minorVersion = 3;
         data.doubleBuffer = true;
 
-        _canvas = new SwtCanvas(parent, SWT.NONE, data);
+        _canvas = new Lwjgl3SwtCanvas(parent, SWT.NONE, data);
         final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(scene);
         canvasRenderer.setCanvasCallback(new Lwjgl3CanvasCallback() {
             @Override
@@ -260,7 +253,7 @@ public class GesturesSwtExample implements Updater {
 
         _canvas.setCanvasRenderer(canvasRenderer);
         frameWork.addCanvas(_canvas);
-        _canvas.addControlListener(newResizeHandler(_canvas, canvasRenderer));
+        addResizeHandler(_canvas, canvasRenderer);
         _canvas.setFocus();
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(_canvas);
@@ -279,87 +272,87 @@ public class GesturesSwtExample implements Updater {
 
         logicalLayer.registerInput(_canvas, pl);
 
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(PinchGestureEvent.class),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                final PinchGestureEvent event = inputStates.getCurrent().getGestureState()
-                        .first(PinchGestureEvent.class);
-                // scale the balls
-                if (event.isStartOfGesture()) {
-                    workScale = ballScale;
-                }
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(PinchGestureEvent.class), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        final PinchGestureEvent event = inputStates.getCurrent().getGestureState()
+                                .first(PinchGestureEvent.class);
+                        // scale the balls
+                        if (event.isStartOfGesture()) {
+                            workScale = ballScale;
+                        }
 
-                ballScale = MathUtils.clamp(workScale * event.getScale(), 0.1, 10);
-                if (balls != null) {
-                    for (final BallSprite b : balls) {
-                        b.getBall().scale(ballScale);
-                        b.setScale(b.getBall().getTotalScale());
+                        ballScale = MathUtils.clamp(workScale * event.getScale(), 0.1, 10);
+                        if (balls != null) {
+                            for (final BallSprite b : balls) {
+                                b.getBall().scale(ballScale);
+                                b.setScale(b.getBall().getTotalScale());
+                            }
+                        }
                     }
-                }
-            }
-        }));
+                }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(RotateGestureEvent.class),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
-                        .first(RotateGestureEvent.class);
-                // Alter time scale
-                currentRot += event.getDeltaRadians();
-                currentRot = MathUtils.clamp(currentRot, 0, MathUtils.PI);
-                timeScale = currentRot * ROT_SCALE + 0.01;
-            }
-        }));
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(RotateGestureEvent.class), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        final RotateGestureEvent event = inputStates.getCurrent().getGestureState()
+                                .first(RotateGestureEvent.class);
+                        // Alter time scale
+                        currentRot += event.getDeltaRadians();
+                        currentRot = MathUtils.clamp(currentRot, 0, MathUtils.PI);
+                        timeScale = currentRot * ROT_SCALE + 0.01;
+                    }
+                }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(PanGestureEvent.class),
-                new TriggerAction() {
-            int oldX = -1, oldY = -1;
-            int minDeltaSq = 10 * 10;
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(PanGestureEvent.class), new TriggerAction() {
+                    int oldX = -1, oldY = -1;
+                    int minDeltaSq = 10 * 10;
 
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                final PanGestureEvent event = inputStates.getCurrent().getGestureState()
-                        .first(PanGestureEvent.class);
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        final PanGestureEvent event = inputStates.getCurrent().getGestureState()
+                                .first(PanGestureEvent.class);
 
-                if (event.isStartOfGesture()) {
-                    oldX = event.getX();
-                    oldY = event.getY();
-                    return;
-                }
+                        if (event.isStartOfGesture()) {
+                            oldX = event.getX();
+                            oldY = event.getY();
+                            return;
+                        }
 
-                final int dx = event.getX() - oldX;
-                final int dy = event.getY() - oldY;
+                        final int dx = event.getX() - oldX;
+                        final int dy = event.getY() - oldY;
 
-                final int dSq = dx * dx + dy * dy;
+                        final int dSq = dx * dx + dy * dy;
 
-                if (dSq > minDeltaSq) {
-                    spawnExtraBall(shell.getLocation(), scene, event, 1.0);
-                    oldX = event.getX();
-                    oldY = event.getY();
-                }
-            }
-        }));
+                        if (dSq > minDeltaSq) {
+                            spawnExtraBall(shell.getLocation(), scene, event, 1.0);
+                            oldX = event.getX();
+                            oldY = event.getY();
+                        }
+                    }
+                }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class),
-                new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                @SuppressWarnings("unused")
-                final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(SwipeGestureEvent.class), new TriggerAction() {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        @SuppressWarnings("unused")
+                        final SwipeGestureEvent event = inputStates.getCurrent().getGestureState()
                                 .first(SwipeGestureEvent.class);
-                resetBalls(0);
-            }
-        }));
+                        resetBalls(0);
+                    }
+                }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new GestureEventCondition(LongPressGestureEvent.class),
-                new TriggerAction() {
-            @Override
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                final LongPressGestureEvent event = inputStates.getCurrent().getGestureState()
-                        .first(LongPressGestureEvent.class);
+        logicalLayer.registerTrigger(
+                new InputTrigger(new GestureEventCondition(LongPressGestureEvent.class), new TriggerAction() {
+                    @Override
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        final LongPressGestureEvent event = inputStates.getCurrent().getGestureState()
+                                .first(LongPressGestureEvent.class);
 
-                // spawn a larger bubble
-                spawnExtraBall(shell.getLocation(), scene, event, 3.0);
-            }
-        }));
+                        // spawn a larger bubble
+                        spawnExtraBall(shell.getLocation(), scene, event, 3.0);
+                    }
+                }));
 
         _canvas.init();
     }
@@ -379,33 +372,27 @@ public class GesturesSwtExample implements Updater {
         ballSprite.updateGeometricState(0);
     }
 
-    ControlListener newResizeHandler(final SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
-        final ControlListener retVal = new ControlListener() {
-            public void controlMoved(final ControlEvent e) {}
+    void addResizeHandler(final Lwjgl3SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
+        swtCanvas.addListener((final int w, final int h) -> {
+            if ((w == 0) || (h == 0)) {
+                return;
+            }
 
-            public void controlResized(final ControlEvent event) {
-                final Rectangle size = swtCanvas.getClientArea();
-                if ((size.width == 0) && (size.height == 0)) {
-                    return;
-                }
-                final float aspect = (float) size.width / (float) size.height;
-                final Camera camera = canvasRenderer.getCamera();
-                if (camera != null) {
-                    final double fovY = camera.getFovY();
-                    final double near = camera.getFrustumNear();
-                    final double far = camera.getFrustumFar();
-                    camera.setFrustumPerspective(fovY, aspect, near, far);
-                    camera.resize(size.width, size.height);
-                }
+            final float aspect = (float) w / (float) h;
+            final Camera camera = canvasRenderer.getCamera();
+            if (camera != null) {
+                final double fovY = camera.getFovY();
+                final double near = camera.getFrustumNear();
+                final double far = camera.getFrustumFar();
+                camera.setFrustumPerspective(fovY, aspect, near, far);
+                camera.resize(w, h);
+            }
 
-                if (balls != null) {
-                    for (final BallSprite b : balls) {
-                        b.updateAreaDimensions(size.width, size.height);
-                    }
+            if (balls != null) {
+                for (final BallSprite b : balls) {
+                    b.updateAreaDimensions(w, h);
                 }
             }
-        };
-        return retVal;
+        });
     }
-
 }

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.opengl.swt.GLCanvas;
 import org.lwjgl.opengl.swt.GLData;
@@ -43,9 +42,13 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
         setCurrent();
 
         addListener(SWT.Resize, event -> {
-            final Rectangle clientArea = getClientArea();
+        	if (_listeners.isEmpty()) return;
+        	
+            int width = getClientAreaWidthScaled();
+            int height = getClientAreaHeightScaled();
+
             for (final ICanvasListener l : _listeners) {
-                l.onResize(clientArea.width, clientArea.height);
+                l.onResize(width, height);
             }
         });
     }
@@ -74,11 +77,12 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
     private void privateInit() {
         // tell our parent to lay us out so we have the right starting size.
         getParent().layout();
-        final Rectangle size = getClientArea();
+        int width = getClientAreaWidthScaled();
+        int height = getClientAreaHeightScaled();
 
         setCurrent();
 
-        final DisplaySettings settings = new DisplaySettings(Math.max(size.width, 1), Math.max(size.height, 1), 0, 0,
+        final DisplaySettings settings = new DisplaySettings(Math.max(width, 1), Math.max(height, 1), 0, 0,
                 _passedGLData.alphaSize, _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples,
                 false, _passedGLData.stereo);
 
@@ -111,15 +115,25 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
     @Override
     public int getContentHeight() {
-        return getClientArea().x;
+        return getClientAreaHeightScaled();
     }
 
-    @Override
+    private int getClientAreaHeightScaled() {
+    	int height = getClientArea().height;
+		return Math.round(height * getMonitor().getZoom() / 100f);
+	}
+
+	@Override
     public int getContentWidth() {
-        return getClientArea().y;
+        return getClientAreaWidthScaled();
     }
 
-    @Override
+    private int getClientAreaWidthScaled() {
+    	int width = getClientArea().width;
+		return Math.round(width * getMonitor().getZoom() / 100f);
+	}
+
+	@Override
     public void addListener(final ICanvasListener listener) {
         _listeners.add(listener);
     }

@@ -14,19 +14,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.BasicScene;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
@@ -115,7 +109,22 @@ public class LwjglHeadlessSwtExample {
         canvas.setFocus();
 
         addCanvasCallback(canvas, renderer);
-        addControlListener(canvas, renderer);
+        canvas.addListener((final int w, final int h) -> {
+            System.err.println(w);
+            if ((w == 0) || (h == 0)) {
+                return;
+            }
+
+            final float aspect = (float) w / (float) h;
+            final Camera camera = renderer.getCamera();
+            if (camera != null) {
+                final double fovY = camera.getFovY();
+                final double near = camera.getFrustumNear();
+                final double far = camera.getFrustumFar();
+                camera.setFrustumPerspective(fovY, aspect, near, far);
+                camera.resize(w, h);
+            }
+        });
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas);
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas);
@@ -146,29 +155,6 @@ public class LwjglHeadlessSwtExample {
             @Override
             public void doSwap() {
                 canvas.swapBuffers();
-            }
-        });
-    }
-
-    static void addControlListener(final Composite comp, final CanvasRenderer canvasRenderer) {
-        comp.addControlListener(new ControlListener() {
-            public void controlMoved(final ControlEvent e) {}
-
-            public void controlResized(final ControlEvent event) {
-                final Rectangle size = DPIUtil.autoScaleUp(comp.getClientArea());
-                if ((size.width == 0) && (size.height == 0)) {
-                    return;
-                }
-
-                final float aspect = (float) size.width / (float) size.height;
-                final Camera camera = canvasRenderer.getCamera();
-                if (camera != null) {
-                    final double fovY = camera.getFovY();
-                    final double near = camera.getFrustumNear();
-                    final double far = camera.getFrustumFar();
-                    camera.setFrustumPerspective(fovY, aspect, near, far);
-                    camera.resize(size.width, size.height);
-                }
             }
         });
     }

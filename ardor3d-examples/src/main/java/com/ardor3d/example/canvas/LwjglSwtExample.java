@@ -18,9 +18,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -202,7 +199,7 @@ public class LwjglSwtExample {
         addCallback(canvas1, lwjglCanvasRenderer1);
         canvas1.setCanvasRenderer(lwjglCanvasRenderer1);
         frameWork.addCanvas(canvas1);
-        canvas1.addControlListener(newResizeHandler(canvas1, lwjglCanvasRenderer1));
+        addResizeHandler(canvas1, lwjglCanvasRenderer1);
         canvas1.setFocus();
 
         final Lwjgl3SwtCanvas canvas2 = new Lwjgl3SwtCanvas(bottomLeft, SWT.NONE, data);
@@ -210,21 +207,21 @@ public class LwjglSwtExample {
         addCallback(canvas2, lwjglCanvasRenderer2);
         canvas2.setCanvasRenderer(lwjglCanvasRenderer2);
         frameWork.addCanvas(canvas2);
-        canvas2.addControlListener(newResizeHandler(canvas2, lwjglCanvasRenderer2));
+        addResizeHandler(canvas2, lwjglCanvasRenderer2);
 
         final Lwjgl3SwtCanvas canvas3 = new Lwjgl3SwtCanvas(topRight, SWT.NONE, data);
         final Lwjgl3CanvasRenderer lwjglCanvasRenderer3 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas3, lwjglCanvasRenderer3);
         canvas3.setCanvasRenderer(lwjglCanvasRenderer3);
         frameWork.addCanvas(canvas3);
-        canvas3.addControlListener(newResizeHandler(canvas3, lwjglCanvasRenderer3));
+        addResizeHandler(canvas3, lwjglCanvasRenderer3);
 
         final Lwjgl3SwtCanvas canvas4 = new Lwjgl3SwtCanvas(bottomRight, SWT.NONE, data);
         final Lwjgl3CanvasRenderer lwjglCanvasRenderer4 = new Lwjgl3CanvasRenderer(scene);
         addCallback(canvas4, lwjglCanvasRenderer4);
         canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
         frameWork.addCanvas(canvas4);
-        canvas4.addControlListener(newResizeHandler(canvas4, lwjglCanvasRenderer4));
+        addResizeHandler(canvas4, lwjglCanvasRenderer4);
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas1);
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
@@ -346,27 +343,22 @@ public class LwjglSwtExample {
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
-    static ControlListener newResizeHandler(final Lwjgl3SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
-        final ControlListener retVal = new ControlListener() {
-            public void controlMoved(final ControlEvent e) {}
-
-            public void controlResized(final ControlEvent event) {
-                final Rectangle size = swtCanvas.getClientArea();
-                if ((size.width == 0) && (size.height == 0)) {
-                    return;
-                }
-                final float aspect = (float) size.width / (float) size.height;
-                final Camera camera = canvasRenderer.getCamera();
-                if (camera != null) {
-                    final double fovY = camera.getFovY();
-                    final double near = camera.getFrustumNear();
-                    final double far = camera.getFrustumFar();
-                    camera.setFrustumPerspective(fovY, aspect, near, far);
-                    camera.resize(size.width, size.height);
-                }
+    static void addResizeHandler(final Lwjgl3SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
+        swtCanvas.addListener((final int w, final int h) -> {
+            if ((w == 0) || (h == 0)) {
+                return;
             }
-        };
-        return retVal;
+
+            final float aspect = (float) w / (float) h;
+            final Camera camera = canvasRenderer.getCamera();
+            if (camera != null) {
+                final double fovY = camera.getFovY();
+                final double near = camera.getFrustumNear();
+                final double far = camera.getFrustumFar();
+                camera.setFrustumPerspective(fovY, aspect, near, far);
+                camera.resize(w, h);
+            }
+        });
     }
 }
 
