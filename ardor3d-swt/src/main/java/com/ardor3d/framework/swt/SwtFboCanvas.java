@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2018 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -20,6 +20,7 @@ import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.bounding.BoundingBox;
@@ -193,12 +194,28 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
 
     @Override
     public int getContentHeight() {
-        return getClientArea().x;
+        return getClientAreaHeightScaled();
+    }
+
+    private int getClientAreaHeightScaled() {
+        final int height = getClientArea().height;
+        final int dpi = Display.getCurrent().getDPI().y;
+        final int zoom = getMonitor().getZoom();
+        final float factor = (float) dpi / (float) zoom;
+        return Math.round(height * factor);
     }
 
     @Override
     public int getContentWidth() {
-        return getClientArea().y;
+        return getClientAreaWidthScaled();
+    }
+
+    private int getClientAreaWidthScaled() {
+        final int width = getClientArea().width;
+        final int dpi = Display.getCurrent().getDPI().x;
+        final int zoom = getMonitor().getZoom();
+        final float factor = (float) dpi / (float) zoom;
+        return Math.round(width * factor);
     }
 
     @Override

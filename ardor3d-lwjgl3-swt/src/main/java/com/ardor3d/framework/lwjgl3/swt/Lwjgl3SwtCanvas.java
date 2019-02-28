@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.lwjgl.opengl.swt.GLCanvas;
 import org.lwjgl.opengl.swt.GLData;
 
@@ -120,7 +121,10 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
     private int getClientAreaHeightScaled() {
     	int height = getClientArea().height;
-		return Math.round(height * getMonitor().getZoom() / 100f);
+    	int dpi = Display.getCurrent().getDPI().y;
+    	int zoom = getMonitor().getZoom();
+    	float factor = (float)dpi/(float)zoom;
+		return Math.round(height * factor);
 	}
 
 	@Override
@@ -130,7 +134,10 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
     private int getClientAreaWidthScaled() {
     	int width = getClientArea().width;
-		return Math.round(width * getMonitor().getZoom() / 100f);
+    	int dpi = Display.getCurrent().getDPI().x;
+    	int zoom = getMonitor().getZoom();
+    	float factor = (float)dpi/(float)zoom;
+		return Math.round(width * factor);
 	}
 
 	@Override
