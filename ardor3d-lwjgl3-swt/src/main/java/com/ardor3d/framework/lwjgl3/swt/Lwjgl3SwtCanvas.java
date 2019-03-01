@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.lwjgl.opengl.swt.GLCanvas;
@@ -31,122 +32,126 @@ import com.ardor3d.input.MouseManager;
  * A canvas for embedding into SWT applications.
  */
 public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
-    protected CanvasRenderer _canvasRenderer;
-    protected boolean _inited = false;
-    protected final GLData _passedGLData;
+	protected CanvasRenderer _canvasRenderer;
+	protected boolean _inited = false;
+	protected final GLData _passedGLData;
 
-    protected List<ICanvasListener> _listeners = new ArrayList<>();
+	protected List<ICanvasListener> _listeners = new ArrayList<>();
 
-    public Lwjgl3SwtCanvas(final Composite composite, final int style, final GLData glData) {
-        super(composite, style, glData);
-        _passedGLData = getGLData();
-        setCurrent();
+	public Lwjgl3SwtCanvas(final Composite composite, final int style, final GLData glData) {
+		super(composite, style, glData);
+		_passedGLData = getGLData();
+		setCurrent();
 
-        addListener(SWT.Resize, event -> {
-        	if (_listeners.isEmpty()) return;
-        	
-            int width = getClientAreaWidthScaled();
-            int height = getClientAreaHeightScaled();
+		addListener(SWT.Resize, event -> {
+			if (_listeners.isEmpty()) {
+				return;
+			}
 
-            for (final ICanvasListener l : _listeners) {
-                l.onResize(width, height);
-            }
-        });
-    }
+			final Rectangle clientArea = getClientArea();
+			final int width = clientArea.width;
+			final int height = clientArea.height;
 
-    public CanvasRenderer getCanvasRenderer() {
-        return _canvasRenderer;
-    }
+			for (final ICanvasListener l : _listeners) {
+				l.onResize(width, height);
+			}
+		});
+	}
 
-    public void setCanvasRenderer(final CanvasRenderer renderer) {
-        _canvasRenderer = renderer;
-    }
+	@Override
+	public CanvasRenderer getCanvasRenderer() {
+		return _canvasRenderer;
+	}
 
-    protected MouseManager _manager;
+	public void setCanvasRenderer(final CanvasRenderer renderer) {
+		_canvasRenderer = renderer;
+	}
 
-    @Override
-    public MouseManager getMouseManager() {
-        return _manager;
-    }
+	protected MouseManager _manager;
 
-    @Override
-    public void setMouseManager(final MouseManager manager) {
-        _manager = manager;
-    }
+	@Override
+	public MouseManager getMouseManager() {
+		return _manager;
+	}
 
-    @MainThread
-    private void privateInit() {
-        // tell our parent to lay us out so we have the right starting size.
-        getParent().layout();
-        int width = getClientAreaWidthScaled();
-        int height = getClientAreaHeightScaled();
+	@Override
+	public void setMouseManager(final MouseManager manager) {
+		_manager = manager;
+	}
 
-        setCurrent();
+	@MainThread
+	private void privateInit() {
+		// tell our parent to lay us out so we have the right starting size.
+		getParent().layout();
+		setCurrent();
+		final int w = getClientArea().width;
+		final int h = getClientArea().height;
 
-        final DisplaySettings settings = new DisplaySettings(Math.max(width, 1), Math.max(height, 1), 0, 0,
-                _passedGLData.alphaSize, _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples,
-                false, _passedGLData.stereo);
+		final DisplaySettings settings = new DisplaySettings(w, h, 0, 0, _passedGLData.alphaSize,
+				_passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples, false, _passedGLData.stereo);
 
-        _canvasRenderer.init(settings, false); // false - do not do back buffer swap, swt will do that.
-        _inited = true;
-    }
+		_canvasRenderer.init(settings, false); // false - do not do back buffer swap, swt will do that.
+		_inited = true;
+	}
 
-    @MainThread
-    public void init() {
-        privateInit();
-    }
+	@Override
+	@MainThread
+	public void init() {
+		privateInit();
+	}
 
-    @MainThread
-    public void draw(final CountDownLatch latch) {
-        if (!_inited) {
-            privateInit();
-        }
+	@Override
+	@MainThread
+	public void draw(final CountDownLatch latch) {
+		if (!_inited) {
+			privateInit();
+		}
 
-        if (!isDisposed() && isVisible()) {
-            setCurrent();
+		if (!isDisposed() && isVisible()) {
+			setCurrent();
 
-            if (_canvasRenderer.draw()) {
-                swapBuffers();
-                _canvasRenderer.releaseCurrentContext();
-            }
-        }
+			if (_canvasRenderer.draw()) {
+				swapBuffers();
+				_canvasRenderer.releaseCurrentContext();
+			}
+		}
 
-        latch.countDown();
-    }
+		latch.countDown();
+	}
 
-    @Override
-    public int getContentHeight() {
-        return getClientAreaHeightScaled();
-    }
+	@Override
+	public int getContentHeight() {
+		return getClientArea().height;
+	}
 
-    private int getClientAreaHeightScaled() {
-    	int height = getClientArea().height;
-    	int dpi = Display.getCurrent().getDPI().y;
-    	int zoom = getMonitor().getZoom();
-    	float factor = (float)dpi/(float)zoom;
+	public int getClientAreaHeightScaled() {
+		final int height = getClientArea().height;
+		final int dpi = Display.getCurrent().getDPI().y;
+		final int zoom = getMonitor().getZoom();
+		final float factor = (float) dpi / (float) zoom;
 		return Math.round(height * factor);
 	}
 
 	@Override
-    public int getContentWidth() {
-        return getClientAreaWidthScaled();
-    }
+	public int getContentWidth() {
+		return getClientArea().width;
+	}
 
-    private int getClientAreaWidthScaled() {
-    	int width = getClientArea().width;
-    	int dpi = Display.getCurrent().getDPI().x;
-    	int zoom = getMonitor().getZoom();
-    	float factor = (float)dpi/(float)zoom;
+	public int getClientAreaWidthScaled() {
+		final int width = getClientArea().width;
+		final int dpi = Display.getCurrent().getDPI().x;
+		final int zoom = getMonitor().getZoom();
+		final float factor = (float) dpi / (float) zoom;
 		return Math.round(width * factor);
 	}
 
 	@Override
-    public void addListener(final ICanvasListener listener) {
-        _listeners.add(listener);
-    }
+	public void addListener(final ICanvasListener listener) {
+		_listeners.add(listener);
+	}
 
-    @Override
-    public boolean removeListener(final ICanvasListener listener) {
-        return _listeners.remove(listener);
-    }
+	@Override
+	public boolean removeListener(final ICanvasListener listener) {
+		return _listeners.remove(listener);
+	}
 }

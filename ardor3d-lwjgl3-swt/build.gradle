@@ -2,8 +2,20 @@ import org.gradle.internal.os.OperatingSystem
 
 description = 'Ardor 3D LWJGL3 SWT'
 
+switch ( OperatingSystem.current() ) {
+	case OperatingSystem.WINDOWS:
+		project.ext.lwjgl3SwtJar = "lwjgl3-swt-windows.jar"
+		break
+	case OperatingSystem.LINUX:
+		project.ext.lwjgl3SwtJar = "lwjgl3-swt-linux.jar"
+		break
+	case OperatingSystem.MAC_OS:
+		project.ext.lwjgl3SwtJar = "lwjgl3-swt-macos.jar"
+		break
+}
+
 dependencies {
-	api project(':ardor3d-lwjgl3')
-	api project(':ardor3d-swt')
-	api files('lwjgl3-swt.jar')
+	api project(":ardor3d-lwjgl3")
+	api project(":ardor3d-swt")
+	api files("$lwjgl3SwtJar")
 }

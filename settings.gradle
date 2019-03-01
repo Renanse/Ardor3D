@@ -15,7 +15,6 @@ include ':ardor3d-terrain'
 include ':ardor3d-tools'
 include ':ardor3d-examples'
 include ':ardor3d-performance'
-include ':lwjgl3-swt'
 
 project(':ardor3d-savable').projectDir = "$rootDir/ardor3d-savable" as File
 project(':ardor3d-math').projectDir = "$rootDir/ardor3d-math" as File
@@ -33,4 +32,3 @@ project(':ardor3d-terrain').projectDir = "$rootDir/ardor3d-terrain" as File
 project(':ardor3d-tools').projectDir = "$rootDir/ardor3d-tools" as File
 project(':ardor3d-examples').projectDir = "$rootDir/ardor3d-examples" as File
 project(':ardor3d-performance').projectDir = "$rootDir/ardor3d-performance" as File
-project(':lwjgl3-swt').projectDir = "$rootDir/lwjgl3-swt" as File

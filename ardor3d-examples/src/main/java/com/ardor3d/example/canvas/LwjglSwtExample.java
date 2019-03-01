@@ -103,6 +103,7 @@ public class LwjglSwtExample {
         // INIT SWT STUFF
         final Display display = new Display();
         final Shell shell = new Shell(display);
+        shell.setText("Lwjgl SWT Example");
         shell.setLayout(new FillLayout());
 
         // This is our tab folder, it will be accepting our 3d canvases

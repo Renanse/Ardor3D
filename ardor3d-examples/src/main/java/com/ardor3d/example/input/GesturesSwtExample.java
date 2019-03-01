@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2017 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -38,6 +38,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
+import com.ardor3d.input.Key;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.gesture.event.LongPressGestureEvent;
@@ -53,6 +54,7 @@ import com.ardor3d.input.gesture.touch.SwipeInterpreter;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -165,6 +167,9 @@ public class GesturesSwtExample implements Updater {
     }
 
     public static void main(final String[] args) {
+        AWTImageLoader.registerLoader();
+        ExampleBase.addDefaultResourceLocators();
+
         final Timer timer = new Timer();
         final FrameHandler frameWork = new FrameHandler(timer);
         final LogicalLayer logicalLayer = new LogicalLayer();
@@ -187,9 +192,6 @@ public class GesturesSwtExample implements Updater {
         addInstructions(right);
         splitter.setWeights(new int[] { 75, 25 });
 
-        AWTImageLoader.registerLoader();
-
-        ExampleBase.addDefaultResourceLocators();
         scene.getRoot().setRenderMaterial("unlit/textured/basic.yaml");
 
         game.setupCanvas(shell, left, scene, frameWork, logicalLayer);
@@ -227,10 +229,10 @@ public class GesturesSwtExample implements Updater {
             final FrameHandler frameWork, final LogicalLayer logicalLayer) {
         final GLData data = new GLData();
         data.depthSize = 8;
+        data.doubleBuffer = true;
         data.profile = GLData.Profile.CORE;
         data.majorVersion = 3;
         data.minorVersion = 3;
-        data.doubleBuffer = true;
 
         _canvas = new Lwjgl3SwtCanvas(parent, SWT.NONE, data);
         final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(scene);
@@ -241,9 +243,7 @@ public class GesturesSwtExample implements Updater {
             }
 
             @Override
-            public void releaseContext(final boolean force) {
-                ; // do nothing?
-            }
+            public void releaseContext(final boolean force) {}
 
             @Override
             public void doSwap() {
@@ -255,6 +255,9 @@ public class GesturesSwtExample implements Updater {
         frameWork.addCanvas(_canvas);
         addResizeHandler(_canvas, canvasRenderer);
         _canvas.setFocus();
+
+        final Camera cam = Camera.newOrthoCamera(_canvas);
+        canvasRenderer.setCamera(cam);
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(_canvas);
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(_canvas);
@@ -271,6 +274,11 @@ public class GesturesSwtExample implements Updater {
                 focusWrapper);
 
         logicalLayer.registerInput(_canvas, pl);
+        logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                System.err.println(((Lwjgl3SwtCanvas) source).getClientArea());
+            }
+        }));
 
         logicalLayer.registerTrigger(
                 new InputTrigger(new GestureEventCondition(PinchGestureEvent.class), new TriggerAction() {
@@ -373,18 +381,19 @@ public class GesturesSwtExample implements Updater {
     }
 
     void addResizeHandler(final Lwjgl3SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
-        swtCanvas.addListener((final int w, final int h) -> {
+        swtCanvas.addListener((int w, int h) -> {
+            w = swtCanvas.getClientArea().width;
+            h = swtCanvas.getClientArea().height;
+
             if ((w == 0) || (h == 0)) {
                 return;
             }
 
-            final float aspect = (float) w / (float) h;
             final Camera camera = canvasRenderer.getCamera();
             if (camera != null) {
-                final double fovY = camera.getFovY();
                 final double near = camera.getFrustumNear();
                 final double far = camera.getFrustumFar();
-                camera.setFrustumPerspective(fovY, aspect, near, far);
+                camera.setFrustum(near, far, 0, w, h, 0);
                 camera.resize(w, h);
             }
 
