@@ -38,7 +38,6 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ControllerWrapper;
-import com.ardor3d.input.Key;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.gesture.event.LongPressGestureEvent;
@@ -54,7 +53,6 @@ import com.ardor3d.input.gesture.touch.SwipeInterpreter;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
-import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -274,11 +272,6 @@ public class GesturesSwtExample implements Updater {
                 focusWrapper);
 
         logicalLayer.registerInput(_canvas, pl);
-        logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                System.err.println(((Lwjgl3SwtCanvas) source).getClientArea());
-            }
-        }));
 
         logicalLayer.registerTrigger(
                 new InputTrigger(new GestureEventCondition(PinchGestureEvent.class), new TriggerAction() {
@@ -381,10 +374,7 @@ public class GesturesSwtExample implements Updater {
     }
 
     void addResizeHandler(final Lwjgl3SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
-        swtCanvas.addListener((int w, int h) -> {
-            w = swtCanvas.getClientArea().width;
-            h = swtCanvas.getClientArea().height;
-
+        swtCanvas.addListener((final int w, final int h) -> {
             if ((w == 0) || (h == 0)) {
                 return;
             }

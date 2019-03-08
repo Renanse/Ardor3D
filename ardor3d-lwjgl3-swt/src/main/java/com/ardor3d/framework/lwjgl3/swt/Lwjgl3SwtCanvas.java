@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.lwjgl.opengl.swt.GLCanvas;
 import org.lwjgl.opengl.swt.GLData;
 
@@ -48,9 +46,8 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 				return;
 			}
 
-			final Rectangle clientArea = getClientArea();
-			final int width = clientArea.width;
-			final int height = clientArea.height;
+			final int width = getContentWidth();
+			final int height = getContentHeight();
 
 			for (final ICanvasListener l : _listeners) {
 				l.onResize(width, height);
@@ -84,8 +81,8 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 		// tell our parent to lay us out so we have the right starting size.
 		getParent().layout();
 		setCurrent();
-		final int w = getClientArea().width;
-		final int h = getClientArea().height;
+		final int w = getContentWidth();
+		final int h = getContentHeight();
 
 		final DisplaySettings settings = new DisplaySettings(w, h, 0, 0, _passedGLData.alphaSize,
 				_passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples, false, _passedGLData.stereo);
@@ -121,28 +118,16 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
 	@Override
 	public int getContentHeight() {
-		return getClientArea().height;
-	}
-
-	public int getClientAreaHeightScaled() {
 		final int height = getClientArea().height;
-		final int dpi = Display.getCurrent().getDPI().y;
-		final int zoom = getMonitor().getZoom();
-		final float factor = (float) dpi / (float) zoom;
-		return Math.round(height * factor);
+		final int zoom = getMonitor().getZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
+		return Math.round(zoom * height * 0.01f);
 	}
 
 	@Override
 	public int getContentWidth() {
-		return getClientArea().width;
-	}
-
-	public int getClientAreaWidthScaled() {
 		final int width = getClientArea().width;
-		final int dpi = Display.getCurrent().getDPI().x;
-		final int zoom = getMonitor().getZoom();
-		final float factor = (float) dpi / (float) zoom;
-		return Math.round(width * factor);
+		final int zoom = getMonitor().getZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
+		return Math.round(zoom * width * 0.01f);
 	}
 
 	@Override
