@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.opengl.swt.GLCanvas;
 import org.lwjgl.opengl.swt.GLData;
@@ -118,15 +119,15 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
 	@Override
 	public int getContentHeight() {
-		final int height = getClientArea().height;
-		final int zoom = getMonitor().getZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
+		final int height = getSize().y;
+		final int zoom = DPIUtil.getDeviceZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
 		return Math.round(zoom * height * 0.01f);
 	}
 
 	@Override
 	public int getContentWidth() {
-		final int width = getClientArea().width;
-		final int zoom = getMonitor().getZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
+		final int width = getSize().x;
+		final int zoom = DPIUtil.getDeviceZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
 		return Math.round(zoom * width * 0.01f);
 	}
 
