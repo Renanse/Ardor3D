@@ -168,7 +168,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
      *         lower left corner.
      */
     private int getArdor3DY(final MouseEvent e) {
-        return Math.round(DPIUtil.autoScaleUp(e.y) * SwtConstants.PlatformDPIScale);
+        return Math.round(DPIUtil.autoScaleUp(_control.getSize().y - e.y) * SwtConstants.PlatformDPIScale);
     }
 
     private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
