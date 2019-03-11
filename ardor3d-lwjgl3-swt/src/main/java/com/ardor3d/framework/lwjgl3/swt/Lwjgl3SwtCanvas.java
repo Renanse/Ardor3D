@@ -19,13 +19,13 @@ import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.opengl.swt.GLCanvas;
 import org.lwjgl.opengl.swt.GLData;
-import org.lwjgl.system.Platform;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
+import com.ardor3d.framework.swt.SwtConstants;
 import com.ardor3d.input.MouseManager;
 
 /**
@@ -120,18 +120,12 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
 	@Override
 	public int getContentHeight() {
-		final int height = getSize().y;
-		int zoom = DPIUtil.getDeviceZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
-		if (Platform.get() == Platform.LINUX) zoom *= 2;
-		return Math.round(zoom * height * 0.01f);
+		return Math.round(DPIUtil.autoScaleUp(getSize().y) * SwtConstants.PlatformDPIScale);
 	}
 
 	@Override
 	public int getContentWidth() {
-		final int width = getSize().x;
-		int zoom = DPIUtil.getDeviceZoom(); // zoom is 100 if no scaling, 200 for 2x scaling, etc.
-		if (Platform.get() == Platform.LINUX) zoom *= 2;
-		return Math.round(zoom * width * 0.01f);
+		return Math.round(DPIUtil.autoScaleUp(getSize().x) * SwtConstants.PlatformDPIScale);
 	}
 
 	@Override

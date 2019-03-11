@@ -20,10 +20,12 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Control;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.ThreadSafe;
+import com.ardor3d.framework.swt.SwtConstants;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
@@ -139,7 +141,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     }
 
     private int getDX(final MouseEvent e) {
-        return e.x - _lastState.getX();
+        return getArdor3DX(e) - _lastState.getX();
     }
 
     private int getDY(final MouseEvent e) {
@@ -147,13 +149,26 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     }
 
     /**
+     * Scale (for HighDPI, if needed) the X coordinate of the event.
+     *
      * @param e
      *            our mouseEvent
-     * @return the Y coordinate of the event, flipped relative to the component since we expect an origin in the lower
-     *         left corner.
+     * @return the scaled X coordinate of the event.
+     */
+    private int getArdor3DX(final MouseEvent e) {
+        return Math.round(DPIUtil.autoScaleUp(e.x) * SwtConstants.PlatformDPIScale);
+    }
+
+    /**
+     * Scale (for HighDPI) and flip the Y coordinate of the event.
+     *
+     * @param e
+     *            our mouseEvent
+     * @return the scaled Y coordinate of the event, flipped relative to the component since we expect an origin in the
+     *         lower left corner.
      */
     private int getArdor3DY(final MouseEvent e) {
-        return _control.getSize().y - e.y;
+        return Math.round(DPIUtil.autoScaleUp(e.y) * SwtConstants.PlatformDPIScale);
     }
 
     private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
@@ -206,14 +221,13 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
 
     private void initState(final MouseEvent mouseEvent) {
         if (_lastState == null) {
-            _lastState = new MouseState(mouseEvent.x, getArdor3DY(mouseEvent), 0, 0, 0, null, null);
+            _lastState = new MouseState(getArdor3DX(mouseEvent), getArdor3DY(mouseEvent), 0, 0, 0, null, null);
         }
     }
 
     private void addNewState(final MouseEvent mouseEvent, final int wheelDX,
             final EnumMap<MouseButton, ButtonState> buttons, final Multiset<MouseButton> clicks) {
-
-        final MouseState newState = new MouseState(mouseEvent.x, getArdor3DY(mouseEvent), getDX(mouseEvent),
+        final MouseState newState = new MouseState(getArdor3DX(mouseEvent), getArdor3DY(mouseEvent), getDX(mouseEvent),
                 getDY(mouseEvent), wheelDX, buttons, clicks);
 
         _upcomingEvents.add(newState);
