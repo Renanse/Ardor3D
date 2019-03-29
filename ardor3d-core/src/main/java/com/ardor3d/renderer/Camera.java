@@ -1071,6 +1071,10 @@ public class Camera implements Savable, Externalizable {
         _updateMVPMatrix = true;
         _updateInverseMVPMatrix = true;
 
+        markFrustumDirty();
+    }
+
+    public void markFrustumDirty() {
         _frustumDirty = true;
     }
 
@@ -1151,6 +1155,10 @@ public class Camera implements Savable, Externalizable {
         _updateMVPMatrix = true;
         _updateInverseMVPMatrix = true;
 
+        markFrameDirty();
+    }
+
+    public void markFrameDirty() {
         _frameDirty = true;
     }
 
@@ -1513,6 +1521,10 @@ public class Camera implements Savable, Externalizable {
      * Mark view port dirty.
      */
     protected void onViewPortChange() {
+        markViewPortDirty();
+    }
+
+    public void markViewPortDirty() {
         _viewPortDirty = true;
     }
 

@@ -39,6 +39,7 @@ public class RendererRecord extends StateRecord {
         _clippingTestValid = false;
         _texturesValid = false;
         _currentTextureArraysUnit = -1;
+        _programId = -1;
     }
 
     @Override

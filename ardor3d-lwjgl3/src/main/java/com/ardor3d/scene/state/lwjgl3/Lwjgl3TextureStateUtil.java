@@ -88,10 +88,7 @@ public abstract class Lwjgl3TextureStateUtil {
         }
 
         // Create a new texture id for this texture
-        final IntBuffer id = BufferUtils.createIntBuffer(1);
-        id.clear();
-        GL11C.glGenTextures(id);
-        final int textureId = id.get(0);
+        final int textureId = GL11C.glGenTextures();
 
         // store the new id by our current gl context.
         texture.setTextureIdForContext(context, textureId);
