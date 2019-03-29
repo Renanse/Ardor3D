@@ -41,6 +41,7 @@ public class ResourceLocatorTool {
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_SHADER = "shader";
     public static final String TYPE_MATERIAL = "material";
+    public static final String TYPE_FONT = "font";
 
     private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<String, List<ResourceLocator>>();
 
