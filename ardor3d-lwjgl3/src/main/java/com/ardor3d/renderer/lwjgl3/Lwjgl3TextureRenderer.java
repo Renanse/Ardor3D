@@ -11,7 +11,6 @@
 package com.ardor3d.renderer.lwjgl3;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -95,9 +94,7 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         // Create the texture
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
-        GL11C.glGenTextures(ibuf);
-        final int textureId = ibuf.get(0);
+        final int textureId = GL11C.glGenTextures();
         tex.setTextureIdForContext(context, textureId);
 
         Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
@@ -473,16 +470,12 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     public void activate() {
         // Lazy init
         if (_fboID == 0) {
-            final IntBuffer buffer = BufferUtils.createIntBuffer(1);
-
             // Create our texture binding FBO
-            GL30C.glGenFramebuffers(buffer); // generate id
-            _fboID = buffer.get(0);
+            _fboID = GL30C.glGenFramebuffers(); // generate id
 
             // Create a depth renderbuffer to use for RTT use
             if (_depthBits >= 0) {
-                GL30C.glGenRenderbuffers(buffer); // generate id
-                _depthRBID = buffer.get(0);
+                _depthRBID = GL30C.glGenRenderbuffers(); // generate id
                 GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _depthRBID);
                 GL30C.glRenderbufferStorage(GL30C.GL_RENDERBUFFER, getDepthFormat(), _width, _height);
             }
@@ -493,14 +486,11 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
             // If we support it, rustle up a multisample framebuffer + renderbuffers
             if (_samples != 0 && _supportsMultisample) {
                 // create ms framebuffer object
-                GL30C.glGenFramebuffers(buffer);
-                _msfboID = buffer.get(0);
+                _msfboID = GL30C.glGenFramebuffers();
 
                 // create ms renderbuffers
-                GL30C.glGenRenderbuffers(buffer); // generate id
-                _mscolorRBID = buffer.get(0);
-                GL30C.glGenRenderbuffers(buffer); // generate id
-                _msdepthRBID = buffer.get(0);
+                _mscolorRBID = GL30C.glGenRenderbuffers(); // generate id
+                _msdepthRBID = GL30C.glGenRenderbuffers(); // generate id
 
                 // set up renderbuffer properties
                 GL30C.glBindRenderbuffer(GL30C.GL_RENDERBUFFER, _mscolorRBID);
@@ -595,17 +585,11 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
     public void cleanup() {
         if (_fboID != 0) {
-            final IntBuffer id = BufferUtils.createIntBuffer(1);
-            id.put(_fboID);
-            id.rewind();
-            GL30C.glDeleteFramebuffers(id);
+            GL30C.glDeleteFramebuffers(_fboID);
         }
 
         if (_depthRBID != 0) {
-            final IntBuffer id = BufferUtils.createIntBuffer(1);
-            id.put(_depthRBID);
-            id.rewind();
-            GL30C.glDeleteRenderbuffers(id);
+            GL30C.glDeleteRenderbuffers(_depthRBID);
         }
     }
 }

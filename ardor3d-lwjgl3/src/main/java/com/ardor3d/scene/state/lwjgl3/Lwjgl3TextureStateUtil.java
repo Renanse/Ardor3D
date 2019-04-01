@@ -24,6 +24,7 @@ import org.lwjgl.opengl.GL14C;
 import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL44C;
 import org.lwjgl.opengl.GL46C;
+import org.lwjgl.system.MemoryStack;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -807,11 +808,7 @@ public abstract class Lwjgl3TextureStateUtil {
             return;
         }
 
-        final IntBuffer idBuffer = BufferUtils.createIntBuffer(1);
-        idBuffer.clear();
-        idBuffer.put(id.intValue());
-        idBuffer.rewind();
-        GL11C.glDeleteTextures(idBuffer);
+        GL11C.glDeleteTextures(id.intValue());
         record.removeTextureRecord(id);
         texture.removeFromIdCache(context);
     }
@@ -821,17 +818,18 @@ public abstract class Lwjgl3TextureStateUtil {
         final RenderContext context = ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
 
-        final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
-        idBuffer.clear();
-        for (final Integer i : ids) {
-            if (i != null) {
-                idBuffer.put(i);
-                record.removeTextureRecord(i);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            final IntBuffer idBuffer = stack.mallocInt(ids.size());
+            for (final Integer i : ids) {
+                if (i != null) {
+                    idBuffer.put(i);
+                    record.removeTextureRecord(i);
+                }
             }
-        }
-        idBuffer.flip();
-        if (idBuffer.remaining() > 0) {
-            GL11C.glDeleteTextures(idBuffer);
+            idBuffer.flip();
+            if (idBuffer.remaining() > 0) {
+                GL11C.glDeleteTextures(idBuffer);
+            }
         }
     }
 
