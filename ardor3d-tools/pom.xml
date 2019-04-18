@@ -7,9 +7,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>ardor3d-terrain</artifactId>
+    <artifactId>ardor3d-tools</artifactId>
     <packaging>bundle</packaging>
-    <name>Ardor 3D Terrain</name>
+    <name>Ardor 3D Tools</name>
   
     <dependencies>
         <dependency>
@@ -17,9 +17,34 @@
             <artifactId>ardor3d-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-effects</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ardor3d-awt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-extras</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-lwjgl</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

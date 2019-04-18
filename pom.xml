@@ -3,7 +3,7 @@
     <groupId>com.ardor3d</groupId>
     <artifactId>ardor3d</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     
     <name>Ardor 3D</name>
     <description>A free, open source 3D graphics engine written in Java</description>
@@ -52,6 +52,7 @@
         <module>ardor3d-animation</module>
         <module>ardor3d-ui</module>
         <module>ardor3d-terrain</module>
+        <module>ardor3d-tools</module>
         <module>ardor3d-examples</module>
         <module>ardor3d-distribution</module>
     </modules>
@@ -83,10 +84,10 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
                 <configuration>
-                    <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]>
+                    <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Bird Dog Games.  All Rights Reserved.</i>]]>
                     </bottom>
                     <links>
-                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
+                        <link>https://docs.oracle.com/javase/8/docs/api/</link>
                     </links>
                     <linksource>true</linksource>
                     <quiet>true</quiet>
@@ -114,8 +115,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
@@ -195,7 +196,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.3.7</version>
+                    <version>2.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.mavennatives</groupId>
@@ -210,8 +211,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -226,6 +227,20 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
@@ -233,7 +248,7 @@
                     <manifestLocation>target/classes/META-INF</manifestLocation>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+                        <Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
                     </instructions>
                 </configuration>
             </plugin>
@@ -244,7 +259,7 @@
     <!-- these properties help simplify specifying some commonly occurring variables -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jogamp.version>2.1.4-rc-20140126</jogamp.version>
+        <jogamp.version>2.1.5-01</jogamp.version>
         <lwjgl.version>2.9.3</lwjgl.version>
         <swt.version>3.106.3</swt.version>
     </properties>
