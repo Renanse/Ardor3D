@@ -7,7 +7,7 @@ techniques:
           - key: uv0
           
         uniforms: 
-          - builtIn: [model, view, projection, defaultColor]
+          - builtIn: [model, view, projection, defaultColor, textureMatrix0]
 
         shaders: 
           Vertex: 
