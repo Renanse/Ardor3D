@@ -59,6 +59,7 @@ public abstract class AbstractRenderer implements Renderer {
         _matrixStore.put(RenderMatrixType.Model, BufferUtils.createFloatBuffer(16));
         _matrixStore.put(RenderMatrixType.View, BufferUtils.createFloatBuffer(16));
         _matrixStore.put(RenderMatrixType.Projection, BufferUtils.createFloatBuffer(16));
+        _matrixStore.put(RenderMatrixType.ModelViewProjection, BufferUtils.createFloatBuffer(16));
         _matrixStore.put(RenderMatrixType.Normal, BufferUtils.createFloatBuffer(9));
 
         for (final RenderState.StateType type : RenderState.StateType.values()) {
@@ -220,6 +221,41 @@ public abstract class AbstractRenderer implements Renderer {
         final FloatBuffer dst = _matrixStore.get(type);
         dst.clear();
         transform.getGLApplyMatrix(dst);
+        if (type == RenderMatrixType.Model) {
+            updateMVP();
+    }
+        }
+
+    private void updateMVP() {
+        final Matrix4 mvp = Matrix4.fetchTempInstance();
+        final Matrix4 temp = Matrix4.fetchTempInstance();
+
+        try {
+
+            final FloatBuffer model = getMatrix(RenderMatrixType.Model);
+            final FloatBuffer view = getMatrix(RenderMatrixType.View);
+            final FloatBuffer projection = getMatrix(RenderMatrixType.Projection);
+
+            // projection
+            projection.rewind();
+            mvp.fromFloatBuffer(projection, false);
+
+            // view
+            view.rewind();
+            temp.fromFloatBuffer(view, false);
+            mvp.multiplyLocal(temp);
+
+            // model
+            model.rewind();
+            temp.fromFloatBuffer(model, false);
+            mvp.multiplyLocal(temp);
+
+            setMatrix(RenderMatrixType.ModelViewProjection, mvp, false);
+
+        } finally {
+            Matrix4.releaseTempInstance(temp);
+            Matrix4.releaseTempInstance(mvp);
+        }
     }
 
     @Override

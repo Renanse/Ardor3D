@@ -14,6 +14,7 @@ import java.util.concurrent.CountDownLatch;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.input.MouseManager;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 /**
  * This interface defines the View, and should maybe be called the ViewUpdater. It owns the rendering phase, and
@@ -79,4 +80,16 @@ public interface Canvas {
      * @return the height, in pixels, of the content portion of this canvas (i.e. without any chrome.)
      */
     int getContentHeight();
+
+    /**
+     * Set the background color of this canvas, assuming the canvas has a valid CanvasRenderer set.
+     *
+     * @param color
+     *            the new background color to set.
+     * @throws NullPointerException
+     *             if no CanvasRenderer is set on this Canvas.
+     */
+    default void setBackgroundColor(final ReadOnlyColorRGBA color) {
+        getCanvasRenderer().getRenderer().setBackgroundColor(color);
+    }
 }

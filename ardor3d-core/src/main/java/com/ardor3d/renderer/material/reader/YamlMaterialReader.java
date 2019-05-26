@@ -455,6 +455,10 @@ public class YamlMaterialReader {
                 pass.addUniform(new UniformRef("normalMat", UniformType.Matrix3x3, UniformSource.RendererMatrix,
                         RenderMatrixType.Normal));
                 return;
+            case "modelViewProj":
+                pass.addUniform(new UniformRef("modelViewProj", UniformType.Matrix4x4, UniformSource.RendererMatrix,
+                        RenderMatrixType.ModelViewProjection));
+                return;
             case "cameraLoc":
                 pass.addUniform(new UniformRef("cameraLoc", UniformType.Float3, UniformSource.Ardor3dState,
                         Ardor3dStateProperty.CurrentCameraLocation));
