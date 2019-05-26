@@ -38,7 +38,7 @@ public final class TriggerConditions {
     private static final Predicate<TwoInputStates> ALWAYS_FALSE = new Predicate<TwoInputStates>() {
         @Override
         public boolean apply(final TwoInputStates arg0) {
-            return true;
+            return false;
         }
     };
 
@@ -63,7 +63,7 @@ public final class TriggerConditions {
     }
 
     /**
-     * 
+     *
      * @return a condition that is true if the left button is down
      */
     public static MouseButtonCondition leftButtonDown() {
@@ -71,7 +71,7 @@ public final class TriggerConditions {
     }
 
     /**
-     * 
+     *
      * @return a condition that is true if the right button is down
      */
     public static MouseButtonCondition rightButtonDown() {
@@ -79,7 +79,7 @@ public final class TriggerConditions {
     }
 
     /**
-     * 
+     *
      * @return a condition that is true if the middle button is down
      */
     public static MouseButtonCondition middleButtonDown() {
