@@ -20,6 +20,12 @@ public enum Ardor3dStateProperty {
     /** A Float3 vector pulled from current camera's position field. */
     CurrentCameraLocation,
 
+    /** A Float2 vector pulled from current camera's viewport width and height, as passed in glViewport. */
+    CurrentViewportSizePixels,
+
+    /** A Float2 vector pulled from current camera's viewport offset x and y, as passed in glViewport. */
+    CurrentViewportOffsetPixels,
+
     /**
      * Properties of the light in the current LightState. The light index comes from the extra field of the uniform,
      * which must be of type Integer.

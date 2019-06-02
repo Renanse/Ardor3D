@@ -582,6 +582,22 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 return buffer;
             }
 
+            case CurrentViewportSizePixels: {
+                final FloatBuffer buffer = stack.mallocFloat(2);
+                final Camera cam = Camera.getCurrentCamera();
+                buffer.put(cam.getViewportWidth()).put(cam.getViewportHeight());
+                buffer.rewind();
+                return buffer;
+            }
+
+            case CurrentViewportOffsetPixels: {
+                final FloatBuffer buffer = stack.mallocFloat(2);
+                final Camera cam = Camera.getCurrentCamera();
+                buffer.put(cam.getViewportOffsetX()).put(cam.getViewportOffsetY());
+                buffer.rewind();
+                return buffer;
+            }
+
             case Light: {
                 throw new Ardor3dException(
                         "Uniform of source Ardor3dStateProperty+Light must be of type 'UniformSupplier'.");

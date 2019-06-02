@@ -1548,11 +1548,27 @@ public class Camera implements Savable, Externalizable {
      *            the Renderer to use.
      */
     protected void applyViewport(final Renderer renderer) {
-        final int x = (int) (_viewPortLeft * _width);
-        final int y = (int) (_viewPortBottom * _height);
-        final int w = (int) ((_viewPortRight - _viewPortLeft) * _width);
-        final int h = (int) ((_viewPortTop - _viewPortBottom) * _height);
+        final int x = getViewportOffsetX();
+        final int y = getViewportOffsetY();
+        final int w = getViewportWidth();
+        final int h = getViewportHeight();
         renderer.setViewport(x, y, w, h);
+    }
+
+    public int getViewportOffsetX() {
+        return (int) (_viewPortLeft * _width);
+    }
+
+    public int getViewportOffsetY() {
+        return (int) (_viewPortBottom * _height);
+    }
+
+    public int getViewportWidth() {
+        return (int) ((_viewPortRight - _viewPortLeft) * _width);
+    }
+
+    public int getViewportHeight() {
+        return (int) ((_viewPortTop - _viewPortBottom) * _height);
     }
 
     /**
