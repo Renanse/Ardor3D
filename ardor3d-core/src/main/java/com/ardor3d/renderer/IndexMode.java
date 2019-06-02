@@ -27,6 +27,8 @@ public enum IndexMode {
      */
     TriangleFan(true),
 
+    TrianglesAdjacency(true), TriangleStripAdjacency(true),
+
     // LINE
     /**
      * Every two vertices referenced by the indexbuffer will be considered a stand-alone line segment.
@@ -42,6 +44,17 @@ public enum IndexMode {
      * form a loop.
      */
     LineLoop(false),
+    /**
+     * Requires 4 vertices, but the first and last vertex are only used to provide information about adjacent lines -
+     * they are not drawn.
+     */
+    LinesAdjacency(false),
+
+    /**
+     * Requires 4 vertices, but the first and last vertex are only used to provide information about adjacent lines
+     * strip segments - they are not drawn.
+     */
+    LineStripAdjacency(false),
 
     // POINT
     /**
@@ -65,10 +78,14 @@ public enum IndexMode {
             case Triangles:
             case TriangleStrip:
             case TriangleFan:
+            case TrianglesAdjacency:
+            case TriangleStripAdjacency:
                 return 3;
             case Lines:
             case LineStrip:
             case LineLoop:
+            case LinesAdjacency:
+            case LineStripAdjacency:
                 return 2;
             case Points:
                 return 1;
@@ -88,6 +105,7 @@ public enum IndexMode {
                 return size / 3;
             case TriangleFan:
             case TriangleStrip:
+            case LineStripAdjacency:
                 return size - 2;
             case Lines:
                 return size / 2;
@@ -97,6 +115,13 @@ public enum IndexMode {
                 return size;
             case Points:
                 return size;
+            case LinesAdjacency:
+                return size / 4;
+            case TrianglesAdjacency:
+                return size / 6;
+            case TriangleStripAdjacency:
+                return (size / 2) - 2;
+
         }
 
         throw new IllegalArgumentException("unimplemented index mode: " + indexMode);

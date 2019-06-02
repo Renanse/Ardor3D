@@ -109,11 +109,15 @@ public abstract class AbstractRenderer implements Renderer {
             case Triangles:
             case TriangleFan:
             case TriangleStrip:
+            case TrianglesAdjacency:
+            case TriangleStripAdjacency:
                 StatCollector.addStat(StatType.STAT_TRIANGLE_COUNT, primCount);
                 break;
             case Lines:
             case LineLoop:
             case LineStrip:
+            case LinesAdjacency:
+            case LineStripAdjacency:
                 StatCollector.addStat(StatType.STAT_LINE_COUNT, primCount);
                 break;
             case Points:
@@ -223,8 +227,8 @@ public abstract class AbstractRenderer implements Renderer {
         transform.getGLApplyMatrix(dst);
         if (type == RenderMatrixType.Model) {
             updateMVP();
-    }
         }
+    }
 
     private void updateMVP() {
         final Matrix4 mvp = Matrix4.fetchTempInstance();

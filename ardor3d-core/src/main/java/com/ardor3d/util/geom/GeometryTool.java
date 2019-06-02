@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -323,5 +324,40 @@ public final class GeometryTool {
         }
 
         return rVal;
+    }
+
+    public static IndexBufferData<?> generateAdjacencyIndices(final IndexMode mode, final int vertexCount) {
+        switch (mode) {
+            case LinesAdjacency: {
+                if (vertexCount < 2) {
+                    return null;
+                }
+                final int lines = vertexCount / 2;
+                final int indices = 4 * lines;
+                final IndexBufferData<?> rVal = BufferUtils.createIndexBufferData(indices, vertexCount - 1);
+                for (int i = 0; i < lines; i++) {
+                    rVal.put(i == 0 ? 1 : i * 2 - 1);
+                    rVal.put(i * 2);
+                    rVal.put(i * 2 + 1);
+                    rVal.put(i + 1 == lines ? i * 2 : i * 2 + 2);
+                }
+                return rVal;
+            }
+            case LineStripAdjacency: {
+                if (vertexCount < 2) {
+                    return null;
+                }
+                final int indices = vertexCount + 2;
+                final IndexBufferData<?> rVal = BufferUtils.createIndexBufferData(indices, vertexCount - 1);
+                rVal.put(1);
+                for (int i = 0; i < vertexCount; i++) {
+                    rVal.put(i);
+                }
+                rVal.put(vertexCount - 2);
+                return rVal;
+            }
+            default:
+                throw new IllegalArgumentException("Unhandled mode: " + mode);
+        }
     }
 }

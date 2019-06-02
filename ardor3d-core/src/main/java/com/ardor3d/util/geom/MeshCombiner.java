@@ -26,6 +26,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.Ardor3dException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -421,6 +422,8 @@ class IndexCombiner {
                     modes.add(mode);
                     break;
                 }
+                default:
+                    throw new Ardor3dException("Unhandled IndexMode: " + mode);
             }
         }
 

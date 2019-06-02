@@ -226,6 +226,9 @@ public class MeshData implements Savable {
      */
     public void markIndicesDirty() {
         final AbstractBufferData<?> data = getIndices();
+        if (data == null) {
+            return;
+        }
 
         data.markDirty();
         markBuffersDirty();
@@ -1001,6 +1004,7 @@ public class MeshData implements Savable {
      *
      * @return the position you would expect to find the given point in the index buffer
      */
+    // FIXME: Need to ignore adjacency verts
     public int getVertexIndex(final int primitiveIndex, final int point, final int section) {
         int index = 0;
         // move our offset up to the beginning of our section
@@ -1101,8 +1105,10 @@ public class MeshData implements Savable {
         final boolean hasIndices = getIndices() != null;
         switch (mode) {
             case Triangles:
+            case TrianglesAdjacency:
             case TriangleFan:
-            case TriangleStrip: {
+            case TriangleStrip:
+            case TriangleStripAdjacency: {
                 int pntA = getVertexIndex(primitiveIndex, 0, section);
                 int pntB = getVertexIndex(primitiveIndex, 1, section);
                 int pntC = getVertexIndex(primitiveIndex, 2, section);
@@ -1148,8 +1154,10 @@ public class MeshData implements Savable {
                 break;
             }
             case Lines:
+            case LinesAdjacency:
             case LineLoop:
-            case LineStrip: {
+            case LineStrip:
+            case LineStripAdjacency: {
                 int pntA = getVertexIndex(primitiveIndex, 0, section);
                 int pntB = getVertexIndex(primitiveIndex, 1, section);
                 if (hasIndices) {

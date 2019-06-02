@@ -453,6 +453,12 @@ public class Lwjgl3Renderer extends AbstractRenderer {
             case TriangleFan:
                 glMode = GL11C.GL_TRIANGLE_FAN;
                 break;
+            case TrianglesAdjacency:
+                glMode = GL32C.GL_TRIANGLES_ADJACENCY;
+                break;
+            case TriangleStripAdjacency:
+                glMode = GL32C.GL_TRIANGLE_STRIP_ADJACENCY;
+                break;
             case Lines:
                 glMode = GL11C.GL_LINES;
                 break;
@@ -461,6 +467,12 @@ public class Lwjgl3Renderer extends AbstractRenderer {
                 break;
             case LineLoop:
                 glMode = GL11C.GL_LINE_LOOP;
+                break;
+            case LinesAdjacency:
+                glMode = GL32C.GL_LINES_ADJACENCY;
+                break;
+            case LineStripAdjacency:
+                glMode = GL32C.GL_LINE_STRIP_ADJACENCY;
                 break;
             case Points:
                 glMode = GL11C.GL_POINTS;
