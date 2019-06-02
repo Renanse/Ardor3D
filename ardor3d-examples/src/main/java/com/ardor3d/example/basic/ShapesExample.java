@@ -260,8 +260,9 @@ public class ShapesExample extends ExampleBase {
         verts.put(5).put(5).put(0);
         verts.put(0).put(5).put(0);
         final Line line = new Line("Lines", verts, null, null, null);
+        line.setLineWidth(4);
         line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        line.setRenderMaterial("unlit/untextured/basic.yaml");
+        line.setRenderMaterial("line/untextured/basic.yaml");
 
         return line;
     }
