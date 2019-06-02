@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,13 +21,15 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.util.geom.GeometryTool;
 
 /**
  * A demonstration of antialising on a Line object.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.LineExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_LineExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_LineExample.jpg", //
+        maxHeapMemory = 64)
 public class LineExample extends ExampleBase {
 
     public static void main(final String[] args) {
@@ -70,7 +72,7 @@ public class LineExample extends ExampleBase {
         // This line will be Cyan.
         antialiased.setDefaultColor(ColorRGBA.CYAN);
         // Finally let us make this antialiased... see also BlendState below.
-        antialiased.setAntialiased(true);
+//        antialiased.setAntialiased(true);
 
         // Uncomment to see a dashed line. :)
         // antialiased.setStipplePattern((short) 0xFFF0);
@@ -89,11 +91,12 @@ public class LineExample extends ExampleBase {
 
         // Add our antialiased line to the scene.
         _root.attachChild(antialiased);
+        _root.setRenderMaterial("line/untextured/basic_miter.yaml");
     }
 
     /**
      * Create a line, using the "equation" defined by the given grapher object.
-     * 
+     *
      * @param grapher
      *            the equation to use for our line.
      * @param min
@@ -119,8 +122,11 @@ public class LineExample extends ExampleBase {
         // Create our Line object using the vertex data. We will not be providing normals, colors or texture coords.
         final Line line = new Line("graphed line: " + grapher, vertexList.toArray(new Vector3[vertexList.size()]),
                 null, null, null);
+        final MeshData meshData = line.getMeshData();
         // The type of line we are making is a LineStrip. You can experiment and try making this Lines, or a Line Loop.
-        line.getMeshData().setIndexMode(IndexMode.LineStrip);
+        meshData.setIndexMode(IndexMode.LineStripAdjacency);
+        meshData.setIndices(GeometryTool.generateAdjacencyIndices(meshData.getIndexMode(0), meshData.getVertexCount()));
+        meshData.markIndicesDirty();
         // Update the model bound of our line to fit the data we've provided.
         line.updateModelBound();
         // Send back our Line.
