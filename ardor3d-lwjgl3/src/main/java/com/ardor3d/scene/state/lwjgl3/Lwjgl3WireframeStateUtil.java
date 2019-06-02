@@ -28,8 +28,6 @@ public abstract class Lwjgl3WireframeStateUtil {
         context.setCurrentState(StateType.Wireframe, state);
 
         if (state.isEnabled()) {
-            renderer.setupLineParameters(state.getLineWidth(), state.isAntialiased());
-
             switch (state.getFace()) {
                 case Front:
                     applyPolyMode(GL11C.GL_LINE, GL11C.GL_FILL, record);

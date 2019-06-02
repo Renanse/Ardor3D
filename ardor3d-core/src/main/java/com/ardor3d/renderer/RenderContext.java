@@ -17,7 +17,6 @@ import java.util.Stack;
 import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
@@ -47,7 +46,6 @@ public class RenderContext {
     protected RenderMaterial _enforcedMaterial = null;
     protected Stack<RenderMaterial> _materialBackStack = new Stack<>();
 
-    protected final LineRecord _lineRecord = new LineRecord();
     protected final RendererRecord _rendererRecord = createRendererRecord();
 
     /** Basically this object represents the sharable portion of a GL context... Textures, displayLists, etc. */
@@ -86,7 +84,6 @@ public class RenderContext {
         for (final RenderState.StateType type : RenderState.StateType.values()) {
             _stateRecords.get(type).invalidate();
         }
-        _lineRecord.invalidate();
         _rendererRecord.invalidate();
 
         clearCurrentStates();
@@ -98,10 +95,6 @@ public class RenderContext {
 
     public StateRecord getStateRecord(final RenderState.StateType type) {
         return _stateRecords.get(type);
-    }
-
-    public LineRecord getLineRecord() {
-        return _lineRecord;
     }
 
     public RendererRecord getRendererRecord() {

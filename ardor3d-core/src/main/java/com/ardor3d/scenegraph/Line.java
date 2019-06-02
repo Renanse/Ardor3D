@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2012 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -18,22 +18,21 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Line extends Mesh {
 
-    private float _lineWidth = 1.0f;
-    private boolean _antialiased = false;
+    private float _lineWidth;
+    private float _miterLimit;
 
     public Line() {
         this("line");
     }
 
     /**
-     * Constructs a new line with the given name. By default, the line has no information.
+     * Constructs a new line with the given name. By default, the line has no geometric data.
      *
      * @param name
      *            The name of the line.
@@ -42,6 +41,8 @@ public class Line extends Mesh {
         super(name);
 
         _meshData.setIndexMode(IndexMode.Lines);
+        setLineWidth(1.0f);
+        setMiterLimit(.75f);
     }
 
     /**
@@ -149,72 +150,62 @@ public class Line extends Mesh {
     }
 
     /**
-     * @return true if lines are to be drawn antialiased
-     */
-    public boolean isAntialiased() {
-        return _antialiased;
-    }
-
-    /**
-     * Sets whether the line should be antialiased. May decrease performance. If you want to enabled antialiasing, you
-     * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
-     * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
-     *
-     * @param antialiased
-     *            true if the line should be antialiased.
-     */
-    public void setAntialiased(final boolean antialiased) {
-        _antialiased = antialiased;
-    }
-
-    /**
-     * @return the width of this line.
+     * @return the width of this line in pixels.
      */
     public float getLineWidth() {
         return _lineWidth;
     }
 
     /**
-     * Sets the width of the line when drawn. Non anti-aliased line widths are rounded to the nearest whole number by
-     * opengl.
-     *
-     * Note that only a width of 1.0 is guaranteed to work. All other values may generate an error or be ignored or
-     * both.
+     * Sets the desired pixel width of the line when drawn.
      *
      * @param lineWidth
      *            The lineWidth to set.
      */
     public void setLineWidth(final float lineWidth) {
         _lineWidth = lineWidth;
+        setProperty("lineWidth", _lineWidth);
+    }
+
+    /**
+     * @return the dot product limit between line segments where we will draw a miter. The range is [-1, 1]. In effect,
+     *         a value of 1 will mean ALWAYS add a miter joint, while -1 will mean NEVER add one. Default is .75.
+     */
+    public float getMiterLimit() {
+        return _miterLimit;
+    }
+
+    /**
+     * Sets the dot product limit between line segments where we will draw a miter. The range is [-1, 1]. In effect, a
+     * value of 1 will mean ALWAYS add a miter joint, while -1 will mean NEVER add one. Default is .75.
+     *
+     * @param limit
+     *            The limit to set. Should be in the range [-1, 1], however this is not enforced.
+     */
+    public void setMiterLimit(final float limit) {
+        _miterLimit = limit;
+        setProperty("miterLimit", _miterLimit);
     }
 
     @Override
     public Line makeCopy(final boolean shareGeometricData) {
         final Line lineCopy = (Line) super.makeCopy(shareGeometricData);
-        lineCopy.setAntialiased(_antialiased);
         lineCopy.setLineWidth(_lineWidth);
+        lineCopy.setMiterLimit(_miterLimit);
         return lineCopy;
     }
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write(_lineWidth, "lineWidth", 1);
-        capsule.write(_antialiased, "antialiased", false);
+        capsule.write(_lineWidth, "lineWidth", 1.0f);
+        capsule.write(_miterLimit, "miterLimit", 0.75f);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        _lineWidth = capsule.readFloat("lineWidth", 1);
-        _antialiased = capsule.readBoolean("antialiased", false);
+        setLineWidth(capsule.readFloat("lineWidth", 1.0f));
+        setMiterLimit(capsule.readFloat("miterLimit", 0.75f));
     }
-
-    @Override
-    public boolean render(final Renderer renderer) {
-        renderer.setupLineParameters(getLineWidth(), isAntialiased());
-
-        return super.render(renderer);
-    }
-
 }

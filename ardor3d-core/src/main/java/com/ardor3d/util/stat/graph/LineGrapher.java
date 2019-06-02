@@ -235,7 +235,6 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
         _horizontals.setDefaultColor(
                 getColorConfig(LineGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.BLUE)));
         _horizontals.setLineWidth(getIntConfig(LineGrapher.Horizontal, ConfigKeys.Width.name(), 1));
-        _horizontals.setAntialiased(getBooleanConfig(LineGrapher.Horizontal, ConfigKeys.Antialias.name(), true));
     }
 
     // - Setup enough vertical bars to have one at every (10 X samplerate)
@@ -259,7 +258,6 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
         _verticals.setDefaultColor(
                 getColorConfig(LineGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.RED)));
         _verticals.setLineWidth(getIntConfig(LineGrapher.Vertical, ConfigKeys.Width.name(), 1));
-        _verticals.setAntialiased(getBooleanConfig(LineGrapher.Vertical, ConfigKeys.Antialias.name(), true));
     }
 
     class LineEntry {
@@ -290,7 +288,6 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
             line.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
             line.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
-            line.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
             if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
                 line.getSceneHints().setCullHint(CullHint.Always);
             }
@@ -311,7 +308,6 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
         lineKey.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
-        lineKey.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
         if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
             lineKey.getSceneHints().setCullHint(CullHint.Always);
         }

@@ -229,7 +229,6 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         _horizontals.setDefaultColor(
                 getColorConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.BLUE)));
         _horizontals.setLineWidth(getIntConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Width.name(), 1));
-        _horizontals.setAntialiased(getBooleanConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Antialias.name(), true));
     }
 
     // - Setup enough vertical bars to have one at every (10 X samplerate)
@@ -253,7 +252,6 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         _verticals.setDefaultColor(
                 getColorConfig(TimedAreaGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.RED)));
         _verticals.setLineWidth(getIntConfig(TimedAreaGrapher.Vertical, ConfigKeys.Width.name(), 1));
-        _verticals.setAntialiased(getBooleanConfig(TimedAreaGrapher.Vertical, ConfigKeys.Antialias.name(), true));
     }
 
     class AreaEntry {
@@ -291,7 +289,6 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
         lineKey.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
-        lineKey.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
         if (!getBooleanConfig(type, ConfigKeys.ShowAreas.name(), true)) {
             lineKey.getSceneHints().setCullHint(CullHint.Always);
         }

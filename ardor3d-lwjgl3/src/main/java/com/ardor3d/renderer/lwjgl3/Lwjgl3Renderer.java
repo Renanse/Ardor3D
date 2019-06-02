@@ -42,7 +42,6 @@ import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3BlendStateUtil;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3ColorMaskStateUtil;
@@ -292,34 +291,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
 
             GL11C.glDrawBuffer(buffer);
             record.setDrawBufferTarget(target);
-        }
-    }
-
-    @Override
-    public void setupLineParameters(final float lineWidth, final boolean antialiased) {
-        final LineRecord lineRecord = ContextManager.getCurrentContext().getLineRecord();
-
-        if (!lineRecord.isValid() || lineRecord.width != lineWidth) {
-            GL11C.glLineWidth(lineWidth);
-            lineRecord.width = lineWidth;
-        }
-
-        if (antialiased) {
-            if (!lineRecord.isValid() || !lineRecord.smoothed) {
-                GL11C.glEnable(GL11C.GL_LINE_SMOOTH);
-                lineRecord.smoothed = true;
-            }
-            if (!lineRecord.isValid() || lineRecord.smoothHint != GL11C.GL_NICEST) {
-                GL11C.glHint(GL11C.GL_LINE_SMOOTH_HINT, GL11C.GL_NICEST);
-                lineRecord.smoothHint = GL11C.GL_NICEST;
-            }
-        } else if (!lineRecord.isValid() || lineRecord.smoothed) {
-            GL11C.glDisable(GL11C.GL_LINE_SMOOTH);
-            lineRecord.smoothed = false;
-        }
-
-        if (!lineRecord.isValid()) {
-            lineRecord.validate();
         }
     }
 

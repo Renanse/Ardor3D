@@ -262,15 +262,6 @@ public interface Renderer {
      * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
      * lwjgl/jogl.
      *
-     * @param lineWidth
-     * @param antialiased
-     */
-    void setupLineParameters(float lineWidth, boolean antialiased);
-
-    /**
-     * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
-     * lwjgl/jogl.
-     *
      * @param pointSize
      * @param antialiased
      * @param isSprite
