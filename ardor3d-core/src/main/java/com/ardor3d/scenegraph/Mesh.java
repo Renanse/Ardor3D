@@ -416,13 +416,12 @@ public class Mesh extends Spatial implements Renderable, Pickable {
      */
     public void setRandomColors() {
         FloatBuffer colorBuf = _meshData.getColorBuffer();
-        if (colorBuf == null) {
+        if (colorBuf == null || colorBuf.limit() < _meshData.getVertexCount() * 4) {
             colorBuf = BufferUtils.createColorBuffer(_meshData.getVertexCount());
             _meshData.setColorBuffer(colorBuf);
-        } else {
-            colorBuf.rewind();
         }
 
+        colorBuf.rewind();
         for (int x = 0, cLength = colorBuf.limit(); x < cLength; x += 4) {
             colorBuf.put(MathUtils.nextRandomFloat());
             colorBuf.put(MathUtils.nextRandomFloat());
@@ -430,6 +429,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             colorBuf.put(1);
         }
         colorBuf.flip();
+        _meshData.markBufferDirty(MeshData.KEY_ColorCoords);
     }
 
     // PICKABLE INTERFACE
