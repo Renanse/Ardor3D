@@ -21,7 +21,7 @@ techniques:
 
         shaders: 
           Vertex: 
-            source: line/line.vert            
+            source: line/line.vert
           Geometry:
             source: line/lines_miter.geom
           Fragment: 
