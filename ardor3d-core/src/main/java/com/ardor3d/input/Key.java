@@ -785,11 +785,6 @@ public enum Key {
     NOTIFICATION,
 
     /**
-     * add key
-     */
-    ADD,
-
-    /**
      * pound key
      */
     POUND,
