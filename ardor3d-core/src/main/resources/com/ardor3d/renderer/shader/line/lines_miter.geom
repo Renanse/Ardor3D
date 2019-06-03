@@ -126,7 +126,7 @@ void main(void)
 	gl_Position = toNDCSpace(p1, length_a * miter_a);
 	EmitVertex();
 
-	VertexOut.uv0 = vec2(0, 1);
+	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[1].color;
 	gl_Position = toNDCSpace(p1, -length_a * miter_a);
 	EmitVertex();
@@ -136,7 +136,7 @@ void main(void)
 	gl_Position = toNDCSpace(p2, length_b * miter_b);
 	EmitVertex();
 
-	VertexOut.uv0 = vec2(0, 1);
+	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[2].color;
 	gl_Position = toNDCSpace(p2, -length_b * miter_b);
 	EmitVertex();
