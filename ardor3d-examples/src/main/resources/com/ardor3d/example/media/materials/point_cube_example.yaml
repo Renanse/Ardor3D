@@ -1,0 +1,184 @@
+--- # Material
+name: rtt_cubemap_example
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+
+        uniforms: 
+          - builtIn: [modelViewProj]
+          - 
+            shaderKey: scale
+            type: Float4
+            source: SpatialProperty
+          - 
+            shaderKey: time
+            type: Float1
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            program: |
+              #version 330 core
+              
+              in vec3 vertex;
+              
+              uniform mat4 modelViewProj;
+              
+              void main()
+              {
+                  gl_Position = vec4(vertex, 1.0);
+              }
+          Geometry:
+            program: |
+              #version 330 core
+              
+              // TODO: Possible Optimization. Since with a cube we always know only 3 sides can be seen at any given time
+              // Given a camera angle we should be able to calculate which three sides(6 triangles) to emit.
+              // So a kind of back face culling before we even have a face :-)
+              
+              layout(points) in;
+              layout(triangle_strip, max_vertices = 17) out;
+              
+              uniform vec4 scale;
+              uniform float time;
+              uniform mat4 modelViewProj;
+              
+              out vec2 TexCoords;
+
+              // Cube vertexes              
+              const vec4 cube[8] = vec4[8](
+                                            vec4(  1, -1, -1, 1),
+                                            vec4(  1,  1, -1, 1),
+                                            vec4( -1, -1, -1, 1),
+                                            vec4( -1,  1, -1, 1),
+                                            vec4(  1, -1,  1, 1),
+                                            vec4(  1,  1,  1, 1),
+                                            vec4( -1,  1,  1, 1),
+                                            vec4( -1, -1,  1, 1)
+                                          );
+                                            
+              // CubeMap texture coordinates for use with
+              // Texture continuous tri strip(degenerate):
+              // 326742031 131 65410          
+              const vec2 coord[16] = vec2[16](
+                                            vec2( 0.25,   0),
+                                            vec2( 0.50,   0),
+                                            vec2( 0.25, 1.0/3),
+                                            vec2( 0.50, 1.0/3),
+                                            vec2( 0.50, 2.0/3),
+                                            vec2( 0.75, 1.0/3),
+                                            vec2( 0.75, 2.0/3),
+                                            vec2( 1.00, 1.0/3),
+                                            vec2( 1.00, 2.0/3),
+                                            vec2( 0.00, 1.0/3),
+                                            vec2( 0.00, 2.0/3),
+                                            vec2( 0.25, 1.0/3),
+                                            vec2( 0.25, 2.0/3),
+                                            vec2( 0.50, 2.0/3),
+                                            vec2( 0.25,   1),
+                                            vec2( 0.50,   1)
+                                          );
+              
+              void main()
+              {
+                // TODO: Support individual scaling of the cubes
+                // XXX: Some hardcoded motion pattern use here
+                float radius = sqrt( gl_in[0].gl_Position.x*gl_in[0].gl_Position.x + gl_in[0].gl_Position.y*gl_in[0].gl_Position.y + gl_in[0].gl_Position.z*gl_in[0].gl_Position.z);
+                vec4 position = vec4( gl_in[0].gl_Position.x + 150*cos(0.8*time + 0.008*radius),
+                                      gl_in[0].gl_Position.y + 100*sin(0.8*time + 0.005*radius),
+                                      gl_in[0].gl_Position.z + 50*sin(0.5*time + 0.005*radius),
+                                      1);
+
+                TexCoords = coord[0];
+                gl_Position = modelViewProj * (scale*cube[3] + position);
+                EmitVertex();
+                
+                TexCoords = coord[1];
+                gl_Position = modelViewProj * (scale*cube[2] + position);
+                EmitVertex();
+                
+                TexCoords = coord[2];
+                gl_Position = modelViewProj * (scale*cube[6] + position);
+                EmitVertex();
+                
+                TexCoords = coord[3];
+                gl_Position = modelViewProj * (scale*cube[7] + position);
+                EmitVertex();
+                
+                TexCoords = coord[4];
+                gl_Position = modelViewProj * (scale*cube[4] + position);
+                EmitVertex();
+                
+                TexCoords = coord[5];
+                gl_Position = modelViewProj * (scale*cube[2] + position);
+                EmitVertex();
+                
+                TexCoords = coord[6];
+                gl_Position = modelViewProj * (scale*cube[0] + position);
+                EmitVertex();
+                
+                TexCoords = coord[7];
+                gl_Position = modelViewProj * (scale*cube[3] + position); 
+                EmitVertex();
+                
+                TexCoords = coord[8];
+                gl_Position = modelViewProj * (scale*cube[1] + position);
+                EmitVertex();
+                
+                // Texture discontinuity need to use a degenerate strip to be able to use
+                // texture mapping. We lose some performance here.
+                // XXX: Can it be done in another way?
+                // Optimal strip: 32674203165410
+                // Texture continuous strip: 326742031 131 65410
+                TexCoords = coord[8];
+                gl_Position = modelViewProj * (scale*cube[1] + position);
+                EmitVertex();
+                
+                TexCoords = coord[9];
+                gl_Position = modelViewProj * (scale*cube[3] + position);
+                EmitVertex();
+                
+                TexCoords = coord[10];
+                gl_Position = modelViewProj * (scale*cube[1] + position); 
+                EmitVertex();
+                
+                TexCoords = coord[11];
+                gl_Position = modelViewProj * (scale*cube[6] + position); 
+                EmitVertex();
+                
+                TexCoords = coord[12];
+                gl_Position = modelViewProj * (scale*cube[5] + position); 
+                EmitVertex();
+                  
+                TexCoords = coord[13];
+                gl_Position = modelViewProj * (scale*cube[4] + position); 
+                EmitVertex();
+                  
+                TexCoords = coord[14];
+                gl_Position = modelViewProj * (scale*cube[1] + position); 
+                EmitVertex();
+                  
+                TexCoords = coord[15];
+                gl_Position = modelViewProj * (scale*cube[0] + position);
+                EmitVertex();
+                
+                EndPrimitive();
+              }
+          Fragment: 
+            program: |
+              #version 330 core
+  
+              out vec4 FragColor;
+
+              in vec2 TexCoords;
+              
+              uniform sampler2D diffuse;
+              
+              void main()
+              {
+                FragColor = texture(diffuse, TexCoords);
+              }
+                    
+              
