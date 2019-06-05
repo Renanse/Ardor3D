@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.effect;
 
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,10 +19,14 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.shape.Extrusion;
 import com.ardor3d.spline.CatmullRomSpline;
 import com.ardor3d.spline.Curve;
+import com.ardor3d.util.MaterialUtil;
+import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
 /**
@@ -75,7 +80,7 @@ public class ExtrusionExample extends ExampleBase {
         extrusion3.setTranslation(10, 20, 0);
         _root.attachChild(extrusion3);
 
-        _root.setRenderMaterial("unlit/untextured/basic.yaml");
+        MaterialUtil.autoMaterials(_root);
     }
 
     private Line createLines() {
@@ -91,14 +96,18 @@ public class ExtrusionExample extends ExampleBase {
         };
 
         final Line line = new Line("curve", vectors, null, null, null);
-
         line.getMeshData().setIndexMode(IndexMode.Lines);
+        generateLineNormals(line);
+
+        line.setAntialiased(true);
+        final BlendState bs = new BlendState();
+        bs.setBlendEnabled(true);
+        line.setRenderState(bs);
 
         return line;
     }
 
     private Line createLineStrip(final boolean loop) {
-        // Create a line with our example "makeLine" method. See method below.
         final ReadOnlyVector3[] vectors = { //
                 new Vector3(0, 0, 0), //
                 new Vector3(5, 0, 0), //
@@ -112,13 +121,41 @@ public class ExtrusionExample extends ExampleBase {
         // Create our curve from the control points and a spline
         final Curve curve = new Curve(controls, new CatmullRomSpline());
 
-        // Create a line from the curve so its easy to check the box is following it
+        // Create a line from the curve
         final Line line = curve.toRenderableLine(10);
+        line.getMeshData().setIndexMode(loop ? IndexMode.LineLoop : IndexMode.LineStrip);
 
-        if (loop) {
-            line.getMeshData().setIndexMode(IndexMode.LineLoop);
-        }
+        // set normals
+        generateLineNormals(line);
+
+        // Make it anti-aliased
+        line.setAntialiased(true);
+        final BlendState bs = new BlendState();
+        bs.setBlendEnabled(true);
+        line.setRenderState(bs);
 
         return line;
+    }
+
+    private void generateLineNormals(final Line line) {
+        final MeshData data = line.getMeshData();
+        final FloatBuffer verts = data.getVertexBuffer();
+        final FloatBuffer norms = BufferUtils.createVector3Buffer(data.getNormalBuffer(), data.getVertexCount());
+        data.setNormalBuffer(norms);
+        final Vector3 prev = new Vector3(), curr = new Vector3(), next = new Vector3();
+        final Vector3 dirPrev = new Vector3(), dirNext = new Vector3(), norm = new Vector3(), tan = new Vector3();
+        for (int i = 0, maxI = data.getVertexCount(); i < maxI; i++) {
+            BufferUtils.populateFromBuffer(prev, verts, i > 0 ? i - 1 : i);
+            BufferUtils.populateFromBuffer(curr, verts, i);
+            BufferUtils.populateFromBuffer(next, verts, i < maxI - 1 ? i + 1 : i);
+
+            dirPrev.set(curr).subtractLocal(prev).normalizeLocal();
+            dirNext.set(next).subtractLocal(curr).normalizeLocal();
+
+            norm.set((dirNext.getY() + dirPrev.getY()) / 2.0, (dirNext.getX() + dirPrev.getX()) / -2.0, 0);
+
+            BufferUtils.setInBuffer(norm, norms, i);
+        }
+
     }
 }

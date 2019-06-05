@@ -46,7 +46,7 @@ public class NormalGenerator {
     private static final Logger logger = Logger.getLogger(NormalGenerator.class.getName());
 
     // The angle up to which edges between triangles are smoothed
-    private float _creaseAngle;
+    private double _creaseAngle;
 
     // Source data
     private Vector3[] _sourceVerts;
@@ -87,7 +87,7 @@ public class NormalGenerator {
      *            The angle between two triangles up to which the normal between the two triangles will be interpolated,
      *            creating a smooth transition
      */
-    public void generateNormals(final Mesh mesh, final float creaseAngle) {
+    public void generateNormals(final Mesh mesh, final double creaseAngle) {
         if (mesh != null) {
             _creaseAngle = creaseAngle;
             generateNormals(mesh);

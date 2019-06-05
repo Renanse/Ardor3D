@@ -22,6 +22,7 @@ import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.geom.GeometryTool;
 
 /**
@@ -72,10 +73,7 @@ public class LineExample extends ExampleBase {
         // This line will be Cyan.
         antialiased.setDefaultColor(ColorRGBA.CYAN);
         // Finally let us make this antialiased... see also BlendState below.
-//        antialiased.setAntialiased(true);
-
-        // Uncomment to see a dashed line. :)
-        // antialiased.setStipplePattern((short) 0xFFF0);
+        antialiased.setAntialiased(true);
 
         // Antialiased lines work by adding small pixels to the line with alpha blending values.
         // To make use of this, you need to add a blend state that blends the source color
@@ -91,7 +89,7 @@ public class LineExample extends ExampleBase {
 
         // Add our antialiased line to the scene.
         _root.attachChild(antialiased);
-        _root.setRenderMaterial("line/untextured/basic_miter.yaml");
+        MaterialUtil.autoMaterials(_root);
     }
 
     /**
@@ -120,8 +118,8 @@ public class LineExample extends ExampleBase {
         }
 
         // Create our Line object using the vertex data. We will not be providing normals, colors or texture coords.
-        final Line line = new Line("graphed line: " + grapher, vertexList.toArray(new Vector3[vertexList.size()]),
-                null, null, null);
+        final Line line = new Line("graphed line: " + grapher, vertexList.toArray(new Vector3[vertexList.size()]), null,
+                null, null);
         final MeshData meshData = line.getMeshData();
         // The type of line we are making is a LineStrip. You can experiment and try making this Lines, or a Line Loop.
         meshData.setIndexMode(IndexMode.LineStripAdjacency);

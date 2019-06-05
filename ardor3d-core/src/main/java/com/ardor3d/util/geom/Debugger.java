@@ -35,6 +35,7 @@ import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -46,6 +47,7 @@ import com.ardor3d.scenegraph.shape.OrientedBox;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ExtendedCamera;
+import com.ardor3d.util.MaterialUtil;
 
 /**
  * Debugger provides tools for viewing scene data such as boundings and normals.
@@ -183,6 +185,7 @@ public final class Debugger {
         normalLines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
         normalLines.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(500));
         normalLines.updateWorldRenderStates(false);
+        MaterialUtil.autoMaterials(normalLines);
     }
     private static final Vector3 _normalVect = new Vector3(), _normalVect2 = new Vector3();
     public static final ColorRGBA NORMAL_COLOR_BASE = new ColorRGBA(ColorRGBA.RED);
@@ -260,35 +263,36 @@ public final class Debugger {
             final FloatBuffer norms = mesh.getMeshData().getNormalBuffer();
             final FloatBuffer verts = mesh.getMeshData().getVertexBuffer();
             if (norms != null && verts != null && norms.limit() == verts.limit()) {
-                FloatBuffer lineVerts = normalLines.getMeshData().getVertexBuffer();
+                final MeshData normMD = normalLines.getMeshData();
+                FloatBuffer lineVerts = normMD.getVertexBuffer();
                 if (lineVerts.capacity() < (3 * (2 * mesh.getMeshData().getVertexCount()))) {
-                    normalLines.getMeshData().setVertexBuffer(null);
+                    normMD.setVertexBuffer(null);
                     lineVerts = BufferUtils.createVector3Buffer(mesh.getMeshData().getVertexCount() * 2);
-                    normalLines.getMeshData().setVertexBuffer(lineVerts);
+                    normMD.setVertexBuffer(lineVerts);
                 } else {
                     lineVerts.clear();
                     lineVerts.limit(3 * 2 * mesh.getMeshData().getVertexCount());
-                    normalLines.getMeshData().setVertexBuffer(lineVerts);
+                    normMD.setVertexBuffer(lineVerts);
                 }
 
-                FloatBuffer lineColors = normalLines.getMeshData().getColorBuffer();
+                FloatBuffer lineColors = normMD.getColorBuffer();
                 if (lineColors.capacity() < (4 * (2 * mesh.getMeshData().getVertexCount()))) {
-                    normalLines.getMeshData().setColorBuffer(null);
+                    normMD.setColorBuffer(null);
                     lineColors = BufferUtils.createColorBuffer(mesh.getMeshData().getVertexCount() * 2);
-                    normalLines.getMeshData().setColorBuffer(lineColors);
+                    normMD.setColorBuffer(lineColors);
                 } else {
                     lineColors.clear();
                 }
 
-                IndexBufferData<?> lineInds = normalLines.getMeshData().getIndices();
-                if (lineInds == null || lineInds.getBufferCapacity() < (normalLines.getMeshData().getVertexCount())) {
-                    normalLines.getMeshData().setIndices(null);
+                IndexBufferData<?> lineInds = normMD.getIndices();
+                if (lineInds == null || lineInds.getBufferCapacity() < (normMD.getVertexCount())) {
+                    normMD.setIndices(null);
                     lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2,
-                            normalLines.getMeshData().getVertexCount() - 1);
-                    normalLines.getMeshData().setIndices(lineInds);
+                            normMD.getVertexCount() - 1);
+                    normMD.setIndices(lineInds);
                 } else {
                     lineInds.getBuffer().clear();
-                    lineInds.getBuffer().limit(normalLines.getMeshData().getVertexCount());
+                    lineInds.getBuffer().limit(normMD.getVertexCount());
                 }
 
                 verts.rewind();
@@ -325,6 +329,10 @@ public final class Debugger {
                     lineInds.put((x * 2) + 1);
                 }
 
+                normMD.markBufferDirty(MeshData.KEY_VertexCoords);
+                normMD.markBufferDirty(MeshData.KEY_ColorCoords);
+                normMD.markBuffersDirty();
+                normMD.markIndicesDirty();
                 normalLines.onDraw(r);
             }
 
@@ -646,6 +654,7 @@ public final class Debugger {
         }
 
         lineFrustum.setDefaultColor(color);
+        MaterialUtil.autoMaterials(lineFrustum);
 
         extendedCamera.set(camera);
         extendedCamera.calculateFrustum(fNear, fFar);

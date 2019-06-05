@@ -66,6 +66,7 @@ import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.scenegraph.shape.Tube;
 import com.ardor3d.ui.text.BMTextBackground;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -260,9 +261,10 @@ public class ShapesExample extends ExampleBase {
         verts.put(5).put(5).put(0);
         verts.put(0).put(5).put(0);
         final Line line = new Line("Lines", verts, null, null, null);
-        line.setLineWidth(4);
         line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        line.setRenderMaterial("line/untextured/basic.yaml");
+        line.setAntialiased(true);
+        line.setLineWidth(1);
+        MaterialUtil.autoMaterials(line);
 
         return line;
     }
