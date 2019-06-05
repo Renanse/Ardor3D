@@ -13,10 +13,12 @@ package com.ardor3d.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.material.fog.FogParams;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
@@ -47,7 +49,9 @@ public abstract class MaterialUtil {
         if (spat instanceof Node) {
             material = processNodeMaterial((Node) spat, replaceExisting);
         } else if (replaceExisting || spat.getRenderMaterial() == null) {
-            if (spat instanceof Mesh) {
+            if (spat instanceof Line) {
+                material = calcLineMaterial((Line) spat);
+            } else if (spat instanceof Mesh) {
                 material = calcMeshMaterial((Mesh) spat);
             }
         }
@@ -130,7 +134,34 @@ public abstract class MaterialUtil {
 
         material.append(".yaml");
 
-        System.out.println(material + " - " + mesh.getName());
+        System.out.println("Mesh material: " + material + " - " + mesh.getName());
+
+        return material.toString();
+    }
+
+    private static String calcLineMaterial(final Line line) {
+        final StringBuilder material = new StringBuilder("line/");
+        final MeshData meshData = line.getMeshData();
+
+        // Check if we are textured
+        final TextureState ts = line.getWorldRenderState(StateType.Texture);
+        final boolean textured = (ts != null && ts.isEnabled() && ts.getNumberOfSetTextures() > 0);
+        material.append(textured ? "textured/" : "untextured/");
+
+        // Check if we are using vertex colors
+        final boolean vertColor = line.getMeshData().containsKey(MeshData.KEY_ColorCoords);
+        material.append(vertColor ? "vertex_color" : "basic");
+
+        // Check if we are mitered
+        final IndexMode mode = meshData.getIndexMode(0);
+        material.append(mode == IndexMode.LinesAdjacency || mode == IndexMode.LineStripAdjacency ? "_miter" : "");
+
+        // Check if we are anti-aliased
+        material.append(line.isAntialiased() ? "_aa" : "");
+
+        material.append(".yaml");
+
+        System.out.println("Line material: " + material + " - " + line.getName());
 
         return material.toString();
     }

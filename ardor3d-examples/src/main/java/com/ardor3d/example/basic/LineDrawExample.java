@@ -40,6 +40,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.GeometryTool;
@@ -60,7 +61,6 @@ public class LineDrawExample extends ExampleBase {
     private final float spacing = 10f;
 
     private boolean mitered;
-    private boolean antiAliased;
     private boolean vertexColors;
     private boolean textured = true;
     private int textureIndex;
@@ -116,13 +116,20 @@ public class LineDrawExample extends ExampleBase {
                 }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.L), (source, inputStates, tpf) -> {
-            antiAliased = !antiAliased;
+            line.setAntialiased(!line.isAntialiased());
             updateLineMaterial();
             recreateInstructions();
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.V), (source, inputStates, tpf) -> {
             vertexColors = !vertexColors;
+
+            if (vertexColors) {
+                line.setRandomColors();
+            } else {
+                line.getMeshData().setColorCoords(null);
+            }
+
             updateLineMaterial();
             recreateInstructions();
         }));
@@ -183,79 +190,68 @@ public class LineDrawExample extends ExampleBase {
 
     private void updateLineMaterial() {
 
-        final StringBuilder sb = new StringBuilder("line/");
-        sb.append(textured ? "textured/" : "untextured/");
-        sb.append(vertexColors ? "vertex_color" : "basic");
-        sb.append(mitered ? "_miter" : "");
-        sb.append(antiAliased ? "_aa" : "");
-        sb.append(".yaml");
-        System.err.println(sb.toString());
+        try {
+            final MeshData meshData = line.getMeshData();
 
-        line.setRenderMaterial(sb.toString());
-        final MeshData meshData = line.getMeshData();
+            if (mitered) {
+                meshData.setIndexMode(IndexMode.LineStripAdjacency);
+                meshData.setIndices(
+                        GeometryTool.generateAdjacencyIndices(line.getMeshData().getIndexMode(0), points.size()));
+            } else {
+                meshData.setIndexMode(IndexMode.LineStrip);
+                meshData.setIndices(null);
+            }
+            meshData.markIndicesDirty();
 
-        if (vertexColors) {
-            line.setRandomColors();
-        } else {
-            meshData.setColorCoords(null);
+            // this forces some useful update - still looking into it
+            meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+
+            if (!textured) {
+                line.clearRenderState(StateType.Texture);
+                return;
+            }
+
+            Image image;
+
+            if (textureIndex == 0) {
+                // solid line, alpha edges
+                image = GeneratedImageFactory.create1DColorImage(true, //
+                        new ReadOnlyColorRGBA[] { //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 0), //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 0), //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 0), //
+                                new ColorRGBA(1, 1, 1, 1) });
+            } else if (textureIndex == 1) {
+                // double line, alpha edges
+                image = GeneratedImageFactory.create1DColorImage(true, //
+                        new ReadOnlyColorRGBA[] { //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 0), //
+                                new ColorRGBA(1, 1, 1, 0), //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 1), //
+                                new ColorRGBA(1, 1, 1, 1) });
+
+            } else {
+                return;
+            }
+
+            final TextureState ts = new TextureState();
+            final Texture tex = new Texture2D();
+            tex.setImage(image);
+            tex.setMagnificationFilter(MagnificationFilter.Bilinear);
+            tex.setMinificationFilter(MinificationFilter.Trilinear);
+            tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
+            ts.setTexture(tex);
+            line.setRenderState(ts);
+        } finally {
+            MaterialUtil.autoMaterials(line, true);
         }
-
-        if (mitered) {
-            meshData.setIndexMode(IndexMode.LineStripAdjacency);
-            meshData.setIndices(
-                    GeometryTool.generateAdjacencyIndices(line.getMeshData().getIndexMode(0), points.size()));
-        } else {
-            meshData.setIndexMode(IndexMode.LineStrip);
-            meshData.setIndices(null);
-        }
-        meshData.markIndicesDirty();
-
-        // this forces some useful update - still looking into it
-        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-
-        if (!textured) {
-            line.clearRenderState(StateType.Texture);
-            return;
-        }
-
-        Image image;
-
-        if (textureIndex == 0) {
-            // solid line, alpha edges
-            image = GeneratedImageFactory.create1DColorImage(true, //
-                    new ReadOnlyColorRGBA[] { //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 1) });
-        } else if (textureIndex == 1) {
-            // double line, alpha edges
-            image = GeneratedImageFactory.create1DColorImage(true, //
-                    new ReadOnlyColorRGBA[] { //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1) });
-
-        } else {
-            return;
-        }
-
-        final TextureState ts = new TextureState();
-        final Texture tex = new Texture2D();
-        tex.setImage(image);
-        tex.setMagnificationFilter(MagnificationFilter.Bilinear);
-        tex.setMinificationFilter(MinificationFilter.Trilinear);
-        tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
-        ts.setTexture(tex);
-        line.setRenderState(ts);
     }
 
     protected void addPointToLine(final int x, final int y) {
@@ -289,7 +285,7 @@ public class LineDrawExample extends ExampleBase {
         createControlText("LMB", "Add New Point");
         createControlText("T", "Wireframe");
         createControlText("[  ]", "Line Weight: " + String.format("%.1f", line.getLineWidth()));
-        createControlText("L", "[" + (antiAliased ? "ON" : "OFF") + "] Toggle Antialiased");
+        createControlText("L", "[" + (line.isAntialiased() ? "ON" : "OFF") + "] Toggle Antialiased");
         createControlText("V", "[" + (vertexColors ? "ON" : "OFF") + "] Toggle Random Vertex Colors");
         createControlText("M", "[" + (mitered ? "ON" : "OFF") + "] Toggle Mitering");
         if (mitered) {
