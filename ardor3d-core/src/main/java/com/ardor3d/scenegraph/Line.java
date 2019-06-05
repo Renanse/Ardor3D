@@ -26,6 +26,7 @@ public class Line extends Mesh {
 
     private float _lineWidth;
     private float _miterLimit;
+    private boolean _antialiased = false;
 
     public Line() {
         this("line");
@@ -150,6 +151,25 @@ public class Line extends Mesh {
     }
 
     /**
+     * @return true if lines are to be drawn antialiased
+     */
+    public boolean isAntialiased() {
+        return _antialiased;
+    }
+
+    /**
+     * Sets whether the line should be antialiased. May decrease performance. If you want to enabled antialiasing, you
+     * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
+     * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
+     *
+     * @param antialiased
+     *            true if the line should be antialiased.
+     */
+    public void setAntialiased(final boolean antialiased) {
+        _antialiased = antialiased;
+    }
+
+    /**
      * @return the width of this line in pixels.
      */
     public float getLineWidth() {
@@ -192,6 +212,7 @@ public class Line extends Mesh {
         final Line lineCopy = (Line) super.makeCopy(shareGeometricData);
         lineCopy.setLineWidth(_lineWidth);
         lineCopy.setMiterLimit(_miterLimit);
+        lineCopy.setAntialiased(_antialiased);
         return lineCopy;
     }
 
@@ -200,6 +221,7 @@ public class Line extends Mesh {
         super.write(capsule);
         capsule.write(_lineWidth, "lineWidth", 1.0f);
         capsule.write(_miterLimit, "miterLimit", 0.75f);
+        capsule.write(_antialiased, "antialiased", false);
     }
 
     @Override
@@ -207,5 +229,6 @@ public class Line extends Mesh {
         super.read(capsule);
         setLineWidth(capsule.readFloat("lineWidth", 1.0f));
         setMiterLimit(capsule.readFloat("miterLimit", 0.75f));
+        _antialiased = capsule.readBoolean("antialiased", false);
     }
 }

@@ -1,0 +1,37 @@
+---
+# Note - Requires incoming lines to use Adjacency
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: color
+          
+        uniforms: 
+          - builtIn: [modelViewProj, viewSize, viewOffset]
+          - 
+            shaderKey: lineWidth
+            type: Float1
+            source: SpatialProperty
+            defaultValue: 1.0
+          - 
+            shaderKey: miterLimit
+            type: Float1
+            source: SpatialProperty
+            defaultValue: 0.75
+          - 
+            shaderKey: featherWidth
+            type: Float1
+            source: SpatialProperty
+            defaultValue: 1.0
+
+        shaders: 
+          Vertex: 
+            source: line/line.vert
+            define: VERT_COLORS
+          Geometry:
+            source: line/lines_miter.geom
+            define: ANTIALIAS
+          Fragment: 
+            source: line/line_modulate.frag
+            define: TEXTURED

@@ -6,9 +6,10 @@
 uniform float	lineWidth;
 uniform vec2	viewSize;
 uniform vec2	viewOffset;
+uniform float	featherWidth;
 
 layout(lines) in;
-layout(triangle_strip, max_vertices=4) out;
+layout(triangle_strip, max_vertices=8) out;
 
 in VertexData{
 	#ifdef FLAT_COLORS
@@ -59,26 +60,70 @@ void main()
 	// multiply normal by lineWidth to get offset
 	vec2 offset = lineWidth * 0.5 * normal;
 
-	// generate the triangle strip
+#ifndef ANTIALIAS
+	// generate the triangle strip using two triangles
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = VertexIn[0].color;
+	gl_Position = toNDCSpace(p0, offset);
+	EmitVertex();
+
 	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = VertexIn[0].color;
+	gl_Position = toNDCSpace(p0, -offset);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = VertexIn[1].color;
+	gl_Position = toNDCSpace(p1, offset);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = VertexIn[1].color;
+	gl_Position = toNDCSpace(p1, -offset);
+	EmitVertex();
+#else
+	vec2 offsetFeather = (featherWidth + (lineWidth * 0.5)) * normal;
+	// generate the triangle strip using 6 triangles
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = vec4(VertexIn[0].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p0, offsetFeather);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p1, offsetFeather);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[0].color;
 	gl_Position = toNDCSpace(p0, offset);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = VertexIn[0].color;
-	gl_Position = toNDCSpace(p0, -offset);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(0, 0);
 	VertexOut.color = VertexIn[1].color;
 	gl_Position = toNDCSpace(p1, offset);
 	EmitVertex();
-
-	VertexOut.uv0 = vec2(1, 0);
+	
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = VertexIn[0].color;
+	gl_Position = toNDCSpace(p0, -offset);
+	EmitVertex();
+	
+	VertexOut.uv0 = vec2(0, 0);
 	VertexOut.color = VertexIn[1].color;
 	gl_Position = toNDCSpace(p1, -offset);
 	EmitVertex();
+	
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = vec4(VertexIn[0].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p0, -offsetFeather);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p1, -offsetFeather);
+	EmitVertex();
+#endif
 
 	EndPrimitive();
 }

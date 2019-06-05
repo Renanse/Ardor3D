@@ -1,0 +1,29 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          
+        uniforms: 
+          - builtIn: [modelViewProj, defaultColor, viewSize, viewOffset]
+          - 
+            shaderKey: lineWidth
+            type: Float1
+            source: SpatialProperty
+            defaultValue: 1.0
+          - 
+            shaderKey: featherWidth
+            type: Float1
+            source: SpatialProperty
+            defaultValue: 1.0
+
+        shaders: 
+          Vertex: 
+            source: line/line.vert
+          Geometry:
+            source: line/lines_no_miter.geom
+            define: ANTIALIAS
+          Fragment: 
+            source: line/line_modulate.frag
+            define: TEXTURED

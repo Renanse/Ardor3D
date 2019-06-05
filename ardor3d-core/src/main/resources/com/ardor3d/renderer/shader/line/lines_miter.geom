@@ -7,9 +7,10 @@ uniform float	miterLimit;
 uniform float	lineWidth;
 uniform vec2	viewSize;
 uniform vec2	viewOffset;
+uniform float	featherWidth;
 
 layout(lines_adjacency) in;
-layout(triangle_strip, max_vertices = 7) out;
+layout(triangle_strip, max_vertices = 11) out;
 
 in VertexData{
 	#ifdef FLAT_COLORS
@@ -77,6 +78,7 @@ void main(void)
 		length_a = lineWidth * 0.5;
 
 		// close the gap
+		// XXX: we don't add antialiasing to the miter joint, but we could?
 		if(dot(dirPrev, normCurr) > 0) {
 			VertexOut.uv0 = vec2(0, 0);
 			VertexOut.color = VertexIn[1].color;
@@ -120,26 +122,74 @@ void main(void)
 		length_b = lineWidth * 0.5;
 	}
 
+	vec2 offsetA = length_a * miter_a;
+	vec2 offsetB = length_b * miter_b;
+
+#ifndef ANTIALIAS
 	// generate the triangle strip
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = VertexIn[1].color;
-	gl_Position = toNDCSpace(p1, length_a * miter_a);
-	EmitVertex();
-
 	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[1].color;
-	gl_Position = toNDCSpace(p1, -length_a * miter_a);
+	gl_Position = toNDCSpace(p1, offsetA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = VertexIn[2].color;
-	gl_Position = toNDCSpace(p2, length_b * miter_b);
+	VertexOut.color = VertexIn[1].color;
+	gl_Position = toNDCSpace(p1, -offsetA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[2].color;
-	gl_Position = toNDCSpace(p2, -length_b * miter_b);
+	gl_Position = toNDCSpace(p2, offsetB);
 	EmitVertex();
+
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = VertexIn[2].color;
+	gl_Position = toNDCSpace(p2, -offsetB);
+	EmitVertex();
+#else
+	vec2 offsetFeatherA = (featherWidth + (length_a)) * miter_a;
+	vec2 offsetFeatherB = (featherWidth + (length_b)) * miter_b;
+	// generate the triangle strip using 6 triangles
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = vec4(VertexIn[0].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p1, offsetFeatherA);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p2, offsetFeatherB);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = VertexIn[1].color;
+	gl_Position = toNDCSpace(p1, offsetA);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(1, 0);
+	VertexOut.color = VertexIn[2].color;
+	gl_Position = toNDCSpace(p2, offsetB);
+	EmitVertex();
+	
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = VertexIn[1].color;
+	gl_Position = toNDCSpace(p1, -offsetA);
+	EmitVertex();
+	
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = VertexIn[2].color;
+	gl_Position = toNDCSpace(p2, -offsetB);
+	EmitVertex();
+	
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = vec4(VertexIn[0].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p1, -offsetFeatherA);
+	EmitVertex();
+
+	VertexOut.uv0 = vec2(0, 0);
+	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	gl_Position = toNDCSpace(p2, -offsetFeatherB);
+	EmitVertex();
+#endif
 
 	EndPrimitive();
 }

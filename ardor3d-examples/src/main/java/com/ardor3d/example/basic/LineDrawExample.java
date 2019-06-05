@@ -60,8 +60,9 @@ public class LineDrawExample extends ExampleBase {
     private final float spacing = 10f;
 
     private boolean mitered;
+    private boolean antiAliased;
     private boolean vertexColors;
-    private boolean textured;
+    private boolean textured = true;
     private int textureIndex;
 
     public static void main(final String[] args) {
@@ -114,6 +115,12 @@ public class LineDrawExample extends ExampleBase {
                     recreateInstructions();
                 }));
 
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.L), (source, inputStates, tpf) -> {
+            antiAliased = !antiAliased;
+            updateLineMaterial();
+            recreateInstructions();
+        }));
+
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.V), (source, inputStates, tpf) -> {
             vertexColors = !vertexColors;
             updateLineMaterial();
@@ -157,6 +164,7 @@ public class LineDrawExample extends ExampleBase {
         line.setDefaultColor(ColorRGBA.WHITE);
         line.getMeshData().setIndexMode(IndexMode.LineStripAdjacency);
         line.setRenderState(_wireframeState);
+        line.setAntialiased(true);
         addPointToLine(800, 600);
         addPointToLine(0, 0);
         addPointToLine(400, 0);
@@ -178,7 +186,10 @@ public class LineDrawExample extends ExampleBase {
         final StringBuilder sb = new StringBuilder("line/");
         sb.append(textured ? "textured/" : "untextured/");
         sb.append(vertexColors ? "vertex_color" : "basic");
-        sb.append(mitered ? "_miter.yaml" : ".yaml");
+        sb.append(mitered ? "_miter" : "");
+        sb.append(antiAliased ? "_aa" : "");
+        sb.append(".yaml");
+        System.err.println(sb.toString());
 
         line.setRenderMaterial(sb.toString());
         final MeshData meshData = line.getMeshData();
@@ -213,26 +224,25 @@ public class LineDrawExample extends ExampleBase {
             // solid line, alpha edges
             image = GeneratedImageFactory.create1DColorImage(true, //
                     new ReadOnlyColorRGBA[] { //
+                            new ColorRGBA(1, 1, 1, 1), //
                             new ColorRGBA(1, 1, 1, 0), //
                             new ColorRGBA(1, 1, 1, 1), //
+                            new ColorRGBA(1, 1, 1, 0), //
                             new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0) });
+                            new ColorRGBA(1, 1, 1, 0), //
+                            new ColorRGBA(1, 1, 1, 1) });
         } else if (textureIndex == 1) {
             // double line, alpha edges
             image = GeneratedImageFactory.create1DColorImage(true, //
                     new ReadOnlyColorRGBA[] { //
+                            new ColorRGBA(1, 1, 1, 1), //
+                            new ColorRGBA(1, 1, 1, 1), //
+                            new ColorRGBA(1, 1, 1, 1), //
+                            new ColorRGBA(1, 1, 1, 0), //
                             new ColorRGBA(1, 1, 1, 0), //
                             new ColorRGBA(1, 1, 1, 1), //
                             new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 0), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 1), //
-                            new ColorRGBA(1, 1, 1, 0) });
+                            new ColorRGBA(1, 1, 1, 1) });
 
         } else {
             return;
@@ -279,8 +289,9 @@ public class LineDrawExample extends ExampleBase {
         createControlText("LMB", "Add New Point");
         createControlText("T", "Wireframe");
         createControlText("[  ]", "Line Weight: " + String.format("%.1f", line.getLineWidth()));
-        createControlText("V", "Toggle Random Vertex Colors");
-        createControlText("M", "Toggle Mitering");
+        createControlText("L", "[" + (antiAliased ? "ON" : "OFF") + "] Toggle Antialiased");
+        createControlText("V", "[" + (vertexColors ? "ON" : "OFF") + "] Toggle Random Vertex Colors");
+        createControlText("M", "[" + (mitered ? "ON" : "OFF") + "] Toggle Mitering");
         if (mitered) {
             createControlText("-  =", "Miter Limit: " + String.format("%.1f", line.getMiterLimit()));
         }
