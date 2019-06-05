@@ -143,7 +143,7 @@ public class ExtrusionExample extends ExampleBase {
         final FloatBuffer norms = BufferUtils.createVector3Buffer(data.getNormalBuffer(), data.getVertexCount());
         data.setNormalBuffer(norms);
         final Vector3 prev = new Vector3(), curr = new Vector3(), next = new Vector3();
-        final Vector3 dirPrev = new Vector3(), dirNext = new Vector3(), norm = new Vector3(), tan = new Vector3();
+        final Vector3 dirPrev = new Vector3(), dirNext = new Vector3(), norm = new Vector3();
         for (int i = 0, maxI = data.getVertexCount(); i < maxI; i++) {
             BufferUtils.populateFromBuffer(prev, verts, i > 0 ? i - 1 : i);
             BufferUtils.populateFromBuffer(curr, verts, i);
