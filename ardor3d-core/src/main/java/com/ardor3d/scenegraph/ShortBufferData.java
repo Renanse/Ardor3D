@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -38,7 +38,7 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
 
     /**
      * Creates a new ShortBufferData.
-     * 
+     *
      * @param buffer
      *            Buffer holding the data. Must not be null.
      */
@@ -116,6 +116,13 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
     public void put(final int[] array, final int offset, final int length) {
         for (int i = offset, max = offset + length; i < max; i++) {
             put(array[i]);
+        }
+    }
+
+    @Override
+    public void put(final IntBuffer buffer) {
+        while (buffer.hasRemaining()) {
+            put(buffer.get());
         }
     }
 

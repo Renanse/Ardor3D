@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -37,7 +37,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
 
     /**
      * Sets the value of this buffer at the current position, incrementing our position by 1 entry.
-     * 
+     *
      * @param value
      *            the value to place into this object at the current position.
      * @return this object, for chaining.
@@ -46,7 +46,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
 
     /**
      * Sets the value of this buffer at the given index.
-     * 
+     *
      * @param index
      *            the absolute position to put our value at. This is in entries, not bytes, and is 0 based. So for a
      *            ShortBuffer, 2 would be the 3rd short from the beginning, etc.
@@ -59,7 +59,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
     /**
      * Write the contents of the given IndexBufferData into this one. Note that data conversion is handled using the
      * get/put methods in IndexBufferData.
-     * 
+     *
      * @param buf
      *            the source buffer object.
      */
@@ -68,7 +68,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
     /**
      * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
      * the get/put methods in IndexBufferData.
-     * 
+     *
      * @param array
      *            the source int array.
      */
@@ -77,13 +77,22 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
     /**
      * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
      * the get/put methods in IndexBufferData.
-     * 
+     *
      * @param array
      *            the source int array.
      * @param offset
      * @param length
      */
     public abstract void put(int[] array, int offset, int length);
+
+    /**
+     * Write the contents of the given IntBuffer into this IndexBufferData. Note that data conversion is handled using
+     * the get/put methods in IndexBufferData.
+     *
+     * @param array
+     *            the source int array.
+     */
+    public abstract void put(IntBuffer buffer);
 
     /**
      * Get the underlying nio buffer.

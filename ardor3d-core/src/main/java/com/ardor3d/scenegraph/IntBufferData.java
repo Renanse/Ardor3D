@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -37,7 +37,7 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
 
     /**
      * Creates a new IntBufferData.
-     * 
+     *
      * @param buffer
      *            Buffer holding the data. Must not be null.
      */
@@ -112,6 +112,13 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
     @Override
     public void put(final int[] array, final int offset, final int length) {
         _buffer.put(array, offset, length);
+    }
+
+    @Override
+    public void put(final IntBuffer buffer) {
+        while (buffer.hasRemaining()) {
+            put(buffer.get());
+        }
     }
 
     @Override
