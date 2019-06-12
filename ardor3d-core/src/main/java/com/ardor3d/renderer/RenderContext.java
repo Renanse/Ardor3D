@@ -14,6 +14,7 @@ import java.util.EmptyStackException;
 import java.util.EnumMap;
 import java.util.Stack;
 
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -26,7 +27,8 @@ import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
  */
 public class RenderContext {
 
-    public class RenderContextRef extends Object {}
+    public class RenderContextRef extends Object {
+    }
 
     /** List of states that override any set states on a spatial if not null. */
     protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates = new EnumMap<RenderState.StateType, RenderState>(
@@ -57,6 +59,8 @@ public class RenderContext {
     protected final Object _contextKey;
 
     protected Camera _currentCamera = null;
+
+    protected CanvasRenderer _currentCanvasRenderer = null;
 
     public RenderContext(final Object key, final ContextCapabilities caps) {
         this(key, caps, null);
@@ -186,6 +190,14 @@ public class RenderContext {
 
     public void setCurrentCamera(final Camera cam) {
         _currentCamera = cam;
+    }
+
+    public CanvasRenderer getCurrentCanvasRenderer() {
+        return _currentCanvasRenderer;
+    }
+
+    public void setCurrentCanvasRenderer(final CanvasRenderer renderer) {
+        _currentCanvasRenderer = renderer;
     }
 
     public RenderContextRef getGlContextRef() {

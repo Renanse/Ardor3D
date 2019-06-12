@@ -78,6 +78,7 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
 
         ContextManager.addContext(this, _currentContext);
         ContextManager.switchContext(this);
+        ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
 
         _renderer = createRenderer();
 
@@ -158,6 +159,7 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
     public void makeCurrentContext() throws Ardor3dException {
         _canvasCallback.makeCurrent(false);
         ContextManager.switchContext(this);
+        ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
     }
 
     public void releaseCurrentContext() {

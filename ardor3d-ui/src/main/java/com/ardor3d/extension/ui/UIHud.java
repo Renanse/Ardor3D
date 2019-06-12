@@ -147,6 +147,7 @@ public class UIHud extends Node {
         getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        setLayer(Spatial.LAYER_UI);
 
         final ZBufferState zstate = new ZBufferState();
         zstate.setEnabled(false);

@@ -12,6 +12,7 @@ package com.ardor3d.framework;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.Ardor3dException;
@@ -103,5 +104,18 @@ public interface CanvasRenderer {
      *            Renderer.BUFFER_COLOR_AND_DEPTH
      */
     void setFrameClear(final int buffers);
+
+    /**
+     * Convenience method for retrieving the CanvasRenderer set on the current RenderContext. Similar to
+     * ContextManager.getCurrentContext().getCurrentCanvasRenderer() but with null checks for current context.
+     *
+     * @return the CanvasRenderer on the current RenderContext.
+     */
+    public static CanvasRenderer getCurrent() {
+        if (ContextManager.getCurrentContext() == null) {
+            return null;
+        }
+        return ContextManager.getCurrentContext().getCurrentCanvasRenderer();
+    }
 
 }
