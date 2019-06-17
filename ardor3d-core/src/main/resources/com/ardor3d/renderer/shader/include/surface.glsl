@@ -8,6 +8,7 @@ struct ColorSurface {
     vec3 specular;
     vec3 emissive;
     float shininess;
+    float opacity;
 };
 
 // com.ardor3d.surface.PbrSurface

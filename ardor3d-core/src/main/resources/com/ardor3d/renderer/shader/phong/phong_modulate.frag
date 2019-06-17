@@ -78,7 +78,7 @@ void main()
     for(int i = 0; i < NR_LIGHTS; i++)
     	lighting += calcLighting(light[i], WorldPos, Normal, V, surface, USE_BLINN_PHONG);
 
-    color = clamp(color * vec4(surface.emissive + lighting, 1.0), 0.0, 1.0);
+    color = clamp(color * vec4(surface.emissive + lighting, surface.opacity), 0.0, 1.0);
 
 #ifdef USE_FOG
     float fogAmount = calcFogAmount(fogParams, abs(ViewPos.z/ViewPos.w));

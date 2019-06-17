@@ -52,6 +52,9 @@ import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
@@ -458,9 +461,44 @@ public class AssimpModelImporter {
                     surface.setSpecular(toColorRGBA(color));
                 }
 
-                final FloatBuffer value = stack.mallocFloat(1);
-                if (readMaterialFloat(mat, Assimp.AI_MATKEY_SHININESS, value, stack.ints(1))) {
-                    surface.setShininess(Math.max(0.001f, value.get(0)));
+                final FloatBuffer fValue = stack.mallocFloat(1);
+                final IntBuffer iValue = stack.mallocInt(1);
+                final IntBuffer one = stack.ints(1);
+
+                if (readMaterialFloat(mat, Assimp.AI_MATKEY_SHININESS, fValue, one)) {
+                    surface.setShininess(Math.max(0.001f, fValue.get(0)));
+                }
+
+                // check if we need blending
+                if (readMaterialFloat(mat, Assimp.AI_MATKEY_OPACITY, fValue, one)) {
+
+                    final float opacity = fValue.get(0);
+
+                    if (opacity > 0f && opacity <= .999f) {
+                        surface.setOpacity(opacity);
+
+                        final BlendState bs = new BlendState();
+                        store.addRenderState(i, bs);
+                        bs.setBlendEnabled(true);
+                        bs.setTestEnabled(true);
+
+                        if (readMaterialInt(mat, Assimp.AI_MATKEY_BLEND_FUNC, iValue, one)) {
+                            if (iValue.get(0) == Assimp.aiBlendMode_Additive) {
+                                bs.setSourceFunction(BlendState.SourceFunction.One);
+                                bs.setDestinationFunction(BlendState.DestinationFunction.One);
+                            } else {
+                                bs.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+                                bs.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+                            }
+                        }
+                    }
+                }
+
+                // check if cull state is needed
+                if (readMaterialInt(mat, Assimp.AI_MATKEY_TWOSIDED, iValue, one)) {
+                    final CullState cs = new CullState();
+                    store.addRenderState(i, cs);
+                    cs.setCullFace(iValue.get(0) == 0 ? Face.Back : Face.None);
                 }
 
                 if (isLoadTextures()) {
@@ -511,6 +549,13 @@ public class AssimpModelImporter {
             final IntBuffer inOut) {
         store.clear();
         return Assimp.aiGetMaterialFloatArray(mat, key, Assimp.aiTextureType_NONE, 0, store,
+                inOut) == Assimp.aiReturn_SUCCESS && inOut.get(0) == 1;
+    }
+
+    private boolean readMaterialInt(final AIMaterial mat, final String key, final IntBuffer store,
+            final IntBuffer inOut) {
+        store.clear();
+        return Assimp.aiGetMaterialIntegerArray(mat, key, Assimp.aiTextureType_NONE, 0, store,
                 inOut) == Assimp.aiReturn_SUCCESS && inOut.get(0) == 1;
     }
 }

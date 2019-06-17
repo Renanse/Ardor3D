@@ -34,6 +34,7 @@ public class ColorSurface implements IUniformSupplier, Savable {
     protected final ColorRGBA _emissive = new ColorRGBA(0f, 0f, 0f, 1f);
     protected final ColorRGBA _specular = new ColorRGBA(1f, 1f, 1f, 1f);
     protected float _shininess = 32f;
+    protected float _opacity = 1f;
 
     protected final List<UniformRef> _cachedUniforms = new ArrayList<>();
 
@@ -48,6 +49,8 @@ public class ColorSurface implements IUniformSupplier, Savable {
                 (Supplier<ReadOnlyColorRGBA>) this::getSpecular));
         _cachedUniforms.add(new UniformRef("shininess", UniformType.Float1, UniformSource.Supplier,
                 (Supplier<Float>) this::getShininess));
+        _cachedUniforms.add(new UniformRef("opacity", UniformType.Float1, UniformSource.Supplier,
+                (Supplier<Float>) this::getOpacity));
     }
 
     @Override
@@ -85,12 +88,20 @@ public class ColorSurface implements IUniformSupplier, Savable {
         return _specular;
     }
 
-    public void setShininess(final float shininess) {
-        _shininess = shininess;
+    public void setShininess(final float value) {
+        _shininess = value;
     }
 
     public float getShininess() {
         return _shininess;
+    }
+
+    public void setOpacity(final float value) {
+        _shininess = value;
+    }
+
+    public float getOpacity() {
+        return _opacity;
     }
 
     @Override
@@ -122,6 +133,7 @@ public class ColorSurface implements IUniformSupplier, Savable {
         _emissive.set(capsule.readSavable("emissive", (ColorRGBA) ColorRGBA.BLACK));
         _specular.set(capsule.readSavable("specular", (ColorRGBA) ColorRGBA.WHITE));
         _shininess = capsule.readFloat("shininess", 32f);
+        _opacity = capsule.readFloat("opacity", 1f);
     }
 
     /**
@@ -137,5 +149,6 @@ public class ColorSurface implements IUniformSupplier, Savable {
         capsule.write(_emissive, "emissive", (ColorRGBA) ColorRGBA.BLACK);
         capsule.write(_specular, "specular", (ColorRGBA) ColorRGBA.WHITE);
         capsule.write(_shininess, "shininess", 32f);
+        capsule.write(_opacity, "opacity", 1f);
     }
 }
