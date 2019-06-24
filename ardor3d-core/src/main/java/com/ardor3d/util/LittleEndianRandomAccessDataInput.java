@@ -155,6 +155,7 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
      * @throws IOException
      *             if this method is called.
      */
+    @Deprecated
     public final String readLine() throws IOException {
         throw new IOException("operation unsupported.");
     }
@@ -165,6 +166,7 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
      * @throws IOException
      *             if this method is called.
      */
+    @Deprecated
     public final String readUTF() throws IOException {
         throw new IOException("operation unsupported.");
     }

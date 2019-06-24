@@ -13,6 +13,11 @@ package com.ardor3d.scenegraph;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.Vector2;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -91,6 +96,64 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
             i++;
         }
         _buffer.rewind();
+    }
+
+    public void put(final Vector2 vector) {
+        _buffer.put(vector.getXf());
+        _buffer.put(vector.getYf());
+    }
+
+    public void put(final Vector3 vector) {
+        _buffer.put(vector.getXf());
+        _buffer.put(vector.getYf());
+        _buffer.put(vector.getZf());
+    }
+
+    public void put(final Vector4 vector) {
+        _buffer.put(vector.getXf());
+        _buffer.put(vector.getYf());
+        _buffer.put(vector.getZf());
+        _buffer.put(vector.getWf());
+    }
+
+    public void put(final Quaternion quat) {
+        _buffer.put(quat.getXf());
+        _buffer.put(quat.getYf());
+        _buffer.put(quat.getZf());
+        _buffer.put(quat.getWf());
+    }
+
+    public void putRGBA(final ColorRGBA color) {
+        _buffer.put(color.getRed());
+        _buffer.put(color.getGreen());
+        _buffer.put(color.getBlue());
+        _buffer.put(color.getAlpha());
+    }
+
+    public void putRGB(final ColorRGBA color) {
+        _buffer.put(color.getRed());
+        _buffer.put(color.getGreen());
+        _buffer.put(color.getBlue());
+    }
+
+    public void putBGRA(final ColorRGBA color) {
+        _buffer.put(color.getBlue());
+        _buffer.put(color.getGreen());
+        _buffer.put(color.getRed());
+        _buffer.put(color.getAlpha());
+    }
+
+    public void putABGR(final ColorRGBA color) {
+        _buffer.put(color.getAlpha());
+        _buffer.put(color.getBlue());
+        _buffer.put(color.getGreen());
+        _buffer.put(color.getRed());
+    }
+
+    public void putBGR(final ColorRGBA color) {
+        _buffer.put(color.getBlue());
+        _buffer.put(color.getGreen());
+        _buffer.put(color.getRed());
     }
 
     @Override

@@ -31,7 +31,7 @@ public class PriorityExecutors {
         private static final int DEFAULT_PRIORITY = 0;
         private static AtomicLong instanceCounter = new AtomicLong();
 
-        @SuppressWarnings({ "unchecked" })
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         public PriorityExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime,
                 final TimeUnit unit, final ThreadFactory factory) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit,
