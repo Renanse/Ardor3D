@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,6 +11,8 @@
 package com.ardor3d.extension.terrain.providers.simplearray;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,8 +21,6 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class SimpleArrayTextureSource implements TextureSource {
     private final int tileSize;
@@ -36,7 +36,7 @@ public class SimpleArrayTextureSource implements TextureSource {
 
     @Override
     public TextureConfiguration getConfiguration() throws Exception {
-        final Map<Integer, TextureStoreFormat> textureStoreFormat = Maps.newHashMap();
+        final Map<Integer, TextureStoreFormat> textureStoreFormat = new HashMap<>();
         textureStoreFormat.put(0, TextureStoreFormat.RGBA8);
 
         return new TextureConfiguration(availableClipmapLevels, textureStoreFormat, tileSize, 1f, true, true);
@@ -45,7 +45,7 @@ public class SimpleArrayTextureSource implements TextureSource {
     @Override
     public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
             final int numTilesY) throws Exception {
-        final Set<Tile> validTiles = Sets.newHashSet();
+        final Set<Tile> validTiles = new HashSet<>();
 
         final int levelSize = 1 << availableClipmapLevels - clipmapLevel;
 

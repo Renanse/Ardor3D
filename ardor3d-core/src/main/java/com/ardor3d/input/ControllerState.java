@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -19,18 +19,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ardor3d.annotation.Immutable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @Immutable
 public class ControllerState {
 
     public static final ControllerState NOTHING = new ControllerState(0);
 
-    protected final Map<String, Map<String, Float>> _controllerStates = Maps.newLinkedHashMap();
-    protected final List<ControllerEvent> _eventsSinceLastState = Lists.newArrayList();
+    protected final Map<String, Map<String, Float>> _controllerStates = new LinkedHashMap<>();
+    protected final List<ControllerEvent> _eventsSinceLastState = new ArrayList<>();
 
-    protected ControllerState(final int ignore) {}
+    protected ControllerState(final int ignore) {
+    }
 
     public ControllerState() {
         ControllerState.NOTHING.duplicateStates(_controllerStates);
@@ -96,7 +95,7 @@ public class ControllerState {
     private void duplicateStates(final Map<String, Map<String, Float>> store) {
         store.clear();
         for (final Entry<String, Map<String, Float>> entry : _controllerStates.entrySet()) {
-            store.put(entry.getKey(), Maps.newLinkedHashMap(entry.getValue()));
+            store.put(entry.getKey(), new LinkedHashMap<>(entry.getValue()));
         }
     }
 

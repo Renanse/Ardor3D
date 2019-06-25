@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -65,7 +66,6 @@ import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.VertMap;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
@@ -196,7 +196,7 @@ public class ColladaAnimUtils {
         final Node meshNode = _colladaMeshUtils.buildMesh(geometry);
         if (meshNode != null) {
             // Look for skeleton entries in the original <instance_controller> element
-            final List<Element> skeletonRoots = Lists.newArrayList();
+            final List<Element> skeletonRoots = new ArrayList<>();
             for (final Element sk : instanceController.getChildren("skeleton")) {
                 final Element skroot = _colladaDOMUtil.findTargetWithId(sk.getText());
                 if (skroot != null) {
@@ -215,9 +215,9 @@ public class ColladaAnimUtils {
             }
 
             // Pull out our joint names and bind matrices
-            final List<String> jointNames = Lists.newArrayList();
-            final List<Transform> bindMatrices = Lists.newArrayList();
-            final List<ColladaInputPipe.ParamType> paramTypes = Lists.newArrayList();
+            final List<String> jointNames = new ArrayList<>();
+            final List<Transform> bindMatrices = new ArrayList<>();
+            final List<ColladaInputPipe.ParamType> paramTypes = new ArrayList<>();
 
             for (final Element inputEL : jointsEL.getChildren("input")) {
                 final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, inputEL);
@@ -324,8 +324,8 @@ public class ColladaAnimUtils {
             }
 
             // Pull out our per vertex joint indices and weights
-            final List<Short> jointIndices = Lists.newArrayList();
-            final List<Float> jointWeights = Lists.newArrayList();
+            final List<Short> jointIndices = new ArrayList<>();
+            final List<Float> jointWeights = new ArrayList<>();
             int indOff = 0, weightOff = 0;
 
             int maxOffset = 0;
@@ -709,9 +709,9 @@ public class ColladaAnimUtils {
             targetChannel.currentPos = 0;
         }
 
-        final List<Float> finalTimeList = Lists.newArrayList();
-        final List<Transform> finalTransformList = Lists.newArrayList();
-        final List<TargetChannel> workingChannels = Lists.newArrayList();
+        final List<Float> finalTimeList = new ArrayList<>();
+        final List<Transform> finalTransformList = new ArrayList<>();
+        final List<TargetChannel> workingChannels = new ArrayList<>();
         for (;;) {
             float lowestTime = Float.MAX_VALUE;
             boolean found = false;
@@ -923,7 +923,7 @@ public class ColladaAnimUtils {
         return currentElement;
     }
 
-    private static final Map<String, Integer> symbolMap = Maps.newHashMap();
+    private static final Map<String, Integer> symbolMap = new HashMap<>();
     static {
         symbolMap.put("ANGLE", 3);
         symbolMap.put("TIME", 0);
@@ -1021,7 +1021,7 @@ public class ColladaAnimUtils {
      * @return
      */
     private List<TransformElement> getNodeTransformList(final List<Element> transforms) {
-        final List<TransformElement> transformList = Lists.newArrayList();
+        final List<TransformElement> transformList = new ArrayList<>();
 
         for (final Element transform : transforms) {
             final double[] array = _colladaDOMUtil.parseDoubleArray(transform);
@@ -1170,7 +1170,7 @@ public class ColladaAnimUtils {
 
     private static class Target {
         public String id;
-        public List<String> sids = Lists.newArrayList();
+        public List<String> sids = new ArrayList<>();
         public AccessorType accessorType = AccessorType.None;
         public int accessorIndexX = -1, accessorIndexY = -1;
 

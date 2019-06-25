@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -13,8 +13,6 @@ package com.ardor3d.input;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 public class ControllerInfo {
 
     private final String _controllerName;
@@ -23,8 +21,8 @@ public class ControllerInfo {
 
     public ControllerInfo(final String controllerName, final List<String> axisNames, final List<String> buttonNames) {
         _controllerName = controllerName;
-        _axisNames = Lists.newArrayList(axisNames);
-        _buttonNames = Lists.newArrayList(buttonNames);
+        _axisNames = new ArrayList<>(axisNames);
+        _buttonNames = new ArrayList<>(buttonNames);
     }
 
     public String getControllerName() {

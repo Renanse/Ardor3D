@@ -12,6 +12,7 @@ package com.ardor3d.extension.animation.skeletal;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.annotation.SavableFactory;
@@ -21,7 +22,6 @@ import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
 
 /**
  * Joins a Skeleton with an array of joint poses. This allows the skeleton to exist and be reused between multiple
@@ -48,7 +48,7 @@ public class SkeletonPose implements Savable {
     /**
      * The list of elements interested in notification when this SkeletonPose updates. Not saved to savable.
      */
-    private transient final List<PoseListener> _poseListeners = Lists.newArrayListWithCapacity(1);
+    private transient final List<PoseListener> _poseListeners = new ArrayList<>(1);
 
     /**
      * Construct a new SkeletonPose using the given Skeleton.

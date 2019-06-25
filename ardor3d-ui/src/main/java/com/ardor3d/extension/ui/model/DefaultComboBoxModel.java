@@ -10,16 +10,15 @@
 
 package com.ardor3d.extension.ui.model;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 /**
  * Default implementation of a ComboBox model.
  */
 public class DefaultComboBoxModel implements ComboBoxModel {
 
-    protected List<ModelElement> _elements = Lists.newArrayList();
+    protected List<ModelElement> _elements = new ArrayList<>();
 
     public DefaultComboBoxModel() {}
 

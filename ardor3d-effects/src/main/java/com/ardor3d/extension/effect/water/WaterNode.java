@@ -38,7 +38,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.TextureManager;
-import com.google.common.collect.Lists;
 
 /**
  * The WaterNode handles rendering of a water effect on all of it's children. What is reflected in the water is
@@ -61,8 +60,8 @@ public class WaterNode extends Node {
     protected Texture2D textureRefract;
     protected Texture2D textureDepth;
 
-    protected ArrayList<Spatial> renderList = Lists.newArrayList();
-    protected ArrayList<Texture> texArray = Lists.newArrayList();
+    protected ArrayList<Spatial> renderList = new ArrayList<>();
+    protected ArrayList<Texture> texArray = new ArrayList<>();
     protected Node skyBox;
 
     protected CullState cullBackFace;

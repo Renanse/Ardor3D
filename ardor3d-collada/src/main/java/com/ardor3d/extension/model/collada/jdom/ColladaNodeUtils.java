@@ -33,7 +33,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.Lists;
 
 /**
  * Methods for parsing Collada data related to scenes and node hierarchy.
@@ -95,7 +94,7 @@ public class ColladaNodeUtils {
 
             // build a list of joints - one list per skeleton - and build a skeleton for each joint list.
             for (final JointNode jointChildNode : _dataCache.getRootJointNode().getChildren()) {
-                final List<Joint> jointList = Lists.newArrayList();
+                final List<Joint> jointList = new ArrayList<>();
                 buildJointLists(jointChildNode, jointList);
                 final Joint[] joints = jointList.toArray(new Joint[jointList.size()]);
                 final Skeleton skeleton = new Skeleton(joints[0].getName() + "_skeleton", joints);

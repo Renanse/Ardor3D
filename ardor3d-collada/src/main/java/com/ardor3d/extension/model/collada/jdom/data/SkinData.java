@@ -22,7 +22,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
 
 /**
  * Data class used to hold references to useful objects created during parsing of a single Collada <skin> tag.
@@ -32,7 +31,7 @@ public class SkinData implements Savable {
 
     private SkeletonPose _pose;
     private Node _skinBaseNode;
-    private final List<SkinnedMesh> _skins = Lists.newArrayList();
+    private final List<SkinnedMesh> _skins = new ArrayList<>();
     private final String _name;
 
     /**

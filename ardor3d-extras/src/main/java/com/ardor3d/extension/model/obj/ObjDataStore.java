@@ -10,16 +10,16 @@
 
 package com.ardor3d.extension.model.obj;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.math.Vector3;
-import com.google.common.collect.Lists;
 
 public class ObjDataStore {
-    private final List<Vector3> _vertices = Lists.newArrayList();
-    private final List<Vector3> _normals = Lists.newArrayList();
-    private final List<Vector3> _generatedNormals = Lists.newArrayList();
-    private final List<Vector3> _uvs = Lists.newArrayList();
+    private final List<Vector3> _vertices = new ArrayList<>();
+    private final List<Vector3> _normals = new ArrayList<>();
+    private final List<Vector3> _generatedNormals = new ArrayList<>();
+    private final List<Vector3> _uvs = new ArrayList<>();
 
     public List<Vector3> getVertices() {
         return _vertices;

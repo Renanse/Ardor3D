@@ -30,7 +30,6 @@ import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.common.collect.Sets;
 
 /**
  * Mesh supporting deformation via skeletal animation.
@@ -590,7 +589,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         final short[] joints = new short[vcount * maxCount];
         final float[] weights = new float[vcount * maxCount];
 
-        final TreeSet<JointWeight> weightSort = Sets.newTreeSet();
+        final TreeSet<JointWeight> weightSort = new TreeSet<>();
         // Walk through old data vertex by vertex
         int index;
         for (int i = 0; i < vcount; i++) {

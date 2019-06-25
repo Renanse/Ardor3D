@@ -11,6 +11,8 @@
 package com.ardor3d.extension.terrain.providers.array;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,8 +22,6 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class ArrayTextureSource implements TextureSource {
     private final int tileSize;
@@ -43,7 +43,7 @@ public class ArrayTextureSource implements TextureSource {
 
     @Override
     public TextureConfiguration getConfiguration() throws Exception {
-        final Map<Integer, TextureStoreFormat> textureStoreFormat = Maps.newHashMap();
+        final Map<Integer, TextureStoreFormat> textureStoreFormat = new HashMap<>();
         textureStoreFormat.put(0, TextureStoreFormat.R8);
 
         return new TextureConfiguration(heightMaps.size(), textureStoreFormat, tileSize, 1f, true, false);
@@ -52,7 +52,7 @@ public class ArrayTextureSource implements TextureSource {
     @Override
     public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
             final int numTilesY) throws Exception {
-        final Set<Tile> validTiles = Sets.newHashSet();
+        final Set<Tile> validTiles = new HashSet<>();
 
         final int heightMapSize = heightMapSizes.get(clipmapLevel);
         for (int y = 0; y < numTilesY; y++) {

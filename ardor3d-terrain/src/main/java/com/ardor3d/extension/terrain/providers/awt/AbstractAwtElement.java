@@ -14,6 +14,7 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.math.Transform;
@@ -21,14 +22,13 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector4;
-import com.google.common.collect.Maps;
 
 public abstract class AbstractAwtElement {
 
     protected final Transform _transform = new Transform();
     protected Composite _compositeOverride;
     protected ElementUpdateListener _listener;
-    protected Map<RenderingHints.Key, Object> hints = Maps.newHashMap();
+    protected Map<RenderingHints.Key, Object> hints = new HashMap<>();
 
     protected Vector4 _awtBounds = new Vector4();
 

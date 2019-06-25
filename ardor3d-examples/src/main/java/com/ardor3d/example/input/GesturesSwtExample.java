@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.input;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -69,7 +70,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
-import com.google.common.collect.Lists;
 
 public class GesturesSwtExample implements Updater {
 
@@ -79,7 +79,7 @@ public class GesturesSwtExample implements Updater {
     private final BasicScene scene;
     private final LogicalLayer logicalLayer;
 
-    private final List<BallSprite> balls = Lists.newArrayList();
+    private final List<BallSprite> balls = new ArrayList<>();
 
     private boolean inited;
 

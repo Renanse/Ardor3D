@@ -20,12 +20,11 @@ import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
 
 @SavableFactory(factoryMethod = "initSavable")
 public class AnimationItem implements Savable {
     private final String _name;
-    private final List<AnimationItem> _children = Lists.newArrayList();
+    private final List<AnimationItem> _children = new ArrayList<>();
     private AnimationClip _animationClip;
 
     public AnimationItem(final String name) {

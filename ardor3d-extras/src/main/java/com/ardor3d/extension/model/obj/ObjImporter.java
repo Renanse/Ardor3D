@@ -12,6 +12,7 @@ package com.ardor3d.extension.model.obj;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -24,7 +25,6 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.common.collect.Lists;
 
 /**
  * Wavefront OBJ importer. See <a href="http://local.wasp.uwa.edu.au/~pbourke/dataformats/obj/">the format spec</a>
@@ -305,7 +305,7 @@ public class ObjImporter {
                     }
 
                     // Each token corresponds to 1 vertex entry
-                    final List<ObjIndexSet> indices = Lists.newArrayList();
+                    final List<ObjIndexSet> indices = new ArrayList<>();
                     for (int i = 1; i < tokens.length; i++) {
                         indices.add(new ObjIndexSet(tokens[i], store.getDataStore(), currentSmoothGroup));
                     }
@@ -320,7 +320,7 @@ public class ObjImporter {
                     }
 
                     // Each token corresponds to 1 vertex entry and possibly one texture entry
-                    final List<ObjIndexSet> indices = Lists.newArrayList();
+                    final List<ObjIndexSet> indices = new ArrayList<>();
                     for (int i = 1; i < tokens.length; i++) {
                         indices.add(new ObjIndexSet(tokens[i], store.getDataStore(), currentSmoothGroup));
                     }
@@ -335,7 +335,7 @@ public class ObjImporter {
                     }
 
                     // Each token corresponds to 1 vertex entry and possibly one texture entry and normal entry.
-                    final List<ObjIndexSet> indices = Lists.newArrayList();
+                    final List<ObjIndexSet> indices = new ArrayList<>();
                     for (int i = 1; i < tokens.length; i++) {
                         indices.add(new ObjIndexSet(tokens[i], store.getDataStore(), currentSmoothGroup));
                     }

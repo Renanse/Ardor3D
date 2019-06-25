@@ -11,11 +11,11 @@
 package com.ardor3d.input.logical;
 
 import java.util.EnumMap;
+import java.util.function.Predicate;
 
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.util.Timer;
-import com.google.common.base.Predicate;
 
 /**
  * Utility methods for getting standard TriggerConditions. To reduce object creation, it may be a good idea to use
@@ -28,18 +28,12 @@ public final class TriggerConditions {
     private static final MouseButtonCondition MIDDLE_DOWN_CONDITION = makeCondition(MouseButton.MIDDLE,
             ButtonState.DOWN);
 
-    private static final Predicate<TwoInputStates> ALWAYS_TRUE = new Predicate<TwoInputStates>() {
-        @Override
-        public boolean apply(final TwoInputStates arg0) {
-            return true;
-        }
+    private static final Predicate<TwoInputStates> ALWAYS_TRUE = (final TwoInputStates arg0) -> {
+        return true;
     };
 
-    private static final Predicate<TwoInputStates> ALWAYS_FALSE = new Predicate<TwoInputStates>() {
-        @Override
-        public boolean apply(final TwoInputStates arg0) {
-            return false;
-        }
+    private static final Predicate<TwoInputStates> ALWAYS_FALSE = (final TwoInputStates arg0) -> {
+        return false;
     };
 
     private static MouseButtonCondition makeCondition(final MouseButton button, final ButtonState state) {
@@ -108,7 +102,7 @@ public final class TriggerConditions {
             private double lastPass = 0;
 
             @Override
-            public boolean apply(final TwoInputStates arg0) {
+            public boolean test(final TwoInputStates arg0) {
                 final double now = timer.getTimeInSeconds();
                 if (now - lastPass >= throttleTime) {
                     lastPass = now;

@@ -12,12 +12,12 @@ package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.google.common.collect.Lists;
 
 /**
  * An animation source channel consisting of keyword samples indicating when a specific trigger condition is met. Each
@@ -94,8 +94,8 @@ public class TriggerChannel extends AbstractAnimationChannel {
         if (startTime > endTime) {
             throw new IllegalArgumentException("startTime > endTime");
         }
-        final List<Float> times = Lists.newArrayList();
-        final List<String> keys = Lists.newArrayList();
+        final List<Float> times = new ArrayList<>();
+        final List<String> keys = new ArrayList<>();
 
         final TriggerData tData = new TriggerData();
 

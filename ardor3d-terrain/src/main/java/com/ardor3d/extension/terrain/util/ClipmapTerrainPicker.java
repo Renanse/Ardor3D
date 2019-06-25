@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.extension.terrain.client.ClipmapLevel;
@@ -22,7 +23,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.google.common.collect.Lists;
 
 /**
  * A picking assistant to be used with ClipmapLevel and an AbstractBresenhamTracer.
@@ -57,7 +57,7 @@ public class ClipmapTerrainPicker {
             final Class<? extends AbstractBresenhamTracer> tracerClass, final int maxChecks,
             final Vector3 initialSpacing) throws InstantiationException, IllegalAccessException {
         _clipmapLevels = levels;
-        _tracers = Lists.newArrayList();
+        _tracers = new ArrayList<>();
         for (int i = 0, max = levels.size(); i < max; i++) {
             final AbstractBresenhamTracer tracer = tracerClass.newInstance();
             final int space = 1 << i;
@@ -117,8 +117,8 @@ public class ClipmapTerrainPicker {
             final double x = _workEyePos.getX();
             final double z = _workEyePos.getZ();
             final double intOnX = x - Math.floor(x), intOnZ = z - Math.floor(z);
-            final double height = MathUtils
-                    .lerp(intOnZ, MathUtils.lerp(intOnX, h1, h2), MathUtils.lerp(intOnX, h3, h4));
+            final double height = MathUtils.lerp(intOnZ, MathUtils.lerp(intOnX, h1, h2),
+                    MathUtils.lerp(intOnX, h3, h4));
 
             intersection.set(x, height, z);
             terrainWorldTransform.applyForward(intersection, intersection);
@@ -230,8 +230,8 @@ public class ClipmapTerrainPicker {
         }
 
         if (!_workRay.intersectsTriangle(_gridTriA.getA(), _gridTriA.getB(), _gridTriA.getC(), store)) {
-            final boolean intersects = _workRay.intersectsTriangle(_gridTriB.getA(), _gridTriB.getB(),
-                    _gridTriB.getC(), store);
+            final boolean intersects = _workRay.intersectsTriangle(_gridTriB.getA(), _gridTriB.getB(), _gridTriB.getC(),
+                    store);
             if (intersects && normalStore != null) {
                 final Vector3 edge1 = Vector3.fetchTempInstance().set(_gridTriB.getB()).subtractLocal(_gridTriB.getA());
                 final Vector3 edge2 = Vector3.fetchTempInstance().set(_gridTriB.getC()).subtractLocal(_gridTriB.getA());
@@ -272,7 +272,8 @@ public class ClipmapTerrainPicker {
 
         final float h1 = getWeightedHeight(tileStore[0], tileStore[1], tileStore[2], tileStore[3], scaledClipSideSize);
         final float h2 = getWeightedHeight(tileStore[4], tileStore[5], tileStore[6], tileStore[7], scaledClipSideSize);
-        final float h3 = getWeightedHeight(tileStore[8], tileStore[9], tileStore[10], tileStore[11], scaledClipSideSize);
+        final float h3 = getWeightedHeight(tileStore[8], tileStore[9], tileStore[10], tileStore[11],
+                scaledClipSideSize);
         final float h4 = getWeightedHeight(tileStore[12], tileStore[13], tileStore[14], tileStore[15],
                 scaledClipSideSize);
 

@@ -55,7 +55,6 @@ import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Maps;
 
 /**
  * Base class for all scenegraph objects.
@@ -94,7 +93,7 @@ public abstract class Spatial implements Savable, Hintable {
             DirtyType.Transform);
 
     /** User supplied properties. */
-    protected Map<String, Object> _properties = Maps.newHashMap();
+    protected Map<String, Object> _properties = new HashMap<>();
 
     /** Keeps track of the current frustum intersection state of this Spatial. */
     protected Camera.FrustumIntersect _frustumIntersects = Camera.FrustumIntersect.Intersects;

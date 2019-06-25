@@ -10,6 +10,7 @@
 
 package com.ardor3d.util.stat;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +20,6 @@ import java.util.Stack;
 import java.util.logging.Logger;
 
 import com.ardor3d.util.Timer;
-import com.google.common.collect.Lists;
 
 /**
  * This class acts as a centralized data store for statistics. As data is added to the collector, a sum total is kept as
@@ -51,7 +51,7 @@ public abstract class StatCollector {
 
     protected static double lastTimeCheckMS = 0;
 
-    protected static List<StatListener> listeners = Lists.newArrayList();
+    protected static List<StatListener> listeners = new ArrayList<>();
 
     protected static double startOffset = 0;
 

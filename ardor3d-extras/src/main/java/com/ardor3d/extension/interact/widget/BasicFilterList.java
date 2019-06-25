@@ -10,15 +10,15 @@
 
 package com.ardor3d.extension.interact.widget;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.UpdateFilter;
-import com.google.common.collect.Lists;
 
 public class BasicFilterList implements IFilterList {
-    final List<UpdateFilter> _filters = Lists.newArrayList();
+    final List<UpdateFilter> _filters = new ArrayList<>();
 
     public Iterator<UpdateFilter> iterator() {
         return _filters.iterator();

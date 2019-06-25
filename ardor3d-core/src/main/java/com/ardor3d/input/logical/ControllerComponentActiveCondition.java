@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,8 +11,7 @@
 package com.ardor3d.input.logical;
 
 import java.util.Map;
-
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 public final class ControllerComponentActiveCondition implements Predicate<TwoInputStates> {
 
@@ -24,7 +23,7 @@ public final class ControllerComponentActiveCondition implements Predicate<TwoIn
         componentNames = components;
     }
 
-    public boolean apply(final TwoInputStates states) {
+    public boolean test(final TwoInputStates states) {
         final Map<String, Float> currentStates = states.getCurrent().getControllerState()
                 .getControllerComponentValues(controllerName);
         final Map<String, Float> previousStates = states.getPrevious().getControllerState()

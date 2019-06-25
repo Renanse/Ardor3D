@@ -10,14 +10,14 @@
 
 package com.ardor3d.extension.terrain.providers.awt;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.ardor3d.math.type.ReadOnlyVector4;
-import com.google.common.collect.Lists;
 
 public class AwtElementProvider implements ElementUpdateListener {
-    private final List<AbstractAwtElement> _elements = Lists.newLinkedList();
-    private final List<ElementUpdateListener> _updateListeners = Lists.newLinkedList();
+    private final List<AbstractAwtElement> _elements = new LinkedList<>();
+    private final List<ElementUpdateListener> _updateListeners = new LinkedList<>();
 
     public List<AbstractAwtElement> getElements() {
         return _elements;

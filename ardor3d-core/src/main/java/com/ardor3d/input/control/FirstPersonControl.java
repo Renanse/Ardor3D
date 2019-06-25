@@ -3,12 +3,14 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.input.control;
+
+import java.util.function.Predicate;
 
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.Key;
@@ -24,8 +26,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 public class FirstPersonControl {
 
@@ -125,8 +125,8 @@ public class FirstPersonControl {
             rotX -= 1;
         }
         if (rotX != 0 || rotY != 0) {
-            rotate(camera, rotX * (_keyRotateSpeed / _mouseRotateSpeed) * tpf, rotY
-                    * (_keyRotateSpeed / _mouseRotateSpeed) * tpf);
+            rotate(camera, rotX * (_keyRotateSpeed / _mouseRotateSpeed) * tpf,
+                    rotY * (_keyRotateSpeed / _mouseRotateSpeed) * tpf);
         }
     }
 
@@ -204,7 +204,7 @@ public class FirstPersonControl {
 
     /**
      * Deregister the triggers of the given FirstPersonControl from the given LogicalLayer.
-     * 
+     *
      * @param layer
      * @param control
      */
@@ -219,9 +219,9 @@ public class FirstPersonControl {
 
     public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
         // Mouse look
-        final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(),
-                Predicates.or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
-        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
+        final Predicate<TwoInputStates> someMouseDown = TriggerConditions.leftButtonDown()
+                .or(TriggerConditions.rightButtonDown()).or(TriggerConditions.middleButtonDown());
+        final Predicate<TwoInputStates> dragged = TriggerConditions.mouseMoved().and(someMouseDown);
         final TriggerAction dragAction = new TriggerAction() {
 
             // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
@@ -249,7 +249,7 @@ public class FirstPersonControl {
         final Predicate<TwoInputStates> keysHeld = new Predicate<TwoInputStates>() {
             Key[] keys = new Key[] { Key.W, Key.A, Key.S, Key.D, Key.LEFT, Key.RIGHT, Key.UP, Key.DOWN };
 
-            public boolean apply(final TwoInputStates states) {
+            public boolean test(final TwoInputStates states) {
                 for (final Key k : keys) {
                     if (states.getCurrent() != null && states.getCurrent().getKeyboardState().isDown(k)) {
                         return true;
@@ -261,8 +261,8 @@ public class FirstPersonControl {
 
         final TriggerAction moveAction = new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                FirstPersonControl.this.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent()
-                        .getKeyboardState(), tpf);
+                FirstPersonControl.this.move(source.getCanvasRenderer().getCamera(),
+                        inputStates.getCurrent().getKeyboardState(), tpf);
             }
         };
         _keyTrigger = new InputTrigger(keysHeld, moveAction);
@@ -310,7 +310,7 @@ public class FirstPersonControl {
     }
 
     /**
-     * 
+     *
      * @param maxVerticalAngle
      *            the new maximum angle, in radians, to clamp our vertical angle to. Defaults to +60 degrees (in
      *            radians). Must be less than the max angle. Has no effect unless clampVerticalAngle is true.

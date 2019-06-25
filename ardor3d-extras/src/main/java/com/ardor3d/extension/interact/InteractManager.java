@@ -28,15 +28,13 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 
 public class InteractManager {
 
     /**
      * List of widgets currently managed by this manager.
      */
-    protected final List<AbstractInteractWidget> _widgets = Lists.newArrayList();
+    protected final List<AbstractInteractWidget> _widgets = new ArrayList<>();
 
     /**
      * The logical layer used by this manager to receive input events prior to forwarding them to the scene.
@@ -67,7 +65,7 @@ public class InteractManager {
     /**
      * List of filters to modify state prior to applying to a Spatial target.
      */
-    protected List<UpdateFilter> _filters = Lists.newArrayList();
+    protected List<UpdateFilter> _filters = new ArrayList<>();
 
     /** ArrayList of update logic for this manager. */
     protected List<UpdateLogic> _updateLogic;
@@ -133,11 +131,9 @@ public class InteractManager {
      * Set up our logical layer with a trigger that hands input to the manager and saves whether it was "consumed".
      */
     private void setupLogicalLayer() {
-        _logicalLayer.registerTrigger(new InputTrigger(new Predicate<TwoInputStates>() {
-            public boolean apply(final TwoInputStates arg0) {
-                // always trigger this.
-                return true;
-            }
+        _logicalLayer.registerTrigger(new InputTrigger((final TwoInputStates arg0) -> {
+            // always trigger this.
+            return true;
         }, new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (_spatialTarget != null) {

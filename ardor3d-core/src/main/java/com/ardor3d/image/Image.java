@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,13 +20,12 @@ import java.util.List;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
 
 /**
  * <code>Image</code> defines a data format for a graphical image. The image is defined by a format, a height and width,
  * and the image data. The width and height must be greater than 0. The data is contained in a byte buffer, and should
  * be packed before creation of the image object.
- * 
+ *
  */
 public class Image implements Serializable, Savable {
 
@@ -49,7 +48,7 @@ public class Image implements Serializable, Savable {
     /**
      * Constructor instantiates a new <code>Image</code> object. The attributes of the image are defined during
      * construction.
-     * 
+     *
      * @param format
      *            the data format of the image. Must not be null.
      * @param type
@@ -82,7 +81,7 @@ public class Image implements Serializable, Savable {
     /**
      * Constructor instantiates a new <code>Image</code> object. The attributes of the image are defined during
      * construction.
-     * 
+     *
      * @param format
      *            the data format of the image. Must not be null.
      * @param type
@@ -98,13 +97,13 @@ public class Image implements Serializable, Savable {
      */
     public Image(final ImageDataFormat format, final PixelDataType type, final int width, final int height,
             final ByteBuffer data, final int[] mipMapSizes) {
-        this(format, type, width, height, Lists.newArrayList(data), mipMapSizes);
+        this(format, type, width, height, Arrays.asList(data), mipMapSizes);
     }
 
     /**
      * <code>setData</code> sets the data that makes up the image. This data is packed into an array of
      * <code>ByteBuffer</code> objects.
-     * 
+     *
      * @param data
      *            the data that contains the image information. Must not be null.
      */
@@ -118,17 +117,17 @@ public class Image implements Serializable, Savable {
     /**
      * <code>setData</code> sets the data that makes up the image. This data is packed into a single
      * <code>ByteBuffer</code>.
-     * 
+     *
      * @param data
      *            the data that contains the image information.
      */
     public void setData(final ByteBuffer data) {
-        _data = Lists.newArrayList(data);
+        _data = Arrays.asList(data);
     }
 
     /**
      * Adds the given buffer onto the current list of image data
-     * 
+     *
      * @param data
      *            the data that contains the image information.
      */
@@ -153,7 +152,7 @@ public class Image implements Serializable, Savable {
     /**
      * Sets the mipmap data sizes stored in this image's data buffer. Mipmaps are stored sequentially, and the first
      * mipmap is the main image data. To specify no mipmaps, pass null.
-     * 
+     *
      * @param mipMapSizes
      *            the mipmap sizes array, or null to indicate no mip maps.
      */
@@ -168,7 +167,7 @@ public class Image implements Serializable, Savable {
     /**
      * <code>setHeight</code> sets the height value of the image. It is typically a good idea to try to keep this as a
      * multiple of 2.
-     * 
+     *
      * @param height
      *            the height of the image.
      */
@@ -179,7 +178,7 @@ public class Image implements Serializable, Savable {
     /**
      * <code>setDepth</code> sets the depth value of the image. It is typically a good idea to try to keep this as a
      * multiple of 2. This is used for 3d images.
-     * 
+     *
      * @param depth
      *            the depth of the image.
      */
@@ -190,7 +189,7 @@ public class Image implements Serializable, Savable {
     /**
      * <code>setWidth</code> sets the width value of the image. It is typically a good idea to try to keep this as a
      * multiple of 2.
-     * 
+     *
      * @param width
      *            the width of the image.
      */
@@ -267,7 +266,7 @@ public class Image implements Serializable, Savable {
 
     /**
      * <code>getData</code> returns the data for this image. If the data is undefined, null will be returned.
-     * 
+     *
      * @return the data for this image.
      */
     public List<ByteBuffer> getData() {
@@ -288,7 +287,7 @@ public class Image implements Serializable, Savable {
     /**
      * <code>getData</code> returns the data for this image at a given index. If the data is undefined, null will be
      * returned.
-     * 
+     *
      * @return the data for this image.
      */
     public ByteBuffer getData(final int index) {
@@ -301,7 +300,7 @@ public class Image implements Serializable, Savable {
 
     /**
      * Returns whether the image data contains mipmaps.
-     * 
+     *
      * @return true if the image data contains mipmaps, false if not.
      */
     public boolean hasMipmaps() {
@@ -310,7 +309,7 @@ public class Image implements Serializable, Savable {
 
     /**
      * Returns the mipmap sizes for this image.
-     * 
+     *
      * @return the mipmap sizes for this image.
      */
     public int[] getMipMapByteSizes() {

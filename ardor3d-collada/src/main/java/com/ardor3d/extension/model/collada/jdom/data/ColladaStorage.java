@@ -12,6 +12,7 @@ package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -34,10 +34,10 @@ import com.google.common.collect.Multimap;
 public class ColladaStorage implements Savable {
 
     private Node _scene;
-    private final List<SkinData> _skins = Lists.newArrayList();
+    private final List<SkinData> _skins = new ArrayList<>();
     private AssetData _assetData;
 
-    private final List<AbstractAnimationChannel> _transformChannels = Lists.newArrayList();
+    private final List<AbstractAnimationChannel> _transformChannels = new ArrayList<>();
     private AnimationItem _animationItemRoot;
 
     // List of parsed color buffers, useful if collada includes multiple color channels per meshdata object

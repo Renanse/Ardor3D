@@ -11,6 +11,9 @@
 package com.ardor3d.example.pipeline;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -51,8 +54,6 @@ import com.ardor3d.util.geom.MeshCombiner;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
@@ -66,9 +67,9 @@ public class AnimationDemoExample extends ExampleBase {
 
     static AnimationDemoExample instance;
 
-    private final List<AnimationManager> managers = Lists.newArrayList();
-    private final List<AnimationInfo> animInfo = Lists.newArrayList();
-    private final Map<SkeletonPose, SkinnedMesh> poseToMesh = Maps.newIdentityHashMap();
+    private final List<AnimationManager> managers = new ArrayList<>();
+    private final List<AnimationInfo> animInfo = new ArrayList<>();
+    private final Map<SkeletonPose, SkinnedMesh> poseToMesh = new IdentityHashMap<>();
 
     private RenderMaterial matGPU;
 
@@ -181,7 +182,7 @@ public class AnimationDemoExample extends ExampleBase {
         return skeleton;
     }
 
-    private final Map<String, AnimationClip> animationStore = Maps.newHashMap();
+    private final Map<String, AnimationClip> animationStore = new HashMap<>();
 
     private AnimationManager createAnimationManager(final SkeletonPose pose) {
         // Make our manager

@@ -32,8 +32,6 @@ import com.ardor3d.input.MouseState;
 import com.ardor3d.input.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.EnumMultiset;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 
@@ -42,7 +40,7 @@ import com.google.common.collect.PeekingIterator;
  */
 public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelListener, MouseMotionListener {
     @GuardedBy("this")
-    protected final LinkedList<MouseState> _upcomingEvents = Lists.newLinkedList();
+    protected final LinkedList<MouseState> _upcomingEvents = new LinkedList<>();
 
     @GuardedBy("this")
     protected AwtMouseIterator _currentIterator = null;
@@ -58,7 +56,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     protected final MouseManager _manager;
 
     protected final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
-    protected final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
+    protected final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
     protected final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
     protected int _ignoreX = Integer.MAX_VALUE;

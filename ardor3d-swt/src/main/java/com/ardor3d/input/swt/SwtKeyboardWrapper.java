@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -67,6 +67,8 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
         final char keyChar = event.character;
 
+        // TODO: use keyChar in new character event
+
         if (_lastKeyPressed != null) {
             // if this is a different key to the last key that was pressed, then
             // add an 'up' even for the previous one - SWT doesn't send an 'up' event for the
@@ -74,21 +76,21 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
             // 1. key 1 down
             // 2. key 2 down
             // 3. key 1 up
-            _upcomingEvents.add(new KeyEvent(_lastKeyPressed, KeyState.UP, keyChar));
+            _upcomingEvents.add(new KeyEvent(_lastKeyPressed, KeyState.UP));
         }
 
         _lastKeyPressed = key;
-        _upcomingEvents.add(new KeyEvent(key, KeyState.DOWN, keyChar));
+        _upcomingEvents.add(new KeyEvent(key, KeyState.DOWN));
     }
 
     public synchronized void keyReleased(final org.eclipse.swt.events.KeyEvent event) {
-        _upcomingEvents.add(new KeyEvent(fromKeyEventToKey(event), KeyState.UP, event.character));
+        _upcomingEvents.add(new KeyEvent(fromKeyEventToKey(event), KeyState.UP));
         _lastKeyPressed = null;
     }
 
     /**
      * Convert from SWT key event to Ardor3D Key. Override to provide additional or custom behavior.
-     * 
+     *
      * @param e
      *            the SWT KeyEvent received by the input system.
      * @return an Ardor3D Key, to be forwarded to the Predicate/Trigger system.

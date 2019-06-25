@@ -67,7 +67,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.google.common.base.Predicates;
 
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
@@ -296,15 +295,15 @@ public class LwjglSwtExample {
                     }
                 }));
 
-        logicalLayer.registerTrigger(
-                new InputTrigger(Predicates.or(new MouseButtonLongPressedCondition(MouseButton.LEFT, 500, 5),
-                        new GestureEventCondition(LongPressGestureEvent.class)), new TriggerAction() {
-                            @Override
-                            public void perform(final Canvas source, final TwoInputStates inputStates,
-                                    final double tpf) {
-                                game.toggleRotation();
-                            }
-                        }));
+        logicalLayer.registerTrigger(new InputTrigger( //
+                new MouseButtonLongPressedCondition(MouseButton.LEFT, 500, 5)
+                        .or(new GestureEventCondition(LongPressGestureEvent.class)),
+                new TriggerAction() {
+                    @Override
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                        game.toggleRotation();
+                    }
+                }));
 
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
         try {

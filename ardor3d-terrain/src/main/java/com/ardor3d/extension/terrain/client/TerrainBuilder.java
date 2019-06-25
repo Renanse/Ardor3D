@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import com.ardor3d.extension.terrain.util.TerrainGridCachePanel;
 import com.ardor3d.extension.terrain.util.TextureGridCachePanel;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class TerrainBuilder {
@@ -48,16 +48,16 @@ public class TerrainBuilder {
 
     private boolean showDebugPanels = false;
 
-    private final List<TextureSource> extraTextureSources = Lists.newArrayList();
+    private final List<TextureSource> extraTextureSources = new ArrayList<>();
     private final ExecutorService tileThreadService;
 
     public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera) {
         this(terrainDataProvider, camera, //
                 PriorityExecutors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                         new ThreadFactoryBuilder() //
-                .setThreadFactory(Executors.defaultThreadFactory())//
-                .setDaemon(true).setNameFormat("TileCacheThread-%s")//
-                .build()));
+                                .setThreadFactory(Executors.defaultThreadFactory())//
+                                .setDaemon(true).setNameFormat("TileCacheThread-%s")//
+                                .build()));
     }
 
     public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera,
@@ -122,7 +122,7 @@ public class TerrainBuilder {
 
         logger.info("server clipmapLevels: " + clipmapLevels);
 
-        final List<TerrainCache> cacheList = Lists.newArrayList();
+        final List<TerrainCache> cacheList = new ArrayList<>();
         TerrainCache parentCache = null;
 
         final int baseLevel = Math.max(clipmapLevels - clipLevelCount, 0);
@@ -172,7 +172,7 @@ public class TerrainBuilder {
 
         logger.info("server clipmapLevels: " + clipmapLevels);
 
-        final List<TextureCache> cacheList = Lists.newArrayList();
+        final List<TextureCache> cacheList = new ArrayList<>();
         TextureCache parentCache = null;
         final int baseLevel = Math.max(clipmapLevels - textureClipLevelCount, 0);
         int meshLevel = textureClipLevelCount - 1;

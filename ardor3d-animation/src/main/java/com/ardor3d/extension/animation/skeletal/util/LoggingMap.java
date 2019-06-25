@@ -11,11 +11,10 @@
 package com.ardor3d.extension.animation.skeletal.util;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import com.google.common.collect.Maps;
 
 /**
  * This class essentially just wraps a KEY->VALUE HashMap, providing extra logging when a VALUE is not found, or
@@ -29,7 +28,7 @@ public class LoggingMap<KEY, VALUE> {
     private static final Logger logger = Logger.getLogger(LoggingMap.class.getName());
 
     /** Our map of values. */
-    protected final Map<KEY, VALUE> _wrappedMap = Maps.newHashMap();
+    protected final Map<KEY, VALUE> _wrappedMap = new HashMap<>();
 
     /** If not null, this callback is asked to load the missing value using the key. */
     private MissingCallback<KEY, VALUE> _missCallback = null;

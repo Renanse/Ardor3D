@@ -34,7 +34,6 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
-import com.google.common.collect.Maps;
 
 /**
  * Provides some common base level method implementations for Renderers.
@@ -49,7 +48,7 @@ public abstract class AbstractRenderer implements Renderer {
 
     protected int _stencilClearValue;
 
-    protected Map<RenderMatrixType, FloatBuffer> _matrixStore = Maps.newEnumMap(RenderMatrixType.class);
+    protected Map<RenderMatrixType, FloatBuffer> _matrixStore = new EnumMap<>(RenderMatrixType.class);
 
     /** List of default rendering states for this specific renderer type */
     protected final EnumMap<RenderState.StateType, RenderState> defaultStateList = new EnumMap<RenderState.StateType, RenderState>(

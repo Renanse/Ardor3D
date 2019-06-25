@@ -10,13 +10,8 @@
 
 package com.ardor3d.input;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -69,13 +64,13 @@ public class TestPhysicalLayer {
 
         mocks = new Object[] { keyboardWrapper, mouseWrapper, controllerWrapper, gestureWrapper, focusWrapper };
 
-        Adown.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
+        Adown.add(new KeyEvent(Key.A, KeyState.DOWN));
 
-        AdownBdown.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
-        AdownBdown.add(new KeyEvent(Key.B, KeyState.DOWN, 'b'));
+        AdownBdown.add(new KeyEvent(Key.A, KeyState.DOWN));
+        AdownBdown.add(new KeyEvent(Key.B, KeyState.DOWN));
 
-        AdownAup.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
-        AdownAup.add(new KeyEvent(Key.A, KeyState.UP, 'a'));
+        AdownAup.add(new KeyEvent(Key.A, KeyState.DOWN));
+        AdownAup.add(new KeyEvent(Key.A, KeyState.UP));
 
         buttonDown.add(new MouseState(0, 0, 0, 0, 0,
                 MouseButton.makeMap(ButtonState.DOWN, ButtonState.UP, ButtonState.UP), null));
@@ -359,8 +354,8 @@ public class TestPhysicalLayer {
 
     private static class NeverEndingKeyIterator extends AbstractIterator<KeyEvent>
             implements PeekingIterator<KeyEvent> {
-        final KeyEvent aUp = new KeyEvent(Key.A, KeyState.UP, 'a');
-        final KeyEvent aDown = new KeyEvent(Key.A, KeyState.DOWN, 'a');
+        final KeyEvent aUp = new KeyEvent(Key.A, KeyState.UP);
+        final KeyEvent aDown = new KeyEvent(Key.A, KeyState.DOWN);
 
         int count = 0;
 

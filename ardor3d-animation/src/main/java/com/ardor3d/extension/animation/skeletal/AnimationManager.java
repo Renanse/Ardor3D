@@ -3,13 +3,14 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,6 @@ import com.ardor3d.extension.animation.skeletal.util.LoggingMap;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
-import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -61,7 +61,7 @@ public class AnimationManager {
     protected AnimationApplier _applier;
 
     /** Our animation layers. */
-    protected final List<AnimationLayer> _layers = Lists.newArrayList();
+    protected final List<AnimationLayer> _layers = new ArrayList<>();
 
     /**
      * A map of key->Double values, allowing control over elements under this manager without needing precise knowledge
@@ -97,15 +97,15 @@ public class AnimationManager {
     /**
      * Listeners for changes to this manager's AnimationUpdateState.
      */
-    protected final List<AnimationUpdateStateListener> _updateStateListeners = Lists.newArrayList();
+    protected final List<AnimationUpdateStateListener> _updateStateListeners = new ArrayList<>();
 
     /**
      * Construct a new AnimationManager.
-     * 
+     *
      * @param globalTimer
-     *            the timer to use for global time keeping.
+     *                        the timer to use for global time keeping.
      * @param pose
-     *            a pose to update. Optional if we won't be animating a {@link SkinnedMesh}.
+     *                        a pose to update. Optional if we won't be animating a {@link SkinnedMesh}.
      */
     public AnimationManager(final ReadOnlyTimer globalTimer, final SkeletonPose pose) {
         this(globalTimer, pose, null);
@@ -113,13 +113,13 @@ public class AnimationManager {
 
     /**
      * Construct a new AnimationManager.
-     * 
+     *
      * @param globalTimer
-     *            the timer to use for global time keeping.
+     *                        the timer to use for global time keeping.
      * @param pose
-     *            a pose to update. Optional if we won't be animating a {@link SkinnedMesh}.
+     *                        a pose to update. Optional if we won't be animating a {@link SkinnedMesh}.
      * @param sceneRoot
-     *            a root we will use to search for spatials when doing transform animations.
+     *                        a root we will use to search for spatials when doing transform animations.
      */
     public AnimationManager(final ReadOnlyTimer globalTimer, final SkeletonPose pose, final Spatial sceneRoot) {
         _globalTimer = globalTimer;
@@ -130,10 +130,9 @@ public class AnimationManager {
         layer.setManager(this);
         _layers.add(layer);
 
+        _applyToPoses = new ArrayList<>();
         if (pose != null) {
-            _applyToPoses = Lists.newArrayList(pose);
-        } else {
-            _applyToPoses = Lists.newArrayList();
+            _applyToPoses.add(pose);
         }
 
         _valuesStore.setLogOnReplace(false);
@@ -156,14 +155,14 @@ public class AnimationManager {
 
     /**
      * @param timer
-     *            the timer to be used by this manager for global time keeping.
+     *                  the timer to be used by this manager for global time keeping.
      */
     public void setGlobalTimer(final Timer timer) {
         _globalTimer = timer;
     }
 
     /**
-     * 
+     *
      * @return True if clips will reset if the currentUpdateState is Stop.
      */
     public boolean isResetClipsOnStop() {
@@ -172,9 +171,9 @@ public class AnimationManager {
 
     /**
      * @param resetClipsOnStop
-     *            True if clips are to be reset when currentUpdateState is Stop, false otherwise.
-     * 
-     * 
+     *                             True if clips are to be reset when currentUpdateState is Stop, false otherwise.
+     *
+     *
      */
     public void setResetClipsOnStop(final boolean resetClipsOnStop) {
         _resetClipsOnStop = resetClipsOnStop;
@@ -206,7 +205,7 @@ public class AnimationManager {
 
     /**
      * @param newAnimationState
-     *            the new animation state in the animation Manager.
+     *                              the new animation state in the animation Manager.
      */
     public void setAnimationUpdateState(final AnimationUpdateState newAnimationState) {
         if (newAnimationState == _currentAnimationState) {
@@ -259,9 +258,9 @@ public class AnimationManager {
 
     /**
      * Notify any listeners of the state change
-     * 
+     *
      * @param oldState
-     *            previous state
+     *                     previous state
      */
     protected void fireAnimationUpdateStateChange(final AnimationUpdateState oldState) {
         for (final AnimationUpdateStateListener listener : _updateStateListeners) {
@@ -271,9 +270,9 @@ public class AnimationManager {
 
     /**
      * Add an AnimationUpdateStateListener to this manager.
-     * 
+     *
      * @param listener
-     *            the listener to add.
+     *                     the listener to add.
      */
     public void addAnimationUpdateStateListener(final AnimationUpdateStateListener listener) {
         _updateStateListeners.add(listener);
@@ -281,9 +280,9 @@ public class AnimationManager {
 
     /**
      * Remove an AnimationUpdateStateListener from this manager.
-     * 
+     *
      * @param listener
-     *            the listener to remove.
+     *                     the listener to remove.
      * @return true if the listener was found
      */
     public boolean removeAnimationUpdateStateListener(final AnimationUpdateStateListener listener) {
@@ -306,7 +305,7 @@ public class AnimationManager {
 
     /**
      * @param pose
-     *            a pose to add to be updated by this manager.
+     *                 a pose to add to be updated by this manager.
      */
     public void addPose(final SkeletonPose pose) {
         _applyToPoses.add(pose);
@@ -314,7 +313,7 @@ public class AnimationManager {
 
     /**
      * @param pose
-     *            the pose to remove from this manager.
+     *                 the pose to remove from this manager.
      * @return true if the pose was found to be removed.
      */
     public boolean removePose(final SkeletonPose pose) {
@@ -323,7 +322,7 @@ public class AnimationManager {
 
     /**
      * @param pose
-     *            a pose to look for
+     *                 a pose to look for
      * @return true if the pose was found in this manager.
      */
     public boolean containsPose(final SkeletonPose pose) {
@@ -339,7 +338,7 @@ public class AnimationManager {
 
     /**
      * @param index
-     *            the index to pull the pose from.
+     *                  the index to pull the pose from.
      * @return pose at the given index
      */
     public SkeletonPose getSkeletonPose(final int index) {
@@ -355,7 +354,7 @@ public class AnimationManager {
 
     /**
      * @param applier
-     *            a logic object to be responsible for taking animation data and applying it to skeleton poses.
+     *                    a logic object to be responsible for taking animation data and applying it to skeleton poses.
      */
     public void setApplier(final AnimationApplier applier) {
         _applier = applier;
@@ -427,9 +426,9 @@ public class AnimationManager {
 
     /**
      * Retrieve and track an instance of an animation clip to be used with this manager.
-     * 
+     *
      * @param clip
-     *            the clip to instance.
+     *                 the clip to instance.
      * @return our new clip instance.
      */
     public AnimationClipInstance getClipInstance(final AnimationClip clip) {
@@ -445,9 +444,9 @@ public class AnimationManager {
 
     /**
      * Retrieve an existing clip instance being tracked by this manager.
-     * 
+     *
      * @param clipName
-     *            the name of the clip to find an existing instance of. Case sensitive.
+     *                     the name of the clip to find an existing instance of. Case sensitive.
      * @return our existing clip instance, or null if we were not tracking a clip of the given name.
      */
     public AnimationClipInstance findClipInstance(final String clipName) {
@@ -462,9 +461,9 @@ public class AnimationManager {
 
     /**
      * Retrieve an existing clip tracked by this manager.
-     * 
+     *
      * @param clipName
-     *            the name of the clip to find. Case sensitive.
+     *                     the name of the clip to find. Case sensitive.
      * @return our existing clip, or null if we were not tracking a clip of the given name.
      */
     public AnimationClip findAnimationClip(final String clipName) {
@@ -479,11 +478,11 @@ public class AnimationManager {
 
     /**
      * Rewind and reactivate the clip instance associated with the given clip.
-     * 
+     *
      * @param clip
-     *            the clip to pull the instance for.
+     *                            the clip to pull the instance for.
      * @param globalStartTime
-     *            the time to set the clip instance's start as.
+     *                            the time to set the clip instance's start as.
      */
     public void resetClipInstance(final AnimationClip clip, final double globalStartTime) {
         final AnimationClipInstance instance = getClipInstance(clip);
@@ -495,7 +494,7 @@ public class AnimationManager {
 
     /**
      * @param index
-     *            the index of the layer to retrieve.
+     *                  the index of the layer to retrieve.
      * @return the animation layer at that index, or null of index is outside the bounds of our list of layers.
      */
     public AnimationLayer getAnimationLayer(final int index) {
@@ -507,7 +506,7 @@ public class AnimationManager {
 
     /**
      * @param layerName
-     *            the name of the layer to find.
+     *                      the name of the layer to find.
      * @return the first animation layer with a matching name, or null of none are found.
      */
     public AnimationLayer findAnimationLayer(final String layerName) {
@@ -521,9 +520,9 @@ public class AnimationManager {
 
     /**
      * Add a new layer to our list of animation layers.
-     * 
+     *
      * @param layer
-     *            the layer to add.
+     *                  the layer to add.
      * @return the index of our added layer in our list of animation layers.
      */
     public int addAnimationLayer(final AnimationLayer layer) {
@@ -534,11 +533,11 @@ public class AnimationManager {
 
     /**
      * Insert a given animation layer into our list of layers.
-     * 
+     *
      * @param layer
-     *            the layer to insert.
+     *                  the layer to insert.
      * @param index
-     *            the index to insert at. Moves any layers at that index over by one before inserting.
+     *                  the index to insert at. Moves any layers at that index over by one before inserting.
      */
     public void insertAnimationLayer(final AnimationLayer layer, final int index) {
         _layers.add(index, layer);
@@ -547,7 +546,7 @@ public class AnimationManager {
 
     /**
      * @param layer
-     *            a layer to remove.
+     *                  a layer to remove.
      * @return true if the layer is found to remove.
      */
     public boolean removeAnimationLayer(final AnimationLayer layer) {
@@ -570,7 +569,7 @@ public class AnimationManager {
 
     /**
      * @param updateRate
-     *            the new throttle rate. Default is 60fps (1.0/60.0). Set to 0 to disable throttling.
+     *                       the new throttle rate. Default is 60fps (1.0/60.0). Set to 0 to disable throttling.
      */
     public void setUpdateRate(final double updateRate) {
         _updateRate = updateRate;

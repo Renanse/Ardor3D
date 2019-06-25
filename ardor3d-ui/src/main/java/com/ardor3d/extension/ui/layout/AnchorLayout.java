@@ -11,6 +11,7 @@
 package com.ardor3d.extension.ui.layout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,7 +21,6 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.Maps;
 
 /**
  * <p>
@@ -51,7 +51,7 @@ import com.google.common.collect.Maps;
 public class AnchorLayout extends UILayout {
 
     /** map used to track anchor relationship during layout. */
-    private final Map<UIComponent, AnchorRecord> _records = Maps.newHashMap();
+    private final Map<UIComponent, AnchorRecord> _records = new HashMap<>();
 
     // Various min/max values set and used during a layout operation.
     private int _maxX = 0;

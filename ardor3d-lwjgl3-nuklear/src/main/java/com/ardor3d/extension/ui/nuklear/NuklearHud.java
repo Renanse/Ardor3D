@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,7 +74,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.Ardor3dException;
-import com.google.common.base.Predicate;
 
 /**
  * Provides a way to connect Nuklear UI content into Ardor3D.
@@ -181,7 +181,7 @@ public class NuklearHud extends Spatial implements Renderable {
 	protected void setupLogicalLayer() {
 		_logicalLayer.registerTrigger(new InputTrigger(new Predicate<TwoInputStates>() {
 			@Override
-			public boolean apply(final TwoInputStates arg0) {
+			public boolean test(final TwoInputStates arg0) {
 				// always trigger this.
 				return true;
 			}

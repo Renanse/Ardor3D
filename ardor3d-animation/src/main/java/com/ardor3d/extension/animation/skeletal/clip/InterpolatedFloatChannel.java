@@ -12,12 +12,12 @@ package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.google.common.collect.Lists;
 
 /**
  * An animation source channel consisting of float value samples. These samples are interpolated between key frames.
@@ -90,8 +90,8 @@ public class InterpolatedFloatChannel extends AbstractAnimationChannel {
         if (startTime > endTime) {
             throw new IllegalArgumentException("startTime > endTime");
         }
-        final List<Float> times = Lists.newArrayList();
-        final List<Float> keys = Lists.newArrayList();
+        final List<Float> times = new ArrayList<>();
+        final List<Float> keys = new ArrayList<>();
 
         final float[] data = new float[1];
 

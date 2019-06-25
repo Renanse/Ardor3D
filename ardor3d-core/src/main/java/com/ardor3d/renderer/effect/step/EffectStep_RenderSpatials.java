@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.effect.step;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -19,13 +20,11 @@ import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class EffectStep_RenderSpatials implements EffectStep {
-    private final EnumMap<StateType, RenderState> _states = Maps.newEnumMap(StateType.class);
+    private final EnumMap<StateType, RenderState> _states = new EnumMap<>(StateType.class);
     private RenderMaterial _enforcedMaterial;
-    private final List<Spatial> _spatials = Lists.newArrayList();
+    private final List<Spatial> _spatials = new ArrayList<>();
     private final Camera _trackedCamera;
 
     public EffectStep_RenderSpatials(final Camera trackedCamera) {

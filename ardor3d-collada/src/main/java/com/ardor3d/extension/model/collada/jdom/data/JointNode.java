@@ -10,15 +10,15 @@
 
 package com.ardor3d.extension.model.collada.jdom.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.scenegraph.Node;
-import com.google.common.collect.Lists;
 
 public class JointNode {
     private JointNode parent;
-    private final List<JointNode> children = Lists.newArrayList();
+    private final List<JointNode> children = new ArrayList<>();
     private final Joint joint;
 
     /** Scene node associated with the Joint. */

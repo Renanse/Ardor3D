@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +44,6 @@ import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.glfw.GLFWKeyboardWrapper;
 import com.ardor3d.input.glfw.GLFWMouseManager;
 import com.ardor3d.input.glfw.GLFWMouseWrapper;
-import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -85,8 +85,6 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasListener {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
@@ -524,8 +522,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
             }
         }));
 
-        final Predicate<TwoInputStates> clickLeftOrRight = Predicates.or(
-                new MouseButtonClickedCondition(MouseButton.LEFT), new MouseButtonClickedCondition(MouseButton.RIGHT));
+        final Predicate<TwoInputStates> clickLeftOrRight = new MouseButtonClickedCondition(MouseButton.LEFT)
+                .or(new MouseButtonClickedCondition(MouseButton.RIGHT));
 
         _logicalLayer.registerTrigger(new InputTrigger(clickLeftOrRight, new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -550,12 +548,12 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
                     }
                 }));
 
-        _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-                System.out.println("Key character pressed: "
-                        + inputState.getCurrent().getKeyboardState().getKeyEvent().getKeyChar());
-            }
-        }));
+//        _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
+//            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+//                System.out.println("Key character pressed: "
+//                        + inputState.getCurrent().getKeyboardState().getKeyEvent().getKeyChar());
+//            }
+//        }));
 
     }
 

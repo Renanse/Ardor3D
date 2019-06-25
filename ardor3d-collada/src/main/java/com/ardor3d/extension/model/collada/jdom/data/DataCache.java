@@ -11,7 +11,11 @@
 package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -29,8 +33,6 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.geom.VertMap;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -68,35 +70,35 @@ public class DataCache {
     private final Multimap<Joint, AttachmentPoint> _attachmentPoints = ArrayListMultimap.create();
 
     public DataCache() {
-        _boundMaterials = Maps.newHashMap();
-        _textures = Maps.newHashMap();
-        _idCache = Maps.newHashMap();
-        _sidCache = Maps.newHashMap();
-        _xPathExpressions = Maps.newHashMap();
+        _boundMaterials = new HashMap<>();
+        _textures = new HashMap<>();
+        _idCache = new HashMap<>();
+        _sidCache = new HashMap<>();
+        _xPathExpressions = new HashMap<>();
         _pattern = Pattern.compile("\\s");
 
         _transformTypes = Collections
-                .unmodifiableList(Lists.newArrayList("lookat", "matrix", "rotate", "scale", "scew", "translate"));
+                .unmodifiableList(Arrays.asList("lookat", "matrix", "rotate", "scale", "scew", "translate"));
 
-        _floatArrays = Maps.newHashMap();
-        _doubleArrays = Maps.newHashMap();
-        _booleanArrays = Maps.newHashMap();
-        _intArrays = Maps.newHashMap();
-        _stringArrays = Maps.newHashMap();
+        _floatArrays = new HashMap<>();
+        _doubleArrays = new HashMap<>();
+        _booleanArrays = new HashMap<>();
+        _intArrays = new HashMap<>();
+        _stringArrays = new HashMap<>();
         _vertMappings = ArrayListMultimap.create();
-        _meshVertMap = Maps.newIdentityHashMap();
+        _meshVertMap = new IdentityHashMap<>();
         _parsedVertexColors = ArrayListMultimap.create();
-        _materialInfoMap = Maps.newHashMap();
-        _meshMaterialMap = Maps.newIdentityHashMap();
+        _materialInfoMap = new HashMap<>();
+        _meshMaterialMap = new IdentityHashMap<>();
 
-        _elementSpatialMapping = Maps.newHashMap();
+        _elementSpatialMapping = new HashMap<>();
 
-        _elementJointMapping = Maps.newHashMap();
-        _externalJointMapping = Maps.newHashMap();
-        _skeletons = Lists.newArrayList();
-        _jointSkeletonMapping = Maps.newHashMap();
-        _skeletonPoseMapping = Maps.newHashMap();
-        _controllers = Lists.newArrayList();
+        _elementJointMapping = new HashMap<>();
+        _externalJointMapping = new HashMap<>();
+        _skeletons = new ArrayList<>();
+        _jointSkeletonMapping = new HashMap<>();
+        _skeletonPoseMapping = new HashMap<>();
+        _controllers = new ArrayList<>();
     }
 
     public void bindMaterial(final String ref, final Element material) {

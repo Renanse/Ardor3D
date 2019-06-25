@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.queue;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ardor3d.renderer.Renderer;
@@ -18,11 +19,10 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
-import com.google.common.collect.Maps;
 
 public class RenderQueue {
 
-    private final Map<RenderBucketType, RenderBucket> renderBuckets = Maps.newLinkedHashMap();
+    private final Map<RenderBucketType, RenderBucket> renderBuckets = new LinkedHashMap<>();
 
     public RenderQueue() {
         setupDefaultBuckets();

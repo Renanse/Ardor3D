@@ -10,14 +10,12 @@
 
 package com.ardor3d.image.loader.dds;
 
-import static com.ardor3d.image.loader.dds.DdsUtils.flipDXT;
-import static com.ardor3d.image.loader.dds.DdsUtils.getInt;
-import static com.ardor3d.image.loader.dds.DdsUtils.isSet;
-import static com.ardor3d.image.loader.dds.DdsUtils.shiftCount;
+import static com.ardor3d.image.loader.dds.DdsUtils.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,7 +26,6 @@ import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.util.LittleEndianDataInput;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * <p>
@@ -253,7 +250,7 @@ public class DdsLoader implements ImageLoader {
         }
 
         // Go through and load in image data
-        final List<ByteBuffer> imageData = Lists.newArrayList();
+        final List<ByteBuffer> imageData = new ArrayList<>();
         for (int i = 0; i < image.getDepth(); i++) {
             // read in compressed data
             if (compressedFormat) {

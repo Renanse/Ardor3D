@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,7 +30,6 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.gc.ContextValueReference;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.common.collect.Lists;
 
 /**
  * <code>TextureKey</code> provides a way for the TextureManager to cache and retrieve <code>Texture</code> objects.
@@ -76,7 +76,7 @@ final public class TextureKey implements Savable {
     protected transient int _code = Integer.MAX_VALUE;
 
     /** cache of texturekey objects allowing us to find an existing texture key. */
-    protected static final List<WeakReference<TextureKey>> _keyCache = Lists.newLinkedList();
+    protected static final List<WeakReference<TextureKey>> _keyCache = new LinkedList<>();
 
     private static final Integer ZERO = new Integer(0);
 

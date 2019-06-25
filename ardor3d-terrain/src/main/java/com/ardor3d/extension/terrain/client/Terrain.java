@@ -39,7 +39,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.common.collect.Lists;
 
 /**
  * An implementation of geometry clipmapping
@@ -57,7 +56,7 @@ public class Terrain extends Node implements Pickable, Runnable {
     private final BlendState blendState;
 
     /** Reference to the texture clipmap */
-    private final List<TextureClipmap> _textureClipmaps = Lists.newArrayList();
+    private final List<TextureClipmap> _textureClipmaps = new ArrayList<>();
 
     /** Reference to normal map */
     private TextureClipmap _normalClipmap;
@@ -137,7 +136,7 @@ public class Terrain extends Node implements Pickable, Runnable {
         this.updateWorldRenderStates(true);
     }
 
-    private final List<Long> timers = Lists.newArrayList();
+    private final List<Long> timers = new ArrayList<>();
 
     @Override
     protected void updateChildren(final double time) {

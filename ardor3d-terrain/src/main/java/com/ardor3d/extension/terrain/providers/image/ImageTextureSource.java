@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -11,7 +11,10 @@
 package com.ardor3d.extension.terrain.providers.image;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,9 +25,6 @@ import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class ImageTextureSource implements TextureSource {
     private final int tileSize;
@@ -40,8 +40,8 @@ public class ImageTextureSource implements TextureSource {
 
     public ImageTextureSource(final int tileSize, final Image map, final List<Integer> heightMapSizes) {
         this.tileSize = tileSize;
-        maps = Lists.newArrayListWithExpectedSize(heightMapSizes.size());
-        this.heightMapSizes = Lists.newArrayList(heightMapSizes);
+        maps = new ArrayList<>(heightMapSizes.size());
+        this.heightMapSizes = new ArrayList<>(heightMapSizes);
         buildMips(map);
     }
 
@@ -59,9 +59,12 @@ public class ImageTextureSource implements TextureSource {
             final byte[] heightMapMip = new byte[currentSize * currentSize * 3];
             for (int x = 0; x < currentSize; x++) {
                 for (int z = 0; z < currentSize; z++) {
-                    heightMapMip[3 * (z * currentSize + x) + 0] = parentHeightMap[3 * (z * currentSize * 4 + x * 2) + 0];
-                    heightMapMip[3 * (z * currentSize + x) + 1] = parentHeightMap[3 * (z * currentSize * 4 + x * 2) + 1];
-                    heightMapMip[3 * (z * currentSize + x) + 2] = parentHeightMap[3 * (z * currentSize * 4 + x * 2) + 2];
+                    heightMapMip[3 * (z * currentSize + x) + 0] = parentHeightMap[3 * (z * currentSize * 4 + x * 2)
+                            + 0];
+                    heightMapMip[3 * (z * currentSize + x) + 1] = parentHeightMap[3 * (z * currentSize * 4 + x * 2)
+                            + 1];
+                    heightMapMip[3 * (z * currentSize + x) + 2] = parentHeightMap[3 * (z * currentSize * 4 + x * 2)
+                            + 2];
                 }
             }
             parentHeightMap = heightMapMip;
@@ -72,7 +75,7 @@ public class ImageTextureSource implements TextureSource {
 
     @Override
     public TextureConfiguration getConfiguration() throws Exception {
-        final Map<Integer, TextureStoreFormat> textureStoreFormat = Maps.newHashMap();
+        final Map<Integer, TextureStoreFormat> textureStoreFormat = new HashMap<>();
         textureStoreFormat.put(0, TextureStoreFormat.RGB8);
 
         return new TextureConfiguration(maps.size(), textureStoreFormat, tileSize, 1f, true, false);
@@ -81,7 +84,7 @@ public class ImageTextureSource implements TextureSource {
     @Override
     public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
             final int numTilesY) throws Exception {
-        final Set<Tile> validTiles = Sets.newHashSet();
+        final Set<Tile> validTiles = new HashSet<>();
 
         final int heightMapSize = heightMapSizes.get(clipmapLevel);
         for (int y = 0; y < numTilesY; y++) {

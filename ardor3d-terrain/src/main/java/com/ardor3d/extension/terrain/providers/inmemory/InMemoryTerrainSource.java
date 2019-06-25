@@ -3,13 +3,14 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.extension.terrain.providers.inmemory;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -17,7 +18,6 @@ import com.ardor3d.extension.terrain.client.TerrainConfiguration;
 import com.ardor3d.extension.terrain.client.TerrainSource;
 import com.ardor3d.extension.terrain.providers.inmemory.data.InMemoryTerrainData;
 import com.ardor3d.extension.terrain.util.Tile;
-import com.google.common.collect.Sets;
 
 public class InMemoryTerrainSource implements TerrainSource {
     private final int tileSize;
@@ -41,7 +41,7 @@ public class InMemoryTerrainSource implements TerrainSource {
             final int numTilesY) throws Exception {
         final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
 
-        final Set<Tile> validTiles = Sets.newHashSet();
+        final Set<Tile> validTiles = new HashSet<>();
 
         final int levelSize = 1 << baseClipmapLevel;
         final int size = inMemoryTerrainData.getSide();
@@ -70,7 +70,7 @@ public class InMemoryTerrainSource implements TerrainSource {
 
         final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
 
-        final Set<Tile> tiles = Sets.newHashSet();
+        final Set<Tile> tiles = new HashSet<>();
 
         synchronized (updatedTiles[baseClipmapLevel]) {
             if (updatedTiles[baseClipmapLevel].isEmpty()) {

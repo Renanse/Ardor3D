@@ -12,6 +12,7 @@ package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,7 +26,6 @@ import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * An animation channel consisting of a series of transforms interpolated over time.
@@ -200,10 +200,10 @@ public class TransformChannel extends AbstractAnimationChannel {
         if (startTime > endTime) {
             throw new IllegalArgumentException("startTime > endTime");
         }
-        final List<Float> times = Lists.newArrayList();
-        final List<ReadOnlyQuaternion> rotations = Lists.newArrayList();
-        final List<ReadOnlyVector3> translations = Lists.newArrayList();
-        final List<ReadOnlyVector3> scales = Lists.newArrayList();
+        final List<Float> times = new ArrayList<>();
+        final List<ReadOnlyQuaternion> rotations = new ArrayList<>();
+        final List<ReadOnlyVector3> translations = new ArrayList<>();
+        final List<ReadOnlyVector3> scales = new ArrayList<>();
 
         final TransformData tData = new TransformData();
 

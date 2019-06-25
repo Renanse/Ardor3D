@@ -72,7 +72,6 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Tube;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.common.collect.Lists;
 
 /**
  * An example illustrating the use of the interact framework.
@@ -146,7 +145,7 @@ public class InteractUIExample extends ExampleBase {
         _root.updateGeometricState(0);
     }
 
-    LinkedList<Spatial> path = Lists.newLinkedList();
+    LinkedList<Spatial> path = new LinkedList<>();
 
     private void initPath() {
         final Spatial marker1 = createMarker();

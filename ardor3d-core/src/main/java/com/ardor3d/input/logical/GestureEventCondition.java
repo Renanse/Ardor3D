@@ -11,10 +11,10 @@
 package com.ardor3d.input.logical;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
-import com.google.common.base.Predicate;
 
 public class GestureEventCondition implements Predicate<TwoInputStates> {
 
@@ -25,7 +25,7 @@ public class GestureEventCondition implements Predicate<TwoInputStates> {
     }
 
     @Override
-    public boolean apply(final TwoInputStates states) {
+    public boolean test(final TwoInputStates states) {
         final InputState current = states.getCurrent();
         if (current == null) {
             return false;

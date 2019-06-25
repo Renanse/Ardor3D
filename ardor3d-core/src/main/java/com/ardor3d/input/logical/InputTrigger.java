@@ -3,16 +3,17 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.input.logical;
 
+import java.util.function.Predicate;
+
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.framework.Canvas;
-import com.google.common.base.Predicate;
 
 /**
  * Defines an action to be performed when a specific input condition is met.
@@ -25,7 +26,7 @@ public final class InputTrigger {
 
     /**
      * Construct a new InputTrigger with the given condition and action.
-     * 
+     *
      * @param condition
      *            the predicate to test for this trigger
      * @param action
@@ -38,7 +39,7 @@ public final class InputTrigger {
 
     /**
      * Construct a new InputTrigger with the given condition and action.
-     * 
+     *
      * @param condition
      *            the predicate to test for this trigger
      * @param action
@@ -54,7 +55,7 @@ public final class InputTrigger {
 
     /**
      * Checks if the condition is applicable, and if so, performs the action.
-     * 
+     *
      * @param source
      *            the Canvas that was the source of the current input
      * @param states
@@ -63,7 +64,7 @@ public final class InputTrigger {
      *            the time per frame in seconds
      */
     void performIfValid(final Canvas source, final TwoInputStates states, final double tpf) {
-        if (_condition.apply(states)) {
+        if (_condition.test(states)) {
             _action.perform(source, states, tpf);
         }
     }

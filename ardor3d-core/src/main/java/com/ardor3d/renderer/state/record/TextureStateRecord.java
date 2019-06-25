@@ -17,7 +17,6 @@ import java.util.HashMap;
 import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Maps;
 
 public class TextureStateRecord extends StateRecord {
 
@@ -31,7 +30,7 @@ public class TextureStateRecord extends StateRecord {
     public final DoubleBuffer tmp_matrixBuffer = BufferUtils.createDoubleBuffer(16);
 
     public TextureStateRecord() {
-        textures = Maps.newHashMap();
+        textures = new HashMap<>();
         units = new TextureUnitRecord[TextureState.MAX_TEXTURES];
         for (int i = 0; i < units.length; i++) {
             units[i] = new TextureUnitRecord();

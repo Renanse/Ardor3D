@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,24 +32,24 @@ import com.ardor3d.util.export.Ardor3dImporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.ReadListener;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Maps;
 
 public class BinaryImporter implements Ardor3dImporter {
     private static final Logger logger = Logger.getLogger(BinaryImporter.class.getName());
 
     // Key - alias, object - bco
-    protected final Map<String, BinaryClassObject> _classes = Maps.newHashMap();
+    protected final Map<String, BinaryClassObject> _classes = new HashMap<>();
     // Key - id, object - the savable
-    protected final Map<Integer, Savable> _contentTable = Maps.newHashMap();
+    protected final Map<Integer, Savable> _contentTable = new HashMap<>();
     // Key - savable, object - capsule
-    protected final Map<Savable, BinaryInputCapsule> _capsuleTable = Maps.newIdentityHashMap();
+    protected final Map<Savable, BinaryInputCapsule> _capsuleTable = new IdentityHashMap<>();
     // Key - id, opject - location in the file
-    protected final Map<Integer, Integer> _locationTable = Maps.newHashMap();
+    protected final Map<Integer, Integer> _locationTable = new HashMap<>();
 
     protected byte[] _dataArray = null;
     protected int _aliasWidth = 0;
 
-    public BinaryImporter() {}
+    public BinaryImporter() {
+    }
 
     public Savable load(final InputStream is) throws IOException {
         return load(is, null, null);

@@ -10,10 +10,11 @@
 
 package com.ardor3d.input.logical;
 
+import java.util.function.Predicate;
+
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
-import com.google.common.base.Predicate;
 
 /**
  * A condition that is true if a given button was clicked (has a click count) when going from the previous input state
@@ -39,7 +40,7 @@ public final class MouseButtonClickedCondition implements Predicate<TwoInputStat
         _button = button;
     }
 
-    public boolean apply(final TwoInputStates states) {
+    public boolean test(final TwoInputStates states) {
         final MouseState currentState = states.getCurrent().getMouseState();
         final MouseState previousState = states.getPrevious().getMouseState();
 

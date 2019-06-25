@@ -12,6 +12,7 @@ package com.ardor3d.extension.shadow.map;
 
 import java.lang.ref.WeakReference;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -61,7 +62,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * A pass providing a parallel split shadow mapping (PSSM) layer across the top of an existing scene.
@@ -88,10 +88,10 @@ public class ParallelSplitShadowMapPass extends Pass {
     private Texture2D _shadowMapTexture[];
 
     /** The list of occluding nodes - filled from ShadowCasterManager. */
-    private final List<Spatial> _occluderNodes = Lists.newArrayList();
+    private final List<Spatial> _occluderNodes = new ArrayList<>();
 
     /** Extra bounds receivers, when rendering shadows other ways than through overlay */
-    private final List<Spatial> _boundsReceiver = Lists.newArrayList();
+    private final List<Spatial> _boundsReceiver = new ArrayList<>();
 
     // Various optimizations for rendering shadow maps...
     /** Culling front faces when rendering shadow maps. */

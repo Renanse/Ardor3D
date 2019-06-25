@@ -10,6 +10,8 @@
 
 package com.ardor3d.input.control;
 
+import java.util.function.Predicate;
+
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.gesture.event.PinchGestureEvent;
@@ -25,8 +27,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 /**
  * <p>
@@ -386,10 +386,10 @@ public class OrbitCamControl {
 
     public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
         // Mouse look
-        final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(),
-                Predicates.or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
+        final Predicate<TwoInputStates> someMouseDown = TriggerConditions.leftButtonDown()
+                .or(TriggerConditions.rightButtonDown()).or(TriggerConditions.middleButtonDown());
         final Predicate<TwoInputStates> scrollWheelMoved = new MouseWheelMovedCondition();
-        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
+        final Predicate<TwoInputStates> dragged = TriggerConditions.mouseMoved().and(someMouseDown);
         final TriggerAction mouseAction = new TriggerAction() {
 
             // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
@@ -415,8 +415,8 @@ public class OrbitCamControl {
             }
         };
 
-        final Predicate<TwoInputStates> predicate = Predicates.or(scrollWheelMoved,
-                dragOnly ? dragged : TriggerConditions.mouseMoved());
+        final Predicate<TwoInputStates> predicate = scrollWheelMoved
+                .or(dragOnly ? dragged : TriggerConditions.mouseMoved());
         _mouseTrigger = new InputTrigger(predicate, mouseAction);
         layer.registerTrigger(_mouseTrigger);
     }

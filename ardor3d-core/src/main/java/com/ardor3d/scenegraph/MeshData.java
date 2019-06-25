@@ -50,7 +50,6 @@ import com.ardor3d.util.gc.ContextValueReference;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -91,7 +90,7 @@ public class MeshData implements Savable {
     protected transient int[] _primitiveCounts = new int[1];
 
     /** Buffer data holding buffers and number of coordinates per vertex */
-    protected Map<String, AbstractBufferData<? extends Buffer>> _vertexDataItems = Maps.newHashMap();
+    protected Map<String, AbstractBufferData<? extends Buffer>> _vertexDataItems = new HashMap<>();
 
     /** Index data. */
     protected IndexBufferData<?> _indexBuffer;

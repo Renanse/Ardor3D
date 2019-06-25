@@ -11,6 +11,7 @@
 package com.ardor3d.example.effect;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,6 @@ import com.ardor3d.spline.CatmullRomSpline;
 import com.ardor3d.spline.Curve;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * A demonstration of the Extrusion class - showing how a set of point can be converted into a 3d shape.
@@ -47,7 +47,7 @@ public class ExtrusionExample extends ExampleBase {
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 0, 80));
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(), Vector3.UNIT_Y);
 
-        final List<ReadOnlyVector3> path = Lists.newArrayList();
+        final List<ReadOnlyVector3> path = new ArrayList<>();
         path.add(new Vector3(0, 0, 0));
         path.add(new Vector3(0, 0, 4));
         path.add(new Vector3(1, 0, 8));

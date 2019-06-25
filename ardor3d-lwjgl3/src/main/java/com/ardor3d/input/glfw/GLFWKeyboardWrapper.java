@@ -13,6 +13,7 @@ package com.ardor3d.input.glfw;
 import java.util.LinkedList;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
 import com.ardor3d.annotation.GuardedBy;
@@ -27,10 +28,13 @@ import com.google.common.collect.PeekingIterator;
 public class GLFWKeyboardWrapper implements KeyboardWrapper {
 
     @GuardedBy("this")
-    protected final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<KeyEvent>();
+    protected final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<>();
 
     @SuppressWarnings("unused")
     private GLFWKeyCallback _keyCallback;
+
+    @SuppressWarnings("unused")
+    private GLFWCharCallback _charCallback;
 
     private KeyboardIterator _currentIterator;
 
@@ -62,12 +66,18 @@ public class GLFWKeyboardWrapper implements KeyboardWrapper {
                         // do nothing on REPEAT?
                         return;
                 }
-                // TODO: Need to rewrite Ardor's text processing to handle text input coming from elsewhere.
-                final char keyChar = '?';
 
-                _upcomingEvents.add(new KeyEvent(key, state, keyChar));
+                _upcomingEvents.add(new KeyEvent(key, state));
             }
 
+        }));
+
+        GLFW.glfwSetCharCallback(_canvas.getWindowId(), (_charCallback = new GLFWCharCallback() {
+
+            @Override
+            public void invoke(final long window, final int codepoint) {
+                System.err.println((char) codepoint);
+            }
         }));
     }
 

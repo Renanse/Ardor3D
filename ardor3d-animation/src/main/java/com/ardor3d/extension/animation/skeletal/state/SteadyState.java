@@ -10,13 +10,13 @@
 
 package com.ardor3d.extension.animation.skeletal.state;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.BlendTreeSource;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
-import com.google.common.collect.Maps;
 
 /**
  * A "steady" state is an animation state that is concrete and stand-alone (vs. a state that handles transitioning
@@ -28,7 +28,7 @@ public class SteadyState extends AbstractFiniteState {
     private final String _name;
 
     /** A map of possible transitions for moving from this state to another. */
-    private final Map<String, AbstractTransitionState> _transitions = Maps.newHashMap();
+    private final Map<String, AbstractTransitionState> _transitions = new HashMap<>();
 
     /** A transition to use if we reach the end of this state. May be null. */
     private AbstractTransitionState _endTransition;

@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.model.util.nvtristrip;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,7 +23,6 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * Ported from <a href="http://developer.nvidia.com/object/nvtristrip_library.html">NVIDIA's NvTriStrip Library</a>
@@ -241,7 +241,7 @@ public class NvTriangleStripper implements Visitor {
         PrimitiveGroup[] primGroups;
 
         // put data in format that the stripifier likes
-        final List<Integer> tempIndices = Lists.newArrayList();
+        final List<Integer> tempIndices = new ArrayList<>();
         int maxIndex = 0;
         for (int i = 0; i < in_indices.length; i++) {
             tempIndices.add(in_indices[i]);
@@ -249,8 +249,8 @@ public class NvTriangleStripper implements Visitor {
                 maxIndex = in_indices[i];
             }
         }
-        final List<NvStripInfo> tempStrips = Lists.newArrayList();
-        final List<NvFaceInfo> tempFaces = Lists.newArrayList();
+        final List<NvStripInfo> tempStrips = new ArrayList<>();
+        final List<NvFaceInfo> tempFaces = new ArrayList<>();
 
         final NvStripifier stripifier = new NvStripifier();
 
@@ -258,7 +258,7 @@ public class NvTriangleStripper implements Visitor {
         stripifier.stripify(tempIndices, _cacheSize, _minStripSize, maxIndex, tempStrips, tempFaces);
 
         // stitch strips together
-        final List<Integer> stripIndices = Lists.newArrayList();
+        final List<Integer> stripIndices = new ArrayList<>();
         int numSeparateStrips = 0;
 
         if (_listsOnly) {
@@ -374,7 +374,7 @@ public class NvTriangleStripper implements Visitor {
 
             final List<NvFaceInfo> in_bins[] = new List[NUMBINS];
             for (int i = 0; i < NUMBINS; i++) {
-                in_bins[i] = Lists.newArrayList();
+                in_bins[i] = new ArrayList<>();
             }
 
             // hash input indices on first index

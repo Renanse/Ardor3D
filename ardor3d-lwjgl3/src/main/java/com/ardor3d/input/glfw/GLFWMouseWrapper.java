@@ -10,6 +10,7 @@
 
 package com.ardor3d.input.glfw;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -28,8 +29,6 @@ import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.math.MathUtils;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.EnumMultiset;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 
@@ -50,10 +49,10 @@ public class GLFWMouseWrapper implements MouseWrapper {
     private MouseIterator _currentIterator = null;
 
     private static final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
-    private static final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
+    private static final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
     private static final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
-    private final EnumMap<MouseButton, ButtonState> _lastButtonState = Maps.newEnumMap(MouseButton.class);
+    private final EnumMap<MouseButton, ButtonState> _lastButtonState = new EnumMap<>(MouseButton.class);
 
     private static boolean _sendClickState = false;
     private static boolean _ignoreInput;
@@ -65,7 +64,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
         _canvas = canvas;
 
         // fill our button state map with undefined
-        Lists.newArrayList(MouseButton.values()).forEach((final MouseButton b) -> {
+        Arrays.asList(MouseButton.values()).forEach((final MouseButton b) -> {
             _lastButtonState.put(b, ButtonState.UNDEFINED);
             _lastClickTime.put(b, 0L);
         });
@@ -94,7 +93,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
                 // Add our new state
                 final int x = _lastState != null ? _lastState.getX() : 0;
                 final int y = _lastState != null ? _lastState.getY() : 0;
-                addNextState(new MouseState(x, y, 0, 0, 0, Maps.newEnumMap(_lastButtonState),
+                addNextState(new MouseState(x, y, 0, 0, 0, new EnumMap<>(_lastButtonState),
                         _sendClickState && !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null));
             }
         });
@@ -119,7 +118,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
                 }
 
                 // Add our new state
-                final MouseState event = new MouseState(x, y, dx, dy, 0, Maps.newEnumMap(_lastButtonState), null);
+                final MouseState event = new MouseState(x, y, dx, dy, 0, new EnumMap<>(_lastButtonState), null);
                 addNextState(event);
             }
         });
@@ -139,7 +138,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
                 // Add our new state
                 final int x = _lastState != null ? _lastState.getX() : 0;
                 final int y = _lastState != null ? _lastState.getY() : 0;
-                final MouseState event = new MouseState(x, y, 0, 0, dw, Maps.newEnumMap(_lastButtonState), null);
+                final MouseState event = new MouseState(x, y, 0, 0, dw, new EnumMap<>(_lastButtonState), null);
                 addNextState(event);
             }
         });
@@ -219,7 +218,8 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
     private class MouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
 
-        public MouseIterator() {}
+        public MouseIterator() {
+        }
 
         @Override
         protected MouseState computeNext() {

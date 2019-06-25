@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,8 @@ package com.ardor3d.extension.ui.text.font;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,8 +28,6 @@ import com.ardor3d.ui.text.BMFont.Char;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.URLResourceSource;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Provides BMFonts for use in UIFont.
@@ -36,9 +36,9 @@ public class BMFontProvider implements FontProvider {
 
     private static Logger logger = Logger.getLogger(BMFontProvider.class.getName());
 
-    protected Map<UIFont, Integer> _scoreMap = Maps.newHashMap();
+    protected Map<UIFont, Integer> _scoreMap = new HashMap<>();
 
-    protected final Set<FontInfo> _fonts = Sets.newHashSet();
+    protected final Set<FontInfo> _fonts = new HashSet<>();
 
     public void addFont(final String source, final String family, final int size, final boolean bold,
             final boolean italic) {
@@ -53,14 +53,18 @@ public class BMFontProvider implements FontProvider {
 
     @Override
     public UIFont getClosestMatchingFont(final Map<String, Object> currentStyles, final AtomicReference<Double> scale) {
-        final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD) ? (Boolean) currentStyles
-                .get(StyleConstants.KEY_BOLD) : false;
-        final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS) ? (Boolean) currentStyles
-                .get(StyleConstants.KEY_ITALICS) : false;
-        final int size = currentStyles.containsKey(StyleConstants.KEY_SIZE) ? (Integer) currentStyles
-                .get(StyleConstants.KEY_SIZE) : UIComponent.getDefaultFontSize();
-        final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY) ? currentStyles.get(
-                StyleConstants.KEY_FAMILY).toString() : UIComponent.getDefaultFontFamily();
+        final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD)
+                ? (Boolean) currentStyles.get(StyleConstants.KEY_BOLD)
+                : false;
+        final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS)
+                ? (Boolean) currentStyles.get(StyleConstants.KEY_ITALICS)
+                : false;
+        final int size = currentStyles.containsKey(StyleConstants.KEY_SIZE)
+                ? (Integer) currentStyles.get(StyleConstants.KEY_SIZE)
+                : UIComponent.getDefaultFontSize();
+        final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY)
+                ? currentStyles.get(StyleConstants.KEY_FAMILY).toString()
+                : UIComponent.getDefaultFontFamily();
 
         FontInfo closest = null;
         int score, bestScore = Integer.MIN_VALUE;
@@ -128,11 +132,11 @@ public class BMFontProvider implements FontProvider {
                 }
             }
 
-            final Map<Character, CharacterDescriptor> descriptors = Maps.newHashMap();
+            final Map<Character, CharacterDescriptor> descriptors = new HashMap<>();
             for (final int val : closest.bmFont.getMappedChars()) {
                 final Char c = closest.bmFont.getChar(val);
-                final CharacterDescriptor desc = new CharacterDescriptor((char)c.id, c.x, c.y, c.width, c.height, c.xadvance,
-                        c.xoffset, c.yoffset, 1.0, null);
+                final CharacterDescriptor desc = new CharacterDescriptor((char) c.id, c.x, c.y, c.width, c.height,
+                        c.xadvance, c.xoffset, c.yoffset, 1.0, null);
                 descriptors.put((char) val, desc);
             }
 

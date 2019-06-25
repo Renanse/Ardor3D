@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.interact.widget;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,7 +29,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.google.common.collect.Maps;
 
 public class CompoundInteractWidget extends AbstractInteractWidget {
 
@@ -39,7 +39,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
 
     public static double MIN_SCALE = 0.000001;
 
-    protected Map<String, AbstractInteractWidget> _widgets = Maps.newHashMap();
+    protected Map<String, AbstractInteractWidget> _widgets = new HashMap<>();
 
     protected AbstractInteractWidget _lastInputWidget = null;
 

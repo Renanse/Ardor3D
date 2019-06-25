@@ -12,7 +12,9 @@ package com.ardor3d.extension.model.obj;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +34,6 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.GeometryTool;
 import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 import com.ardor3d.util.geom.VertGroupData;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class ObjGeometryStore {
     private static final String DEFAULT_GROUP = "_default_";
@@ -44,7 +44,7 @@ public class ObjGeometryStore {
     private int _totalLines = 0;
     private int _totalMeshes = 0;
     private final Node _root = new Node();
-    private final Map<String, Spatial> _groupMap = Maps.newHashMap();
+    private final Map<String, Spatial> _groupMap = new HashMap<>();
 
     private ObjMaterial _currentMaterial = new ObjMaterial("default");
     private String _currentObjectName;
@@ -54,8 +54,8 @@ public class ObjGeometryStore {
     private ObjSetManager _lineManager;
     private ObjSetManager _pointManager;
 
-    private final Map<String, ObjMaterial> materialLibrary = Maps.newHashMap();
-    private final Map<Spatial, String> _materialMap = Maps.newHashMap();
+    private final Map<String, ObjMaterial> materialLibrary = new HashMap<>();
+    private final Map<Spatial, String> _materialMap = new HashMap<>();
 
     public ObjGeometryStore() {
         super();
@@ -266,7 +266,7 @@ public class ObjGeometryStore {
 
             int j = 0;
             final long[] vertGroups = new long[_meshManager.getStore().size()];
-            final List<Long> groups = Lists.newArrayList();
+            final List<Long> groups = new ArrayList<>();
             Vector3 vector;
             for (final ObjIndexSet set : _meshManager.getStore().keySet()) {
                 vertGroups[j] = set.getSmoothGroup();

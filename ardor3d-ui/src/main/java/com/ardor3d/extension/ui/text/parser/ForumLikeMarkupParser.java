@@ -3,13 +3,14 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.extension.ui.text.parser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -21,7 +22,6 @@ import com.ardor3d.extension.ui.text.StyleConstants;
 import com.ardor3d.extension.ui.text.StyleSpan;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.google.common.collect.Lists;
 
 public class ForumLikeMarkupParser implements StyleParser {
 
@@ -37,7 +37,7 @@ public class ForumLikeMarkupParser implements StyleParser {
         int index = 0;
         TagStatus tagStatus = TagStatus.NONE;
         String currTagText = "";
-        final LinkedList<StyleSpan> buildingSpans = Lists.newLinkedList();
+        final LinkedList<StyleSpan> buildingSpans = new LinkedList<>();
         final StringTokenizer st = new StringTokenizer(text, "[]\\", true);
         String token;
         while (st.hasMoreTokens()) {
@@ -103,8 +103,8 @@ public class ForumLikeMarkupParser implements StyleParser {
                     try {
                         // parse a color
                         final String c = currTagText.substring(2);
-                        buildingSpans.add(new StyleSpan(StyleConstants.KEY_COLOR, ColorRGBA.parseColor(c, null), index,
-                                0));
+                        buildingSpans
+                                .add(new StyleSpan(StyleConstants.KEY_COLOR, ColorRGBA.parseColor(c, null), index, 0));
                     } catch (final Exception e) {
                         e.printStackTrace();
                     }
@@ -183,12 +183,12 @@ public class ForumLikeMarkupParser implements StyleParser {
         }
 
         // list of spans, sorted by start index
-        final List<StyleSpan> starts = Lists.newArrayList();
+        final List<StyleSpan> starts = new ArrayList<>();
         starts.addAll(spans);
         Collections.sort(starts);
 
         // list of spans, to be sorted by end index
-        final List<StyleSpan> ends = Lists.newLinkedList();
+        final List<StyleSpan> ends = new LinkedList<>();
 
         final StringBuilder builder = new StringBuilder();
 

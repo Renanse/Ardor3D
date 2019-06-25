@@ -11,8 +11,10 @@
 package com.ardor3d.extension.ui.text;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,8 +34,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.MeshData;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 public enum TextFactory {
@@ -100,11 +100,11 @@ public enum TextFactory {
         rVal.setStyled(styled);
 
         // note: spans must be in order by start index
-        final LinkedList<StyleSpan> spans = Lists.newLinkedList();
+        final LinkedList<StyleSpan> spans = new LinkedList<>();
         final String visibleText;
         if (styled && parser != null) {
             // parse text for style spans
-            final List<StyleSpan> styleStore = Lists.newArrayList();
+            final List<StyleSpan> styleStore = new ArrayList<>();
             visibleText = parser.parseStyleSpans(rawText, styleStore);
             Collections.sort(styleStore);
             if (!styleStore.isEmpty()) {
@@ -126,7 +126,7 @@ public enum TextFactory {
         textData.reset();
 
         char prevChar = 0, c = 0;
-        final List<StyleSpan> currentStyles = Lists.newLinkedList();
+        final List<StyleSpan> currentStyles = new LinkedList<>();
         // indexed by character offset
         final List<CharacterDescriptor> descs = textData._characters;
         final List<Integer> descXStarts = textData._xStarts;
@@ -139,7 +139,7 @@ public enum TextFactory {
         int maxLineHeight = 0, xOffset = 0, maxSizeHeight = 0;
         UIFont prevFont = null;
         double scale = 1, prevScale = 0;
-        final Map<String, Object> stylesMap = Maps.newHashMap();
+        final Map<String, Object> stylesMap = new HashMap<>();
 
         final char[] chars = visibleText.toCharArray();
         for (int i = 0; i < chars.length; i++) {

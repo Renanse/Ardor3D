@@ -10,13 +10,13 @@
 
 package com.ardor3d.extension.animation.skeletal.state;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.BinaryLERPSource;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
 import com.ardor3d.math.MathUtils;
-import com.google.common.collect.Maps;
 
 /**
  * An abstract transition state that blends between two other states.
@@ -195,7 +195,7 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
         // too many new transform data objects. This assumes that a
         // same state always returns the same transform data objects.
         if (_sourceData == null) {
-            _sourceData = Maps.newHashMap();
+            _sourceData = new HashMap<>();
         }
         return BinaryLERPSource.combineSourceData(sourceAData, sourceBData, getPercent(), _sourceData);
     }

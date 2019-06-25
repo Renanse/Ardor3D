@@ -10,10 +10,10 @@
 
 package com.ardor3d.extension.animation.skeletal.clip;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.annotation.SavableFactory;
-import com.google.common.collect.Lists;
 
 /**
  * An animation source channel consisting of keyword samples indicating when a specific trigger condition is met. Each
@@ -49,7 +49,7 @@ public class GuaranteedTriggerChannel extends TriggerChannel {
         if (oldIndex == newIndex) {
             triggerData.arm(newIndex, _keys[newIndex]);
         } else {
-            final List<String> triggers = Lists.newArrayList();
+            final List<String> triggers = new ArrayList<>();
             for (int i = oldIndex + 1; i <= newIndex; i++) {
                 if (_keys[i] != null) {
                     triggers.add(_keys[i]);
@@ -85,8 +85,8 @@ public class GuaranteedTriggerChannel extends TriggerChannel {
         if (startTime > endTime) {
             throw new IllegalArgumentException("startTime > endTime");
         }
-        final List<Float> times = Lists.newArrayList();
-        final List<String> keys = Lists.newArrayList();
+        final List<Float> times = new ArrayList<>();
+        final List<String> keys = new ArrayList<>();
 
         final TriggerData tData = new TriggerData();
 

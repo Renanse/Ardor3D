@@ -18,13 +18,13 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyTransform;
-import com.google.common.collect.Maps;
 
 public class AwtShapeElement extends AbstractAwtElement {
 
@@ -40,7 +40,7 @@ public class AwtShapeElement extends AbstractAwtElement {
 
     protected Vector4 _margin = new Vector4(1, 1, 1, 1);
 
-    protected final Map<Integer, BasicStroke> _strokes = Maps.newHashMap();
+    protected final Map<Integer, BasicStroke> _strokes = new HashMap<>();
 
     public AwtShapeElement(final Shape shape) {
         this(shape, Transform.IDENTITY, null);

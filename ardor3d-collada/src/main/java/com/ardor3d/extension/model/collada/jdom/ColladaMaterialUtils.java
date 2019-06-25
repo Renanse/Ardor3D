@@ -249,12 +249,12 @@ public class ColladaMaterialUtils {
                     }
                 }
                 /* Reflectivity property */
-                float reflectivity = 1.0f;
                 property = blinnPhongLambert.getChild("reflectivity");
                 if (property != null) {
                     final Element propertyValue = property.getChildren().get(0);
                     if ("float".equals(propertyValue.getName())) {
-                        reflectivity = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                        final float reflectivity = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                        mesh.setProperty("reflectivity", reflectivity);
                     }
                 }
                 /* Reflective property. Texture only */
@@ -262,8 +262,8 @@ public class ColladaMaterialUtils {
                 if (property != null) {
                     final Element propertyValue = property.getChildren().get(0);
                     if ("texture".equals(propertyValue.getName()) && _loadTextures) {
-                        final Texture reflectiveTexture = populateTextureState(mesh, propertyValue, effect,
-                                loadedTextures, mInfo, "reflective");
+                        // final Texture reflectiveTexture =
+                        populateTextureState(mesh, propertyValue, effect, loadedTextures, mInfo, "reflective");
                         //
                         // reflectiveTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
                         // reflectiveTexture.setApply(ApplyMode.Combine);

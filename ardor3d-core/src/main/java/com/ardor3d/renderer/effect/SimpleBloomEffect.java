@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.effect;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -25,13 +26,12 @@ import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.Lists;
 
 public class SimpleBloomEffect extends RenderEffect {
     protected static final String RT_MAIN = "LDRBloomEffect.MAIN";
     protected static final String RT_SECONDARY = "LDRBloomEffect.SECONDARY";
 
-    protected final List<Spatial> _bloomItems = Lists.newArrayList();
+    protected final List<Spatial> _bloomItems = new ArrayList<>();
 
     protected float _downsampleRatio = .33f;
     protected int _blurPasses = 1;

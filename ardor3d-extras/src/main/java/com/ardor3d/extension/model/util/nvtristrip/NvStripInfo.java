@@ -10,13 +10,12 @@
 
 package com.ardor3d.extension.model.util.nvtristrip;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 final class NvStripInfo {
     NvStripStartInfo _startInfo;
-    List<NvFaceInfo> _faces = Lists.newArrayList();
+    List<NvFaceInfo> _faces = new ArrayList<>();
     int _stripId;
     int _experimentId;
 
@@ -177,11 +176,11 @@ final class NvStripInfo {
      */
     void build(final List<NvEdgeInfo> edgeInfos, final List<NvFaceInfo> faceInfos) {
         // used in building the strips forward and backward
-        final List<Integer> scratchIndices = Lists.newArrayList();
+        final List<Integer> scratchIndices = new ArrayList<>();
 
         // build forward... start with the initial face
-        final List<NvFaceInfo> forwardFaces = Lists.newArrayList();
-        final List<NvFaceInfo> backwardFaces = Lists.newArrayList();
+        final List<NvFaceInfo> forwardFaces = new ArrayList<>();
+        final List<NvFaceInfo> backwardFaces = new ArrayList<>();
         forwardFaces.add(_startInfo._startFace);
 
         markTriangle(_startInfo._startFace);
@@ -251,7 +250,7 @@ final class NvStripInfo {
 
         // tempAllFaces is going to be forwardFaces + backwardFaces
         // it's used for Unique()
-        final List<NvFaceInfo> tempAllFaces = Lists.newArrayList();
+        final List<NvFaceInfo> tempAllFaces = new ArrayList<>();
         for (int i = 0; i < forwardFaces.size(); i++) {
             tempAllFaces.add(forwardFaces.get(i));
         }

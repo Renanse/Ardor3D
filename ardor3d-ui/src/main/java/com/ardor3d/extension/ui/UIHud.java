@@ -45,8 +45,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 
 /**
  * UIHud represents a "Heads Up Display" or the base of a game UI scenegraph. Various UI Input, dragging, events, etc.
@@ -115,7 +113,7 @@ public class UIHud extends Node {
     /**
      * List of hud listeners.
      */
-    private final List<HudListener> _hudListeners = Lists.newArrayList();
+    private final List<HudListener> _hudListeners = new ArrayList<>();
 
     /**
      * An optional mouseManager, required in order to test mouse is grabbed.
@@ -125,7 +123,7 @@ public class UIHud extends Node {
     /**
      * The list of currently displayed pop-overs, with each entry being a "child" of the one previous.
      */
-    private final List<IPopOver> _popovers = Lists.newArrayList();
+    private final List<IPopOver> _popovers = new ArrayList<>();
 
     private final Canvas _canvas;
 
@@ -559,11 +557,9 @@ public class UIHud extends Node {
      * Set up our logical layer with a trigger that hands input to the UI and saves whether it was "consumed".
      */
     protected void setupLogicalLayer() {
-        _logicalLayer.registerTrigger(new InputTrigger(new Predicate<TwoInputStates>() {
-            public boolean apply(final TwoInputStates arg0) {
-                // always trigger this.
-                return true;
-            }
+        _logicalLayer.registerTrigger(new InputTrigger((final TwoInputStates arg0) -> {
+            // always trigger this.
+            return true;
         }, new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 _mouseInputConsumed = offerMouseInputToUI(inputStates);

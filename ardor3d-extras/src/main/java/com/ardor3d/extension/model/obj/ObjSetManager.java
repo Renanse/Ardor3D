@@ -3,23 +3,22 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.extension.model.obj;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 public class ObjSetManager {
-    private final Map<ObjIndexSet, Integer> _store = Maps.newLinkedHashMap();
-    private final List<Integer> _indices = Lists.newArrayList();
-    private final List<Integer> _lengths = Lists.newArrayList();
+    private final Map<ObjIndexSet, Integer> _store = new LinkedHashMap<>();
+    private final List<Integer> _indices = new ArrayList<>();
+    private final List<Integer> _lengths = new ArrayList<>();
 
     public int findSet(final ObjIndexSet set) {
         if (_store.containsKey(set)) {

@@ -10,13 +10,13 @@
 
 package com.ardor3d.extension.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.Lists;
 
 /**
  * A special frame meant to display menu items.
@@ -188,7 +188,7 @@ public class UIPieMenu extends UIPopupMenu implements IPopOver {
         }
 
         // gather our components
-        final List<UIComponent> comps = Lists.newArrayList();
+        final List<UIComponent> comps = new ArrayList<>();
         final Rectangle2 storeA = Rectangle2.fetchTempInstance();
         for (int i = 0; i < content.size(); i++) {
             final Spatial spat = content.get(i);

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -16,6 +16,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +32,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class AwtTextureSource implements TextureSource, ElementUpdateListener {
     private static final int tileSize = 128;
@@ -69,7 +69,7 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
 
         for (int i = 0; i < availableClipmapLevels; i++) {
             _image[i] = new BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB);
-            _updatedTiles[i] = Sets.newHashSet();
+            _updatedTiles[i] = new HashSet<>();
         }
     }
 
@@ -79,7 +79,7 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
 
     @Override
     public TextureConfiguration getConfiguration() throws Exception {
-        final Map<Integer, TextureStoreFormat> textureStoreFormat = Maps.newHashMap();
+        final Map<Integer, TextureStoreFormat> textureStoreFormat = new HashMap<>();
         textureStoreFormat.put(0, format);
 
         return new TextureConfiguration(availableClipmapLevels, textureStoreFormat, tileSize, 1f, false, true);
@@ -100,7 +100,7 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
             return null;
         }
 
-        final Set<Tile> tiles = Sets.newHashSet();
+        final Set<Tile> tiles = new HashSet<>();
 
         int checkX, checkY;
         for (final Iterator<Tile> it = _updatedTiles[baseClipmapLevel].iterator(); it.hasNext();) {
@@ -149,7 +149,7 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
         graphics.setComposite(composite);
 
         // get list of elements that intersect the given region
-        final List<AbstractAwtElement> elements = Lists.newArrayList(provider.getElements());
+        final List<AbstractAwtElement> elements = new ArrayList<>(provider.getElements());
         for (final Iterator<AbstractAwtElement> it = elements.iterator(); it.hasNext();) {
             final AbstractAwtElement element = it.next();
 

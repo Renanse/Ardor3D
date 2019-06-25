@@ -11,6 +11,7 @@
 package com.ardor3d.extension.model.md2;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -31,7 +32,6 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.common.collect.Lists;
 
 public class Md2Importer {
 
@@ -160,8 +160,8 @@ public class Md2Importer {
             bis.seek(header.offsetGlCommands);
             int length, absLength;
             Md2GlCommand cmd;
-            final List<Integer> fanIndices = Lists.newArrayList();
-            final List<Integer> stripIndices = Lists.newArrayList();
+            final List<Integer> fanIndices = new ArrayList<>();
+            final List<Integer> stripIndices = new ArrayList<>();
             for (int i = 0; i < header.numGlCommands; i++) {
                 length = bis.readInt();
                 if (length == 0) {

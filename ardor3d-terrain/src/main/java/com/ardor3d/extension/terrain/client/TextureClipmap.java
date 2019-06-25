@@ -12,8 +12,10 @@ package com.ardor3d.extension.terrain.client;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -36,8 +38,6 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * An implementation of texture clipmapping
@@ -57,7 +57,7 @@ public class TextureClipmap {
 
     private Texture3D textureClipmap;
 
-    private final List<LevelData> levelDataList = Lists.newArrayList();
+    private final List<LevelData> levelDataList = new ArrayList<>();
 
     private final FloatBuffer sliceDataBuffer;
     private final FloatBuffer sliceDataCopy;
@@ -128,7 +128,7 @@ public class TextureClipmap {
         createTexture();
     }
 
-    private final List<Long> timers = Lists.newArrayList();
+    private final List<Long> timers = new ArrayList<>();
 
     public void prepareToDrawClips(final Terrain terrain) {
         sliceDataCopy.clear();
@@ -309,7 +309,7 @@ public class TextureClipmap {
 
             Collections.sort(regionList, regionSorter);
 
-            final Set<Integer> affectedUnits = Sets.newHashSet();
+            final Set<Integer> affectedUnits = new HashSet<>();
             for (int i = regionList.size() - 1; i >= 0; i--) {
                 final Region region = regionList.get(i);
 

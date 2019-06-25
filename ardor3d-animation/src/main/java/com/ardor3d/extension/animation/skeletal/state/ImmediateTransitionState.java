@@ -10,11 +10,11 @@
 
 package com.ardor3d.extension.animation.skeletal.state;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
-import com.google.common.collect.Maps;
 
 /**
  * Cuts directly to the set target state, without any intermediate transition action.
@@ -49,7 +49,7 @@ public class ImmediateTransitionState extends AbstractTransitionState {
      */
     @Override
     public Map<String, ? extends Object> getCurrentSourceData(final AnimationManager manager) {
-        return Maps.newHashMap();
+        return new HashMap<>();
     }
 
     /**

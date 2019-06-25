@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -49,7 +49,8 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     public void init() {
         _component.addKeyListener(this);
         _component.addFocusListener(new FocusListener() {
-            public void focusLost(final FocusEvent e) {}
+            public void focusLost(final FocusEvent e) {
+            }
 
             public void focusGained(final FocusEvent e) {
                 _pressedList.clear();
@@ -73,9 +74,12 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyPressed(final java.awt.event.KeyEvent e) {
+        // TODO: use key character
+        final char keyChar = e.getKeyChar();
+
         final Key pressed = fromKeyEventToKey(e);
         if (!_pressedList.contains(pressed)) {
-            _upcomingEvents.add(new KeyEvent(pressed, KeyState.DOWN, e.getKeyChar()));
+            _upcomingEvents.add(new KeyEvent(pressed, KeyState.DOWN));
             _pressedList.add(pressed);
         }
         if (_consumeEvents) {
@@ -85,7 +89,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     public synchronized void keyReleased(final java.awt.event.KeyEvent e) {
         final Key released = fromKeyEventToKey(e);
-        _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
+        _upcomingEvents.add(new KeyEvent(released, KeyState.UP));
         _pressedList.remove(released);
         if (_consumeEvents) {
             e.consume();
@@ -94,7 +98,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     /**
      * Convert from AWT key event to Ardor3D Key. Override to provide additional or custom behavior.
-     * 
+     *
      * @param e
      *            the AWT KeyEvent received by the input system.
      * @return an Ardor3D Key, to be forwarded to the Predicate/Trigger system.

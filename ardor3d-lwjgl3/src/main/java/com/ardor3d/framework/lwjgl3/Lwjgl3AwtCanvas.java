@@ -13,6 +13,7 @@ package com.ardor3d.framework.lwjgl3;
 import static org.lwjgl.system.jawt.JAWTFunctions.JAWT_VERSION_1_4;
 
 import java.awt.Canvas;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -25,7 +26,6 @@ import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.MouseManager;
-import com.google.common.collect.Lists;
 
 public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrapper {
 
@@ -40,7 +40,7 @@ public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrappe
 
     protected int _contentWidth, _contentHeight;
 
-    protected List<ICanvasListener> _listeners = Lists.newArrayList();
+    protected List<ICanvasListener> _listeners = new ArrayList<>();
 
     /**
      * If true, we will not try to drop and reclaim the context on each frame.

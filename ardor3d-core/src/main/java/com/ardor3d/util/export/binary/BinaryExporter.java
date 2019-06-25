@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -28,8 +29,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.util.export.Ardor3dExporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Exports to the ardor3d Binary Format. Format descriptor: (each numbered item denotes a series of bytes that follows
@@ -124,14 +123,14 @@ public class BinaryExporter implements Ardor3dExporter {
     protected int _aliasCount = 1;
     protected int _idCount = 1;
 
-    protected final Map<Savable, BinaryIdContentPair> _contentTable = Maps.newIdentityHashMap();
+    protected final Map<Savable, BinaryIdContentPair> _contentTable = new IdentityHashMap<>();
 
-    protected final Map<Integer, Integer> _locationTable = Maps.newHashMap();
+    protected final Map<Integer, Integer> _locationTable = new HashMap<>();
 
     // key - class name, value = bco
-    protected final Map<String, BinaryClassObject> _classes = Maps.newHashMap();
+    protected final Map<String, BinaryClassObject> _classes = new HashMap<>();
 
-    protected final List<Savable> _contentKeys = Lists.newArrayList();
+    protected final List<Savable> _contentKeys = new ArrayList<>();
 
     public BinaryExporter() {
         this(DEFAULT_COMPRESSION);
@@ -139,7 +138,7 @@ public class BinaryExporter implements Ardor3dExporter {
 
     /**
      * Construct a new exporter, specifying some options.
-     * 
+     *
      * @param compression
      *            the compression type to use. One of the constants from {@link java.util.zip.Deflater}
      */

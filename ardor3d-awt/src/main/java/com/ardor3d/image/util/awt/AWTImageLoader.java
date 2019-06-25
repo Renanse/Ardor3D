@@ -19,6 +19,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -31,7 +32,6 @@ import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.image.loader.ImageLoaderUtil;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * Image loader that makes use of AWT's ImageIO to load image file data.
@@ -49,7 +49,7 @@ public class AWTImageLoader implements ImageLoader {
 
     public static void registerLoader() {
         if (supportedFormats == null) {
-            final List<String> formats = Lists.newArrayList();
+            final List<String> formats = new ArrayList<>();
             for (String format : ImageIO.getReaderFormatNames()) {
                 format = "." + format.toUpperCase();
                 if (!formats.contains(format)) {

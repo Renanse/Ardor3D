@@ -11,17 +11,17 @@
 package com.ardor3d.scenegraph;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 public class InstancingManager {
 
     private int _maxBatchSize = 30;
-    private final List<Mesh> _visibleMeshes = Lists.newArrayListWithCapacity(_maxBatchSize);
+    private final List<Mesh> _visibleMeshes = new ArrayList<>(_maxBatchSize);
     private FloatBuffer _transformBuffer;
     private int _primCount;
     private int _meshesToDraw = 0;

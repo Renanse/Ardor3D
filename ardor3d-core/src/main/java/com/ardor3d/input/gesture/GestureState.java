@@ -10,20 +10,20 @@
 
 package com.ardor3d.input.gesture;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
-import com.google.common.collect.Lists;
 
 @Immutable
 public class GestureState {
 
     public static final GestureState NOTHING = new GestureState(0);
 
-    protected final List<AbstractGestureEvent> _eventsSinceLastState = Lists.newArrayList();
+    protected final List<AbstractGestureEvent> _eventsSinceLastState = new ArrayList<>();
 
     protected GestureState(final int ignore) {}
 

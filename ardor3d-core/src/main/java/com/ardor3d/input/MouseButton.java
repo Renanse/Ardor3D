@@ -12,8 +12,6 @@ package com.ardor3d.input;
 
 import java.util.EnumMap;
 
-import com.google.common.collect.Maps;
-
 public enum MouseButton {
     LEFT, RIGHT, MIDDLE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, UNKNOWN;
 
@@ -28,7 +26,7 @@ public enum MouseButton {
         if (middle == null) {
             throw new NullPointerException("middle");
         }
-        final EnumMap<MouseButton, ButtonState> map = Maps.newEnumMap(MouseButton.class);
+        final EnumMap<MouseButton, ButtonState> map = new EnumMap<>(MouseButton.class);
         map.put(LEFT, left);
         map.put(RIGHT, right);
         map.put(MIDDLE, middle);

@@ -11,6 +11,7 @@
 package com.ardor3d.renderer.effect.step;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.renderer.effect.EffectManager;
@@ -19,14 +20,13 @@ import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.google.common.collect.Maps;
 
 public class EffectStep_RenderScreenOverlay implements EffectStep {
 
-    private final EnumMap<StateType, RenderState> _states = Maps.newEnumMap(StateType.class);
+    private final EnumMap<StateType, RenderState> _states = new EnumMap<>(StateType.class);
     private RenderMaterial _enforcedMaterial;
     private final TextureState _texState = new TextureState();
-    private final Map<String, Integer> _targetMap = Maps.newHashMap();
+    private final Map<String, Integer> _targetMap = new HashMap<>();
 
     public EffectStep_RenderScreenOverlay() {
         _states.put(StateType.Texture, _texState);

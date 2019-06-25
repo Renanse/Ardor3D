@@ -10,13 +10,13 @@
 
 package com.ardor3d.extension.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.model.DefaultSliderModel;
 import com.ardor3d.extension.ui.model.SliderModel;
-import com.google.common.collect.Lists;
 
 /**
  * A widget allowing display and control of a choice from a range of values.
@@ -33,7 +33,7 @@ public class UISlider extends UIContainer {
     private final UISliderKnob _knob;
 
     /** List of action listeners notified when this slider is changed. */
-    private final List<ActionListener> _listeners = Lists.newArrayList();
+    private final List<ActionListener> _listeners = new ArrayList<>();
 
     /** The orientation of this slider knob. */
     private final Orientation _orientation;
@@ -66,7 +66,8 @@ public class UISlider extends UIContainer {
     public UISlider(final Orientation orientation, final int minValue, final int maxValue, final int initialValue) {
         assert orientation != null : "orientation must not be null.";
         assert minValue <= maxValue : "minValue must be less than maxValue.";
-        assert minValue <= initialValue && initialValue <= maxValue : "initialValue must be between minValue and maxValue.";
+        assert minValue <= initialValue
+                && initialValue <= maxValue : "initialValue must be between minValue and maxValue.";
 
         // Set our orientation
         _orientation = orientation;

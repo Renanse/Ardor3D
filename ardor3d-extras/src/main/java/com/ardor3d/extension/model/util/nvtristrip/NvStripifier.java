@@ -3,19 +3,18 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.extension.model.util.nvtristrip;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Ported from <a href="http://developer.nvidia.com/object/nvtristrip_library.html">NVIDIA's NvTriStrip Library</a>
@@ -25,14 +24,14 @@ final class NvStripifier {
 
     public static int CACHE_INEFFICIENCY = 6;
 
-    protected List<Integer> _indices = Lists.newArrayList();
+    protected List<Integer> _indices = new ArrayList<>();
     protected int _cacheSize;
     protected int _minStripLength;
     protected float _meshJump;
     protected boolean _firstTimeResetPoint;
 
     /**
-     * 
+     *
      * @param in_indices
      *            the input indices of the mesh to stripify
      * @param in_cacheSize
@@ -59,12 +58,12 @@ final class NvStripifier {
         _indices = in_indices;
 
         // build the stripification info
-        final List<NvFaceInfo> allFaceInfos = Lists.newArrayList();
-        final List<NvEdgeInfo> allEdgeInfos = Lists.newArrayList();
+        final List<NvFaceInfo> allFaceInfos = new ArrayList<>();
+        final List<NvEdgeInfo> allEdgeInfos = new ArrayList<>();
 
         buildStripifyInfo(allFaceInfos, allEdgeInfos, maxIndex);
 
-        final List<NvStripInfo> allStrips = Lists.newArrayList();
+        final List<NvStripInfo> allStrips = new ArrayList<>();
 
         // stripify
         findAllStrips(allStrips, allFaceInfos, allEdgeInfos, numSamples);
@@ -75,7 +74,7 @@ final class NvStripifier {
 
     /**
      * Generates actual strips from the list-in-strip-order.
-     * 
+     *
      * @param allStrips
      * @param stripIndices
      * @param bStitchStrips
@@ -150,8 +149,8 @@ final class NvStripifier {
                     stripIndices.add(tFirstFace._v0);
 
                     // Check CW/CCW ordering
-                    if (NvStripifier.nextIsCW(stripIndices.size() - accountForNegatives) != NvStripifier.isCW(
-                            strip._faces.get(0), tFirstFace._v0, tFirstFace._v1)) {
+                    if (NvStripifier.nextIsCW(stripIndices.size() - accountForNegatives) != NvStripifier
+                            .isCW(strip._faces.get(0), tFirstFace._v0, tFirstFace._v1)) {
                         stripIndices.add(tFirstFace._v0);
                     }
                 }
@@ -325,7 +324,7 @@ final class NvStripifier {
     }
 
     /**
-     * 
+     *
      * @param numIndices
      * @return true if the next face should be ordered in CW fashion
      */
@@ -385,7 +384,7 @@ final class NvStripifier {
 
     /**
      * find the edge info for these two indices
-     * 
+     *
      * @param edgeInfos
      * @param v0
      * @param v1
@@ -416,7 +415,7 @@ final class NvStripifier {
 
     /**
      * find the other face sharing these vertices
-     * 
+     *
      * @param edgeInfos
      * @param v0
      * @param v1
@@ -439,7 +438,7 @@ final class NvStripifier {
     /**
      * A good reset point is one near other committed areas so that we know that when we've made the longest strips its
      * because we're stripifying in the same general orientation.
-     * 
+     *
      * @param faceInfos
      * @param edgeInfos
      * @return
@@ -494,11 +493,11 @@ final class NvStripifier {
 
     /**
      * Does the stripification, puts output strips into vector allStrips
-     * 
+     *
      * Works by setting running a number of experiments in different areas of the mesh, and accepting the one which
      * results in the longest strips. It then accepts this, and moves on to a different area of the mesh. We try to jump
      * around the mesh some, to ensure that large open spans of strips get generated.
-     * 
+     *
      * @param allStrips
      * @param allFaceInfos
      * @param allEdgeInfos
@@ -519,11 +518,11 @@ final class NvStripifier {
             //
             final List<NvStripInfo>[] experiments = new List[numSamples * 6];
             for (int i = 0; i < experiments.length; i++) {
-                experiments[i] = Lists.newArrayList();
+                experiments[i] = new ArrayList<>();
             }
 
             int experimentIndex = 0;
-            final Set<NvFaceInfo> resetPoints = Sets.newHashSet();
+            final Set<NvFaceInfo> resetPoints = new HashSet<>();
             for (int i = 0; i < numSamples; i++) {
 
                 // Try to find another good reset point.
@@ -641,7 +640,7 @@ final class NvStripifier {
     /**
      * Splits the input vector of strips (allBigStrips) into smaller, cache friendly pieces, then reorders these pieces
      * to maximize cache hits. The final strips are stored in outStrips
-     * 
+     *
      * @param allStrips
      * @param outStrips
      * @param edgeInfos
@@ -650,7 +649,7 @@ final class NvStripifier {
     void splitUpStripsAndOptimize(final List<NvStripInfo> allStrips, final List<NvStripInfo> outStrips,
             final List<NvEdgeInfo> edgeInfos, final List<NvFaceInfo> outFaceList) {
         final int threshold = _cacheSize;
-        final List<NvStripInfo> tempStrips = Lists.newArrayList();
+        final List<NvStripInfo> tempStrips = new ArrayList<>();
 
         // split up strips into threshold-sized pieces
         for (int i = 0; i < allStrips.size(); i++) {
@@ -681,9 +680,8 @@ final class NvStripifier {
                             degenerateCount++;
 
                             // last time or first time through, no need for a degenerate
-                            if ((faceCtr + 1 != threshold + j * threshold + degenerateCount || j == numTimes - 1
-                                    && numLeftover < 4 && numLeftover > 0)
-                                    && !bFirstTime) {
+                            if ((faceCtr + 1 != threshold + j * threshold + degenerateCount
+                                    || j == numTimes - 1 && numLeftover < 4 && numLeftover > 0) && !bFirstTime) {
                                 currentStrip._faces.add(allStripI._faces.get(faceCtr++));
                             } else {
                                 ++faceCtr;
@@ -747,7 +745,7 @@ final class NvStripifier {
         }
 
         // add small strips to face list
-        final List<NvStripInfo> tempStrips2 = Lists.newArrayList();
+        final List<NvStripInfo> tempStrips2 = new ArrayList<>();
         removeSmallStrips(tempStrips, tempStrips2, outFaceList);
 
         outStrips.clear();
@@ -868,7 +866,7 @@ final class NvStripifier {
             final List<NvFaceInfo> faceList) {
         faceList.clear();
         allBigStrips.clear(); // make sure these are empty
-        final List<NvFaceInfo> tempFaceList = Lists.newArrayList();
+        final List<NvFaceInfo> tempFaceList = new ArrayList<>();
 
         for (int i = 0; i < allStrips.size(); i++) {
             final NvStripInfo allStripI = allStrips.get(i);
@@ -918,7 +916,7 @@ final class NvStripifier {
 
     /**
      * Finds the next face to start the next strip on.
-     * 
+     *
      * @param faceInfos
      * @param edgeInfos
      * @param strip
@@ -962,7 +960,7 @@ final class NvStripifier {
 
     /**
      * "Commits" the input strips by setting their m_experimentId to -1 and adding to the allStrips vector
-     * 
+     *
      * @param allStrips
      * @param strips
      */
@@ -985,7 +983,7 @@ final class NvStripifier {
     }
 
     /**
-     * 
+     *
      * @param strips
      * @return the average strip size of the input vector of strips
      */
@@ -1000,7 +998,7 @@ final class NvStripifier {
 
     /**
      * Finds a good starting point, namely one which has only one neighbor
-     * 
+     *
      * @param faceInfos
      * @param edgeInfos
      * @return
@@ -1038,7 +1036,7 @@ final class NvStripifier {
 
     /**
      * Updates the input vertex cache with this strip's vertices
-     * 
+     *
      * @param vcache
      * @param strip
      */
@@ -1050,7 +1048,7 @@ final class NvStripifier {
 
     /**
      * Updates the input vertex cache with this face's vertices
-     * 
+     *
      * @param vcache
      * @param face
      */
@@ -1120,7 +1118,7 @@ final class NvStripifier {
     }
 
     /**
-     * 
+     *
      * @param face
      * @param edgeInfoVec
      * @return the number of neighbors that this face has
@@ -1145,7 +1143,7 @@ final class NvStripifier {
 
     /**
      * Builds the list of all face and edge infos
-     * 
+     *
      * @param faceInfos
      * @param edgeInfos
      * @param maxIndex

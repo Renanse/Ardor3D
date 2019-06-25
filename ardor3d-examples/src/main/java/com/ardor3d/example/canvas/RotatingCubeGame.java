@@ -18,10 +18,8 @@ import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.control.OrbitCamControl;
-import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
@@ -156,13 +154,13 @@ public class RotatingCubeGame implements Updater {
             }
         }));
 
-        logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                final InputState current = inputStates.getCurrent();
-
-                System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
-            }
-        }));
+//        logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
+//            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//                final InputState current = inputStates.getCurrent();
+//
+//                System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
+//            }
+//        }));
     }
 
     private void lookAtZero(final Canvas source) {

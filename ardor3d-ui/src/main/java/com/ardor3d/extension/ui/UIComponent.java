@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.ui;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -46,7 +47,6 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.PickingHint;
-import com.google.common.collect.Maps;
 
 /**
  * Base UI class. All UI components/widgets/controls extend this class.
@@ -97,9 +97,9 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     private static int _defaultFontSize = 18;
 
     /** The default font styles to use. */
-    private static Map<String, Object> _defaultFontStyles = Maps.newHashMap();
+    private static Map<String, Object> _defaultFontStyles = new HashMap<>();
     /** The font styles to use for text on this component, if needed. */
-    private Map<String, Object> _fontStyles = Maps.newHashMap();
+    private Map<String, Object> _fontStyles = new HashMap<>();
 
     /** Optional information used by a parent container's layout. */
     private UILayoutData _layoutData = null;
@@ -236,7 +236,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
         if (getParent() != null && getParent() instanceof UIComponent) {
             styles = ((UIComponent) getParent()).getFontStyles();
         } else {
-            styles = Maps.newHashMap(UIComponent._defaultFontStyles);
+            styles = new HashMap<>(UIComponent._defaultFontStyles);
             styles.put(StyleConstants.KEY_COLOR, UIComponent.DEFAULT_FOREGROUND_COLOR);
         }
         styles.putAll(_fontStyles);
@@ -853,13 +853,15 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * Override to provide an action to take when this component or its top level component are attached to a UIHud.
      */
-    public void attachedToHud() {}
+    public void attachedToHud() {
+    }
 
     /**
      * Override to provide an action to take just before this component or its top level component are removed from a
      * UIHud.
      */
-    public void detachedFromHud() {}
+    public void detachedFromHud() {
+    }
 
     /**
      * Centers this frame on the view of the camera
@@ -1243,9 +1245,9 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      */
     public static void setDefaultFontStyles(final Map<String, Object> defaultStyles) {
         if (defaultStyles == null) {
-            UIComponent._defaultFontStyles = Maps.newHashMap();
+            UIComponent._defaultFontStyles = new HashMap<>();
         } else {
-            UIComponent._defaultFontStyles = Maps.newHashMap(defaultStyles);
+            UIComponent._defaultFontStyles = new HashMap<>(defaultStyles);
         }
     }
 
@@ -1333,7 +1335,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * Let subcomponents know that style has been changed.
      */
-    public void fireStyleChanged() {}
+    public void fireStyleChanged() {
+    }
 
     /**
      * @return true if all components should use their opacity value to blend against other components (and/or the 3d
@@ -1362,7 +1365,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * Ask this component to update its minimum allowed size, based on its contents.
      */
-    protected void updateMinimumSizeFromContents() {}
+    protected void updateMinimumSizeFromContents() {
+    }
 
     /**
      * Perform any pre-draw operations on this component.
@@ -1378,14 +1382,16 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *
      * @param renderer
      */
-    protected void postdrawComponent(final Renderer renderer) {}
+    protected void postdrawComponent(final Renderer renderer) {
+    }
 
     /**
      * Draw this component's contents using the given renderer.
      *
      * @param renderer
      */
-    protected void drawComponent(final Renderer renderer) {}
+    protected void drawComponent(final Renderer renderer) {
+    }
 
     // *******************
     // ** INPUT methods
@@ -1645,12 +1651,14 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /**
      * Called by the hud when a component is given focus.
      */
-    public void gainedFocus() {}
+    public void gainedFocus() {
+    }
 
     /**
      * Called by the hud when a component loses focus.
      */
-    public void lostFocus() {}
+    public void lostFocus() {
+    }
 
     /**
      * Looks up the scenegraph for a Hud and asks it to set us as the currently focused component.

@@ -3,18 +3,19 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
 package com.ardor3d.input.logical;
 
+import java.util.function.Predicate;
+
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
-import com.google.common.base.Predicate;
 
 /**
  * A condition that is true if a given button was pressed when going from the previous input state to the current one.
@@ -25,7 +26,7 @@ public final class MouseButtonReleasedCondition implements Predicate<TwoInputSta
 
     /**
      * Construct a new MouseButtonPressedCondition.
-     * 
+     *
      * @param button
      *            the button that should be pressed to trigger this condition
      * @throws NullPointerException
@@ -39,7 +40,7 @@ public final class MouseButtonReleasedCondition implements Predicate<TwoInputSta
         _button = button;
     }
 
-    public boolean apply(final TwoInputStates states) {
+    public boolean test(final TwoInputStates states) {
         final InputState currentState = states.getCurrent();
         final InputState previousState = states.getPrevious();
 

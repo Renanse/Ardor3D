@@ -13,6 +13,7 @@ package com.ardor3d.example.renderer.utils.atlas;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -44,7 +45,6 @@ import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.MeshCombiner;
-import com.google.common.collect.Lists;
 
 /**
  * Example showing how to use the TexturePacker to create a texture atlas. Also shows the benefits of using it together
@@ -151,7 +151,7 @@ public class AtlasExampleMultiTextured extends ExampleBase {
 
     private void packIntoAtlas(final Spatial spatial) {
         // Gather up all meshes to do the atlas operation on
-        final List<Mesh> meshes = Lists.newArrayList();
+        final List<Mesh> meshes = new ArrayList<>();
         spatial.acceptVisitor((final Spatial spat) -> {
             if (spat instanceof Mesh) {
                 meshes.add((Mesh) spat);

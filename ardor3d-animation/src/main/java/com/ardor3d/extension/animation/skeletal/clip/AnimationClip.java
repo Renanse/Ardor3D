@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -12,6 +12,7 @@ package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.annotation.SavableFactory;
@@ -19,7 +20,6 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * AnimationClip manages a set of animation channels as a single clip entity.
@@ -41,18 +41,18 @@ public class AnimationClip implements Savable {
      */
     public AnimationClip(final String name) {
         _name = name;
-        _channels = Lists.newArrayList();
+        _channels = new ArrayList<>();
     }
 
     /**
      * Construct a new animation clip, copying in a given list of channels.
-     * 
+     *
      * @param channels
-     *            a list of channels to shallow copy locally.
+     *                     a list of channels to shallow copy locally.
      */
     public AnimationClip(final String name, final List<AbstractAnimationChannel> channels) {
         _name = name;
-        _channels = Lists.newArrayList(channels);
+        _channels = new ArrayList<>(channels);
         updateMaxTimeIndex();
     }
 
@@ -65,11 +65,11 @@ public class AnimationClip implements Savable {
 
     /**
      * Update an instance of this clip.
-     * 
+     *
      * @param clockTime
-     *            the current local clip time (where 0 == start of clip)
+     *                      the current local clip time (where 0 == start of clip)
      * @param instance
-     *            the instance record to update.
+     *                      the instance record to update.
      */
     public void update(final double clockTime, final AnimationClipInstance instance) {
         // Go through each channel and update clipState
@@ -82,9 +82,9 @@ public class AnimationClip implements Savable {
 
     /**
      * Add a channel to this clip.
-     * 
+     *
      * @param channel
-     *            the channel to add.
+     *                    the channel to add.
      */
     public void addChannel(final AbstractAnimationChannel channel) {
         _channels.add(channel);
@@ -93,9 +93,9 @@ public class AnimationClip implements Savable {
 
     /**
      * Locate a channel in this clip using its channel name.
-     * 
+     *
      * @param channelName
-     *            the name to match against.
+     *                        the name to match against.
      * @return the first channel with a name matching the given channelName, or null if no matches are found.
      */
     public AbstractAnimationChannel findChannelByName(final String channelName) {
@@ -109,9 +109,9 @@ public class AnimationClip implements Savable {
 
     /**
      * Remove a given channel from this clip.
-     * 
+     *
      * @param channel
-     *            the channel to remove.
+     *                    the channel to remove.
      * @return true if this clip had the given channel and it was removed.
      */
     public boolean removeChannel(final AbstractAnimationChannel channel) {

@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.client;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +21,6 @@ import com.ardor3d.extension.terrain.util.PriorityExecutors.PriorityRunnable;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.MathUtils;
-import com.google.common.collect.Sets;
 
 public abstract class AbstractGridCache {
 
@@ -31,9 +31,9 @@ public abstract class AbstractGridCache {
     protected final CacheData[][] cache;
     protected final int destinationSize;
 
-    protected final Set<TileLoadingData> currentTiles = Sets.newHashSet();
-    protected Set<TileLoadingData> newThreadTiles = Sets.newHashSet();
-    protected Set<TileLoadingData> backThreadTiles = Sets.newHashSet();
+    protected final Set<TileLoadingData> currentTiles = new HashSet<>();
+    protected Set<TileLoadingData> newThreadTiles = new HashSet<>();
+    protected Set<TileLoadingData> backThreadTiles = new HashSet<>();
 
     protected final int meshClipIndex;
     protected final int dataClipIndex;
@@ -46,7 +46,7 @@ public abstract class AbstractGridCache {
 
     // Debug
     protected boolean enableDebug = true;
-    protected final Set<TileLoadingData> debugTiles = Sets.newHashSet();
+    protected final Set<TileLoadingData> debugTiles = new HashSet<>();
 
     protected final ExecutorService tileThreadService;
 
@@ -95,7 +95,7 @@ public abstract class AbstractGridCache {
             backCurrentTileY = tileY;
 
             // Gather all of the tiles in range of our new position
-            final Set<TileLoadingData> newTiles = Sets.newHashSet();
+            final Set<TileLoadingData> newTiles = new HashSet<>();
             for (int i = 0; i < cacheSize; i++) {
                 for (int j = 0; j < cacheSize; j++) {
                     final int sourceX = tileX + j - cacheSize / 2;
@@ -237,7 +237,7 @@ public abstract class AbstractGridCache {
     public Set<TileLoadingData> getDebugTiles() {
         Set<TileLoadingData> copyTiles = null;
         synchronized (debugTiles) {
-            copyTiles = Sets.newHashSet(debugTiles);
+            copyTiles = new HashSet<>(debugTiles);
         }
         return copyTiles;
     }
@@ -299,8 +299,9 @@ public abstract class AbstractGridCache {
             final int level = sourceCache.meshClipIndex;
             final int vertexDistance = sourceCache.vertexDistance;
             final int tileSize = sourceCache.tileSize;
-            final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance, sourceTile.getY()
-                    * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
+            final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance,
+                    sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance,
+                    tileSize * vertexDistance);
 
             final DoubleBufferedList<Region> mailBox = sourceCache.mailBox;
             if (mailBox != null) {

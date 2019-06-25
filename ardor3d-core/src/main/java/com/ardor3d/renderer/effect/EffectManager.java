@@ -10,7 +10,9 @@
 
 package com.ardor3d.renderer.effect;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +29,6 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Quad;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class EffectManager {
 
@@ -37,8 +37,8 @@ public class EffectManager {
     public final static String RT_FRAMEBUFFER = "*Framebuffer";
 
     protected final DisplaySettings _canvasSettings;
-    protected final List<RenderEffect> _effects = Lists.newArrayList();
-    protected final Map<String, RenderTarget> _renderTargetMap = Maps.newHashMap();
+    protected final List<RenderEffect> _effects = new ArrayList<>();
+    protected final Map<String, RenderTarget> _renderTargetMap = new HashMap<>();
     protected Renderer _currentRenderer = null;
     protected RenderTarget _currentRenderTarget = null;
     protected Camera _sceneCamera;

@@ -24,7 +24,6 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Maps;
 
 /**
  * <code>RenderState</code> is the base class for all states that affect the rendering of a piece of geometry. They
@@ -83,10 +82,11 @@ public abstract class RenderState implements Savable {
 
     static public class StateStack implements Poolable {
 
-        private final EnumMap<RenderState.StateType, Stack<RenderState>> stacks = Maps
-                .newEnumMap(RenderState.StateType.class);
+        private final EnumMap<RenderState.StateType, Stack<RenderState>> stacks = new EnumMap<>(
+                RenderState.StateType.class);
 
-        public StateStack() {}
+        public StateStack() {
+        }
 
         public final static StateStack fetchTempInstance() {
             if (Constants.useStatePools) {
@@ -138,7 +138,8 @@ public abstract class RenderState implements Savable {
     /**
      * Constructs a new RenderState. The state is enabled by default.
      */
-    public RenderState() {}
+    public RenderState() {
+    }
 
     /**
      * @return An statetype enum value for the subclass.

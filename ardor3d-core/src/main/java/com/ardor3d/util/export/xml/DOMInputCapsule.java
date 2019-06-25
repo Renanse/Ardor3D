@@ -40,7 +40,6 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.export.binary.BinaryClassField;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * Part of the ardor3d XML IO system
@@ -954,7 +953,7 @@ public class DOMInputCapsule implements InputCapsule {
             final String s = tmpEl.getAttribute("size");
             final int size = Integer.parseInt(s);
             @SuppressWarnings("rawtypes")
-            final List tmp = Lists.newArrayList();
+            final List tmp = new ArrayList<>();
             _currentElem = findFirstChildElement(tmpEl);
             for (int i = 0; i < size; i++) {
                 tmp.add(readSavableFromCurrentElem(null));

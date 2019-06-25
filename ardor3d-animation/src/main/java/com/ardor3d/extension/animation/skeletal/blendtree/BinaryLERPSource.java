@@ -10,13 +10,13 @@
 
 package com.ardor3d.extension.animation.skeletal.blendtree;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.clip.TransformData;
 import com.ardor3d.math.MathUtils;
-import com.google.common.collect.Maps;
 
 /**
  * <p>
@@ -112,7 +112,7 @@ public class BinaryLERPSource extends AbstractTwoPartSource {
 
         Map<String, Object> rVal = store;
         if (rVal == null) {
-            rVal = Maps.newHashMap();
+            rVal = new HashMap<>();
         }
 
         for (final Entry<String, ? extends Object> entryAData : sourceAData.entrySet()) {

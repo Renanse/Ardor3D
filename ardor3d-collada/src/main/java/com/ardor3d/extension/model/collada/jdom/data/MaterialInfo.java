@@ -10,19 +10,19 @@
 
 package com.ardor3d.extension.model.collada.jdom.data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.image.Texture;
-import com.google.common.collect.Maps;
 
 public class MaterialInfo {
 
     private String _materialName;
     private String _profile;
     private String _technique;
-    private final Map<String, String> _textureReferences = Maps.newHashMap();
-    private final Map<String, Texture> _textures = Maps.newHashMap();
-    private final Map<String, String> _textureFileNames = Maps.newHashMap();
+    private final Map<String, String> _textureReferences = new HashMap<>();
+    private final Map<String, Texture> _textures = new HashMap<>();
+    private final Map<String, String> _textureFileNames = new HashMap<>();
     private boolean _useTransparency;
     private float _transparency = 1.0f;
 

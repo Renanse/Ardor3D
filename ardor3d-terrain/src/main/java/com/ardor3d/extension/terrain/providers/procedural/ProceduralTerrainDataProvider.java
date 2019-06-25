@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.providers.procedural;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
@@ -17,7 +18,6 @@ import com.ardor3d.extension.terrain.client.TerrainSource;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.google.common.collect.Maps;
 
 public class ProceduralTerrainDataProvider implements TerrainDataProvider {
     private final Function3D function;
@@ -43,7 +43,7 @@ public class ProceduralTerrainDataProvider implements TerrainDataProvider {
 
     @Override
     public Map<Integer, String> getAvailableMaps() throws Exception {
-        final Map<Integer, String> maps = Maps.newHashMap();
+        final Map<Integer, String> maps = new HashMap<>();
         maps.put(0, "ProceduralMap");
 
         return maps;

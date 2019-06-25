@@ -12,13 +12,13 @@ package com.ardor3d.util.gc;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.ardor3d.renderer.RenderContext.RenderContextRef;
 import com.ardor3d.util.Constants;
-import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -34,7 +34,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
     /**
      * Keep a strong reference to these objects until their reference is cleared.
      */
-    private static final List<ContextValueReference<?, ?>> REFS = Lists.newLinkedList();
+    private static final List<ContextValueReference<?, ?>> REFS = new LinkedList<>();
 
     private final Map<RenderContextRef, U> _valueCache;
     private U _singleContextValue;
