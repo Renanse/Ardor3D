@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ardor3d.input.Focus.FocusWrapper;
+import com.ardor3d.input.character.CharacterInputEvent;
 import com.ardor3d.input.character.CharacterInputWrapper;
 import com.ardor3d.input.controller.ControllerEvent;
 import com.ardor3d.input.controller.ControllerWrapper;
@@ -49,17 +50,19 @@ public class TestPhysicalLayer {
 
     Object[] mocks;
 
-    List<KeyEvent> noKeys = new LinkedList<KeyEvent>();
-    List<KeyEvent> Adown = new LinkedList<KeyEvent>();
-    List<KeyEvent> AdownBdown = new LinkedList<KeyEvent>();
-    List<KeyEvent> AdownAup = new LinkedList<KeyEvent>();
+    List<KeyEvent> noKeys = new LinkedList<>();
+    List<KeyEvent> Adown = new LinkedList<>();
+    List<KeyEvent> AdownBdown = new LinkedList<>();
+    List<KeyEvent> AdownAup = new LinkedList<>();
 
-    List<ControllerEvent> nothing = new LinkedList<ControllerEvent>();
+    List<ControllerEvent> nothing = new LinkedList<>();
 
-    List<AbstractGestureEvent> noGestures = new LinkedList<AbstractGestureEvent>();
+    List<AbstractGestureEvent> noGestures = new LinkedList<>();
 
-    List<MouseState> buttonDown = new LinkedList<MouseState>();
-    List<MouseState> noMice = new LinkedList<MouseState>();
+    List<CharacterInputEvent> noCharacters = new LinkedList<>();
+
+    List<MouseState> buttonDown = new LinkedList<>();
+    List<MouseState> noMice = new LinkedList<>();
 
     List<InputState> inputStates;
     InputState is;
@@ -119,6 +122,9 @@ public class TestPhysicalLayer {
 
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false).atLeastOnce();
 
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .times(3);
+
         replay(mocks);
 
         pl.readState();
@@ -160,6 +166,9 @@ public class TestPhysicalLayer {
 
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false).times(2);
 
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .times(4);
+
         replay(mocks);
 
         pl.readState();
@@ -200,6 +209,9 @@ public class TestPhysicalLayer {
                 .times(4);
         expect(gestureWrapper.getGestureEvents()).andReturn(Iterators.peekingIterator(noGestures.iterator())).times(4);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false).times(2);
+
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .times(4);
 
         replay(mocks);
 
@@ -243,6 +255,9 @@ public class TestPhysicalLayer {
                 .atLeastOnce();
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false).atLeastOnce();
 
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .atLeastOnce();
+
         replay(mocks);
 
         pl.readState();
@@ -267,6 +282,9 @@ public class TestPhysicalLayer {
                 .atLeastOnce();
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false).atLeastOnce();
 
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .atLeastOnce();
+
         replay(mocks);
 
         pl.readState();
@@ -288,6 +306,9 @@ public class TestPhysicalLayer {
                 .times(2);
         expect(gestureWrapper.getGestureEvents()).andReturn(Iterators.peekingIterator(noGestures.iterator())).times(2);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(true);
+
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .times(2);
 
         replay(mocks);
 
@@ -323,6 +344,8 @@ public class TestPhysicalLayer {
         expect(gestureWrapper.getGestureEvents()).andReturn(Iterators.peekingIterator(noGestures.iterator())).times(3);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(true);
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .times(3);
 
         replay(mocks);
 
@@ -362,6 +385,8 @@ public class TestPhysicalLayer {
         expect(gestureWrapper.getGestureEvents()).andReturn(Iterators.peekingIterator(noGestures.iterator())).times(3);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(true);
+        expect(characterWrapper.getCharacterEvents()).andReturn(Iterators.peekingIterator(noCharacters.iterator()))
+                .times(3);
 
         replay(mocks);
 
