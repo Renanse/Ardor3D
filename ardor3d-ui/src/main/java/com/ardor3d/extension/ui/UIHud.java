@@ -22,20 +22,21 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyboardState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseManager;
-import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.character.CharacterInputEvent;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyboardState;
 import com.ardor3d.input.logical.BasicTriggersApplier;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.GrabbedState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseManager;
+import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -524,10 +525,16 @@ public class UIHud extends Node {
                         } else {
                             // only key state consumed
                             final TwoInputStates forwardingState = new TwoInputStates(
-                                    new InputState(KeyboardState.NOTHING, prev.getMouseState(),
-                                            prev.getControllerState(), prev.getGestureState()),
-                                    new InputState(KeyboardState.NOTHING, curr.getMouseState(),
-                                            curr.getControllerState(), prev.getGestureState()));
+                                    new InputState(KeyboardState.NOTHING, //
+                                            prev.getMouseState(), //
+                                            prev.getControllerState(), //
+                                            prev.getGestureState(), //
+                                            prev.getCharacterState()),
+                                    new InputState(KeyboardState.NOTHING, //
+                                            curr.getMouseState(), //
+                                            curr.getControllerState(), //
+                                            curr.getGestureState(), //
+                                            curr.getCharacterState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         }
@@ -535,10 +542,16 @@ public class UIHud extends Node {
                         if (!_keyInputConsumed) {
                             // only mouse consumed
                             final TwoInputStates forwardingState = new TwoInputStates(
-                                    new InputState(prev.getKeyboardState(), MouseState.NOTHING,
-                                            prev.getControllerState(), prev.getGestureState()),
-                                    new InputState(curr.getKeyboardState(), MouseState.NOTHING,
-                                            curr.getControllerState(), prev.getGestureState()));
+                                    new InputState(prev.getKeyboardState(), //
+                                            MouseState.NOTHING, //
+                                            prev.getControllerState(), //
+                                            prev.getGestureState(), //
+                                            prev.getCharacterState()),
+                                    new InputState(curr.getKeyboardState(), //
+                                            MouseState.NOTHING, //
+                                            curr.getControllerState(), //
+                                            curr.getGestureState(), //
+                                            curr.getCharacterState()));
                             forwardTo.getApplier().checkAndPerformTriggers(forwardTo.getTriggers(), source,
                                     forwardingState, tpf);
                         } else {
@@ -601,6 +614,16 @@ public class UIHud extends Node {
                     for (final Key key : released) {
                         consumed |= fireKeyReleasedEvent(key, current);
                     }
+                }
+            }
+        }
+
+        {
+            // Character input
+            final List<CharacterInputEvent> events = current.getCharacterState().getEvents();
+            if (!events.isEmpty()) {
+                for (final CharacterInputEvent e : events) {
+                    fireCharacterReceived(e.getValue(), current);
                 }
             }
         }
@@ -871,6 +894,23 @@ public class UIHud extends Node {
     public boolean fireKeyReleasedEvent(final Key key, final InputState currentIS) {
         if (_focusedComponent != null) {
             return _focusedComponent.keyReleased(key, currentIS);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Handle receipt of character values, generally after typing on the keyboard.
+     *
+     * @param value
+     *            character value received.
+     * @param currentIS
+     *            the current input state.
+     * @return if this event is consumed.
+     */
+    public boolean fireCharacterReceived(final char value, final InputState currentIS) {
+        if (_focusedComponent != null) {
+            return _focusedComponent.characterReceived(value, currentIS);
         } else {
             return false;
         }

@@ -13,7 +13,7 @@ package com.ardor3d.input.logical;
 import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 
 /**
  * A condition that is true when a key is down in the current input state.

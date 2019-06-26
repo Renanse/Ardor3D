@@ -11,7 +11,7 @@
 package com.ardor3d.extension.ui.text;
 
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.util.trigger.TimedTrigger;
 
@@ -324,37 +324,60 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
                 break;
         }
 
-//        if (_textEntry.isEditable()) {
-//            char c = state.getKeyboardState().getKeyEvent().getKeyChar();
-//            if (c == '\r') {
-//                c = '\n';
-//            }
-//            if (c >= 32 && c != (char) -1 || c == '\n' || c == '\t') {
-//                if (selection.getSelectionLength() > 0) {
-//                    _textEntry.deleteSelectedText();
-//                    text = _textEntry.getText();
-//                    if (text == null) {
-//                        text = "";
-//                    }
-//                    caretPosition = _textEntry.setCaretPosition(selection.getStartIndex());
-//                    _textEntry.clearSelection();
-//                    s1 = text.substring(0, caretPosition);
-//                    s2 = text.substring(caretPosition, text.length());
-//                }
-//
-//                if (c == '\t') {
-//                    _textEntry.setText(s1 + String.format("%" + DefaultLatinTextEntryKeyHandler.TAB_SIZE + "s", ' ')
-//                            + s2);
-//                    caretPosition = _textEntry.setCaretPosition(caretPosition
-//                            + DefaultLatinTextEntryKeyHandler.TAB_SIZE);
-//                } else {
-//                    _textEntry.setText(s1 + c + s2);
-//                    caretPosition = _textEntry.setCaretPosition(caretPosition + 1);
-//                }
-//            }
-//        }
-
         return true;
+    }
+
+    @Override
+    public boolean characterReceived(final char value, final InputState state) {
+
+        if (_textEntry.isEditable()) {
+            // grab our text
+            String text = _textEntry.getText();
+
+            // get our current caret location
+            int caretPosition = _textEntry.getCaretPosition();
+            if (caretPosition > text.length()) {
+                caretPosition = _textEntry.setCaretPosition(text.length());
+            }
+
+            // get our text selection object
+            final TextSelection selection = _textEntry.getSelection();
+
+            // divide the text based on caret position.
+            String s1 = text.substring(0, caretPosition);
+            String s2 = text.substring(caretPosition, text.length());
+
+            char c = value;
+            if (c == '\r') {
+                c = '\n';
+            }
+
+            if (c >= 32 && c != (char) -1 || c == '\n' || c == '\t') {
+                if (selection.getSelectionLength() > 0) {
+                    _textEntry.deleteSelectedText();
+                    text = _textEntry.getText();
+                    if (text == null) {
+                        text = "";
+                    }
+                    caretPosition = _textEntry.setCaretPosition(selection.getStartIndex());
+                    _textEntry.clearSelection();
+                    s1 = text.substring(0, caretPosition);
+                    s2 = text.substring(caretPosition, text.length());
+                }
+
+                if (c == '\t') {
+                    _textEntry.setText(
+                            s1 + String.format("%" + DefaultLatinTextEntryKeyHandler.TAB_SIZE + "s", ' ') + s2);
+                    caretPosition = _textEntry
+                            .setCaretPosition(caretPosition + DefaultLatinTextEntryKeyHandler.TAB_SIZE);
+                } else {
+                    _textEntry.setText(s1 + c + s2);
+                    caretPosition = _textEntry.setCaretPosition(caretPosition + 1);
+                }
+            }
+        }
+
+        return false;
     }
 
     protected boolean isShiftDown(final InputState state) {

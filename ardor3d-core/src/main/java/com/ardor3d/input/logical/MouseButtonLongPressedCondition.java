@@ -15,10 +15,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.math.MathUtils;
 
 /**

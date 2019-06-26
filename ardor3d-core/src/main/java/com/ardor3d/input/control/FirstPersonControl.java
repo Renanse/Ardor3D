@@ -13,14 +13,14 @@ package com.ardor3d.input.control;
 import java.util.function.Predicate;
 
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyboardState;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyboardState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;

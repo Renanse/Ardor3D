@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.keyboard;
 
 /**
  * Keys supported by Ardor3D platforms. Note that all keys are not likely supported by any one platform.

@@ -29,7 +29,7 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;

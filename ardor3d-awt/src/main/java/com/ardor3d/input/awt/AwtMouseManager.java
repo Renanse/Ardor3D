@@ -25,13 +25,13 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import com.ardor3d.image.util.awt.AWTImageUtil;
-import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.MouseCursor;
-import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.mouse.GrabbedState;
+import com.ardor3d.input.mouse.MouseCursor;
+import com.ardor3d.input.mouse.MouseManager;
 
 /**
- * Implementation of the {@link com.ardor3d.input.MouseManager} interface for use with AWT windows. This implementation
- * supports the optional {@link #setGrabbed(com.ardor3d.input.GrabbedState)} and {@link #setPosition(int, int)} methods
+ * Implementation of the {@link com.ardor3d.input.mouse.MouseManager} interface for use with AWT windows. This implementation
+ * supports the optional {@link #setGrabbed(com.ardor3d.input.mouse.GrabbedState)} and {@link #setPosition(int, int)} methods
  * if an AWT robot can be created on the current system. The constructor takes an AWT {@link java.awt.Component}
  * instance, for which the cursor is set. In a multi-canvas application, each canvas can have its own AwtMouseManager
  * instance, or it is possible to use a single one for the AWT container that includes the canvases.

@@ -17,6 +17,10 @@ import java.util.EnumSet;
 
 import org.junit.Test;
 
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyEvent;
+import com.ardor3d.input.keyboard.KeyboardState;
+
 public class TestKeyboardState {
     KeyboardState ks1, ks2;
 

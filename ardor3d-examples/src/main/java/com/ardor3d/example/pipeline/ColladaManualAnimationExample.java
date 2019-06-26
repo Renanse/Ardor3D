@@ -27,7 +27,7 @@ import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;

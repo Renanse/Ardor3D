@@ -13,9 +13,9 @@ package com.ardor3d.input.logical;
 import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
 
 /**
  * A condition that is true if a given button was pressed when going from the previous input state to the current one.

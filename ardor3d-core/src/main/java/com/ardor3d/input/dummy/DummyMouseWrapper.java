@@ -8,10 +8,10 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.logical;
+package com.ardor3d.input.dummy;
 
-import com.ardor3d.input.MouseState;
-import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.input.mouse.MouseWrapper;
 import com.google.common.collect.PeekingIterator;
 
 /**
@@ -37,7 +37,7 @@ public class DummyMouseWrapper implements MouseWrapper {
         }
     };
 
-    public PeekingIterator<MouseState> getEvents() {
+    public PeekingIterator<MouseState> getMouseEvents() {
         return empty;
     }
 

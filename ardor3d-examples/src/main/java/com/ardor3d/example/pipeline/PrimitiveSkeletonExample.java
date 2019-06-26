@@ -18,7 +18,7 @@ import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;

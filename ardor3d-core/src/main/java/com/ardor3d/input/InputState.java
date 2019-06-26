@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2017 Bird Dog Games, Inc..
+ * Copyright (c) 2008-2019 Bird Dog Games, Inc..
  *
  * This file is part of Ardor3D.
  *
@@ -13,7 +13,11 @@ package com.ardor3d.input;
 import java.text.MessageFormat;
 
 import com.ardor3d.annotation.Immutable;
+import com.ardor3d.input.character.CharacterInputState;
+import com.ardor3d.input.controller.ControllerState;
 import com.ardor3d.input.gesture.GestureState;
+import com.ardor3d.input.keyboard.KeyboardState;
+import com.ardor3d.input.mouse.MouseState;
 
 /**
  * The total input state of the devices that are being handled.
@@ -21,14 +25,15 @@ import com.ardor3d.input.gesture.GestureState;
 @Immutable
 public class InputState {
     public static final InputState LOST_FOCUS = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
-            ControllerState.NOTHING, GestureState.NOTHING);
+            ControllerState.NOTHING, GestureState.NOTHING, CharacterInputState.NOTHING);
     public static final InputState EMPTY = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
-            ControllerState.NOTHING, GestureState.NOTHING);
+            ControllerState.NOTHING, GestureState.NOTHING, CharacterInputState.NOTHING);
 
-    private final KeyboardState keyboardState;
-    private final MouseState mouseState;
-    private final ControllerState controllerState;
-    private final GestureState gestureState;
+    private final KeyboardState _keyboardState;
+    private final MouseState _mouseState;
+    private final ControllerState _controllerState;
+    private final GestureState _gestureState;
+    private final CharacterInputState _characterState;
 
     /**
      * Creates a new instance.
@@ -41,11 +46,14 @@ public class InputState {
      *            a non-null ControllerState instance
      * @param gestureState
      *            a non-null GestureState instance
+     * @param characterState
+     *            a non-null CharacterInputState instance
      * @throws NullPointerException
      *             if any parameter is null
      */
     public InputState(final KeyboardState keyboardState, final MouseState mouseState,
-            final ControllerState controllerState, final GestureState gestureState) {
+            final ControllerState controllerState, final GestureState gestureState,
+            final CharacterInputState characterState) {
         if (keyboardState == null) {
             throw new NullPointerException("Keyboard state");
         }
@@ -62,32 +70,37 @@ public class InputState {
             throw new NullPointerException("Gesture state");
         }
 
-        this.keyboardState = keyboardState;
-        this.mouseState = mouseState;
-        this.controllerState = controllerState;
-        this.gestureState = gestureState;
+        _keyboardState = keyboardState;
+        _mouseState = mouseState;
+        _controllerState = controllerState;
+        _gestureState = gestureState;
+        _characterState = characterState;
     }
 
     public KeyboardState getKeyboardState() {
-        return keyboardState;
+        return _keyboardState;
     }
 
     public MouseState getMouseState() {
-        return mouseState;
+        return _mouseState;
     }
 
     public ControllerState getControllerState() {
-        return controllerState;
+        return _controllerState;
     }
 
     public GestureState getGestureState() {
-        return gestureState;
+        return _gestureState;
+    }
+
+    public CharacterInputState getCharacterState() {
+        return _characterState;
     }
 
     @Override
     public String toString() {
         return MessageFormat.format(
-                "InputState[keyboardState={0}, mouseState={1}, controllerState={2}, controllerState={3}]",
-                keyboardState, mouseState, controllerState, gestureState);
+                "InputState[keyboardState={0}, mouseState={1}, controllerState={2}, gestureState={3}, characterState={4}]",
+                _keyboardState, _mouseState, _controllerState, _gestureState, _characterState);
     }
 }

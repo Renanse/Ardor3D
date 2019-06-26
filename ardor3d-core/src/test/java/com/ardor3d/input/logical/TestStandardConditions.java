@@ -17,15 +17,16 @@ import java.util.EnumSet;
 
 import org.junit.Test;
 
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.ControllerState;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyEvent;
-import com.ardor3d.input.KeyboardState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.character.CharacterInputState;
+import com.ardor3d.input.controller.ControllerState;
 import com.ardor3d.input.gesture.GestureState;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyEvent;
+import com.ardor3d.input.keyboard.KeyboardState;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
 
 public class TestStandardConditions {
     final KeyboardState ks = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);
@@ -33,6 +34,7 @@ public class TestStandardConditions {
             MouseButton.makeMap(ButtonState.UP, ButtonState.UP, ButtonState.UP), null);
     final ControllerState cs = new ControllerState();
     final GestureState gs = new GestureState();
+    final CharacterInputState cis = new CharacterInputState();
     InputState is1, is2, is3, is4, is5;
 
     KeyboardState aDown = new KeyboardState(EnumSet.of(Key.A), KeyEvent.NOTHING);
@@ -48,9 +50,9 @@ public class TestStandardConditions {
     public void testKeyHeld1() throws Exception {
         final KeyHeldCondition kh = new KeyHeldCondition(Key.A);
 
-        is1 = new InputState(ks, ms, cs, gs);
-        is2 = new InputState(aDown, ms, cs, gs);
-        is3 = new InputState(bDown, ms, cs, gs);
+        is1 = new InputState(ks, ms, cs, gs, cis);
+        is2 = new InputState(aDown, ms, cs, gs, cis);
+        is3 = new InputState(bDown, ms, cs, gs, cis);
 
         assertFalse("not down", kh.test(new TwoInputStates(is1, is1)));
         assertTrue("down", kh.test(new TwoInputStates(is1, is2)));
@@ -73,9 +75,9 @@ public class TestStandardConditions {
     public void testKeyPressed() throws Exception {
         final KeyPressedCondition kh = new KeyPressedCondition(Key.A);
 
-        is1 = new InputState(ks, ms, cs, gs);
-        is2 = new InputState(aDown, ms, cs, gs);
-        is3 = new InputState(bDown, ms, cs, gs);
+        is1 = new InputState(ks, ms, cs, gs, cis);
+        is2 = new InputState(aDown, ms, cs, gs, cis);
+        is3 = new InputState(bDown, ms, cs, gs, cis);
 
         assertFalse("not down", kh.test(new TwoInputStates(is1, is1)));
         assertTrue("down", kh.test(new TwoInputStates(is1, is2)));
@@ -98,9 +100,9 @@ public class TestStandardConditions {
     public void testKeyReleased() throws Exception {
         final KeyReleasedCondition kh = new KeyReleasedCondition(Key.A);
 
-        is1 = new InputState(ks, ms, cs, gs);
-        is2 = new InputState(aDown, ms, cs, gs);
-        is3 = new InputState(bDown, ms, cs, gs);
+        is1 = new InputState(ks, ms, cs, gs, cis);
+        is2 = new InputState(aDown, ms, cs, gs, cis);
+        is3 = new InputState(bDown, ms, cs, gs, cis);
 
         assertFalse("not down", kh.test(new TwoInputStates(is1, is1)));
         assertFalse("not down", kh.test(new TwoInputStates(is1, is2)));
@@ -128,11 +130,11 @@ public class TestStandardConditions {
         final MouseState ms4 = new MouseState(3, 1, 2, 1, 0, bothDown, null);
         final MouseState ms5 = new MouseState(3, 0, 0, -1, 0, bothDown, null);
 
-        is1 = new InputState(ks, ms, cs, gs);
-        is2 = new InputState(ks, ms2, cs, gs);
-        is3 = new InputState(ks, ms3, cs, gs);
-        is4 = new InputState(ks, ms4, cs, gs);
-        is5 = new InputState(ks, ms5, cs, gs);
+        is1 = new InputState(ks, ms, cs, gs, cis);
+        is2 = new InputState(ks, ms2, cs, gs, cis);
+        is3 = new InputState(ks, ms3, cs, gs, cis);
+        is4 = new InputState(ks, ms4, cs, gs, cis);
+        is5 = new InputState(ks, ms5, cs, gs, cis);
 
         assertFalse("mm1", mm.test(new TwoInputStates(is1, is1)));
         assertTrue("mm2", mm.test(new TwoInputStates(is1, is2)));
@@ -156,11 +158,11 @@ public class TestStandardConditions {
         final MouseState ms4 = new MouseState(3, 1, 2, 1, 0, upDown, null);
         final MouseState ms5 = new MouseState(3, 0, 0, -1, 0, downUp, null);
 
-        is1 = new InputState(ks, ms, cs, gs);
-        is2 = new InputState(ks, ms2, cs, gs);
-        is3 = new InputState(ks, ms3, cs, gs);
-        is4 = new InputState(ks, ms4, cs, gs);
-        is5 = new InputState(ks, ms5, cs, gs);
+        is1 = new InputState(ks, ms, cs, gs, cis);
+        is2 = new InputState(ks, ms2, cs, gs, cis);
+        is3 = new InputState(ks, ms3, cs, gs, cis);
+        is4 = new InputState(ks, ms4, cs, gs, cis);
+        is5 = new InputState(ks, ms5, cs, gs, cis);
 
         assertFalse("mm1", mm.test(new TwoInputStates(is1, is1)));
         assertFalse("mm2", mm.test(new TwoInputStates(is1, is2)));
@@ -183,11 +185,11 @@ public class TestStandardConditions {
         final MouseState ms4 = new MouseState(3, 1, 2, 1, 0, upDown, null);
         final MouseState ms5 = new MouseState(3, 0, 0, -1, 0, downUp, null);
 
-        is1 = new InputState(ks, ms, cs, gs);
-        is2 = new InputState(ks, ms2, cs, gs);
-        is3 = new InputState(ks, ms3, cs, gs);
-        is4 = new InputState(ks, ms4, cs, gs);
-        is5 = new InputState(ks, ms5, cs, gs);
+        is1 = new InputState(ks, ms, cs, gs, cis);
+        is2 = new InputState(ks, ms2, cs, gs, cis);
+        is3 = new InputState(ks, ms3, cs, gs, cis);
+        is4 = new InputState(ks, ms4, cs, gs, cis);
+        is5 = new InputState(ks, ms5, cs, gs, cis);
 
         assertFalse("mm1", mm.test(new TwoInputStates(is1, is1)));
         assertFalse("mm2", mm.test(new TwoInputStates(is1, is2)));

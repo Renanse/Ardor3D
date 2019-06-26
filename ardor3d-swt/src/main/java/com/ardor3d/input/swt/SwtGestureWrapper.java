@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Touch;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.ThreadSafe;
-import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.gesture.GestureWrapper;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.gesture.touch.AbstractTouchInterpreter;
@@ -35,6 +34,7 @@ import com.ardor3d.input.gesture.touch.RotateInterpreter;
 import com.ardor3d.input.gesture.touch.SwipeInterpreter;
 import com.ardor3d.input.gesture.touch.TouchHistory;
 import com.ardor3d.input.gesture.touch.TouchStatus;
+import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.MathUtils;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
@@ -102,7 +102,7 @@ public class SwtGestureWrapper implements GestureWrapper, TouchListener {
     }
 
     @Override
-    public PeekingIterator<AbstractGestureEvent> getEvents() {
+    public PeekingIterator<AbstractGestureEvent> getGestureEvents() {
         updateInterpreters();
 
         if (_currentIterator == null || !_currentIterator.hasNext()) {

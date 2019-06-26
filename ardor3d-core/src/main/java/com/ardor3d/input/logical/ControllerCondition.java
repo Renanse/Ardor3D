@@ -13,8 +13,8 @@ package com.ardor3d.input.logical;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.ardor3d.input.ControllerEvent;
-import com.ardor3d.input.ControllerState;
+import com.ardor3d.input.controller.ControllerEvent;
+import com.ardor3d.input.controller.ControllerState;
 
 public final class ControllerCondition implements Predicate<TwoInputStates> {
 

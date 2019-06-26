@@ -8,11 +8,13 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.Focus;
 
 /**
- * Enumerates the different states a mouse button can be in.
+ * Describes the interface to implement to keep track of focus changes.
  */
-public enum ButtonState {
-    UP, DOWN, UNDEFINED
+public interface FocusWrapper {
+    public boolean getAndClearFocusLost();
+
+    void init();
 }

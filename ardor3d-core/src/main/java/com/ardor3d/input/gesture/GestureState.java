@@ -21,13 +21,12 @@ import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 @Immutable
 public class GestureState {
 
-    public static final GestureState NOTHING = new GestureState(0);
+    public static final GestureState NOTHING = new GestureState();
 
     protected final List<AbstractGestureEvent> _eventsSinceLastState = new ArrayList<>();
 
-    protected GestureState(final int ignore) {}
-
-    public GestureState() {}
+    public GestureState() {
+    }
 
     public void addEvent(final AbstractGestureEvent event) {
         _eventsSinceLastState.add(event);

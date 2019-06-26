@@ -14,9 +14,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
 import com.ardor3d.framework.lwjgl3.GLFWCanvas;
-import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.MouseCursor;
-import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.mouse.GrabbedState;
+import com.ardor3d.input.mouse.MouseCursor;
+import com.ardor3d.input.mouse.MouseManager;
 
 public class GLFWMouseManager implements MouseManager {
 

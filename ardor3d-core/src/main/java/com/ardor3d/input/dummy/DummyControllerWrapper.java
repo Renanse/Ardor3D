@@ -8,11 +8,11 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.logical;
+package com.ardor3d.input.dummy;
 
-import com.ardor3d.input.ControllerEvent;
-import com.ardor3d.input.ControllerInfo;
-import com.ardor3d.input.ControllerWrapper;
+import com.ardor3d.input.controller.ControllerEvent;
+import com.ardor3d.input.controller.ControllerInfo;
+import com.ardor3d.input.controller.ControllerWrapper;
 import com.google.common.collect.PeekingIterator;
 
 public class DummyControllerWrapper implements ControllerWrapper {
@@ -34,7 +34,7 @@ public class DummyControllerWrapper implements ControllerWrapper {
         }
     };
 
-    public PeekingIterator<ControllerEvent> getEvents() {
+    public PeekingIterator<ControllerEvent> getControllerEvents() {
         return empty;
     }
 

@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.keyboard;
 
 /**
  * Thrown when an attempt at fetching a {@link Key} instance for an invalid/unknown key code is made.

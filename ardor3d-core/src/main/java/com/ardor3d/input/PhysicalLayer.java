@@ -18,12 +18,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.ardor3d.input.Focus.FocusWrapper;
+import com.ardor3d.input.character.CharacterInputEvent;
+import com.ardor3d.input.character.CharacterInputState;
+import com.ardor3d.input.character.CharacterInputWrapper;
+import com.ardor3d.input.controller.ControllerEvent;
+import com.ardor3d.input.controller.ControllerState;
+import com.ardor3d.input.controller.ControllerWrapper;
+import com.ardor3d.input.dummy.DummyCharacterInputWrapper;
+import com.ardor3d.input.dummy.DummyControllerWrapper;
+import com.ardor3d.input.dummy.DummyFocusWrapper;
+import com.ardor3d.input.dummy.DummyGestureWrapper;
+import com.ardor3d.input.dummy.DummyKeyboardWrapper;
+import com.ardor3d.input.dummy.DummyMouseWrapper;
 import com.ardor3d.input.gesture.GestureState;
 import com.ardor3d.input.gesture.GestureWrapper;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
-import com.ardor3d.input.logical.DummyControllerWrapper;
-import com.ardor3d.input.logical.DummyFocusWrapper;
-import com.ardor3d.input.logical.DummyGestureWrapper;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyEvent;
+import com.ardor3d.input.keyboard.KeyState;
+import com.ardor3d.input.keyboard.KeyboardState;
+import com.ardor3d.input.keyboard.KeyboardWrapper;
+import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.input.mouse.MouseWrapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.PeekingIterator;
 
@@ -36,62 +53,36 @@ public class PhysicalLayer {
 
     private static final Logger logger = Logger.getLogger(PhysicalLayer.class.getName());
 
-    private final BlockingQueue<InputState> _stateQueue;
-    private final KeyboardWrapper _keyboardWrapper;
-    private final MouseWrapper _mouseWrapper;
-    private final FocusWrapper _focusWrapper;
-    private final ControllerWrapper _controllerWrapper;
-    private final GestureWrapper _gestureWrapper;
+    protected final BlockingQueue<InputState> _stateQueue;
+    protected final KeyboardWrapper _keyboardWrapper;
+    protected final MouseWrapper _mouseWrapper;
+    protected final FocusWrapper _focusWrapper;
+    protected final ControllerWrapper _controllerWrapper;
+    protected final GestureWrapper _gestureWrapper;
+    protected final CharacterInputWrapper _characterWrapper;
 
-    private KeyboardState _currentKeyboardState;
-    private MouseState _currentMouseState;
-    private ControllerState _currentControllerState;
-    private GestureState _currentGestureState;
+    protected KeyboardState _currentKeyboardState = KeyboardState.NOTHING;
+    protected MouseState _currentMouseState = MouseState.NOTHING;
+    protected ControllerState _currentControllerState = ControllerState.NOTHING;
+    protected GestureState _currentGestureState = GestureState.NOTHING;
+    protected CharacterInputState _currentCharacterState = CharacterInputState.NOTHING;
 
-    private boolean _inited = false;
+    protected boolean _inited = false;
 
-    private static final long MAX_INPUT_POLL_TIME = TimeUnit.SECONDS.toNanos(2);
-    private static final List<InputState> EMPTY_LIST = ImmutableList.of();
+    protected static final long MAX_INPUT_POLL_TIME = TimeUnit.SECONDS.toNanos(2);
+    protected static final List<InputState> EMPTY_LIST = ImmutableList.of();
 
-    public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper) {
-        this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, DummyGestureWrapper.INSTANCE,
-                DummyFocusWrapper.INSTANCE);
-    }
-
-    public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
-            final FocusWrapper focusWrapper) {
-        this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, DummyGestureWrapper.INSTANCE, focusWrapper);
-    }
-
-    public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
-            final ControllerWrapper controllerWrapper) {
-        this(keyboardWrapper, mouseWrapper, controllerWrapper, DummyGestureWrapper.INSTANCE, DummyFocusWrapper.INSTANCE);
-    }
-
-    public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
-            final ControllerWrapper controllerWrapper, final FocusWrapper focusWrapper) {
-        this(keyboardWrapper, mouseWrapper, controllerWrapper, DummyGestureWrapper.INSTANCE, focusWrapper);
-    }
-
-    public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
-            final GestureWrapper gestureWrapper) {
-        this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, gestureWrapper, DummyFocusWrapper.INSTANCE);
-    }
-
-    public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
+    protected PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final ControllerWrapper controllerWrapper, final GestureWrapper gestureWrapper,
-            final FocusWrapper focusWrapper) {
+            final FocusWrapper focusWrapper, final CharacterInputWrapper characterWrapper) {
         _keyboardWrapper = keyboardWrapper;
         _mouseWrapper = mouseWrapper;
         _focusWrapper = focusWrapper;
         _controllerWrapper = controllerWrapper;
         _gestureWrapper = gestureWrapper;
-        _stateQueue = new LinkedBlockingQueue<InputState>();
+        _characterWrapper = characterWrapper;
 
-        _currentKeyboardState = KeyboardState.NOTHING;
-        _currentMouseState = MouseState.NOTHING;
-        _currentControllerState = ControllerState.NOTHING;
-        _currentGestureState = GestureState.NOTHING;
+        _stateQueue = new LinkedBlockingQueue<InputState>();
     }
 
     /**
@@ -117,6 +108,7 @@ public class PhysicalLayer {
         MouseState oldMouseState = _currentMouseState;
         ControllerState oldControllerState = _currentControllerState;
         GestureState oldGestureState = _currentGestureState;
+        CharacterInputState oldCharacterState = _currentCharacterState;
 
         final long loopExitTime = System.nanoTime() + MAX_INPUT_POLL_TIME;
 
@@ -125,22 +117,26 @@ public class PhysicalLayer {
             readMouseState();
             readControllerState();
             readGestureState();
+            readCharacterState();
 
             // if there is no new input, exit the loop. Otherwise, add a new input state to the queue, and
             // see if there is even more input to read.
-            if (oldKeyState.equals(_currentKeyboardState) && oldMouseState.equals(_currentMouseState)
-                    && oldControllerState.equals(_currentControllerState)
-                    && oldGestureState.equals(_currentGestureState)) {
+            if (oldKeyState.equals(_currentKeyboardState) //
+                    && oldMouseState.equals(_currentMouseState) //
+                    && oldControllerState.equals(_currentControllerState) //
+                    && oldGestureState.equals(_currentGestureState) //
+                    && oldCharacterState.equals(_currentCharacterState)) {
                 break;
             }
 
             _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState, _currentControllerState,
-                    _currentGestureState));
+                    _currentGestureState, _currentCharacterState));
 
             oldKeyState = _currentKeyboardState;
             oldMouseState = _currentMouseState;
             oldControllerState = _currentControllerState;
             oldGestureState = _currentGestureState;
+            oldCharacterState = _currentCharacterState;
 
             if (System.nanoTime() > loopExitTime) {
                 logger.severe("Spent too long collecting input data, this is probably an input system bug");
@@ -153,8 +149,8 @@ public class PhysicalLayer {
         }
     }
 
-    private void readControllerState() {
-        final PeekingIterator<ControllerEvent> eventIterator = _controllerWrapper.getEvents();
+    protected void readControllerState() {
+        final PeekingIterator<ControllerEvent> eventIterator = _controllerWrapper.getControllerEvents();
 
         if (eventIterator.hasNext()) {
             _currentControllerState = new ControllerState(_currentControllerState);
@@ -164,8 +160,8 @@ public class PhysicalLayer {
         }
     }
 
-    private void readGestureState() {
-        final PeekingIterator<AbstractGestureEvent> eventIterator = _gestureWrapper.getEvents();
+    protected void readGestureState() {
+        final PeekingIterator<AbstractGestureEvent> eventIterator = _gestureWrapper.getGestureEvents();
 
         if (eventIterator.hasNext()) {
             _currentGestureState = new GestureState();
@@ -177,16 +173,29 @@ public class PhysicalLayer {
         }
     }
 
-    private void readMouseState() {
-        final PeekingIterator<MouseState> eventIterator = _mouseWrapper.getEvents();
+    protected void readCharacterState() {
+        final PeekingIterator<CharacterInputEvent> eventIterator = _characterWrapper.getCharacterEvents();
+
+        if (eventIterator.hasNext()) {
+            _currentCharacterState = new CharacterInputState();
+            while (eventIterator.hasNext()) {
+                _currentCharacterState.addEvent(eventIterator.next());
+            }
+        } else {
+            _currentCharacterState = CharacterInputState.NOTHING;
+        }
+    }
+
+    protected void readMouseState() {
+        final PeekingIterator<MouseState> eventIterator = _mouseWrapper.getMouseEvents();
 
         if (eventIterator.hasNext()) {
             _currentMouseState = eventIterator.next();
         }
     }
 
-    private void readKeyboardState() {
-        final PeekingIterator<KeyEvent> eventIterator = _keyboardWrapper.getEvents();
+    protected void readKeyboardState() {
+        final PeekingIterator<KeyEvent> eventIterator = _keyboardWrapper.getKeyEvents();
 
         // if no new events, just leave the current state as is
         if (!eventIterator.hasNext()) {
@@ -233,15 +242,16 @@ public class PhysicalLayer {
         return result;
     }
 
-    private void lostFocus() {
+    protected void lostFocus() {
         _stateQueue.add(InputState.LOST_FOCUS);
         _currentKeyboardState = KeyboardState.NOTHING;
         _currentMouseState = MouseState.NOTHING;
         _currentControllerState = ControllerState.NOTHING;
         _currentGestureState = GestureState.NOTHING;
+        _currentCharacterState = CharacterInputState.NOTHING;
     }
 
-    private void init() {
+    protected void init() {
         _inited = true;
 
         _keyboardWrapper.init();
@@ -249,6 +259,7 @@ public class PhysicalLayer {
         _focusWrapper.init();
         _controllerWrapper.init();
         _gestureWrapper.init();
+        _characterWrapper.init();
     }
 
     public ControllerWrapper getControllerWrapper() {
@@ -265,5 +276,49 @@ public class PhysicalLayer {
 
     public GestureWrapper getGestureWrapper() {
         return _gestureWrapper;
+    }
+
+    public static final class Builder {
+        protected KeyboardWrapper _keyboardWrapper = DummyKeyboardWrapper.INSTANCE;
+        protected MouseWrapper _mouseWrapper = DummyMouseWrapper.INSTANCE;
+        protected FocusWrapper _focusWrapper = DummyFocusWrapper.INSTANCE;
+        protected ControllerWrapper _controllerWrapper = DummyControllerWrapper.INSTANCE;
+        protected GestureWrapper _gestureWrapper = DummyGestureWrapper.INSTANCE;
+        protected CharacterInputWrapper _characterWrapper = DummyCharacterInputWrapper.INSTANCE;
+
+        public Builder with(final KeyboardWrapper wrapper) {
+            _keyboardWrapper = wrapper;
+            return this;
+        }
+
+        public Builder with(final MouseWrapper wrapper) {
+            _mouseWrapper = wrapper;
+            return this;
+        }
+
+        public Builder with(final FocusWrapper wrapper) {
+            _focusWrapper = wrapper;
+            return this;
+        }
+
+        public Builder with(final ControllerWrapper wrapper) {
+            _controllerWrapper = wrapper;
+            return this;
+        }
+
+        public Builder with(final GestureWrapper wrapper) {
+            _gestureWrapper = wrapper;
+            return this;
+        }
+
+        public Builder with(final CharacterInputWrapper wrapper) {
+            _characterWrapper = wrapper;
+            return this;
+        }
+
+        public PhysicalLayer build() {
+            return new PhysicalLayer(_keyboardWrapper, _mouseWrapper, _controllerWrapper, _gestureWrapper,
+                    _focusWrapper, _characterWrapper);
+        }
     }
 }

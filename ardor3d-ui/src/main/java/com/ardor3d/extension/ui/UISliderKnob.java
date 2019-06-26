@@ -13,7 +13,7 @@ package com.ardor3d.extension.ui;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.model.SliderModel;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.math.MathUtils;
 
 /**

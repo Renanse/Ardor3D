@@ -12,7 +12,7 @@ package com.ardor3d.input.swt;
 
 import org.eclipse.swt.SWT;
 
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 
 /**
  * Enumeration for use in converting between SWT key codes and Ardor3d Keys.

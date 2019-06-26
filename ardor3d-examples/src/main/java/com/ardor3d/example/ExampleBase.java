@@ -13,6 +13,7 @@ package com.ardor3d.example;
 import java.awt.EventQueue;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -35,16 +36,15 @@ import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.image.util.awt.ScreenShotImageExporter;
-import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.character.CharacterInputEvent;
 import com.ardor3d.input.control.FirstPersonControl;
+import com.ardor3d.input.glfw.GLFWCharacterInputWrapper;
 import com.ardor3d.input.glfw.GLFWKeyboardWrapper;
 import com.ardor3d.input.glfw.GLFWMouseManager;
 import com.ardor3d.input.glfw.GLFWMouseWrapper;
-import com.ardor3d.input.logical.DummyControllerWrapper;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.logical.AnyCharacterCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -53,6 +53,9 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.GrabbedState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -365,8 +368,11 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
             final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(example);
             final GLFWCanvas canvas = new GLFWCanvas(settings, canvasRenderer);
             example._canvas = canvas;
-            example._physicalLayer = new PhysicalLayer(new GLFWKeyboardWrapper(canvas), new GLFWMouseWrapper(canvas),
-                    new DummyControllerWrapper());
+            example._physicalLayer = new PhysicalLayer.Builder()//
+                    .with(new GLFWKeyboardWrapper(canvas)) //
+                    .with(new GLFWCharacterInputWrapper(canvas)) //
+                    .with(new GLFWMouseWrapper(canvas))//
+                    .build();
             example._mouseManager = new GLFWMouseManager(canvas);
             example._canvas.setMouseManager(example._mouseManager);
         }
@@ -548,12 +554,14 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
                     }
                 }));
 
-//        _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-//            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-//                System.out.println("Key character pressed: "
-//                        + inputState.getCurrent().getKeyboardState().getKeyEvent().getKeyChar());
-//            }
-//        }));
+        _logicalLayer.registerTrigger(new InputTrigger(new AnyCharacterCondition(), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                final List<CharacterInputEvent> events = inputState.getCurrent().getCharacterState().getEvents();
+                for (final CharacterInputEvent e : events) {
+                    System.out.println("Character entered: " + e.getValue());
+                }
+            }
+        }));
 
     }
 

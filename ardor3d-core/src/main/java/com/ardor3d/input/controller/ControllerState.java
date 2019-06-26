@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;

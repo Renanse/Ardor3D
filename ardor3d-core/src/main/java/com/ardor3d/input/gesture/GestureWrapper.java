@@ -26,6 +26,6 @@ public interface GestureWrapper {
      *
      * @return an iterator that allows the client to check which events have still not been handled
      */
-    public PeekingIterator<AbstractGestureEvent> getEvents();
+    public PeekingIterator<AbstractGestureEvent> getGestureEvents();
 
 }

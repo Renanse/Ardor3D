@@ -26,10 +26,10 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.framework.swt.SwtFboCanvas;
 import com.ardor3d.image.util.awt.AWTImageLoader;
-import com.ardor3d.input.ControllerWrapper;
-import com.ardor3d.input.Key;
 import com.ardor3d.input.PhysicalLayer;
-import com.ardor3d.input.logical.DummyControllerWrapper;
+import com.ardor3d.input.character.CharacterInputWrapper;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.swt.SwtFocusWrapper;
 import com.ardor3d.input.swt.SwtGestureWrapper;
@@ -132,10 +132,14 @@ public class LwjglHeadlessSwtExample {
         final SwtMouseManager mouseManager = new SwtMouseManager(canvas);
         canvas.setMouseManager(mouseManager);
         final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas, mouseWrapper, true);
-        final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
-        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, gestureWrapper,
-                focusWrapper);
+        final PhysicalLayer pl = new PhysicalLayer.Builder() //
+                .with((KeyboardWrapper) keyboardWrapper) //
+                .with((CharacterInputWrapper) keyboardWrapper) //
+                .with(mouseWrapper) //
+                .with(gestureWrapper) //
+                .with(focusWrapper)//
+                .build();
 
         logicalLayer.registerInput(canvas, pl);
     }

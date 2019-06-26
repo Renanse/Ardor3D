@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.logical;
+package com.ardor3d.input.dummy;
 
 import com.ardor3d.input.gesture.GestureWrapper;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
@@ -34,7 +34,7 @@ public class DummyGestureWrapper implements GestureWrapper {
         }
     };
 
-    public PeekingIterator<AbstractGestureEvent> getEvents() {
+    public PeekingIterator<AbstractGestureEvent> getGestureEvents() {
         return empty;
     }
 

@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.canvas;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,8 +19,10 @@ import com.ardor3d.framework.BasicScene;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.character.CharacterInputEvent;
 import com.ardor3d.input.control.OrbitCamControl;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.logical.AnyCharacterCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
@@ -154,13 +157,14 @@ public class RotatingCubeGame implements Updater {
             }
         }));
 
-//        logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-//            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//                final InputState current = inputStates.getCurrent();
-//
-//                System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
-//            }
-//        }));
+        logicalLayer.registerTrigger(new InputTrigger(new AnyCharacterCondition(), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                final List<CharacterInputEvent> events = inputState.getCurrent().getCharacterState().getEvents();
+                for (final CharacterInputEvent e : events) {
+                    System.out.println("Character entered: " + e.getValue());
+                }
+            }
+        }));
     }
 
     private void lookAtZero(final Canvas source) {

@@ -21,7 +21,7 @@ import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;

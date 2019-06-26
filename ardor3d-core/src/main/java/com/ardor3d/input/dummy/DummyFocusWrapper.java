@@ -8,9 +8,9 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.logical;
+package com.ardor3d.input.dummy;
 
-import com.ardor3d.input.FocusWrapper;
+import com.ardor3d.input.Focus.FocusWrapper;
 
 /**
  * A "do-nothing" implementation of FocusWrapper useful when you want to ignore (or do not need) focus events.

@@ -13,7 +13,7 @@ package com.ardor3d.framework;
 import java.util.concurrent.CountDownLatch;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 /**

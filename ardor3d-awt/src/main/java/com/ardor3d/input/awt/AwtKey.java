@@ -12,7 +12,7 @@ package com.ardor3d.input.awt;
 
 import java.awt.event.KeyEvent;
 
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 
 /**
  * Enum used for translations between AWT key codes and Ardor3D {@link Key} instances.

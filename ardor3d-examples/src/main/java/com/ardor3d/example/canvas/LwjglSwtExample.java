@@ -40,16 +40,13 @@ import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.framework.lwjgl3.swt.Lwjgl3SwtCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.util.awt.AWTImageLoader;
-import com.ardor3d.input.ControllerWrapper;
-import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.character.CharacterInputWrapper;
 import com.ardor3d.input.gesture.event.LongPressGestureEvent;
 import com.ardor3d.input.gesture.event.RotateGestureEvent;
 import com.ardor3d.input.gesture.event.SwipeGestureEvent;
-import com.ardor3d.input.logical.DummyControllerWrapper;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -57,6 +54,9 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonLongPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.GrabbedState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.swt.SwtFocusWrapper;
 import com.ardor3d.input.swt.SwtGestureWrapper;
 import com.ardor3d.input.swt.SwtKeyboardWrapper;
@@ -229,10 +229,14 @@ public class LwjglSwtExample {
         final SwtMouseManager mouseManager = new SwtMouseManager(canvas1);
         canvas1.setMouseManager(mouseManager);
         final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas1, mouseWrapper, true);
-        final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
-        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, gestureWrapper,
-                focusWrapper);
+        final PhysicalLayer pl = new PhysicalLayer.Builder() //
+                .with((KeyboardWrapper) keyboardWrapper) //
+                .with((CharacterInputWrapper) keyboardWrapper) //
+                .with(mouseWrapper) //
+                .with(gestureWrapper) //
+                .with(focusWrapper)//
+                .build();
 
         logicalLayer.registerInput(canvas1, pl);
 

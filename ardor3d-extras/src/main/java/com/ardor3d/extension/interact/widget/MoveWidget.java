@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.MouseCursor;
-import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.MouseCursor;
+import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Line3;
 import com.ardor3d.math.MathUtils;

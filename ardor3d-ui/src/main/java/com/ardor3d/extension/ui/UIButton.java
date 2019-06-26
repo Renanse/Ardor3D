@@ -18,7 +18,7 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.MouseButton;
 import com.google.common.collect.ImmutableSet;
 
 /**

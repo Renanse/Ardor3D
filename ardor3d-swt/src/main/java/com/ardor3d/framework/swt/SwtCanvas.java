@@ -25,7 +25,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
-import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.mouse.MouseManager;
 
 /**
  * A canvas for embedding into SWT applications.

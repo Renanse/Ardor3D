@@ -8,7 +8,7 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.keyboard;
 
 import com.ardor3d.annotation.Immutable;
 

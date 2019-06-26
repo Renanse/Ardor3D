@@ -13,8 +13,8 @@ package com.ardor3d.input.logical;
 import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
 
 /**
  * A condition that is true if a given button was clicked (has a click count) when going from the previous input state

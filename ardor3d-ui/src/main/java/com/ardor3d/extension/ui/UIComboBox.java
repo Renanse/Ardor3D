@@ -23,7 +23,7 @@ import com.ardor3d.extension.ui.model.DefaultComboBoxModel;
 import com.ardor3d.extension.ui.skin.SkinningTask;
 import com.ardor3d.extension.ui.text.StyleConstants;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.scenegraph.Spatial;
 
 /**

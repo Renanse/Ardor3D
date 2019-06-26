@@ -14,9 +14,9 @@ import java.util.EnumMap;
 import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
 
 /**
  * A condition that checks the state of the two most commonly used mouse buttons.

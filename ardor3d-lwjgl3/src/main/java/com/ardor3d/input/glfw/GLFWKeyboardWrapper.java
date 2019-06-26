@@ -13,15 +13,14 @@ package com.ardor3d.input.glfw;
 import java.util.LinkedList;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.framework.lwjgl3.GLFWCanvas;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyEvent;
-import com.ardor3d.input.KeyState;
-import com.ardor3d.input.KeyboardWrapper;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyEvent;
+import com.ardor3d.input.keyboard.KeyState;
+import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
 
@@ -32,9 +31,6 @@ public class GLFWKeyboardWrapper implements KeyboardWrapper {
 
     @SuppressWarnings("unused")
     private GLFWKeyCallback _keyCallback;
-
-    @SuppressWarnings("unused")
-    private GLFWCharCallback _charCallback;
 
     private KeyboardIterator _currentIterator;
 
@@ -69,20 +65,11 @@ public class GLFWKeyboardWrapper implements KeyboardWrapper {
 
                 _upcomingEvents.add(new KeyEvent(key, state));
             }
-
-        }));
-
-        GLFW.glfwSetCharCallback(_canvas.getWindowId(), (_charCallback = new GLFWCharCallback() {
-
-            @Override
-            public void invoke(final long window, final int codepoint) {
-                System.err.println((char) codepoint);
-            }
         }));
     }
 
     @Override
-    public synchronized PeekingIterator<KeyEvent> getEvents() {
+    public synchronized PeekingIterator<KeyEvent> getKeyEvents() {
         if (_currentIterator == null || !_currentIterator.hasNext()) {
             _currentIterator = new KeyboardIterator();
         }

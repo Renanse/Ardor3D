@@ -26,10 +26,10 @@ import org.eclipse.swt.widgets.Control;
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.ThreadSafe;
 import com.ardor3d.framework.swt.SwtConstants;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
-import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.input.mouse.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Multiset;
@@ -69,7 +69,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         _control.addMouseWheelListener(this);
     }
 
-    public synchronized PeekingIterator<MouseState> getEvents() {
+    public synchronized PeekingIterator<MouseState> getMouseEvents() {
         expireClickEvents();
 
         if (_currentIterator == null || !_currentIterator.hasNext()) {

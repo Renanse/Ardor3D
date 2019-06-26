@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.mouse;
 
 import com.google.common.collect.PeekingIterator;
 
@@ -27,7 +27,7 @@ public interface MouseWrapper {
      *
      * @return an iterator that allows the client to check which events have still not been handled
      */
-    public PeekingIterator<MouseState> getEvents();
+    public PeekingIterator<MouseState> getMouseEvents();
 
     public void setIgnoreInput(boolean ignore);
 

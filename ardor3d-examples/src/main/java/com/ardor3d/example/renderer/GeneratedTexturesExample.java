@@ -159,7 +159,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         for (int i = 0; i < COUNT; i++) {
             srcs[i] = new UIPanel("src-" + i, null) {
                 @Override
-                public boolean mousePressed(final com.ardor3d.input.MouseButton button,
+                public boolean mousePressed(final com.ardor3d.input.mouse.MouseButton button,
                         final com.ardor3d.input.InputState state) {
                     if (zoom || this == zoomed) {
                         toggleZoom(this);

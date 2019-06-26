@@ -13,8 +13,8 @@ package com.ardor3d.input.logical;
 import java.util.EnumMap;
 import java.util.function.Predicate;
 
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.util.Timer;
 
 /**

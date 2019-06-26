@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 
 /**
  * A condition that is true if a given key was pressed when going from the previous input state to the current one.

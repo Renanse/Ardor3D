@@ -14,8 +14,8 @@ import com.ardor3d.extension.ui.backdrop.UIBackdrop;
 import com.ardor3d.extension.ui.border.UIBorder;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.google.common.collect.ImmutableSet;
 
@@ -197,6 +197,11 @@ public abstract class StateBasedUIComponent extends UIComponent {
     @Override
     public boolean keyHeld(final Key key, final InputState state) {
         return getCurrentState().keyHeld(key, state) || super.keyHeld(key, state);
+    }
+
+    @Override
+    public boolean characterReceived(final char value, final InputState state) {
+        return getCurrentState().characterReceived(value, state) || super.characterReceived(value, state);
     }
 
     @Override

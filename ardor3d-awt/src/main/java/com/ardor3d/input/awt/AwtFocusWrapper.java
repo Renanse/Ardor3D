@@ -14,7 +14,7 @@ import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import com.ardor3d.input.FocusWrapper;
+import com.ardor3d.input.Focus.FocusWrapper;
 
 /**
  * Focus listener class for use with AWT.

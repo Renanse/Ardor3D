@@ -26,8 +26,8 @@ import com.ardor3d.extension.ui.text.UIKeyHandler;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
@@ -1602,8 +1602,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *
      * @param key
      *            the key pressed.
-     * @param the
-     *            current tracked state of the input system.
+     * @param state
+     *            the current tracked state of the input system.
      * @return true if we want to consider the event "consumed" by the UI system.
      */
     public boolean keyPressed(final Key key, final InputState state) {
@@ -1619,8 +1619,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *
      * @param key
      *            the key held.
-     * @param the
-     *            current tracked state of the input system.
+     * @param state
+     *            the current tracked state of the input system.
      * @return true if we want to consider the event "consumed" by the UI system.
      */
     public boolean keyHeld(final Key key, final InputState state) {
@@ -1636,13 +1636,30 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
      *
      * @param key
      *            the key released.
-     * @param the
-     *            current tracked state of the input system.
+     * @param state
+     *            the current tracked state of the input system.
      * @return true if we want to consider the event "consumed" by the UI system.
      */
     public boolean keyReleased(final Key key, final InputState state) {
         if (!_consumeKeyEvents && getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).keyReleased(key, state);
+        } else {
+            return _consumeKeyEvents;
+        }
+    }
+
+    /**
+     * Called when this component has focus and a character value is input.
+     *
+     * @param value
+     *            the character value released.
+     * @param state
+     *            the current tracked state of the input system.
+     * @return true if we want to consider the event "consumed" by the UI system.
+     */
+    public boolean characterReceived(final char value, final InputState state) {
+        if (!_consumeKeyEvents && getParent() instanceof UIComponent) {
+            return ((UIComponent) getParent()).characterReceived(value, state);
         } else {
             return _consumeKeyEvents;
         }

@@ -12,7 +12,7 @@ package com.ardor3d.input.glfw;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 
 public enum GLFWKey {
 

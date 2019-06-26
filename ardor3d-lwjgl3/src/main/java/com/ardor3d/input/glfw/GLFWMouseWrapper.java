@@ -22,10 +22,10 @@ import org.lwjgl.glfw.GLFWScrollCallback;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.framework.lwjgl3.GLFWCanvas;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
-import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.MathUtils;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.EnumMultiset;
@@ -173,7 +173,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
     }
 
     @Override
-    public PeekingIterator<MouseState> getEvents() {
+    public PeekingIterator<MouseState> getMouseEvents() {
         // only create a new iterator if there isn't an existing, valid, one.
         if (_currentIterator == null || !_currentIterator.hasNext()) {
             _currentIterator = new MouseIterator();

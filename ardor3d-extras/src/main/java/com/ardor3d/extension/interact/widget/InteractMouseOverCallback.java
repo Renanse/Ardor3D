@@ -12,7 +12,7 @@ package com.ardor3d.extension.interact.widget;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.mouse.MouseState;
 
 public interface InteractMouseOverCallback {
     void mouseEntered(Canvas source, MouseState current, InteractManager manager);

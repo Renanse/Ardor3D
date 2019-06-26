@@ -3,15 +3,15 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input.logical;
+package com.ardor3d.input.dummy;
 
-import com.ardor3d.input.KeyEvent;
-import com.ardor3d.input.KeyboardWrapper;
+import com.ardor3d.input.keyboard.KeyEvent;
+import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.google.common.collect.PeekingIterator;
 
 /**
@@ -26,7 +26,8 @@ public class DummyKeyboardWrapper implements KeyboardWrapper {
             return false;
         }
 
-        public void remove() {}
+        public void remove() {
+        }
 
         public KeyEvent peek() {
             return null;
@@ -37,7 +38,7 @@ public class DummyKeyboardWrapper implements KeyboardWrapper {
         }
     };
 
-    public PeekingIterator<KeyEvent> getEvents() {
+    public PeekingIterator<KeyEvent> getKeyEvents() {
         return empty;
     }
 

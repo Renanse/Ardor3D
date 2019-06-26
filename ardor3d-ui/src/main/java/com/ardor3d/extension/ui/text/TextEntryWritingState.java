@@ -12,11 +12,11 @@ package com.ardor3d.extension.ui.text;
 
 import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.text.TextSelection.SelectionState;
-import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
 
 public class TextEntryWritingState extends UIState {
 
@@ -43,6 +43,11 @@ public class TextEntryWritingState extends UIState {
     @Override
     public boolean keyHeld(final Key key, final InputState state) {
         return _component.getKeyHandler().keyHeld(key, state);
+    }
+
+    @Override
+    public boolean characterReceived(final char value, final InputState state) {
+        return _component.getKeyHandler().characterReceived(value, state);
     }
 
     @Override

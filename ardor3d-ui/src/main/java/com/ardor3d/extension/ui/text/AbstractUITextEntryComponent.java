@@ -18,7 +18,7 @@ import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;

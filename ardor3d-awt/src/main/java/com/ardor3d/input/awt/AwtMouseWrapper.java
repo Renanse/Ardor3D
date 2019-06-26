@@ -24,12 +24,12 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 
 import com.ardor3d.annotation.GuardedBy;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseManager;
-import com.ardor3d.input.MouseState;
-import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.GrabbedState;
+import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseManager;
+import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.input.mouse.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Multiset;
@@ -81,7 +81,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         _component.addMouseWheelListener(this);
     }
 
-    public synchronized PeekingIterator<MouseState> getEvents() {
+    public synchronized PeekingIterator<MouseState> getMouseEvents() {
         expireClickEvents();
 
         if (_currentIterator == null || !_currentIterator.hasNext()) {

@@ -11,7 +11,7 @@
 package com.ardor3d.extension.ui.text;
 
 import com.ardor3d.input.InputState;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 
 public interface UIKeyHandler {
 
@@ -23,4 +23,6 @@ public interface UIKeyHandler {
     boolean keyReleased(Key key, InputState state);
 
     boolean keyHeld(Key key, InputState state);
+
+    boolean characterReceived(char value, InputState state);
 }

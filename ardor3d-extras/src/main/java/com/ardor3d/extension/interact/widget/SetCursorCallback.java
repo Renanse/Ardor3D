@@ -12,9 +12,9 @@ package com.ardor3d.extension.interact.widget;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.MouseCursor;
-import com.ardor3d.input.MouseManager;
-import com.ardor3d.input.MouseState;
+import com.ardor3d.input.mouse.MouseCursor;
+import com.ardor3d.input.mouse.MouseManager;
+import com.ardor3d.input.mouse.MouseState;
 
 public class SetCursorCallback implements InteractMouseOverCallback {
 

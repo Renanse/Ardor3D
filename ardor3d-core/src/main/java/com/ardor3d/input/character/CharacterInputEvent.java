@@ -8,15 +8,15 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.character;
 
 import com.ardor3d.annotation.Immutable;
 
 @Immutable
-public class InputCharacterEvent {
+public class CharacterInputEvent {
     private final char _value;
 
-    public InputCharacterEvent(final char value) {
+    public CharacterInputEvent(final char value) {
         _value = value;
     }
 
@@ -26,6 +26,6 @@ public class InputCharacterEvent {
 
     @Override
     public String toString() {
-        return "InputCharacterEvent{" + "_value=" + _value + '}';
+        return "CharacterInputEvent{" + "_value=" + _value + '}';
     }
 }

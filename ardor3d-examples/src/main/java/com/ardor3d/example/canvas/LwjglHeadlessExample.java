@@ -22,7 +22,7 @@ import com.ardor3d.framework.lwjgl3.GLFWHeadlessCanvas;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.image.util.awt.ScreenShotImageExporter;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.screen.ScreenExporter;

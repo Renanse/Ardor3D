@@ -8,14 +8,15 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.character;
 
 import com.google.common.collect.PeekingIterator;
 
 /**
- * Defines the API for keyboard wrappers.
+ * Defines the API for character input wrappers - these classes supply characters input into the system in some manner,
+ * be it from a keyboard or some other device.
  */
-public interface KeyboardWrapper {
+public interface CharacterInputWrapper {
     /**
      * Allows the keyboard wrapper implementation to initialise itself.
      */
@@ -27,5 +28,5 @@ public interface KeyboardWrapper {
      *
      * @return an iterator that allows the client to check which events have still not been handled
      */
-    public PeekingIterator<KeyEvent> getEvents();
+    public PeekingIterator<CharacterInputEvent> getCharacterEvents();
 }

@@ -38,8 +38,8 @@ import com.ardor3d.framework.lwjgl3.swt.Lwjgl3SwtCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
-import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.character.CharacterInputWrapper;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.gesture.event.LongPressGestureEvent;
 import com.ardor3d.input.gesture.event.PanGestureEvent;
@@ -51,7 +51,7 @@ import com.ardor3d.input.gesture.touch.PanInterpreter;
 import com.ardor3d.input.gesture.touch.PinchInterpreter;
 import com.ardor3d.input.gesture.touch.RotateInterpreter;
 import com.ardor3d.input.gesture.touch.SwipeInterpreter;
-import com.ardor3d.input.logical.DummyControllerWrapper;
+import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -241,7 +241,8 @@ public class GesturesSwtExample implements Updater {
             }
 
             @Override
-            public void releaseContext(final boolean force) {}
+            public void releaseContext(final boolean force) {
+            }
 
             @Override
             public void doSwap() {
@@ -266,10 +267,14 @@ public class GesturesSwtExample implements Updater {
         gestureWrapper.addTouchInterpreter(new PanInterpreter(3));
         gestureWrapper.addTouchInterpreter(new SwipeInterpreter(2, 1.2, 100L));
         gestureWrapper.addTouchInterpreter(new LongPressInterpreter());
-        final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
-        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, gestureWrapper,
-                focusWrapper);
+        final PhysicalLayer pl = new PhysicalLayer.Builder() //
+                .with((KeyboardWrapper) keyboardWrapper) //
+                .with((CharacterInputWrapper) keyboardWrapper) //
+                .with(mouseWrapper) //
+                .with(gestureWrapper) //
+                .with(focusWrapper)//
+                .build();
 
         logicalLayer.registerInput(_canvas, pl);
 

@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.controller;
 
 import com.google.common.collect.PeekingIterator;
 
@@ -24,7 +24,7 @@ public interface ControllerWrapper {
      * 
      * @return an iterator that allows the client to check which events have still not been handled
      */
-    public PeekingIterator<ControllerEvent> getEvents();
+    public PeekingIterator<ControllerEvent> getControllerEvents();
 
     public int getControllerCount();
 

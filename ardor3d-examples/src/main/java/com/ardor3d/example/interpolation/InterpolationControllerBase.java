@@ -14,7 +14,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
-import com.ardor3d.input.Key;
+import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;

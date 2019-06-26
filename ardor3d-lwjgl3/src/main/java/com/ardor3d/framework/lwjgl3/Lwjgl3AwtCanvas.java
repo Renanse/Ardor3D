@@ -24,8 +24,8 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
-import com.ardor3d.input.FocusWrapper;
-import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.Focus.FocusWrapper;
+import com.ardor3d.input.mouse.MouseManager;
 
 public class Lwjgl3AwtCanvas extends Canvas implements NativeCanvas, FocusWrapper {
 
