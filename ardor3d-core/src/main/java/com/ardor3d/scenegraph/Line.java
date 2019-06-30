@@ -5,15 +5,17 @@
  *
  * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
- * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ * LICENSE file or at <https://git.io/fjRmv>.
  */
 
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -24,9 +26,15 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Line extends Mesh {
 
+    private static final Logger logger = Logger.getLogger(Line.class.getName());
+
+    public final static String KEY_Distances = "distance";
+
     private float _lineWidth;
     private float _miterLimit;
     private boolean _antialiased = false;
+    private short _stipplePattern = (short) 0xFFFF;
+    private float _stippleFactor = 1f;
 
     public Line() {
         this("line");
@@ -106,64 +114,26 @@ public class Line extends Mesh {
         _meshData.setColorBuffer(colors);
         _meshData.setTextureCoords(coords, 0);
         _meshData.setIndices(null);
+
+        updateLineDistances();
     }
 
     /**
-     * Puts a circle into vertex and normal buffer at the current buffer position. The buffers are enlarged and copied
-     * if they are too small.
-     *
-     * @param radius
-     *            radius of the circle
-     * @param x
-     *            x coordinate of circle center
-     * @param y
-     *            y coordinate of circle center
-     * @param segments
-     *            number of line segments the circle is built from
-     * @param insideOut
-     *            false for normal winding (ccw), true for clockwise winding
-     */
-    public void appendCircle(final double radius, final double x, final double y, final int segments,
-            final boolean insideOut) {
-        final int requiredFloats = segments * 2 * 3;
-        final FloatBuffer verts = BufferUtils.ensureLargeEnough(_meshData.getVertexBuffer(), requiredFloats);
-        _meshData.setVertexBuffer(verts);
-        final FloatBuffer normals = BufferUtils.ensureLargeEnough(_meshData.getNormalBuffer(), requiredFloats);
-        _meshData.setNormalBuffer(normals);
-        double angle = 0;
-        final double step = MathUtils.PI * 2 / segments;
-        for (int i = 0; i < segments; i++) {
-            final double dx = MathUtils.cos(insideOut ? -angle : angle) * radius;
-            final double dy = MathUtils.sin(insideOut ? -angle : angle) * radius;
-            if (i > 0) {
-                verts.put((float) (dx + x)).put((float) (dy + y)).put(0);
-                normals.put((float) dx).put((float) dy).put(0);
-            }
-            verts.put((float) (dx + x)).put((float) (dy + y)).put(0);
-            normals.put((float) dx).put((float) dy).put(0);
-            angle += step;
-        }
-        verts.put((float) (radius + x)).put((float) y).put(0);
-        normals.put((float) radius).put(0).put(0);
-
-        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        _meshData.markBufferDirty(MeshData.KEY_NormalCoords);
-    }
-
-    /**
-     * @return true if lines are to be drawn antialiased
+     * @return true if lines are to be drawn anti-aliased. This is used only as a hint to MaterialUtil for choosing an
+     *         appropriate material.
      */
     public boolean isAntialiased() {
         return _antialiased;
     }
 
     /**
-     * Sets whether the line should be antialiased. May decrease performance. If you want to enabled antialiasing, you
-     * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
-     * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
+     * Hints whether the line should be anti-aliased. This is used only as a hint to MaterialUtil for choosing an
+     * appropriate material. May decrease performance as it requires rendering 3x as many triangles as without. If you
+     * want to enabled anti-aliasing, you should also use an alpha state with a source of SourceFunction.SourceAlpha and
+     * a destination of DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
      *
      * @param antialiased
-     *            true if the line should be antialiased.
+     *            true if the line should be anti-aliased.
      */
     public void setAntialiased(final boolean antialiased) {
         _antialiased = antialiased;
@@ -207,12 +177,80 @@ public class Line extends Mesh {
         setProperty("miterLimit", _miterLimit);
     }
 
+    /**
+     * @return the set stipplePattern. 0xFFFF means no stipple.
+     */
+    public short getStipplePattern() {
+        return _stipplePattern;
+    }
+
+    /**
+     * The stipple or pattern to use when drawing this line. 0xFFFF is a solid line.
+     *
+     * @param stipplePattern
+     *            a 16bit short whose bits describe the pattern to use when drawing this line
+     */
+    public void setStipplePattern(final short stipplePattern) {
+        _stipplePattern = stipplePattern;
+        setProperty("stipplePattern", _stipplePattern);
+    }
+
+    /**
+     * @return the set stippleFactor.
+     */
+    public float getStippleFactor() {
+        return _stippleFactor;
+    }
+
+    /**
+     * @param stippleFactor
+     *            magnification factor to apply to the stipple pattern.
+     */
+    public void setStippleFactor(final float stippleFactor) {
+        _stippleFactor = stippleFactor;
+        setProperty("stippleFactor", _stippleFactor);
+    }
+
+    /**
+     * Calculate the distance along the line at each point on the line.
+     */
+    public void updateLineDistances() {
+        final MeshData md = getMeshData();
+        final FloatBuffer positions = md.getVertexBuffer();
+        if (positions == null) {
+            logger.log(Level.WARNING, "Unable to generate line distances - vertices were null.");
+            return;
+        }
+
+        final int vCount = md.getVertexCount();
+        FloatBufferData dists = md.getCoords(KEY_Distances);
+        if (dists == null || dists.getBufferCapacity() != vCount) {
+            dists = new FloatBufferData(vCount, 1);
+            md.setCoords(KEY_Distances, dists);
+        }
+
+        float d = 0f;
+        final Vector3 prevPos = new Vector3();
+        final Vector3 nextPos = new Vector3();
+        BufferUtils.populateFromBuffer(nextPos, positions, 0);
+        dists.put(0f);
+        for (int i = 1; i < vCount; i++) {
+            prevPos.set(nextPos);
+            BufferUtils.populateFromBuffer(nextPos, positions, i);
+            d += nextPos.subtract(prevPos, prevPos).length();
+            System.err.println(d);
+            dists.put(d);
+        }
+    }
+
     @Override
     public Line makeCopy(final boolean shareGeometricData) {
         final Line lineCopy = (Line) super.makeCopy(shareGeometricData);
         lineCopy.setLineWidth(_lineWidth);
         lineCopy.setMiterLimit(_miterLimit);
         lineCopy.setAntialiased(_antialiased);
+        lineCopy.setStippleFactor(_stippleFactor);
+        lineCopy.setStipplePattern(_stipplePattern);
         return lineCopy;
     }
 
@@ -222,6 +260,8 @@ public class Line extends Mesh {
         capsule.write(_lineWidth, "lineWidth", 1.0f);
         capsule.write(_miterLimit, "miterLimit", 0.75f);
         capsule.write(_antialiased, "antialiased", false);
+        capsule.write(_stippleFactor, "stippleFactor", 1f);
+        capsule.write(_stipplePattern, "stipplePattern", (short) 0xFFFF);
     }
 
     @Override
@@ -229,6 +269,8 @@ public class Line extends Mesh {
         super.read(capsule);
         setLineWidth(capsule.readFloat("lineWidth", 1.0f));
         setMiterLimit(capsule.readFloat("miterLimit", 0.75f));
-        _antialiased = capsule.readBoolean("antialiased", false);
+        setAntialiased(capsule.readBoolean("antialiased", false));
+        setStippleFactor(capsule.readFloat("stippleFactor", 1f));
+        setStipplePattern(capsule.readShort("stipplePattern", (short) 0xFFFF));
     }
 }

@@ -18,6 +18,16 @@ techniques:
             type: Float1
             source: SpatialProperty
             defaultValue: 1.0
+          - 
+            shaderKey: stippleFactor
+            type: Float1
+            source: SpatialProperty
+            defaultValue: 1.0
+          - 
+            shaderKey: stipplePattern
+            type: UInt1
+            source: SpatialProperty
+            defaultValue: 0xffff
 
         shaders: 
           Vertex: 

@@ -28,6 +28,7 @@ out VertexData{
 	#endif
 	
 	vec2 uv0;
+	noperspective float distance;
 } VertexOut;
 
 
@@ -125,25 +126,32 @@ void main(void)
 	vec2 offsetA = length_a * miter_a;
 	vec2 offsetB = length_b * miter_b;
 
+	float distanceA = length(p1-p0);
+	float distanceB = distanceA + length(p2-p1);
+
 #ifndef ANTIALIAS
 	// generate the triangle strip
 	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[1].color;
+	VertexOut.distance = distanceA;
 	gl_Position = toNDCSpace(p1, offsetA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(0, 0);
 	VertexOut.color = VertexIn[1].color;
+	VertexOut.distance = distanceA;
 	gl_Position = toNDCSpace(p1, -offsetA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[2].color;
+	VertexOut.distance = distanceB;
 	gl_Position = toNDCSpace(p2, offsetB);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(0, 0);
 	VertexOut.color = VertexIn[2].color;
+	VertexOut.distance = distanceB;
 	gl_Position = toNDCSpace(p2, -offsetB);
 	EmitVertex();
 #else
@@ -151,42 +159,50 @@ void main(void)
 	vec2 offsetFeatherB = (featherWidth + (length_b)) * miter_b;
 	// generate the triangle strip using 6 triangles
 	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = vec4(VertexIn[0].color.xyz, 0.0);
+	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	VertexOut.distance = distanceA;
 	gl_Position = toNDCSpace(p1, offsetFeatherA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	VertexOut.color = vec4(VertexIn[2].color.xyz, 0.0);
+	VertexOut.distance = distanceB;
 	gl_Position = toNDCSpace(p2, offsetFeatherB);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[1].color;
+	VertexOut.distance = distanceA;
 	gl_Position = toNDCSpace(p1, offsetA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(1, 0);
 	VertexOut.color = VertexIn[2].color;
+	VertexOut.distance = distanceB;
 	gl_Position = toNDCSpace(p2, offsetB);
 	EmitVertex();
 	
 	VertexOut.uv0 = vec2(0, 0);
 	VertexOut.color = VertexIn[1].color;
+	VertexOut.distance = distanceA;
 	gl_Position = toNDCSpace(p1, -offsetA);
 	EmitVertex();
 	
 	VertexOut.uv0 = vec2(0, 0);
 	VertexOut.color = VertexIn[2].color;
+	VertexOut.distance = distanceB;
 	gl_Position = toNDCSpace(p2, -offsetB);
 	EmitVertex();
 	
 	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = vec4(VertexIn[0].color.xyz, 0.0);
+	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	VertexOut.distance = distanceA;
 	gl_Position = toNDCSpace(p1, -offsetFeatherA);
 	EmitVertex();
 
 	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
+	VertexOut.color = vec4(VertexIn[2].color.xyz, 0.0);
+	VertexOut.distance = distanceB;
 	gl_Position = toNDCSpace(p2, -offsetFeatherB);
 	EmitVertex();
 #endif

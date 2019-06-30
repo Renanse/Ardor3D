@@ -1427,6 +1427,12 @@ public abstract class Spatial implements Savable, Hintable {
             }
         }
 
+        // copy material
+        spat.setRenderMaterial(_material);
+
+        // copy properties
+        spat._properties.putAll(_properties);
+
         return spat;
     }
 

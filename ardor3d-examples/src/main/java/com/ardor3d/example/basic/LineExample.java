@@ -74,6 +74,7 @@ public class LineExample extends ExampleBase {
         antialiased.setDefaultColor(ColorRGBA.CYAN);
         // Finally let us make this antialiased... see also BlendState below.
         antialiased.setAntialiased(true);
+        antialiased.setStipplePattern((short) 0xFFF0);
 
         // Antialiased lines work by adding small pixels to the line with alpha blending values.
         // To make use of this, you need to add a blend state that blends the source color

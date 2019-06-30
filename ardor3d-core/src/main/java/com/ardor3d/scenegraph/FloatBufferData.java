@@ -98,6 +98,10 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
         _buffer.rewind();
     }
 
+    public void put(final float value) {
+        _buffer.put(value);
+    }
+
     public void put(final Vector2 vector) {
         _buffer.put(vector.getXf());
         _buffer.put(vector.getYf());

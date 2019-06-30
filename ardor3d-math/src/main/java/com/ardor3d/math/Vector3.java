@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -88,7 +88,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Constructs a new vector set to the (x, y, z) values of the given source vector.
-     * 
+     *
      * @param src
      */
     public Vector3(final ReadOnlyVector3 src) {
@@ -97,7 +97,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Constructs a new vector set to (x, y, z).
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -191,7 +191,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Stores the double values of this vector in the given double array.
-     * 
+     *
      * @param store
      *            if null, a new double[3] array is created.
      * @return the double array
@@ -213,7 +213,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Stores the double values of this vector in the given float array.
-     * 
+     *
      * @param store
      *            if null, a new float[3] array is created.
      * @return the float array
@@ -236,7 +236,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Sets the first component of this vector to the given double value.
-     * 
+     *
      * @param x
      */
     public void setX(final double x) {
@@ -245,7 +245,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Sets the second component of this vector to the given double value.
-     * 
+     *
      * @param y
      */
     public void setY(final double y) {
@@ -254,7 +254,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Sets the third component of this vector to the given double value.
-     * 
+     *
      * @param z
      */
     public void setZ(final double z) {
@@ -263,7 +263,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Sets the value of this vector to (x, y, z)
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -278,7 +278,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Sets the value of this vector to the (x, y, z) values of the provided source vector.
-     * 
+     *
      * @param source
      * @return this vector for chaining
      * @throws NullPointerException
@@ -293,7 +293,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Sets the value of this vector to (0, 0, 0)
-     * 
+     *
      * @return this vector for chaining
      */
     public Vector3 zero() {
@@ -303,7 +303,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     /**
      * Adds the given values to those of this vector and returns them in store * @param store the vector to store the
      * result in for return. If null, a new vector object is created and returned. .
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -323,7 +323,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Increments the values of this vector with the given x, y and z values.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -335,7 +335,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Adds the values of the given source vector to those of this vector and returns them in store.
-     * 
+     *
      * @param source
      * @param store
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
@@ -350,7 +350,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Increments the values of this vector with the x, y and z values of the given vector.
-     * 
+     *
      * @param source
      * @return this vector for chaining
      * @throws NullPointerException
@@ -362,7 +362,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Subtracts the given values from those of this vector and returns them in store.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -382,7 +382,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Decrements the values of this vector by the given x, y and z values.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -394,10 +394,11 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Subtracts the values of the given source vector from those of this vector and returns them in store.
-     * 
+     *
      * @param source
      * @param store
-     *            the vector to store the result in for return. If null, a new vector object is created and returned.
+     *            the vector to store the result in for return. If null, a new vector object is created and returned. It
+     *            IS okay for source and store to be the same object.
      * @return (this.x - source.x, this.y - source.y, this.z - source.z)
      * @throws NullPointerException
      *             if source is null.
@@ -409,7 +410,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Decrements the values of this vector by the x, y and z values from the given source vector.
-     * 
+     *
      * @param source
      * @return this vector for chaining
      * @throws NullPointerException
@@ -421,7 +422,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Multiplies the values of this vector by the given scalar value and returns the result in store.
-     * 
+     *
      * @param scalar
      * @param store
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
@@ -439,7 +440,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Internally modifies the values of this vector by multiplying them each by the given scalar value.
-     * 
+     *
      * @param scalar
      * @return this vector for chaining
      */
@@ -449,7 +450,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Multiplies the values of this vector by the given scale values and returns the result in store.
-     * 
+     *
      * @param scale
      * @param store
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
@@ -467,7 +468,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Internally modifies the values of this vector by multiplying them each by the given scale values.
-     * 
+     *
      * @param scalar
      * @return this vector for chaining
      */
@@ -477,7 +478,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Multiplies the values of this vector by the given scale values and returns the result in store.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -497,7 +498,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Internally modifies the values of this vector by multiplying them each by the given scale values.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -509,7 +510,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Divides the values of this vector by the given scalar value and returns the result in store.
-     * 
+     *
      * @param scalar
      * @param store
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
@@ -527,7 +528,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Internally modifies the values of this vector by dividing them each by the given scalar value.
-     * 
+     *
      * @param scalar
      * @return this vector for chaining
      * @throws ArithmeticException
@@ -541,7 +542,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Divides the values of this vector by the given scale values and returns the result in store.
-     * 
+     *
      * @param scale
      * @param store
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
@@ -559,7 +560,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Internally modifies the values of this vector by dividing them each by the given scale values.
-     * 
+     *
      * @param scale
      * @return this vector for chaining
      */
@@ -569,7 +570,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Divides the values of this vector by the given scale values and returns the result in store.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -589,7 +590,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Internally modifies the values of this vector by dividing them each by the given scale values.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -600,10 +601,10 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     }
 
     /**
-     * 
+     *
      * Internally modifies this vector by multiplying its values with a given scale value, then adding a given "add"
      * value.
-     * 
+     *
      * @param scale
      *            the value to multiply this vector by.
      * @param add
@@ -620,7 +621,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     /**
      * Scales this vector by multiplying its values with a given scale value, then adding a given "add" value. The
      * result is store in the given store parameter.
-     * 
+     *
      * @param scale
      *            the value to multiply by.
      * @param add
@@ -662,7 +663,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     /**
      * Creates a new unit length vector from this one by dividing by length. If the length is 0, (ie, if the vector is
      * 0, 0, 0) then a new vector (0, 0, 0) is returned.
-     * 
+     *
      * @param store
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
      * @return a new unit vector (or 0, 0, 0 if this unit is 0 length)
@@ -680,7 +681,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     /**
      * Converts this vector into a unit vector by dividing it internally by its length. If the length is 0, (ie, if the
      * vector is 0, 0, 0) then no action is taken.
-     * 
+     *
      * @return this vector for chaining
      */
     public Vector3 normalizeLocal() {
@@ -696,7 +697,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * Performs a linear interpolation between this vector and the given end vector, using the given scalar as a
      * percent. iow, if changeAmnt is closer to 0, the result will be closer to the current value of this vector and if
      * it is closer to 1, the result will be closer to the end value. The result is returned as a new vector object.
-     * 
+     *
      * @param endVec
      * @param scalar
      * @param store
@@ -722,7 +723,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * Performs a linear interpolation between this vector and the given end vector, using the given scalar as a
      * percent. iow, if changeAmnt is closer to 0, the result will be closer to the current value of this vector and if
      * it is closer to 1, the result will be closer to the end value. The result is stored back in this vector.
-     * 
+     *
      * @param endVec
      * @param scalar
      * @return this vector for chaining
@@ -740,7 +741,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * Performs a linear interpolation between the given begin and end vectors, using the given scalar as a percent.
      * iow, if changeAmnt is closer to 0, the result will be closer to the begin value and if it is closer to 1, the
      * result will be closer to the end value. The result is returned as a new vector object.
-     * 
+     *
      * @param beginVec
      * @param endVec
      * @param scalar
@@ -774,7 +775,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * Performs a linear interpolation between the given begin and end vectors, using the given scalar as a percent.
      * iow, if changeAmnt is closer to 0, the result will be closer to the begin value and if it is closer to 1, the
      * result will be closer to the end value. The result is stored back in this vector.
-     * 
+     *
      * @param beginVec
      * @param endVec
      * @param changeAmnt
@@ -959,7 +960,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Check a vector... if it is null or its doubles are NaN or infinite, return false. Else return true.
-     * 
+     *
      * @param vector
      *            the vector to check
      * @return true or false as stated above.
@@ -979,7 +980,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Check if a vector is non-null and has infinite values.
-     * 
+     *
      * @param vector
      *            the vector to check
      * @return true or false as stated above.
@@ -1077,7 +1078,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param in
      *            ObjectInput
      * @throws IOException
@@ -1092,7 +1093,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     /**
      * Used with serialization. Not to be called manually.
-     * 
+     *
      * @param out
      *            ObjectOutput
      * @throws IOException
@@ -1123,7 +1124,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     /**
      * Releases a Vector3 back to be used by a future call to fetchTempInstance. TAKE CARE: this Vector3 object should
      * no longer have other classes referencing it or "Bad Things" will happen.
-     * 
+     *
      * @param vec
      *            the Vector3 to release.
      */
