@@ -955,7 +955,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      */
     @Override
     public double smallestAngleBetween(final ReadOnlyVector3 otherVector) {
-        return MathUtils.acos(dot(otherVector));
+        return MathUtils.acos(MathUtils.clamp(dot(otherVector), -1.0, 1.0));
     }
 
     /**
