@@ -5,7 +5,7 @@
  *
  * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
- * LICENSE file or at <https://github.com/Renanse/Ardor3D/blob/master/LICENSE>.
+ * LICENSE file or at <https://git.io/fjRmv>.
  */
 
 package com.ardor3d.util.resource;
