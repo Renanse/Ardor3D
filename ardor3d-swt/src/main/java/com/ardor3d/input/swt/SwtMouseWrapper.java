@@ -20,12 +20,11 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Control;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.ThreadSafe;
-import com.ardor3d.framework.swt.SwtConstants;
+import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.mouse.ButtonState;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
@@ -155,7 +154,12 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
      * @return the scaled X coordinate of the event.
      */
     private int getArdor3DX(final MouseEvent e) {
-        return Math.round(DPIUtil.autoScaleUp(e.x) * SwtConstants.PlatformDPIScale);
+        final int x = e.x;
+        if (_control instanceof Canvas) {
+            final Canvas canvas = (Canvas) _control;
+            return canvas.scaleToHiDpi(x);
+        }
+        return x;
     }
 
     /**
@@ -167,7 +171,12 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
      *         lower left corner.
      */
     private int getArdor3DY(final MouseEvent e) {
-        return Math.round(DPIUtil.autoScaleUp(_control.getSize().y - e.y) * SwtConstants.PlatformDPIScale);
+        final int y = _control.getSize().y - e.y;
+        if (_control instanceof Canvas) {
+            final Canvas canvas = (Canvas) _control;
+            return canvas.scaleToHiDpi(y);
+        }
+        return y;
     }
 
     private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,

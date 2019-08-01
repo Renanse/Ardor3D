@@ -92,4 +92,26 @@ public interface Canvas {
     default void setBackgroundColor(final ReadOnlyColorRGBA color) {
         getCanvasRenderer().getRenderer().setBackgroundColor(color);
     }
+
+    /**
+     * Attempt to convert from unscaled screen pixels to scaled based on monitor DPI.
+     *
+     * @param size
+     *            unscaled pixel size
+     * @return scaled pixel size.
+     */
+    default int scaleToHiDpi(final int size) {
+        return size;
+    }
+
+    /**
+     * Attempt to convert to unscaled screen pixels from scaled based on monitor DPI.
+     *
+     * @param size
+     *            monitor DPI scaled pixel size
+     * @return unscaled pixel size.
+     */
+    default int scaleFromHiDpi(final int size) {
+        return size;
+    }
 }

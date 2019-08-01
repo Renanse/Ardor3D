@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Composite;
 import org.lwjgl.opengl.swt.GLCanvas;
 import org.lwjgl.opengl.swt.GLData;
@@ -25,7 +24,6 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
-import com.ardor3d.framework.swt.SwtConstants;
 import com.ardor3d.input.mouse.MouseManager;
 
 /**
@@ -120,12 +118,12 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
 	@Override
 	public int getContentHeight() {
-		return Math.round(DPIUtil.autoScaleUp(getSize().y) * SwtConstants.PlatformDPIScale);
+		return scaleToHiDpi(getSize().y);
 	}
 
 	@Override
 	public int getContentWidth() {
-		return Math.round(DPIUtil.autoScaleUp(getSize().x) * SwtConstants.PlatformDPIScale);
+		return scaleToHiDpi(getSize().x);
 	}
 
 	@Override
@@ -136,5 +134,23 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 	@Override
 	public boolean removeListener(final ICanvasListener listener) {
 		return _listeners.remove(listener);
+	}
+
+	@Override
+	public int scaleToHiDpi(final int size) {
+		return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp(size) : size;
+	}
+
+	@Override
+	public int scaleFromHiDpi(final int size) {
+		return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown(size) : size;
+	}
+
+	public static boolean ApplyScale = true;
+	static {
+		final String os = System.getProperty("os.name").toLowerCase();
+		if (os.startsWith("mac os x")) {
+			ApplyScale = false;
+		}
 	}
 }

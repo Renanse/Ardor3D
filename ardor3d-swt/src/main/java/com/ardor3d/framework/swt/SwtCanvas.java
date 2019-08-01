@@ -111,12 +111,12 @@ public class SwtCanvas extends GLCanvas implements Canvas {
 
     @Override
     public int getContentHeight() {
-        return getClientArea().x;
+        return scaleToHiDpi(getSize().y);
     }
 
     @Override
     public int getContentWidth() {
-        return getClientArea().y;
+        return scaleToHiDpi(getSize().x);
     }
 
     @Override
@@ -127,5 +127,23 @@ public class SwtCanvas extends GLCanvas implements Canvas {
     @Override
     public boolean removeListener(final ICanvasListener listener) {
         return _listeners.remove(listener);
+    }
+
+    @Override
+    public int scaleToHiDpi(final int size) {
+        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp(size) : size;
+    }
+
+    @Override
+    public int scaleFromHiDpi(final int size) {
+        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown(size) : size;
+    }
+
+    public static boolean ApplyScale = true;
+    static {
+        final String os = System.getProperty("os.name").toLowerCase();
+        if (os.startsWith("mac os x")) {
+            ApplyScale = false;
+        }
     }
 }

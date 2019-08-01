@@ -16,11 +16,9 @@ import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.bounding.BoundingBox;
@@ -149,8 +147,8 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         _oldHeight = height;
 
         // On Linux, HDPI scaling makes a mess of the canvas.
-        width = DPIUtil.autoScaleUp(width);
-        height = DPIUtil.autoScaleUp(height);
+        width = org.eclipse.swt.internal.DPIUtil.autoScaleUp(width);
+        height = org.eclipse.swt.internal.DPIUtil.autoScaleUp(height);
 
         final DisplaySettings settings = _settings.resizedCopy(width, height);
         _canvasRenderer.init(settings, false);
@@ -194,28 +192,30 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
 
     @Override
     public int getContentHeight() {
-        return getClientAreaHeightScaled();
-    }
-
-    private int getClientAreaHeightScaled() {
-        final int height = getClientArea().height;
-        final int dpi = Display.getCurrent().getDPI().y;
-        final int zoom = getMonitor().getZoom();
-        final float factor = (float) dpi / (float) zoom;
-        return Math.round(height * factor);
+        return scaleToHiDpi(getSize().y);
     }
 
     @Override
     public int getContentWidth() {
-        return getClientAreaWidthScaled();
+        return scaleToHiDpi(getSize().x);
     }
 
-    private int getClientAreaWidthScaled() {
-        final int width = getClientArea().width;
-        final int dpi = Display.getCurrent().getDPI().x;
-        final int zoom = getMonitor().getZoom();
-        final float factor = (float) dpi / (float) zoom;
-        return Math.round(width * factor);
+    @Override
+    public int scaleToHiDpi(final int size) {
+        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp(size) : size;
+    }
+
+    @Override
+    public int scaleFromHiDpi(final int size) {
+        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown(size) : size;
+    }
+
+    public static boolean ApplyScale = true;
+    static {
+        final String os = System.getProperty("os.name").toLowerCase();
+        if (os.startsWith("mac os x")) {
+            ApplyScale = false;
+        }
     }
 
     @Override
