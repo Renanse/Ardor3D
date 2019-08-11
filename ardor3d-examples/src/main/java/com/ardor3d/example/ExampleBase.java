@@ -77,6 +77,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.ui.text.BMText;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
@@ -179,6 +180,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
         AWTImageLoader.registerLoader();
 
         addDefaultResourceLocators();
+
+        BMText.setDpiScaleProvider(_canvas);
 
         /**
          * Create a ZBuffer to display pixels closest to the camera above farther ones.

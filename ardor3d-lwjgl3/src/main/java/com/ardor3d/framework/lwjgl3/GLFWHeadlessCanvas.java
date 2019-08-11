@@ -108,7 +108,7 @@ public class GLFWHeadlessCanvas implements NativeCanvas {
             throw new Ardor3dException("Cannot create window: " + e.getMessage());
         }
 
-        _canvasRenderer.init(_settings, true); // true - do swap in renderer.
+        _canvasRenderer.init(this, _settings, true); // true - do swap in renderer.
         _inited = true;
     }
 

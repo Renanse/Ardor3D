@@ -157,7 +157,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         final int x = e.x;
         if (_control instanceof Canvas) {
             final Canvas canvas = (Canvas) _control;
-            return canvas.scaleToHiDpi(x);
+            return (int) Math.round(canvas.scaleToScreenDpi(x));
         }
         return x;
     }
@@ -174,7 +174,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         final int y = _control.getSize().y - e.y;
         if (_control instanceof Canvas) {
             final Canvas canvas = (Canvas) _control;
-            return canvas.scaleToHiDpi(y);
+            return (int) Math.round(canvas.scaleToScreenDpi(y));
         }
         return y;
     }

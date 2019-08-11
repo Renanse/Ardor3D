@@ -21,7 +21,7 @@ import com.ardor3d.util.Ardor3dException;
  * Represents a class that knows how to render a scene using a specific Open GL implementation.
  */
 public interface CanvasRenderer {
-    void init(DisplaySettings settings, boolean doSwap);
+    void init(Canvas canvas, DisplaySettings settings, boolean doSwap);
 
     /**
      * Draw the current state of the scene.

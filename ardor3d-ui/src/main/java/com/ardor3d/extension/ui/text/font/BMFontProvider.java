@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.text.CharacterDescriptor;
 import com.ardor3d.extension.ui.text.StyleConstants;
+import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMFont.Char;
@@ -52,19 +53,24 @@ public class BMFontProvider implements FontProvider {
     }
 
     @Override
-    public UIFont getClosestMatchingFont(final Map<String, Object> currentStyles, final AtomicReference<Double> scale) {
+    public UIFont getClosestMatchingFont(final Map<String, Object> currentStyles, final IDpiScaleProvider scaler,
+            final AtomicReference<Double> scale) {
         final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD)
                 ? (Boolean) currentStyles.get(StyleConstants.KEY_BOLD)
                 : false;
         final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS)
                 ? (Boolean) currentStyles.get(StyleConstants.KEY_ITALICS)
                 : false;
-        final int size = currentStyles.containsKey(StyleConstants.KEY_SIZE)
-                ? (Integer) currentStyles.get(StyleConstants.KEY_SIZE)
-                : UIComponent.getDefaultFontSize();
         final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY)
                 ? currentStyles.get(StyleConstants.KEY_FAMILY).toString()
                 : UIComponent.getDefaultFontFamily();
+
+        int size = currentStyles.containsKey(StyleConstants.KEY_SIZE)
+                ? (Integer) currentStyles.get(StyleConstants.KEY_SIZE)
+                : UIComponent.getDefaultFontSize();
+        if (scaler != null) {
+            size = (int) Math.round(scaler.scaleToScreenDpi(size));
+        }
 
         FontInfo closest = null;
         int score, bestScore = Integer.MIN_VALUE;

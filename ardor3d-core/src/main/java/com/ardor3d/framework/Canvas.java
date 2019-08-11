@@ -20,7 +20,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
  * This interface defines the View, and should maybe be called the ViewUpdater. It owns the rendering phase, and
  * controls all interactions with the Renderer.
  */
-public interface Canvas {
+public interface Canvas extends IDpiScaleProvider {
 
     /**
      * Do work to initialize this canvas, generally setting up the associated CanvasRenderer, etc.
@@ -100,7 +100,7 @@ public interface Canvas {
      *            unscaled pixel size
      * @return scaled pixel size.
      */
-    default int scaleToHiDpi(final int size) {
+    default double scaleToScreenDpi(final double size) {
         return size;
     }
 
@@ -111,7 +111,7 @@ public interface Canvas {
      *            monitor DPI scaled pixel size
      * @return unscaled pixel size.
      */
-    default int scaleFromHiDpi(final int size) {
+    default double scaleFromScreenDpi(final double size) {
         return size;
     }
 }

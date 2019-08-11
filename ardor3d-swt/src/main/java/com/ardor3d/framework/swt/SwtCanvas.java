@@ -82,7 +82,7 @@ public class SwtCanvas extends GLCanvas implements Canvas {
                 _passedGLData.alphaSize, _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples,
                 false, _passedGLData.stereo);
 
-        _canvasRenderer.init(settings, false); // false - do not do back buffer swap, swt will do that.
+        _canvasRenderer.init(this, settings, false); // false - do not do back buffer swap, swt will do that.
         _inited = true;
     }
 
@@ -111,12 +111,12 @@ public class SwtCanvas extends GLCanvas implements Canvas {
 
     @Override
     public int getContentHeight() {
-        return scaleToHiDpi(getSize().y);
+        return (int) Math.round(scaleToScreenDpi(getSize().y));
     }
 
     @Override
     public int getContentWidth() {
-        return scaleToHiDpi(getSize().x);
+        return (int) Math.round(scaleToScreenDpi(getSize().x));
     }
 
     @Override
@@ -130,20 +130,12 @@ public class SwtCanvas extends GLCanvas implements Canvas {
     }
 
     @Override
-    public int scaleToHiDpi(final int size) {
-        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp(size) : size;
+    public double scaleToScreenDpi(final double size) {
+        return SwtDpiScaler.INSTANCE.scaleToScreenDpi(size);
     }
 
     @Override
-    public int scaleFromHiDpi(final int size) {
-        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown(size) : size;
-    }
-
-    public static boolean ApplyScale = true;
-    static {
-        final String os = System.getProperty("os.name").toLowerCase();
-        if (os.startsWith("mac os x")) {
-            ApplyScale = false;
-        }
+    public double scaleFromScreenDpi(final double size) {
+        return SwtDpiScaler.INSTANCE.scaleFromScreenDpi(size);
     }
 }

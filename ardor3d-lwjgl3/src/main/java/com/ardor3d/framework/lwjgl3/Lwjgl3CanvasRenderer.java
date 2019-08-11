@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
@@ -61,7 +62,7 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
      * Note: this requires the OpenGL context is already current.
      */
     @Override
-    public void init(final DisplaySettings settings, final boolean doSwap) {
+    public void init(final Canvas canvas, final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
 
         // Grab a shared context, if one is given.
@@ -88,10 +89,12 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
 
         _renderer.setBackgroundColor(ColorRGBA.BLACK);
 
+        final float aspectRatio = (float) canvas.getContentWidth() / (float) canvas.getContentHeight();
+
         if (_camera == null) {
             /** Set up how our camera sees. */
-            _camera = new Camera(settings.getWidth(), settings.getHeight());
-            _camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1, 1000);
+            _camera = new Camera(canvas.getContentWidth(), canvas.getContentHeight());
+            _camera.setFrustumPerspective(45.0f, aspectRatio, 1, 1000);
             _camera.setProjectionMode(ProjectionMode.Perspective);
 
             final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
@@ -102,8 +105,8 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
             _camera.setFrame(loc, left, up, dir);
         } else {
             // use new width and height to set ratio.
-            _camera.setFrustumPerspective(_camera.getFovY(), (float) settings.getWidth() / (float) settings.getHeight(),
-                    _camera.getFrustumNear(), _camera.getFrustumFar());
+            _camera.setFrustumPerspective(_camera.getFovY(), aspectRatio, _camera.getFrustumNear(),
+                    _camera.getFrustumFar());
         }
     }
 

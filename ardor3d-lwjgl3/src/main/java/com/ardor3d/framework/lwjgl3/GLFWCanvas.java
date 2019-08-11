@@ -11,6 +11,7 @@
 package com.ardor3d.framework.lwjgl3;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +56,11 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     protected volatile boolean _focusLost = false;
 
     protected GLFWWindowFocusCallback _focusCallback;
-
     protected GLFWErrorCallback _errorCallback;
-
     protected GLFWWindowSizeCallbackI _resizeCallback;
 
     protected int _contentWidth, _contentHeight;
+    protected float _dpiScale = 1f;
 
     protected List<ICanvasListener> _listeners = new ArrayList<>();
 
@@ -121,6 +121,8 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
+            // TODO: Allow toggle of this scaling?
+            GLFW.glfwWindowHint(GLFW.GLFW_SCALE_TO_MONITOR, GLFW.GLFW_TRUE);
             GLFW.glfwSetErrorCallback(_errorCallback = GLFWErrorCallback.createPrint(System.err));
             if (_settings.isFullScreen()) {
                 // TODO: allow choice of monitor
@@ -152,7 +154,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             throw new Ardor3dException("Cannot create window: " + e.getMessage());
         }
 
-        _canvasRenderer.init(_settings, true); // true - do swap in renderer.
+        _canvasRenderer.init(this, _settings, true); // true - do swap in renderer.
         _inited = true;
     }
 
@@ -163,6 +165,11 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
             GLFW.glfwGetFramebufferSize(_windowId, width, height);
             _contentWidth = width.get();
             _contentHeight = height.get();
+
+            final FloatBuffer xscale = stack.mallocFloat(1);
+            final FloatBuffer yscale = stack.mallocFloat(1);
+            GLFW.glfwGetWindowContentScale(_windowId, xscale, yscale);
+            _dpiScale = (xscale.get() + yscale.get()) / 2f;
         }
         for (final ICanvasListener l : _listeners) {
             l.onResize(_contentWidth, _contentHeight);
@@ -306,5 +313,15 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     @Override
     public boolean removeListener(final ICanvasListener listener) {
         return _listeners.remove(listener);
+    }
+
+    @Override
+    public double scaleToScreenDpi(final double size) {
+        return size * _dpiScale;
+    }
+
+    @Override
+    public double scaleFromScreenDpi(final double size) {
+        return size / _dpiScale;
     }
 }

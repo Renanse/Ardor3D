@@ -151,7 +151,7 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
         height = org.eclipse.swt.internal.DPIUtil.autoScaleUp(height);
 
         final DisplaySettings settings = _settings.resizedCopy(width, height);
-        _canvasRenderer.init(settings, false);
+        _canvasRenderer.init(this, settings, false);
 
         if (_fboTexture != null && _fboTexture.getTextureIdForContext(_canvasRenderer.getRenderContext()) != 0) {
             _canvasRenderer.getRenderer().getTextureUtils().deleteTexture(_fboTexture);
@@ -192,30 +192,12 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
 
     @Override
     public int getContentHeight() {
-        return scaleToHiDpi(getSize().y);
+        return (int) Math.round(scaleToScreenDpi(getSize().y));
     }
 
     @Override
     public int getContentWidth() {
-        return scaleToHiDpi(getSize().x);
-    }
-
-    @Override
-    public int scaleToHiDpi(final int size) {
-        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp(size) : size;
-    }
-
-    @Override
-    public int scaleFromHiDpi(final int size) {
-        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown(size) : size;
-    }
-
-    public static boolean ApplyScale = true;
-    static {
-        final String os = System.getProperty("os.name").toLowerCase();
-        if (os.startsWith("mac os x")) {
-            ApplyScale = false;
-        }
+        return (int) Math.round(scaleToScreenDpi(getSize().x));
     }
 
     @Override
@@ -227,4 +209,15 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
     public boolean removeListener(final ICanvasListener listener) {
         return _listeners.remove(listener);
     }
+
+    @Override
+    public double scaleToScreenDpi(final double size) {
+        return SwtDpiScaler.INSTANCE.scaleToScreenDpi(size);
+    }
+
+    @Override
+    public double scaleFromScreenDpi(final double size) {
+        return SwtDpiScaler.INSTANCE.scaleFromScreenDpi(size);
+    }
+
 }

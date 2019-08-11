@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
+import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.TransformException;
@@ -40,6 +41,7 @@ import com.ardor3d.util.geom.BufferUtils;
 @SavableFactory(factoryMethod = "initSavable")
 public class BMText extends Mesh {
     private static final Logger logger = Logger.getLogger(BMText.class.getName());
+    private static IDpiScaleProvider _scaleProvider;
 
     protected BMFont _font;
 
@@ -153,7 +155,8 @@ public class BMText extends Mesh {
         return new BMText();
     }
 
-    protected BMText() {}
+    protected BMText() {
+    }
 
     /**
      *
@@ -234,15 +237,15 @@ public class BMText extends Mesh {
     /**
      * If AutoScale is enabled, this scale parameter acts as a bias. Setting the scale to 0.95 will sharpen the font and
      * increase readability a bit if you're using a bilinear min filter on the texture. When AutoScale is disabled, this
-     * scales the font to world units, e.g. setScale(1) would make the font characters approximately 1 world unit in
+     * scales the font to world units, e.g. setScale(1.0) would make the font characters approximately 1 world unit in
      * size, regardless of the font point size.
      */
     public void setFontScale(final double scale) {
         _fontScale = scale;
 
         if (_autoScale == AutoScale.Off) {
-            final double unit = 1.0 / _font.getSize();
-            final double s = unit * _fontScale;
+            final double scaledScale = _scaleProvider == null ? scale : _scaleProvider.scaleToScreenDpi(scale);
+            final double s = scaledScale / _font.getSize();
             this.setScale(s, s, -s);
         }
     }
@@ -829,4 +832,13 @@ public class BMText extends Mesh {
         // return
         return text;
     }
+
+    public static void setDpiScaleProvider(final IDpiScaleProvider provider) {
+        _scaleProvider = provider;
+    }
+
+    public static IDpiScaleProvider getDpiScaleProvider() {
+        return _scaleProvider;
+    }
+
 }
