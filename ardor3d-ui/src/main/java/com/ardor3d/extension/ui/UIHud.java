@@ -351,6 +351,7 @@ public class UIHud extends Node {
     @Override
     public void draw(final Renderer r) {
         final Camera cam = Camera.getCurrentCamera();
+        r.getQueue().pushBuckets();
         _hudCamera.apply(r);
         try {
             Spatial child;
@@ -375,6 +376,7 @@ public class UIHud extends Node {
             r.getScissorUtils().clearClips();
         }
         r.renderBuckets();
+        r.getQueue().popBuckets();
         cam.apply(r);
     }
 
