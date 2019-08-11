@@ -90,8 +90,8 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     /** The amount of time (in ms) before we should show the tooltip on this component. */
     protected int _tooltipPopTime = 1000;
 
-    /** The default font family (Vera) used when font family field and all parents font fields are null. */
-    private static String _defaultFontFamily = "Vera";
+    /** The default font family used when font family field and all parents font fields are null. */
+    private static String _defaultFontFamily = "Arial";
 
     /** The default font size (18) used when font size field and all parents font size fields are 0. */
     private static int _defaultFontSize = 18;
@@ -1218,7 +1218,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     }
 
     /**
-     * @return the default Font family. Defaults to "Vera".
+     * @return the default Font family. Defaults to "Arial".
      */
     public static String getDefaultFontFamily() {
         return UIComponent._defaultFontFamily;

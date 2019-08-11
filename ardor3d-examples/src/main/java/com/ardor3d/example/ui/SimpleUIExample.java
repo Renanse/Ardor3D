@@ -368,11 +368,11 @@ public class SimpleUIExample extends ExampleBase {
         final UIPanel panel = new UIPanel(new RectLayout());
 
         final UIButton okButton = new UIButton("OK!");
-        okButton.setLayoutData(RectLayoutData.pinCenter(100, 50, 55, 0));
+        okButton.setLayoutData(RectLayoutData.pinCenter(200, 50, 105, 0));
         panel.add(okButton);
 
         final UIButton cancelButton = new UIButton("Cancel");
-        cancelButton.setLayoutData(RectLayoutData.pinCenter(100, 50, -55, 0));
+        cancelButton.setLayoutData(RectLayoutData.pinCenter(200, 50, -105, 0));
         panel.add(cancelButton);
 
         return panel;

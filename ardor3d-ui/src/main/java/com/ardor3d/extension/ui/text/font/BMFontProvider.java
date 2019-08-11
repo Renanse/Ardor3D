@@ -77,31 +77,15 @@ public class BMFontProvider implements FontProvider {
 
         for (final FontInfo info : _fonts) {
             score = 0;
+
             if (family.equalsIgnoreCase(info.family)) {
                 score += 200;
             }
 
-            if (info.bold) {
-                if (isBold) {
-                    score += 50;
-                } else {
-                    score -= 25;
-                }
-            } else if (isBold) {
-                score -= 25;
-            }
+            score -= 5 * Math.abs(size - info.size);
 
-            if (info.italic) {
-                if (isItalic) {
-                    score += 50;
-                } else {
-                    score -= 25;
-                }
-            } else if (isItalic) {
-                score -= 25;
-            }
-
-            score -= Math.abs(size - info.size);
+            score += isBold == info.bold ? 10 : -10;
+            score += isItalic == info.italic ? 10 : -10;
 
             if (score > bestScore) {
                 closest = info;
