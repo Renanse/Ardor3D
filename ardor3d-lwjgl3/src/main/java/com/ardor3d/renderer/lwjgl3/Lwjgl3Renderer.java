@@ -11,7 +11,6 @@
 package com.ardor3d.renderer.lwjgl3;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.logging.Logger;
@@ -295,30 +294,22 @@ public class Lwjgl3Renderer extends AbstractRenderer {
     }
 
     @Override
-    public void setupPointParameters(final float pointSize, final boolean antialiased, final boolean isSprite,
-            final boolean useDistanceAttenuation, final FloatBuffer attenuationCoefficients, final float minPointSize,
-            final float maxPointSize) {
-//        final RenderContext context = ContextManager.getCurrentContext();
+    public void setPointSize(final boolean shaderSizeControl, final float staticPointSize) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
 
-        // TODO: make a record for point states
-        GL11C.glPointSize(pointSize);
+        if (record.isShaderPointSize() != shaderSizeControl) {
+            record.setShaderPointSize(shaderSizeControl);
+            if (shaderSizeControl) {
+                GL11C.glEnable(GL32C.GL_PROGRAM_POINT_SIZE);
+            } else {
+                GL11C.glDisable(GL32C.GL_PROGRAM_POINT_SIZE);
+            }
+        }
 
-        // Supposedly all points are smoothed now and the below is meaningless in opengl core
-        // if (isSprite) {
-        // GL11C.glEnable(GL46C.GL_POINT_SPRITE);
-        // GL11C.glTexEnvi(GL46C.GL_POINT_SPRITE, GL46C.GL_COORD_REPLACE, GL11C.GL_TRUE);
-        // }
-        //
-        // if (useDistanceAttenuation && context.getCapabilities().isPointParametersSupported()) {
-        // GL46C.glPointParameter(GL46C.GL_POINT_DISTANCE_ATTENUATION, attenuationCoefficients);
-        // GL46C.glPointParameterf(GL46C.GL_POINT_SIZE_MIN, minPointSize);
-        // GL46C.glPointParameterf(GL46C.GL_POINT_SIZE_MAX, maxPointSize);
-        // }
-        //
-        // if (antialiased) {
-        // GL11C.glEnable(GL46C.GL_POINT_SMOOTH);
-        // GL11C.glHint(GL46C.GL_POINT_SMOOTH_HINT, GL11C.GL_NICEST);
-        // }
+        if (!shaderSizeControl) {
+            GL11C.glPointSize(staticPointSize);
+        }
     }
 
     @Override

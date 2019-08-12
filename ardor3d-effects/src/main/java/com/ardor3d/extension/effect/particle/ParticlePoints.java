@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -26,7 +26,8 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class ParticlePoints extends ParticleSystem {
 
-    public ParticlePoints() {}
+    public ParticlePoints() {
+    }
 
     public ParticlePoints(final String name, final int numParticles) {
         super(name, numParticles);
@@ -74,8 +75,8 @@ public class ParticlePoints extends ParticleSystem {
             _particles[k].setStartIndex(k * verts);
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
-                BufferUtils.setInBuffer(sharedTextureData[a], getParticleGeometry().getMeshData().getTextureCoords(0)
-                        .getBuffer(), ind);
+                BufferUtils.setInBuffer(sharedTextureData[a],
+                        getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer(), ind);
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
 
@@ -118,25 +119,6 @@ public class ParticlePoints extends ParticleSystem {
     }
 
     /**
-     * @return true if points are to be drawn antialiased
-     */
-    public boolean isAntialiased() {
-        return getParticleGeometry().isAntialiased();
-    }
-
-    /**
-     * Sets whether the points should be antialiased. May decrease performance. If you want to enabled antialiasing, you
-     * should also use an alphastate with a source of SourceFunction.SourceAlpha and a destination of
-     * DB_ONE_MINUS_SRC_ALPHA or DB_ONE.
-     * 
-     * @param antialiased
-     *            true if the line should be antialiased.
-     */
-    public void setAntialiased(final boolean antialiased) {
-        getParticleGeometry().setAntialiased(antialiased);
-    }
-
-    /**
      * @return the pixel size of each point.
      */
     public float getPointSize() {
@@ -146,7 +128,7 @@ public class ParticlePoints extends ParticleSystem {
     /**
      * Sets the pixel width of the points when drawn. Non anti-aliased point sizes are rounded to the nearest whole
      * number by opengl.
-     * 
+     *
      * @param size
      *            The size to set.
      */

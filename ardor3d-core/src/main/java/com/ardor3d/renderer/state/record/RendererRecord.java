@@ -30,6 +30,7 @@ public class RendererRecord extends StateRecord {
     private boolean _texturesValid = false;
     private int _currentTextureArraysUnit = 0;
     private int _programId;
+    private boolean _shaderPointSize;
 
     @Override
     public void invalidate() {
@@ -151,5 +152,13 @@ public class RendererRecord extends StateRecord {
 
     public void setProgramId(final int programId) {
         _programId = programId;
+    }
+
+    public boolean isShaderPointSize() {
+        return _shaderPointSize;
+    }
+
+    public void setShaderPointSize(final boolean shaderPointSize) {
+        _shaderPointSize = shaderPointSize;
     }
 }

@@ -530,7 +530,6 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
                     oldGeom.getNumParticles(), ParticleType.Point);
             newGeom = pPoints;
             pPoints.setPointSize(5);
-            pPoints.setAntialiased(true);
         } else if (newType == ParticleSystem.ParticleType.Line) {
             newGeom = ParticleFactory.buildParticles(oldGeom.getName(), oldGeom.getNumParticles(), ParticleType.Line);
         } else {

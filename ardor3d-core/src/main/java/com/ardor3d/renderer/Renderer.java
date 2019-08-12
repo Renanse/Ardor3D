@@ -259,19 +259,15 @@ public interface Renderer {
     void setDrawBuffer(DrawBufferTarget target);
 
     /**
-     * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
-     * lwjgl/jogl.
+     * Set our GL_POINT size. Either point size is controlled by the shader, or if that is false, a single point size is
+     * used as given.
      *
-     * @param pointSize
-     * @param antialiased
-     * @param isSprite
-     * @param useDistanceAttenuation
-     * @param attenuationCoefficients
-     * @param minPointSize
-     * @param maxPointSize
+     * @param shaderSizeControl
+     *            if true, point size is controlled from our vertex shader via <code>gl_PointSize</code>.
+     * @param staticPointSize
+     *            the size to make our points, only used if <code>shaderSizeControl</code> is false;
      */
-    void setupPointParameters(float pointSize, boolean antialiased, boolean isSprite, boolean useDistanceAttenuation,
-            FloatBuffer attenuationCoefficients, float minPointSize, float maxPointSize);
+    void setPointSize(final boolean shaderSizeControl, final float staticPointSize);
 
     /**
      * Apply the given state to the current RenderContext using this Renderer.

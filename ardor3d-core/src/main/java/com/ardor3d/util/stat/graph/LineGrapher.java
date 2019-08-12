@@ -277,7 +277,6 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
             point.setDefaultColor(getColorConfig(type, ConfigKeys.PointColor.name(), new ColorRGBA(ColorRGBA.WHITE)));
             point.setPointSize(getIntConfig(type, ConfigKeys.PointSize.name(), 5));
-            point.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
             if (!getBooleanConfig(type, ConfigKeys.ShowPoints.name(), false)) {
                 point.getSceneHints().setCullHint(CullHint.Always);
             }

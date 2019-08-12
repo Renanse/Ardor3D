@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -23,8 +23,8 @@ import com.ardor3d.util.geom.BufferUtils;
  * A simple demonstration of displaying numerous Point in three-dimensions.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.PointsExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_PointsExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_PointsExample.jpg", //
+        maxHeapMemory = 64)
 public class PointsExample extends ExampleBase {
 
     static final int POINTS = 25;
@@ -48,7 +48,6 @@ public class PointsExample extends ExampleBase {
         }
         final Point pointsA = new Point("points", pointData, null, null, null);
         pointsA.setRandomColors();
-        pointsA.setAntialiased(true);
         pointsA.setPointSize(4.25f);
 
         final BlendState bState = new BlendState();
