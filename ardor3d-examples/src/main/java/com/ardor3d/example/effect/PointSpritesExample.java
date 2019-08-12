@@ -81,19 +81,11 @@ public class PointSpritesExample extends ExampleBase {
 
         buildPointSprites();
     }
-//
-//    private void buildShader() {
-//        _pointSpriteShaderState = new ShaderState();
-//        _pointSpriteShaderState.setShader(ShaderType.Vertex, s_vert_pointsprite);
-//        _pointSpriteShaderState.setShader(ShaderType.Fragment, s_frag_pointsprite);
-//        _pointSpriteShaderState.setUniform("texture", 0);
-//        _pointSpriteShaderState.setUniform("time", 0f);
-//    }
 
     private void buildPointSprites() {
         _points = new Point();
         _points.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        _points.setPointSize(12);
+        _points.setPointSize(20);
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/flare.png", Texture.MinificationFilter.NearestNeighborNoMipMaps,
                 TextureStoreFormat.GuessCompressedFormat, true));
@@ -131,6 +123,9 @@ public class PointSpritesExample extends ExampleBase {
         }
         _points.getMeshData().setVertexBuffer(vBuf);
         _points.getMeshData().setColorBuffer(cBuf);
+
+        _points.setRenderMaterial("point_sprites_example.yaml");
+
         _root.attachChild(_points);
     }
 
@@ -148,27 +143,4 @@ public class PointSpritesExample extends ExampleBase {
         store.set(x, y, z);
         store.multiplyLocal(len);
     }
-
-    private static final String s_vert_pointsprite = //
-            "uniform float time;" + //
-                    "const float a = 3.1415/20.0;" + //
-                    "void main()" + //
-                    "{" + //
-                    "  float radius = gl_Color.a;" + //
-                    "  gl_FrontColor.rgb = gl_Color.rgb;" + //
-                    "  gl_FrontColor.a = 1.0 - 0.02*radius;" + //
-                    "  gl_Position=gl_ModelViewProjectionMatrix*vec4(gl_Vertex.x, " + //
-                    "                                                gl_Vertex.y + (10.0-0.3*radius)*cos(time+a*radius), "
-                    + //
-                    "                                                gl_Vertex.z, 1.0);" + //
-                    "}";
-
-    private static final String s_frag_pointsprite = //
-            "#version 120\n" + //
-                    "uniform sampler2D texture;" + //
-                    "" + //
-                    "void main()" + //
-                    "{" + //
-                    "  gl_FragColor = vec4(texture2D(texture, gl_PointCoord)) * gl_Color;" + //
-                    "}";
 }

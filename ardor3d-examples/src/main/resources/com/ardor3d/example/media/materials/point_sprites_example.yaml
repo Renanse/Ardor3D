@@ -1,0 +1,54 @@
+--- # Material
+name: rtt_cubemap_example
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: color
+
+
+        uniforms: 
+          - builtIn: [modelViewProj]
+          - 
+            shaderKey: time
+            type: Float1
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            program: |
+              #version 330 core
+              
+              in vec3 vertex;
+              in vec4 color;
+              
+              out vec4 DiffuseColor;
+              
+              uniform mat4 modelViewProj;
+              uniform float time;
+              
+              const float a = 3.1415/20.0;
+              
+              void main()
+              {
+                  float radius = color.a;
+                  DiffuseColor = vec4(color.rgb, 1.0 - 0.02 * radius);
+                  gl_Position = modelViewProj * vec4(vertex.x, vertex.y + (10.0 - 0.3 * radius) * cos(time + a * radius), vertex.z, 1.0);
+              }
+          Fragment: 
+            program: |
+              #version 330 core
+  
+              out vec4 FragColor;
+
+              in vec4 DiffuseColor;
+              
+              uniform sampler2D diffuse;
+              
+              void main()
+              {
+                FragColor = vec4(texture2D(diffuse, gl_PointCoord)) * DiffuseColor;
+              }
+                    
+              
