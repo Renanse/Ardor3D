@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.text.CharacterDescriptor;
 import com.ardor3d.extension.ui.text.StyleConstants;
+import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMFont.Char;
@@ -52,15 +53,24 @@ public class BMFontProvider implements FontProvider {
     }
 
     @Override
-    public UIFont getClosestMatchingFont(final Map<String, Object> currentStyles, final AtomicReference<Double> scale) {
-        final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD) ? (Boolean) currentStyles
-                .get(StyleConstants.KEY_BOLD) : false;
-        final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS) ? (Boolean) currentStyles
-                .get(StyleConstants.KEY_ITALICS) : false;
-        final int size = currentStyles.containsKey(StyleConstants.KEY_SIZE) ? (Integer) currentStyles
-                .get(StyleConstants.KEY_SIZE) : UIComponent.getDefaultFontSize();
-        final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY) ? currentStyles.get(
-                StyleConstants.KEY_FAMILY).toString() : UIComponent.getDefaultFontFamily();
+    public UIFont getClosestMatchingFont(final Map<String, Object> currentStyles, final IDpiScaleProvider scaler,
+            final AtomicReference<Double> scale) {
+        final boolean isBold = currentStyles.containsKey(StyleConstants.KEY_BOLD)
+                ? (Boolean) currentStyles.get(StyleConstants.KEY_BOLD)
+                : false;
+        final boolean isItalic = currentStyles.containsKey(StyleConstants.KEY_ITALICS)
+                ? (Boolean) currentStyles.get(StyleConstants.KEY_ITALICS)
+                : false;
+        final String family = currentStyles.containsKey(StyleConstants.KEY_FAMILY)
+                ? currentStyles.get(StyleConstants.KEY_FAMILY).toString()
+                : UIComponent.getDefaultFontFamily();
+
+        int size = currentStyles.containsKey(StyleConstants.KEY_SIZE)
+                ? (Integer) currentStyles.get(StyleConstants.KEY_SIZE)
+                : UIComponent.getDefaultFontSize();
+        if (scaler != null) {
+            size = (int) Math.round(scaler.scaleToScreenDpi(size));
+        }
 
         FontInfo closest = null;
         int score, bestScore = Integer.MIN_VALUE;
@@ -131,8 +141,8 @@ public class BMFontProvider implements FontProvider {
             final Map<Character, CharacterDescriptor> descriptors = Maps.newHashMap();
             for (final int val : closest.bmFont.getMappedChars()) {
                 final Char c = closest.bmFont.getChar(val);
-                final CharacterDescriptor desc = new CharacterDescriptor((char)c.id, c.x, c.y, c.width, c.height, c.xadvance,
-                        c.xoffset, c.yoffset, 1.0, null);
+                final CharacterDescriptor desc = new CharacterDescriptor((char) c.id, c.x, c.y, c.width, c.height,
+                        c.xadvance, c.xoffset, c.yoffset, 1.0, null);
                 descriptors.put((char) val, desc);
             }
 
