@@ -40,7 +40,6 @@ import com.ardor3d.extension.ui.layout.RectLayout;
 import com.ardor3d.extension.ui.layout.RectLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.model.DefaultComboBoxModel;
-import com.ardor3d.extension.ui.text.TextFactory;
 import com.ardor3d.extension.ui.text.UIPasswordField;
 import com.ardor3d.extension.ui.text.UITextArea;
 import com.ardor3d.extension.ui.text.UITextField;
@@ -83,7 +82,6 @@ public class SimpleUIExample extends ExampleBase {
         _canvas.setTitle("Simple UI Example");
 
         UIComponent.setUseTransparency(true);
-        TextFactory.INSTANCE.setDpiScaleProvider(_canvas);
 
         // Add a spinning 3D box to show behind UI.
         final Box box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);

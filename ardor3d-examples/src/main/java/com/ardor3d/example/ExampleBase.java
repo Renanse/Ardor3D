@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.lwjgl.system.Configuration;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.extension.ui.text.TextFactory;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -182,6 +183,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
         addDefaultResourceLocators();
 
         BMText.setDpiScaleProvider(_canvas);
+        TextFactory.INSTANCE.setDpiScaleProvider(_canvas);
 
         /**
          * Create a ZBuffer to display pixels closest to the camera above farther ones.
