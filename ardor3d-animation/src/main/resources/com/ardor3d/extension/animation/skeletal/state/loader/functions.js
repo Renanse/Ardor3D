@@ -1,3 +1,4 @@
+/*global Packages, MANAGER, INPUTSTORE, OUTPUTSTORE*/
 // load our helper functions first...
 try{ load("nashorn:mozilla_compat.js"); } catch(e){}
 
@@ -17,99 +18,6 @@ importPackage(Packages.com.ardor3d.extension.animation.skeletal.state);
  * LICENSE file or at <https://git.io/fjRmv>.
  */
  
-/**
- * Parse a SteadyState Java object from the given json data structure.
- * 
- * @param json
- *            the json data structure
- * @return the new SteadyState
- */
-function _steadyState(json) {
-	var state = new SteadyState(json.name);
-
-	// check if we are simple and just have a clip
-	if (json.clip) {
-		// convert clip to source
-		var clip = INPUTSTORE.clips.get(json.clip);
-		state.sourceTree = new ClipSource(clip, MANAGER);
-		OUTPUTSTORE.clipSources.put(state.sourceTree);
-	}
-	// else we should have a tree
-	else if (json.tree) {
-		state.sourceTree = _treeSource(json.tree);
-	}
-
-	if (json.endTransition) {
-		// parse end transition
-		state.endTransition = _transitionState(json.endTransition);
-	}
-
-	// look for a set of transitions
-	if (json.transitions) {
-		for ( var key in json.transitions) {
-			// parse and add transition
-			state.addTransition(key, _transitionState(json.transitions[key]));
-		}
-	}
-
-	var layerName=AnimationLayer.BASE_LAYER_NAME;
-	if (json.layer) {
-		layerName = json.layer;
-	}
-
-	MANAGER.findAnimationLayer(layerName).addSteadyState(state);
-
-	return state;
-}
-
-/**
- * Parse an AbstractTransitionState Java object from the given json data array.
- * 
- * @param args
- *            the json data array
- * @return the new AbstractTransitionState
- */
-function _transitionState(args) {
-	var type = args[2];
-	var transition;
-
-	// based on our "type", create our transition state...
-	switch (type) {
-	case 'fade':
-		transition = new FadeTransitionState(args[3], args[4],
-				AbstractTwoStateLerpTransition.BlendType.valueOf(args[5]));
-		break;
-	case 'syncfade':
-		transition = new SyncFadeTransitionState(args[3], args[4],
-				AbstractTwoStateLerpTransition.BlendType.valueOf(args[5]));
-		break;
-	case 'frozen':
-		transition = new FrozenTransitionState(args[3], args[4],
-				AbstractTwoStateLerpTransition.BlendType.valueOf(args[5]));
-		break;
-	case 'immediate':
-		transition = new ImmediateTransitionState(args[3]);
-		break;
-	case 'ignore':
-		transition = new IgnoreTransitionState();
-		break;
-	default:
-		return null;
-	}
-
-	// pull a start window, if set
-	if (args[0] != '-') {
-		transition.startWindow = args[0];
-	}
-
-	// pull an end window, if set
-	if (args[1] != '-') {
-		transition.endWindow = args[1];
-	}
-
-	return transition;
-}
-
 /**
  * Parse a BlendTreeSource Java object from the given json data structure.
  * 
@@ -215,6 +123,99 @@ function _treeSource(json) {
 	}
 
 	return null;
+}
+ 
+/**
+ * Parse an AbstractTransitionState Java object from the given json data array.
+ * 
+ * @param args
+ *            the json data array
+ * @return the new AbstractTransitionState
+ */
+function _transitionState(args) {
+	var type = args[2];
+	var transition;
+
+	// based on our "type", create our transition state...
+	switch (type) {
+	case 'fade':
+		transition = new FadeTransitionState(args[3], args[4],
+				AbstractTwoStateLerpTransition.BlendType.valueOf(args[5]));
+		break;
+	case 'syncfade':
+		transition = new SyncFadeTransitionState(args[3], args[4],
+				AbstractTwoStateLerpTransition.BlendType.valueOf(args[5]));
+		break;
+	case 'frozen':
+		transition = new FrozenTransitionState(args[3], args[4],
+				AbstractTwoStateLerpTransition.BlendType.valueOf(args[5]));
+		break;
+	case 'immediate':
+		transition = new ImmediateTransitionState(args[3]);
+		break;
+	case 'ignore':
+		transition = new IgnoreTransitionState();
+		break;
+	default:
+		return null;
+	}
+
+	// pull a start window, if set
+	if (args[0] != '-') {
+		transition.startWindow = args[0];
+	}
+
+	// pull an end window, if set
+	if (args[1] != '-') {
+		transition.endWindow = args[1];
+	}
+
+	return transition;
+}
+ 
+/**
+ * Parse a SteadyState Java object from the given json data structure.
+ * 
+ * @param json
+ *            the json data structure
+ * @return the new SteadyState
+ */
+function _steadyState(json) {
+	var state = new SteadyState(json.name);
+
+	// check if we are simple and just have a clip
+	if (json.clip) {
+		// convert clip to source
+		var clip = INPUTSTORE.clips.get(json.clip);
+		state.sourceTree = new ClipSource(clip, MANAGER);
+		OUTPUTSTORE.clipSources.put(state.sourceTree);
+	}
+	// else we should have a tree
+	else if (json.tree) {
+		state.sourceTree = _treeSource(json.tree);
+	}
+
+	if (json.endTransition) {
+		// parse end transition
+		state.endTransition = _transitionState(json.endTransition);
+	}
+
+	// look for a set of transitions
+	if (json.transitions) {
+		for ( var key in json.transitions) {
+			// parse and add transition
+			state.addTransition(key, _transitionState(json.transitions[key]));
+		}
+	}
+
+	var layerName=AnimationLayer.BASE_LAYER_NAME;
+	if (json.layer) {
+		layerName = json.layer;
+	}
+
+	MANAGER.findAnimationLayer(layerName).addSteadyState(state);
+
+	return state;
 }
 
 /**
