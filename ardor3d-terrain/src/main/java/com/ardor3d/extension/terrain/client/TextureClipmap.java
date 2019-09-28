@@ -56,7 +56,7 @@ public class TextureClipmap {
     private int currentShownLevels;
     private int minVisibleLevel = 0;
 
-    private float scale = 1f;
+    private float density = 1f;
 
     private Texture3D textureClipmap;
     private GLSLShaderObjectsState textureClipmapShader;
@@ -115,7 +115,7 @@ public class TextureClipmap {
         }
 
         textureLevels = roundUpPowerTwo(validLevels);
-        scale = textureConfiguration.getTextureDensity() * textureSize / 128;
+        density = textureConfiguration.getTextureDensity();
 
         TextureClipmap.logger.info("Texture size: " + textureSize);
         TextureClipmap.logger.info("ValidLevels: " + validLevels);
@@ -139,7 +139,7 @@ public class TextureClipmap {
 
         eyePosition.set(position);
         textureClipmapShader.setUniform("eyePosition", eyePosition);
-        eyePosition.multiplyLocal(textureSize / (scale * 4f * 32f));
+        eyePosition.multiplyLocal(density);
 
         for (int unit = minVisibleLevel; unit < validLevels; unit++) {
             if (cacheList.get(unit).isValid()) {
@@ -430,15 +430,15 @@ public class TextureClipmap {
                 int width1 = textureSize - dX;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
-                        imageDestination, dX1, 0, 0, textureSize, textureSize);
+                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1, imageDestination,
+                        dX1, 0, 0, textureSize, textureSize);
 
                 dX1 = 0;
                 width1 = width - width1;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
-                        imageDestination, dX1, 0, 0, textureSize, textureSize);
+                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1, imageDestination,
+                        dX1, 0, 0, textureSize, textureSize);
             } else {
                 imageDestination.rewind();
                 renderer.updateTexture3DSubImage(textureClipmap, dX, 0, unit, width, textureSize, 1, imageDestination,
@@ -494,15 +494,15 @@ public class TextureClipmap {
                 int width1 = textureSize - dX;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
-                        imageDestination, dX1, 0, 0, textureSize, textureSize);
+                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1, imageDestination,
+                        dX1, 0, 0, textureSize, textureSize);
 
                 dX1 = 0;
                 width1 = width - width1;
 
                 imageDestination.rewind();
-                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1,
-                        imageDestination, dX1, 0, 0, textureSize, textureSize);
+                renderer.updateTexture3DSubImage(textureClipmap, dX1, 0, unit, width1, textureSize, 1, imageDestination,
+                        dX1, 0, 0, textureSize, textureSize);
             } else {
                 imageDestination.rewind();
                 renderer.updateTexture3DSubImage(textureClipmap, dX, 0, unit, width, textureSize, 1, imageDestination,
@@ -558,7 +558,7 @@ public class TextureClipmap {
         }
         textureClipmapShader.setUniform("texture", 0);
 
-        textureClipmapShader.setUniform("scale", 1f / scale);
+        textureClipmapShader.setUniform("textureDensity", density);
         textureClipmapShader.setUniform("textureSize", (float) textureSize);
         textureClipmapShader.setUniform("texelSize", 1f / textureSize);
 
@@ -610,23 +610,23 @@ public class TextureClipmap {
         return textureClipmap;
     }
 
-    public float getScale() {
-        return scale;
+    public float getPixelDensity() {
+        return density;
     }
 
-    public void setScale(final float scale) {
-        this.scale = scale;
+    public void setPixelDensity(final float density) {
+        this.density = density;
     }
 
     private int roundUpPowerTwo(int v) {
         v--;
         v |= v >> 1;
-            v |= v >> 2;
-            v |= v >> 4;
-            v |= v >> 8;
-            v |= v >> 16;
-            v++;
-            return v;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        v++;
+        return v;
     }
 
     /**

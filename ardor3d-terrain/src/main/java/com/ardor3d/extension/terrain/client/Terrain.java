@@ -313,7 +313,7 @@ public class Terrain extends Node implements Pickable, Runnable {
             }
 
             if (_textureClipmaps.size() > 1) {
-                _geometryClipmapShader.setUniform("scale", 1f / textureClipmap.getScale());
+                _geometryClipmapShader.setUniform("textureDensity", textureClipmap.getPixelDensity());
                 _geometryClipmapShader.setUniform("textureSize", (float) textureClipmap.getTextureSize());
                 _geometryClipmapShader.setUniform("texelSize", 1f / textureClipmap.getTextureSize());
                 _geometryClipmapShader.setUniform("levels", (float) textureClipmap.getTextureLevels());
@@ -475,8 +475,8 @@ public class Terrain extends Node implements Pickable, Runnable {
                 _geometryClipmapShader.setVertexShader(vertexShader.openStream());
                 _geometryClipmapShader.setFragmentShader(pixelShader.openStream());
             } catch (final IOException ex) {
-                Terrain.logger
-                        .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+                Terrain.logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.",
+                        ex);
             }
 
             _geometryClipmapShader.setUniform("texture", 0);
@@ -484,7 +484,7 @@ public class Terrain extends Node implements Pickable, Runnable {
 
             if (!_textureClipmaps.isEmpty()) {
                 final TextureClipmap textureClipmap = _textureClipmaps.get(0);
-                _geometryClipmapShader.setUniform("scale", 1f / textureClipmap.getScale());
+                _geometryClipmapShader.setUniform("textureDensity", textureClipmap.getPixelDensity());
                 _geometryClipmapShader.setUniform("textureSize", (float) textureClipmap.getTextureSize());
                 _geometryClipmapShader.setUniform("texelSize", 1f / textureClipmap.getTextureSize());
 
