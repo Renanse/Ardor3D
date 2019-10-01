@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
+import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.TransformException;
@@ -38,6 +39,7 @@ import com.google.common.collect.Lists;
 @SavableFactory(factoryMethod = "initSavable")
 public class BMText extends Mesh {
     private static final Logger logger = Logger.getLogger(BMText.class.getName());
+    private static IDpiScaleProvider _scaleProvider;
 
     protected BMFont _font;
 
@@ -151,7 +153,8 @@ public class BMText extends Mesh {
         return new BMText();
     }
 
-    protected BMText() {}
+    protected BMText() {
+    }
 
     /**
      *
@@ -237,8 +240,8 @@ public class BMText extends Mesh {
         _fontScale = scale;
 
         if (_autoScale == AutoScale.Off) {
-            final double unit = 1.0 / _font.getSize();
-            final double s = unit * _fontScale;
+            final double scaledScale = _scaleProvider == null ? scale : _scaleProvider.scaleToScreenDpi(scale);
+            final double s = scaledScale / _font.getSize();
             this.setScale(s, s, -s);
         }
     }
@@ -817,5 +820,13 @@ public class BMText extends Mesh {
 
         // return
         return text;
+    }
+
+    public static void setDpiScaleProvider(final IDpiScaleProvider provider) {
+        _scaleProvider = provider;
+    }
+
+    public static IDpiScaleProvider getDpiScaleProvider() {
+        return _scaleProvider;
     }
 }

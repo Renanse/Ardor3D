@@ -25,6 +25,7 @@ import com.ardor3d.extension.ui.text.font.FontProvider;
 import com.ardor3d.extension.ui.text.font.UIFont;
 import com.ardor3d.extension.ui.text.parser.ForumLikeMarkupParser;
 import com.ardor3d.extension.ui.text.parser.StyleParser;
+import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.BlendState;
@@ -39,6 +40,7 @@ import com.google.common.collect.Multimap;
 public enum TextFactory {
     INSTANCE;
 
+    private IDpiScaleProvider _scaleProvider;
     private FontProvider _fontProvider;
     private StyleParser _styleParser;
     private final static float[] WHITE = new float[] { 1, 1, 1, 1 };
@@ -63,6 +65,14 @@ public enum TextFactory {
         fontProvider.addFont("com/ardor3d/ui/text/DroidSansMono-40-bold-regular", "DroidSansMono", 40, true, false);
         setFontProvider(fontProvider);
         setStyleParser(new ForumLikeMarkupParser());
+    }
+
+    public void setDpiScaleProvider(final IDpiScaleProvider provider) {
+        _scaleProvider = provider;
+    }
+
+    public IDpiScaleProvider getDpiScaleProvider() {
+        return _scaleProvider;
     }
 
     public void setFontProvider(final FontProvider provider) {
@@ -172,7 +182,7 @@ public enum TextFactory {
 
             // find the UIFont related to the given font family & size & styles
             final AtomicReference<Double> scaleRef = new AtomicReference<Double>();
-            final UIFont font = provider.getClosestMatchingFont(stylesMap, scaleRef);
+            final UIFont font = provider.getClosestMatchingFont(stylesMap, _scaleProvider, scaleRef);
             if (font == null) {
                 return rVal;
             }
