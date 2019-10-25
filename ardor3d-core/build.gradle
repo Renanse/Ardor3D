@@ -2,5 +2,5 @@
 description = 'Ardor 3D Core'
 dependencies {
   compile project(':ardor3d-math')
-    implementation 'com.google.guava:guava:18.0'
+    compile group: 'com.google.guava', name: 'guava', version:'18.0'
 }
