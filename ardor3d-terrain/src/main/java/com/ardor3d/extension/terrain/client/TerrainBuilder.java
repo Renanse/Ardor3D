@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import com.ardor3d.extension.terrain.util.BresenhamYUpGridTracer;
 import com.ardor3d.extension.terrain.util.PriorityExecutors;
@@ -55,9 +56,9 @@ public class TerrainBuilder {
         this(terrainDataProvider, camera, //
                 PriorityExecutors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                         new ThreadFactoryBuilder() //
-                .setThreadFactory(Executors.defaultThreadFactory())//
-                .setDaemon(true).setNameFormat("TileCacheThread-%s")//
-                .build()));
+                                .setThreadFactory(Executors.defaultThreadFactory())//
+                                .setDaemon(true).setNameFormat("TileCacheThread-%s")//
+                                .build()));
     }
 
     public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera,
@@ -149,7 +150,7 @@ public class TerrainBuilder {
         if (showDebugPanels) {
             final TerrainGridCachePanel panel = new TerrainGridCachePanel(cacheList, cacheSize);
             final JFrame frame = new JFrame("Terrain Cache Debug");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.getContentPane().add(panel);
             frame.setBounds(10, 10, panel.getSize().width, panel.getSize().height);
             frame.setVisible(true);
@@ -197,7 +198,7 @@ public class TerrainBuilder {
         if (showDebugPanels) {
             final TextureGridCachePanel panel = new TextureGridCachePanel(cacheList, cacheSize);
             final JFrame frame = new JFrame("Texture Cache Debug");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.getContentPane().add(panel);
             frame.setBounds(10, 120, panel.getSize().width, panel.getSize().height);
             frame.setVisible(true);

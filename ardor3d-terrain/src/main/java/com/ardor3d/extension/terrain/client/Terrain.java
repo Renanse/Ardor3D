@@ -283,10 +283,16 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     @Override
     public void draw(final Renderer r) {
-        updateShader(r);
+        if (_geometryClipmapShader == null) {
+            reloadShader();
+        }
+
+        getWorldTransform().applyInverse(_terrainCamera.getLocation(), transformedFrustumPos);
+        _geometryClipmapShader.setUniform("eyePosition", transformedFrustumPos);
 
         boolean first = true;
         if (_normalClipmap != null) {
+            _normalClipmap.update(r, transformedFrustumPos);
             clipTextureState.setTexture(_normalClipmap.getTexture(), _normalUnit);
             _geometryClipmapShader.setUniform("normalMap", _normalUnit);
         }
@@ -294,6 +300,8 @@ public class Terrain extends Node implements Pickable, Runnable {
             if (!textureClipmap.isEnabled()) {
                 continue;
             }
+
+            textureClipmap.update(r, transformedFrustumPos);
 
             clipTextureState.setTexture(textureClipmap.getTexture());
             if (first) {
@@ -445,26 +453,6 @@ public class Terrain extends Node implements Pickable, Runnable {
         worldBound.setCenter(center.getX(), (heightMax + heightMin) * 0.5, center.getZ());
         worldBound.transform(_worldTransform, worldBound);
         clearDirty(DirtyType.Bounding);
-    }
-
-    /**
-     * Initialize/Update shaders
-     */
-    public void updateShader(final Renderer r) {
-        if (_geometryClipmapShader != null) {
-            getWorldTransform().applyInverse(_terrainCamera.getLocation(), transformedFrustumPos);
-            _geometryClipmapShader.setUniform("eyePosition", transformedFrustumPos);
-            for (final TextureClipmap textureClipmap : _textureClipmaps) {
-                textureClipmap.update(r, transformedFrustumPos);
-            }
-            if (_normalClipmap != null) {
-                _normalClipmap.update(r, transformedFrustumPos);
-            }
-
-            return;
-        }
-
-        reloadShader();
     }
 
     public void reloadShader() {
