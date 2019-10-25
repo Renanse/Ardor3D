@@ -3,7 +3,7 @@
     <groupId>com.ardor3d</groupId>
     <artifactId>ardor3d</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     
     <name>Ardor 3D</name>
     <description>A free, open source 3D graphics engine written in Java</description>
