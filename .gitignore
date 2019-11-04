@@ -5,3 +5,4 @@ target/
 .classpath
 .gradle/
 */build/*
+ardor3d-examples/cache/

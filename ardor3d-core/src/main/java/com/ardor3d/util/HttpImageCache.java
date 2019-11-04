@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,12 +38,15 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
+import com.google.common.util.concurrent.Striped;
 
 public enum HttpImageCache {
     Instance;
 
     Comparator<ImageCacheItem> DateCompare = (a, b) -> b.lastAccessed.compareTo(a.lastAccessed);
     ConcurrentMap<String, ImageCacheItem> MemoryCache = new ConcurrentHashMap<String, ImageCacheItem>();
+    Striped<Lock> Locks = Striped.lazyWeakLock(10);
+
     boolean checkModified = false;
     long maxMemoryCacheSize = 8 * 1024 * 1024;
     long minModCheckSeconds = 24 * 60 * 60;
@@ -156,52 +160,60 @@ public enum HttpImageCache {
         // Convert our name to a key to be used in our in memory hash and file system
         final String key = convertUrlToFileName(uri.toString(), type, flipped);
 
-        // Check the memory cache
-        ImageCacheItem cacheItem = MemoryCache.get(key);
+        final Lock lock = Locks.get(key);
 
-        if (cacheItem == null && cacheDir != null) {
-            // Check the file cache
-            try {
-                final File f = new File(cacheDir, key);
-                if (f.exists()) {
-                    // Load bytes from file
-                    final ResourceSource src = new URLResourceSource(f.toURI().toURL(), ".ABI");
-                    final Image img = ImageLoaderUtil.loadImage(src, flipped);
+        try {
+            lock.lock();
+            // Check the memory cache
+            ImageCacheItem cacheItem = MemoryCache.get(key);
 
-                    // Make sure the image is reasonably sized before we store it
-                    if (img.getWidth() > 8) {
-                        // Create a cache item to store in memory
-                        cacheItem = new ImageCacheItem(key, ".ABI", flipped, img,
-                                Instant.ofEpochMilli(f.lastModified()));
+            if (cacheItem == null && cacheDir != null) {
+                // Check the file cache
+                try {
+                    final File f = new File(cacheDir, key);
+                    if (f.exists()) {
+                        // Load bytes from file
+                        final ResourceSource src = new URLResourceSource(f.toURI().toURL(), ".ABI");
+                        final Image img = ImageLoaderUtil.loadImage(src, flipped);
 
-                        // Add to our cache
-                        MemoryCache.put(key, cacheItem);
+                        // Make sure the image is reasonably sized before we store it
+                        if (img.getWidth() > 8) {
+                            // Create a cache item to store in memory
+                            cacheItem = new ImageCacheItem(key, ".ABI", flipped, img,
+                                    Instant.ofEpochMilli(f.lastModified()));
 
-                        cleanupMemoryCache();
+                            // Add to our cache
+                            MemoryCache.put(key, cacheItem);
+
+                            cleanupMemoryCache();
+                        }
                     }
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                    cacheItem = null;
                 }
-            } catch (final Exception e) {
-                e.printStackTrace();
-                cacheItem = null;
             }
-        }
 
-        // if we don't have a cached copy, we'll have to ask for one.
-        if (cacheItem == null) {
-            return tryGetImage(new ImageCacheItem(key, type, flipped), uri);
-        }
+            // if we don't have a cached copy, we'll have to ask for one.
+            if (cacheItem == null) {
+                return tryGetImage(new ImageCacheItem(key, type, flipped), uri);
+            }
 
-        // if we have not asked about this item for a bit, fire off a check to see if there's an update. But send the
-        // cached copy back immediately.
-        if (checkModified && cacheItem.lastChecked.until(Instant.now(), ChronoUnit.SECONDS) > minModCheckSeconds) {
-            final ImageCacheItem item = cacheItem;
-            CompletableFuture.runAsync(() -> tryGetImage(item, uri));
-        } else {
-            cacheItem.lastAccessed = Instant.now();
-        }
+            // if we have not asked about this item for a bit, fire off a check to see if there's an update. But send
+            // the
+            // cached copy back immediately.
+            if (checkModified && cacheItem.lastChecked.until(Instant.now(), ChronoUnit.SECONDS) > minModCheckSeconds) {
+                final ImageCacheItem item = cacheItem;
+                CompletableFuture.runAsync(() -> tryGetImage(item, uri));
+            } else {
+                cacheItem.lastAccessed = Instant.now();
+            }
 
-        // return any existing cached copy.
-        return cacheItem.value;
+            // return any existing cached copy.
+            return cacheItem.value;
+        } finally {
+            lock.unlock();
+        }
     }
 
     private Image tryGetImage(final ImageCacheItem cacheItem, final URI uri) {
