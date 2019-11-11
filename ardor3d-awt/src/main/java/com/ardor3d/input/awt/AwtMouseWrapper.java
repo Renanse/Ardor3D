@@ -62,6 +62,8 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     protected int _ignoreX = Integer.MAX_VALUE;
     protected int _ignoreY = Integer.MAX_VALUE;
 
+    protected boolean _flipY = true;
+
     public AwtMouseWrapper(final Component component, final MouseManager manager) {
         _manager = manager;
         if (component instanceof Frame) {
@@ -91,7 +93,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         return _currentIterator;
     }
 
-    private void expireClickEvents() {
+    protected void expireClickEvents() {
         if (!_clicks.isEmpty()) {
             for (final MouseButton mb : MouseButton.values()) {
                 if (System.currentTimeMillis() - _lastClickTime.get(mb) > MouseState.CLICK_TIME_MS) {
@@ -99,6 +101,14 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
                 }
             }
         }
+    }
+
+    public boolean isFlipY() {
+        return _flipY;
+    }
+
+    public void setFlipY(final boolean flipY) {
+        _flipY = flipY;
     }
 
     public synchronized void mousePressed(final MouseEvent e) {
@@ -231,13 +241,13 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         }
     }
 
-    private void initState(final MouseEvent mouseEvent) {
+    protected void initState(final MouseEvent mouseEvent) {
         if (_lastState == null) {
             _lastState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), 0, 0, 0, null, null);
         }
     }
 
-    private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
+    protected void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
         final MouseState newState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent),
                 getDY(mouseEvent),
@@ -250,11 +260,11 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         _lastState = newState;
     }
 
-    private int getDX(final MouseEvent e) {
+    protected int getDX(final MouseEvent e) {
         return e.getX() - _lastState.getX();
     }
 
-    private int getDY(final MouseEvent e) {
+    protected int getDY(final MouseEvent e) {
         return getArdor3DY(e) - _lastState.getY();
     }
 
@@ -264,19 +274,23 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
      * @return the Y coordinate of the event, flipped relative to the component since we expect an origin in the lower
      *         left corner.
      */
-    private int getArdor3DY(final MouseEvent e) {
-        final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
-                : _component.getHeight();
-        return height - e.getY();
+    protected int getArdor3DY(final MouseEvent e) {
+        if (_flipY) {
+            final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
+                    : _component.getHeight();
+            return height - e.getY();
+        } else {
+            return e.getY();
+        }
     }
 
-    private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
+    protected void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
             final ButtonState buttonState) {
         final MouseButton button = getButtonForEvent(e);
         buttons.put(button, buttonState);
     }
 
-    private MouseButton getButtonForEvent(final MouseEvent e) {
+    protected MouseButton getButtonForEvent(final MouseEvent e) {
         MouseButton button;
         switch (e.getButton()) {
             case MouseEvent.BUTTON1:
@@ -294,7 +308,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         return button;
     }
 
-    private class AwtMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
+    protected class AwtMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
         @Override
         protected MouseState computeNext() {
             synchronized (AwtMouseWrapper.this) {
@@ -312,8 +326,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
     public synchronized void mouseClicked(final MouseEvent e) {
         // Yes, we could use the click count here, but in the interests of this working the same way as SWT and Native,
-        // we
-        // will do it the same way they do it.
+        // we will do it the same way they do it.
         if (_consumeEvents) {
             e.consume();
         }

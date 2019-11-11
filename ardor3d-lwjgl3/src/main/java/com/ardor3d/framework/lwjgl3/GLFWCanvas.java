@@ -26,8 +26,6 @@ import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL30C;
-import org.lwjgl.opengl.GL33C;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 
