@@ -39,6 +39,7 @@ import com.ardor3d.image.PixelDataType;
 import com.ardor3d.input.Focus.FocusWrapper;
 import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class GLFWCanvas implements NativeCanvas, FocusWrapper {
@@ -210,7 +211,8 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     		GLFW.glfwDestroyWindow(_windowId);
     		_windowId = 0;
     	}
-        GLFW.glfwTerminate();
+    	if (!Constants.useMultipleContexts)
+    		GLFW.glfwTerminate();
     }
 
     @Override

@@ -49,7 +49,7 @@ public class GLFWCanvasCallback implements Lwjgl3CanvasCallback {
 	@MainThread
 	@Override
 	public void makeCurrent(final boolean force) {
-		if (force || !Constants.useMultipleContexts) {
+		if (force || Constants.useMultipleContexts) {
 			long id = _windowId.getAsLong();
 			if (id != 0)
 				GLFW.glfwMakeContextCurrent(_windowId.getAsLong());
@@ -59,7 +59,7 @@ public class GLFWCanvasCallback implements Lwjgl3CanvasCallback {
 	@MainThread
 	@Override
 	public void releaseContext(final boolean force) {
-		if (force || !Constants.useMultipleContexts) {
+		if (force || Constants.useMultipleContexts) {
 			GLFW.glfwMakeContextCurrent(0);
 		}
 	}
