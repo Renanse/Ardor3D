@@ -94,7 +94,7 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
     }
 
     @Override
-    public void put(final IndexBufferData<?> buf) {
+    public IntBufferData put(final IndexBufferData<?> buf) {
         if (buf instanceof IntBufferData) {
             _buffer.put((IntBuffer) buf.getBuffer());
         } else {
@@ -102,23 +102,27 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
                 put(buf.get());
             }
         }
+        return this;
     }
 
     @Override
-    public void put(final int[] array) {
+    public IntBufferData put(final int[] array) {
         _buffer.put(array);
+        return this;
     }
 
     @Override
-    public void put(final int[] array, final int offset, final int length) {
+    public IntBufferData put(final int[] array, final int offset, final int length) {
         _buffer.put(array, offset, length);
+        return this;
     }
 
     @Override
-    public void put(final IntBuffer buffer) {
+    public IntBufferData put(final IntBuffer buffer) {
         while (buffer.hasRemaining()) {
             put(buffer.get());
         }
+        return this;
     }
 
     @Override

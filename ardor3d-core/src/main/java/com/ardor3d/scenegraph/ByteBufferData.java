@@ -95,7 +95,7 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
     }
 
     @Override
-    public void put(final IndexBufferData<?> buf) {
+    public ByteBufferData put(final IndexBufferData<?> buf) {
         if (buf instanceof ByteBufferData) {
             _buffer.put((ByteBuffer) buf.getBuffer());
         } else {
@@ -103,27 +103,31 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
                 put(buf.get());
             }
         }
+        return this;
     }
 
     @Override
-    public void put(final int[] array) {
+    public ByteBufferData put(final int[] array) {
         for (int i = 0; i < array.length; i++) {
             put(array[i]);
         }
+        return this;
     }
 
     @Override
-    public void put(final int[] array, final int offset, final int length) {
+    public ByteBufferData put(final int[] array, final int offset, final int length) {
         for (int i = offset, max = offset + length; i < max; i++) {
             put(array[i]);
         }
+        return this;
     }
 
     @Override
-    public void put(final IntBuffer buffer) {
+    public ByteBufferData put(final IntBuffer buffer) {
         while (buffer.hasRemaining()) {
             put(buffer.get());
         }
+        return this;
     }
 
     @Override

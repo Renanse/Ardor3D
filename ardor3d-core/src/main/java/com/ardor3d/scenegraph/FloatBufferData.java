@@ -98,66 +98,76 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
         _buffer.rewind();
     }
 
-    public void put(final float value) {
+    public FloatBufferData put(final float value) {
         _buffer.put(value);
+        return this;
     }
 
-    public void put(final Vector2 vector) {
+    public FloatBufferData put(final Vector2 vector) {
         _buffer.put(vector.getXf());
         _buffer.put(vector.getYf());
+        return this;
     }
 
-    public void put(final Vector3 vector) {
+    public FloatBufferData put(final Vector3 vector) {
         _buffer.put(vector.getXf());
         _buffer.put(vector.getYf());
         _buffer.put(vector.getZf());
+        return this;
     }
 
-    public void put(final Vector4 vector) {
+    public FloatBufferData put(final Vector4 vector) {
         _buffer.put(vector.getXf());
         _buffer.put(vector.getYf());
         _buffer.put(vector.getZf());
         _buffer.put(vector.getWf());
+        return this;
     }
 
-    public void put(final Quaternion quat) {
+    public FloatBufferData put(final Quaternion quat) {
         _buffer.put(quat.getXf());
         _buffer.put(quat.getYf());
         _buffer.put(quat.getZf());
         _buffer.put(quat.getWf());
+        return this;
     }
 
-    public void putRGBA(final ColorRGBA color) {
+    public FloatBufferData putRGBA(final ColorRGBA color) {
         _buffer.put(color.getRed());
         _buffer.put(color.getGreen());
         _buffer.put(color.getBlue());
         _buffer.put(color.getAlpha());
+        return this;
     }
 
-    public void putRGB(final ColorRGBA color) {
+    public FloatBufferData putRGB(final ColorRGBA color) {
         _buffer.put(color.getRed());
         _buffer.put(color.getGreen());
         _buffer.put(color.getBlue());
+        return this;
     }
 
-    public void putBGRA(final ColorRGBA color) {
+    public FloatBufferData putBGRA(final ColorRGBA color) {
         _buffer.put(color.getBlue());
         _buffer.put(color.getGreen());
         _buffer.put(color.getRed());
         _buffer.put(color.getAlpha());
+        return this;
     }
 
-    public void putABGR(final ColorRGBA color) {
+    public FloatBufferData putABGR(final ColorRGBA color) {
         _buffer.put(color.getAlpha());
         _buffer.put(color.getBlue());
         _buffer.put(color.getGreen());
         _buffer.put(color.getRed());
+        return this;
     }
 
-    public void putBGR(final ColorRGBA color) {
+    public FloatBufferData putBGR(final ColorRGBA color) {
         _buffer.put(color.getBlue());
         _buffer.put(color.getGreen());
         _buffer.put(color.getRed());
+        return this;
     }
 
     @Override

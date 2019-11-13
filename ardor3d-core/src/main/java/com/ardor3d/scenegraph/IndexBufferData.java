@@ -63,7 +63,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      * @param buf
      *            the source buffer object.
      */
-    public abstract void put(IndexBufferData<?> buf);
+    public abstract IndexBufferData<?> put(IndexBufferData<?> buf);
 
     /**
      * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
@@ -72,7 +72,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      * @param array
      *            the source int array.
      */
-    public abstract void put(int[] array);
+    public abstract IndexBufferData<?> put(int[] array);
 
     /**
      * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
@@ -83,7 +83,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      * @param offset
      * @param length
      */
-    public abstract void put(int[] array, int offset, int length);
+    public abstract IndexBufferData<?> put(int[] array, int offset, int length);
 
     /**
      * Write the contents of the given IntBuffer into this IndexBufferData. Note that data conversion is handled using
@@ -92,7 +92,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      * @param array
      *            the source int array.
      */
-    public abstract void put(IntBuffer buffer);
+    public abstract IndexBufferData<?> put(IntBuffer buffer);
 
     /**
      * Get the underlying nio buffer.

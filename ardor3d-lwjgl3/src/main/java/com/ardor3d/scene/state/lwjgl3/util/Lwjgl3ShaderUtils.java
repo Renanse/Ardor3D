@@ -407,15 +407,33 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     final Vector2 vec = (Vector2) value;
                     return stack.mallocFloat(2).put(vec.getXf()).put(vec.getYf()).flip();
                 }
+                if (value instanceof Vector2[]) {
+                    final Vector2[] vecs = (Vector2[]) value;
+                    final FloatBuffer buff = stack.mallocFloat(2 * vecs.length);
+                    for (int i = 0; i < vecs.length; i++) {
+                        Vector2 vec = vecs[i];
+                        buff.put(vec.getXf()).put(vec.getYf());
+                    }
+                    return buff.flip();
+                }
                 return (FloatBuffer) value;
             case Float3:
                 if (value instanceof Vector3) {
                     final Vector3 vec = (Vector3) value;
                     return stack.mallocFloat(3).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).flip();
                 }
+                if (value instanceof Vector3[]) {
+                    final Vector3[] vecs = (Vector3[]) value;
+                    final FloatBuffer buff = stack.mallocFloat(3 * vecs.length);
+                    for (int i = 0; i < vecs.length; i++) {
+                        Vector3 vec = vecs[i];
+						buff.put(vec.getXf()).put(vec.getYf()).put(vec.getZf());
+					}
+                    return buff.flip();
+                }
                 if (value instanceof ReadOnlyColorRGBA) {
                     final ReadOnlyColorRGBA vec = (ReadOnlyColorRGBA) value;
-                    return stack.mallocFloat(4).put(vec.getRed()).put(vec.getGreen()).put(vec.getBlue()).flip();
+                    return stack.mallocFloat(3).put(vec.getRed()).put(vec.getGreen()).put(vec.getBlue()).flip();
                 }
                 return (FloatBuffer) value;
             case Float4:
@@ -423,6 +441,15 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                     final Vector4 vec = (Vector4) value;
                     return stack.mallocFloat(4).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf())
                             .flip();
+                }
+                if (value instanceof Vector4[]) {
+                    final Vector4[] vecs = (Vector4[]) value;
+                    final FloatBuffer buff = stack.mallocFloat(4 * vecs.length);
+                    for (int i = 0; i < vecs.length; i++) {
+                        Vector4 vec = vecs[i];
+                        buff.put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf());
+                    }
+                    return buff.flip();
                 }
                 if (value instanceof Quaternion) {
                     final Quaternion vec = (Quaternion) value;

@@ -95,7 +95,7 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
     }
 
     @Override
-    public void put(final IndexBufferData<?> buf) {
+    public ShortBufferData put(final IndexBufferData<?> buf) {
         if (buf instanceof ShortBufferData) {
             _buffer.put((ShortBuffer) buf.getBuffer());
         } else {
@@ -103,27 +103,31 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
                 put(buf.get());
             }
         }
+        return this;
     }
 
     @Override
-    public void put(final int[] array) {
+    public ShortBufferData put(final int[] array) {
         for (int i = 0; i < array.length; i++) {
             put(array[i]);
         }
+        return this;
     }
 
     @Override
-    public void put(final int[] array, final int offset, final int length) {
+    public ShortBufferData put(final int[] array, final int offset, final int length) {
         for (int i = offset, max = offset + length; i < max; i++) {
             put(array[i]);
         }
+        return this;
     }
 
     @Override
-    public void put(final IntBuffer buffer) {
+    public ShortBufferData put(final IntBuffer buffer) {
         while (buffer.hasRemaining()) {
             put(buffer.get());
         }
+        return this;
     }
 
     @Override
