@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,14 +32,17 @@ public class URLResourceSource implements ResourceSource {
     // used to make equals more efficient
     private transient String _urlToString = null;
 
+    private long _lastModifiedValue;
+
     /**
      * Construct a new URLResourceSource. Must set URL separately.
      */
-    public URLResourceSource() {}
+    public URLResourceSource() {
+    }
 
     /**
      * Construct a new URLResourceSource from a specific URL.
-     * 
+     *
      * @param sourceUrl
      *            The url to load the resource from. Must not be null. If the URL has a valid URL filename (see
      *            {@link URL#getFile()}) and an extension (eg. http://url/myFile.png) then the extension (.png in this
@@ -62,7 +66,7 @@ public class URLResourceSource implements ResourceSource {
 
     /**
      * Construct a new URLResourceSource from a specific URL and type.
-     * 
+     *
      * @param sourceUrl
      *            The url to load the resource from. Must not be null.
      * @param type
@@ -118,8 +122,18 @@ public class URLResourceSource implements ResourceSource {
         _type = type;
     }
 
+    /**
+     * @return the last modified date on the underlying URL connection - will be 0 until openStream has been called.
+     */
+    public long getLastModifiedValue() {
+        return _lastModifiedValue;
+    }
+
     public InputStream openStream() throws IOException {
-        return _url.openStream();
+        final URLConnection connection = _url.openConnection();
+        connection.connect();
+        _lastModifiedValue = connection.getLastModified();
+        return connection.getInputStream();
     }
 
     /**
