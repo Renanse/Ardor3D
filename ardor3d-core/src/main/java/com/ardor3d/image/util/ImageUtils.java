@@ -317,8 +317,10 @@ public abstract class ImageUtils {
         }
 
         final ByteBuffer buff = srcImg.getData(0);
-        final int x = Math.round(MathUtils.clamp01(uv.getXf()) * srcImg.getWidth());
-        final int y = Math.round(MathUtils.clamp01(uv.getYf()) * srcImg.getHeight());
+        final int width = srcImg.getWidth();
+        final int height = srcImg.getHeight();
+        final int x = Math.round(MathUtils.clamp01(uv.getXf()) * (width - 1));
+        final int y = Math.round(MathUtils.clamp01(uv.getYf()) * (height - 1));
         int bpp;
         switch (srcImg.getDataFormat()) {
             case RGB:
@@ -331,7 +333,7 @@ public abstract class ImageUtils {
                 throw new Ardor3dException("Unhandled image data format: " + srcImg.getDataFormat());
         }
 
-        final int offset = bpp * (srcImg.getWidth() * y + x);
+        final int offset = bpp * (width * y + x);
         final byte red = buff.get(offset + 0);
         final byte green = buff.get(offset + 1);
         final byte blue = buff.get(offset + 2);
