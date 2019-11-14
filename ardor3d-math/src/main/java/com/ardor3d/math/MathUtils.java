@@ -536,6 +536,14 @@ public class MathUtils {
         return val < min ? min : val > max ? max : val;
     }
 
+    public static double clamp01(final double val) {
+        return clamp(val, 0.0, 1.0);
+    }
+
+    public static float clamp01(final float val) {
+        return clamp(val, 0.0f, 1.0f);
+    }
+
     public static int moduloPositive(final int value, final int size) {
         int wrappedValue = value % size;
         wrappedValue += wrappedValue < 0 ? size : 0;

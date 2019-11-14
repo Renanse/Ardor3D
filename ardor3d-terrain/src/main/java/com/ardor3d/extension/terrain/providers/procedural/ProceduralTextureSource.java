@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,6 +21,7 @@ import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.GeneratedImageFactory;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
@@ -101,7 +102,8 @@ public class ProceduralTextureSource implements TextureSource {
                     final int heightX = tileX * tileSize + x;
                     final int heightY = tileY * tileSize + y;
 
-                    final double eval = function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0) * 0.4167f + 0.5f;
+                    final double eval = MathUtils.clamp01(function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0)
+                            * 0.5 + 0.5);
                     final byte colIndex = (byte) (eval * 255);
 
                     final ReadOnlyColorRGBA c = terrainColors[colIndex & 0xFF];

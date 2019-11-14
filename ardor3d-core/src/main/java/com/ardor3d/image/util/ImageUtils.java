@@ -10,10 +10,17 @@
 
 package com.ardor3d.image.util;
 
+import java.nio.ByteBuffer;
+
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Vector2;
+import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class ImageUtils {
 
@@ -22,7 +29,8 @@ public abstract class ImageUtils {
     }
 
     public static final TextureStoreFormat getTextureStoreFormat(final TextureStoreFormat format, final Image image) {
-        if (format != TextureStoreFormat.GuessCompressedFormat && format != TextureStoreFormat.GuessNoCompressedFormat) {
+        if (format != TextureStoreFormat.GuessCompressedFormat
+                && format != TextureStoreFormat.GuessNoCompressedFormat) {
             return format;
         }
         if (image == null) {
@@ -224,4 +232,116 @@ public abstract class ImageUtils {
 
         throw new Error("Unhandled type / format combination: " + type + " / " + dataFormat);
     }
+
+    /**
+     * Generate a new sub-image from the given source image, by bilinear-interpolation across a quadrilateral defined by
+     * the uv values of four corners. The resulting image will be of data type {@link PixelDataType#UnsignedByte} and
+     * data format {@link ImageDataFormat#RGB} or {@link ImageDataFormat#RGBA}, depending on if the source image has
+     * alpha.
+     *
+     * See {@link #getPixel(Image, ColorRGBA, Vector2)} for limitations on srcImg data type and format.
+     *
+     * @param srcImg
+     *            the source image
+     * @param width
+     *            the desired width of our new texture image
+     * @param height
+     *            the desired height of our new texture image
+     * @param bottomLeft
+     *            the bottom left corner of the quadrilateral. The full image's bottom left is [0, 0]
+     * @param topLeft
+     *            the top left corner of the quadrilateral. The full image's top left is [0, 1]
+     * @param topRight
+     *            the top right corner of the quadrilateral. The full image's top right is [1, 1]
+     * @param bottomRight
+     *            the bottom right corner of the quadrilateral. The full image's bottom right is [1, 0]
+     * @return the new Image.
+     */
+    public static Image generateSubImage(final Image srcImg, final int width, final int height,
+            final Vector2 bottomLeft, final Vector2 topLeft, final Vector2 topRight, final Vector2 bottomRight) {
+
+        final boolean hasAlpha = srcImg.getDataFormat().hasAlpha();
+        final ByteBuffer dstBuff = BufferUtils.createByteBuffer(width * height * (hasAlpha ? 4 : 3));
+
+        final Vector2 uv = new Vector2();
+        final ColorRGBA pixel = new ColorRGBA();
+        for (int j = 0; j < height; j++) {
+            final float y = j / (height - 1f);
+            for (int i = 0; i < width; i++) {
+                final float x = i / (width - 1f);
+                uv.zero();
+                bottomLeft.scaleAdd((1 - x) * (1 - y), uv, uv);
+                topLeft.scaleAdd((1 - x) * y, uv, uv);
+                topRight.scaleAdd(x * y, uv, uv);
+                bottomRight.scaleAdd(x * (1 - y), uv, uv);
+
+                getPixel(srcImg, uv, pixel);
+
+                final byte red = (byte) (pixel.getRed() * 0xff);
+                final byte green = (byte) (pixel.getGreen() * 0xff);
+                final byte blue = (byte) (pixel.getBlue() * 0xff);
+                dstBuff.put(red).put(green).put(blue);
+                if (hasAlpha) {
+                    final byte alpha = (byte) (pixel.getAlpha() * 0xff);
+                    dstBuff.put(alpha);
+                }
+            }
+        }
+
+        dstBuff.flip();
+        return new Image(hasAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB, PixelDataType.UnsignedByte, width,
+                height, dstBuff, null);
+    }
+
+    /**
+     * Grabs the RGBA color of a pixel at the given uv texture coordinate in a given source Image.
+     *
+     * Note that currently, only RGBA/RGB images with a data type of UnsignedByte or Integer are handled by this method.
+     * Only the first data buffer stored in the Image is used.
+     *
+     * @param srcImg
+     *            the source image to pull pixel color from.
+     * @param uv
+     *            the point at which to query pixel color. Should be in the range of [0,0]-[1,1] (bottom left to top
+     *            right). Values outside of this range are clamped.
+     * @param store
+     *            optional ColorRGBA object to store our result in. If null is passed, a new ColorRGBA object is
+     *            instantiated and filled with the result.
+     * @return the pixel color.
+     * @throws Ardor3dException
+     *             if the srcImg's data type or data format are not handled. @
+     */
+    public static ColorRGBA getPixel(final Image srcImg, final Vector2 uv, final ColorRGBA store) {
+        if (srcImg.getDataType() != PixelDataType.UnsignedByte && srcImg.getDataType() != PixelDataType.Int) {
+            throw new Ardor3dException("Unhandled image data type: " + srcImg.getDataType());
+        }
+
+        final ByteBuffer buff = srcImg.getData(0);
+        final int x = Math.round(MathUtils.clamp01(uv.getXf()) * srcImg.getWidth());
+        final int y = Math.round(MathUtils.clamp01(uv.getYf()) * srcImg.getHeight());
+        int bpp;
+        switch (srcImg.getDataFormat()) {
+            case RGB:
+                bpp = 3;
+                break;
+            case RGBA:
+                bpp = 4;
+                break;
+            default:
+                throw new Ardor3dException("Unhandled image data format: " + srcImg.getDataFormat());
+        }
+
+        final int offset = bpp * (srcImg.getWidth() * y + x);
+        final byte red = buff.get(offset + 0);
+        final byte green = buff.get(offset + 1);
+        final byte blue = buff.get(offset + 2);
+        final byte alpha = bpp == 4 ? buff.get(offset + 3) : (byte) 0xff;
+
+        if (store == null) {
+            return new ColorRGBA(red / 255f, green / 255f, blue / 255f, alpha / 255f);
+        }
+
+        return store.set(red / 255f, green / 255f, blue / 255f, alpha / 255f);
+    }
+
 }
