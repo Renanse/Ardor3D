@@ -1,5 +1,5 @@
 --- # Material
-name: skinned mesh
+name: normal-mapped terrain
 techniques: 
   passes: 
       - 
@@ -21,7 +21,7 @@ techniques:
             type: Float3
             source: SpatialProperty
           - 
-            shaderKey: scale
+            shaderKey: textureDensity
             type: Float1
             source: SpatialProperty
           - 

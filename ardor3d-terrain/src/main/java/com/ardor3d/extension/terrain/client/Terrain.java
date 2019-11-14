@@ -244,12 +244,6 @@ public class Terrain extends Node implements Pickable, Runnable {
         getWorldTransform().applyInverse(_terrainCamera.getLocation(), transformedFrustumPos);
         setProperty("eyePosition", transformedFrustumPos);
 
-        // tell all of our clipmaps and let them update as needed.
-        for (int i = 0, maxI = _textureClipmaps.size(); i < maxI; i++) {
-            final TextureClipmap textureClipmap = _textureClipmaps.get(i);
-            textureClipmap.update(r, transformedFrustumPos);
-        }
-
         // If we have a normalmap clip, update and grab the texture for drawing later.
         if (_normalClipmap != null) {
             _normalClipmap.update(r, transformedFrustumPos);
@@ -265,6 +259,9 @@ public class Terrain extends Node implements Pickable, Runnable {
             if (!textureClipmap.isEnabled()) {
                 continue;
             }
+
+            // update clipmap contents
+            textureClipmap.update(r, transformedFrustumPos);
 
             // prepare this clipmap for drawing
             textureClipmap.prepareToDrawClips(this);

@@ -2,15 +2,15 @@
 
 in vec4 vertex;
  
-out vec2 vVertex;
-out vec3  eyeSpacePosition;
+out vec2 vVertex;             // our vertex position relative to our eye.
+out vec3 eyeSpacePosition;
  
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
  
 uniform vec3 eyePosition;
-uniform float scale;
+uniform float textureDensity;
 uniform int vertexDistance;
 uniform int clipSideSize;
 
@@ -27,12 +27,18 @@ void applyTerrainBlending(inout vec4 position)
 
 void main() 
 {
-	vVertex = (vertex.xz - eyePosition.xz) * vec2(scale/32.0);
-    
-    // assign to position so we can use in in/out param 
+    // Sent to fragment program for texture clipmap generation.
+    // This is the signed distance from our eye to the vertex/pixel, modified by our 
+    // pixel density.  A higher density means the texture is packed more tightly 
+    // around the viewer. We accomplish this by increasing the distance to the pixel.
+    vVertex = (vertex.xz - eyePosition.xz) * textureDensity;
+
+	// Apply terrain height blending    
+    // assign vertex to position so we can use in in/out param 
     vec4 position = vertex;
     applyTerrainBlending(position);
     
+    // Used for fog calculations
     mat4 modelViewMatrix = view * model;
     eyeSpacePosition = (modelViewMatrix * position).xyz;
     

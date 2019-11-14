@@ -1,15 +1,68 @@
 #ifndef TERRAIN_FRAG_INC
 #define TERRAIN_FRAG_INC
 
-void computeUnit1(inout float unit1, const in vec2 vVertex, 
-				  const in int validLevels, const in int minLevel)
+void computeUnit(out float unit, const in vec2 vVertex, const in int minLevel, 
+                  const in int validLevels, const in float textureSize)
 {
-	unit1 = (max(abs(vVertex.x), abs(vVertex.y)));
-	unit1 = floor(unit1);
-	unit1 = log2(unit1);
-	unit1 = floor(unit1);
-	unit1 = min(unit1, validLevels);
-    unit1 = max(unit1, minLevel);
+	// get our texture size as a power of 2.
+	float log2texSize = log2(textureSize);
+	
+	// determine the closest power of two lower than the max X or Y distance to the vertex from the eye. 
+	float maxDistance = floor(max(abs(vVertex.x), abs(vVertex.y)));
+	unit = floor(log2(maxDistance));
+	
+	// Determine our clipmap unit by subtracting our texture's size as pow 2.
+	//
+	// We remove 2 from our size before this: 
+	//  -  One for the fact that we center our clipmap, so we are dealing with half distance
+	//  -  Another because we want to be in a given clipmap up UNTIL hitting the given size.
+	//
+	// For example, if our texture is size 128, our 0th clipmap will cover (-64, 64).  128 is
+	// 2^7.  For a vertex that is 32 units away, we'd have unit = log2(32) = 5, then we'd 
+	// subtract (7 - 2) from that, giving us a final unit of 0.  At distance 64, the resulting
+	// unit is 1.  [log(64) - (7 - 2) = 6 - 5 = 1.]
+	unit -= (log2texSize - 2);
+	
+	// Now make sure that our unit falls within in an appropriate range.
+	unit = clamp(unit, minLevel, validLevels);
+}
+
+/**
+ * set up values needed to lookup texture value in clipmap
+ */
+void calculateClipUVs(const in float unit, const in float textureSize, const in float texelSize,
+                  out vec3 texCoord1, out vec3 texCoord2, out vec2 fadeCoord)
+{
+	// get our texture size as a power of 2.
+	float log2texSize = log2(textureSize);
+
+	// We now calculate 2 texture coordinates - this is to allow us to blend between levels
+	
+	// Determine our first texcoord - divide our distance vector by our unit texture size,
+	// This will give ous a range of [-.5, .5].  We add .5 to shift us to [0, 1]
+	vec2 uv1 = vVertex / vec2(exp2(unit + log2texSize));
+	fadeCoord = uv1; // save our [-.5, .5] tex coord for later use
+	uv1 += vec2(0.5);
+	uv1 *= vec2(1.0 - texelSize);
+	uv1 += sliceOffset[int(unit)];
+
+	// figure the next farthest out unit for blending
+	float unit2 = unit + 1.0;
+	unit2 = min(unit2, validLevels);
+
+	// Determine our second texcoord - divide our distance vector by our unit texture size,
+	// This will give us a range of [-.5, .5].  We add .5 to shift us to [0, 1]
+	vec2 uv2 = vVertex/vec2(exp2(unit2+log2texSize));
+	uv2 += vec2(0.5);
+	uv2 *= vec2(1.0 - texelSize);
+	uv2 += sliceOffset[int(unit2)];
+	  	
+	// Determine our depth texture coords
+	float z1 = clamp(unit / levels, 0.0, 0.99);
+	float z2 = clamp(unit2 / levels, 0.0, 0.99);
+	
+	texCoord1 = vec3(uv1, z1);
+	texCoord2 = vec3(uv2, z2);
 }
 
 /**
@@ -30,62 +83,28 @@ vec4 texture3DBilinear( const in sampler3D textureSampler, const in vec3 uv,
 }
 
 /**
- * set up values needed to lookup texture value in clipmap
- */
-void clipTexSetup(inout float unit1,  out float unit2,
-                  out vec2 texCoord1, out vec2 texCoord2, 
-                  out vec2 offset1,   out vec2 offset2,
-                  out vec2 fadeCoord, const in float texelSize)
-{
-  offset1 = sliceOffset[int(unit1)];
-  float frac = unit1;
-  frac = exp2(frac);
-  frac *= 4.0; //Magic number
-  texCoord1 = vVertex/vec2(frac);
-  fadeCoord = texCoord1;
-  texCoord1 += vec2(0.5);
-  texCoord1 *= vec2(1.0 - texelSize);
-  texCoord1 += offset1;
-
-  unit2 = unit1 + 1.0;
-  unit2 = min(unit2, validLevels);
-  offset2 = sliceOffset[int(unit2)];
-  float frac2 = unit2;
-  frac2 = exp2(frac2);
-  frac2 *= 4.0; //Magic number
-  texCoord2 = vVertex/vec2(frac2);
-  texCoord2 += vec2(0.5);
-  texCoord2 *= vec2(1.0 - texelSize);
-  texCoord2 += offset2;
-
-  unit1 /= levels;
-  unit1 = clamp(unit1, 0.0, 0.99);
-
-  unit2 /= levels;
-  unit2 = clamp(unit2, 0.0, 0.99);
-  
-  return;
-}
-
-/**
- * lookup color in texture clipmap
+ * Look up appropriate color in texture clipmap, taking blending to next clip level and 
+ * optional debug into consideration
  */
 vec4 clipTexColor(in sampler3D texture,
-                  in float unit1, in float unit2,
-                  in vec2 texCoord1, in vec2 texCoord2, 
-                  in vec2 offset1, in vec2 offset2,
+                  in vec3 texCoord1, in vec3 texCoord2,
                   in vec2 fadeCoord, const in float textureSize, 
                   const in float texelSize, const in int showDebug)
 {
-  vec4 tex = texture3DBilinear(texture, vec3(texCoord1.x, texCoord1.y, unit1), textureSize, texelSize);
-  vec4 tex2 = texture3DBilinear(texture, vec3(texCoord2.x, texCoord2.y, unit2), textureSize, texelSize);
+	// sample our textures - this texture and the next furthest for blending
+	vec4 tex1 = texture3DBilinear(texture, texCoord1, textureSize, texelSize);
+	vec4 tex2 = texture3DBilinear(texture, texCoord2, textureSize, texelSize);
 
-  float fadeVal1 = abs(fadeCoord.x)*2.05;
-  float fadeVal2 = abs(fadeCoord.y)*2.05;
-  float fadeVal = max(fadeVal1, fadeVal2);
-  fadeVal = max(0.0, fadeVal-0.8)*5.0;
-  fadeVal = min(1.0, fadeVal);
-  return mix(tex, tex2, fadeVal) + vec4(fadeVal*showDebug);
+	// Now, determine our crossfade between sampled textures using our original [-.5, 5] uv
+	float fadeVal = max(abs(fadeCoord.x), abs(fadeCoord.y)) * 2.05;
+	
+	// Fade between textures in the last 20% of our texture.
+	fadeVal = max(0.0, fadeVal - 0.8) * 5.0;
+	fadeVal = min(1.0, fadeVal);
+
+	// Mix the textures using our fade value.  
+	// Add an optional white color if debug is enabled.
+	return mix(tex1, tex2, fadeVal) + vec4(fadeVal * showDebug);
 }
 
 #endif

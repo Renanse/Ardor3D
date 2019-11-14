@@ -27,6 +27,9 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class ProceduralNormalMapSource implements TextureSource {
     private final Function3D function;
+    private final double heightScale;
+    private final double xGridSpacing;
+    private final double zGridSpacing;
 
     private static final int tileSize = 128;
     private static final int availableClipmapLevels = 8;
@@ -41,8 +44,12 @@ public class ProceduralNormalMapSource implements TextureSource {
         }
     };
 
-    public ProceduralNormalMapSource(final Function3D function) {
+    public ProceduralNormalMapSource(final Function3D function, final double heightScale, final double xGridSpacing,
+            final double zGridSpacing) {
         this.function = function;
+        this.heightScale = heightScale;
+        this.xGridSpacing = xGridSpacing;
+        this.zGridSpacing = zGridSpacing;
     }
 
     @Override
@@ -78,7 +85,8 @@ public class ProceduralNormalMapSource implements TextureSource {
 
         final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
 
-        final Vector3 normal = new Vector3();
+        final Vector3 n = new Vector3();
+        final Vector3 n2 = new Vector3();
         textureLock.lock();
         try {
             // clear our cache
@@ -95,21 +103,47 @@ public class ProceduralNormalMapSource implements TextureSource {
                     final int heightX = tileX * tileSize + x;
                     final int heightY = tileY * tileSize + y;
 
-                    normal.setZ(1);
-
                     final double eval1 = getValue(x - 1, y, heightX - 1, heightY, baseClipmapLevel);
                     final double eval2 = getValue(x + 1, y, heightX + 1, heightY, baseClipmapLevel);
                     final double eval3 = getValue(x, y - 1, heightX, heightY - 1, baseClipmapLevel);
                     final double eval4 = getValue(x, y + 1, heightX, heightY + 1, baseClipmapLevel);
 
-                    normal.setX((eval1 - eval2) / 2.);
-                    normal.setY((eval3 - eval4) / 2.);
-                    normal.normalizeLocal();
+                    double dXh = eval1 - eval2;
+                    if (dXh != 0) {
+                        // alter by our height scale
+                        dXh *= heightScale;
+                        // determine slope of perpendicular line
+                        final double slopeX = 2.0 * xGridSpacing / dXh;
+                        // now plug into cos(arctan(x)) to get unit length vector
+                        n.setX(Math.copySign(1.0 / Math.sqrt(1 + slopeX * slopeX), dXh));
+                        n.setY(0);
+                        n.setZ(Math.abs(slopeX * n.getX()));
+                    } else {
+                        n.set(0, 0, 1);
+                    }
 
+                    double dZh = eval3 - eval4;
+                    if (dZh != 0) {
+                        // alter by our height scale
+                        dZh *= heightScale;
+                        // determine slope of perpendicular line
+                        final double slopeZ = 2.0 * zGridSpacing / dZh;
+                        // now plug into cos(arctan(x)) to get unit length vector
+                        n2.setX(0);
+                        n2.setY(Math.copySign(1.0 / Math.sqrt(1 + slopeZ * slopeZ), dZh));
+                        n2.setZ(Math.abs(slopeZ * n2.getY()));
+                    } else {
+                        n2.set(0, 0, 1);
+                    }
+
+                    // add together the vectors across X and Z and normalize to get final normal
+                    n.addLocal(n2).normalizeLocal();
+
+                    // place data in buffer, scaled to roughly fit [-1, 1] in [0, 255]
                     final int index = (x + y * tileSize) * 3;
-                    data.put(index, (byte) (normal.getX() * 255));
-                    data.put(index + 1, (byte) (normal.getY() * 255));
-                    data.put(index + 2, (byte) (normal.getZ() * 255));
+                    data.put(index + 0, (byte) ((int) (127 * n.getX()) + 128));
+                    data.put(index + 1, (byte) ((int) (127 * n.getY()) + 128));
+                    data.put(index + 2, (byte) ((int) (127 * n.getZ()) + 128));
                 }
             }
         } finally {
@@ -118,7 +152,8 @@ public class ProceduralNormalMapSource implements TextureSource {
         return data;
     }
 
-    private double getValue(final int x, final int y, final int heightX, final int heightY, final int baseClipmapLevel) {
+    private double getValue(final int x, final int y, final int heightX, final int heightY,
+            final int baseClipmapLevel) {
         double val = cache[x + 1][y + 1];
         if (val == Double.NEGATIVE_INFINITY) {
             val = cache[x + 1][y + 1] = function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0);

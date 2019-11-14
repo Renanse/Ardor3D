@@ -53,7 +53,7 @@ public class TextureClipmap {
     private int currentShownLevels;
     private int minVisibleLevel = 0;
 
-    private float scale = 1f;
+    private float density = 1f;
 
     private Texture3D textureClipmap;
 
@@ -112,7 +112,7 @@ public class TextureClipmap {
         }
 
         textureLevels = roundUpPowerTwo(validLevels);
-        scale = textureConfiguration.getTextureDensity() * textureSize / 128;
+        density = textureConfiguration.getTextureDensity();
 
         TextureClipmap.logger.info("Texture size: " + textureSize);
         TextureClipmap.logger.info("ValidLevels: " + validLevels);
@@ -136,7 +136,7 @@ public class TextureClipmap {
         terrain.setProperty("sliceOffset", sliceDataBuffer.clear());
 
         terrain.setProperty("minLevel", currentShownLevels);
-        terrain.setProperty("scale", 1f / getScale());
+        terrain.setProperty("textureDensity", density);
         terrain.setProperty("levels", getTextureLevels());
         terrain.setProperty("validLevels", getValidLevels() - 1);
         terrain.setProperty("showDebug", isShowDebug() ? 1 : 0);
@@ -152,7 +152,7 @@ public class TextureClipmap {
         }
 
         eyePosition.set(eyePos);
-        eyePosition.multiplyLocal(textureSize / (scale * 4f * 32f));
+        eyePosition.multiplyLocal(density);
 
         for (int unit = minVisibleLevel; unit < validLevels; unit++) {
             if (cacheList.get(unit).isValid()) {
@@ -583,12 +583,12 @@ public class TextureClipmap {
         return textureClipmap;
     }
 
-    public float getScale() {
-        return scale;
+    public float getPixelDensity() {
+        return density;
     }
 
-    public void setScale(final float scale) {
-        this.scale = scale;
+    public void setPixelDensity(final float density) {
+        this.density = density;
     }
 
     private int roundUpPowerTwo(int v) {

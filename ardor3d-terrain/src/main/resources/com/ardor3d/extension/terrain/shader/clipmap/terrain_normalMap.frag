@@ -28,22 +28,22 @@ uniform FogParams fogParams;
 
 void main()
 {  
-	float unit1, unit2;
-	vec2 texCoord1, texCoord2;
-	vec2 offset1, offset2;
+	float unit;
+	vec3 texCoord1, texCoord2;
 	vec2 fadeCoord;
-
-	computeUnit1(unit1, vVertex, validLevels, minLevel);		
 
 	float textureSize = textureSize(diffuseMap, 0).x;
 	float texelSize = 1 / textureSize;
+
+	// determine which unit we are looking at
+	computeUnit(unit, vVertex, minLevel, validLevels, textureSize);
 	
-	//-- setup clip lookup values
-	clipTexSetup(unit1, unit2, texCoord1, texCoord2, offset1, offset2, fadeCoord, texelSize);
+	// determine our clip coordinate values
+	calculateClipUVs(unit, textureSize, texelSize, texCoord1, texCoord2, fadeCoord);
   
 	//-- lookup clip colors
-    vec4 texCol  = clipTexColor(diffuseMap, unit1, unit2, texCoord1, texCoord2, offset1, offset2, fadeCoord, textureSize, texelSize, showDebug);
-    vec4 normCol = clipTexColor(normalMap,  unit1, unit2, texCoord1, texCoord2, offset1, offset2, fadeCoord, textureSize, texelSize, 0) * vec4(2.0) - vec4(1.0);
+    vec4 texCol = clipTexColor(diffuseMap, texCoord1, texCoord2, fadeCoord, textureSize, texelSize, showDebug);
+    vec4 normCol = clipTexColor(normalMap, texCoord1, texCoord2, fadeCoord, textureSize, texelSize, 0) * vec4(2.0) - vec4(1.0);
 
     vec3 nLightDir = normalize(-lightDir.xyz);
     vec3 n = normalize(normCol.xyz);
@@ -53,6 +53,7 @@ void main()
     color = color * texCol;
 
 #ifdef USE_FOG
+	// Calculate any fog contribution using vertex distance in eye space.
     float dist = length(eyeSpacePosition);
     float fogAmount = calcFogAmount(fogParams, abs(dist));
     FragColor = mix(color, fogParams.color, fogAmount);
