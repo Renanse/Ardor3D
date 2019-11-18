@@ -19,6 +19,7 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -196,7 +197,8 @@ public abstract class ImageUtils {
      * @return the new Image.
      */
     public static Image generateSubImage(final Image srcImg, final int width, final int height,
-            final Vector2 bottomLeft, final Vector2 topLeft, final Vector2 topRight, final Vector2 bottomRight) {
+            final ReadOnlyVector2 bottomLeft, final ReadOnlyVector2 topLeft, final ReadOnlyVector2 topRight,
+            final ReadOnlyVector2 bottomRight) {
 
         final boolean hasAlpha = srcImg.getDataFormat().hasAlpha();
         final ByteBuffer dstBuff = BufferUtils.createByteBuffer(width * height * (hasAlpha ? 4 : 3));
