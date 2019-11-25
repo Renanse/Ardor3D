@@ -238,7 +238,6 @@ public class Line extends Mesh {
             prevPos.set(nextPos);
             BufferUtils.populateFromBuffer(nextPos, positions, i);
             d += nextPos.subtract(prevPos, prevPos).length();
-            System.err.println(d);
             dists.put(d);
         }
     }

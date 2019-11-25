@@ -4,6 +4,7 @@ include ':ardor3d-math'
 include ':ardor3d-core'
 include ':ardor3d-lwjgl3'
 include ':ardor3d-lwjgl3-nuklear'
+include ':ardor3d-lwjgl3-awt'
 include ':ardor3d-lwjgl3-swt'
 include ':ardor3d-swt'
 include ':ardor3d-awt'
@@ -22,6 +23,7 @@ project(':ardor3d-math').projectDir = "$rootDir/ardor3d-math" as File
 project(':ardor3d-core').projectDir = "$rootDir/ardor3d-core" as File
 project(':ardor3d-lwjgl3').projectDir = "$rootDir/ardor3d-lwjgl3" as File
 project(':ardor3d-lwjgl3-nuklear').projectDir = "$rootDir/ardor3d-lwjgl3-nuklear" as File
+project(':ardor3d-lwjgl3-awt').projectDir = "$rootDir/ardor3d-lwjgl3-awt" as File
 project(':ardor3d-lwjgl3-swt').projectDir = "$rootDir/ardor3d-lwjgl3-swt" as File
 project(':ardor3d-swt').projectDir = "$rootDir/ardor3d-swt" as File
 project(':ardor3d-awt').projectDir = "$rootDir/ardor3d-awt" as File

@@ -10,6 +10,7 @@
 
 package com.ardor3d.tool.editor.particle.swing;
 
+import java.net.URISyntaxException;
 import java.util.prefs.Preferences;
 
 import com.ardor3d.extension.effect.particle.ParticleSystem;
@@ -21,9 +22,13 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -31,7 +36,11 @@ import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.geom.GeometryTool;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 import com.ardor3d.util.stat.graph.GraphFactory;
@@ -219,6 +228,14 @@ class ParticleEditorScene implements Scene, Updater {
         };
         grid.setDefaultColor(ColorRGBA.DARK_GRAY);
         grid.getSceneHints().setCullHint(_prefs.getBoolean("showgrid", true) ? CullHint.Dynamic : CullHint.Always);
+        grid.setLineWidth(1.5f);
+
+        final MeshData meshData = grid.getMeshData();
+        meshData.setIndexMode(IndexMode.LinesAdjacency);
+        meshData.setIndices(GeometryTool.generateAdjacencyIndices(meshData.getIndexMode(0), meshData.getVertexCount()));
+        meshData.markIndicesDirty();
+        
+        MaterialUtil.autoMaterials(grid);
         return grid;
     }
 

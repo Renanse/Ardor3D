@@ -27,6 +27,7 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasAdapter;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3ContextCapabilities;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3Renderer;
@@ -46,6 +47,7 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
 
     public Lwjgl3CanvasRenderer(final Scene scene) {
         _scene = scene;
+        _canvasCallback = new Lwjgl3CanvasAdapter();
     }
 
     @MainThread

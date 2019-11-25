@@ -65,6 +65,9 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import org.lwjgl.opengl.awt.GLData;
+
+import com.ardor3d.extension.effect.EffectUtils;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.SimpleParticleInfluenceFactory;
@@ -73,8 +76,8 @@ import com.ardor3d.extension.effect.particle.WanderInfluence;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.framework.lwjgl3.Lwjgl3AwtCanvas;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
+import com.ardor3d.framework.lwjgl3.awt.Lwjgl3AwtCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.TextureStoreFormat;
@@ -95,6 +98,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RendererCallable;
+import com.ardor3d.renderer.material.MaterialManager;
+import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
@@ -161,6 +166,9 @@ public class ParticleEditorFrame extends JFrame {
     public ParticleEditorFrame() {
         try {
             AWTImageLoader.registerLoader();
+            
+            addDefaultResourceLocators();
+            EffectUtils.addDefaultResourceLocators();
 
             init();
 
@@ -1023,8 +1031,14 @@ public class ParticleEditorFrame extends JFrame {
             }
         };
 
-        final DisplaySettings settings = new DisplaySettings(1, 1, 0, 0, 0, 16, 0, 0, false, false);
-        final Lwjgl3AwtCanvas theCanvas = new Lwjgl3AwtCanvas(settings, canvasRenderer);
+        final GLData data = new GLData();
+        data.depthSize = 16;
+        data.doubleBuffer = true;
+        data.profile = GLData.Profile.CORE;
+        data.majorVersion = 3;
+        data.minorVersion = 3;
+        
+        final Lwjgl3AwtCanvas theCanvas = new Lwjgl3AwtCanvas(data, canvasRenderer);
         theCanvas.setSize(new Dimension(width, height));
         theCanvas.setMinimumSize(new Dimension(100, 100));
         theCanvas.setVisible(true);
@@ -1239,6 +1253,19 @@ public class ParticleEditorFrame extends JFrame {
                 pmesh.getSceneHints()
                         .setCullHint(((Boolean) aValue).booleanValue() ? CullHint.Dynamic : CullHint.Always);
             }
+        }
+    }
+
+    public static void addDefaultResourceLocators() {
+        try {
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/material")));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, new SimpleResourceLocator(
+                    ResourceLocatorTool.getClassPathResource(MaterialManager.class, "com/ardor3d/renderer/shader")));
+            MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
+                    .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
+        } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
         }
     }
 }
