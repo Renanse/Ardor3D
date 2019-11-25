@@ -192,7 +192,14 @@ public abstract class AbstractGridCache {
             // check if the given tile is valid and should be processed
             if (validTiles == null || validTiles.contains(data.sourceTile)) {
                 cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
-                data.future = tileThreadService.submit(PriorityRunnable.of(data, meshClipIndex));
+                int priority = Math.abs(data.sourceTile.getX() - tileX) + Math.abs(data.sourceTile.getY() - tileY);
+                if (priority <= 3) {
+                    priority = 100 * meshClipIndex;
+                } else {
+                    priority = 2 * meshClipIndex - priority;
+                }
+
+                data.future = tileThreadService.submit(PriorityRunnable.of(data, priority));
             }
             tileIterator.remove();
         }
