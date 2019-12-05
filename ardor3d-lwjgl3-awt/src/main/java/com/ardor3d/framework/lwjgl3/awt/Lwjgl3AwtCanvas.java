@@ -12,12 +12,9 @@ package com.ardor3d.framework.lwjgl3.awt;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-
-import javax.swing.SwingUtilities;
 
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
@@ -132,23 +129,14 @@ public class Lwjgl3AwtCanvas extends AWTGLCanvas implements Canvas {
 	@MainThread
 	public void draw(final CountDownLatch latch) {
 		try {
-			SwingUtilities.invokeAndWait(()->{
-				try {
-				if (!isValid())
-					return;
-				render();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (!isValid())
+				return;
+
+			render();
+		} finally {
+			if (latch != null)
+				latch.countDown();
 		}
-		latch.countDown();
 	}
 
 	@Override
@@ -169,5 +157,9 @@ public class Lwjgl3AwtCanvas extends AWTGLCanvas implements Canvas {
 	@Override
 	public boolean removeListener(final ICanvasListener listener) {
 		return _listeners.remove(listener);
+	}
+
+	public boolean isInited() {
+		return _inited;
 	}
 }
