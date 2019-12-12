@@ -11,7 +11,6 @@
 package com.ardor3d.example.canvas;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -34,7 +33,6 @@ import com.ardor3d.util.screen.ScreenExporter;
         thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
         maxHeapMemory = 64)
 public class LwjglHeadlessExample {
-    private static final Logger logger = Logger.getLogger(LwjglHeadlessExample.class.toString());
     private static RotatingCubeGame game;
     private static ScreenShotImageExporter _screenShotExp = new ScreenShotImageExporter();
     private static boolean _doShot = true;

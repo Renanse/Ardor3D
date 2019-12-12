@@ -796,7 +796,7 @@ public class DOMInputCapsule implements InputCapsule {
                 final Class<? extends Savable> clazz = (Class<? extends Savable>) Class.forName(className);
                 final SavableFactory ann = clazz.getAnnotation(SavableFactory.class);
                 if (ann == null) {
-                    tmp = clazz.newInstance();
+                    tmp = clazz.getDeclaredConstructor().newInstance();
                 } else {
                     tmp = (Savable) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null,
                             (Object[]) null);

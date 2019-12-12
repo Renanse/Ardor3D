@@ -1442,7 +1442,7 @@ public abstract class Spatial implements Savable, Hintable {
         try {
             final SavableFactory ann = clazz.getAnnotation(SavableFactory.class);
             if (ann == null) {
-                spat = clazz.newInstance();
+                spat = clazz.getDeclaredConstructor().newInstance();
             } else {
                 spat = (Spatial) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null, (Object[]) null);
             }

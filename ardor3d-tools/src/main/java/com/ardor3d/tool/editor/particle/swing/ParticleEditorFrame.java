@@ -1116,15 +1116,15 @@ public class ParticleEditorFrame extends JFrame {
             last.x = arg0.getX();
             last.y = arg0.getY();
 
-            final int mods = arg0.getModifiers();
-            if ((mods & InputEvent.BUTTON1_MASK) != 0) {
+            final int mods = arg0.getModifiersEx();
+            if ((mods & InputEvent.BUTTON1_DOWN_MASK) != 0) {
                 rotateCamera(worldUpVector, difX * 0.0025f);
                 rotateCamera(Camera.getCurrentCamera().getLeft(), -difY * 0.0025);
             }
-            if ((mods & InputEvent.BUTTON2_MASK) != 0 && difY != 0) {
+            if ((mods & InputEvent.BUTTON2_DOWN_MASK) != 0 && difY != 0) {
                 zoomCamera(difY * mult);
             }
-            if ((mods & InputEvent.BUTTON3_MASK) != 0) {
+            if ((mods & InputEvent.BUTTON3_DOWN_MASK) != 0) {
                 panCamera(-difX, -difY);
             }
         }

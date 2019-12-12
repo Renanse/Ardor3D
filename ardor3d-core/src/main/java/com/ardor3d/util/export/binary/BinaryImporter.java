@@ -233,7 +233,7 @@ public class BinaryImporter implements Ardor3dImporter {
                 final Class<? extends Savable> clazz = (Class<? extends Savable>) Class.forName(bco._className);
                 final SavableFactory ann = clazz.getAnnotation(SavableFactory.class);
                 if (ann == null) {
-                    out = clazz.newInstance();
+                    out = clazz.getDeclaredConstructor().newInstance();
                 } else {
                     out = (Savable) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null,
                             (Object[]) null);

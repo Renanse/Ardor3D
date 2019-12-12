@@ -10,7 +10,6 @@
 
 package com.ardor3d.tool.editor.particle.swing;
 
-import java.net.URISyntaxException;
 import java.util.prefs.Preferences;
 
 import com.ardor3d.extension.effect.particle.ParticleSystem;
@@ -24,8 +23,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.material.MaterialManager;
-import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.MeshData;
@@ -39,8 +36,6 @@ import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.GeometryTool;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 import com.ardor3d.util.stat.graph.GraphFactory;

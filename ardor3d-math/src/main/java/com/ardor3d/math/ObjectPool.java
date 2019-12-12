@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Simple Object pool for use with our Math Library to help reduce object creation during calculations. This class uses
  * a ThreadLocal pool of objects to allow for fast multi-threaded use.
- * 
+ *
  * @param <T>
  *            the type.
  */
@@ -57,7 +57,7 @@ public abstract class ObjectPool<T extends Poolable> {
             @Override
             protected T newInstance() {
                 try {
-                    return clazz.newInstance();
+                    return clazz.getDeclaredConstructor().newInstance();
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
                 }

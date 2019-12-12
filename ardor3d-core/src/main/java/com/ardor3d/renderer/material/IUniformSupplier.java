@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.material;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,25 +36,14 @@ public interface IUniformSupplier {
 
         try {
             final Class<?> clazz = Class.forName(className);
-            final Object val = clazz.newInstance();
+            final Object val = clazz.getDeclaredConstructor().newInstance();
             if (val instanceof IUniformSupplier) {
                 final IUniformSupplier supplier = (IUniformSupplier) val;
                 supplier.applyDefaultUniformValues();
                 return supplier;
             }
-        } catch (final ClassNotFoundException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
-        } catch (final SecurityException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
-        } catch (final IllegalArgumentException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
-        } catch (final IllegalAccessException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
-        } catch (final InstantiationException ex) {
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException | ClassNotFoundException ex) {
             // TODO Auto-generated catch block
             ex.printStackTrace();
         }

@@ -338,7 +338,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
     public static void start(final Class<? extends ExampleBase> exampleClazz) {
         ExampleBase example;
         try {
-            example = exampleClazz.newInstance();
+            example = exampleClazz.getDeclaredConstructor().newInstance();
         } catch (final Exception ex) {
             ex.printStackTrace();
             return;

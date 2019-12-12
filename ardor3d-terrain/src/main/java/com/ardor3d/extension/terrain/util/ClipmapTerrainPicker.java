@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.util.Ardor3dException;
 
 /**
  * A picking assistant to be used with ClipmapLevel and an AbstractBresenhamTracer.
@@ -48,18 +50,22 @@ public class ClipmapTerrainPicker {
      *            class type for our Bresenham tracer.
      * @param maxChecks
      *            the maximum number of grid spaces we'll walk before giving up our search.
-     * @throws IllegalAccessException
-     *             if we are unable to create an instance of our tracerClass
-     * @throws InstantiationException
+     * @throws Ardor3dException
      *             if we are unable to create an instance of our tracerClass
      */
     public ClipmapTerrainPicker(final List<ClipmapLevel> levels,
             final Class<? extends AbstractBresenhamTracer> tracerClass, final int maxChecks,
-            final Vector3 initialSpacing) throws InstantiationException, IllegalAccessException {
+            final Vector3 initialSpacing) throws Ardor3dException {
         _clipmapLevels = levels;
         _tracers = new ArrayList<>();
         for (int i = 0, max = levels.size(); i < max; i++) {
-            final AbstractBresenhamTracer tracer = tracerClass.newInstance();
+            AbstractBresenhamTracer tracer;
+            try {
+                tracer = tracerClass.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                throw new Ardor3dException(e.getMessage(), e);
+            }
             final int space = 1 << i;
             final Vector3 vec = new Vector3(initialSpacing).multiplyLocal(space);
             if (vec.getX() == 0) {

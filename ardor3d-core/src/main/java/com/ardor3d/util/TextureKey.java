@@ -78,7 +78,7 @@ final public class TextureKey implements Savable {
     /** cache of texturekey objects allowing us to find an existing texture key. */
     protected static final List<WeakReference<TextureKey>> _keyCache = new LinkedList<>();
 
-    private static final Integer ZERO = new Integer(0);
+    private static final Integer ZERO = Integer.valueOf(0);
 
     /** RTT code use */
     private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
