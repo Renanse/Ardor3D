@@ -12,7 +12,6 @@ package com.ardor3d.extension.terrain.providers.procedural;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.ardor3d.extension.terrain.client.TextureConfiguration;
@@ -67,23 +66,6 @@ public class ProceduralTextureSource implements TextureSource {
     }
 
     @Override
-    public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
-    }
-
-    @Override
     public ByteBuffer getTile(final int clipmapLevel, final Tile tile) throws Exception {
         final ByteBuffer data = tileDataPool.get();
         final int tileX = tile.getX();
@@ -102,8 +84,8 @@ public class ProceduralTextureSource implements TextureSource {
                     final int heightX = tileX * tileSize + x;
                     final int heightY = tileY * tileSize + y;
 
-                    final double eval = MathUtils.clamp01(function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0)
-                            * 0.5 + 0.5);
+                    final double eval = MathUtils.clamp01(
+                            function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0) * 0.5 + 0.5);
                     final byte colIndex = (byte) (eval * 255);
 
                     final ReadOnlyColorRGBA c = terrainColors[colIndex & 0xFF];
@@ -118,5 +100,29 @@ public class ProceduralTextureSource implements TextureSource {
             textureLock.unlock();
         }
         return data;
+    }
+
+    protected String name;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String value) {
+        name = value;
+    }
+
+    protected ColorRGBA tint = new ColorRGBA(ColorRGBA.WHITE);
+
+    @Override
+    public ReadOnlyColorRGBA getTintColor() {
+        return tint;
+    }
+
+    @Override
+    public void setTintColor(final ReadOnlyColorRGBA value) {
+        tint.set(value);
     }
 }

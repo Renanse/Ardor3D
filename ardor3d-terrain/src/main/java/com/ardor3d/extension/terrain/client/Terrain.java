@@ -215,13 +215,13 @@ public class Terrain extends Node implements Pickable, Runnable {
             }
         }
 
+        // Update from mailbox
+        updateFromMailbox();
+
         // Update vertices.
         for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
             _clips.get(i).updateVertices();
         }
-
-        // Update from mailbox
-        updateFromMailbox();
 
         // Update indices.
         for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -20,6 +20,8 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.providers.inmemory.data.InMemoryTerrainData;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -100,11 +102,6 @@ public class InMemoryTextureSource implements TextureSource {
     }
 
     @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
-    }
-
-    @Override
     public ByteBuffer getTile(final int clipmapLevel, final Tile tile) throws Exception {
         final int tileX = tile.getX();
         final int tileY = tile.getY();
@@ -138,5 +135,29 @@ public class InMemoryTextureSource implements TextureSource {
         }
 
         return data;
+    }
+
+    protected String name;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String value) {
+        name = value;
+    }
+
+    protected ColorRGBA tint = new ColorRGBA(ColorRGBA.WHITE);
+
+    @Override
+    public ReadOnlyColorRGBA getTintColor() {
+        return tint;
+    }
+
+    @Override
+    public void setTintColor(final ReadOnlyColorRGBA value) {
+        tint.set(value);
     }
 }

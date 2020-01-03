@@ -17,6 +17,7 @@ uniform float validLevels;
 uniform float textureSize; 
 uniform float texelSize; 
 uniform float showDebug;
+uniform vec4 tint;
 
 varying vec2 vVertex;
 varying vec3 eyeSpacePosition;
@@ -107,5 +108,5 @@ void main()
 	float fog = clamp((gl_Fog.end - dist) * gl_Fog.scale, 0.0, 1.0);
 	
 	// mix fog with terrain color, modulated by ambient and diffuse.	
-    gl_FragColor = mix(gl_Fog.color, texCol * (ambient + diffuse), fog);  
+    gl_FragColor = mix(gl_Fog.color, tint * texCol * (ambient + diffuse), fog);  
 }

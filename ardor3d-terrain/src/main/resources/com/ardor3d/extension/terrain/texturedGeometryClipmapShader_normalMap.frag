@@ -18,6 +18,7 @@ uniform float validLevels;
 uniform float textureSize; 
 uniform float texelSize; 
 uniform float showDebug; 
+uniform vec4 tint;
 
 uniform vec3 lightDir;
 
@@ -119,5 +120,5 @@ void main()
     
     float NdotL = max(dot(n,-lightDir.xzy),0.0);
     vec4 color = ambient + diffuse * NdotL;
-    gl_FragColor = mix(gl_Fog.color, color * texCol, fog);
+    gl_FragColor = mix(gl_Fog.color, tint * color * texCol, fog);
 }

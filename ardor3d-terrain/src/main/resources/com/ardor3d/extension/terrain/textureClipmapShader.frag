@@ -17,6 +17,7 @@ uniform float validLevels;
 uniform float textureSize; 
 uniform float texelSize; 
 uniform float showDebug;
+uniform vec4 tint;
 
 varying vec2 vVertex;
 
@@ -97,5 +98,5 @@ void main()
 	
 	// Mix the textures using our fade value.  
 	// Add an optional white color if debug is enabled.
-    gl_FragColor = mix(tex, tex2, fadeVal) + vec4(fadeVal*showDebug);
+    gl_FragColor = tint * mix(tex, tex2, fadeVal) + vec4(fadeVal*showDebug);
 }

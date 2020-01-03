@@ -109,7 +109,7 @@ public abstract class AbstractGridCache {
                 }
             }
 
-            // Walk through tiles we are currently loading
+            // Walk through tiles we are currently tracking status of. We think these are valid currently.
             final Iterator<TileLoadingData> tileIterator = currentTiles.iterator();
             while (tileIterator.hasNext()) {
                 final TileLoadingData data = tileIterator.next();
@@ -123,7 +123,7 @@ public abstract class AbstractGridCache {
                     data.isCancelled = true;
                     final Future<?> future = data.future;
                     if (future != null && !future.isDone()) {
-                        future.cancel(true);
+                        future.cancel(false);
                     }
 
                     // remove the tile from current
@@ -192,7 +192,14 @@ public abstract class AbstractGridCache {
             // check if the given tile is valid and should be processed
             if (validTiles == null || validTiles.contains(data.sourceTile)) {
                 cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
-                data.future = tileThreadService.submit(PriorityRunnable.of(data, meshClipIndex));
+                int priority = Math.abs(data.sourceTile.getX() - tileX) + Math.abs(data.sourceTile.getY() - tileY);
+                if (priority <= 3) {
+                    priority = 100 * meshClipIndex;
+                } else {
+                    priority = 2 * meshClipIndex - priority;
+                }
+
+                data.future = tileThreadService.submit(PriorityRunnable.of(data, priority));
             }
             tileIterator.remove();
         }
@@ -293,14 +300,20 @@ public abstract class AbstractGridCache {
                 return;
             }
 
+            if (isCancelled()) {
+                state = State.cancelled;
+                return;
+            }
+
             state = State.finished;
             sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
 
             final int level = sourceCache.meshClipIndex;
             final int vertexDistance = sourceCache.vertexDistance;
             final int tileSize = sourceCache.tileSize;
-            final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance, sourceTile.getY()
-                    * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
+            final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance,
+                    sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance,
+                    tileSize * vertexDistance);
 
             final DoubleBufferedList<Region> mailBox = sourceCache.mailBox;
             if (mailBox != null) {

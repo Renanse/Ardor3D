@@ -21,6 +21,7 @@ uniform float validLevels;
 uniform float textureSize; 
 uniform float texelSize; 
 uniform float showDebug; 
+uniform vec4 tint;
 
 uniform vec4 sampleDist;
 uniform vec4 shadowColor;
@@ -125,5 +126,5 @@ void main()
     	shade = shadow2DProj(shadowMap3, gl_TexCoord[3]).x;
     }
     
-    gl_FragColor = mix(gl_Fog.color, texCol * (ambient + diffuse) * vec4(1.0-shade*shadowColor.a), fog);  
+    gl_FragColor = mix(gl_Fog.color, tint * texCol * (ambient + diffuse) * vec4(1.0-shade*shadowColor.a), fog);  
 }

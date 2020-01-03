@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -21,6 +21,8 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -59,9 +61,12 @@ public class ImageTextureSource implements TextureSource {
             final byte[] heightMapMip = new byte[currentSize * currentSize * 3];
             for (int x = 0; x < currentSize; x++) {
                 for (int z = 0; z < currentSize; z++) {
-                    heightMapMip[3 * (z * currentSize + x) + 0] = parentHeightMap[3 * (z * currentSize * 4 + x * 2) + 0];
-                    heightMapMip[3 * (z * currentSize + x) + 1] = parentHeightMap[3 * (z * currentSize * 4 + x * 2) + 1];
-                    heightMapMip[3 * (z * currentSize + x) + 2] = parentHeightMap[3 * (z * currentSize * 4 + x * 2) + 2];
+                    heightMapMip[3 * (z * currentSize + x) + 0] = parentHeightMap[3 * (z * currentSize * 4 + x * 2)
+                            + 0];
+                    heightMapMip[3 * (z * currentSize + x) + 1] = parentHeightMap[3 * (z * currentSize * 4 + x * 2)
+                            + 1];
+                    heightMapMip[3 * (z * currentSize + x) + 2] = parentHeightMap[3 * (z * currentSize * 4 + x * 2)
+                            + 2];
                 }
             }
             parentHeightMap = heightMapMip;
@@ -99,17 +104,6 @@ public class ImageTextureSource implements TextureSource {
     }
 
     @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
-    }
-
-    @Override
     public ByteBuffer getTile(final int clipmapLevel, final Tile tile) throws Exception {
         final int tileX = tile.getX();
         final int tileY = tile.getY();
@@ -136,5 +130,29 @@ public class ImageTextureSource implements TextureSource {
             }
         }
         return data;
+    }
+
+    protected String name;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String value) {
+        name = value;
+    }
+
+    protected ColorRGBA tint = new ColorRGBA(ColorRGBA.WHITE);
+
+    @Override
+    public ReadOnlyColorRGBA getTintColor() {
+        return tint;
+    }
+
+    @Override
+    public void setTintColor(final ReadOnlyColorRGBA value) {
+        tint.set(value);
     }
 }

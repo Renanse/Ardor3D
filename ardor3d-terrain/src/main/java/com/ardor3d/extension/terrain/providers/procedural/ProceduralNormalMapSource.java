@@ -13,15 +13,16 @@ package com.ardor3d.extension.terrain.providers.procedural;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.ardor3d.extension.terrain.client.TextureConfiguration;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.functions.Function3D;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Maps;
 
@@ -58,23 +59,6 @@ public class ProceduralNormalMapSource implements TextureSource {
         textureStoreFormat.put(0, TextureStoreFormat.RGB8);
 
         return new TextureConfiguration(availableClipmapLevels, textureStoreFormat, tileSize, 1f, false, false);
-    }
-
-    @Override
-    public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
     }
 
     @Override
@@ -160,5 +144,29 @@ public class ProceduralNormalMapSource implements TextureSource {
         }
 
         return val;
+    }
+
+    protected String name;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String value) {
+        name = value;
+    }
+
+    protected ColorRGBA tint = new ColorRGBA(ColorRGBA.WHITE);
+
+    @Override
+    public ReadOnlyColorRGBA getTintColor() {
+        return tint;
+    }
+
+    @Override
+    public void setTintColor(final ReadOnlyColorRGBA value) {
+        tint.set(value);
     }
 }
