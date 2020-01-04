@@ -139,65 +139,59 @@ public class TextureClipmap {
         textureClipmapShader.setUniform("eyePosition", eyePosition);
         eyePosition.multiplyLocal(density);
 
-        {
-            currentShownLevels = -1;
-            for (int unit = minVisibleLevel; unit < validLevels; unit++) {
-                // get our clip data and position
-                final int exp2 = MathUtils.pow2(unit);
-                float x = eyePosition.getXf() / exp2;
-                float y = eyePosition.getZf() / exp2;
+        currentShownLevels = -1;
+        for (int unit = minVisibleLevel; unit < validLevels; unit++) {
+            // get our clip data and position
+            final int exp2 = MathUtils.pow2(unit);
+            float x = eyePosition.getXf() / exp2;
+            float y = eyePosition.getZf() / exp2;
 
-                final int offX = MathUtils.floor(x);
-                final int offY = MathUtils.floor(y);
+            final int offX = MathUtils.floor(x);
+            final int offY = MathUtils.floor(y);
 
-                final LevelData levelData = levelDataList.get(unit);
-                final TextureCache cache = cacheList.get(unit);
-                final boolean valid = cache.isValid();
-                if (!valid) {
-                    currentShownLevels = -1;
+            final TextureCache cache = cacheList.get(unit);
+            cache.setCurrentPosition(offX, offY);
 
-                    if (levelData.x != offX || levelData.y != offY) {
-                        cache.setCurrentPosition(offX, offY);
-                    }
-                    continue;
-                }
-
-                // otherwise, clip is valid...
-                if (currentShownLevels == -1) {
-                    currentShownLevels = unit;
-                }
-
-                // If our anchor has shifted, update our level data info.
-                if (levelData.x != offX || levelData.y != offY) {
-                    cache.setCurrentPosition(offX, offY);
-                    // this also calls updateQuick on level
-                    updateLevel(renderer, levelData, offX, offY);
-                }
-
-                // Check for individually updated tiles from our source
-                final Set<Tile> updatedTiles = cache.handleUpdateRequests();
-                if (updatedTiles != null) {
-                    final int sX = offX - textureSize / 2;
-                    final int sY = offY - textureSize / 2;
-
-                    // XXX: Perhaps this could find out a subregion of the tile that had changed and update just that,
-                    // but for now we will update the full level.
-                    updateQuick(renderer, levelData, textureSize + 1, textureSize + 1, sX, sY, levelData.offsetX,
-                            levelData.offsetY, textureSize, textureSize);
-                }
-
-                // calculate values used to shift texcoords in shader
-                int shiftX = levelData.x;
-                int shiftY = levelData.y;
-                shiftX = MathUtils.moduloPositive(shiftX, 2);
-                shiftY = MathUtils.moduloPositive(shiftY, 2);
-
-                x = (MathUtils.moduloPositive(x, 2) - shiftX + levelData.offsetX) / textureSize;
-                y = (MathUtils.moduloPositive(y, 2) - shiftY + levelData.offsetY) / textureSize;
-
-                sliceDataBuffer.put(unit * 2, x);
-                sliceDataBuffer.put(unit * 2 + 1, y);
+            final boolean valid = cache.isValid();
+            if (!valid) {
+                // clip is not valid, so invalidate whatever we might have though was the lowest clip
+                currentShownLevels = -1;
+                continue;
             }
+
+            // otherwise, clip is valid... should be fully loaded.
+            if (currentShownLevels == -1) {
+                currentShownLevels = unit;
+            }
+
+            // If our anchor has shifted, update our level data info.
+            final LevelData levelData = levelDataList.get(unit);
+            if (levelData.x != offX || levelData.y != offY) {
+                // this also calls updateQuick on level
+                updateLevel(renderer, levelData, offX, offY);
+            }
+
+            // Check for individually updated tiles from our source
+            final Set<Tile> updatedTiles = cache.handleUpdateRequests();
+            if (updatedTiles != null) {
+                final int sX = offX - textureSize / 2;
+                final int sY = offY - textureSize / 2;
+
+                // XXX: Perhaps this could find out a subregion of the tile that had changed and update just that,
+                // but for now we will update the full level.
+                updateQuick(renderer, levelData, textureSize + 1, textureSize + 1, sX, sY, levelData.offsetX,
+                        levelData.offsetY, textureSize, textureSize);
+            }
+
+            // calculate values used to shift texcoords in shader
+            final int shiftX = MathUtils.moduloPositive(levelData.x, 2);
+            final int shiftY = MathUtils.moduloPositive(levelData.y, 2);
+
+            x = (MathUtils.moduloPositive(x, 2) - shiftX + levelData.offsetX) / textureSize;
+            y = (MathUtils.moduloPositive(y, 2) - shiftY + levelData.offsetY) / textureSize;
+
+            sliceDataBuffer.put(unit * 2, x);
+            sliceDataBuffer.put(unit * 2 + 1, y);
         }
 
         if (currentShownLevels == -1) {
