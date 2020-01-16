@@ -109,7 +109,7 @@ public abstract class AbstractGridCache {
                 }
             }
 
-            // Walk through tiles we are currently loading
+            // Walk through tiles we are currently tracking status of. We think these are valid currently.
             final Iterator<TileLoadingData> tileIterator = currentTiles.iterator();
             while (tileIterator.hasNext()) {
                 final TileLoadingData data = tileIterator.next();
@@ -123,7 +123,7 @@ public abstract class AbstractGridCache {
                     data.isCancelled = true;
                     final Future<?> future = data.future;
                     if (future != null && !future.isDone()) {
-                        future.cancel(true);
+                        future.cancel(false);
                     }
 
                     // remove the tile from current

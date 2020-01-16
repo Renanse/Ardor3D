@@ -10,6 +10,7 @@ in vec3 eyeSpacePosition;
 out vec4 FragColor;
 
 uniform sampler3D diffuseMap;
+uniform vec4 tint;
 
 uniform int levels;
 uniform int minLevel;
@@ -45,7 +46,7 @@ void main()
 	// Calculate any fog contribution using vertex distance in eye space.
     float dist = length(eyeSpacePosition);
     float fogAmount = calcFogAmount(fogParams, abs(dist));
-    FragColor = mix(texCol, fogParams.color, fogAmount);
+    FragColor = mix(tint * texCol, fogParams.color, fogAmount);
 #else
     FragColor = texCol;
 #endif

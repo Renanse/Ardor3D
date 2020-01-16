@@ -28,8 +28,10 @@ import com.ardor3d.extension.terrain.client.TextureConfiguration;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -86,12 +88,6 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
     }
 
     @Override
-    public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
     public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
             final int numTilesY) throws Exception {
         final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
@@ -114,11 +110,6 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
         }
 
         return tiles;
-    }
-
-    @Override
-    public int getContributorId(final int clipmapLevel, final Tile sourceTile) {
-        return 0;
     }
 
     @Override
@@ -227,5 +218,29 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
                 }
             }
         }
+    }
+
+    protected String name;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String value) {
+        name = value;
+    }
+
+    protected ColorRGBA tint = new ColorRGBA(ColorRGBA.WHITE);
+
+    @Override
+    public ReadOnlyColorRGBA getTintColor() {
+        return tint;
+    }
+
+    @Override
+    public void setTintColor(final ReadOnlyColorRGBA value) {
+        tint.set(value);
     }
 }

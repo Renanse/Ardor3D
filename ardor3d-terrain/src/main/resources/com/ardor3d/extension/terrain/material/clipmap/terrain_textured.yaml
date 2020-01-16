@@ -44,6 +44,11 @@ techniques:
             shaderKey: sliceOffset
             type: Float2
             source: SpatialProperty
+          - 
+            shaderKey: tint
+            type: Float4
+            source: SpatialProperty
+            defaultValue: [1, 1, 1, 1]
 
         shaders: 
           Vertex: 

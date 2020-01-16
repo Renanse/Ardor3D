@@ -11,6 +11,7 @@ out vec4 FragColor;
 
 uniform sampler3D diffuseMap;
 uniform sampler3D normalMap;
+uniform vec4 tint;
 
 uniform int levels;
 uniform int minLevel;
@@ -50,7 +51,7 @@ void main()
     float NdotL = max(dot(n,nLightDir),0.0);
     
     vec4 color = vec4(0.1) + vec4(NdotL, NdotL, NdotL, 1.0);
-    color = color * texCol;
+    color = color * tint * texCol;
 
 #ifdef USE_FOG
 	// Calculate any fog contribution using vertex distance in eye space.

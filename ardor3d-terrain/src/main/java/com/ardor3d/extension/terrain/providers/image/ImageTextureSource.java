@@ -24,6 +24,8 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class ImageTextureSource implements TextureSource {
@@ -102,17 +104,6 @@ public class ImageTextureSource implements TextureSource {
     }
 
     @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
-    }
-
-    @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
-    }
-
-    @Override
     public ByteBuffer getTile(final int clipmapLevel, final Tile tile) throws Exception {
         final int tileX = tile.getX();
         final int tileY = tile.getY();
@@ -139,5 +130,29 @@ public class ImageTextureSource implements TextureSource {
             }
         }
         return data;
+    }
+
+    protected String name;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String value) {
+        name = value;
+    }
+
+    protected ColorRGBA tint = new ColorRGBA(ColorRGBA.WHITE);
+
+    @Override
+    public ReadOnlyColorRGBA getTintColor() {
+        return tint;
+    }
+
+    @Override
+    public void setTintColor(final ReadOnlyColorRGBA value) {
+        tint.set(value);
     }
 }

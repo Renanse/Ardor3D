@@ -136,6 +136,7 @@ public class TextureClipmap {
         terrain.setProperty("sliceOffset", sliceDataBuffer.clear());
 
         terrain.setProperty("minLevel", currentShownLevels);
+        terrain.setProperty("tint", source.getTintColor());
         terrain.setProperty("textureDensity", density);
         terrain.setProperty("levels", getTextureLevels());
         terrain.setProperty("validLevels", getValidLevels() - 1);
@@ -174,11 +175,11 @@ public class TextureClipmap {
         // }
         // }
 
-        if (timers.size() < currentShownLevels) {
-            for (int unit = 0; unit < currentShownLevels; unit++) {
-                timers.add(System.currentTimeMillis());
-            }
+        while (timers.size() < currentShownLevels) {
+            timers.add(System.currentTimeMillis());
         }
+
+        // walk through clipmaps that are already valid and go ahead and update them periodically
         for (int unit = 0; unit < currentShownLevels; unit++) {
             final long t = System.currentTimeMillis() - timers.get(unit);
             if (t > 500) {
@@ -203,7 +204,7 @@ public class TextureClipmap {
             }
         }
 
-        // Walk through each level of the clipmap
+        // Walk backwards through clips that are not currently valid and update them
         for (int unit = validLevels - 1; unit >= currentShownLevels; unit--) {
             // calculate the anchor of the clipmap using our eye pos
             float x = eyePosition.getXf();
