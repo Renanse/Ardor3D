@@ -44,7 +44,7 @@ public class GLFWMouseManager implements MouseManager {
 
     @Override
     public void setPosition(final int x, final int y) {
-        GLFW.glfwSetCursorPos(_canvas.getWindowId(), x, y);
+        GLFW.glfwSetCursorPos(_canvas.getWindowId(), x, _canvas.getContentHeight() - y);
     }
 
     @Override
