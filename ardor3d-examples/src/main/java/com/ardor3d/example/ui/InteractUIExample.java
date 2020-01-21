@@ -44,11 +44,12 @@ import com.ardor3d.extension.ui.model.DefaultComboBoxModel;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
+import com.ardor3d.input.InputState;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
-import com.ardor3d.input.logical.MouseButtonLongPressedCondition;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.GrabbedState;
@@ -308,11 +309,11 @@ public class InteractUIExample extends ExampleBase {
                 }));
 
         _logicalLayer.registerTrigger(
-                new InputTrigger(new MouseButtonLongPressedCondition(MouseButton.LEFT, 1500, 5), new TriggerAction() {
+                new InputTrigger(new MouseButtonPressedCondition(MouseButton.MIDDLE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
-                        showMenu();
+                        showMenu(inputStates.getCurrent());
                     }
                 }));
 
@@ -320,7 +321,7 @@ public class InteractUIExample extends ExampleBase {
                 .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                        showMenu();
+                        showMenu(inputStates.getCurrent());
                     }
                 }));
         manager.getLogicalLayer()
@@ -337,7 +338,7 @@ public class InteractUIExample extends ExampleBase {
 
     UIPieMenu menu;
 
-    protected void showMenu() {
+    protected void showMenu(final InputState state) {
         if (menu == null) {
             menu = new UIPieMenu(hud, 70, 200);
             menu.setTotalArcLength(MathUtils.PI);
@@ -346,54 +347,39 @@ public class InteractUIExample extends ExampleBase {
 
             final UIPieMenu addPie = new UIPieMenu(hud);
             menu.addItem(new UIPieMenuItem("Add Node...", null, addPie, 100));
-            addPie.addItem(new UIPieMenuItem("Before", null, true, new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent event) {
-                    final Spatial spat = manager.getSpatialTarget();
-                    if (spat == null) {
-                        return;
-                    }
-                    createMarkerBefore(spat);
+            addPie.addItem(new UIPieMenuItem("Before", null, true, event -> {
+                final Spatial spat = manager.getSpatialTarget();
+                if (spat == null) {
+                    return;
                 }
+                createMarkerBefore(spat);
             }));
-            addPie.addItem(new UIPieMenuItem("After", null, true, new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent event) {
-                    final Spatial spat = manager.getSpatialTarget();
-                    if (spat == null) {
-                        return;
-                    }
-                    createMarkerAfter(spat);
+            addPie.addItem(new UIPieMenuItem("After", null, true, event -> {
+                final Spatial spat = manager.getSpatialTarget();
+                if (spat == null) {
+                    return;
                 }
+                createMarkerAfter(spat);
             }));
 
             final UIPieMenu remPie = new UIPieMenu(hud);
-            remPie.addItem(new UIPieMenuItem("Node", null, true, new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent event) {
-                    final Spatial spat = manager.getSpatialTarget();
-                    if (spat == null) {
-                        return;
-                    }
-                    removeMarker(spat);
-                }
-            }));
-            menu.addItem(new UIPieMenuItem("Delete...", null, remPie, 100));
-
-            menu.setCenterItem(new UIPieMenuItem("Cancel", null, true, new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent event) {
+            remPie.addItem(new UIPieMenuItem("Node", null, true, event -> {
+                final Spatial spat = manager.getSpatialTarget();
+                if (spat == null) {
                     return;
                 }
+                removeMarker(spat);
             }));
 
-            menu.addItem(new UIPieMenuItem("Reset Node", null, true, new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent event) {
-                    final Spatial spat = manager.getSpatialTarget();
-                    if (spat == null) {
-                        return;
-                    }
+            menu.addItem(new UIPieMenuItem("Delete...", null, remPie, 100));
+
+            menu.setCenterItem(new UIPieMenuItem("Cancel", null, true, event -> {
+            }));
+
+            menu.addItem(new UIPieMenuItem("Reset Node", null, true, event -> {
+                final Spatial spat = manager.getSpatialTarget();
+                if (spat == null) {
+                    return;
                 }
             }));
             menu.updateMinimumSizeFromContents();
@@ -413,9 +399,10 @@ public class InteractUIExample extends ExampleBase {
         tempVec.set(Camera.getCurrentCamera().getScreenCoordinates(spat.getWorldTransform().applyForward(tempVec)));
         tempVec.setZ(0);
         menu.showAt((int) tempVec.getX(), (int) tempVec.getY());
+        _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
         _mouseManager.setPosition((int) tempVec.getX(), (int) tempVec.getY());
         if (menu.getCenterItem() != null) {
-            menu.getCenterItem().mouseEntered((int) tempVec.getX(), (int) tempVec.getY(), null);
+            menu.getCenterItem().mouseEntered((int) tempVec.getX(), (int) tempVec.getY(), state);
         }
     }
 
