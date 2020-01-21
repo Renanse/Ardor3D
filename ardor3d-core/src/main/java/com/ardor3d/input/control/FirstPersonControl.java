@@ -219,9 +219,8 @@ public class FirstPersonControl {
 
     public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
         // Mouse look
-        final Predicate<TwoInputStates> someMouseDown = TriggerConditions.leftButtonDown()
-                .or(TriggerConditions.rightButtonDown()).or(TriggerConditions.middleButtonDown());
-        final Predicate<TwoInputStates> dragged = TriggerConditions.mouseMoved().and(someMouseDown);
+        final Predicate<TwoInputStates> dragged = TriggerConditions.mouseMoved()
+                .and(TriggerConditions.leftButtonDown());
         final TriggerAction dragAction = new TriggerAction() {
 
             // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
