@@ -65,7 +65,7 @@ public class UIHud extends Node {
     /**
      * The single tooltip used by this hud - lazy inited
      */
-    private UITooltip _ttip;
+    protected UITooltip _ttip;
 
     /**
      * Internal flag indicating whether the last input event was consumed by the UI. This is used to decide if we will
@@ -82,57 +82,54 @@ public class UIHud extends Node {
     /**
      * Flag used to determine if we should use mouse input when mouse is grabbed. Defaults to true.
      */
-    private boolean _ignoreMouseInputOnGrabbed = true;
+    protected boolean _ignoreMouseInputOnGrabbed = true;
 
     /** Which button is used for drag operations. Defaults to LEFT. */
-    private MouseButton _dragButton = MouseButton.LEFT;
+    protected MouseButton _dragButton = MouseButton.LEFT;
 
     /** Tracks the previous component our mouse was over so we can properly handle mouse entered and departed events. */
-    private UIComponent _lastMouseOverComponent;
+    protected UIComponent _lastMouseOverComponent;
 
     /** Tracks last mouse location so we can detect movement. */
-    private int _lastMouseX, _lastMouseY;
+    protected int _lastMouseX, _lastMouseY;
 
     /** Tracks last mouse pressed so we can detect clicks. */
-    private int _mousePressedX, _mousePressedY;
+    protected int _mousePressedX, _mousePressedY;
 
     /**
      * List of potential drag listeners. When a drag operation is detected, we will offer it to each item in the list
      * until one accepts it.
      */
-    private final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
+    protected final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
 
     /** Our current drag listener. When an drag finished, this is set back to null. */
-    private DragListener _dragListener = null;
+    protected DragListener _dragListener = null;
 
     /** The component that currently has key focus - key events will be sent to this component. */
-    private UIComponent _focusedComponent = null;
-
-    /** The last component to be pressed. This component will receive any next mouseUp event. */
-    private UIComponent _mousePressedComponent = null;
+    protected UIComponent _focusedComponent = null;
 
     /**
      * List of hud listeners.
      */
-    private final List<HudListener> _hudListeners = new ArrayList<>();
+    protected final List<HudListener> _hudListeners = new ArrayList<>();
 
     /**
      * An optional mouseManager, required in order to test mouse is grabbed.
      */
-    private MouseManager _mouseManager;
+    protected MouseManager _mouseManager;
 
     /**
      * The list of currently displayed pop-overs, with each entry being a "child" of the one previous.
      */
-    private final List<IPopOver> _popovers = new ArrayList<>();
+    protected final List<IPopOver> _popovers = new ArrayList<>();
 
-    private final Canvas _canvas;
+    protected final Canvas _canvas;
 
-    private UIInputPostHook _postKeyboardHook;
+    protected UIInputPostHook _postKeyboardHook;
 
-    private UIInputPostHook _postMouseHook;
+    protected UIInputPostHook _postMouseHook;
 
-    private final Camera _hudCamera;
+    protected final Camera _hudCamera;
 
     /**
      * Construct a new UIHud for a given canvas
@@ -205,11 +202,6 @@ public class UIHud extends Node {
         // first lose focus, if appropriate
         if (_focusedComponent != null && (_focusedComponent == component || _focusedComponent.hasAncestor(component))) {
             setFocusedComponent(null);
-        }
-        // drop our mouse pressed component if applicable
-        if (_mousePressedComponent != null
-                && (_mousePressedComponent == component || _mousePressedComponent.hasAncestor(component))) {
-            _mousePressedComponent = null;
         }
         // drop our last mouse over component if applicable
         if (_lastMouseOverComponent != null
@@ -714,7 +706,6 @@ public class UIHud extends Node {
         final UIComponent over = getUIComponent(mouseX, mouseY);
 
         setFocusedComponent(over);
-        _mousePressedComponent = over;
         _mousePressedX = mouseX;
         _mousePressedY = mouseY;
 
@@ -761,22 +752,19 @@ public class UIHud extends Node {
     public boolean fireMouseButtonReleased(final MouseButton button, final InputState currentIS) {
         boolean consumed = false;
         final int mouseX = currentIS.getMouseState().getX(), mouseY = currentIS.getMouseState().getY();
+        final UIComponent over = getUIComponent(mouseX, mouseY);
 
-        // if we have previously sent a component a mouseDown, send it the release event
-        final UIComponent component = _mousePressedComponent;
-        _mousePressedComponent = null;
-
-        if (component != null) {
-            consumed |= component.mouseReleased(button, currentIS);
+        if (over != null) {
+            consumed |= over.mouseReleased(button, currentIS);
             final int distance = Math.abs(mouseX - _mousePressedX) + Math.abs(mouseY - _mousePressedY);
 
             if (distance < UIHud.MOUSE_CLICK_SENSITIVITY) {
-                component.mouseClicked(button, currentIS);
+                over.mouseClicked(button, currentIS);
             }
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.endDrag(component, mouseX, mouseY);
+            _dragListener.endDrag(over, mouseX, mouseY);
             _dragListener = null;
             consumed = true;
         }
@@ -999,5 +987,9 @@ public class UIHud extends Node {
 
     public boolean isAutoConsumeMouseOnOver() {
         return _autoConsumeMouseOnOver;
+    }
+
+    public boolean isDragging(final InputState state) {
+        return state != null && state.getMouseState().getButtonState(getDragButton()) == ButtonState.DOWN;
     }
 }
