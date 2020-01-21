@@ -75,6 +75,7 @@ public class PopOverUIExample extends ExampleBase implements ActionListener {
         box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
         box.setModelBound(new BoundingBox());
         box.setTranslation(new Vector3(0, 0, -15));
+        box.setRenderMaterial("lit/textured/basic_phong.yaml");
         _root.attachChild(box);
 
         setTexture("Logo");

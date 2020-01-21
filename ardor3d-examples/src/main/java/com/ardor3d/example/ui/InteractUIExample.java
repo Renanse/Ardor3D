@@ -140,7 +140,7 @@ public class InteractUIExample extends ExampleBase {
         floor.setRenderState(ts);
         floor.getSceneHints().setPickingHint(PickingHint.Pickable, false);
         floor.setModelBound(new BoundingBox());
-        floor.setRenderMaterial("unlit/textured/basic.yaml");
+        floor.setRenderMaterial("lit/textured/basic_phong.yaml");
         _root.attachChild(floor);
         _root.updateGeometricState(0);
     }
@@ -198,7 +198,7 @@ public class InteractUIExample extends ExampleBase {
                 }
             }
         });
-        t.setRenderMaterial("unlit/untextured/basic.yaml");
+        t.setRenderMaterial("lit/untextured/basic_phong.yaml");
         _root.attachChild(t);
         path.add(t);
         return t;
