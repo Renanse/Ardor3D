@@ -21,6 +21,8 @@ import com.ardor3d.math.Vector3;
  */
 public class UIPieMenuItem extends UIMenuItem {
 
+    protected int _subMenuSize = 0;
+
     public UIPieMenuItem(final String text) {
         this(text, null);
     }
@@ -36,14 +38,17 @@ public class UIPieMenuItem extends UIMenuItem {
 
     public UIPieMenuItem(final String text, final SubTex icon, final UIPieMenu subMenu, final int size) {
         super(text, icon, false, null);
+        _subMenu = subMenu;
+        _subMenuSize = size;
         addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                showSubMenu(subMenu, size);
+                showSubMenu();
             }
         });
     }
 
-    protected void showSubMenu(final UIPieMenu subMenu, final int size) {
+    @Override
+    protected void showSubMenu() {
         final UIHud hud = getHud();
         if (hud == null) {
             return;
@@ -51,10 +56,11 @@ public class UIPieMenuItem extends UIMenuItem {
 
         boolean setup = false;
         final Vector3 showAt = new Vector3(getWorldTranslation());
+        final UIPieMenu subMenu = (UIPieMenu) _subMenu;
         if (getParent() instanceof UIPieMenu) {
             final UIPieMenu pie = (UIPieMenu) getParent();
             if (pie.getCenterItem() != this) {
-                subMenu.setOuterRadius(pie.getOuterRadius() + size);
+                subMenu.setOuterRadius(pie.getOuterRadius() + _subMenuSize);
                 subMenu.setInnerRadius(pie.getOuterRadius());
                 subMenu.setTotalArcLength(pie.getSliceRadians());
                 subMenu.setStartAngle(pie.getSliceIndex(this) * pie.getSliceRadians() + pie.getStartAngle());
@@ -64,7 +70,7 @@ public class UIPieMenuItem extends UIMenuItem {
             }
         }
         if (!setup) {
-            subMenu.setOuterRadius(size);
+            subMenu.setOuterRadius(_subMenuSize);
             subMenu.setInnerRadius(0);
             subMenu.setTotalArcLength(MathUtils.TWO_PI);
             subMenu.setStartAngle(0);
