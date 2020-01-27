@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -67,7 +67,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Construct a new button with the given text.
-     * 
+     *
      * @param text
      */
     public UIButton(final String text) {
@@ -76,7 +76,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Construct a new button with the given text and icon.
-     * 
+     *
      * @param text
      * @param icon
      */
@@ -106,7 +106,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Add the specified listener to this button's list of listeners notified when pressed.
-     * 
+     *
      * @param listener
      */
     public void addActionListener(final ActionListener listener) {
@@ -115,7 +115,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Remove the given listener from the notification list.
-     * 
+     *
      * @param listener
      */
     public boolean removeActionListener(final ActionListener listener) {
@@ -195,7 +195,7 @@ public class UIButton extends AbstractLabelUIComponent {
     /**
      * If selectable, set this button's state to either selected (true) or default (false) - or disabled versions of
      * each if currently disabled.
-     * 
+     *
      * @param selected
      */
     public void setSelected(boolean selected) {
@@ -297,7 +297,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Sets the text on this button and all contained states.
-     * 
+     *
      * @param text
      *            the new text
      */
@@ -312,7 +312,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Sets the text on this button and all contained states.
-     * 
+     *
      * @param text
      *            the new text
      * @param isStyled
@@ -331,7 +331,7 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /**
      * Sets the icon on this button and all contained states.
-     * 
+     *
      * @param icon
      *            the new icon
      */
@@ -369,7 +369,14 @@ public class UIButton extends AbstractLabelUIComponent {
 
         @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
-            switchState(getMouseOverState());
+            final UIHud hud = UIButton.this.getHud();
+            final boolean drag = hud != null && hud.isDragging(state);
+            if (!drag) {
+                switchState(getMouseOverState());
+                return;
+            } else if (hud.getFocusedComponent() == UIButton.this) {
+                switchState(getPressedState());
+            }
         }
 
         @Override
@@ -416,7 +423,12 @@ public class UIButton extends AbstractLabelUIComponent {
 
         @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
-            switchState(getMouseOverSelectedState());
+            final UIHud hud = UIButton.this.getHud();
+            final boolean drag = hud != null && hud.isDragging(state);
+            if (!drag || hud.getFocusedComponent() == UIButton.this) {
+                switchState(getMouseOverSelectedState());
+                return;
+            }
         }
 
         @Override

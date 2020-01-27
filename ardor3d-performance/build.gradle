@@ -1,8 +1,8 @@
 
 description = 'Ardor 3D Performance'
 dependencies {
-  compile project(':ardor3d-savable')
-  compile project(':ardor3d-math')
-  compile project(':ardor3d-core')
+  api project(':ardor3d-savable')
+  api project(':ardor3d-math')
+  api project(':ardor3d-core')
   implementation 'javax.vecmath:vecmath:1.5.2'
 }

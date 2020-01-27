@@ -10,6 +10,7 @@
 package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.layout.RowLayout;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
 
@@ -17,6 +18,12 @@ import com.ardor3d.scenegraph.visitor.Visitor;
  * A special frame meant to display menu items.
  */
 public class UIPopupMenu extends UIContainer implements IPopOver {
+
+    public enum SubMenuBehavior {
+        INHERIT, HOVER_OPEN, CLICK_TO_OPEN
+    }
+
+    private SubMenuBehavior _subMenuBehavior = SubMenuBehavior.INHERIT;
 
     public UIPopupMenu() {
         super();
@@ -86,5 +93,25 @@ public class UIPopupMenu extends UIContainer implements IPopOver {
 
         hud.remove(this);
         _parent = null;
+    }
+
+    public SubMenuBehavior getSubMenuBehavior() {
+        if (_subMenuBehavior == SubMenuBehavior.INHERIT) {
+            final Node parent = getParent();
+            if (parent instanceof UIPopupMenu) {
+                return ((UIPopupMenu) parent).getSubMenuBehavior();
+            } else {
+                return SubMenuBehavior.HOVER_OPEN;
+            }
+        }
+        return _subMenuBehavior;
+    }
+
+    public SubMenuBehavior getLocalSubMenuBehavior() {
+        return _subMenuBehavior;
+    }
+
+    public void setSubMenuBehavior(final SubMenuBehavior behavior) {
+        _subMenuBehavior = behavior;
     }
 }

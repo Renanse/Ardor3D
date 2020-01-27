@@ -23,7 +23,7 @@ subprojects {
     	mavenCentral()
 		
 		maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-		maven { url "http://repo.maven.apache.org/maven2" }
+		maven { url "https://repo.maven.apache.org/maven2" }
 		//maven { url "http://jogamp.org/deployment/maven" }
 	}
 
