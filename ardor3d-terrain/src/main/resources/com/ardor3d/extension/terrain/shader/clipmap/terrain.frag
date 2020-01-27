@@ -48,6 +48,6 @@ void main()
     float fogAmount = calcFogAmount(fogParams, abs(dist));
     FragColor = mix(tint * texCol, fogParams.color, fogAmount);
 #else
-    FragColor = texCol;
+    FragColor = tint * texCol;
 #endif
 }
