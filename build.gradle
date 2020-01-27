@@ -1,7 +1,7 @@
 allprojects  {
-	apply plugin: 'maven'
+	apply plugin: 'java-library'
 	group = 'com.ardor3d'
-	version = '1.0.3'
+	version = '1.0.4'
 }
 
 subprojects {
@@ -47,7 +47,7 @@ subprojects {
 	}
 	
 	dependencies {
-		testCompile group: 'junit', name: 'junit', version:'4.10'
-		testCompile group: 'org.easymock', name: 'easymockclassextension', version:'2.4'
+		testImplementation group: 'junit', name: 'junit', version:'4.10'
+		testImplementation group: 'org.easymock', name: 'easymockclassextension', version:'2.4'
 	}
 }
