@@ -16,6 +16,7 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.scenegraph.Node;
 
 /**
@@ -36,6 +37,12 @@ public class UIMenuItem extends UIButton {
     public UIMenuItem(final String text, final SubTex icon, final boolean closeMenuOnSelect,
             final ActionListener listener) {
         super(text, icon);
+
+        _defaultState = new DefaultState();
+        _pressedState = new PressedState();
+        _mouseOverState = new MouseOverState();
+        applySkin();
+        switchState(_defaultState);
 
         if (listener != null) {
             addActionListener(listener);
@@ -79,7 +86,7 @@ public class UIMenuItem extends UIButton {
         final UIPopupMenu.SubMenuBehavior behavior = getMenuBehavior();
         if (behavior == SubMenuBehavior.HOVER_OPEN) {
             if (state != null && state.getMouseState().getButtonStates().containsValue(ButtonState.DOWN)) {
-                switchState(_pressedState);
+                switchState(getMouseOverState());
             }
             if (_subMenu != null) {
                 showSubMenu();
@@ -100,5 +107,54 @@ public class UIMenuItem extends UIButton {
             return ((UIPopupMenu) parent).getSubMenuBehavior();
         }
         return SubMenuBehavior.HOVER_OPEN;
+    }
+
+    class DefaultState extends LabelState {
+
+        @Override
+        public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
+            switchState(getMouseOverState());
+        }
+
+        @Override
+        public boolean mousePressed(final MouseButton button, final InputState state) {
+            switchState(getPressedState());
+            return true;
+        }
+    }
+
+    class PressedState extends LabelState {
+
+        @Override
+        public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
+            switchState(getDefaultState());
+        }
+
+        @Override
+        public boolean mouseReleased(final MouseButton button, final InputState state) {
+            switchState(getMouseOverState());
+            fireActionEvent();
+            return true;
+        }
+    }
+
+    class MouseOverState extends LabelState {
+
+        @Override
+        public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
+            switchState(getDefaultState());
+        }
+
+        @Override
+        public boolean mousePressed(final MouseButton button, final InputState state) {
+            switchState(getPressedState());
+            return true;
+        }
+
+        @Override
+        public boolean mouseReleased(final MouseButton button, final InputState state) {
+            fireActionEvent();
+            return true;
+        }
     }
 }
