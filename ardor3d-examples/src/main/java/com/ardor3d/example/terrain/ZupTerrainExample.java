@@ -172,7 +172,7 @@ public class ZupTerrainExample extends ExampleBase {
             final TerrainDataProvider terrainDataProvider = new ArrayTerrainDataProvider(heightMap, SIZE,
                     new Vector3(1, 300, 1));
 
-            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).setShowDebugPanels(true).build();
+            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
             terrain.setRenderMaterial("clipmap/terrain_textured.yaml");
 
             terrain.setRotation(new Quaternion().fromAngleAxis(MathUtils.HALF_PI, Vector3.UNIT_X));

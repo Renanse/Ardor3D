@@ -191,7 +191,7 @@ public class ShadowedTerrainExample extends ExampleBase {
             final TerrainDataProvider terrainDataProvider = new ArrayTerrainDataProvider(heightMap, SIZE,
                     new Vector3(1, 300, 1));
 
-            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).setShowDebugPanels(true).build();
+            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
 
 //            terrain.setPixelShader(
 //                    new UrlInputSupplier(ResourceLocatorTool.getClassPathResource(ShadowedTerrainExample.class,

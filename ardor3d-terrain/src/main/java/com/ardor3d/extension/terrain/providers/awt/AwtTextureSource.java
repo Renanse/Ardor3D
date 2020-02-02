@@ -80,7 +80,7 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
     }
 
     @Override
-    public TextureConfiguration getConfiguration() throws Exception {
+    public TextureConfiguration getConfiguration() {
         final Map<Integer, TextureStoreFormat> textureStoreFormat = new HashMap<>();
         textureStoreFormat.put(0, format);
 

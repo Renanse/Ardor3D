@@ -54,7 +54,7 @@ public class ProceduralNormalMapSource implements TextureSource {
     }
 
     @Override
-    public TextureConfiguration getConfiguration() throws Exception {
+    public TextureConfiguration getConfiguration() {
         final Map<Integer, TextureStoreFormat> textureStoreFormat = new HashMap<>();
         textureStoreFormat.put(0, TextureStoreFormat.RGB8);
 

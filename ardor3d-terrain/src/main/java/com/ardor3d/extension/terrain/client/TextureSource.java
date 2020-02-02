@@ -12,14 +12,11 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
  */
 public interface TextureSource {
     /**
-     * Called to initialize and setup the texture clipmap.
+     * Called to get the configuration used by this source.
      *
-     * @param mapID
-     *            Map to get configuration for.
-     * @return
-     * @throws Exception
+     * @return TextureConfiguration
      */
-    TextureConfiguration getConfiguration() throws Exception;
+    TextureConfiguration getConfiguration();
 
     /**
      * Returns which tiles contain data in the requested region. May return null to indicate all tiles are invalid, or

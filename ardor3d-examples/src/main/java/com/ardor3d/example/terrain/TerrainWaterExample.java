@@ -256,7 +256,7 @@ public class TerrainWaterExample extends ExampleBase {
             final TerrainDataProvider terrainDataProvider = new ProceduralTerrainDataProvider(function,
                     new Vector3(1, 200, 1), -1.2f, 1.2f);
 
-            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).setShowDebugPanels(true).build();
+            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
             terrain.setRenderMaterial("clipmap/terrain_textured.yaml");
 
         } catch (final Exception ex1) {

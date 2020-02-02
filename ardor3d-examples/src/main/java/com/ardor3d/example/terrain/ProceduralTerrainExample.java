@@ -161,7 +161,7 @@ public class ProceduralTerrainExample extends ExampleBase {
             final TerrainDataProvider terrainDataProvider = new ProceduralTerrainDataProvider(function,
                     new Vector3(6, 300, 6), -1.2f, 1.2f);
 
-            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).setShowDebugPanels(true).build();
+            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
             terrain.setRenderMaterial("clipmap/terrain_textured_normal_map.yaml");
 
             _root.attachChild(terrain);

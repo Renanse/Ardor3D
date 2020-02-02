@@ -181,7 +181,7 @@ public class ArrayTerrainExample extends ExampleBase {
             final TerrainDataProvider terrainDataProvider = new ArrayTerrainDataProvider(heightMap, SIZE,
                     new Vector3(1, 300, 1), true);
 
-            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).setShowDebugPanels(true).build();
+            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
             terrain.setRenderMaterial("clipmap/terrain_textured_normal_map.yaml");
 
             _root.attachChild(terrain);

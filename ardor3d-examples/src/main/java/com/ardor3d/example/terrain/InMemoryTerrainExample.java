@@ -156,7 +156,7 @@ public class InMemoryTerrainExample extends ExampleBase {
 
             final TerrainDataProvider terrainDataProvider = new InMemoryTerrainDataProvider(inMemoryTerrainData, true);
 
-            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).setShowDebugPanels(true).build();
+            terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
             terrain.setRenderMaterial("clipmap/terrain_textured.yaml");
 
             _root.attachChild(terrain);

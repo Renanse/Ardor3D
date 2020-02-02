@@ -183,7 +183,7 @@ public class ShapesPlusProceduralTerrainExample extends ExampleBase {
 
             final TerrainBuilder terrainBuilder = new TerrainBuilder(baseTerrainDataProvider, terrainCamera);
             terrainBuilder.addTextureConnection(awtTextureSource);
-            terrain = terrainBuilder.setShowDebugPanels(true).build();
+            terrain = terrainBuilder.withShowDebugPanels(true).build();
             terrain.setRenderMaterial("clipmap/terrain_textured.yaml");
 
             _root.attachChild(terrain);

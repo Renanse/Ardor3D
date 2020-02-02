@@ -290,7 +290,7 @@ public class MountainShadowTerrainExample extends ExampleBase {
             terrainDataProvider.setHeightMax(0.34f);
 
             final TerrainBuilder builder = new TerrainBuilder(terrainDataProvider, terrainCamera)
-                    .setShowDebugPanels(true);
+                    .withShowDebugPanels(true);
 
             terrain = builder.build();
 //            terrain.setPixelShader(

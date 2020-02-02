@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.extension.terrain.client.TerrainBuilder.BuildConfiguration;
 import com.ardor3d.extension.terrain.util.AbstractBresenhamTracer;
 import com.ardor3d.extension.terrain.util.ClipmapTerrainPicker;
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
@@ -45,31 +46,34 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  */
 public class Terrain extends Node implements Pickable, Runnable {
     /** Our picker. */
-    private ClipmapTerrainPicker _picker = null;
+    protected ClipmapTerrainPicker _picker = null;
 
-    private List<ClipmapLevel> _clips;
-    private int _visibleLevels = 0;
-    private int _minVisibleLevel = 0;
-    private final Camera _terrainCamera;
-    private final int _clipSideSize;
+    protected final BuildConfiguration _buildConfig;
 
-    private final BlendState blendState;
+    protected List<ClipmapLevel> _clips;
+    protected int _visibleLevels = 0;
+    protected int _minVisibleLevel = 0;
+    protected final Camera _terrainCamera;
+    protected final int _clipSideSize;
+    protected final TerrainConfiguration _terrainConfiguration;
+
+    protected final BlendState blendState;
 
     /** Reference to the texture clipmap */
-    private final List<TextureClipmap> _textureClipmaps = new ArrayList<>();
+    protected final List<TextureClipmap> _textureClipmaps = new ArrayList<>();
 
     /** Reference to normal map */
-    private TextureClipmap _normalClipmap;
-    private int _normalUnit;
+    protected TextureClipmap _normalClipmap;
+    protected int _normalUnit;
 
-    private final Vector3 transformedFrustumPos = new Vector3();
+    protected final Vector3 transformedFrustumPos = new Vector3();
 
-    private final DoubleBufferedList<Region> mailBox = new DoubleBufferedList<Region>();
+    protected final DoubleBufferedList<Region> mailBox = new DoubleBufferedList<Region>();
 
     /** Timers for mailbox updates */
-    private long oldTime = 0;
-    private long updateTimer = 0;
-    private final long updateThreashold = 300;
+    protected long oldTime = 0;
+    protected long updateTimer = 0;
+    protected final long updateThreashold = 300;
 
     protected boolean runCacheThread = true;
     protected Thread cacheThread;
@@ -78,17 +82,19 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     final TextureState clipTextureState = new TextureState();
 
-    private final Comparator<Region> regionSorter = new Comparator<Region>() {
+    protected final Comparator<Region> regionSorter = new Comparator<Region>() {
         @Override
         public int compare(final Region r1, final Region r2) {
             return r1.getLevel() - r2.getLevel();
         }
     };
 
-    public Terrain(final Camera camera, final List<TerrainCache> cacheList, final int clipSideSize,
+    public Terrain(final BuildConfiguration buildConfig, final List<TerrainCache> cacheList,
             final TerrainConfiguration terrainConfiguration) {
-        _terrainCamera = camera;
-        _clipSideSize = clipSideSize;
+        _buildConfig = buildConfig;
+        _terrainCamera = buildConfig.camera;
+        _clipSideSize = buildConfig.clipmapTerrainSize;
+        _terrainConfiguration = terrainConfiguration;
 
         _worldBound = new BoundingBox(Vector3.ZERO, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
                 Double.POSITIVE_INFINITY);
@@ -117,7 +123,7 @@ public class Terrain extends Node implements Pickable, Runnable {
             for (int i = 0; i < cacheList.size(); i++) {
                 final TerrainCache cache = cacheList.get(i);
                 cache.setMailBox(mailBox);
-                final ClipmapLevel clipmap = new ClipmapLevel(i, camera, clipSideSize, heightScale, cache);
+                final ClipmapLevel clipmap = new ClipmapLevel(i, _terrainCamera, _clipSideSize, heightScale, cache);
                 _clips.add(clipmap);
                 attachChild(clipmap);
             }
@@ -136,7 +142,7 @@ public class Terrain extends Node implements Pickable, Runnable {
         this.updateWorldRenderStates(true);
     }
 
-    private final List<Long> timers = new ArrayList<>();
+    protected final List<Long> timers = new ArrayList<>();
 
     @Override
     protected void updateChildren(final double time) {
@@ -297,7 +303,7 @@ public class Terrain extends Node implements Pickable, Runnable {
         }
     }
 
-    private void updateFromMailbox() {
+    protected void updateFromMailbox() {
         if (updateTimer > updateThreashold) {
             final List<Region> regionList = mailBox.switchAndGet();
             if (!regionList.isEmpty()) {
@@ -360,7 +366,7 @@ public class Terrain extends Node implements Pickable, Runnable {
         oldTime = time;
     }
 
-    private void recursiveAddUpdates(final List<Region> regionList, final int level, final int x, final int y,
+    protected void recursiveAddUpdates(final List<Region> regionList, final int level, final int x, final int y,
             final int width, final int height) {
         if (level == 0) {
             return;
@@ -374,8 +380,8 @@ public class Terrain extends Node implements Pickable, Runnable {
         }
     }
 
-    private final Vector3 _boundsCenter = new Vector3();
-    private final Vector3 _boundsExtents = new Vector3();
+    protected final Vector3 _boundsCenter = new Vector3();
+    protected final Vector3 _boundsExtents = new Vector3();
 
     @Override
     public void updateWorldBound(final boolean recurse) {
@@ -574,6 +580,14 @@ public class Terrain extends Node implements Pickable, Runnable {
         return 0;
     }
 
+    public Camera getTerrainCamera() {
+        return _terrainCamera;
+    }
+
+    public TerrainConfiguration getTerrainConfiguration() {
+        return _terrainConfiguration;
+    }
+
     /**
      * Get height of the terrain at the given world coordinates. This height will correlate to the finest level of
      * detail, currently valid clipmap level at the given coordinates.
@@ -595,6 +609,10 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     public void shutdown() {
         runCacheThread = false;
+    }
+
+    public BuildConfiguration getBuildConfig() {
+        return _buildConfig;
     }
 
     public TextureState getClipTextureState() {
