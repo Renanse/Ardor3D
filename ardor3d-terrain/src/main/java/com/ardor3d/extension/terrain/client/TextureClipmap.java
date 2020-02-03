@@ -114,9 +114,9 @@ public class TextureClipmap {
         textureLevels = roundUpPowerTwo(validLevels);
         density = textureConfiguration.getTextureDensity();
 
-        TextureClipmap.logger.info("Texture size: " + textureSize);
-        TextureClipmap.logger.info("ValidLevels: " + validLevels);
-        TextureClipmap.logger.info("3D Texture depth: " + textureLevels);
+        TextureClipmap.logger.fine("Texture size: " + textureSize);
+        TextureClipmap.logger.fine("ValidLevels: " + validLevels);
+        TextureClipmap.logger.fine("3D Texture depth: " + textureLevels);
 
         sliceDataBuffer = BufferUtils.createFloatBuffer(textureLevels * 2);
         sliceDataCopy = BufferUtils.createFloatBuffer(textureLevels * 2);
@@ -127,8 +127,6 @@ public class TextureClipmap {
 
         createTexture();
     }
-
-    private final List<Long> timers = new ArrayList<>();
 
     public void prepareToDrawClips(final Terrain terrain) {
         sliceDataCopy.clear();
@@ -155,75 +153,34 @@ public class TextureClipmap {
         eyePosition.set(eyePos);
         eyePosition.multiplyLocal(density);
 
+        currentShownLevels = -1;
         for (int unit = minVisibleLevel; unit < validLevels; unit++) {
-            if (cacheList.get(unit).isValid()) {
-                currentShownLevels = unit;
-                break;
-            }
-        }
-
-        // TODO: improve calcs for removing levels based on height above terrain
-        // if (eyePosition.getYf() > heightRangeMax) {
-        // final float diff = eyePosition.getYf() - heightRangeMax;
-        // final float x = (float) (diff * Math.tan(Math.toRadians(80)));
-        // for (int unit = currentShownLevels; unit < validLevels; unit++) {
-        // final float heightTest = scale * textureSize * MathUtils.pow2(unit) / x;
-        // if (heightTest > 1) {
-        // currentShownLevels = unit;
-        // break;
-        // }
-        // }
-        // }
-
-        while (timers.size() < currentShownLevels) {
-            timers.add(System.currentTimeMillis());
-        }
-
-        // walk through clipmaps that are already valid and go ahead and update them periodically
-        for (int unit = 0; unit < currentShownLevels; unit++) {
-            final long t = System.currentTimeMillis() - timers.get(unit);
-            if (t > 500) {
-                timers.set(unit, System.currentTimeMillis());
-
-                float x = eyePosition.getXf();
-                float y = eyePosition.getZf();
-
-                final int exp2 = MathUtils.pow2(unit);
-                x /= exp2;
-                y /= exp2;
-
-                final int offX = MathUtils.floor(x);
-                final int offY = MathUtils.floor(y);
-
-                final LevelData levelData = levelDataList.get(unit);
-
-                if (levelData.x != offX || levelData.y != offY) {
-                    final TextureCache cache = cacheList.get(unit);
-                    cache.setCurrentPosition(offX, offY);
-                }
-            }
-        }
-
-        // Walk backwards through clips that are not currently valid and update them
-        for (int unit = validLevels - 1; unit >= currentShownLevels; unit--) {
-            // calculate the anchor of the clipmap using our eye pos
-            float x = eyePosition.getXf();
-            float y = eyePosition.getZf();
-
+            // get our clip data and position
             final int exp2 = MathUtils.pow2(unit);
-            x /= exp2;
-            y /= exp2;
+            float x = eyePosition.getXf() / exp2;
+            float y = eyePosition.getZf() / exp2;
 
             final int offX = MathUtils.floor(x);
             final int offY = MathUtils.floor(y);
 
-            // Get our level data for this level
-            final LevelData levelData = levelDataList.get(unit);
+            final TextureCache cache = cacheList.get(unit);
+            cache.setCurrentPosition(offX, offY);
+
+            final boolean valid = cache.isValid();
+            if (!valid) {
+                // clip is not valid, so invalidate whatever we might have though was the lowest clip
+                currentShownLevels = -1;
+                continue;
+            }
+
+            // otherwise, clip is valid... should be fully loaded.
+            if (currentShownLevels == -1) {
+                currentShownLevels = unit;
+            }
 
             // If our anchor has shifted, update our level data info.
-            final TextureCache cache = cacheList.get(unit);
+            final LevelData levelData = levelDataList.get(unit);
             if (levelData.x != offX || levelData.y != offY) {
-                cache.setCurrentPosition(offX, offY);
                 // this also calls updateQuick on level
                 updateLevel(renderer, levelData, offX, offY);
             }
@@ -234,23 +191,25 @@ public class TextureClipmap {
                 final int sX = offX - textureSize / 2;
                 final int sY = offY - textureSize / 2;
 
-                // XXX: Perhaps this could find out a subregion of the tile that had changed and update just that, but
-                // for now we will update the full level.
+                // XXX: Perhaps this could find out a subregion of the tile that had changed and update just that,
+                // but for now we will update the full level.
                 updateQuick(renderer, levelData, textureSize + 1, textureSize + 1, sX, sY, levelData.offsetX,
                         levelData.offsetY, textureSize, textureSize);
             }
 
             // calculate values used to shift texcoords in shader
-            int shiftX = levelData.x;
-            int shiftY = levelData.y;
-            shiftX = MathUtils.moduloPositive(shiftX, 2);
-            shiftY = MathUtils.moduloPositive(shiftY, 2);
+            final int shiftX = MathUtils.moduloPositive(levelData.x, 2);
+            final int shiftY = MathUtils.moduloPositive(levelData.y, 2);
 
             x = (MathUtils.moduloPositive(x, 2) - shiftX + levelData.offsetX) / textureSize;
             y = (MathUtils.moduloPositive(y, 2) - shiftY + levelData.offsetY) / textureSize;
 
             sliceDataBuffer.put(unit * 2, x);
             sliceDataBuffer.put(unit * 2 + 1, y);
+        }
+
+        if (currentShownLevels == -1) {
+            currentShownLevels = validLevels - 1;
         }
 
         sliceDataBuffer.rewind();
