@@ -12,6 +12,7 @@ package com.ardor3d.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.material.fog.FogParams;
@@ -26,7 +27,11 @@ import com.ardor3d.scenegraph.Spatial;
 
 public abstract class MaterialUtil {
 
-    private MaterialUtil() {}
+    /** Our class logger */
+    private static final Logger logger = Logger.getLogger(MaterialUtil.class.getName());
+
+    private MaterialUtil() {
+    }
 
     public static void autoMaterials(final Spatial spat) {
         autoMaterials(spat, false);
@@ -134,7 +139,7 @@ public abstract class MaterialUtil {
 
         material.append(".yaml");
 
-        System.out.println("Mesh material: " + material + " - " + mesh.getName());
+        logger.fine(() -> "Mesh material: " + material + " - " + mesh.getName());
 
         return material.toString();
     }
@@ -161,7 +166,7 @@ public abstract class MaterialUtil {
 
         material.append(".yaml");
 
-        System.out.println("Line material: " + material + " - " + line.getName());
+        logger.fine(() -> "Line material: " + material + " - " + line.getName());
 
         return material.toString();
     }

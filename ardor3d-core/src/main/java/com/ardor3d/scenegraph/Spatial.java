@@ -1249,7 +1249,7 @@ public abstract class Spatial implements Savable, Hintable {
      */
     public void addController(final SpatialController<?> controller) {
         if (_controllers == null) {
-            _controllers = new ArrayList<SpatialController<?>>(1);
+            _controllers = new ArrayList<>(1);
         }
         _controllers.add(controller);
     }
