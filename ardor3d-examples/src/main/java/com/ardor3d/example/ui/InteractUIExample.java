@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -19,10 +19,8 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.data.SpatialState;
-import com.ardor3d.extension.interact.filter.PlaneBoundaryFilter;
+import com.ardor3d.extension.interact.filter.AbstractDragDelayFilter;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
-import com.ardor3d.extension.interact.widget.BasicFilterList;
-import com.ardor3d.extension.interact.widget.IFilterList;
 import com.ardor3d.extension.interact.widget.MovePlanarWidget;
 import com.ardor3d.extension.interact.widget.MovePlanarWidget.MovePlane;
 import com.ardor3d.extension.ui.Orientation;
@@ -42,6 +40,7 @@ import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.model.DefaultComboBoxModel;
 import com.ardor3d.extension.ui.util.Insets;
+import com.ardor3d.extension.ui.util.UIArc;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.input.InputState;
@@ -54,16 +53,17 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.GrabbedState;
 import com.ardor3d.input.mouse.MouseButton;
+import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.Plane;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -98,6 +98,7 @@ public class InteractUIExample extends ExampleBase {
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
         manager.update(timer);
+        hud.updateGeometricState(timer.getTimePerFrame());
     }
 
     @Override
@@ -259,20 +260,17 @@ public class InteractUIExample extends ExampleBase {
         hud.setupInput(_physicalLayer, manager.getLogicalLayer());
         hud.setMouseManager(_mouseManager);
 
-        final BasicFilterList filterList = new BasicFilterList();
-
         // add some widgets.
-        insertWidget = new InsertMarkerUIWidget(filterList);
+        insertWidget = new InsertMarkerUIWidget();
         manager.addWidget(insertWidget);
 
-        colorWidget = new ColorSelectUIWidget(filterList);
+        colorWidget = new ColorSelectUIWidget();
         manager.addWidget(colorWidget);
 
-        pulseWidget = new PulseControlUIWidget(filterList);
+        pulseWidget = new PulseControlUIWidget();
         manager.addWidget(pulseWidget);
 
-        moveWidget = new MovePlanarWidget(filterList).withPlane(MovePlane.XZ).withDefaultHandle(.33, .33,
-                ColorRGBA.YELLOW);
+        moveWidget = new MovePlanarWidget().withPlane(MovePlane.XZ).withDefaultHandle(.33, .33, ColorRGBA.YELLOW);
         manager.addWidget(moveWidget);
 
         // set the default as current
@@ -332,9 +330,58 @@ public class InteractUIExample extends ExampleBase {
                     }
                 }));
 
-        // add some filters
-        manager.addFilter(new PlaneBoundaryFilter(new Plane(Vector3.UNIT_Y, 0)));
+        moveWidget.addFilter(new AbstractDragDelayFilter(.5f, .25f) {
+            @Override
+            protected void showTimerViz(final InteractManager manager, final AbstractInteractWidget widget,
+                    final MouseState current) {
+                if (timerArc == null) {
+                    timerArc = new UIArc("timer", MathUtils.TWO_PI / 60, 1, 0.5);
+                    timerArc.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+                    timerArc.setRenderMaterial("unlit/untextured/basic.yaml");
+                }
+                clearTimerViz(manager, widget, current, true);
+                timerArc.setDefaultColor(ColorRGBA.LIGHT_GRAY);
+                updateTimerViz(manager, widget, current, 0.0f);
+                if (timerArc.getParent() == null) {
+                    hud.attachChild(timerArc);
+                }
+            }
+
+            @Override
+            protected void updateTimerViz(final InteractManager manager, final AbstractInteractWidget widget,
+                    final MouseState current, final float percent) {
+                timerArc.resetGeometry(0, MathUtils.TWO_PI * percent, 30, 15, null, true);
+                timerArc.setTranslation(current.getX(), current.getY(), 0);
+                timerArc.updateGeometricState(0);
+            }
+
+            @Override
+            protected void clearTimerViz(final InteractManager manager, final AbstractInteractWidget widget,
+                    final MouseState current, final boolean immediate) {
+                if (timerArc.getParent() == null) {
+                    return;
+                }
+
+                if (immediate) {
+                    timerArc.removeFromParent();
+                    return;
+                }
+
+                clearTime = 0f;
+                timerArc.addController((dt, caller) -> {
+                    clearTime += dt;
+                    timerArc.setDefaultColor(ColorRGBA.WHITE);
+                    if (clearTime > 0.25f) {
+                        timerArc.clearControllers();
+                        timerArc.removeFromParent();
+                    }
+                });
+            }
+        });
     }
+
+    UIArc timerArc;
+    float clearTime;
 
     UIPieMenu menu;
 
@@ -428,9 +475,7 @@ public class InteractUIExample extends ExampleBase {
 
         UIPanel uiPanel;
 
-        public InsertMarkerUIWidget(final IFilterList filterList) {
-            super(filterList);
-
+        public InsertMarkerUIWidget() {
             createFrame();
         }
 
@@ -540,9 +585,7 @@ public class InteractUIExample extends ExampleBase {
         UIPanel uiPanel;
         ColorRGBA unconsumedColor;
 
-        public ColorSelectUIWidget(final IFilterList filterList) {
-            super(filterList);
-
+        public ColorSelectUIWidget() {
             createFrame();
         }
 
@@ -639,9 +682,7 @@ public class InteractUIExample extends ExampleBase {
         UIPanel uiPanel;
         Double unconsumedPulse;
 
-        public PulseControlUIWidget(final IFilterList filterList) {
-            super(filterList);
-
+        public PulseControlUIWidget() {
             createFrame();
         }
 

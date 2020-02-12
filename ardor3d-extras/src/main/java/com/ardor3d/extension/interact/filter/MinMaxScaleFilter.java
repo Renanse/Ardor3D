@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -12,11 +12,12 @@ package com.ardor3d.extension.interact.filter;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.data.SpatialState;
+import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
-public class MinMaxScaleFilter implements UpdateFilter {
+public class MinMaxScaleFilter extends UpdateFilterAdapter {
     protected Vector3 _minScale = new Vector3();
     protected Vector3 _maxScale = new Vector3();
 
@@ -31,7 +32,7 @@ public class MinMaxScaleFilter implements UpdateFilter {
     }
 
     @Override
-    public void applyFilter(final InteractManager manager) {
+    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
         final SpatialState state = manager.getSpatialState();
         final ReadOnlyVector3 scale = state.getTransform().getScale();
         final double x = MathUtils.clamp(scale.getX(), _minScale.getX(), _maxScale.getX());
@@ -40,10 +41,4 @@ public class MinMaxScaleFilter implements UpdateFilter {
 
         state.getTransform().setScale(x, y, z);
     }
-
-    @Override
-    public void beginDrag(final InteractManager manager) { /**/}
-
-    @Override
-    public void endDrag(final InteractManager manager) { /**/}
 }

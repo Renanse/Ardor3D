@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -12,23 +12,23 @@ package com.ardor3d.extension.interact.widget;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.UpdateFilter;
+import com.ardor3d.input.mouse.MouseState;
 
 /**
  * Provides a clean way to capture all of beginDrag, endDrag, and applyFilters. This scheme allows a compound widget to
- * implement IFilerList and pass itself to leaf widgets, who can then forward calls to the parent list.
- *
+ * implement IFilterList and pass itself to leaf widgets, who can then forward calls to the parent list.
  */
 public interface IFilterList extends Iterable<UpdateFilter> {
 
-    public void applyFilters(final InteractManager manager);
+    public void applyFilters(final InteractManager manager, final AbstractInteractWidget widget);
 
-    public void beginDrag(final InteractManager manager);
+    public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state);
 
-    public void endDrag(final InteractManager manager);
+    public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state);
 
     public int size();
 
-    public UpdateFilter get(int index);
+    public UpdateFilter get(final int index);
 
     public boolean add(final UpdateFilter filter);
 

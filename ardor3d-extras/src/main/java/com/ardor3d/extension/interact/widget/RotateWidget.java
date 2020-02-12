@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -54,8 +54,7 @@ public class RotateWidget extends AbstractInteractWidget {
 
     public static MouseCursor DEFAULT_CURSOR = null;
 
-    public RotateWidget(final IFilterList filterList) {
-        super(filterList);
+    public RotateWidget() {
         _handle = new Node("rotationHandle");
 
         final ZBufferState zstate = new ZBufferState();

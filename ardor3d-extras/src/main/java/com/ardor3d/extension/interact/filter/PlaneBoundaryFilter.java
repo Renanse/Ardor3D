@@ -1,9 +1,9 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -14,10 +14,11 @@ import java.util.Arrays;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.data.SpatialState;
+import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 
-public class PlaneBoundaryFilter implements UpdateFilter {
+public class PlaneBoundaryFilter extends UpdateFilterAdapter {
     private final ReadOnlyPlane[] _planes;
     private final Vector3 _calcVectorA = new Vector3();
     private final Vector3 _calcVectorB = new Vector3();
@@ -27,7 +28,7 @@ public class PlaneBoundaryFilter implements UpdateFilter {
     }
 
     @Override
-    public void applyFilter(final InteractManager manager) {
+    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
         final SpatialState state = manager.getSpatialState();
         _calcVectorA.set(state.getTransform().getTranslation());
         for (final ReadOnlyPlane plane : _planes) {
@@ -41,10 +42,4 @@ public class PlaneBoundaryFilter implements UpdateFilter {
 
         state.getTransform().setTranslation(_calcVectorA);
     }
-
-    @Override
-    public void beginDrag(final InteractManager manager) { /**/}
-
-    @Override
-    public void endDrag(final InteractManager manager) { /**/}
 }

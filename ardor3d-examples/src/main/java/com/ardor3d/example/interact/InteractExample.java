@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -21,7 +21,6 @@ import com.ardor3d.extension.interact.filter.AllowScaleFilter;
 import com.ardor3d.extension.interact.filter.MinMaxScaleFilter;
 import com.ardor3d.extension.interact.filter.PlaneBoundaryFilter;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
-import com.ardor3d.extension.interact.widget.BasicFilterList;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
 import com.ardor3d.extension.interact.widget.MoveMultiPlanarWidget;
 import com.ardor3d.extension.interact.widget.MovePlanarWidget;
@@ -54,6 +53,7 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -63,8 +63,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * An example illustrating the use of the interact framework.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.interact.InteractExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractExample.jpg", //
-maxHeapMemory = 64)
+        thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractExample.jpg", //
+        maxHeapMemory = 64)
 public class InteractExample extends ExampleBase {
 
     private InteractManager manager;
@@ -103,6 +103,8 @@ public class InteractExample extends ExampleBase {
 
         // create an object or two to manipulate
         addObjects();
+
+        MaterialUtil.autoMaterials(_root);
     }
 
     private void addFloor() {
@@ -172,47 +174,45 @@ public class InteractExample extends ExampleBase {
         manager = new InteractManager();
         manager.setupInput(_canvas, _physicalLayer, _logicalLayer);
 
-        final BasicFilterList filterList = new BasicFilterList();
-
         // add some widgets.
-        rotateWidget = new RotateWidget(filterList).withXAxis().withYAxis().withZAxis();
-        rotateWidget.setTexture((Texture2D) TextureManager.load("images/tick.png",
-                Texture.MinificationFilter.Trilinear, true));
+        rotateWidget = new RotateWidget().withXAxis().withYAxis().withZAxis();
+        rotateWidget.setTexture(
+                (Texture2D) TextureManager.load("images/tick.png", Texture.MinificationFilter.Trilinear, true));
         manager.addWidget(rotateWidget);
 
-        scaleWidget = new SimpleScaleWidget(filterList).withArrow(Vector3.UNIT_Y);
+        scaleWidget = new SimpleScaleWidget().withArrow(Vector3.UNIT_Y);
         manager.addWidget(scaleWidget);
 
-        moveWidget = new MoveWidget(filterList).withXAxis().withYAxis().withZAxis();
+        moveWidget = new MoveWidget().withXAxis().withYAxis().withZAxis();
         manager.addWidget(moveWidget);
 
         // set the default as current
         manager.setActiveWidget(rotateWidget);
 
         // add triggers to change which widget is active
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyHeldCondition(Key.LEFT_SHIFT), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT_SHIFT), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(scaleWidget);
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.LEFT_SHIFT), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LEFT_SHIFT), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(rotateWidget);
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyHeldCondition(Key.LEFT_CONTROL), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT_CONTROL), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(moveWidget);
                     }
                 }));
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyReleasedCondition(Key.LEFT_CONTROL), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LEFT_CONTROL), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.setActiveWidget(rotateWidget);
@@ -223,8 +223,9 @@ public class InteractExample extends ExampleBase {
         manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
             @Override
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                rotateWidget.setInteractMatrix(rotateWidget.getInteractMatrix() == InteractMatrix.World ? InteractMatrix.Local
-                        : InteractMatrix.World);
+                rotateWidget.setInteractMatrix(
+                        rotateWidget.getInteractMatrix() == InteractMatrix.World ? InteractMatrix.Local
+                                : InteractMatrix.World);
                 rotateWidget.targetDataUpdated(manager);
                 moveWidget.setInteractMatrix(rotateWidget.getInteractMatrix());
                 moveWidget.targetDataUpdated(manager);
@@ -232,8 +233,8 @@ public class InteractExample extends ExampleBase {
         }));
 
         // add triggers to change which widget is active
-        manager.getLogicalLayer().registerTrigger(
-                new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+        manager.getLogicalLayer()
+                .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
                     @Override
                     public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                         manager.getSpatialTarget().setRotation(Matrix3.IDENTITY);
@@ -242,15 +243,15 @@ public class InteractExample extends ExampleBase {
                 }));
 
         // add some filters
-        manager.addFilter(new MinMaxScaleFilter(1.0, 10.0));
-        manager.addFilter(new AllowScaleFilter(false, true, false));
-        manager.addFilter(new PlaneBoundaryFilter(new Plane(Vector3.UNIT_Y, 0)));
+        scaleWidget.addFilter(new MinMaxScaleFilter(1.0, 10.0));
+        scaleWidget.addFilter(new AllowScaleFilter(false, true, false));
+        moveWidget.addFilter(new PlaneBoundaryFilter(new Plane(Vector3.UNIT_Y, 0)));
     }
 
     public static void setupCursors() {
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    AbstractInteractWidget.class, "com/ardor3d/extension/interact/widget/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool
+                    .getClassPathResource(AbstractInteractWidget.class, "com/ardor3d/extension/interact/widget/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
 
             // ROTATE
@@ -265,7 +266,8 @@ public class InteractExample extends ExampleBase {
             // MOVE
             img = TextureManager.load("move.png", Texture.MinificationFilter.BilinearNoMipMaps, true).getImage();
             MoveWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2, img.getHeight() / 2);
-            MoveMultiPlanarWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2, img.getHeight() / 2);
+            MoveMultiPlanarWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2,
+                    img.getHeight() / 2);
             MovePlanarWidget.DEFAULT_CURSOR = new MouseCursor("move", img, img.getWidth() / 2, img.getHeight() / 2);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

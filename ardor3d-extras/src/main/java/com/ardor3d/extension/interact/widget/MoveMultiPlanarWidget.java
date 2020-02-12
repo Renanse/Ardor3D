@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -46,12 +46,11 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
 
     public static MouseCursor DEFAULT_CURSOR = null;
 
-    public MoveMultiPlanarWidget(final IFilterList filterList) {
-        this(filterList, 0.5);
+    public MoveMultiPlanarWidget() {
+        this(0.5);
     }
 
-    public MoveMultiPlanarWidget(final IFilterList filterList, final double extent) {
-        super(filterList);
+    public MoveMultiPlanarWidget(final double extent) {
         _handle = new Node("moveHandle");
 
         final BlendState blend = new BlendState();

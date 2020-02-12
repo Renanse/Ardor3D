@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -46,7 +46,6 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
     protected InteractMatrix _interactMatrix;
 
     public CompoundInteractWidget() {
-        super(new BasicFilterList());
         _handle = new Node("handleRoot");
     }
 
@@ -179,7 +178,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MoveMultiPlanarWidget(_filters);
+        widget = new MoveMultiPlanarWidget();
         _widgets.put(CompoundInteractWidget.MOVE_MULTIPLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -193,7 +192,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MoveMultiPlanarWidget(_filters, extent);
+        widget = new MoveMultiPlanarWidget(extent);
         _widgets.put(CompoundInteractWidget.MOVE_MULTIPLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -206,7 +205,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MovePlanarWidget(_filters).withPlane(plane).withDefaultHandle(.5, .25, color);
+        widget = new MovePlanarWidget().withPlane(plane).withDefaultHandle(.5, .25, color);
         _widgets.put(CompoundInteractWidget.MOVE_PLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -220,7 +219,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
             widget.getHandle().removeFromParent();
         }
 
-        widget = new MovePlanarWidget(_filters).withPlane(plane).withDefaultHandle(radius, height, color);
+        widget = new MovePlanarWidget().withPlane(plane).withDefaultHandle(radius, height, color);
         _widgets.put(CompoundInteractWidget.MOVE_PLANAR_KEY, widget);
         _handle.attachChild(widget.getHandle());
 
@@ -230,7 +229,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
     private MoveWidget verifyMoveWidget() {
         MoveWidget moveWidget = (MoveWidget) _widgets.get(CompoundInteractWidget.MOVE_KEY);
         if (moveWidget == null) {
-            moveWidget = new MoveWidget(_filters);
+            moveWidget = new MoveWidget();
             _widgets.put(CompoundInteractWidget.MOVE_KEY, moveWidget);
             _handle.attachChild(moveWidget.getHandle());
         }
@@ -240,7 +239,7 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
     private RotateWidget verifyRotateWidget() {
         RotateWidget rotateWidget = (RotateWidget) _widgets.get(CompoundInteractWidget.ROTATE_KEY);
         if (rotateWidget == null) {
-            rotateWidget = new RotateWidget(_filters);
+            rotateWidget = new RotateWidget();
             _widgets.put(CompoundInteractWidget.ROTATE_KEY, rotateWidget);
             _handle.attachChild(rotateWidget.getHandle());
         }

@@ -33,6 +33,7 @@ import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Cylinder;
+import com.ardor3d.util.MaterialUtil;
 
 public class MovePlanarWidget extends AbstractInteractWidget {
 
@@ -47,8 +48,7 @@ public class MovePlanarWidget extends AbstractInteractWidget {
         XY, XZ, YZ
     }
 
-    public MovePlanarWidget(final IFilterList filterList) {
-        super(filterList);
+    public MovePlanarWidget() {
         _handle = new Node("moveHandle");
 
         final BlendState blend = new BlendState();
@@ -82,6 +82,7 @@ public class MovePlanarWidget extends AbstractInteractWidget {
                 break;
         }
         handle.updateModelBound();
+        MaterialUtil.autoMaterials(handle);
         withHandle(handle);
         return this;
     }

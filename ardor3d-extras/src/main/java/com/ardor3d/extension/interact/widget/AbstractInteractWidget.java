@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -32,6 +32,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.ReadOnlyTimer;
 
 public abstract class AbstractInteractWidget {
@@ -39,7 +40,8 @@ public abstract class AbstractInteractWidget {
     public static double MIN_SCALE = 0.000001;
 
     protected Node _handle;
-    protected boolean _flipPickRay, _dragging, _mouseOver = false;
+    protected boolean _flipPickRay, _mouseOver = false;
+    protected DragState _dragState = DragState.NONE;
     protected MouseButton _dragButton = MouseButton.LEFT;
 
     protected boolean _activeInputOnly = true;
@@ -59,13 +61,12 @@ public abstract class AbstractInteractWidget {
     protected InteractMatrix _interactMatrix = InteractMatrix.World;
 
     /** List of filters to modify state after applying input. */
-    protected IFilterList _filters;
+    protected IFilterList _filters = new BasicFilterList();
 
     protected InteractMouseOverCallback _mouseOverCallback;
 
-    public AbstractInteractWidget(final IFilterList filterList) {
+    public AbstractInteractWidget() {
         _results.setCheckDistance(true);
-        _filters = filterList;
     }
 
     /**
@@ -84,17 +85,18 @@ public abstract class AbstractInteractWidget {
      *            our interact manager.
      */
     public void processInput(final Canvas source, final TwoInputStates inputStates, final AtomicBoolean inputConsumed,
-            final InteractManager manager) { /**/}
+            final InteractManager manager) {
+        /**/}
 
     protected void applyFilters(final InteractManager manager) {
-        _filters.applyFilters(manager);
+        _filters.applyFilters(manager, this);
     }
 
     public void checkMouseOver(final Canvas source, final MouseState current, final InteractManager manager) {
         final Camera camera = source.getCanvasRenderer().getCamera();
 
         // If we are dragging, we're in mouseOver state.
-        if (_dragging) {
+        if (_dragState != DragState.NONE) {
             if (!_mouseOver) {
                 mouseEntered(source, current, manager);
             }
@@ -157,55 +159,82 @@ public abstract class AbstractInteractWidget {
             return false;
         }
 
-        // Make sure we are dragging.
+        // Make sure we have our drag button down.
         if (current.getButtonState(_dragButton) != ButtonState.DOWN) {
-            if (_dragging) {
-                endDrag(manager);
+            if (_dragState != DragState.NONE) {
+                endDrag(manager, current);
             }
             return false;
         }
-        // if we're already dragging, make sure we only act on drags that started with a positive pick.
-        else if (!current.getButtonsPressedSince(previous).contains(_dragButton) && !_dragging) {
-            return false;
-        }
 
-        final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
-        // Make sure we are dragging over the handle
-        if (!_dragging) {
-            findPick(oldMouse, camera);
-            final Vector3 lastPick = getLastPick();
-            if (lastPick == null) {
-                _lastDragSpatial = null;
+        switch (_dragState) {
+            case NONE:
+                // if we were not dragging previously, then let's see if we can drag now...
+                // ...make sure this is a new drag interaction - i.e. the mouse button was clicked in this frame
+                if (previous.getButtonState(_dragButton) == ButtonState.DOWN) {
+                    return false;
+                }
+                if (!isOverHandle(camera, previous)) {
+                    // No pick found, so we were dragging over nothing. Ignore.
+                    _lastDragSpatial = null;
+                    return false;
+                }
+
+                // We did find a pick, so start the drag process
+                beginDrag(manager, current);
+
+                // we've established that our mouse is being held down, and started over our arrow. So consume.
+                inputConsumed.set(true);
+
+                return true;
+
+            case DRAG:
+                // we're in the process of dragging still, so mark input as consumed.
+                inputConsumed.set(true);
+
+                // return true if our mouse state has changed
+                return current != previous && (current.getDx() != 0 || current.getDy() != 0);
+
+            case START_DRAG:
+                _dragState = DragState.DRAG;
+                return true;
+
+            case PREPARE_DRAG:
+                if (!isOverHandle(camera, previous)) {
+                    // No pick found, so we were dragging over nothing. Ignore.
+                    endDrag(manager, current);
+                    return false;
+                }
+
+                // we're still preparing a drag, so mark consumed and return false (not yet dragging.)
+                inputConsumed.set(true);
+                _filters.beginDrag(manager, this, current);
                 return false;
-            } else {
-                beginDrag(manager);
-            }
+
+            default:
+                throw new Ardor3dException("Unhandled drag state: " + _dragState);
         }
-
-        // we've established that our mouse is being held down, and started over our arrow. So consume.
-        inputConsumed.set(true);
-
-        // check if we've moved at all
-        if (current == previous || current.getDx() == 0 && current.getDy() == 0) {
-            return false;
-        }
-
-        return true;
     }
 
-    public void beginDrag(final InteractManager manager) {
+    private boolean isOverHandle(final Camera camera, final MouseState previous) {
+        // ...make sure we are dragging over a widget handle
+        findPick(new Vector2(previous.getX(), previous.getY()), camera);
+        return getLastPick() != null;
+    }
+
+    public void beginDrag(final InteractManager manager, final MouseState current) {
         if (_results.getNumber() > 0) {
             final PickData pickData = _results.getPickData(0);
             _lastDragSpatial = (Spatial) pickData.getTarget();
-            _dragging = true;
-            _filters.beginDrag(manager);
+            _dragState = DragState.START_DRAG;
+            _filters.beginDrag(manager, this, current);
         }
     }
 
-    public void endDrag(final InteractManager manager) {
-        _dragging = false;
+    public void endDrag(final InteractManager manager, final MouseState current) {
+        _dragState = DragState.NONE;
         _lastDragSpatial = null;
-        _filters.endDrag(manager);
+        _filters.endDrag(manager, this, current);
     }
 
     public void update(final ReadOnlyTimer timer, final InteractManager manager) {
@@ -224,11 +253,12 @@ public abstract class AbstractInteractWidget {
         return 1.0;
     }
 
-    public void render(final Renderer renderer, final InteractManager manager) { /**/}
+    public void render(final Renderer renderer, final InteractManager manager) {
+        /**/}
 
     public void targetChanged(final InteractManager manager) {
-        if (_dragging) {
-            endDrag(manager);
+        if (_dragState != DragState.NONE) {
+            endDrag(manager, null);
         }
         if (_mouseOver) {
             mouseDeparted(null, null, manager);
@@ -236,11 +266,12 @@ public abstract class AbstractInteractWidget {
         targetDataUpdated(manager);
     }
 
-    public void targetDataUpdated(final InteractManager manager) { /**/}
+    public void targetDataUpdated(final InteractManager manager) {
+        /**/}
 
     public void receivedControl(final InteractManager manager) {
-        if (_dragging) {
-            endDrag(manager);
+        if (_dragState != DragState.NONE) {
+            endDrag(manager, null);
         }
     }
 
@@ -295,7 +326,8 @@ public abstract class AbstractInteractWidget {
     }
 
     protected Vector3 getLastPick() {
-        if (_results.getNumber() > 0 && _results.getPickData(0).getIntersectionRecord().getNumberOfIntersections() > 0) {
+        if (_results.getNumber() > 0
+                && _results.getPickData(0).getIntersectionRecord().getNumberOfIntersections() > 0) {
             return _results.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
         }
         return null;
@@ -344,5 +376,13 @@ public abstract class AbstractInteractWidget {
 
     public InteractMouseOverCallback getMouseOverCallback() {
         return _mouseOverCallback;
+    }
+
+    public DragState getDragState() {
+        return _dragState;
+    }
+
+    public void setDragState(final DragState state) {
+        _dragState = state;
     }
 }

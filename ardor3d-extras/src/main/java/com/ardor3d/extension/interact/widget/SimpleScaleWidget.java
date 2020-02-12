@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -43,9 +43,7 @@ public class SimpleScaleWidget extends AbstractInteractWidget {
 
     public static MouseCursor DEFAULT_CURSOR = null;
 
-    public SimpleScaleWidget(final IFilterList filterList) {
-        super(filterList);
-
+    public SimpleScaleWidget() {
         if (SimpleScaleWidget.DEFAULT_CURSOR != null) {
             setMouseOverCallback(new SetCursorCallback(SimpleScaleWidget.DEFAULT_CURSOR));
         }

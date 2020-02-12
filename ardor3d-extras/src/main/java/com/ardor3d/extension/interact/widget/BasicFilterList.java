@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -16,6 +16,7 @@ import java.util.List;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.UpdateFilter;
+import com.ardor3d.input.mouse.MouseState;
 
 public class BasicFilterList implements IFilterList {
     final List<UpdateFilter> _filters = new ArrayList<>();
@@ -24,22 +25,22 @@ public class BasicFilterList implements IFilterList {
         return _filters.iterator();
     }
 
-    public void applyFilters(final InteractManager manager) {
+    public void applyFilters(final InteractManager manager, final AbstractInteractWidget widget) {
         // apply any filters to our state
         for (final UpdateFilter filter : _filters) {
-            filter.applyFilter(manager);
+            filter.applyFilter(manager, widget);
         }
     }
 
-    public void beginDrag(final InteractManager manager) {
+    public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
         for (final UpdateFilter filter : _filters) {
-            filter.beginDrag(manager);
+            filter.beginDrag(manager, widget, state);
         }
     }
 
-    public void endDrag(final InteractManager manager) {
+    public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
         for (final UpdateFilter filter : _filters) {
-            filter.endDrag(manager);
+            filter.endDrag(manager, widget, state);
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2019 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -23,7 +23,6 @@ import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.logical.BasicTriggersApplier;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Spatial;
@@ -62,14 +61,6 @@ public class InteractManager {
      */
     protected final SpatialState _state;
 
-    /**
-     * List of filters to modify state prior to applying to a Spatial target.
-     */
-    protected List<UpdateFilter> _filters = new ArrayList<>();
-
-    /** ArrayList of update logic for this manager. */
-    protected List<UpdateLogic> _updateLogic;
-
     public InteractManager() {
         _state = new SpatialState();
         setupLogicalLayer();
@@ -81,7 +72,6 @@ public class InteractManager {
     }
 
     public void update(final ReadOnlyTimer timer) {
-        runUpdateLogic(timer.getTimePerFrame());
         for (final AbstractInteractWidget widget : _widgets) {
             if (!widget.isActiveUpdateOnly() || widget == _activeWidget) {
                 widget.update(timer, this);
@@ -114,11 +104,6 @@ public class InteractManager {
         }
 
         if (_spatialTarget != null && _inputConsumed.get()) {
-            // apply any filters to our state
-            for (final UpdateFilter filter : _filters) {
-                filter.applyFilter(this);
-            }
-
             // apply state to target
             _state.applyState(_spatialTarget);
 
@@ -134,14 +119,12 @@ public class InteractManager {
         _logicalLayer.registerTrigger(new InputTrigger((final TwoInputStates arg0) -> {
             // always trigger this.
             return true;
-        }, new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                if (_spatialTarget != null) {
-                    _state.copyState(_spatialTarget);
-                }
-                _inputConsumed.set(false);
-                offerInputToWidgets(source, inputStates);
+        }, (source, inputStates, tpf) -> {
+            if (_spatialTarget != null) {
+                _state.copyState(_spatialTarget);
             }
+            _inputConsumed.set(false);
+            offerInputToWidgets(source, inputStates);
         }));
     }
 
@@ -195,16 +178,8 @@ public class InteractManager {
         _widgets.clear();
     }
 
-    public void addFilter(final UpdateFilter filter) {
-        _filters.add(filter);
-    }
-
-    public void removeFilter(final UpdateFilter filter) {
-        _filters.remove(filter);
-    }
-
-    public void clearFilters() {
-        _filters.clear();
+    public void addFilterToWidgets(final UpdateFilter filter) {
+        _widgets.forEach(w -> w.addFilter(filter));
     }
 
     public LogicalLayer getLogicalLayer() {
@@ -258,68 +233,5 @@ public class InteractManager {
 
     public interface UpdateLogic {
         public void update(double time, InteractManager manager);
-    }
-
-    public void addUpdateLogic(final UpdateLogic logic) {
-        if (_updateLogic == null) {
-            _updateLogic = new ArrayList<UpdateLogic>(1);
-        }
-        _updateLogic.add(logic);
-    }
-
-    public boolean removeUpdateLogic(final UpdateLogic logic) {
-        if (_updateLogic == null) {
-            return false;
-        }
-        return _updateLogic.remove(logic);
-    }
-
-    public UpdateLogic removeUpdateLogic(final int index) {
-        if (_updateLogic == null) {
-            return null;
-        }
-        return _updateLogic.remove(index);
-    }
-
-    public void clearUpdateLogic() {
-        if (_updateLogic != null) {
-            _updateLogic.clear();
-        }
-    }
-
-    public UpdateLogic getUpdateLogic(final int i) {
-        if (_updateLogic == null) {
-            _updateLogic = new ArrayList<UpdateLogic>(1);
-        }
-        return _updateLogic.get(i);
-    }
-
-    public List<UpdateLogic> getUpdateLogic() {
-        if (_updateLogic == null) {
-            _updateLogic = new ArrayList<UpdateLogic>(1);
-        }
-        return _updateLogic;
-    }
-
-    public int getUpdateLogicCount() {
-        if (_updateLogic == null) {
-            return 0;
-        }
-        return _updateLogic.size();
-    }
-
-    public void runUpdateLogic(final double time) {
-        if (_updateLogic != null) {
-            for (int i = 0, gSize = _updateLogic.size(); i < gSize; i++) {
-                try {
-                    final UpdateLogic logic = _updateLogic.get(i);
-                    if (logic != null) {
-                        logic.update(time, this);
-                    }
-                } catch (final IndexOutOfBoundsException e) {
-                    break;
-                }
-            }
-        }
     }
 }
