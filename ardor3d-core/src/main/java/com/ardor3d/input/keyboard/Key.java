@@ -1,5 +1,5 @@
 /**
- * Copyright  2008-2019 Bird Dog Games, Inc.
+ * Copyright  2008-2020 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *

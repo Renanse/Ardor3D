@@ -1,11 +1,11 @@
 allprojects  {
 	apply plugin: 'java-library'
 	group = 'com.ardor3d'
-	version = '1.5.0'
+	version = '1.5.1'
 }
 
 subprojects {
-	apply plugin: 'java'
+	apply plugin: 'java-library'
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
 	
