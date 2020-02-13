@@ -107,7 +107,7 @@ public abstract class MaterialUtil {
         final String mostUsed = highEntry;
         node.getChildren().forEach(child -> {
             final String material = kidMaterials.get(child);
-            if (!mostUsed.equals(material)) {
+            if (material != null && !mostUsed.equals(material)) {
                 child.setRenderMaterial(material);
             }
         });
