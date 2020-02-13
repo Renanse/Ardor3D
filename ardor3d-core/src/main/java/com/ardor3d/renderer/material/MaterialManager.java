@@ -27,6 +27,8 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.util.Constants;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
@@ -72,7 +74,14 @@ public enum MaterialManager {
         final RenderMaterial enforced = context.getEnforcedMaterial();
         RenderMaterial material = enforced != null ? enforced : mesh.getWorldRenderMaterial();
 
-        // if we have no material, use any set default
+        // if we have no material and we enable guessing materials, try that first.
+        if (material == null && !Constants.ignoreMissingMaterials) {
+            logger.warning(() -> "Mesh " + mesh + " missing material.  Auto-guessing.");
+            MaterialUtil.autoMaterials(mesh);
+            material = mesh.getWorldRenderMaterial();
+        }
+
+        // if we still have no material, use any set default
         if (material == null) {
             material = _defaultMaterial;
         }

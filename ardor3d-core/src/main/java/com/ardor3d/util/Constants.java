@@ -37,6 +37,8 @@ public class Constants {
 
     public static final boolean enableInstancedGeometrySupport;
 
+    public static final boolean ignoreMissingMaterials;
+
     static {
         boolean hasPropertyAccess = true;
         try {
@@ -61,6 +63,7 @@ public class Constants {
             enableInstancedGeometrySupport = (System.getProperty("ardor3d.enableInstancedGeometrySupport") != null);
             strictVertexAttributes = (System.getProperty("ardor3d.strictVertexAttributes") != null);
             logOpenGLDebug = (System.getProperty("ardor3d.logOpenGLDebug") != null);
+            ignoreMissingMaterials = (System.getProperty("ardor3d.ignoreMissingMaterials") != null);
         } else {
             stats = false;
             trackDirectMemory = false;
@@ -72,6 +75,7 @@ public class Constants {
             enableInstancedGeometrySupport = false;
             strictVertexAttributes = false;
             logOpenGLDebug = false;
+            ignoreMissingMaterials = false;
         }
     }
 }
