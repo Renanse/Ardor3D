@@ -21,8 +21,8 @@ import com.ardor3d.math.MathUtils;
  * where the mouse is also used for scene navigation and inadvertent interaction is possible or likely.
  */
 public abstract class AbstractDragDelayFilter extends UpdateFilterAdapter {
-    protected final float _delayTime;
-    protected final float _exitTime;
+    protected float _delayTime;
+    protected float _exitTime;
     protected long _dragStartTime;
 
     /**
@@ -44,11 +44,12 @@ public abstract class AbstractDragDelayFilter extends UpdateFilterAdapter {
             showTimerViz(manager, widget, current);
         } else if (widget.getDragState() == DragState.PREPARE_DRAG) {
             final float elapsed = (System.currentTimeMillis() - _dragStartTime) / 1000f;
-            if (elapsed > _delayTime) {
+            if (elapsed > getDelayTime()) {
                 widget.setDragState(DragState.DRAG);
+                updateTimerViz(manager, widget, current, 1f);
                 clearTimerViz(manager, widget, current, false);
             } else {
-                updateTimerViz(manager, widget, current, MathUtils.clamp01(elapsed / _delayTime));
+                updateTimerViz(manager, widget, current, MathUtils.clamp01(elapsed / getDelayTime()));
             }
         }
     }
@@ -56,6 +57,22 @@ public abstract class AbstractDragDelayFilter extends UpdateFilterAdapter {
     @Override
     public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState current) {
         clearTimerViz(manager, widget, current, true);
+    }
+
+    public float getDelayTime() {
+        return _delayTime;
+    }
+
+    public void setDelayTime(final float seconds) {
+        _delayTime = seconds;
+    }
+
+    public float getExitTime() {
+        return _exitTime;
+    }
+
+    public void setExitTime(final float seconds) {
+        _exitTime = seconds;
     }
 
     /**
