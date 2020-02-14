@@ -37,6 +37,7 @@ import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -405,6 +406,7 @@ public abstract class UIContainer extends UIComponent {
                 tbuf.put(dW).put(0);
                 tbuf.put(dW).put(dH);
                 tbuf.rewind();
+                _standin.getMeshData().markBufferDirty(MeshData.KEY_TextureCoords0);
 
                 _dirty = false;
             }
