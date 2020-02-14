@@ -641,8 +641,6 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
             blend = new BlendState();
             blend.setBlendEnabled(true);
             blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-            blend.setTestEnabled(true);
-            blend.setTestFunction(BlendState.TestFunction.GreaterThan);
             getEdittedParticles().setRenderState(blend);
         }
         blend.setDestinationFunction(

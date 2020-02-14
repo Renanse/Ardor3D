@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -14,20 +14,16 @@ import com.ardor3d.math.ColorRGBA;
 
 public class BlendStateRecord extends StateRecord {
     public boolean blendEnabled = false;
-    public boolean testEnabled = false;
 
     // RGB or primary
     public int srcFactorRGB = -1;
     public int dstFactorRGB = -1;
     public int blendEqRGB = -1;
 
-    // Alpha (if supported)
+    // Alpha
     public int srcFactorAlpha = -1;
     public int dstFactorAlpha = -1;
     public int blendEqAlpha = -1;
-
-    public int alphaFunc = -1;
-    public float alphaRef = -1;
 
     public ColorRGBA blendColor = new ColorRGBA(-1, -1, -1, -1);
 
@@ -43,7 +39,6 @@ public class BlendStateRecord extends StateRecord {
         super.invalidate();
 
         blendEnabled = false;
-        testEnabled = false;
 
         srcFactorRGB = -1;
         dstFactorRGB = -1;
@@ -52,9 +47,6 @@ public class BlendStateRecord extends StateRecord {
         srcFactorAlpha = -1;
         dstFactorAlpha = -1;
         blendEqAlpha = -1;
-
-        alphaFunc = -1;
-        alphaRef = -1;
 
         blendColor.set(-1, -1, -1, -1);
 

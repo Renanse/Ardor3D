@@ -162,42 +162,6 @@ public class BlendState extends RenderState {
         }
     }
 
-    public enum TestFunction {
-        /**
-         * Never passes the depth test.
-         */
-        Never,
-        /**
-         * Always passes the depth test.
-         */
-        Always,
-        /**
-         * Pass the test if this alpha is equal to the reference alpha.
-         */
-        EqualTo,
-        /**
-         * Pass the test if this alpha is not equal to the reference alpha.
-         */
-        NotEqualTo,
-        /**
-         * Pass the test if this alpha is less than the reference alpha.
-         */
-        LessThan,
-        /**
-         * Pass the test if this alpha is less than or equal to the reference alpha.
-         */
-        LessThanOrEqualTo,
-        /**
-         * Pass the test if this alpha is greater than the reference alpha.
-         */
-        GreaterThan,
-        /**
-         * Pass the test if this alpha is greater than or equal to the reference alpha.
-         */
-        GreaterThanOrEqualTo;
-
-    }
-
     public enum BlendEquation {
         /**
          * Sets the blend equation so that the source and destination data are added. (Default) Clamps to [0,1] Useful
@@ -250,13 +214,6 @@ public class BlendState extends RenderState {
     private DestinationFunction _destinationFunctionAlpha = DestinationFunction.OneMinusSourceAlpha;
     /** The current blend equation. */
     private BlendEquation _blendEquationAlpha = BlendEquation.Add;
-
-    /** If enabled, alpha testing done. */
-    private boolean _testEnabled = false;
-    /** Alpha test value. */
-    private TestFunction _testFunction = TestFunction.GreaterThan;
-    /** The reference value to which incoming alpha values are compared. */
-    private float _reference = 0;
 
     /** Enables conversion of alpha values to masks - a form of dithering. */
     private boolean _sampleAlphaToCoverageEnabled = false;
@@ -456,80 +413,6 @@ public class BlendState extends RenderState {
     }
 
     /**
-     * <code>isTestEnabled</code> returns true if alpha testing is enabled, false otherwise.
-     *
-     * @return true if alpha testing is enabled, false otherwise.
-     */
-    public boolean isTestEnabled() {
-        return _testEnabled;
-    }
-
-    /**
-     * <code>setTestEnabled</code> turns alpha testing on and off. True turns on the testing, while false disables it.
-     *
-     * @param value
-     *            true to enabled alpha testing, false to disable it.
-     */
-    public void setTestEnabled(final boolean value) {
-        _testEnabled = value;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * <code>setTestFunction</code> sets the testing function used for the alpha testing. If an invalid value is passed,
-     * the default TF_ALWAYS is used.
-     *
-     * @param function
-     *            the testing function used for the alpha testing.
-     * @throws IllegalArgumentException
-     *             if function is null
-     */
-    public void setTestFunction(final TestFunction function) {
-        if (function == null) {
-            throw new IllegalArgumentException("function can not be null.");
-        }
-        _testFunction = function;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * <code>getTestFunction</code> returns the testing function used for the alpha testing.
-     *
-     * @return the testing function used for the alpha testing.
-     */
-    public TestFunction getTestFunction() {
-        return _testFunction;
-    }
-
-    /**
-     * <code>setReference</code> sets the reference value that incoming alpha values are compared to when doing alpha
-     * testing. This is clamped to [0, 1].
-     *
-     * @param reference
-     *            the reference value that alpha values are compared to.
-     */
-    public void setReference(float reference) {
-        if (reference < 0) {
-            reference = 0;
-        }
-
-        if (reference > 1) {
-            reference = 1;
-        }
-        _reference = reference;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * <code>getReference</code> returns the reference value that incoming alpha values are compared to.
-     *
-     * @return the reference value that alpha values are compared to.
-     */
-    public float getReference() {
-        return _reference;
-    }
-
-    /**
      * @return the color used in constant blending functions. (0,0,0,0) is the default.
      */
     public ReadOnlyColorRGBA getConstantColor() {
@@ -599,9 +482,6 @@ public class BlendState extends RenderState {
         capsule.write(_sourceFunctionAlpha, "sourceFunctionAlpha", SourceFunction.SourceAlpha);
         capsule.write(_destinationFunctionAlpha, "destinationFunctionAlpha", DestinationFunction.OneMinusSourceAlpha);
         capsule.write(_blendEquationAlpha, "blendEquationAlpha", BlendEquation.Add);
-        capsule.write(_testEnabled, "testEnabled", false);
-        capsule.write(_testFunction, "test", TestFunction.GreaterThan);
-        capsule.write(_reference, "reference", 0);
         capsule.write(_constantColor, "constantColor", null);
         capsule.write(_sampleAlphaToCoverageEnabled, "sampleAlphaToCoverageEnabled", false);
         capsule.write(_sampleAlphaToOneEnabled, "sampleAlphaToOneEnabled", false);
@@ -623,9 +503,6 @@ public class BlendState extends RenderState {
         _destinationFunctionAlpha = capsule.readEnum("destinationFunctionAlpha", DestinationFunction.class,
                 DestinationFunction.OneMinusSourceAlpha);
         _blendEquationAlpha = capsule.readEnum("blendEquationAlpha", BlendEquation.class, BlendEquation.Add);
-        _testEnabled = capsule.readBoolean("testEnabled", false);
-        _testFunction = capsule.readEnum("test", TestFunction.class, TestFunction.GreaterThan);
-        _reference = capsule.readFloat("reference", 0);
         _constantColor = capsule.readSavable("constantColor", null);
     }
 

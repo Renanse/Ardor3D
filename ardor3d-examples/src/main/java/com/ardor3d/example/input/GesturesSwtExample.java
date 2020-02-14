@@ -64,6 +64,7 @@ import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
@@ -116,10 +117,11 @@ public class GesturesSwtExample implements Updater {
         blend.setBlendEnabled(true);
         blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        blend.setTestEnabled(true);
-        blend.setReference(0f);
-        blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         root.setRenderState(blend);
+
+        // set alpha testing
+        root.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        root.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         resetBalls(10);
     }

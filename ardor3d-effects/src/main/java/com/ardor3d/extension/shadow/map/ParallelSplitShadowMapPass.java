@@ -256,7 +256,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _discardShadowFragments = new BlendState();
         _discardShadowFragments.setEnabled(true);
         _discardShadowFragments.setBlendEnabled(true);
-        _discardShadowFragments.setTestEnabled(true);
         _discardShadowFragments.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         _discardShadowFragments.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
 
@@ -1252,7 +1251,6 @@ public class ParallelSplitShadowMapPass extends Pass {
             final BlendState lineBlendState = new BlendState();
             lineBlendState.setEnabled(true);
             lineBlendState.setBlendEnabled(true);
-            lineBlendState.setTestEnabled(true);
             lineBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
             lineBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
             lineFrustum.setRenderState(lineBlendState);

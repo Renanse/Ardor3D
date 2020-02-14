@@ -30,6 +30,7 @@ import com.ardor3d.extension.ui.text.parser.StyleParser;
 import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
@@ -391,10 +392,11 @@ public enum TextFactory {
         blendState.setBlendEnabled(true);
         blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        blendState.setTestEnabled(true);
-        blendState.setTestFunction(BlendState.TestFunction.GreaterThan);
-        blendState.setReference(0f);
         mesh.setRenderState(blendState);
+
+        // set alpha testing
+        mesh.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        mesh.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         mesh.updateWorldRenderStates(false);
     }

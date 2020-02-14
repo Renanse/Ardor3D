@@ -20,8 +20,6 @@ import java.util.Map;
 
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
@@ -339,11 +337,7 @@ public class ObjGeometryStore {
             target.setRenderState(tState);
         }
 
-        final BlendState blend = _currentMaterial.getBlendState();
-        if (blend != null) {
-            target.setRenderState(blend);
-            target.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-        }
+        _currentMaterial.applyBlendAndAlpha(target);
 
         if (_currentMaterial.illumType == 0) {
             target.getSceneHints().setLightCombineMode(LightCombineMode.Off);

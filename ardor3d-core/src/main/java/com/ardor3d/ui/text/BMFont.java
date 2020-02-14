@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
@@ -843,8 +844,6 @@ public class BMFont implements Savable {
             blendState = new BlendState();
             blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
             blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-            blendState.setTestEnabled(true);
-            blendState.setTestFunction(BlendState.TestFunction.GreaterThan);
 
             zBuffState = new ZBufferState();
             zBuffState.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
@@ -856,9 +855,14 @@ public class BMFont implements Savable {
             spatial.setRenderState(textureState);
             spatial.setRenderState(blendState);
             spatial.setRenderState(zBuffState);
+
+            spatial.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+
             if (_useBlend) {
+                spatial.setProperty(AlphaTestConsts.KEY_AlphaReference, _blendEnabledTestRef);
                 spatial.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
             } else {
+                spatial.setProperty(AlphaTestConsts.KEY_AlphaReference, _blendDisabledTestRef);
                 spatial.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
             }
         }
@@ -867,11 +871,9 @@ public class BMFont implements Savable {
             _useBlend = blend;
             if (!_useBlend) {
                 blendState.setBlendEnabled(false);
-                blendState.setReference(_blendDisabledTestRef);
                 zBuffState.setWritable(true);
             } else {
                 blendState.setBlendEnabled(true);
-                blendState.setReference(_blendEnabledTestRef);
                 zBuffState.setWritable(false);
             }
         }

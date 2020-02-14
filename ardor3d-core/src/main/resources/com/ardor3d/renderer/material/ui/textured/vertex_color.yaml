@@ -9,7 +9,7 @@ techniques:
           - key: uv0
           
         uniforms: 
-          - builtIn: [model, view, projection, textureMatrix0]
+          - builtIn: [model, view, projection, textureMatrix0, alphaTest]
 
         shaders: 
           Vertex: 

@@ -100,6 +100,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
@@ -732,14 +733,16 @@ public class ParticleEditorFrame extends JFrame {
         editScene.particleGeom.setStartColor(new ColorRGBA(0.0f, 0.0625f, 1.0f, 1.0f));
         editScene.particleGeom.setEndColor(new ColorRGBA(0.0f, 0.0625f, 1.0f, 0.0f));
         editScene.particleGeom.warmUp(60);
+        
+        // set alpha testing
+        editScene.particleGeom.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        editScene.particleGeom.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         BlendState blend = (BlendState) editScene.particleGeom.getLocalRenderState(StateType.Blend);
         if (blend == null) {
             blend = new BlendState();
             blend.setBlendEnabled(true);
             blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-            blend.setTestEnabled(true);
-            blend.setTestFunction(BlendState.TestFunction.GreaterThan);
             editScene.particleGeom.setRenderState(blend);
         }
         blend.setDestinationFunction(BlendState.DestinationFunction.One);

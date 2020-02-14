@@ -24,6 +24,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
@@ -349,10 +350,12 @@ public class QuadImposterNode extends Node {
         as1.setBlendEnabled(true);
         as1.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         as1.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        as1.setTestEnabled(true);
-        as1.setTestFunction(BlendState.TestFunction.GreaterThan);
         as1.setEnabled(true);
         _imposterQuad.setRenderState(as1);
+
+        // set alpha testing
+        _imposterQuad.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        _imposterQuad.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
     }
 
     public void renderImposter() {

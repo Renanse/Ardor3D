@@ -1,5 +1,7 @@
 #version 330 core
 
+@import include/alpha_test.glsl
+
 #ifdef USE_FOG
 @import include/fog.glsl
 #endif
@@ -17,10 +19,6 @@ uniform int minLevel;
 uniform int validLevels;
 uniform int showDebug; 
 uniform vec2 sliceOffset[16];
-
-#ifdef USE_FOG
-uniform FogParams fogParams;
-#endif
 
 @import clipmap/terrain_frag_inc.glsl
 
@@ -42,10 +40,12 @@ void main()
 	// lookup clip colors
     vec4 texCol = clipTexColor(diffuseMap, texCoord1, texCoord2, fadeCoord, textureSize, texelSize, showDebug);
 
+    if (!applyAlphaTest(texCol)) discard;
+
 #ifdef USE_FOG
 	// Calculate any fog contribution using vertex distance in eye space.
     float dist = length(eyeSpacePosition);
-    float fogAmount = calcFogAmount(fogParams, abs(dist));
+    float fogAmount = calcFogAmount(abs(dist));
     FragColor = mix(tint * texCol, fogParams.color, fogAmount);
 #else
     FragColor = tint * texCol;

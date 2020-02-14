@@ -24,6 +24,7 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
@@ -316,14 +317,12 @@ public class ColladaMaterialUtils {
                     if (diffuseTexture != null) {
                         final BlendState blend = new BlendState();
                         blend.setBlendEnabled(true);
-                        blend.setTestEnabled(true);
                         blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
                         blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
                         mesh.setRenderState(blend);
                     } else {
                         final BlendState blend = new BlendState();
                         blend.setBlendEnabled(true);
-                        blend.setTestEnabled(true);
                         transparent.setAlpha(transparent.getAlpha() * transparency);
                         blend.setConstantColor(transparent);
                         blend.setSourceFunction(BlendState.SourceFunction.ConstantAlpha);
@@ -331,6 +330,7 @@ public class ColladaMaterialUtils {
                         mesh.setRenderState(blend);
                     }
 
+                    mesh.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
                     mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
                 }
 

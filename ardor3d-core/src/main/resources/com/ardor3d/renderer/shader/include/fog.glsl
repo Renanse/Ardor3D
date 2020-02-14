@@ -10,6 +10,8 @@ struct FogParams {
     int function;
 };
 
+uniform FogParams fogParams;
+
 float calcLinearFogAmount(const float start, const float end, const float fogCoord)
 {
 	return 1.0 - clamp((end - fogCoord) / (end - start), 0.0, 1.0);
@@ -21,18 +23,18 @@ float calcExponentialFogAmount(const float density, const float power, const flo
 }
 
 
-float calcFogAmount(FogParams p, const float fogCoord)
+float calcFogAmount(const float fogCoord)
 {
-	switch (p.function)
+	switch (fogParams.function)
 	{
 		case 0: // linear
-			return calcLinearFogAmount(p.start, p.end, fogCoord);
+			return calcLinearFogAmount(fogParams.start, fogParams.end, fogCoord);
 	
 		case 1: // exp
-			return calcExponentialFogAmount(p.density, 1, fogCoord);
+			return calcExponentialFogAmount(fogParams.density, 1, fogCoord);
 	
 		case 2: // exp2
-			return calcExponentialFogAmount(p.density, 2, fogCoord);
+			return calcExponentialFogAmount(fogParams.density, 2, fogCoord);
 	}
 	
 	return 0;

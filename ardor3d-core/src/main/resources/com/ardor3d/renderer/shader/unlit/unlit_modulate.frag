@@ -1,5 +1,7 @@
 #version 330 core
 
+@import include/alpha_test.glsl
+
 #ifdef USE_FOG
 @import include/fog.glsl
 #endif
@@ -34,10 +36,6 @@ in vec4 DiffuseColor;
 	#endif
 #endif
 
-#ifdef USE_FOG
-uniform FogParams fogParams;
-#endif
-
 void main()
 {
 	vec4 color = DiffuseColor;
@@ -57,8 +55,10 @@ void main()
 	#endif
 #endif
 
+    if (!applyAlphaTest(color)) discard;
+
 #ifdef USE_FOG
-    float fogAmount = calcFogAmount(fogParams, abs(ViewPos.z/ViewPos.w));
+    float fogAmount = calcFogAmount(abs(ViewPos.z/ViewPos.w));
     FragColor = mix(color, fogParams.color, fogAmount);
 #else
     FragColor = color;

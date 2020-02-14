@@ -26,6 +26,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
@@ -162,10 +163,11 @@ public class BubbleMarkExample implements Scene {
         blend.setBlendEnabled(true);
         blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        blend.setTestEnabled(true);
-        blend.setReference(0f);
-        blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         root.setRenderState(blend);
+
+        // set alpha testing
+        root.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        root.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         root.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         root.setRenderMaterial("unlit/textured/basic.yaml");

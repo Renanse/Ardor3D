@@ -8,7 +8,7 @@ techniques:
           - key: color
           
         uniforms: 
-          - builtIn: [modelViewProj, viewSize, viewOffset]
+          - builtIn: [modelViewProj, viewSize, viewOffset, alphaTest]
           - 
             shaderKey: lineWidth
             type: Float1

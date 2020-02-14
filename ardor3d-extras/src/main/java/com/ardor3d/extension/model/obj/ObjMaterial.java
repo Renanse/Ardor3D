@@ -13,6 +13,8 @@ package com.ardor3d.extension.model.obj;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Spatial;
@@ -38,18 +40,20 @@ public class ObjMaterial {
         this.name = name;
     }
 
-    public BlendState getBlendState() {
+    public void applyBlendAndAlpha(final Spatial target) {
         if (forceBlend || d != -1 && d < 1.0f) {
             final BlendState blend = new BlendState();
             blend.setBlendEnabled(true);
             blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
             blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-            blend.setTestEnabled(true);
-            blend.setTestFunction(BlendState.TestFunction.GreaterThan);
-            blend.setReference(0);
-            return blend;
+            target.setRenderState(blend);
+
+            // set alpha testing
+            target.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+            target.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
+
+            target.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
         }
-        return null;
     }
 
     public TextureState getTextureState() {

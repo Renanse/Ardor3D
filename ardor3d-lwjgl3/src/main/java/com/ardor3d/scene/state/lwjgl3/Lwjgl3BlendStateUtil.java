@@ -23,7 +23,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.BlendEquation;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.BlendStateRecord;
 
@@ -41,16 +40,11 @@ public abstract class Lwjgl3BlendStateUtil {
             applyBlendColor(state.isBlendEnabled(), state, record, caps);
             applyBlendFunctions(state.isBlendEnabled(), state, record, caps);
 
-            applyTest(state.isTestEnabled(), state, record);
-
             applyAlphaCoverage(state.isSampleAlphaToCoverageEnabled(), state.isSampleAlphaToOneEnabled(), record, caps);
             applySampleCoverage(state.isSampleCoverageEnabled(), state, record, caps);
         } else {
             // disable blend
             applyBlendEquations(false, state, record, caps);
-
-            // disable alpha test
-            applyTest(false, state, record);
 
             // disable sample coverage
             applyAlphaCoverage(false, false, record, caps);
@@ -295,62 +289,5 @@ public abstract class Lwjgl3BlendStateUtil {
                 return GL14C.GL_FUNC_ADD;
         }
         throw new IllegalArgumentException("Invalid blend equation: " + eq);
-    }
-
-    protected static void applyTest(final boolean enabled, final BlendState state, final BlendStateRecord record) {
-        // TODO: We need to inject these into shader uniforms instead.
-
-        // if (record.isValid()) {
-        // if (enabled) {
-        // if (!record.testEnabled) {
-        // GL11C.glEnable(GL11C.GL_ALPHA_TEST);
-        // record.testEnabled = true;
-        // }
-        // final int glFunc = getGLFuncValue(state.getTestFunction());
-        // if (record.alphaFunc != glFunc || record.alphaRef != state.getReference()) {
-        // GL11C.glAlphaFunc(glFunc, state.getReference());
-        // record.alphaFunc = glFunc;
-        // record.alphaRef = state.getReference();
-        // }
-        // } else if (record.testEnabled) {
-        // GL11C.glDisable(GL11C.GL_ALPHA_TEST);
-        // record.testEnabled = false;
-        // }
-        //
-        // } else {
-        // if (enabled) {
-        // GL11C.glEnable(GL11C.GL_ALPHA_TEST);
-        // record.testEnabled = true;
-        // final int glFunc = getGLFuncValue(state.getTestFunction());
-        // GL11C.glAlphaFunc(glFunc, state.getReference());
-        // record.alphaFunc = glFunc;
-        // record.alphaRef = state.getReference();
-        // } else {
-        // GL11C.glDisable(GL11C.GL_ALPHA_TEST);
-        // record.testEnabled = false;
-        // }
-        // }
-    }
-
-    protected static int getGLFuncValue(final TestFunction function) {
-        switch (function) {
-            case Never:
-                return GL11C.GL_NEVER;
-            case LessThan:
-                return GL11C.GL_LESS;
-            case EqualTo:
-                return GL11C.GL_EQUAL;
-            case LessThanOrEqualTo:
-                return GL11C.GL_LEQUAL;
-            case GreaterThan:
-                return GL11C.GL_GREATER;
-            case NotEqualTo:
-                return GL11C.GL_NOTEQUAL;
-            case GreaterThanOrEqualTo:
-                return GL11C.GL_GEQUAL;
-            case Always:
-                return GL11C.GL_ALWAYS;
-        }
-        throw new IllegalArgumentException("Invalid test function type: " + function);
     }
 }

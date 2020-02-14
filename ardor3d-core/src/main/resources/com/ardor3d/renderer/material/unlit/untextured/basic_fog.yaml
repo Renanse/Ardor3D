@@ -6,7 +6,7 @@ techniques:
           - key: vertex
 
         uniforms: 
-          - builtIn: [model, view, projection, defaultColor, fogParams]
+          - builtIn: [model, view, projection, defaultColor, fogParams, alphaTest]
 
         shaders: 
           Vertex: 

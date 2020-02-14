@@ -22,7 +22,6 @@ import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -82,15 +81,6 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
     }
 
     private void setRenderStates(final Texture texture) {
-        final BlendState bs = new BlendState();
-        bs.setBlendEnabled(true);
-        bs.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        bs.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        bs.setTestEnabled(true);
-        bs.setReference(0.5f);
-        bs.setTestFunction(BlendState.TestFunction.GreaterThan);
-        // setRenderState(bs);
-
         final TextureState ts = new TextureState();
         ts.setTexture(texture);
         setRenderState(ts);

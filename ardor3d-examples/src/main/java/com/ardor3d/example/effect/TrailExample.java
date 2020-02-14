@@ -23,6 +23,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
@@ -129,8 +130,11 @@ public class TrailExample extends ExampleBase {
         bs.setBlendEnabled(true);
         bs.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         bs.setDestinationFunction(BlendState.DestinationFunction.One);
-        bs.setTestEnabled(true);
         trailMesh.setRenderState(bs);
+
+        // set alpha testing
+        trailMesh.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        trailMesh.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         final ZBufferState zs = new ZBufferState();
         zs.setWritable(false);

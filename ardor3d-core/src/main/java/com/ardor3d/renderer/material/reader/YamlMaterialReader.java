@@ -37,6 +37,7 @@ import com.ardor3d.renderer.material.ShaderType;
 import com.ardor3d.renderer.material.TechniquePass;
 import com.ardor3d.renderer.material.VertexAttributeRef;
 import com.ardor3d.renderer.material.fog.FogParams;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
@@ -530,6 +531,13 @@ public class YamlMaterialReader {
             case "textureMatrix3":
                 pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix3, UniformType.Matrix4x4,
                         UniformSource.SpatialProperty, Texture.KEY_TextureMatrix3, null, Matrix4.IDENTITY));
+                return;
+            case "alphaTest":
+                pass.addUniform(new UniformRef(AlphaTestConsts.KEY_AlphaTestType, UniformType.Int1,
+                        UniformSource.SpatialProperty, AlphaTestConsts.KEY_AlphaTestType, null,
+                        AlphaTestConsts.TestFunction.Always));
+                pass.addUniform(new UniformRef(AlphaTestConsts.KEY_AlphaReference, UniformType.Float1,
+                        UniformSource.SpatialProperty, AlphaTestConsts.KEY_AlphaReference, null, 0f));
                 return;
             default:
                 throw new Ardor3dException("Unknown default uniform type: " + type);

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
@@ -74,10 +75,10 @@ public class BasicText extends BMText {
         blend.setBlendEnabled(true);
         blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        blend.setTestEnabled(true);
-        blend.setReference(0f);
-        blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         setRenderState(blend);
+
+        setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
         getSceneHints().setCullHint(CullHint.Never);

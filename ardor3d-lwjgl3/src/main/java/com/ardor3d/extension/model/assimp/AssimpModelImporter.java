@@ -480,7 +480,6 @@ public class AssimpModelImporter {
                         final BlendState bs = new BlendState();
                         store.addRenderState(i, bs);
                         bs.setBlendEnabled(true);
-                        bs.setTestEnabled(true);
 
                         if (readMaterialInt(mat, Assimp.AI_MATKEY_BLEND_FUNC, iValue, one)) {
                             if (iValue.get(0) == Assimp.aiBlendMode_Additive) {

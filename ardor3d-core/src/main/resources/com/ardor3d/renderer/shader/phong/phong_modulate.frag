@@ -1,5 +1,7 @@
 #version 330 core
 
+@import include/alpha_test.glsl
+
 @import include/surface.glsl
 @import include/phong_lighting.glsl
 
@@ -50,10 +52,6 @@ uniform Light light[NR_LIGHTS];
 uniform vec3 cameraLoc;
 uniform ColorSurface surface;
 
-#ifdef USE_FOG
-uniform FogParams fogParams;
-#endif
-
 void main()
 {
 	vec4 color = DiffuseColor;
@@ -80,8 +78,10 @@ void main()
 
     color = clamp(color * vec4(surface.emissive + lighting, surface.opacity), 0.0, 1.0);
 
+    if (!applyAlphaTest(color)) discard;
+
 #ifdef USE_FOG
-    float fogAmount = calcFogAmount(fogParams, abs(ViewPos.z/ViewPos.w));
+    float fogAmount = calcFogAmount(abs(ViewPos.z/ViewPos.w));
     FragColor = mix(color, fogParams.color, fogAmount);
 #else
     FragColor = color;

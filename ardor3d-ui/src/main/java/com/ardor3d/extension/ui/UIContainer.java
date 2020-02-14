@@ -30,11 +30,11 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Spatial;
@@ -476,11 +476,11 @@ public abstract class UIContainer extends UIComponent {
         blend.setBlendEnabled(true);
         blend.setSourceFunction(SourceFunction.SourceAlpha);
         blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
-        // throw out fragments with alpha of 0.
-        blend.setTestFunction(TestFunction.GreaterThan);
-        blend.setReference(0.0f);
-        blend.setTestEnabled(true);
         _standin.setRenderState(blend);
+
+        // throw out fragments with alpha of 0.
+        _standin.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+        _standin.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
         // Update our standin's texture
         resetFakeTexture();

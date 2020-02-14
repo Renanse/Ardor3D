@@ -1,5 +1,7 @@
 #version 330 core
 
+@import include/alpha_test.glsl
+
 out vec4 FragColor;
 
 // stipple - pattern is 16 bit
@@ -31,6 +33,8 @@ void main()
 #ifdef TEXTURED
     color = color * texture(tex0, VertexIn.uv0);
 #endif
+
+    if (!applyAlphaTest(color)) discard;
 
     FragColor = color;
 }

@@ -7,7 +7,7 @@ techniques:
           - key: vertex
           
         uniforms: 
-          - builtIn: [modelViewProj, defaultColor, viewSize, viewOffset]
+          - builtIn: [modelViewProj, defaultColor, viewSize, viewOffset, alphaTest]
           - 
             shaderKey: lineWidth
             type: Float1

@@ -7,7 +7,7 @@ techniques:
           - key: vertex
 
         uniforms: 
-          - builtIn: [model, view, projection, fogParams]
+          - builtIn: [model, view, projection, fogParams, alphaTest]
           - 
             shaderKey: eyePosition
             type: Float3

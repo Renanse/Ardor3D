@@ -25,6 +25,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState;
@@ -641,10 +642,13 @@ public final class Debugger {
             final BlendState lineBlendState = new BlendState();
             lineBlendState.setEnabled(true);
             lineBlendState.setBlendEnabled(true);
-            lineBlendState.setTestEnabled(true);
             lineBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
             lineBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
             lineFrustum.setRenderState(lineBlendState);
+
+            // set alpha testing
+            lineFrustum.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+            lineFrustum.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
             final ZBufferState zstate = new ZBufferState();
             lineFrustum.setRenderState(zstate);
