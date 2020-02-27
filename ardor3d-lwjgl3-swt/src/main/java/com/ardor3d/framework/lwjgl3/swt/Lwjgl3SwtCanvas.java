@@ -39,7 +39,7 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 
 	public Lwjgl3SwtCanvas(final Composite composite, final int style, final GLData glData) {
 		super(composite, style, glData);
-		_passedGLData = getGLData();
+		_passedGLData = glData;
 		setCurrent();
 
 		addListener(SWT.Resize, event -> {
@@ -85,8 +85,14 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
 		final int w = getContentWidth();
 		final int h = getContentHeight();
 
+		CanvasRenderer shareCanvasRenderer = null;
+        if(_passedGLData.shareContext != null && _passedGLData.shareContext instanceof com.ardor3d.framework.Canvas) {
+            com.ardor3d.framework.Canvas canvas = (com.ardor3d.framework.Canvas)_passedGLData.shareContext;
+            shareCanvasRenderer = canvas.getCanvasRenderer();
+        }
+		
 		final DisplaySettings settings = new DisplaySettings(w, h, 0, 0, _passedGLData.alphaSize,
-				_passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples, false, _passedGLData.stereo);
+				_passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples, false, _passedGLData.stereo, shareCanvasRenderer);
 
 		_canvasRenderer.init(this, settings, false); // false - do not do back buffer swap, swt will do that.
 		_inited = true;
