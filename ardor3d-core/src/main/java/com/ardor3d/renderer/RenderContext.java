@@ -50,8 +50,11 @@ public class RenderContext {
 
     protected final RendererRecord _rendererRecord = createRendererRecord();
 
-    /** Basically this object represents the sharable portion of a GL context... Textures, displayLists, etc. */
-    protected final RenderContextRef _glContextRef;
+    /** Represents the sharable portion of a GL context... Textures, displayLists, etc. */
+    protected final RenderContextRef _sharableContextRef;
+
+    /** Represents the non-sharable portion of a GL context... VAO, etc. */
+    protected final RenderContextRef _uniqueContextRef = new RenderContextRef();
 
     protected final ContextCapabilities _capabilities;
 
@@ -70,7 +73,7 @@ public class RenderContext {
         _contextKey = key;
         _capabilities = caps;
         setupRecords();
-        _glContextRef = (shared == null) ? new RenderContextRef() : shared._glContextRef;
+        _sharableContextRef = (shared == null) ? new RenderContextRef() : shared._sharableContextRef;
     }
 
     protected RendererRecord createRendererRecord() {
@@ -200,8 +203,12 @@ public class RenderContext {
         _currentCanvasRenderer = renderer;
     }
 
-    public RenderContextRef getGlContextRef() {
-        return _glContextRef;
+    public RenderContextRef getSharableContextRef() {
+        return _sharableContextRef;
+    }
+
+    public RenderContextRef getUniqueContextRef() {
+        return _uniqueContextRef;
     }
 
     /**

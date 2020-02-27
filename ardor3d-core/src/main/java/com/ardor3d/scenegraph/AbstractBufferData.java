@@ -152,7 +152,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
      *         returned.
      */
     public int getBufferId(final RenderContext context) {
-        return getBufferIdByRef(context.getGlContextRef());
+        return getBufferIdByRef(context.getSharableContextRef());
     }
 
     /**
@@ -179,7 +179,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
      * @return the id removed or 0 if not found.
      */
     public int removeBufferId(final RenderContext context) {
-        final Integer id = _bufferIdCache.removeValue(context.getGlContextRef());
+        final Integer id = _bufferIdCache.removeValue(context.getSharableContextRef());
         if (Constants.useMultipleContexts) {
             synchronized (_uploadedContexts) {
                 WeakReference<RenderContextRef> ref;
@@ -187,7 +187,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
                 for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
                     ref = it.next();
                     check = ref.get();
-                    if (check == null || check.equals(context.getGlContextRef())) {
+                    if (check == null || check.equals(context.getSharableContextRef())) {
                         it.remove();
                         continue;
                     }
@@ -217,7 +217,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         if (_bufferIdCache == null) {
             _bufferIdCache = ContextValueReference.newReference(this, _vboRefQueue);
         }
-        _bufferIdCache.put(context.getGlContextRef(), id);
+        _bufferIdCache.put(context.getSharableContextRef(), id);
     }
 
     /**
@@ -246,7 +246,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
                         continue;
                     }
 
-                    if (!uploaded && check.equals(context.getGlContextRef())) {
+                    if (!uploaded && check.equals(context.getSharableContextRef())) {
                         // found match, return false
                         uploaded = true;
                     }
@@ -280,7 +280,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     public void markClean(final RenderContext context) {
         if (Constants.useMultipleContexts) {
             synchronized (_uploadedContexts) {
-                _uploadedContexts.add(new WeakReference<>(context.getGlContextRef()));
+                _uploadedContexts.add(new WeakReference<>(context.getSharableContextRef()));
             }
         } else {
             _uploaded = true;
@@ -311,7 +311,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
                         idMap.put(o, buf.getBufferIdByRef(o));
                     }
                 } else {
-                    idMap.put(ContextManager.getCurrentContext().getGlContextRef(), buf.getBufferIdByRef(null));
+                    idMap.put(ContextManager.getCurrentContext().getSharableContextRef(), buf.getBufferIdByRef(null));
                 }
                 buf._bufferIdCache.clear();
                 buf.markDirty();
@@ -327,14 +327,14 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         // gather up expired vbos... these don't exist in our cache
         gatherGCdIds(idMap);
 
-        final RenderContextRef glRef = context.getGlContextRef();
+        final RenderContextRef glRef = context.getSharableContextRef();
         // Walk through the cached items and delete those too.
         for (final AbstractBufferData<?> buf : _identityCache.keySet()) {
             // only worry about buffers that have received ids.
             if (buf._bufferIdCache != null) {
                 final Integer id = buf._bufferIdCache.removeValue(glRef);
                 if (id != null && id.intValue() != 0) {
-                    idMap.put(context.getGlContextRef(), id);
+                    idMap.put(context.getSharableContextRef(), id);
                 }
             }
         }
@@ -387,7 +387,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
                     if (store == null) { // lazy init
                         store = ArrayListMultimap.create();
                     }
-                    store.put(ContextManager.getCurrentContext().getGlContextRef(), id);
+                    store.put(ContextManager.getCurrentContext().getSharableContextRef(), id);
                 }
             }
             ref.clear();
@@ -397,23 +397,23 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     }
 
     private static void handleVBODelete(final IShaderUtils utils, final Multimap<RenderContextRef, Integer> idMap) {
-        Object currentGLRef = null;
+        RenderContextRef currentSharableRef = null;
         // Grab the current context, if any.
         if (utils != null && ContextManager.getCurrentContext() != null) {
-            currentGLRef = ContextManager.getCurrentContext().getGlContextRef();
+            currentSharableRef = ContextManager.getCurrentContext().getSharableContextRef();
         }
         // For each affected context...
-        for (final RenderContextRef glref : idMap.keySet()) {
+        for (final RenderContextRef sharableRef : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
-            if (utils != null && glref.equals(currentGLRef)) {
-                utils.deleteBuffers(idMap.get(glref));
+            if (utils != null && sharableRef.equals(currentSharableRef)) {
+                utils.deleteBuffers(idMap.get(sharableRef));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref))
+                GameTaskQueueManager.getManager(ContextManager.getContextForSharableRef(sharableRef))
                         .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().getShaderUtils().deleteBuffers(idMap.get(glref));
+                                getRenderer().getShaderUtils().deleteBuffers(idMap.get(sharableRef));
                                 return null;
                             }
                         });

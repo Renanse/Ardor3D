@@ -55,15 +55,33 @@ public class ContextManager {
     /**
      * Find the first context we manage that uses the given shared opengl context.
      *
-     * @param glref
+     * @param reference
      * @return
      */
-    public static RenderContext getContextForRef(final RenderContextRef glref) {
-        if (glref == null) {
+    public static RenderContext getContextForSharableRef(final RenderContextRef reference) {
+        if (reference == null) {
             return null;
         }
         for (final RenderContext context : contextStore.values()) {
-            if (glref.equals(context.getGlContextRef())) {
+            if (reference.equals(context.getSharableContextRef())) {
+                return context;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the first context we manage that uses the given unique opengl context.
+     *
+     * @param reference
+     * @return
+     */
+    public static RenderContext getContextForUniqueRef(final RenderContextRef reference) {
+        if (reference == null) {
+            return null;
+        }
+        for (final RenderContext context : contextStore.values()) {
+            if (reference.equals(context.getUniqueContextRef())) {
                 return context;
             }
         }

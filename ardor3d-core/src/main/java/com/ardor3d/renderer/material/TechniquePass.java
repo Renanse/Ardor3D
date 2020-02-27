@@ -60,7 +60,7 @@ public class TechniquePass {
 
     public int getProgramId(final RenderContext context) {
         if (_shaderIdCache != null) {
-            final Integer id = _shaderIdCache.getValue(context.getGlContextRef());
+            final Integer id = _shaderIdCache.getValue(context.getSharableContextRef());
             if (id != null) {
                 return id.intValue();
             }
@@ -76,7 +76,7 @@ public class TechniquePass {
         if (_shaderIdCache == null) {
             _shaderIdCache = ContextValueReference.newReference(this, _shaderRefQueue);
         }
-        _shaderIdCache.put(context.getGlContextRef(), id);
+        _shaderIdCache.put(context.getSharableContextRef(), id);
     }
 
     public void setName(final String name) {

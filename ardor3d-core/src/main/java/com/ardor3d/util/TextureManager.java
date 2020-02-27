@@ -313,7 +313,8 @@ final public class TextureManager {
                     idMap.put(o, key.getTextureIdForContextRef(o));
                 }
             } else {
-                idMap.put(ContextManager.getCurrentContext().getGlContextRef(), key.getTextureIdForContextRef(null));
+                idMap.put(ContextManager.getCurrentContext().getSharableContextRef(),
+                        key.getTextureIdForContextRef(null));
             }
             key.clearIdCache();
         }
@@ -356,7 +357,7 @@ final public class TextureManager {
 
             final Integer id = key.getTextureIdForContext(context);
             if (id != 0) {
-                idMap.put(context.getGlContextRef(), id);
+                idMap.put(context.getSharableContextRef(), id);
                 key.removeFromIdCache(context);
             }
         }
@@ -430,7 +431,7 @@ final public class TextureManager {
             } else {
                 id = ref.getValue(null);
                 if (id != null && id.intValue() != 0) {
-                    idMap.put(ContextManager.getCurrentContext().getGlContextRef(), id);
+                    idMap.put(ContextManager.getCurrentContext().getSharableContextRef(), id);
                 }
             }
             ref.clear();
@@ -440,28 +441,30 @@ final public class TextureManager {
 
     private static void handleTextureDelete(final ITextureUtils utils, final Multimap<RenderContextRef, Integer> idMap,
             final Map<RenderContextRef, Future<Void>> futureStore) {
-        RenderContextRef currentGLRef = null;
+        RenderContextRef currentSharableRef = null;
         // Grab the current context, if any.
         if (utils != null && ContextManager.getCurrentContext() != null) {
-            currentGLRef = ContextManager.getCurrentContext().getGlContextRef();
+            currentSharableRef = ContextManager.getCurrentContext().getSharableContextRef();
         }
         // For each affected context...
-        for (final RenderContextRef contextRef : idMap.keySet()) {
+        for (final RenderContextRef sharableRef : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
-            if (currentGLRef != null && (!Constants.useMultipleContexts || contextRef.equals(currentGLRef))) {
-                utils.deleteTextureIds(idMap.get(contextRef));
+            if (currentSharableRef != null
+                    && (!Constants.useMultipleContexts || sharableRef.equals(currentSharableRef))) {
+                utils.deleteTextureIds(idMap.get(sharableRef));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                final Future<Void> future = GameTaskQueueManager.getManager(ContextManager.getContextForRef(contextRef))
+                final Future<Void> future = GameTaskQueueManager
+                        .getManager(ContextManager.getContextForSharableRef(sharableRef))
                         .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().getTextureUtils().deleteTextureIds(idMap.get(contextRef));
+                                getRenderer().getTextureUtils().deleteTextureIds(idMap.get(sharableRef));
                                 return null;
                             }
                         });
                 if (futureStore != null) {
-                    futureStore.put(contextRef, future);
+                    futureStore.put(sharableRef, future);
                 }
             }
         }

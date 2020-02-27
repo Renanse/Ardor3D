@@ -132,7 +132,7 @@ public class MeshData implements Savable {
      * @return the id of a vao in the given context. If the vao is not found in the given context, 0 is returned.
      */
     public int getVAOID(final RenderContext context) {
-        return getVAOIDByRef(context.getGlContextRef());
+        return getVAOIDByRef(context.getUniqueContextRef());
     }
 
     /**
@@ -158,7 +158,7 @@ public class MeshData implements Savable {
      * @return the id removed or 0 if not found.
      */
     public int removeVAOID(final RenderContext context) {
-        final Integer id = _vaoIdCache.removeValue(context.getGlContextRef());
+        final Integer id = _vaoIdCache.removeValue(context.getUniqueContextRef());
         if (Constants.useMultipleContexts) {
             synchronized (_uploadedContexts) {
                 WeakReference<RenderContextRef> ref;
@@ -166,7 +166,7 @@ public class MeshData implements Savable {
                 for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
                     ref = it.next();
                     check = ref.get();
-                    if (check == null || check.equals(context.getGlContextRef())) {
+                    if (check == null || check.equals(context.getUniqueContextRef())) {
                         it.remove();
                         continue;
                     }
@@ -196,7 +196,7 @@ public class MeshData implements Savable {
         if (_vaoIdCache == null) {
             _vaoIdCache = ContextValueReference.newReference(this, _vaoRefQueue);
         }
-        _vaoIdCache.put(context.getGlContextRef(), id);
+        _vaoIdCache.put(context.getUniqueContextRef(), id);
     }
 
     /**
@@ -260,7 +260,7 @@ public class MeshData implements Savable {
                         continue;
                     }
 
-                    if (!uploaded && check.equals(context.getGlContextRef())) {
+                    if (!uploaded && check.equals(context.getSharableContextRef())) {
                         // found match, return false
                         uploaded = true;
                     }
@@ -295,7 +295,7 @@ public class MeshData implements Savable {
     public void markBuffersClean(final RenderContext context) {
         if (Constants.useMultipleContexts) {
             synchronized (_uploadedContexts) {
-                _uploadedContexts.add(new WeakReference<>(context.getGlContextRef()));
+                _uploadedContexts.add(new WeakReference<>(context.getSharableContextRef()));
             }
         } else {
             _uploaded = true;
@@ -1354,7 +1354,8 @@ public class MeshData implements Savable {
                         idMap.put(renderRef, data.getVAOIDByRef(renderRef));
                     }
                 } else {
-                    idMap.put(ContextManager.getCurrentContext().getGlContextRef(), data.getVAOIDByRef(null));
+                    // single context mode
+                    idMap.put(ContextManager.getCurrentContext().getUniqueContextRef(), data.getVAOIDByRef(null));
                 }
                 data._vaoIdCache.clear();
             }
@@ -1369,14 +1370,14 @@ public class MeshData implements Savable {
         // gather up expired vaos... these don't exist in our cache
         gatherGCdIds(idMap);
 
-        final RenderContextRef glRef = context.getGlContextRef();
+        final RenderContextRef uniqueRef = context.getUniqueContextRef();
         // Walk through the cached items and delete those too.
         for (final MeshData data : _identityCache.keySet()) {
             // only worry about data that have received ids.
             if (data._vaoIdCache != null) {
-                final Integer id = data._vaoIdCache.removeValue(glRef);
+                final Integer id = data._vaoIdCache.removeValue(uniqueRef);
                 if (id != null && id.intValue() != 0) {
-                    idMap.put(context.getGlContextRef(), id);
+                    idMap.put(uniqueRef, id);
                 }
             }
         }
@@ -1387,13 +1388,13 @@ public class MeshData implements Savable {
     @SuppressWarnings("unchecked")
     private static final Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
         // Pull all expired vaos from ref queue and add to an id multimap.
-        ContextValueReference<MeshData, Integer> ref;
-        while ((ref = (ContextValueReference<MeshData, Integer>) _vaoRefQueue.poll()) != null) {
+        ContextValueReference<MeshData, Integer> valRef;
+        while ((valRef = (ContextValueReference<MeshData, Integer>) _vaoRefQueue.poll()) != null) {
             if (Constants.useMultipleContexts) {
-                final Set<RenderContextRef> contextRefs = ref.getContextRefs();
+                final Set<RenderContextRef> contextRefs = valRef.getContextRefs();
                 for (final RenderContextRef rep : contextRefs) {
                     // Add id to map
-                    final Integer id = ref.getValue(rep);
+                    final Integer id = valRef.getValue(rep);
                     if (id != null) {
                         if (store == null) { // lazy init
                             store = ArrayListMultimap.create();
@@ -1402,38 +1403,38 @@ public class MeshData implements Savable {
                     }
                 }
             } else {
-                final Integer id = ref.getValue(null);
+                final Integer id = valRef.getValue(null);
                 if (id != null) {
                     if (store == null) { // lazy init
                         store = ArrayListMultimap.create();
                     }
-                    store.put(ContextManager.getCurrentContext().getGlContextRef(), id);
+                    store.put(ContextManager.getCurrentContext().getUniqueContextRef(), id);
                 }
             }
-            ref.clear();
+            valRef.clear();
         }
 
         return store;
     }
 
     private static void handleVAODelete(final IShaderUtils utils, final Multimap<RenderContextRef, Integer> idMap) {
-        RenderContextRef currentGLRef = null;
+        RenderContextRef currentUniqueRef = null;
         // Grab the current context, if any.
         if (utils != null && ContextManager.getCurrentContext() != null) {
-            currentGLRef = ContextManager.getCurrentContext().getGlContextRef();
+            currentUniqueRef = ContextManager.getCurrentContext().getUniqueContextRef();
         }
         // For each affected context...
-        for (final RenderContextRef ref : idMap.keySet()) {
+        for (final RenderContextRef uniqueRef : idMap.keySet()) {
             // If we have a deleter and the context is current, immediately delete
-            if (utils != null && ref.equals(currentGLRef)) {
-                utils.deleteVertexArrays(idMap.get(ref));
+            if (utils != null && uniqueRef.equals(currentUniqueRef)) {
+                utils.deleteVertexArrays(idMap.get(uniqueRef));
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(ref))
+                GameTaskQueueManager.getManager(ContextManager.getContextForUniqueRef(uniqueRef))
                         .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
-                                getRenderer().getShaderUtils().deleteVertexArrays(idMap.get(ref));
+                                getRenderer().getShaderUtils().deleteVertexArrays(idMap.get(uniqueRef));
                                 return null;
                             }
                         });

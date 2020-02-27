@@ -126,7 +126,7 @@ final public class TextureKey implements Savable {
                         continue;
                     }
 
-                    if (!uploaded && check.equals(context.getGlContextRef())) {
+                    if (!uploaded && check.equals(context.getSharableContextRef())) {
                         // found match, return false
                         uploaded = true;
                     }
@@ -141,7 +141,7 @@ final public class TextureKey implements Savable {
     public void markClean(final RenderContext context) {
         if (Constants.useMultipleContexts) {
             synchronized (_uploadedContexts) {
-                _uploadedContexts.add(new WeakReference<>(context.getGlContextRef()));
+                _uploadedContexts.add(new WeakReference<>(context.getSharableContextRef()));
             }
         } else {
             _uploaded = true;
@@ -226,7 +226,7 @@ final public class TextureKey implements Savable {
      *         returned.
      */
     public Integer getTextureIdForContext(final RenderContext context) {
-        return getTextureIdForContextRef(context.getGlContextRef());
+        return getTextureIdForContextRef(context.getSharableContextRef());
     }
 
     /**
@@ -264,7 +264,7 @@ final public class TextureKey implements Savable {
      * @return the id removed, or 0 if not found.
      */
     public int removeFromIdCache(final RenderContext context) {
-        final Integer id = _idCache.removeValue(context.getGlContextRef());
+        final Integer id = _idCache.removeValue(context.getSharableContextRef());
         if (Constants.useMultipleContexts) {
             synchronized (_uploadedContexts) {
                 WeakReference<RenderContextRef> ref;
@@ -272,7 +272,7 @@ final public class TextureKey implements Savable {
                 for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
                     ref = it.next();
                     check = ref.get();
-                    if (check == null || check.equals(context.getGlContextRef())) {
+                    if (check == null || check.equals(context.getSharableContextRef())) {
                         it.remove();
                         continue;
                     }
@@ -313,7 +313,7 @@ final public class TextureKey implements Savable {
             throw new IllegalArgumentException("textureId must != 0");
         }
 
-        _idCache.put(context.getGlContextRef(), textureId);
+        _idCache.put(context.getSharableContextRef(), textureId);
     }
 
     @Override
