@@ -641,9 +641,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     @Override
     public int setupBufferObject(final AbstractBufferData<? extends Buffer> buffer, final boolean isEBO,
             final RenderContext context) {
+        final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
 
         int id = buffer.getBufferId(context);
         if (id != 0 && buffer.isBufferClean(context)) {
+            GL15C.glBindBuffer(target, id);
             return id;
         }
 
@@ -661,7 +663,6 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
                 }
             }
 
-            final int target = isEBO ? GL15C.GL_ELEMENT_ARRAY_BUFFER : GL15C.GL_ARRAY_BUFFER;
             GL15C.glBindBuffer(target, id);
             if (newBuffer) {
                 GL15C.glBufferData(target, dataBuffer.capacity() * buffer.getByteCount(),
@@ -688,8 +689,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
     @Override
     public void bindVertexAttribute(final int location, final AbstractBufferData<? extends Buffer> buffer) {
-        GL20C.glVertexAttribPointer(location, buffer.getValuesPerTuple(), getGLDataType(buffer.getBuffer()), false, 0,
-                0);
+        GL20C.glVertexAttribPointer(location, buffer.getValuesPerTuple(), getGLDataType(buffer.getBuffer()), false, 0, 0);
         GL20C.glEnableVertexAttribArray(location);
     }
 

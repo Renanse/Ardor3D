@@ -198,16 +198,14 @@ public class TechniquePass {
 
             // pull our related buffer
             final AbstractBufferData<? extends Buffer> buffer = data.getCoords(attribute.getMeshDataKey());
-            if (buffer.isBufferClean(context)) {
-                continue;
-            }
 
+            // check we have a valid attribute location in the current program
             int location = attribute.getLocation();
             if (location < 0) {
                 // Use the name to find our location
                 location = shaderUtils.findAttributeLocation(programId, attribute.getShaderVariableName());
 
-                // still less than 0? might have been removed during compilation
+                // still less than 0? might have been removed during compilation - ignore
                 if (location < 0) {
                     continue;
                 }
@@ -217,11 +215,11 @@ public class TechniquePass {
             // Make sure our buffer has a vbo and its data is on the card.
             shaderUtils.setupBufferObject(buffer, false, context);
 
-            // Bind our attribute to the current shader program
+            // Bind our buffer to the attribute location
             shaderUtils.bindVertexAttribute(location, buffer);
         }
 
-        // send any indices as well
+        // make sure any index buffer we have is also up to date on the card
         if (data.getIndexBuffer() != null) {
             shaderUtils.setupBufferObject(data.getIndices(), true, context);
         }
