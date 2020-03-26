@@ -11,6 +11,7 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.nio.ByteBuffer;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
@@ -57,6 +58,27 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
     }
 
     @Override
+    public Set<Tile> handleUpdateRequests() {
+        final Set<Tile> updateTiles = getInvalidTilesFromSource(backCurrentTileX - cacheSize / 2,
+                backCurrentTileY - cacheSize / 2, cacheSize, cacheSize);
+        if (updateTiles == null || updateTiles.isEmpty()) {
+            return null;
+        }
+
+        final Set<Tile> rVal = new HashSet<>();
+
+        for (final Tile tile : updateTiles) {
+            final int destX = MathUtils.moduloPositive(tile.getX(), cacheSize);
+            final int destY = MathUtils.moduloPositive(tile.getY(), cacheSize);
+            if (copyTileData(tile, destX, destY)) {
+                rVal.add(tile);
+            }
+        }
+
+        return rVal;
+    }
+
+    @Override
     protected boolean copyTileData(final Tile sourceTile, final int destX, final int destY) {
         ByteBuffer sourceData = null;
         try {
@@ -72,18 +94,18 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
             return false;
         }
 
-        final TextureStoreFormat format = textureConfiguration.getTextureDataType(source.getContributorId(
-                dataClipIndex, sourceTile));
+        final TextureStoreFormat format = textureConfiguration
+                .getTextureDataType(source.getContributorId(dataClipIndex, sourceTile));
         CacheFunctionUtil.applyFunction(useAlpha, function, sourceData, data, destX, destY, format, tileSize, dataSize);
 
         return true;
     }
 
     @Override
-    protected Set<Tile> getValidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
-            final int numTilesX, final int numTilesY) {
+    protected Set<Tile> getValidTilesFromSource(final int tileX, final int tileY, final int numTilesX,
+            final int numTilesY) {
         try {
-            return source.getValidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+            return source.getValidTiles(dataClipIndex, tileX, tileY, numTilesX, numTilesY);
         } catch (final Exception e) {
             logger.log(Level.WARNING, "Exception getting source info", e);
             return null;
@@ -91,10 +113,10 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
     }
 
     @Override
-    protected Set<Tile> getInvalidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
-            final int numTilesX, final int numTilesY) {
+    protected Set<Tile> getInvalidTilesFromSource(final int tileX, final int tileY, final int numTilesX,
+            final int numTilesY) {
         try {
-            return source.getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+            return source.getInvalidTiles(dataClipIndex, tileX, tileY, numTilesX, numTilesY);
         } catch (final Exception e) {
             logger.log(Level.WARNING, "Exception getting source info", e);
             return null;
@@ -229,8 +251,8 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
                 destinationData.put(rgbArray, 0, (destinationSize - dataX) * colorBits);
 
                 destinationData.position(destIndex);
-                destinationData.put(rgbArray, (destinationSize - dataX) * colorBits, (dataX + width - destinationSize)
-                        * colorBits);
+                destinationData.put(rgbArray, (destinationSize - dataX) * colorBits,
+                        (dataX + width - destinationSize) * colorBits);
             } else {
                 final int destIndex = (dataY * destinationSize + dataX) * colorBits;
                 destinationData.position(destIndex);

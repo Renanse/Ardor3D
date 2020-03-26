@@ -3,48 +3,31 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
 package com.ardor3d.extension.terrain.client;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * The TerrainDataProvider is the connection between the terrain core and external data.
  */
 public interface TerrainDataProvider {
     /**
-     * Request for all available maps. Returns a Map with mapIDs and map names.
-     * 
-     * @return Available maps
-     * @throws Exception
+     * @return this provider's TerrainSource
      */
-    Map<Integer, String> getAvailableMaps() throws Exception;
+    TerrainSource getTerrainSource();
 
     /**
-     * Request for a TerrainSource of valid type for this Provider.
-     * 
-     * @param mapId
-     * @return
+     * @return a list of TextureSources for this Provider.
      */
-    TerrainSource getTerrainSource(int mapId);
+    List<TextureSource> getTextureSources();
 
     /**
-     * Request for a TextureSource of valid type for this Provider.
-     * 
-     * @param mapId
-     * @return
+     * @return the normalmap TextureSource for this Provider, or null if none is provided.
      */
-    TextureSource getTextureSource(int mapId);
-
-    /**
-     * Request for a normalmap TextureSource of valid type for this Provider.
-     * 
-     * @param mapId
-     * @return
-     */
-    TextureSource getNormalMapSource(int mapId);
+    TextureSource getNormalMapSource();
 }

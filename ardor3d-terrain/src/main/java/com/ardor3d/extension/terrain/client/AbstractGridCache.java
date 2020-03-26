@@ -78,15 +78,17 @@ public abstract class AbstractGridCache {
         }
     }
 
+    public Region toRegion(final Tile sourceTile) {
+        return new Region(meshClipIndex, sourceTile.getX() * tileSize * vertexDistance,
+                sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
+    }
+
     public void setCurrentPosition(final int x, final int y) {
         final int tileX = MathUtils.floor((float) x / tileSize);
         final int tileY = MathUtils.floor((float) y / tileSize);
 
-        final int diffX = tileX - backCurrentTileX;
-        final int diffY = tileY - backCurrentTileY;
-
         // if we have not moved to a new center tile, ignore the position change.
-        if (diffX == 0 && diffY == 0) {
+        if (tileX == backCurrentTileX && tileY == backCurrentTileY) {
             return;
         }
 
@@ -179,8 +181,8 @@ public abstract class AbstractGridCache {
         }
 
         if (isTileOutsideLocatorArea(tileX, tileY)) {
-            validTiles = getValidTilesFromSource(dataClipIndex, tileX - locatorSize / 2, tileY - locatorSize / 2,
-                    locatorSize, locatorSize);
+            validTiles = getValidTilesFromSource(tileX - locatorSize / 2, tileY - locatorSize / 2, locatorSize,
+                    locatorSize);
             locatorTile = new Tile(tileX, tileY);
         }
 
@@ -205,29 +207,13 @@ public abstract class AbstractGridCache {
         }
     }
 
-    public Set<Tile> handleUpdateRequests() {
-        final Set<Tile> updateTiles = getInvalidTilesFromSource(dataClipIndex, backCurrentTileX - cacheSize / 2,
-                backCurrentTileY - cacheSize / 2, cacheSize, cacheSize);
-        if (updateTiles == null || updateTiles.isEmpty()) {
-            return null;
-        }
-
-        for (final Tile tile : updateTiles) {
-            final int destX = MathUtils.moduloPositive(tile.getX(), cacheSize);
-            final int destY = MathUtils.moduloPositive(tile.getY(), cacheSize);
-            copyTileData(tile, destX, destY);
-        }
-
-        return updateTiles;
-    }
-
     protected abstract boolean copyTileData(final Tile sourceTile, final int destX, final int destY);
 
-    protected abstract Set<Tile> getValidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
-            int numTilesX, int numTilesY);
+    protected abstract Set<Tile> getValidTilesFromSource(final int tileX, final int tileY, int numTilesX,
+            int numTilesY);
 
-    protected abstract Set<Tile> getInvalidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
-            int numTilesX, int numTilesY);
+    protected abstract Set<Tile> getInvalidTilesFromSource(final int tileX, final int tileY, int numTilesX,
+            int numTilesY);
 
     protected abstract AbstractGridCache getParentCache();
 
@@ -303,13 +289,7 @@ public abstract class AbstractGridCache {
             state = State.finished;
             sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
 
-            final int level = sourceCache.meshClipIndex;
-            final int vertexDistance = sourceCache.vertexDistance;
-            final int tileSize = sourceCache.tileSize;
-            final Region region = new Region(level, sourceTile.getX() * tileSize * vertexDistance,
-                    sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance,
-                    tileSize * vertexDistance);
-
+            final Region region = sourceCache.toRegion(sourceTile);
             final DoubleBufferedList<Region> mailBox = sourceCache.mailBox;
             if (mailBox != null) {
                 mailBox.add(region);

@@ -10,8 +10,8 @@
 
 package com.ardor3d.extension.terrain.providers.procedural;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
 import com.ardor3d.extension.terrain.client.TerrainSource;
@@ -42,25 +42,19 @@ public class ProceduralTerrainDataProvider implements TerrainDataProvider {
     }
 
     @Override
-    public Map<Integer, String> getAvailableMaps() throws Exception {
-        final Map<Integer, String> maps = new HashMap<>();
-        maps.put(0, "ProceduralMap");
-
-        return maps;
-    }
-
-    @Override
-    public TerrainSource getTerrainSource(final int mapId) {
+    public TerrainSource getTerrainSource() {
         return new ProceduralTerrainSource(function, scale, minHeight, maxHeight);
     }
 
     @Override
-    public TextureSource getTextureSource(final int mapId) {
-        return new ProceduralTextureSource(function);
+    public List<TextureSource> getTextureSources() {
+        final List<TextureSource> rVal = new ArrayList<>(1);
+        rVal.add(new ProceduralTextureSource(function));
+        return rVal;
     }
 
     @Override
-    public TextureSource getNormalMapSource(final int mapId) {
+    public TextureSource getNormalMapSource() {
         return new ProceduralNormalMapSource(function, scale.getY() / maxHeight, scale.getX(), scale.getZ());
     }
 

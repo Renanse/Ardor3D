@@ -11,11 +11,9 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.nio.FloatBuffer;
-import java.util.Set;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.Region;
-import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 /**
@@ -34,7 +32,7 @@ public interface TerrainCache {
     /**
      * Returns the height at a given grid position. If the cache does not have a valid tile at this position, we'll try
      * our parent level cache.
-     * 
+     *
      * @param x
      *            local x position to get height from
      * @param z
@@ -72,7 +70,11 @@ public interface TerrainCache {
 
     void setMailBox(final DoubleBufferedList<Region> mailBox);
 
-    Set<Tile> handleUpdateRequests();
+    /**
+     * Ask our cache to check for tiles that have gone bad. These should get submitted to the mailbox as regions.
+     */
+    void checkForInvalidatedRegions();
 
     void checkForUpdates();
+
 }
