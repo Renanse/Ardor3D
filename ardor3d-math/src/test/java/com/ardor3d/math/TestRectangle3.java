@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -47,7 +47,6 @@ public class TestRectangle3 {
         final Rectangle3 rect1 = new Rectangle3();
         assertEquals(rect1, rect1);
         assertFalse(rect1.equals(null));
-        assertFalse(rect1.equals(new Vector2()));
 
         // throw in a couple pool accesses for coverage
         final Rectangle3 rect2 = Rectangle3.fetchTempInstance();

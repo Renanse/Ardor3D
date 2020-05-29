@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -52,7 +52,6 @@ public class TestRay3 {
         // couple if equals validity tests
         assertEquals(ray1, ray1);
         assertFalse(ray1.equals(null));
-        assertFalse(ray1.equals(new Vector3()));
 
         // throw in a couple pool accesses for coverage
         final Ray3 ray4 = Ray3.fetchTempInstance();

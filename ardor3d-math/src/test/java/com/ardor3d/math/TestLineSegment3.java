@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -60,7 +60,6 @@ public class TestLineSegment3 {
         final LineSegment3 seg1 = new LineSegment3();
         assertEquals(seg1, seg1);
         assertFalse(seg1.equals(null));
-        assertFalse(seg1.equals(new Vector2()));
 
         // throw in a couple pool accesses for coverage
         final LineSegment3 seg2 = LineSegment3.fetchTempInstance();
