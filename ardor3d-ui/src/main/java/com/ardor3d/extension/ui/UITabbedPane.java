@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -31,7 +31,9 @@ import com.ardor3d.scenegraph.Spatial;
 public class UITabbedPane extends UIPanel {
     private static final Logger logger = Logger.getLogger(UITabbedPane.class.getName());
 
-    /** Our contents... Used instead of the normal children field because we need to track and show just one at a time. */
+    /**
+     * Our contents... Used instead of the normal children field because we need to track and show just one at a time.
+     */
     private final ArrayList<UIComponent> _contents = new ArrayList<UIComponent>();
 
     /** The panel containing our navigation tab buttons. */
@@ -51,7 +53,7 @@ public class UITabbedPane extends UIPanel {
 
     /**
      * Construct a new Tabbed Pane with the given tab placement.
-     * 
+     *
      * @param placement
      *            which edge to place the tab buttons on
      */
@@ -113,8 +115,8 @@ public class UITabbedPane extends UIPanel {
                 final Spatial child = _contents.get(x);
                 if (child instanceof UIComponent) {
                     final UIComponent comp = (UIComponent) child;
-                    comp.setLocalComponentSize(getViewedComponent().getLocalComponentWidth(), getViewedComponent()
-                            .getLocalComponentHeight());
+                    comp.setLocalComponentSize(getViewedComponent().getLocalComponentWidth(),
+                            getViewedComponent().getLocalComponentHeight());
                     comp.layout();
                 }
             }
@@ -145,25 +147,25 @@ public class UITabbedPane extends UIPanel {
      * Adds the given component to this tabbed pane with no icon and "unnamed" as the tab label.
      */
     @Override
-    public void add(final UIComponent component) {
-        add(component, "unnamed", null);
+    public <T extends UIComponent> T add(final T component) {
+        return add(component, "unnamed", null);
     }
 
     /**
      * Adds the given component to this tabbed pane using the given tab label text and no icon.
-     * 
+     *
      * @param component
      *            the component to add
      * @param label
      *            the text of the tab label
      */
-    public void add(final UIComponent component, final String label) {
-        add(component, label, null);
+    public <T extends UIComponent> T add(final T component, final String label) {
+        return add(component, label, null);
     }
 
     /**
      * Adds the given component to this tabbed pane using the given tab label text and icon.
-     * 
+     *
      * @param component
      *            the component to add
      * @param label
@@ -171,10 +173,10 @@ public class UITabbedPane extends UIPanel {
      * @param icon
      *            the icon of the tab label
      */
-    public void add(final UIComponent component, final String label, final SubTex icon) {
+    public <T extends UIComponent> T add(final T component, final String label, final SubTex icon) {
         if (component == null) {
             UITabbedPane.logger.log(Level.WARNING, "Can not add a null component to a TabbedPane.");
-            return;
+            return null;
         }
 
         // make sure the component uses center layout position
@@ -191,11 +193,13 @@ public class UITabbedPane extends UIPanel {
         if (_contents.size() == 1) {
             setCurrentTab(0);
         }
+
+        return component;
     }
 
     /**
      * Remove the tab at the given tab index.
-     * 
+     *
      * @param index
      *            the tab index
      */
@@ -229,7 +233,7 @@ public class UITabbedPane extends UIPanel {
 
     /**
      * Set the currently viewed component to the one associated with the given tab.
-     * 
+     *
      * @param tab
      *            the tab
      */
@@ -239,7 +243,7 @@ public class UITabbedPane extends UIPanel {
 
     /**
      * Set the currently viewed component to the one at the given tab index.
-     * 
+     *
      * @param index
      *            the tab index
      */
@@ -291,7 +295,7 @@ public class UITabbedPane extends UIPanel {
 
     /**
      * Make our tab button using the given label text and icon.
-     * 
+     *
      * @param label
      *            optional label text
      * @param icon

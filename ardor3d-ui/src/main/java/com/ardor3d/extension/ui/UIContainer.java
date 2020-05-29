@@ -127,8 +127,9 @@ public abstract class UIContainer extends UIComponent {
      *
      * @param component
      *            the component to add
+     * @return the component for chaining
      */
-    public void add(final UIComponent component) {
+    public <T extends UIComponent> T add(final T component) {
         attachChild(component);
         // send relation event if we already have a hud
         if (getHud() != null) {
@@ -136,6 +137,7 @@ public abstract class UIContainer extends UIComponent {
         }
         fireStyleChanged();
         fireComponentDirty();
+        return component;
     }
 
     /**
