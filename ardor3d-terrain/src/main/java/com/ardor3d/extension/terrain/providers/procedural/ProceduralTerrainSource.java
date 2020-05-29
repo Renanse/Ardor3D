@@ -3,13 +3,14 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
 package com.ardor3d.extension.terrain.providers.procedural;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,6 +25,7 @@ public class ProceduralTerrainSource implements TerrainSource {
     private final ReadOnlyVector3 scale;
     private final float minHeight;
     private final float maxHeight;
+    private final boolean[] _invalidLevels;
 
     private static final int tileSize = 128;
     private static final int availableClipmapLevels = 8;
@@ -42,11 +44,13 @@ public class ProceduralTerrainSource implements TerrainSource {
         this.scale = scale;
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
+        _invalidLevels = new boolean[availableClipmapLevels];
     }
 
     @Override
     public TerrainConfiguration getConfiguration() throws Exception {
-        return new TerrainConfiguration(availableClipmapLevels, tileSize, scale, minHeight, maxHeight, false);
+        return new TerrainConfiguration(availableClipmapLevels, tileSize, getScale(), getMinHeight(), getMaxHeight(),
+                false);
     }
 
     @Override
@@ -58,12 +62,23 @@ public class ProceduralTerrainSource implements TerrainSource {
     @Override
     public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
             final int numTilesY) throws Exception {
-        return null;
-    }
+        if (clipmapLevel < 0 || clipmapLevel >= availableClipmapLevels) {
+            return null;
+        }
 
-    @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
+        synchronized (_invalidLevels) {
+            if (_invalidLevels[clipmapLevel]) {
+                _invalidLevels[clipmapLevel] = false;
+                final Set<Tile> rVal = new HashSet<>();
+                for (int y = 0; y < numTilesY; y++) {
+                    for (int x = 0; x < numTilesX; x++) {
+                        rVal.add(new Tile(tileX + x, tileY + y));
+                    }
+                }
+                return rVal;
+            }
+            return null;
+        }
     }
 
     @Override
@@ -86,12 +101,37 @@ public class ProceduralTerrainSource implements TerrainSource {
                     final int heightY = tileY * tileSize + y;
 
                     final int index = x + y * tileSize;
-                    data[index] = (float) function.eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel, 0);
+                    data[index] = (float) getFunction().eval(heightX << baseClipmapLevel, heightY << baseClipmapLevel,
+                            0);
                 }
             }
         } finally {
             terrainLock.unlock();
         }
         return data;
+    }
+
+    public void markInvalid() {
+        synchronized (_invalidLevels) {
+            for (int i = 0; i < _invalidLevels.length; i++) {
+                _invalidLevels[i] = true;
+            }
+        }
+    }
+
+    public Function3D getFunction() {
+        return function;
+    }
+
+    public ReadOnlyVector3 getScale() {
+        return scale;
+    }
+
+    public float getMinHeight() {
+        return minHeight;
+    }
+
+    public float getMaxHeight() {
+        return maxHeight;
     }
 }

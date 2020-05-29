@@ -13,7 +13,6 @@ package com.ardor3d.extension.terrain.client;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -115,37 +114,13 @@ public class TerrainBuilder {
         return buildConfig.showDebugPanels;
     }
 
-    public TerrainBuilder withMapId(final int mapId) {
-        buildConfig.mapId = mapId;
-        return this;
-    }
-
-    public int getMapId() {
-        return buildConfig.mapId;
-    }
-
     public Terrain build() throws Exception {
-        final Map<Integer, String> availableMaps = buildConfig.terrainDataProvider.getAvailableMaps();
-        if (availableMaps.isEmpty()) {
-            throw new Exception("No available maps found on this terrain provider.");
-        }
 
-        int selectedMapId = 0;
-        if (buildConfig.mapId < 0) {
-            selectedMapId = availableMaps.keySet().iterator().next();
-        } else {
-            if (!availableMaps.containsKey(buildConfig.mapId)) {
-                throw new IllegalArgumentException(
-                        buildConfig.mapId + " is not a valid terrain ID on this terrain provider.");
-            }
-            selectedMapId = buildConfig.mapId;
-        }
-
-        final TerrainSource terrainSource = buildConfig.terrainDataProvider.getTerrainSource(selectedMapId);
+        final TerrainSource terrainSource = buildConfig.terrainDataProvider.getTerrainSource();
         final Terrain terrain = buildTerrainSystem(terrainSource, buildConfig);
 
-        final TextureSource textureSource = buildConfig.terrainDataProvider.getTextureSource(selectedMapId);
-        if (textureSource != null) {
+        final List<TextureSource> textureSources = buildConfig.terrainDataProvider.getTextureSources();
+        for (final TextureSource textureSource : textureSources) {
             terrain.addTextureClipmap(buildTextureClipmap(textureSource, buildConfig));
         }
 
@@ -153,7 +128,7 @@ public class TerrainBuilder {
             terrain.addTextureClipmap(buildTextureClipmap(extraSource, buildConfig));
         }
 
-        final TextureSource normalSource = buildConfig.terrainDataProvider.getNormalMapSource(selectedMapId);
+        final TextureSource normalSource = buildConfig.terrainDataProvider.getNormalMapSource();
         if (normalSource != null) {
             terrain.setNormalClipmap(buildTextureClipmap(normalSource, buildConfig));
         }
@@ -275,7 +250,6 @@ public class TerrainBuilder {
         public int clipmapTextureSize = 128;
 
         public boolean showDebugPanels = false;
-        public int mapId = -1;
 
     }
 }

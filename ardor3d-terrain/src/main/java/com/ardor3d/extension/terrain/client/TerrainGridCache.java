@@ -11,6 +11,7 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.nio.FloatBuffer;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
@@ -49,6 +50,29 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     }
 
     @Override
+    public void checkForInvalidatedRegions() {
+        final Set<Tile> invalidTiles = getInvalidTilesFromSource(backCurrentTileX - cacheSize / 2,
+                backCurrentTileY - cacheSize / 2, cacheSize, cacheSize);
+        if (invalidTiles == null || invalidTiles.isEmpty()) {
+            return;
+        }
+
+        final Set<TileLoadingData> updates = new HashSet<>();
+
+        for (final Tile tile : invalidTiles) {
+            final int destX = MathUtils.moduloPositive(tile.getX(), cacheSize);
+            final int destY = MathUtils.moduloPositive(tile.getY(), cacheSize);
+            updates.add(new TileLoadingData(this, new Tile(tile.getX(), tile.getY()), new Tile(destX, destY),
+                    dataClipIndex));
+        }
+
+        synchronized (SWAP_LOCK) {
+            backThreadTiles.addAll(updates);
+            updated = true;
+        }
+    }
+
+    @Override
     protected boolean copyTileData(final Tile sourceTile, final int destX, final int destY) {
         float[] sourceData = null;
         try {
@@ -72,10 +96,10 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     }
 
     @Override
-    protected Set<Tile> getValidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
-            final int numTilesX, final int numTilesY) {
+    protected Set<Tile> getValidTilesFromSource(final int tileX, final int tileY, final int numTilesX,
+            final int numTilesY) {
         try {
-            return source.getValidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+            return source.getValidTiles(dataClipIndex, tileX, tileY, numTilesX, numTilesY);
         } catch (final Exception e) {
             logger.log(Level.WARNING, "Exception getting source info", e);
             return null;
@@ -83,10 +107,10 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     }
 
     @Override
-    protected Set<Tile> getInvalidTilesFromSource(final int clipmapLevel, final int tileX, final int tileY,
-            final int numTilesX, final int numTilesY) {
+    protected Set<Tile> getInvalidTilesFromSource(final int tileX, final int tileY, final int numTilesX,
+            final int numTilesY) {
         try {
-            return source.getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+            return source.getInvalidTiles(dataClipIndex, tileX, tileY, numTilesX, numTilesY);
         } catch (final Exception e) {
             logger.log(Level.WARNING, "Exception getting source info", e);
             return null;
@@ -110,7 +134,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
         final CacheData tileData;
         // mallan - 2016-01-26: this conditional will ALWAYS fail once view has
         // moved outside the origin cache bounds (tileX,tileY are source tile coordinates,
-        // cacheSize are desintation tile coordinates). The moduloPositive does what we need,
+        // cacheSize are destination tile coordinates). The moduloPositive does what we need,
         // this conditional breaks the terrain.
         // final int cacheMin = -cacheSize / 2, cacheMax = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
         // if (tileX < cacheMin || tileX > cacheMax || tileY < cacheMin || tileY > cacheMax) {
@@ -153,8 +177,10 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     public float getSubHeight(final float x, final float z) {
         int tileX = MathUtils.floor(x / tileSize);
         int tileY = MathUtils.floor(z / tileSize);
+
+        final int min = -cacheSize / 2;
+        final int max = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
         final CacheData tileData;
-        final int min = -cacheSize / 2, max = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
         if (tileX < min || tileX > max || tileY < min || tileY > max) {
             tileData = null;
         } else {
@@ -173,7 +199,8 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
             final double col = MathUtils.floor(x);
             final double row = MathUtils.floor(z);
 
-            final double intOnX = x - col, intOnZ = z - row;
+            final double intOnX = x - col;
+            final double intOnZ = z - row;
 
             final double col1 = col + 1;
             final double row1 = row + 1;

@@ -11,11 +11,9 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.nio.FloatBuffer;
-import java.util.Set;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.terrain.util.Region;
-import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
@@ -41,43 +39,45 @@ public class ClipmapLevel extends Mesh {
     private final int frameDistance; // (frameSize - 1) * vertexDistance
 
     /**
-     * Gets the distance between two horizontal/vertical vertices. The finest level L = 0 has a distance of
-     * vertexDistance = 1. Then every level it doubles so vertexDistance is always 2^L
+     * Distance between two horizontal/vertical vertices. The finest level L = 0 has a distance of vertexDistance = 1.
+     * Then every level it doubles so vertexDistance is always 2^L
      */
     private final int vertexDistance;
 
     /**
-     * Gets framesize in number of vertices between outer border of current clip and outer border of next finer (inner)
-     * clip.
+     * Number of vertices between outer border of current clip and outer border of next finer (inner) clip.
      */
     private final int frameSize;
 
     /**
-     * Gets the width of a clip in number of vertices. This is always one less than power of two (2^x - 1)
+     * Width of a clip in number of vertices. This is always one less than power of two (2^x - 1)
      */
     private final int clipSideSize;
 
     /**
-     * Gets the region of the current clip.
+     * Region of the current clip.
      */
     private final Region clipRegion;
     private final Region intersectionRegion;
 
     /**
-     * Value that indicates the height scaling. It is also represents the maximum terrain height.
+     * Maximum terrain height.
      */
     private final float heightScale;
 
     private float heightRangeMin = 0.0f;
     private float heightRangeMax = 1.0f;
 
+    private int oldCX = Integer.MIN_VALUE;
+    private int oldCZ = Integer.MIN_VALUE;
+
     /**
-     * Index to indicate how much vertices are added to the triangle strip.
+     * Index to indicate how many vertices are added to the triangle strip.
      */
     private int stripIndex = 0;
 
     /**
-     * The used terrain heightfield. This must be set per reference so all clip levels share the same memory for that
+     * The used terrain height-field. This must be set per reference so all clip levels share the same memory for that
      * variable. The values are between 0.0f and 1.0f
      */
     private final TerrainCache cache;
@@ -117,14 +117,14 @@ public class ClipmapLevel extends Mesh {
      *
      * @param levelIndex
      *            Levelindex of the clipmap. If is 0 this will be the finest level
+     * @param clipmapTestFrustum
+     *            Camera used to acquire a frustum to test view clipping.
      * @param clipSideSize
      *            Number of vertices per clipside. Must be one less than power of two.
      * @param heightScale
-     *            Maximum terrainheight and heightscale
-     * @param fieldsize
-     *            Width and heightvalue of the heightfield
-     * @param heightfield
-     *            Heightvalues with a range of 0.0f - 1.0f
+     *            Maximum terrain height
+     * @param cache
+     *            Level specific height data cache.
      * @exception Exception
      */
     public ClipmapLevel(final int levelIndex, final Camera clipmapTestFrustum, final int clipSideSize,
@@ -188,89 +188,83 @@ public class ClipmapLevel extends Mesh {
         }
     }
 
-    public void updateCache() {
-        getWorldTransform().applyInverse(clipmapTestFrustum.getLocation(), transformedFrustumPos);
-        final int cx = (int) transformedFrustumPos.getX();
-        final int cz = (int) transformedFrustumPos.getZ();
-
-        // Calculate the new position
-        int clipX = cx - (clipSideSize + 1) * vertexDistance / 2;
-        int clipY = cz - (clipSideSize + 1) * vertexDistance / 2;
-
-        // Calculate the modulo to doubleVertexDistance of the new position.
-        // This makes sure that the current level always fits in the hole of the
-        // coarser level. The gridspacing of the coarser level is vertexDistance * 2, so here doubleVertexDistance.
-        final int modX = MathUtils.moduloPositive(clipX, doubleVertexDistance);
-        final int modY = MathUtils.moduloPositive(clipY, doubleVertexDistance);
-        clipX = clipX + doubleVertexDistance - modX;
-        clipY = clipY + doubleVertexDistance - modY;
-
-        cache.setCurrentPosition(clipX / vertexDistance, clipY / vertexDistance);
-
-        // TODO
-        cache.handleUpdateRequests();
-    }
-
     /**
-     * Update clipmap vertices
-     *
-     * @param center
+     * Update our vertex buffer for any changes in frustum camera position or cache events.
      */
     public void updateVertices() {
+        // get our frustum camera's location relative to the world transform of this clipmap.
         getWorldTransform().applyInverse(clipmapTestFrustum.getLocation(), transformedFrustumPos);
         final int cx = (int) transformedFrustumPos.getX();
         final int cz = (int) transformedFrustumPos.getZ();
 
-        // Store the old position to be able to recover it if needed
-        final int oldX = clipRegion.getX();
-        final int oldZ = clipRegion.getY();
+        // Check if we need to update our clip or intersection regions)
+        // The calculations are stable if our integer position has not changed.
+        if (oldCX != cx || oldCZ != cz) {
+            oldCX = cx;
+            oldCZ = cz;
 
-        // Calculate the new position
-        clipRegion.setX(cx - (clipSideSize + 1) * vertexDistance / 2);
-        clipRegion.setY(cz - (clipSideSize + 1) * vertexDistance / 2);
+            // Store the old region positions to diff against any changes
+            final int oldClipX = clipRegion.getX();
+            final int oldClipZ = clipRegion.getY();
 
-        // Calculate the modulo to doubleVertexDistance of the new position.
-        // This makes sure that the current level always fits in the hole of the
-        // coarser level. The gridspacing of the coarser level is vertexDistance * 2, so here doubleVertexDistance.
-        final int modX = MathUtils.moduloPositive(clipRegion.getX(), doubleVertexDistance);
-        final int modY = MathUtils.moduloPositive(clipRegion.getY(), doubleVertexDistance);
-        clipRegion.setX(clipRegion.getX() + doubleVertexDistance - modX);
-        clipRegion.setY(clipRegion.getY() + doubleVertexDistance - modY);
+            // Calculate the new position
+            clipRegion.setX(cx - (clipSideSize + 1) * vertexDistance / 2);
+            clipRegion.setY(cz - (clipSideSize + 1) * vertexDistance / 2);
 
-        // Calculate the moving distance
-        final int dx = clipRegion.getX() - oldX;
-        final int dz = clipRegion.getY() - oldZ;
+            // Calculate the modulo to doubleVertexDistance of the new position.
+            // This makes sure that the current level always fits in the hole of the
+            // coarser level. The grid spacing of the coarser level is vertexDistance * 2, so here doubleVertexDistance.
+            final int modX = MathUtils.moduloPositive(clipRegion.getX(), doubleVertexDistance);
+            final int modY = MathUtils.moduloPositive(clipRegion.getY(), doubleVertexDistance);
+            clipRegion.setX(clipRegion.getX() + doubleVertexDistance - modX);
+            clipRegion.setY(clipRegion.getY() + doubleVertexDistance - modY);
 
-        intersectionRegion.setX(clipRegion.getX());
-        intersectionRegion.setY(clipRegion.getY());
+            // Update our intersection region
+            intersectionRegion.setX(clipRegion.getX());
+            intersectionRegion.setY(clipRegion.getY());
 
-        cache.setCurrentPosition(clipRegion.getX() / vertexDistance, clipRegion.getY() / vertexDistance);
+            // Calculate the moving distance
+            final int dx = clipRegion.getX() - oldClipX;
+            final int dz = clipRegion.getY() - oldClipZ;
 
-        updateVertices(dx, dz);
+            // Use our clip region to set the cache position - this is not the same thing as our camera position.
+            // We do this, even if the region has not changed, because it gives
+            cache.setCurrentPosition(clipRegion.getX() / vertexDistance, clipRegion.getY() / vertexDistance);
 
-        final Set<Tile> updatedTiles = cache.handleUpdateRequests();
-        if (updatedTiles != null) {
-            // TODO: only update what's changed
-            regenerate();
+            // Apply our delta change to the vertex buffer.
+            if (updateVerticesForMovement(dx, dz)) {
+                // We have updated vertex data, so mark our buffer to be re-sent to the card
+                getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+                markDirty(DirtyType.Bounding);
+            }
         }
+
+        // Ask the cache to look for any invalid data in the current region. These will be sent to the mailbox
+        cache.checkForInvalidatedRegions();
     }
 
     public void regenerate() {
-        updateVertices(clipRegion.getWidth(), clipRegion.getHeight());
+        updateVerticesForMovement(clipSideSize - 1, clipSideSize - 1);
+        getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+        markDirty(DirtyType.Bounding);
     }
 
     /**
+     * Update vertices in our clip level based on a movement from our old position.
      *
-     * @param cx
-     * @param cz
+     * @param deltaX
+     *            localized delta change in X
+     * @param deltaZ
+     *            localized delta change in Z (recall that Ardor3D uses Y up)
+     * @return true if we touched the vertex buffer
      */
-    private void updateVertices(int dx, int dz) {
-        if (dx == 0 && dz == 0) {
-            return;
+    private boolean updateVerticesForMovement(final int deltaX, final int deltaZ) {
+        if (deltaX == 0 && deltaZ == 0) {
+            return false;
         }
 
-        dx = MathUtils.clamp(dx, -clipSideSize + 1, clipSideSize - 1);
-        dz = MathUtils.clamp(dz, -clipSideSize + 1, clipSideSize - 1);
+        final int dx = MathUtils.clamp(deltaX, -clipSideSize + 1, clipSideSize - 1);
+        final int dz = MathUtils.clamp(deltaZ, -clipSideSize + 1, clipSideSize - 1);
 
         // Create some better readable variables.
         // This are just the bounds of the current level (the new region).
@@ -279,8 +273,7 @@ public class ClipmapLevel extends Mesh {
         final int zmin = clipRegion.getTop() / vertexDistance;
         final int zmax = clipRegion.getBottom() / vertexDistance;
 
-        final MeshData meshData = getMeshData();
-        final FloatBuffer vertices = meshData.getVertexBuffer();
+        final FloatBuffer vertices = getMeshData().getVertexBuffer();
 
         // Update the L shaped region.
         // This replaces the old data with the new one.
@@ -303,12 +296,14 @@ public class ClipmapLevel extends Mesh {
                 cache.updateRegion(vertices, xmin, zmin, xmax - xmin + 1, -dz + 1);
             }
         }
-        meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-        markDirty(DirtyType.Bounding);
+
+        return true;
     }
 
     /**
-     * Updates the whole indexarray.
+     * Updates the whole index buffer.
+     *
+     * FIXME: Check if we can avoid doing this *every* frame.
      *
      * @param nextFinerLevel
      * @param frustum

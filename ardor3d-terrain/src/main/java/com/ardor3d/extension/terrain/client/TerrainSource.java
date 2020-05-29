@@ -11,7 +11,7 @@ import com.ardor3d.extension.terrain.util.Tile;
 public interface TerrainSource {
     /**
      * Called to initialize and setup the geometry clipmap terrain.
-     * 
+     *
      * @return TerrainConfiguration
      * @throws Exception
      */
@@ -19,7 +19,7 @@ public interface TerrainSource {
 
     /**
      * Returns which tiles that contain data in the requested region.
-     * 
+     *
      * @param clipmapLevel
      * @param tileX
      * @param tileY
@@ -33,7 +33,7 @@ public interface TerrainSource {
 
     /**
      * Returns which tiles that should be marked as invalid and updated in the requested region.
-     * 
+     *
      * @param clipmapLevel
      * @param tileX
      * @param tileY
@@ -46,17 +46,8 @@ public interface TerrainSource {
             throws Exception;
 
     /**
-     * Returns the contributing source id for the requested tile.
-     * 
-     * @param clipmapLevel
-     * @param tile
-     * @return
-     */
-    int getContributorId(int clipmapLevel, Tile tile);
-
-    /**
      * Request for height data for a tile.
-     * 
+     *
      * @param clipmapLevel
      * @param tile
      * @return

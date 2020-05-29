@@ -12,9 +12,7 @@ package com.ardor3d.extension.terrain.providers.array;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
 import com.ardor3d.extension.terrain.client.TerrainSource;
@@ -72,25 +70,19 @@ public class ArrayTerrainDataProvider implements TerrainDataProvider {
     }
 
     @Override
-    public Map<Integer, String> getAvailableMaps() throws Exception {
-        final Map<Integer, String> maps = new HashMap<>();
-        maps.put(0, "ArrayBasedMap");
-
-        return maps;
-    }
-
-    @Override
-    public TerrainSource getTerrainSource(final int mapId) {
+    public TerrainSource getTerrainSource() {
         return new ArrayTerrainSource(tileSize, heightMaps, heightMapSizes, scale, heightMin, heightMax);
     }
 
     @Override
-    public TextureSource getTextureSource(final int mapId) {
-        return new ArrayTextureSource(tileSize, heightMaps, heightMapSizes);
+    public List<TextureSource> getTextureSources() {
+        final List<TextureSource> rVal = new ArrayList<>(1);
+        rVal.add(new ArrayTextureSource(tileSize, heightMaps, heightMapSizes));
+        return rVal;
     }
 
     @Override
-    public TextureSource getNormalMapSource(final int mapId) {
+    public TextureSource getNormalMapSource() {
         if (generateNormalMap) {
             try {
                 final float[] data = heightMaps.get(heightMaps.size() - 1);

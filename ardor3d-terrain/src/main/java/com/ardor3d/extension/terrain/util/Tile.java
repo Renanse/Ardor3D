@@ -2,6 +2,7 @@
 package com.ardor3d.extension.terrain.util;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 
 public class Tile implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -43,6 +44,6 @@ public class Tile implements Serializable {
 
     @Override
     public String toString() {
-        return "Tile [x=" + x + ", y=" + y + "]";
+        return MessageFormat.format("Tile [x={0}, y={1}]", x, y);
     }
 }

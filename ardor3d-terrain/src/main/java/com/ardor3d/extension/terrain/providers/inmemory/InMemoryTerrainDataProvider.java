@@ -11,9 +11,7 @@
 package com.ardor3d.extension.terrain.providers.inmemory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
 import com.ardor3d.extension.terrain.client.TerrainSource;
@@ -39,25 +37,19 @@ public class InMemoryTerrainDataProvider implements TerrainDataProvider {
     }
 
     @Override
-    public Map<Integer, String> getAvailableMaps() throws Exception {
-        final Map<Integer, String> maps = new HashMap<>();
-        maps.put(0, "InMemoryData");
-
-        return maps;
-    }
-
-    @Override
-    public TerrainSource getTerrainSource(final int mapId) {
+    public TerrainSource getTerrainSource() {
         return new InMemoryTerrainSource(tileSize, inMemoryTerrainData);
     }
 
     @Override
-    public TextureSource getTextureSource(final int mapId) {
-        return new InMemoryTextureSource(tileSize, inMemoryTerrainData);
+    public List<TextureSource> getTextureSources() {
+        final List<TextureSource> rVal = new ArrayList<>(1);
+        rVal.add(new InMemoryTextureSource(tileSize, inMemoryTerrainData));
+        return rVal;
     }
 
     @Override
-    public TextureSource getNormalMapSource(final int mapId) {
+    public TextureSource getNormalMapSource() {
         if (generateNormalMap) {
             try {
                 final Image normalImage = NormalMapUtil.constructNormalMap(inMemoryTerrainData.getHeightData(),

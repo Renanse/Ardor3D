@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -19,11 +19,6 @@ public class Region {
     private int width;
     private int height;
 
-    private int left;
-    private int right;
-    private int top;
-    private int bottom;
-
     private final int level;
 
     public Region(final int x, final int y, final int width, final int height) {
@@ -37,11 +32,6 @@ public class Region {
         this.y = y;
         this.width = width;
         this.height = height;
-
-        left = x;
-        right = x + width;
-        top = y;
-        bottom = y + height;
     }
 
     /**
@@ -64,8 +54,6 @@ public class Region {
      */
     public void setX(final int x) {
         this.x = x;
-        left = x;
-        right = x + width;
     }
 
     /**
@@ -74,46 +62,42 @@ public class Region {
      */
     public void setY(final int y) {
         this.y = y;
-        top = y;
-        bottom = y + height;
     }
 
     public void setWidth(final int width) {
         this.width = width;
-        right = x + width;
     }
 
     public void setHeight(final int height) {
         this.height = height;
-        bottom = y + height;
     }
 
     /**
      * @return the left
      */
     public int getLeft() {
-        return left;
+        return x;
     }
 
     /**
      * @return the right
      */
     public int getRight() {
-        return right;
+        return x + width;
     }
 
     /**
      * @return the top
      */
     public int getTop() {
-        return top;
+        return y;
     }
 
     /**
      * @return the bottom
      */
     public int getBottom() {
-        return bottom;
+        return y + height;
     }
 
     /**

@@ -45,6 +45,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * An implementation of geometry clipmapping
  */
 public class Terrain extends Node implements Pickable, Runnable {
+    private static final long NON_VISIBLE_UPDATE_RATE_MS = 500L;
+
     /** Our picker. */
     protected ClipmapTerrainPicker _picker = null;
 
@@ -79,8 +81,9 @@ public class Terrain extends Node implements Pickable, Runnable {
     protected Thread cacheThread;
 
     protected final int CACHE_UPDATE_SLEEP = 250;
+    protected final List<Long> _timers = new ArrayList<>();
 
-    final TextureState clipTextureState = new TextureState();
+    protected final TextureState clipTextureState = new TextureState();
 
     protected final Comparator<Region> regionSorter = new Comparator<Region>() {
         @Override
@@ -88,6 +91,9 @@ public class Terrain extends Node implements Pickable, Runnable {
             return r1.getLevel() - r2.getLevel();
         }
     };
+
+    protected final Vector3 _boundsCenter = new Vector3();
+    protected final Vector3 _boundsExtents = new Vector3();
 
     public Terrain(final BuildConfiguration buildConfig, final List<TerrainCache> cacheList,
             final TerrainConfiguration terrainConfiguration) {
@@ -142,8 +148,6 @@ public class Terrain extends Node implements Pickable, Runnable {
         this.updateWorldRenderStates(true);
     }
 
-    protected final List<Long> timers = new ArrayList<>();
-
     @Override
     protected void updateChildren(final double time) {
         super.updateChildren(time);
@@ -170,23 +174,13 @@ public class Terrain extends Node implements Pickable, Runnable {
         // }
         // }
 
-        if (timers.size() < _visibleLevels) {
-            for (int unit = 0; unit < _visibleLevels; unit++) {
-                timers.add(System.currentTimeMillis());
-            }
-        }
-        for (int unit = 0; unit < _visibleLevels; unit++) {
-            final long t = System.currentTimeMillis() - timers.get(unit);
-            if (t > 500) {
-                timers.set(unit, System.currentTimeMillis());
-                _clips.get(unit).updateCache();
-            }
-        }
+        // Process cache updates for non-visible clip levels
+        checkNonVisibleClips();
 
         // Update from mailbox
         updateFromMailbox();
 
-        // Update vertices.
+        // Process vertex updates for visible clipmap levels.
         for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
             _clips.get(i).updateVertices();
         }
@@ -206,6 +200,31 @@ public class Terrain extends Node implements Pickable, Runnable {
             cacheThread = new Thread(this, "TerrainCacheUpdater");
             cacheThread.setDaemon(true);
             cacheThread.start();
+        }
+    }
+
+    /**
+     * Check clipmap levels below our
+     */
+    private void checkNonVisibleClips() {
+        // Lazy init the contents of _timers
+        final long now = System.currentTimeMillis();
+        if (_timers.size() < _visibleLevels) {
+            for (int unit = 0; unit < _visibleLevels; unit++) {
+                _timers.add(now);
+            }
+        }
+
+        // walk through levels below the visible level
+        for (int unit = 0; unit < _visibleLevels; unit++) {
+            final long t = now - _timers.get(unit);
+            if (t > NON_VISIBLE_UPDATE_RATE_MS) {
+                // Enough time has passed. Reset our timer
+                _timers.set(unit, now);
+
+                // Ask clip to update its vertex buffer
+                _clips.get(unit).updateVertices();
+            }
         }
     }
 
@@ -357,6 +376,7 @@ public class Terrain extends Node implements Pickable, Runnable {
                             region.getHeight() / vertexDistance);
 
                     meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+                    clip.markDirty(DirtyType.Bounding);
                 }
             }
             updateTimer %= updateThreashold;
@@ -379,9 +399,6 @@ public class Terrain extends Node implements Pickable, Runnable {
                     region.getHeight());
         }
     }
-
-    protected final Vector3 _boundsCenter = new Vector3();
-    protected final Vector3 _boundsExtents = new Vector3();
 
     @Override
     public void updateWorldBound(final boolean recurse) {

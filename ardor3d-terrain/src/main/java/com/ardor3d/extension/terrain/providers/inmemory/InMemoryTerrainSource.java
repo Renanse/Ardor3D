@@ -93,11 +93,6 @@ public class InMemoryTerrainSource implements TerrainSource {
     }
 
     @Override
-    public int getContributorId(final int clipmapLevel, final Tile tile) {
-        return 0;
-    }
-
-    @Override
     public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
         final int tileX = tile.getX();
         final int tileY = tile.getY();
