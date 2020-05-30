@@ -70,13 +70,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -304,13 +303,10 @@ public class ExampleRunner extends JFrame {
         btExpand.doClick();
         lStatus.setText("Examples: " + model.getSize());
 
-        tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-
-            public void valueChanged(final TreeSelectionEvent e) {
-                updateDescription();
-                updateActionStatus();
-                tabbedPane.setSelectedIndex(0);
-            }
+        tree.getSelectionModel().addTreeSelectionListener(e -> {
+            updateDescription();
+            updateActionStatus();
+            tabbedPane.setSelectedIndex(0);
         });
 
         updateDescription();
@@ -390,7 +386,7 @@ public class ExampleRunner extends JFrame {
             if ("".equals(imgURL)) {
                 imgURL = "<img src=\""
                         + ResourceLocatorTool.getClassPathResource(ExampleRunner.class,
-                                "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"/>";
+                        "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"/>";
             }
 
             // Set the description HTML
@@ -653,7 +649,7 @@ public class ExampleRunner extends JFrame {
 
         /**
          * Load a class specified by a file- or entry-name
-         * 
+         *
          * @param name
          *            name of a file or entry
          * @return class file that was denoted by the name, null if no class or does not contain a main method
@@ -689,7 +685,7 @@ public class ExampleRunner extends JFrame {
 
         /**
          * Used to descent in directories, loads classes via {@link #load}
-         * 
+         *
          * @param directory
          *            where to search for class files
          * @param allClasses
@@ -1006,7 +1002,7 @@ public class ExampleRunner extends JFrame {
         final ExampleRunner app = new ExampleRunner();
         app.setIconImage(getIcon("ardor3d_white_24.png").getImage());
         app.setSize(800, 400);
-        app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        app.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         app.setLocationRelativeTo(null);
         app.setVisible(true);
     }
