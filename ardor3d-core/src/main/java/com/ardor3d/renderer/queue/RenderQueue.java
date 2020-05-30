@@ -18,7 +18,6 @@ import com.ardor3d.scenegraph.InstancingManager;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.Constants;
 
 public class RenderQueue {
 
@@ -68,7 +67,7 @@ public class RenderQueue {
             throw new Ardor3dException("Can't add spatial to bucket of type: " + type);
         }
 
-        if (Constants.enableInstancedGeometrySupport && prepareForInstancing(spatial)) {
+        if (prepareForInstancing(spatial)) {
             return;
         }
 

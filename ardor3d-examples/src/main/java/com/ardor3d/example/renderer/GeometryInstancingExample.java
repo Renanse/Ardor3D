@@ -49,8 +49,6 @@ public class GeometryInstancingExample extends ExampleBase {
     private Node _base;
 
     public static void main(final String[] args) {
-        // Turn on support for instanced geometry.
-        System.setProperty("ardor3d.enableInstancedGeometrySupport", "true");
         start(GeometryInstancingExample.class);
     }
 

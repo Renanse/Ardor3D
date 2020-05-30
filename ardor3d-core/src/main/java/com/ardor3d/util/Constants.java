@@ -35,8 +35,6 @@ public class Constants {
 
     public static final boolean useValidatingTransform;
 
-    public static final boolean enableInstancedGeometrySupport;
-
     public static final boolean ignoreMissingMaterials;
 
     static {
@@ -60,7 +58,6 @@ public class Constants {
                     : 11);
 
             useValidatingTransform = (System.getProperty("ardor3d.disableValidatingTransform") == null);
-            enableInstancedGeometrySupport = (System.getProperty("ardor3d.enableInstancedGeometrySupport") != null);
             strictVertexAttributes = (System.getProperty("ardor3d.strictVertexAttributes") != null);
             logOpenGLDebug = (System.getProperty("ardor3d.logOpenGLDebug") != null);
             ignoreMissingMaterials = (System.getProperty("ardor3d.ignoreMissingMaterials") != null);
@@ -72,7 +69,6 @@ public class Constants {
             storeSavableImages = false;
             maxStatePoolSize = 11;
             useValidatingTransform = true;
-            enableInstancedGeometrySupport = false;
             strictVertexAttributes = false;
             logOpenGLDebug = false;
             ignoreMissingMaterials = false;
