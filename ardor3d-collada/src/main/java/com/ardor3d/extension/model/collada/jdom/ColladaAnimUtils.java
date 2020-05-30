@@ -66,7 +66,6 @@ import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.VertMap;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -673,7 +672,7 @@ public class ColladaAnimUtils {
             + targetNode.getName() + "(" + targetIndex + ")");
       }
 
-      final EnumMap<Type, ColladaInputPipe> pipes = Maps.newEnumMap(Type.class);
+      final EnumMap<Type, ColladaInputPipe> pipes = new EnumMap<>(Type.class);
 
       final Element samplerElement = _colladaDOMUtil.findTargetWithId(source);
       for (final Element inputElement : samplerElement.getChildren("input")) {
