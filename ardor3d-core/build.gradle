@@ -1,8 +1,8 @@
 
 description = 'Ardor 3D Core'
 
-project.ext.guavaVersion = "27.0.1-jre"
-project.ext.snakeyamlVersion = "1.23"
+project.ext.guavaVersion = "29.0-jre"
+project.ext.snakeyamlVersion = "1.26"
 
 dependencies {
 	api project(':ardor3d-math')

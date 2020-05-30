@@ -1,7 +1,22 @@
+import org.gradle.internal.os.OperatingSystem
+
 allprojects  {
 	apply plugin: 'java-library'
 	group = 'com.ardor3d'
 	version = '1.5.1'
+    project.ext.lwjglVersion = "3.2.3"
+    
+	switch ( OperatingSystem.current() ) {
+		case OperatingSystem.WINDOWS:
+			project.ext.lwjglNatives = "natives-windows"
+			break
+		case OperatingSystem.LINUX:
+			project.ext.lwjglNatives = "natives-linux"
+			break
+		case OperatingSystem.MAC_OS:
+			project.ext.lwjglNatives = "natives-macos"
+			break
+	}    
 }
 
 subprojects {

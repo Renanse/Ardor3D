@@ -1,9 +1,10 @@
-import org.gradle.internal.os.OperatingSystem
 
 description = 'Ardor 3D LWJGL3 AWT'
+
+project.ext.lwjglAwtVersion = "0.1.7"
 
 dependencies {
 	api project(":ardor3d-lwjgl3")
 	api project(":ardor3d-awt")
-	api files("lwjgl3-awt-0.1.7.jar")
+	api "org.lwjglx:lwjgl3-awt:$lwjglAwtVersion"
 }

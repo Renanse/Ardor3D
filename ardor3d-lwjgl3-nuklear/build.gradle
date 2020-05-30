@@ -1,20 +1,5 @@
-import org.gradle.internal.os.OperatingSystem
 
 description = 'Ardor 3D LWJGL3 Nuklear'
-
-project.ext.lwjglVersion = "3.2.3"
-
-switch ( OperatingSystem.current() ) {
-	case OperatingSystem.WINDOWS:
-		project.ext.lwjglNatives = "natives-windows"
-		break
-	case OperatingSystem.LINUX:
-		project.ext.lwjglNatives = "natives-linux"
-		break
-	case OperatingSystem.MAC_OS:
-		project.ext.lwjglNatives = "natives-macos"
-		break
-}
 
 dependencies {
 	api project(":ardor3d-lwjgl3")
