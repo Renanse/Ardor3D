@@ -11,5 +11,5 @@
 package com.ardor3d.input.gesture.touch;
 
 public enum TouchStatus {
-    Unknown, Down, Moved, Up
+  Unknown, Down, Moved, Up
 }

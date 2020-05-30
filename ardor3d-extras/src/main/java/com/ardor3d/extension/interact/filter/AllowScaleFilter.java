@@ -17,23 +17,23 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class AllowScaleFilter extends UpdateFilterAdapter {
 
-    protected boolean _xAxis, _yAxis, _zAxis;
+  protected boolean _xAxis, _yAxis, _zAxis;
 
-    public AllowScaleFilter(final boolean xAxis, final boolean yAxis, final boolean zAxis) {
-        _xAxis = xAxis;
-        _yAxis = yAxis;
-        _zAxis = zAxis;
-    }
+  public AllowScaleFilter(final boolean xAxis, final boolean yAxis, final boolean zAxis) {
+    _xAxis = xAxis;
+    _yAxis = yAxis;
+    _zAxis = zAxis;
+  }
 
-    @Override
-    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
-        final ReadOnlyVector3 oldScale = manager.getSpatialTarget().getScale();
-        final SpatialState state = manager.getSpatialState();
-        final ReadOnlyVector3 scale = state.getTransform().getScale();
+  @Override
+  public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
+    final ReadOnlyVector3 oldScale = manager.getSpatialTarget().getScale();
+    final SpatialState state = manager.getSpatialState();
+    final ReadOnlyVector3 scale = state.getTransform().getScale();
 
-        state.getTransform().setScale( //
-                _xAxis ? scale.getX() : oldScale.getX(), //
-                _yAxis ? scale.getY() : oldScale.getY(), //
-                _zAxis ? scale.getZ() : oldScale.getZ());
-    }
+    state.getTransform().setScale( //
+        _xAxis ? scale.getX() : oldScale.getX(), //
+        _yAxis ? scale.getY() : oldScale.getY(), //
+        _zAxis ? scale.getZ() : oldScale.getZ());
+  }
 }

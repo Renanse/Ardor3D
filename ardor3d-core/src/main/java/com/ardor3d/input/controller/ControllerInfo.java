@@ -15,38 +15,28 @@ import java.util.List;
 
 public class ControllerInfo {
 
-    private final String _controllerName;
-    private final ArrayList<String> _axisNames;
-    private final ArrayList<String> _buttonNames;
+  private final String _controllerName;
+  private final ArrayList<String> _axisNames;
+  private final ArrayList<String> _buttonNames;
 
-    public ControllerInfo(final String controllerName, final List<String> axisNames, final List<String> buttonNames) {
-        _controllerName = controllerName;
-        _axisNames = new ArrayList<>(axisNames);
-        _buttonNames = new ArrayList<>(buttonNames);
-    }
+  public ControllerInfo(final String controllerName, final List<String> axisNames, final List<String> buttonNames) {
+    _controllerName = controllerName;
+    _axisNames = new ArrayList<>(axisNames);
+    _buttonNames = new ArrayList<>(buttonNames);
+  }
 
-    public String getControllerName() {
-        return _controllerName;
-    }
+  public String getControllerName() { return _controllerName; }
 
-    public ArrayList<String> getAxisNames() {
-        return _axisNames;
-    }
+  public ArrayList<String> getAxisNames() { return _axisNames; }
 
-    public ArrayList<String> getButtonNames() {
-        return _buttonNames;
-    }
+  public ArrayList<String> getButtonNames() { return _buttonNames; }
 
-    public int getAxisCount() {
-        return _axisNames.size();
-    }
+  public int getAxisCount() { return _axisNames.size(); }
 
-    public int getButtonCount() {
-        return _buttonNames.size();
-    }
+  public int getButtonCount() { return _buttonNames.size(); }
 
-    @Override
-    public String toString() {
-        return "Controller '" + _controllerName + "' with Axis " + _axisNames + " and Buttons " + _buttonNames;
-    }
+  @Override
+  public String toString() {
+    return "Controller '" + _controllerName + "' with Axis " + _axisNames + " and Buttons " + _buttonNames;
+  }
 }

@@ -14,5 +14,5 @@ package com.ardor3d.extension.model.collada.jdom.data;
  * The 'type' attribute of a node element.
  */
 public enum NodeType {
-    NODE, JOINT
+  NODE, JOINT
 }

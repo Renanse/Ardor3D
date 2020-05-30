@@ -41,125 +41,127 @@ import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
 import com.ardor3d.util.Timer;
 
 /**
- * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas via off-screen FBO rendering.
+ * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas via off-screen FBO
+ * rendering.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglHeadlessSwtExample", //
-        thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
-        maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglHeadlessSwtExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglHeadlessSwtExample.jpg", //
+    maxHeapMemory = 64)
 public class LwjglHeadlessSwtExample {
-    private static final Logger logger = Logger.getLogger(LwjglHeadlessSwtExample.class.toString());
-    private static RotatingCubeGame game;
+  private static final Logger logger = Logger.getLogger(LwjglHeadlessSwtExample.class.toString());
+  private static RotatingCubeGame game;
 
-    public static void main(final String[] args) {
-        ExampleBase.addDefaultResourceLocators();
+  public static void main(final String[] args) {
+    ExampleBase.addDefaultResourceLocators();
 
-        final Timer timer = new Timer();
-        final FrameHandler frameWork = new FrameHandler(timer);
-        final LogicalLayer logicalLayer = new LogicalLayer();
+    final Timer timer = new Timer();
+    final FrameHandler frameWork = new FrameHandler(timer);
+    final LogicalLayer logicalLayer = new LogicalLayer();
 
-        final AtomicBoolean exit = new AtomicBoolean(false);
-        final BasicScene scene = new BasicScene();
-        game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
+    final AtomicBoolean exit = new AtomicBoolean(false);
+    final BasicScene scene = new BasicScene();
+    game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
 
-        frameWork.addUpdater(game);
+    frameWork.addUpdater(game);
 
-        // INIT SWT STUFF
-        final Display display = new Display();
-        final Shell shell = new Shell(display);
-        shell.setLayout(new FillLayout());
+    // INIT SWT STUFF
+    final Display display = new Display();
+    final Shell shell = new Shell(display);
+    shell.setLayout(new FillLayout());
 
-        // Setup AWT image loader to load our ardor3d logo and font texture.
-        AWTImageLoader.registerLoader();
+    // Setup AWT image loader to load our ardor3d logo and font texture.
+    AWTImageLoader.registerLoader();
 
-        // add our canvas to the shell, using the scene we've setup and our logic layer
-        addNewFBOCanvas(shell, scene, frameWork, logicalLayer);
+    // add our canvas to the shell, using the scene we've setup and our logic layer
+    addNewFBOCanvas(shell, scene, frameWork, logicalLayer);
 
-        // show the shell
-        shell.open();
+    // show the shell
+    shell.open();
 
-        // init our game
-        game.init();
+    // init our game
+    game.init();
 
-        // game loop
-        while (!shell.isDisposed() && !exit.get()) {
-            display.readAndDispatch();
-            frameWork.updateFrame();
-            Thread.yield();
-        }
-
-        // cleanup and exit
-        display.dispose();
-        System.exit(0);
+    // game loop
+    while (!shell.isDisposed() && !exit.get()) {
+      display.readAndDispatch();
+      frameWork.updateFrame();
+      Thread.yield();
     }
 
-    private static void addNewFBOCanvas(final Shell shell, final BasicScene scene, final FrameHandler frameWork,
-            final LogicalLayer logicalLayer) {
-        logger.info("Adding canvas");
+    // cleanup and exit
+    display.dispose();
+    System.exit(0);
+  }
 
-        // Display settings to use for canvas - width/height will be updated when canvas is displayed.
-        final DisplaySettings settings = new DisplaySettings(32, 32, 32, 16);
-        final SwtFboCanvas canvas = new SwtFboCanvas(shell, SWT.NONE, settings);
+  private static void addNewFBOCanvas(final Shell shell, final BasicScene scene, final FrameHandler frameWork,
+      final LogicalLayer logicalLayer) {
+    logger.info("Adding canvas");
 
-        // set up the opengl canvas renderer to use
-        final Lwjgl3CanvasRenderer renderer = new Lwjgl3CanvasRenderer(scene);
-        canvas.setCanvasRenderer(renderer);
+    // Display settings to use for canvas - width/height will be updated when canvas is displayed.
+    final DisplaySettings settings = new DisplaySettings(32, 32, 32, 16);
+    final SwtFboCanvas canvas = new SwtFboCanvas(shell, SWT.NONE, settings);
 
-        // add our canvas to framework for updates, etc.
-        frameWork.addCanvas(canvas);
-        canvas.setFocus();
+    // set up the opengl canvas renderer to use
+    final Lwjgl3CanvasRenderer renderer = new Lwjgl3CanvasRenderer(scene);
+    canvas.setCanvasRenderer(renderer);
 
-        addCanvasCallback(canvas, renderer);
-        canvas.addListener((final int w, final int h) -> {
-            System.err.println(w);
-            if ((w == 0) || (h == 0)) {
-                return;
-            }
+    // add our canvas to framework for updates, etc.
+    frameWork.addCanvas(canvas);
+    canvas.setFocus();
 
-            final float aspect = (float) w / (float) h;
-            final Camera camera = renderer.getCamera();
-            if (camera != null) {
-                final double fovY = camera.getFovY();
-                final double near = camera.getFrustumNear();
-                final double far = camera.getFrustumFar();
-                camera.setFrustumPerspective(fovY, aspect, near, far);
-                camera.resize(w, h);
-            }
-        });
+    addCanvasCallback(canvas, renderer);
+    canvas.addListener((final int w, final int h) -> {
+      System.err.println(w);
+      if ((w == 0) || (h == 0)) {
+        return;
+      }
 
-        final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas);
-        final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas);
-        final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas);
-        final SwtMouseManager mouseManager = new SwtMouseManager(canvas);
-        canvas.setMouseManager(mouseManager);
-        final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas, mouseWrapper, true);
+      final float aspect = (float) w / (float) h;
+      final Camera camera = renderer.getCamera();
+      if (camera != null) {
+        final double fovY = camera.getFovY();
+        final double near = camera.getFrustumNear();
+        final double far = camera.getFrustumFar();
+        camera.setFrustumPerspective(fovY, aspect, near, far);
+        camera.resize(w, h);
+      }
+    });
 
-        final PhysicalLayer pl = new PhysicalLayer.Builder() //
-                .with((KeyboardWrapper) keyboardWrapper) //
-                .with((CharacterInputWrapper) keyboardWrapper) //
-                .with(mouseWrapper) //
-                .with(gestureWrapper) //
-                .with(focusWrapper)//
-                .build();
+    final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas);
+    final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas);
+    final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas);
+    final SwtMouseManager mouseManager = new SwtMouseManager(canvas);
+    canvas.setMouseManager(mouseManager);
+    final SwtGestureWrapper gestureWrapper = new SwtGestureWrapper(canvas, mouseWrapper, true);
 
-        logicalLayer.registerInput(canvas, pl);
-    }
+    final PhysicalLayer pl = new PhysicalLayer.Builder() //
+        .with((KeyboardWrapper) keyboardWrapper) //
+        .with((CharacterInputWrapper) keyboardWrapper) //
+        .with(mouseWrapper) //
+        .with(gestureWrapper) //
+        .with(focusWrapper)//
+        .build();
 
-    private static void addCanvasCallback(final SwtFboCanvas canvas, final Lwjgl3CanvasRenderer renderer) {
-        renderer.setCanvasCallback(new Lwjgl3CanvasCallback() {
-            @Override
-            public void makeCurrent(final boolean force) {
-                canvas.setCurrent();
-            }
+    logicalLayer.registerInput(canvas, pl);
+  }
 
-            @Override
-            public void releaseContext(final boolean force) {
-                ;
-            }
+  private static void addCanvasCallback(final SwtFboCanvas canvas, final Lwjgl3CanvasRenderer renderer) {
+    renderer.setCanvasCallback(new Lwjgl3CanvasCallback() {
+      @Override
+      public void makeCurrent(final boolean force) {
+        canvas.setCurrent();
+      }
 
-            @Override
-            public void doSwap() {
-                canvas.swapBuffers();
-            }
-        });
-    }
+      @Override
+      public void releaseContext(final boolean force) {
+
+      }
+
+      @Override
+      public void doSwap() {
+        canvas.swapBuffers();
+      }
+    });
+  }
 }

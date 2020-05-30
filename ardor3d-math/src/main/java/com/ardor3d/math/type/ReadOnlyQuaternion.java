@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -17,63 +17,63 @@ import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyQuaternion {
 
-    double getX();
+  double getX();
 
-    double getY();
+  double getY();
 
-    double getZ();
+  double getZ();
 
-    double getW();
+  double getW();
 
-    float getXf();
+  float getXf();
 
-    float getYf();
+  float getYf();
 
-    float getZf();
+  float getZf();
 
-    float getWf();
+  float getWf();
 
-    double[] toArray(double[] store);
+  double[] toArray(double[] store);
 
-    double[] toEulerAngles(double[] store);
+  double[] toEulerAngles(double[] store);
 
-    Matrix3 toRotationMatrix(Matrix3 store);
+  Matrix3 toRotationMatrix(Matrix3 store);
 
-    Matrix4 toRotationMatrix(Matrix4 store);
+  Matrix4 toRotationMatrix(Matrix4 store);
 
-    Vector3 getRotationColumn(int index, Vector3 store);
+  Vector3 getRotationColumn(int index, Vector3 store);
 
-    double toAngleAxis(Vector3 axisStore);
+  double toAngleAxis(Vector3 axisStore);
 
-    Quaternion normalize(Quaternion store);
+  Quaternion normalize(Quaternion store);
 
-    Quaternion conjugate(Quaternion store);
+  Quaternion conjugate(Quaternion store);
 
-    Quaternion add(ReadOnlyQuaternion quat, Quaternion store);
+  Quaternion add(ReadOnlyQuaternion quat, Quaternion store);
 
-    Quaternion subtract(ReadOnlyQuaternion quat, Quaternion store);
+  Quaternion subtract(ReadOnlyQuaternion quat, Quaternion store);
 
-    Quaternion multiply(double scalar, Quaternion store);
+  Quaternion multiply(double scalar, Quaternion store);
 
-    Quaternion multiply(ReadOnlyQuaternion quat, Quaternion store);
+  Quaternion multiply(ReadOnlyQuaternion quat, Quaternion store);
 
-    Vector3 apply(ReadOnlyVector3 vec, Vector3 store);
+  Vector3 apply(ReadOnlyVector3 vec, Vector3 store);
 
-    Vector3[] toAxes(Vector3 axes[]);
+  Vector3[] toAxes(Vector3 axes[]);
 
-    Quaternion slerp(ReadOnlyQuaternion endQuat, double changeAmnt, Quaternion store);
+  Quaternion slerp(ReadOnlyQuaternion endQuat, double changeAmnt, Quaternion store);
 
-    double magnitudeSquared();
+  double magnitudeSquared();
 
-    double magnitude();
+  double magnitude();
 
-    double dot(double x, double y, double z, double w);
+  double dot(double x, double y, double z, double w);
 
-    double dot(ReadOnlyQuaternion quat);
+  double dot(ReadOnlyQuaternion quat);
 
-    boolean isIdentity();
+  boolean isIdentity();
 
-    Quaternion clone();
+  Quaternion clone();
 
-    boolean strictEquals(Object o);
+  boolean strictEquals(Object o);
 }

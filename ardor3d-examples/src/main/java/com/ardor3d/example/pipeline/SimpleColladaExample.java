@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -22,26 +22,27 @@ import com.ardor3d.util.MaterialUtil;
 /**
  * Simplest example of loading a Collada model.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleColladaExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleColladaExample.jpg", //
-maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleColladaExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleColladaExample.jpg", //
+    maxHeapMemory = 64)
 public class SimpleColladaExample extends ExampleBase {
-    public static void main(final String[] args) {
-        ExampleBase.start(SimpleColladaExample.class);
-    }
+  public static void main(final String[] args) {
+    ExampleBase.start(SimpleColladaExample.class);
+  }
 
-    @Override
-    protected void initExample() {
-        _canvas.setTitle("Ardor3D - Simple Collada Example");
-        _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 5, 20));
+  @Override
+  protected void initExample() {
+    _canvas.setTitle("Ardor3D - Simple Collada Example");
+    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 5, 20));
 
-        // Load the collada scene
-        try {
-            final ColladaStorage storage = new ColladaImporter().load("collada/sony/Seymour.dae");
-            _root.attachChild(storage.getScene());
-            MaterialUtil.autoMaterials(_root);
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
+    // Load the collada scene
+    try {
+      final ColladaStorage storage = new ColladaImporter().load("collada/sony/Seymour.dae");
+      _root.attachChild(storage.getScene());
+      MaterialUtil.autoMaterials(_root);
+    } catch (final IOException ex) {
+      ex.printStackTrace();
     }
+  }
 }

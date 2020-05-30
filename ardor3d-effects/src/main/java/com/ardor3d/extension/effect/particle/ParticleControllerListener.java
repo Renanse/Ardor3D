@@ -14,5 +14,5 @@ package com.ardor3d.extension.effect.particle;
  * ParticleControllerListener This interface is used to receive key events from ParticleController
  */
 public interface ParticleControllerListener {
-    void onDead(ParticleSystem particles);
+  void onDead(ParticleSystem particles);
 }

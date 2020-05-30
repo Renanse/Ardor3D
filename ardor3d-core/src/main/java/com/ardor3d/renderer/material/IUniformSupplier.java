@@ -19,36 +19,36 @@ import com.ardor3d.renderer.material.uniform.UniformRef;
 
 public interface IUniformSupplier {
 
-    List<UniformRef> getUniforms();
+  List<UniformRef> getUniforms();
 
-    /**
-     * Set default values for this uniform supplier. Used when we have to generate a missing supplier (such as a light
-     * for an index with no light.)
-     */
-    void applyDefaultUniformValues();
+  /**
+   * Set default values for this uniform supplier. Used when we have to generate a missing supplier
+   * (such as a light for an index with no light.)
+   */
+  void applyDefaultUniformValues();
 
-    static Set<String> nullProviders = new HashSet<>();
+  Set<String> nullProviders = new HashSet<>();
 
-    static IUniformSupplier getDefaultProvider(final String className) {
-        if (nullProviders.contains(className)) {
-            return null;
-        }
-
-        try {
-            final Class<?> clazz = Class.forName(className);
-            final Object val = clazz.getDeclaredConstructor().newInstance();
-            if (val instanceof IUniformSupplier) {
-                final IUniformSupplier supplier = (IUniformSupplier) val;
-                supplier.applyDefaultUniformValues();
-                return supplier;
-            }
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException | ClassNotFoundException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
-        }
-
-        nullProviders.add(className);
-        return null;
+  static IUniformSupplier getDefaultProvider(final String className) {
+    if (nullProviders.contains(className)) {
+      return null;
     }
+
+    try {
+      final Class<?> clazz = Class.forName(className);
+      final Object val = clazz.getDeclaredConstructor().newInstance();
+      if (val instanceof IUniformSupplier) {
+        final IUniformSupplier supplier = (IUniformSupplier) val;
+        supplier.applyDefaultUniformValues();
+        return supplier;
+      }
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+        | NoSuchMethodException | SecurityException | ClassNotFoundException ex) {
+      // TODO Auto-generated catch block
+      ex.printStackTrace();
+    }
+
+    nullProviders.add(className);
+    return null;
+  }
 }

@@ -31,111 +31,102 @@ import com.ardor3d.input.mouse.MouseManager;
  * A canvas for embedding into SWT applications.
  */
 public class SwtCanvas extends GLCanvas implements Canvas {
-    protected CanvasRenderer _canvasRenderer;
-    protected boolean _inited = false;
-    protected final GLData _passedGLData;
+  protected CanvasRenderer _canvasRenderer;
+  protected boolean _inited = false;
+  protected final GLData _passedGLData;
 
-    protected List<ICanvasListener> _listeners = new ArrayList<>();
+  protected List<ICanvasListener> _listeners = new ArrayList<>();
 
-    public SwtCanvas(final Composite composite, final int style, final GLData glData) {
-        super(composite, style, glData);
-        _passedGLData = getGLData();
-        setCurrent();
+  public SwtCanvas(final Composite composite, final int style, final GLData glData) {
+    super(composite, style, glData);
+    _passedGLData = getGLData();
+    setCurrent();
 
-        addListener(SWT.Resize, event -> {
-            final Rectangle clientArea = getClientArea();
-            for (final ICanvasListener l : _listeners) {
-                l.onResize(clientArea.width, clientArea.height);
-            }
-        });
+    addListener(SWT.Resize, event -> {
+      final Rectangle clientArea = getClientArea();
+      for (final ICanvasListener l : _listeners) {
+        l.onResize(clientArea.width, clientArea.height);
+      }
+    });
+  }
+
+  @Override
+  public CanvasRenderer getCanvasRenderer() { return _canvasRenderer; }
+
+  public void setCanvasRenderer(final CanvasRenderer renderer) { _canvasRenderer = renderer; }
+
+  protected MouseManager _manager;
+
+  @Override
+  public MouseManager getMouseManager() { return _manager; }
+
+  @Override
+  public void setMouseManager(final MouseManager manager) { _manager = manager; }
+
+  @MainThread
+  private void privateInit() {
+    // tell our parent to lay us out so we have the right starting size.
+    getParent().layout();
+    final Rectangle size = getClientArea();
+
+    setCurrent();
+
+    final DisplaySettings settings =
+        new DisplaySettings(Math.max(size.width, 1), Math.max(size.height, 1), 0, 0, _passedGLData.alphaSize,
+            _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples, false, _passedGLData.stereo);
+
+    _canvasRenderer.init(this, settings, false); // false - do not do back buffer swap, swt will do that.
+    _inited = true;
+  }
+
+  @Override
+  @MainThread
+  public void init() {
+    privateInit();
+  }
+
+  @Override
+  @MainThread
+  public void draw(final CountDownLatch latch) {
+    if (!_inited) {
+      privateInit();
     }
 
-    public CanvasRenderer getCanvasRenderer() {
-        return _canvasRenderer;
+    if (!isDisposed() && isVisible()) {
+      setCurrent();
+
+      if (_canvasRenderer.draw()) {
+        swapBuffers();
+        _canvasRenderer.releaseCurrentContext();
+      }
     }
 
-    public void setCanvasRenderer(final CanvasRenderer renderer) {
-        _canvasRenderer = renderer;
-    }
+    latch.countDown();
+  }
 
-    protected MouseManager _manager;
+  @Override
+  public int getContentHeight() { return (int) Math.round(scaleToScreenDpi(getSize().y)); }
 
-    @Override
-    public MouseManager getMouseManager() {
-        return _manager;
-    }
+  @Override
+  public int getContentWidth() { return (int) Math.round(scaleToScreenDpi(getSize().x)); }
 
-    @Override
-    public void setMouseManager(final MouseManager manager) {
-        _manager = manager;
-    }
+  @Override
+  public void addListener(final ICanvasListener listener) {
+    _listeners.add(listener);
+  }
 
-    @MainThread
-    private void privateInit() {
-        // tell our parent to lay us out so we have the right starting size.
-        getParent().layout();
-        final Rectangle size = getClientArea();
+  @Override
+  public boolean removeListener(final ICanvasListener listener) {
+    return _listeners.remove(listener);
+  }
 
-        setCurrent();
+  @Override
+  public double scaleToScreenDpi(final double size) {
+    return SwtDpiScaler.INSTANCE.scaleToScreenDpi(size);
+  }
 
-        final DisplaySettings settings = new DisplaySettings(Math.max(size.width, 1), Math.max(size.height, 1), 0, 0,
-                _passedGLData.alphaSize, _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples,
-                false, _passedGLData.stereo);
-
-        _canvasRenderer.init(this, settings, false); // false - do not do back buffer swap, swt will do that.
-        _inited = true;
-    }
-
-    @MainThread
-    public void init() {
-        privateInit();
-    }
-
-    @MainThread
-    public void draw(final CountDownLatch latch) {
-        if (!_inited) {
-            privateInit();
-        }
-
-        if (!isDisposed() && isVisible()) {
-            setCurrent();
-
-            if (_canvasRenderer.draw()) {
-                swapBuffers();
-                _canvasRenderer.releaseCurrentContext();
-            }
-        }
-
-        latch.countDown();
-    }
-
-    @Override
-    public int getContentHeight() {
-        return (int) Math.round(scaleToScreenDpi(getSize().y));
-    }
-
-    @Override
-    public int getContentWidth() {
-        return (int) Math.round(scaleToScreenDpi(getSize().x));
-    }
-
-    @Override
-    public void addListener(final ICanvasListener listener) {
-        _listeners.add(listener);
-    }
-
-    @Override
-    public boolean removeListener(final ICanvasListener listener) {
-        return _listeners.remove(listener);
-    }
-
-    @Override
-    public double scaleToScreenDpi(final double size) {
-        return SwtDpiScaler.INSTANCE.scaleToScreenDpi(size);
-    }
-
-    @Override
-    public double scaleFromScreenDpi(final double size) {
-        return SwtDpiScaler.INSTANCE.scaleFromScreenDpi(size);
-    }
+  @Override
+  public double scaleFromScreenDpi(final double size) {
+    return SwtDpiScaler.INSTANCE.scaleFromScreenDpi(size);
+  }
 }

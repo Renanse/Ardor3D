@@ -13,20 +13,20 @@ package com.ardor3d.input.character;
 import com.google.common.collect.PeekingIterator;
 
 /**
- * Defines the API for character input wrappers - these classes supply characters input into the system in some manner,
- * be it from a keyboard or some other device.
+ * Defines the API for character input wrappers - these classes supply characters input into the
+ * system in some manner, be it from a keyboard or some other device.
  */
 public interface CharacterInputWrapper {
-    /**
-     * Allows the keyboard wrapper implementation to initialise itself.
-     */
-    public void init();
+  /**
+   * Allows the keyboard wrapper implementation to initialise itself.
+   */
+  void init();
 
-    /**
-     * Returns a peeking iterator that allows the client to loop through all keyboard events that have not yet been
-     * handled.
-     *
-     * @return an iterator that allows the client to check which events have still not been handled
-     */
-    public PeekingIterator<CharacterInputEvent> getCharacterEvents();
+  /**
+   * Returns a peeking iterator that allows the client to loop through all keyboard events that have
+   * not yet been handled.
+   *
+   * @return an iterator that allows the client to check which events have still not been handled
+   */
+  PeekingIterator<CharacterInputEvent> getCharacterEvents();
 }

@@ -18,59 +18,59 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyTransform {
-    ReadOnlyMatrix3 getMatrix();
+  ReadOnlyMatrix3 getMatrix();
 
-    ReadOnlyVector3 getTranslation();
+  ReadOnlyVector3 getTranslation();
 
-    ReadOnlyVector3 getScale();
+  ReadOnlyVector3 getScale();
 
-    boolean isIdentity();
+  boolean isIdentity();
 
-    boolean isRotationMatrix();
+  boolean isRotationMatrix();
 
-    boolean isUniformScale();
+  boolean isUniformScale();
 
-    Vector3 applyForward(Vector3 point);
+  Vector3 applyForward(Vector3 point);
 
-    Vector3 applyForward(ReadOnlyVector3 point, Vector3 store);
+  Vector3 applyForward(ReadOnlyVector3 point, Vector3 store);
 
-    Vector3 applyInverse(Vector3 point);
+  Vector3 applyInverse(Vector3 point);
 
-    Vector3 applyInverse(ReadOnlyVector3 point, Vector3 store);
+  Vector3 applyInverse(ReadOnlyVector3 point, Vector3 store);
 
-    Vector3 applyForwardVector(Vector3 vector);
+  Vector3 applyForwardVector(Vector3 vector);
 
-    Vector3 applyForwardVector(ReadOnlyVector3 vector, Vector3 store);
+  Vector3 applyForwardVector(ReadOnlyVector3 vector, Vector3 store);
 
-    Vector3 applyInverseVector(Vector3 vector);
+  Vector3 applyInverseVector(Vector3 vector);
 
-    Vector3 applyInverseVector(ReadOnlyVector3 vector, Vector3 store);
+  Vector3 applyInverseVector(ReadOnlyVector3 vector, Vector3 store);
 
-    Transform multiply(ReadOnlyTransform transformBy, Transform store);
+  Transform multiply(ReadOnlyTransform transformBy, Transform store);
 
-    Transform invert(Transform store);
+  Transform invert(Transform store);
 
-    Matrix4 getHomogeneousMatrix(Matrix4 store);
+  Matrix4 getHomogeneousMatrix(Matrix4 store);
 
-    /**
-     * Populates an nio double buffer with data from this transform to use as a model view matrix in OpenGL. Does not
-     * modify the position of store.
-     *
-     * @param store
-     *            double buffer to store in. Assumes a size of 16.
-     */
-    void getGLApplyMatrix(DoubleBuffer store);
+  /**
+   * Populates an nio double buffer with data from this transform to use as a model view matrix in
+   * OpenGL. Does not modify the position of store.
+   *
+   * @param store
+   *          double buffer to store in. Assumes a size of 16.
+   */
+  void getGLApplyMatrix(DoubleBuffer store);
 
-    /**
-     * Populates an nio float buffer with data from this transform to use as a model view matrix in OpenGL. Does not
-     * modify the position of store.
-     *
-     * @param store
-     *            float buffer to store in. Assumes a size of 16.
-     */
-    void getGLApplyMatrix(FloatBuffer store);
+  /**
+   * Populates an nio float buffer with data from this transform to use as a model view matrix in
+   * OpenGL. Does not modify the position of store.
+   *
+   * @param store
+   *          float buffer to store in. Assumes a size of 16.
+   */
+  void getGLApplyMatrix(FloatBuffer store);
 
-    Transform clone();
+  Transform clone();
 
-    boolean strictEquals(Object o);
+  boolean strictEquals(Object o);
 }

@@ -15,41 +15,44 @@ import com.ardor3d.input.mouse.MouseWrapper;
 import com.google.common.collect.PeekingIterator;
 
 /**
- * A "do-nothing" implementation of MouseWrapper useful when you want to ignore (or do not need) mouse events.
+ * A "do-nothing" implementation of MouseWrapper useful when you want to ignore (or do not need)
+ * mouse events.
  */
 public class DummyMouseWrapper implements MouseWrapper {
-    public static final DummyMouseWrapper INSTANCE = new DummyMouseWrapper();
+  public static final DummyMouseWrapper INSTANCE = new DummyMouseWrapper();
 
-    PeekingIterator<MouseState> empty = new PeekingIterator<MouseState>() {
+  PeekingIterator<MouseState> empty = new PeekingIterator<>() {
 
-        public boolean hasNext() {
-            return false;
-        }
-
-        public void remove() {}
-
-        public MouseState peek() {
-            return null;
-        }
-
-        public MouseState next() {
-            return null;
-        }
-    };
-
-    public PeekingIterator<MouseState> getMouseEvents() {
-        return empty;
-    }
-
-    public void init() {
-        ; // ignore, does nothing
+    @Override
+    public boolean hasNext() {
+      return false;
     }
 
     @Override
-    public void setIgnoreInput(final boolean ignore) {}
+    public void remove() {}
 
     @Override
-    public boolean isIgnoreInput() {
-        return true;
+    public MouseState peek() {
+      return null;
     }
+
+    @Override
+    public MouseState next() {
+      return null;
+    }
+  };
+
+  @Override
+  public PeekingIterator<MouseState> getMouseEvents() { return empty; }
+
+  @Override
+  public void init() {
+    // ignore, does nothing
+  }
+
+  @Override
+  public void setIgnoreInput(final boolean ignore) {}
+
+  @Override
+  public boolean isIgnoreInput() { return true; }
 }

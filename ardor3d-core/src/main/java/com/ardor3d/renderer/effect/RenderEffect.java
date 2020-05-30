@@ -16,40 +16,37 @@ import java.util.List;
 import com.ardor3d.renderer.effect.step.EffectStep;
 
 /**
- * A RenderEffect object represents a complete set of instructions necessary for applying a specific effect to our
- * render output. Each effect is comprised of a set of 1 or more steps (EffectStep).
+ * A RenderEffect object represents a complete set of instructions necessary for applying a specific
+ * effect to our render output. Each effect is comprised of a set of 1 or more steps (EffectStep).
  */
 public abstract class RenderEffect {
 
-    /** A list of logical steps that comprise our effect. */
-    protected final List<EffectStep> _steps = new ArrayList<>();
+  /** A list of logical steps that comprise our effect. */
+  protected final List<EffectStep> _steps = new ArrayList<>();
 
-    /** Is this render effect active? */
-    protected boolean _enabled = true;
+  /** Is this render effect active? */
+  protected boolean _enabled = true;
 
-    /**
-     * Do any setup necessary for our effect prior. This should be called only once, or on changes to the effect chain.
-     *
-     * @param manager
-     */
-    public void prepare(final EffectManager manager) {}
+  /**
+   * Do any setup necessary for our effect prior. This should be called only once, or on changes to
+   * the effect chain.
+   *
+   * @param manager
+   */
+  public void prepare(final EffectManager manager) {}
 
-    /**
-     * Render this effect.
-     *
-     * @param manager
-     */
-    public void render(final EffectManager manager) {
-        for (final EffectStep step : _steps) {
-            step.apply(manager);
-        }
+  /**
+   * Render this effect.
+   *
+   * @param manager
+   */
+  public void render(final EffectManager manager) {
+    for (final EffectStep step : _steps) {
+      step.apply(manager);
     }
+  }
 
-    public boolean isEnabled() {
-        return _enabled;
-    }
+  public boolean isEnabled() { return _enabled; }
 
-    public void setEnabled(final boolean enabled) {
-        _enabled = enabled;
-    }
+  public void setEnabled(final boolean enabled) { _enabled = enabled; }
 }

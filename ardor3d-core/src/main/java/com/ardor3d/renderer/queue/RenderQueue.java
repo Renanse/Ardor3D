@@ -21,127 +21,127 @@ import com.ardor3d.util.Ardor3dException;
 
 public class RenderQueue {
 
-    private final Map<RenderBucketType, RenderBucket> renderBuckets = new LinkedHashMap<>();
+  private final Map<RenderBucketType, RenderBucket> renderBuckets = new LinkedHashMap<>();
 
-    public RenderQueue() {
-        setupDefaultBuckets();
+  public RenderQueue() {
+    setupDefaultBuckets();
+  }
+
+  public void setupBuckets(final RenderBucketType[] renderBucketTypes, final RenderBucket[] buckets) {
+    if (renderBucketTypes.length != buckets.length) {
+      throw new Ardor3dException("Can't setup buckets, RenderBucketType and RenderBucket counts don't match.");
+    }
+    removeRenderBuckets();
+    for (int i = 0; i < renderBucketTypes.length; i++) {
+      setRenderBucket(renderBucketTypes[i], buckets[i]);
+    }
+  }
+
+  private void setupDefaultBuckets() {
+    setRenderBucket(RenderBucketType.PreBucket, new OpaqueRenderBucket());
+    setRenderBucket(RenderBucketType.Shadow, new OpaqueRenderBucket());
+    setRenderBucket(RenderBucketType.Opaque, new OpaqueRenderBucket());
+    setRenderBucket(RenderBucketType.Transparent, new TransparentRenderBucket());
+    setRenderBucket(RenderBucketType.OrthoOrder, new OrthoOrderRenderBucket());
+    setRenderBucket(RenderBucketType.PostBucket, new OpaqueRenderBucket());
+  }
+
+  public void removeRenderBuckets() {
+    renderBuckets.clear();
+  }
+
+  public void removeRenderBucket(final RenderBucketType type) {
+    renderBuckets.remove(type);
+  }
+
+  public void setRenderBucket(final RenderBucketType type, final RenderBucket renderBucket) {
+    renderBuckets.put(type, renderBucket);
+  }
+
+  public RenderBucket getRenderBucket(final RenderBucketType type) {
+    return renderBuckets.get(type);
+  }
+
+  public void addToQueue(final Spatial spatial, final RenderBucketType type) {
+    if (type == RenderBucketType.Inherit || type == RenderBucketType.Skip) {
+      throw new Ardor3dException("Can't add spatial to bucket of type: " + type);
     }
 
-    public void setupBuckets(final RenderBucketType[] renderBucketTypes, final RenderBucket[] buckets) {
-        if (renderBucketTypes.length != buckets.length) {
-            throw new Ardor3dException("Can't setup buckets, RenderBucketType and RenderBucket counts don't match.");
-        }
-        removeRenderBuckets();
-        for (int i = 0; i < renderBucketTypes.length; i++) {
-            setRenderBucket(renderBucketTypes[i], buckets[i]);
-        }
+    if (prepareForInstancing(spatial)) {
+      return;
     }
 
-    private void setupDefaultBuckets() {
-        setRenderBucket(RenderBucketType.PreBucket, new OpaqueRenderBucket());
-        setRenderBucket(RenderBucketType.Shadow, new OpaqueRenderBucket());
-        setRenderBucket(RenderBucketType.Opaque, new OpaqueRenderBucket());
-        setRenderBucket(RenderBucketType.Transparent, new TransparentRenderBucket());
-        setRenderBucket(RenderBucketType.OrthoOrder, new OrthoOrderRenderBucket());
-        setRenderBucket(RenderBucketType.PostBucket, new OpaqueRenderBucket());
+    final RenderBucket renderBucket = getRenderBucket(type);
+    if (renderBucket != null) {
+      renderBucket.add(spatial);
+    } else {
+      throw new Ardor3dException("No bucket exists of type: " + type);
+    }
+  }
+
+  private final boolean prepareForInstancing(final Spatial spatial) {
+    boolean skipRenderQueue = false;
+
+    if (spatial instanceof Mesh) {
+      final Mesh mesh = (Mesh) spatial;
+      final InstancingManager instancing = mesh.getMeshData().getInstancingManager();
+      // Only one instance needs to be added to the render queue
+      if (instancing != null) {
+        skipRenderQueue = instancing.isAddedToRenderQueue();
+        instancing.registerMesh(mesh);
+      }
+    }
+    return skipRenderQueue;
+  }
+
+  public void removeFromQueue(final Spatial spatial, final RenderBucketType type) {
+    if (type == RenderBucketType.Inherit || type == RenderBucketType.Skip) {
+      throw new Ardor3dException("Can't remove spatial from bucket of type: " + type);
     }
 
-    public void removeRenderBuckets() {
-        renderBuckets.clear();
+    final RenderBucket renderBucket = getRenderBucket(type);
+    if (renderBucket != null) {
+      renderBucket.remove(spatial);
+    } else {
+      throw new Ardor3dException("No bucket exists of type: " + type);
     }
+  }
 
-    public void removeRenderBucket(final RenderBucketType type) {
-        renderBuckets.remove(type);
+  public void clearBuckets() {
+    for (final RenderBucket renderBucket : renderBuckets.values()) {
+      renderBucket.clear();
     }
+  }
 
-    public void setRenderBucket(final RenderBucketType type, final RenderBucket renderBucket) {
-        renderBuckets.put(type, renderBucket);
+  public void sortBuckets() {
+    for (final RenderBucket renderBucket : renderBuckets.values()) {
+      renderBucket.sort();
     }
+  }
 
-    public RenderBucket getRenderBucket(final RenderBucketType type) {
-        return renderBuckets.get(type);
+  public void renderOnly(final Renderer renderer) {
+    for (final RenderBucket renderBucket : renderBuckets.values()) {
+      renderBucket.render(renderer);
     }
+  }
 
-    public void addToQueue(final Spatial spatial, final RenderBucketType type) {
-        if (type == RenderBucketType.Inherit || type == RenderBucketType.Skip) {
-            throw new Ardor3dException("Can't add spatial to bucket of type: " + type);
-        }
-
-        if (prepareForInstancing(spatial)) {
-            return;
-        }
-
-        final RenderBucket renderBucket = getRenderBucket(type);
-        if (renderBucket != null) {
-            renderBucket.add(spatial);
-        } else {
-            throw new Ardor3dException("No bucket exists of type: " + type);
-        }
+  public void renderBuckets(final Renderer renderer) {
+    for (final RenderBucket renderBucket : renderBuckets.values()) {
+      renderBucket.sort();
+      renderBucket.render(renderer);
+      renderBucket.clear();
     }
+  }
 
-    private final boolean prepareForInstancing(final Spatial spatial) {
-        boolean skipRenderQueue = false;
-
-        if (spatial instanceof Mesh) {
-            final Mesh mesh = (Mesh) spatial;
-            final InstancingManager instancing = mesh.getMeshData().getInstancingManager();
-            // Only one instance needs to be added to the render queue
-            if (instancing != null) {
-                skipRenderQueue = instancing.isAddedToRenderQueue();
-                instancing.registerMesh(mesh);
-            }
-        }
-        return skipRenderQueue;
+  public void pushBuckets() {
+    for (final RenderBucket renderBucket : renderBuckets.values()) {
+      renderBucket.pushBucket();
     }
+  }
 
-    public void removeFromQueue(final Spatial spatial, final RenderBucketType type) {
-        if (type == RenderBucketType.Inherit || type == RenderBucketType.Skip) {
-            throw new Ardor3dException("Can't remove spatial from bucket of type: " + type);
-        }
-
-        final RenderBucket renderBucket = getRenderBucket(type);
-        if (renderBucket != null) {
-            renderBucket.remove(spatial);
-        } else {
-            throw new Ardor3dException("No bucket exists of type: " + type);
-        }
+  public void popBuckets() {
+    for (final RenderBucket renderBucket : renderBuckets.values()) {
+      renderBucket.popBucket();
     }
-
-    public void clearBuckets() {
-        for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.clear();
-        }
-    }
-
-    public void sortBuckets() {
-        for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.sort();
-        }
-    }
-
-    public void renderOnly(final Renderer renderer) {
-        for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.render(renderer);
-        }
-    }
-
-    public void renderBuckets(final Renderer renderer) {
-        for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.sort();
-            renderBucket.render(renderer);
-            renderBucket.clear();
-        }
-    }
-
-    public void pushBuckets() {
-        for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.pushBucket();
-        }
-    }
-
-    public void popBuckets() {
-        for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.popBucket();
-        }
-    }
+  }
 }

@@ -16,31 +16,34 @@ import com.google.common.collect.PeekingIterator;
 
 public class DummyCharacterInputWrapper implements CharacterInputWrapper {
 
-    public static final DummyCharacterInputWrapper INSTANCE = new DummyCharacterInputWrapper();
+  public static final DummyCharacterInputWrapper INSTANCE = new DummyCharacterInputWrapper();
 
-    final PeekingIterator<CharacterInputEvent> empty = new PeekingIterator<CharacterInputEvent>() {
-        public boolean hasNext() {
-            return false;
-        }
-
-        public void remove() {
-        }
-
-        public CharacterInputEvent peek() {
-            return null;
-        }
-
-        public CharacterInputEvent next() {
-            return null;
-        }
-    };
-
-    public PeekingIterator<CharacterInputEvent> getCharacterEvents() {
-        return empty;
+  final PeekingIterator<CharacterInputEvent> empty = new PeekingIterator<>() {
+    @Override
+    public boolean hasNext() {
+      return false;
     }
 
-    public void init() {
-        ; // ignore, does nothing
+    @Override
+    public void remove() {}
+
+    @Override
+    public CharacterInputEvent peek() {
+      return null;
     }
+
+    @Override
+    public CharacterInputEvent next() {
+      return null;
+    }
+  };
+
+  @Override
+  public PeekingIterator<CharacterInputEvent> getCharacterEvents() { return empty; }
+
+  @Override
+  public void init() {
+    // ignore, does nothing
+  }
 
 }

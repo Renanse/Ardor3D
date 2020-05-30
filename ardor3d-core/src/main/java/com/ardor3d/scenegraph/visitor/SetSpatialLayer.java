@@ -13,13 +13,14 @@ package com.ardor3d.scenegraph.visitor;
 import com.ardor3d.scenegraph.Spatial;
 
 public class SetSpatialLayer implements Visitor {
-    private final int _layer;
+  private final int _layer;
 
-    public SetSpatialLayer(final int layer) {
-        _layer = layer;
-    }
+  public SetSpatialLayer(final int layer) {
+    _layer = layer;
+  }
 
-    public void visit(final Spatial spatial) {
-        spatial.setLayer(_layer);
-    }
+  @Override
+  public void visit(final Spatial spatial) {
+    spatial.setLayer(_layer);
+  }
 }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -15,15 +15,16 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 
 public class SetModelBoundVisitor implements Visitor {
-    private final BoundingVolume _bound;
+  private final BoundingVolume _bound;
 
-    public SetModelBoundVisitor(final BoundingVolume bound) {
-        _bound = bound;
-    }
+  public SetModelBoundVisitor(final BoundingVolume bound) {
+    _bound = bound;
+  }
 
-    public void visit(final Spatial spatial) {
-        if (spatial instanceof Mesh) {
-            ((Mesh) spatial).setModelBound(_bound.clone(null));
-        }
+  @Override
+  public void visit(final Spatial spatial) {
+    if (spatial instanceof Mesh) {
+      ((Mesh) spatial).setModelBound(_bound.clone(null));
     }
+  }
 }

@@ -15,8 +15,8 @@ import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
 
 public class AtlasTextureParameter {
-    public MinificationFilter minificationFilter = MinificationFilter.Trilinear;
-    public MagnificationFilter magnificationFilter = MagnificationFilter.Bilinear;
-    public WrapMode wrapMode = WrapMode.EdgeClamp;
-    public boolean compress = false;
+  public MinificationFilter minificationFilter = MinificationFilter.Trilinear;
+  public MagnificationFilter magnificationFilter = MagnificationFilter.Bilinear;
+  public WrapMode wrapMode = WrapMode.EdgeClamp;
+  public boolean compress = false;
 }

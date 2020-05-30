@@ -19,49 +19,58 @@ import com.ardor3d.extension.interact.filter.UpdateFilter;
 import com.ardor3d.input.mouse.MouseState;
 
 public class BasicFilterList implements IFilterList {
-    final List<UpdateFilter> _filters = new ArrayList<>();
+  final List<UpdateFilter> _filters = new ArrayList<>();
 
-    public Iterator<UpdateFilter> iterator() {
-        return _filters.iterator();
-    }
+  @Override
+  public Iterator<UpdateFilter> iterator() {
+    return _filters.iterator();
+  }
 
-    public void applyFilters(final InteractManager manager, final AbstractInteractWidget widget) {
-        // apply any filters to our state
-        for (final UpdateFilter filter : _filters) {
-            filter.applyFilter(manager, widget);
-        }
+  @Override
+  public void applyFilters(final InteractManager manager, final AbstractInteractWidget widget) {
+    // apply any filters to our state
+    for (final UpdateFilter filter : _filters) {
+      filter.applyFilter(manager, widget);
     }
+  }
 
-    public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
-        for (final UpdateFilter filter : _filters) {
-            filter.beginDrag(manager, widget, state);
-        }
+  @Override
+  public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
+    for (final UpdateFilter filter : _filters) {
+      filter.beginDrag(manager, widget, state);
     }
+  }
 
-    public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
-        for (final UpdateFilter filter : _filters) {
-            filter.endDrag(manager, widget, state);
-        }
+  @Override
+  public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
+    for (final UpdateFilter filter : _filters) {
+      filter.endDrag(manager, widget, state);
     }
+  }
 
-    public int size() {
-        return _filters.size();
-    }
+  @Override
+  public int size() {
+    return _filters.size();
+  }
 
-    public UpdateFilter get(final int index) {
-        return _filters.get(index);
-    }
+  @Override
+  public UpdateFilter get(final int index) {
+    return _filters.get(index);
+  }
 
-    public boolean add(final UpdateFilter filter) {
-        return _filters.add(filter);
-    }
+  @Override
+  public boolean add(final UpdateFilter filter) {
+    return _filters.add(filter);
+  }
 
-    public boolean remove(final UpdateFilter filter) {
-        return _filters.remove(filter);
-    }
+  @Override
+  public boolean remove(final UpdateFilter filter) {
+    return _filters.remove(filter);
+  }
 
-    public void clear() {
-        _filters.clear();
-    }
+  @Override
+  public void clear() {
+    _filters.clear();
+  }
 
 }

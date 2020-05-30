@@ -19,29 +19,25 @@ import javax.swing.border.TitledBorder;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 
 public abstract class ParticleEditPanel extends JPanel {
-    private static final long serialVersionUID = 1L;
-    private ParticleSystem _particles;
+  private static final long serialVersionUID = 1L;
+  private ParticleSystem _particles;
 
-    public abstract void updateWidgets();
+  public abstract void updateWidgets();
 
-    public void setEdittedParticles(final ParticleSystem particles) {
-        _particles = particles;
-    }
+  public void setEdittedParticles(final ParticleSystem particles) { _particles = particles; }
 
-    public ParticleSystem getEdittedParticles() {
-        return _particles;
-    }
+  public ParticleSystem getEdittedParticles() { return _particles; }
 
-    protected TitledBorder createTitledBorder(final String title) {
-        final TitledBorder border = new TitledBorder(" " + title + " ");
-        border.setTitleFont(new Font("Arial", Font.PLAIN, 10));
-        return border;
-    }
+  protected TitledBorder createTitledBorder(final String title) {
+    final TitledBorder border = new TitledBorder(" " + title + " ");
+    border.setTitleFont(new Font("Arial", Font.PLAIN, 10));
+    return border;
+  }
 
-    protected JLabel createBoldLabel(final String text) {
-        final JLabel label = new JLabel(text);
-        label.setFont(new Font("Arial", Font.BOLD, 13));
-        return label;
-    }
+  protected JLabel createBoldLabel(final String text) {
+    final JLabel label = new JLabel(text);
+    label.setFont(new Font("Arial", Font.BOLD, 13));
+    return label;
+  }
 
 }

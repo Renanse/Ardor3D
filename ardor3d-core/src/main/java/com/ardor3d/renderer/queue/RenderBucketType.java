@@ -15,77 +15,79 @@ import java.util.Map;
 
 public final class RenderBucketType {
 
-    public static RenderBucketType getRenderBucketType(final String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("name must not be null!");
-        }
-
-        RenderBucketType bucketType = bucketTypeMap.get(name);
-        if (bucketType == null) {
-            bucketType = new RenderBucketType(name);
-            bucketTypeMap.put(name, bucketType);
-        }
-        return bucketType;
+  public static RenderBucketType getRenderBucketType(final String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("name must not be null!");
     }
 
-    private static final Map<String, RenderBucketType> bucketTypeMap = new HashMap<String, RenderBucketType>();
-
-    private final String name;
-
-    private RenderBucketType(final String name) {
-        this.name = name;
+    RenderBucketType bucketType = bucketTypeMap.get(name);
+    if (bucketType == null) {
+      bucketType = new RenderBucketType(name);
+      bucketTypeMap.put(name, bucketType);
     }
+    return bucketType;
+  }
 
-    public String name() {
-        return name;
-    }
+  private static final Map<String, RenderBucketType> bucketTypeMap = new HashMap<>();
 
-    @Override
-    public String toString() {
-        return name();
-    }
+  private final String name;
 
-    /**
-     * Use your parent's RenderBucketType. If you do not have a parent, {@link #Opaque} will be used instead.
-     */
-    public static final RenderBucketType Inherit = getRenderBucketType("Inherit");
+  private RenderBucketType(final String name) {
+    this.name = name;
+  }
 
-    /**
-     * Used for objects that we want to guarantee will be rendered first.
-     */
-    public static final RenderBucketType PreBucket = getRenderBucketType("PreBucket");
+  public String name() {
+    return name;
+  }
 
-    /**
-     * TODO: Add definition.
-     */
-    public static final RenderBucketType Shadow = getRenderBucketType("Shadow");
+  @Override
+  public String toString() {
+    return name();
+  }
 
-    /**
-     * Used for surfaces that are fully opaque - can not be seen through. Drawn from front to back.
-     */
-    public static final RenderBucketType Opaque = getRenderBucketType("Opaque");
+  /**
+   * Use your parent's RenderBucketType. If you do not have a parent, {@link #Opaque} will be used
+   * instead.
+   */
+  public static final RenderBucketType Inherit = getRenderBucketType("Inherit");
 
-    /**
-     * Used for surfaces that are partially transparent or translucent - can be seen through. Drawn from back to front.
-     * See also the flag {@link com.ardor3d.renderer.queue.TransparentRenderBucket#setTwoPassTransparency(boolean)
-     * TransparentRenderBucket.setTwoPassTransparency(boolean)} allowing you to enable two pass transparency for more
-     * accurate results.
-     */
-    public static final RenderBucketType Transparent = getRenderBucketType("Transparent");
+  /**
+   * Used for objects that we want to guarantee will be rendered first.
+   */
+  public static final RenderBucketType PreBucket = getRenderBucketType("PreBucket");
 
-    /**
-     * Uses {@link com.ardor3d.scenegraph.hint.SceneHints#getOrthoOrder() SceneHints.getOrthoOrder()} to determine draw
-     * order.
-     */
-    public static final RenderBucketType OrthoOrder = getRenderBucketType("OrthoOrder");
+  /**
+   * TODO: Add definition.
+   */
+  public static final RenderBucketType Shadow = getRenderBucketType("Shadow");
 
-    /**
-     * Used for objects that we want to guarantee will be rendered last.
-     */
-    public static final RenderBucketType PostBucket = getRenderBucketType("PostBucket");
+  /**
+   * Used for surfaces that are fully opaque - can not be seen through. Drawn from front to back.
+   */
+  public static final RenderBucketType Opaque = getRenderBucketType("Opaque");
 
-    /**
-     * Do not use bucket system. Instead, draw the spatial immediately to the back buffer.
-     */
-    public static final RenderBucketType Skip = getRenderBucketType("Skip");
+  /**
+   * Used for surfaces that are partially transparent or translucent - can be seen through. Drawn from
+   * back to front. See also the flag
+   * {@link com.ardor3d.renderer.queue.TransparentRenderBucket#setTwoPassTransparency(boolean)
+   * TransparentRenderBucket.setTwoPassTransparency(boolean)} allowing you to enable two pass
+   * transparency for more accurate results.
+   */
+  public static final RenderBucketType Transparent = getRenderBucketType("Transparent");
+
+  /**
+   * Uses {@link com.ardor3d.scenegraph.hint.SceneHints#getOrthoOrder() SceneHints.getOrthoOrder()} to
+   * determine draw order.
+   */
+  public static final RenderBucketType OrthoOrder = getRenderBucketType("OrthoOrder");
+
+  /**
+   * Used for objects that we want to guarantee will be rendered last.
+   */
+  public static final RenderBucketType PostBucket = getRenderBucketType("PostBucket");
+
+  /**
+   * Do not use bucket system. Instead, draw the spatial immediately to the back buffer.
+   */
+  public static final RenderBucketType Skip = getRenderBucketType("Skip");
 }

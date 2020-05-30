@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -14,37 +14,36 @@ import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.SubTex;
 
 /**
- * A extension of button that is specifically selectable and is generally used with a {@link ButtonGroup}. This class is
- * defined distinctly from UIButton to allow for specific skinning.
+ * A extension of button that is specifically selectable and is generally used with a
+ * {@link ButtonGroup}. This class is defined distinctly from UIButton to allow for specific
+ * skinning.
  */
 public class UIRadioButton extends UIButton {
 
-    public UIRadioButton() {
-        this("");
-    }
+  public UIRadioButton() {
+    this("");
+  }
 
-    public UIRadioButton(final String text) {
-        this(text, null);
-    }
+  public UIRadioButton(final String text) {
+    this(text, null);
+  }
 
-    public UIRadioButton(final String text, final SubTex icon) {
-        super(text, icon);
-        super.setSelectable(true);
-    }
+  public UIRadioButton(final String text, final SubTex icon) {
+    super(text, icon);
+    super.setSelectable(true);
+  }
 
-    /**
-     * Ignored
-     */
-    @Override
-    public void setSelectable(final boolean selectable) {
-        ;
-    }
+  /**
+   * Ignored
+   */
+  @Override
+  public void setSelectable(final boolean selectable) {
 
-    /**
-     * @return true
-     */
-    @Override
-    public boolean isSelectable() {
-        return true;
-    }
+  }
+
+  /**
+   * @return true
+   */
+  @Override
+  public boolean isSelectable() { return true; }
 }

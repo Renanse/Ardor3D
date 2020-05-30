@@ -19,27 +19,27 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 
 public class PlaneBoundaryFilter extends UpdateFilterAdapter {
-    private final ReadOnlyPlane[] _planes;
-    private final Vector3 _calcVectorA = new Vector3();
-    private final Vector3 _calcVectorB = new Vector3();
+  private final ReadOnlyPlane[] _planes;
+  private final Vector3 _calcVectorA = new Vector3();
+  private final Vector3 _calcVectorB = new Vector3();
 
-    public PlaneBoundaryFilter(final ReadOnlyPlane... planes) {
-        _planes = Arrays.copyOf(planes, planes.length);
+  public PlaneBoundaryFilter(final ReadOnlyPlane... planes) {
+    _planes = Arrays.copyOf(planes, planes.length);
+  }
+
+  @Override
+  public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
+    final SpatialState state = manager.getSpatialState();
+    _calcVectorA.set(state.getTransform().getTranslation());
+    for (final ReadOnlyPlane plane : _planes) {
+      final double distance = plane.pseudoDistance(_calcVectorA);
+      if (distance < 0) {
+        // push us back to the plane.
+        _calcVectorB.set(plane.getNormal()).multiplyLocal(-distance);
+        _calcVectorA.addLocal(_calcVectorB);
+      }
     }
 
-    @Override
-    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
-        final SpatialState state = manager.getSpatialState();
-        _calcVectorA.set(state.getTransform().getTranslation());
-        for (final ReadOnlyPlane plane : _planes) {
-            final double distance = plane.pseudoDistance(_calcVectorA);
-            if (distance < 0) {
-                // push us back to the plane.
-                _calcVectorB.set(plane.getNormal()).multiplyLocal(-distance);
-                _calcVectorA.addLocal(_calcVectorB);
-            }
-        }
-
-        state.getTransform().setTranslation(_calcVectorA);
-    }
+    state.getTransform().setTranslation(_calcVectorA);
+  }
 }

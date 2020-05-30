@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -19,6 +19,6 @@ import com.ardor3d.framework.Canvas;
  */
 public interface LogicalTriggersApplier {
 
-    void checkAndPerformTriggers(Set<InputTrigger> triggers, Canvas source, TwoInputStates states, double tpf);
+  void checkAndPerformTriggers(Set<InputTrigger> triggers, Canvas source, TwoInputStates states, double tpf);
 
 }

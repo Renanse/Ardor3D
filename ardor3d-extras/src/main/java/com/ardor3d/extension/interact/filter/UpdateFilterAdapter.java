@@ -16,16 +16,13 @@ import com.ardor3d.input.mouse.MouseState;
 
 public abstract class UpdateFilterAdapter implements UpdateFilter {
 
-    @Override
-    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
-    }
+  @Override
+  public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {}
 
-    @Override
-    public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
-    }
+  @Override
+  public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {}
 
-    @Override
-    public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {
-    }
+  @Override
+  public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state) {}
 
 }

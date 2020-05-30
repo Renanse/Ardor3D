@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -11,13 +11,14 @@
 package com.ardor3d.input.keyboard;
 
 /**
- * Thrown when an attempt at fetching a {@link Key} instance for an invalid/unknown key code is made.
+ * Thrown when an attempt at fetching a {@link Key} instance for an invalid/unknown key code is
+ * made.
  */
 public class KeyNotFoundException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public KeyNotFoundException(final int keyCode) {
-        super("No Key enum value found for code: " + keyCode);
-    }
+  public KeyNotFoundException(final int keyCode) {
+    super("No Key enum value found for code: " + keyCode);
+  }
 }

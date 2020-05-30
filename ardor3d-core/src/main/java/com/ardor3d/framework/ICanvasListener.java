@@ -11,5 +11,5 @@
 package com.ardor3d.framework;
 
 public interface ICanvasListener {
-    void onResize(int newWidth, int newHeight);
+  void onResize(int newWidth, int newHeight);
 }

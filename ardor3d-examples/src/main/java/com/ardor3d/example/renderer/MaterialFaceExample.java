@@ -21,65 +21,66 @@ import com.ardor3d.scenegraph.shape.Quad;
 /**
  * A demonstration using MaterialState to set lighting equation parameters.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MaterialFaceExample", //
-        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MaterialFaceExample.jpg", //
-        maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.renderer.MaterialFaceExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MaterialFaceExample.jpg", //
+    maxHeapMemory = 64)
 public class MaterialFaceExample extends ExampleBase {
 
-    public static void main(final String[] args) {
-        start(MaterialFaceExample.class);
-    }
+  public static void main(final String[] args) {
+    start(MaterialFaceExample.class);
+  }
 
-    @Override
-    public void initExample() {
-        _root.attachChild(createFloor());
-        _root.attachChild(createSky());
-    }
+  @Override
+  public void initExample() {
+    _root.attachChild(createFloor());
+    _root.attachChild(createSky());
+  }
 
-    private Mesh createFloor() {
-        final Mesh floor = new Quad("Floor", 100, 100);
-        floor.updateModelBound();
-        // set the color to green using a single color value
-        floor.setDefaultColor(ColorRGBA.GREEN);
-        // move back from camera.
-        floor.setTranslation(0, -5, -20);
-        // rotate to point up
-        floor.setRotation(new Quaternion(-1, 0, 0, 1));
+  private Mesh createFloor() {
+    final Mesh floor = new Quad("Floor", 100, 100);
+    floor.updateModelBound();
+    // set the color to green using a single color value
+    floor.setDefaultColor(ColorRGBA.GREEN);
+    // move back from camera.
+    floor.setTranslation(0, -5, -20);
+    // rotate to point up
+    floor.setRotation(new Quaternion(-1, 0, 0, 1));
 
-//        // Add a material state.
-//        final MaterialState ms = new MaterialState();
-//        floor.setRenderState(ms);
-//        // Pull diffuse color for front and back from mesh color
-//        ms.setColorMaterial(ColorMaterial.Diffuse);
-//        ms.setColorMaterialFace(MaterialFace.FrontAndBack);
+    // // Add a material state.
+    // final MaterialState ms = new MaterialState();
+    // floor.setRenderState(ms);
+    // // Pull diffuse color for front and back from mesh color
+    // ms.setColorMaterial(ColorMaterial.Diffuse);
+    // ms.setColorMaterialFace(MaterialFace.FrontAndBack);
 
-        return floor;
-    }
+    return floor;
+  }
 
-    private Mesh createSky() {
-        final Dome sky = new Dome("Sky", 30, 30, 10);
-        sky.updateModelBound();
-        // set the vertex colors to red. Same effect as setDefaultColor here, but uses more memory.
-        sky.setSolidColor(ColorRGBA.RED);
-        // move back from camera.
-        sky.setTranslation(0, 10, -20);
+  private Mesh createSky() {
+    final Dome sky = new Dome("Sky", 30, 30, 10);
+    sky.updateModelBound();
+    // set the vertex colors to red. Same effect as setDefaultColor here, but uses more memory.
+    sky.setSolidColor(ColorRGBA.RED);
+    // move back from camera.
+    sky.setTranslation(0, 10, -20);
 
-//        // Add a material state
-//        final MaterialState ms = new MaterialState();
-//        sky.setRenderState(ms);
-//        // Pull diffuse color for front from mesh color
-//        ms.setColorMaterial(ColorMaterial.Diffuse);
-//        ms.setColorMaterialFace(MaterialFace.Front);
-//        // Set shininess for front and back
-//        ms.setShininess(MaterialFace.FrontAndBack, 100);
-//        // Set specular color for front
-//        ms.setSpecular(MaterialFace.Front, ColorRGBA.RED);
-//        // Set specular color for back
-//        ms.setSpecular(MaterialFace.Back, ColorRGBA.WHITE);
-//        // set the back diffuse color to blue
-//        ms.setDiffuse(MaterialFace.Back, ColorRGBA.BLUE);
+    // // Add a material state
+    // final MaterialState ms = new MaterialState();
+    // sky.setRenderState(ms);
+    // // Pull diffuse color for front from mesh color
+    // ms.setColorMaterial(ColorMaterial.Diffuse);
+    // ms.setColorMaterialFace(MaterialFace.Front);
+    // // Set shininess for front and back
+    // ms.setShininess(MaterialFace.FrontAndBack, 100);
+    // // Set specular color for front
+    // ms.setSpecular(MaterialFace.Front, ColorRGBA.RED);
+    // // Set specular color for back
+    // ms.setSpecular(MaterialFace.Back, ColorRGBA.WHITE);
+    // // set the back diffuse color to blue
+    // ms.setDiffuse(MaterialFace.Back, ColorRGBA.BLUE);
 
-        return sky;
-    }
+    return sky;
+  }
 
 }

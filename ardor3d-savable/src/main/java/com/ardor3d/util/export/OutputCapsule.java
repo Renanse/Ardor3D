@@ -21,128 +21,126 @@ import java.util.Map;
 
 public interface OutputCapsule {
 
-    // byte primitive
+  // byte primitive
 
-    public void write(byte value, String name, byte defVal) throws IOException;
+  void write(byte value, String name, byte defVal) throws IOException;
 
-    public void write(byte[] value, String name, byte[] defVal) throws IOException;
+  void write(byte[] value, String name, byte[] defVal) throws IOException;
 
-    public void write(byte[][] value, String name, byte[][] defVal) throws IOException;
+  void write(byte[][] value, String name, byte[][] defVal) throws IOException;
 
-    // int primitive
+  // int primitive
 
-    public void write(int value, String name, int defVal) throws IOException;
+  void write(int value, String name, int defVal) throws IOException;
 
-    public void write(int[] value, String name, int[] defVal) throws IOException;
+  void write(int[] value, String name, int[] defVal) throws IOException;
 
-    public void write(int[][] value, String name, int[][] defVal) throws IOException;
+  void write(int[][] value, String name, int[][] defVal) throws IOException;
 
-    // float primitive
+  // float primitive
 
-    public void write(float value, String name, float defVal) throws IOException;
+  void write(float value, String name, float defVal) throws IOException;
 
-    public void write(float[] value, String name, float[] defVal) throws IOException;
+  void write(float[] value, String name, float[] defVal) throws IOException;
 
-    public void write(float[][] value, String name, float[][] defVal) throws IOException;
+  void write(float[][] value, String name, float[][] defVal) throws IOException;
 
-    // double primitive
+  // double primitive
 
-    public void write(double value, String name, double defVal) throws IOException;
+  void write(double value, String name, double defVal) throws IOException;
 
-    public void write(double[] value, String name, double[] defVal) throws IOException;
+  void write(double[] value, String name, double[] defVal) throws IOException;
 
-    public void write(double[][] value, String name, double[][] defVal) throws IOException;
+  void write(double[][] value, String name, double[][] defVal) throws IOException;
 
-    // long primitive
+  // long primitive
 
-    public void write(long value, String name, long defVal) throws IOException;
+  void write(long value, String name, long defVal) throws IOException;
 
-    public void write(long[] value, String name, long[] defVal) throws IOException;
+  void write(long[] value, String name, long[] defVal) throws IOException;
 
-    public void write(long[][] value, String name, long[][] defVal) throws IOException;
+  void write(long[][] value, String name, long[][] defVal) throws IOException;
 
-    // short primitive
+  // short primitive
 
-    public void write(short value, String name, short defVal) throws IOException;
+  void write(short value, String name, short defVal) throws IOException;
 
-    public void write(short[] value, String name, short[] defVal) throws IOException;
+  void write(short[] value, String name, short[] defVal) throws IOException;
 
-    public void write(short[][] value, String name, short[][] defVal) throws IOException;
+  void write(short[][] value, String name, short[][] defVal) throws IOException;
 
-    // boolean primitive
+  // boolean primitive
 
-    public void write(boolean value, String name, boolean defVal) throws IOException;
+  void write(boolean value, String name, boolean defVal) throws IOException;
 
-    public void write(boolean[] value, String name, boolean[] defVal) throws IOException;
+  void write(boolean[] value, String name, boolean[] defVal) throws IOException;
 
-    public void write(boolean[][] value, String name, boolean[][] defVal) throws IOException;
+  void write(boolean[][] value, String name, boolean[][] defVal) throws IOException;
 
-    // String
+  // String
 
-    public void write(String value, String name, String defVal) throws IOException;
+  void write(String value, String name, String defVal) throws IOException;
 
-    public void write(String[] value, String name, String[] defVal) throws IOException;
+  void write(String[] value, String name, String[] defVal) throws IOException;
 
-    public void write(String[][] value, String name, String[][] defVal) throws IOException;
+  void write(String[][] value, String name, String[][] defVal) throws IOException;
 
-    // BitSet
+  // BitSet
 
-    public void write(BitSet value, String name, BitSet defVal) throws IOException;
+  void write(BitSet value, String name, BitSet defVal) throws IOException;
 
-    // BinarySavable
+  // BinarySavable
 
-    public void write(Savable object, String name, Savable defVal) throws IOException;
+  void write(Savable object, String name, Savable defVal) throws IOException;
 
-    public void write(Savable[] objects, String name, Savable[] defVal) throws IOException;
+  void write(Savable[] objects, String name, Savable[] defVal) throws IOException;
 
-    public void write(Savable[][] objects, String name, Savable[][] defVal) throws IOException;
+  void write(Savable[][] objects, String name, Savable[][] defVal) throws IOException;
 
-    // Lists
+  // Lists
 
-    public void writeSavableList(List<? extends Savable> array, String name, List<? extends Savable> defVal)
-            throws IOException;
+  void writeSavableList(List<? extends Savable> array, String name, List<? extends Savable> defVal) throws IOException;
 
-    public void writeSavableListArray(List<? extends Savable>[] array, String name, List<? extends Savable>[] defVal)
-            throws IOException;
+  void writeSavableListArray(List<? extends Savable>[] array, String name, List<? extends Savable>[] defVal)
+      throws IOException;
 
-    public void writeSavableListArray2D(List<? extends Savable>[][] array, String name,
-            List<? extends Savable>[][] defVal) throws IOException;
+  void writeSavableListArray2D(List<? extends Savable>[][] array, String name, List<? extends Savable>[][] defVal)
+      throws IOException;
 
-    public void writeFloatBufferList(List<FloatBuffer> array, String name, List<FloatBuffer> defVal) throws IOException;
+  void writeFloatBufferList(List<FloatBuffer> array, String name, List<FloatBuffer> defVal) throws IOException;
 
-    public void writeByteBufferList(List<ByteBuffer> array, String name, List<ByteBuffer> defVal) throws IOException;
+  void writeByteBufferList(List<ByteBuffer> array, String name, List<ByteBuffer> defVal) throws IOException;
 
-    // Maps
+  // Maps
 
-    public void writeSavableMap(Map<? extends Savable, ? extends Savable> map, String name,
-            Map<? extends Savable, ? extends Savable> defVal) throws IOException;
+  void writeSavableMap(Map<? extends Savable, ? extends Savable> map, String name,
+      Map<? extends Savable, ? extends Savable> defVal) throws IOException;
 
-    public void writeStringSavableMap(Map<String, ? extends Savable> map, String name,
-            Map<String, ? extends Savable> defVal) throws IOException;
+  void writeStringSavableMap(Map<String, ? extends Savable> map, String name, Map<String, ? extends Savable> defVal)
+      throws IOException;
 
-    public void writeStringObjectMap(Map<String, Object> map, String name, Map<String, Object> defVal)
-            throws IOException;
+  void writeStringObjectMap(Map<String, Object> map, String name, Map<String, Object> defVal) throws IOException;
 
-    // NIO BUFFERS
-    // float buffer
+  // NIO BUFFERS
+  // float buffer
 
-    public void write(FloatBuffer value, String name, FloatBuffer defVal) throws IOException;
+  void write(FloatBuffer value, String name, FloatBuffer defVal) throws IOException;
 
-    // int buffer
+  // int buffer
 
-    public void write(IntBuffer value, String name, IntBuffer defVal) throws IOException;
+  void write(IntBuffer value, String name, IntBuffer defVal) throws IOException;
 
-    // byte buffer
+  // byte buffer
 
-    public void write(ByteBuffer value, String name, ByteBuffer defVal) throws IOException;
+  void write(ByteBuffer value, String name, ByteBuffer defVal) throws IOException;
 
-    // short buffer
+  // short buffer
 
-    public void write(ShortBuffer value, String name, ShortBuffer defVal) throws IOException;
+  void write(ShortBuffer value, String name, ShortBuffer defVal) throws IOException;
 
-    // enums
+  // enums
 
-    public void write(Enum<?> value, String name, Enum<?> defVal) throws IOException;
+  void write(Enum<?> value, String name, Enum<?> defVal) throws IOException;
 
-    public void write(Enum<?>[] value, String name) throws IOException;
+  void write(Enum<?>[] value, String name) throws IOException;
 }

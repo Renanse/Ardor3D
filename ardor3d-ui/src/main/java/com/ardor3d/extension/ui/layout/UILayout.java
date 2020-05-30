@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -17,19 +17,20 @@ import com.ardor3d.extension.ui.UIContainer;
  */
 public abstract class UILayout {
 
-    /**
-     * Perform the actual layout of the contents in the given container.
-     * 
-     * @param container
-     *            the container to layout
-     */
-    public abstract void layoutContents(UIContainer container);
+  /**
+   * Perform the actual layout of the contents in the given container.
+   * 
+   * @param container
+   *          the container to layout
+   */
+  public abstract void layoutContents(UIContainer container);
 
-    /**
-     * Update the minimum size of this container, based on the contents of the provided container and this layout.
-     * 
-     * @param container
-     *            the container to update
-     */
-    public abstract void updateMinimumSizeFromContents(UIContainer container);
+  /**
+   * Update the minimum size of this container, based on the contents of the provided container and
+   * this layout.
+   * 
+   * @param container
+   *          the container to update
+   */
+  public abstract void updateMinimumSizeFromContents(UIContainer container);
 }

@@ -16,18 +16,18 @@ import java.util.List;
  * The TerrainDataProvider is the connection between the terrain core and external data.
  */
 public interface TerrainDataProvider {
-    /**
-     * @return this provider's TerrainSource
-     */
-    TerrainSource getTerrainSource();
+  /**
+   * @return this provider's TerrainSource
+   */
+  TerrainSource getTerrainSource();
 
-    /**
-     * @return a list of TextureSources for this Provider.
-     */
-    List<TextureSource> getTextureSources();
+  /**
+   * @return a list of TextureSources for this Provider.
+   */
+  List<TextureSource> getTextureSources();
 
-    /**
-     * @return the normalmap TextureSource for this Provider, or null if none is provided.
-     */
-    TextureSource getNormalMapSource();
+  /**
+   * @return the normalmap TextureSource for this Provider, or null if none is provided.
+   */
+  TextureSource getNormalMapSource();
 }

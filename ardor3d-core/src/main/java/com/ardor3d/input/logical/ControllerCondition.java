@@ -18,34 +18,35 @@ import com.ardor3d.input.controller.ControllerState;
 
 public final class ControllerCondition implements Predicate<TwoInputStates> {
 
-    private int controllerIndex = -1;
-    private String controllerName = null;
+  private int controllerIndex = -1;
+  private String controllerName = null;
 
-    public ControllerCondition(final int controller) {
-        controllerIndex = controller;
-    }
+  public ControllerCondition(final int controller) {
+    controllerIndex = controller;
+  }
 
-    public ControllerCondition(final String controller) {
-        controllerName = controller;
-    }
+  public ControllerCondition(final String controller) {
+    controllerName = controller;
+  }
 
-    public boolean test(final TwoInputStates states) {
-        boolean apply = false;
-        final ControllerState currentState = states.getCurrent().getControllerState();
-        final ControllerState previousState = states.getPrevious().getControllerState();
+  @Override
+  public boolean test(final TwoInputStates states) {
+    boolean apply = false;
+    final ControllerState currentState = states.getCurrent().getControllerState();
+    final ControllerState previousState = states.getPrevious().getControllerState();
 
-        if (!previousState.equals(currentState)) {
-            if (controllerName == null) {
-                controllerName = currentState.getControllerNames().get(controllerIndex);
-            }
-            final List<ControllerEvent> events = currentState.getEvents();
-            for (final ControllerEvent event : events) {
-                if (event.getControllerName().equals(controllerName)) {
-                    apply = true;
-                }
-            }
+    if (!previousState.equals(currentState)) {
+      if (controllerName == null) {
+        controllerName = currentState.getControllerNames().get(controllerIndex);
+      }
+      final List<ControllerEvent> events = currentState.getEvents();
+      for (final ControllerEvent event : events) {
+        if (event.getControllerName().equals(controllerName)) {
+          apply = true;
         }
-        return apply;
+      }
     }
+    return apply;
+  }
 
 }

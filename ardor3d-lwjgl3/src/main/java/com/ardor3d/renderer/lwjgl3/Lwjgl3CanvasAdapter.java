@@ -12,16 +12,13 @@ package com.ardor3d.renderer.lwjgl3;
 
 public class Lwjgl3CanvasAdapter implements Lwjgl3CanvasCallback {
 
-	@Override
-	public void makeCurrent(boolean force) {
-	}
+  @Override
+  public void makeCurrent(final boolean force) {}
 
-	@Override
-	public void releaseContext(boolean force) {
-	}
+  @Override
+  public void releaseContext(final boolean force) {}
 
-	@Override
-	public void doSwap() {
-	}
+  @Override
+  public void doSwap() {}
 
 }

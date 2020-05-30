@@ -12,8 +12,8 @@ package com.ardor3d.framework;
 
 public interface IDpiScaleProvider {
 
-    double scaleToScreenDpi(double size);
+  double scaleToScreenDpi(double size);
 
-    double scaleFromScreenDpi(double size);
+  double scaleFromScreenDpi(double size);
 
 }

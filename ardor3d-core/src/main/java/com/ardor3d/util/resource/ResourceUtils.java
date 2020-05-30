@@ -19,30 +19,30 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public final class ResourceUtils {
 
-    public static ByteBuffer loadResourceAsByteBuffer(final ResourceSource rsrc, final int initialSize) {
-        ByteBuffer buffer;
-        try (final ReadableByteChannel channel = Channels.newChannel(rsrc.openStream())) {
-            buffer = BufferUtils.createByteBuffer(initialSize);
+  public static ByteBuffer loadResourceAsByteBuffer(final ResourceSource rsrc, final int initialSize) {
+    ByteBuffer buffer;
+    try (final ReadableByteChannel channel = Channels.newChannel(rsrc.openStream())) {
+      buffer = BufferUtils.createByteBuffer(initialSize);
 
-            while (true) {
-                final int bytes = channel.read(buffer);
-                if (bytes == -1) {
-                    break;
-                }
-                if (buffer.remaining() == 0) {
-                    final int newSize = buffer.capacity() * 2;
-                    final ByteBuffer newBuffer = BufferUtils.createByteBuffer(newSize);
-                    buffer.flip();
-                    newBuffer.put(buffer);
-                    buffer = newBuffer;
-                }
-            }
-            buffer.flip();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
+      while (true) {
+        final int bytes = channel.read(buffer);
+        if (bytes == -1) {
+          break;
         }
-
-        return buffer;
+        if (buffer.remaining() == 0) {
+          final int newSize = buffer.capacity() * 2;
+          final ByteBuffer newBuffer = BufferUtils.createByteBuffer(newSize);
+          buffer.flip();
+          newBuffer.put(buffer);
+          buffer = newBuffer;
+        }
+      }
+      buffer.flip();
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
+
+    return buffer;
+  }
 
 }

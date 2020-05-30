@@ -15,14 +15,14 @@ import com.ardor3d.input.keyboard.Key;
 
 public interface UIKeyHandler {
 
-    public static double KeyRepeatIntervalTime = 1 / 25.0;
-    public static double KeyRepeatStartTime = 1.0;
+  double KeyRepeatIntervalTime = 1 / 25.0;
+  double KeyRepeatStartTime = 1.0;
 
-    boolean keyPressed(Key key, InputState state);
+  boolean keyPressed(Key key, InputState state);
 
-    boolean keyReleased(Key key, InputState state);
+  boolean keyReleased(Key key, InputState state);
 
-    boolean keyHeld(Key key, InputState state);
+  boolean keyHeld(Key key, InputState state);
 
-    boolean characterReceived(char value, InputState state);
+  boolean characterReceived(char value, InputState state);
 }

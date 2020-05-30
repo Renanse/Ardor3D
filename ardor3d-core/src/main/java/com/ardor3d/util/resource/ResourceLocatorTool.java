@@ -30,199 +30,195 @@ import java.util.logging.Logger;
 import com.google.common.io.CharStreams;
 
 /**
- * Manager class for locator utility classes used to find various assets. (XXX: Needs more documentation)
+ * Manager class for locator utility classes used to find various assets. (XXX: Needs more
+ * documentation)
  */
 public class ResourceLocatorTool {
-    private static final Logger logger = Logger.getLogger(ResourceLocatorTool.class.getName());
+  private static final Logger logger = Logger.getLogger(ResourceLocatorTool.class.getName());
 
-    public static final String TYPE_TEXTURE = "texture";
-    public static final String TYPE_MODEL = "model";
-    public static final String TYPE_PARTICLE = "particle";
-    public static final String TYPE_AUDIO = "audio";
-    public static final String TYPE_SHADER = "shader";
-    public static final String TYPE_MATERIAL = "material";
-    public static final String TYPE_FONT = "font";
+  public static final String TYPE_TEXTURE = "texture";
+  public static final String TYPE_MODEL = "model";
+  public static final String TYPE_PARTICLE = "particle";
+  public static final String TYPE_AUDIO = "audio";
+  public static final String TYPE_SHADER = "shader";
+  public static final String TYPE_MATERIAL = "material";
+  public static final String TYPE_FONT = "font";
 
-    private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<String, List<ResourceLocator>>();
+  private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<>();
 
-    public static ResourceSource locateResource(final String resourceType, String resourceName) {
-        if (resourceName == null) {
-            return null;
-        }
-
-        try {
-            resourceName = URLDecoder.decode(resourceName, "UTF-8");
-        } catch (final UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-        }
-
-        synchronized (_locatorMap) {
-            final List<ResourceLocator> bases = _locatorMap.get(resourceType);
-            if (bases != null) {
-                for (int i = bases.size(); --i >= 0;) {
-                    final ResourceLocator loc = bases.get(i);
-                    final ResourceSource rVal = loc.locateResource(resourceName);
-                    if (rVal != null) {
-                        return rVal;
-                    }
-                }
-            }
-            // last resort...
-            try {
-                final URL u = ResourceLocatorTool.getClassPathResource(ResourceLocatorTool.class, resourceName);
-                if (u != null) {
-                    return new URLResourceSource(u);
-                }
-            } catch (final Exception e) {
-                logger.logp(Level.WARNING, ResourceLocatorTool.class.getName(), "locateResource(String, String)",
-                        e.getMessage(), e);
-            }
-
-            logger.warning("Unable to locate: " + resourceName);
-            return null;
-        }
+  public static ResourceSource locateResource(final String resourceType, String resourceName) {
+    if (resourceName == null) {
+      return null;
     }
 
-    public static void addResourceLocator(final String resourceType, final ResourceLocator locator) {
-        if (locator == null) {
-            return;
-        }
-        synchronized (_locatorMap) {
-            List<ResourceLocator> bases = _locatorMap.get(resourceType);
-            if (bases == null) {
-                bases = new ArrayList<ResourceLocator>();
-                _locatorMap.put(resourceType, bases);
-            }
-
-            if (!bases.contains(locator)) {
-                bases.add(locator);
-            }
-        }
+    try {
+      resourceName = URLDecoder.decode(resourceName, "UTF-8");
+    } catch (final UnsupportedEncodingException ex) {
+      ex.printStackTrace();
     }
 
-    public static boolean removeResourceLocator(final String resourceType, final ResourceLocator locator) {
-        synchronized (_locatorMap) {
-            final List<ResourceLocator> bases = _locatorMap.get(resourceType);
-            if (bases == null) {
-                return false;
-            }
-            return bases.remove(locator);
+    synchronized (_locatorMap) {
+      final List<ResourceLocator> bases = _locatorMap.get(resourceType);
+      if (bases != null) {
+        for (int i = bases.size(); --i >= 0;) {
+          final ResourceLocator loc = bases.get(i);
+          final ResourceSource rVal = loc.locateResource(resourceName);
+          if (rVal != null) {
+            return rVal;
+          }
         }
+      }
+      // last resort...
+      try {
+        final URL u = ResourceLocatorTool.getClassPathResource(ResourceLocatorTool.class, resourceName);
+        if (u != null) {
+          return new URLResourceSource(u);
+        }
+      } catch (final Exception e) {
+        logger.logp(Level.WARNING, ResourceLocatorTool.class.getName(), "locateResource(String, String)",
+            e.getMessage(), e);
+      }
+
+      logger.warning("Unable to locate: " + resourceName);
+      return null;
+    }
+  }
+
+  public static void addResourceLocator(final String resourceType, final ResourceLocator locator) {
+    if (locator == null) {
+      return;
+    }
+    synchronized (_locatorMap) {
+      List<ResourceLocator> bases = _locatorMap.get(resourceType);
+      if (bases == null) {
+        bases = new ArrayList<>();
+        _locatorMap.put(resourceType, bases);
+      }
+
+      if (!bases.contains(locator)) {
+        bases.add(locator);
+      }
+    }
+  }
+
+  public static boolean removeResourceLocator(final String resourceType, final ResourceLocator locator) {
+    synchronized (_locatorMap) {
+      final List<ResourceLocator> bases = _locatorMap.get(resourceType);
+      if (bases == null) {
+        return false;
+      }
+      return bases.remove(locator);
+    }
+  }
+
+  /**
+   * Locate a resource using various classloaders.
+   *
+   * <ul>
+   * <li>First it tries the Thread.currentThread().getContextClassLoader().</li>
+   * <li>Then it tries the ClassLoader.getSystemClassLoader() (if not same as context class
+   * loader).</li>
+   * <li>Finally it tries the clazz.getClassLoader()</li>
+   * </ul>
+   *
+   * @param clazz
+   *          a class to use as a local reference.
+   * @param name
+   *          the name and path of the resource.
+   * @return the URL of the resource, or null if none found.
+   */
+  public static URL getClassPathResource(final Class<?> clazz, final String name) {
+    URL result = Thread.currentThread().getContextClassLoader().getResource(name);
+    if (result == null && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+      result = ClassLoader.getSystemResource(name);
+    }
+    if (result == null) {
+      result = clazz.getClassLoader().getResource(name);
+    }
+    return result;
+  }
+
+  /**
+   * Locate a resource using various classloaders and open a stream to it.
+   *
+   * @param clazz
+   *          a class to use as a local reference.
+   * @param name
+   *          the name and path of the resource.
+   * @return the input stream if resource is found, or null if not.
+   */
+  public static InputStream getClassPathResourceAsStream(final Class<?> clazz, final String name) {
+    InputStream result = Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+    if (result == null && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+      result = ClassLoader.getSystemResourceAsStream(name);
+    }
+    if (result == null) {
+      result = clazz.getClassLoader().getResourceAsStream(name);
+    }
+    return result;
+  }
+
+  /**
+   * Locate a resource using various classloaders and open a stream to it.
+   *
+   * @param clazz
+   *          a class to use as a local reference.
+   * @param name
+   *          the name and path of the resource.
+   * @return the input stream if resource is found, or null if not.
+   * @throws IOException
+   */
+  public static String getClassPathResourceAsString(final Class<?> clazz, final String name) throws IOException {
+    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+    if (stream == null && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+      stream = ClassLoader.getSystemResourceAsStream(name);
+    }
+    if (stream == null) {
+      stream = clazz.getClassLoader().getResourceAsStream(name);
     }
 
-    /**
-     * Locate a resource using various classloaders.
-     *
-     * <ul>
-     * <li>First it tries the Thread.currentThread().getContextClassLoader().</li>
-     * <li>Then it tries the ClassLoader.getSystemClassLoader() (if not same as context class loader).</li>
-     * <li>Finally it tries the clazz.getClassLoader()</li>
-     * </ul>
-     *
-     * @param clazz
-     *            a class to use as a local reference.
-     * @param name
-     *            the name and path of the resource.
-     * @return the URL of the resource, or null if none found.
-     */
-    public static URL getClassPathResource(final Class<?> clazz, final String name) {
-        URL result = Thread.currentThread().getContextClassLoader().getResource(name);
-        if (result == null
-                && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
-            result = ClassLoader.getSystemResource(name);
-        }
-        if (result == null) {
-            result = clazz.getClassLoader().getResource(name);
-        }
-        return result;
+    if (stream == null) {
+      return null;
     }
-
-    /**
-     * Locate a resource using various classloaders and open a stream to it.
-     *
-     * @param clazz
-     *            a class to use as a local reference.
-     * @param name
-     *            the name and path of the resource.
-     * @return the input stream if resource is found, or null if not.
-     */
-    public static InputStream getClassPathResourceAsStream(final Class<?> clazz, final String name) {
-        InputStream result = Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
-        if (result == null
-                && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
-            result = ClassLoader.getSystemResourceAsStream(name);
-        }
-        if (result == null) {
-            result = clazz.getClassLoader().getResourceAsStream(name);
-        }
-        return result;
+    String text = null;
+    try (final Reader reader = new InputStreamReader(stream)) {
+      text = CharStreams.toString(reader);
     }
+    return text;
+  }
 
-    /**
-     * Locate a resource using various classloaders and open a stream to it.
-     *
-     * @param clazz
-     *            a class to use as a local reference.
-     * @param name
-     *            the name and path of the resource.
-     * @return the input stream if resource is found, or null if not.
-     * @throws IOException
-     */
-    public static String getClassPathResourceAsString(final Class<?> clazz, final String name) throws IOException {
-        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
-        if (stream == null
-                && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
-            stream = ClassLoader.getSystemResourceAsStream(name);
+  /**
+   * Locate all instances of a resource using various classloaders.
+   *
+   * @param clazz
+   *          a class to use as a local reference.
+   * @param name
+   *          the name and path of the resource.
+   * @return a set containing the located URLs of the named resource.
+   */
+  public static Set<URL> getClassPathResources(final Class<?> clazz, final String name) {
+    final Set<URL> results = new HashSet<>();
+    Enumeration<URL> urls = null;
+    try {
+      urls = Thread.currentThread().getContextClassLoader().getResources(name);
+      for (; urls.hasMoreElements();) {
+        results.add(urls.nextElement());
+      }
+    } catch (final IOException ioe) {}
+    if (!Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+      try {
+        urls = ClassLoader.getSystemResources(name);
+        for (; urls.hasMoreElements();) {
+          results.add(urls.nextElement());
         }
-        if (stream == null) {
-            stream = clazz.getClassLoader().getResourceAsStream(name);
-        }
-
-        if (stream == null) {
-            return null;
-        }
-        String text = null;
-        try (final Reader reader = new InputStreamReader(stream)) {
-            text = CharStreams.toString(reader);
-        }
-        return text;
+      } catch (final IOException ioe) {}
     }
-
-    /**
-     * Locate all instances of a resource using various classloaders.
-     *
-     * @param clazz
-     *            a class to use as a local reference.
-     * @param name
-     *            the name and path of the resource.
-     * @return a set containing the located URLs of the named resource.
-     */
-    public static Set<URL> getClassPathResources(final Class<?> clazz, final String name) {
-        final Set<URL> results = new HashSet<>();
-        Enumeration<URL> urls = null;
-        try {
-            urls = Thread.currentThread().getContextClassLoader().getResources(name);
-            for (; urls.hasMoreElements();) {
-                results.add(urls.nextElement());
-            }
-        } catch (final IOException ioe) {
-        }
-        if (!Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
-            try {
-                urls = ClassLoader.getSystemResources(name);
-                for (; urls.hasMoreElements();) {
-                    results.add(urls.nextElement());
-                }
-            } catch (final IOException ioe) {
-            }
-        }
-        try {
-            urls = clazz.getClassLoader().getResources(name);
-            for (; urls.hasMoreElements();) {
-                results.add(urls.nextElement());
-            }
-        } catch (final IOException ioe) {
-        }
-        return results;
-    }
+    try {
+      urls = clazz.getClassLoader().getResources(name);
+      for (; urls.hasMoreElements();) {
+        results.add(urls.nextElement());
+      }
+    } catch (final IOException ioe) {}
+    return results;
+  }
 }

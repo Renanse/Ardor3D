@@ -14,14 +14,14 @@ import com.ardor3d.renderer.effect.EffectManager;
 
 public class EffectStep_SetRenderTarget implements EffectStep {
 
-    private final String _target;
+  private final String _target;
 
-    public EffectStep_SetRenderTarget(final String target) {
-        _target = target;
-    }
+  public EffectStep_SetRenderTarget(final String target) {
+    _target = target;
+  }
 
-    @Override
-    public void apply(final EffectManager manager) {
-        manager.setCurrentRenderTarget(_target);
-    }
+  @Override
+  public void apply(final EffectManager manager) {
+    manager.setCurrentRenderTarget(_target);
+  }
 }

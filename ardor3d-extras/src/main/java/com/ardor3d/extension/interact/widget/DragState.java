@@ -11,5 +11,5 @@
 package com.ardor3d.extension.interact.widget;
 
 public enum DragState {
-    NONE, START_DRAG, PREPARE_DRAG, DRAG
+  NONE, START_DRAG, PREPARE_DRAG, DRAG
 }

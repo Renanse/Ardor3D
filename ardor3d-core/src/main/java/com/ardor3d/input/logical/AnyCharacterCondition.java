@@ -15,9 +15,10 @@ import java.util.function.Predicate;
 import com.ardor3d.input.InputState;
 
 public class AnyCharacterCondition implements Predicate<TwoInputStates> {
-    public boolean test(final TwoInputStates twoInputStates) {
-        final InputState currentState = twoInputStates.getCurrent();
+  @Override
+  public boolean test(final TwoInputStates twoInputStates) {
+    final InputState currentState = twoInputStates.getCurrent();
 
-        return !currentState.getCharacterState().getEvents().isEmpty();
-    }
+    return !currentState.getCharacterState().getEvents().isEmpty();
+  }
 }

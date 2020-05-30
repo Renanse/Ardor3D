@@ -14,21 +14,21 @@ import org.junit.Test;
 
 public class TestObjectPool {
 
-    @Test(expected = RuntimeException.class)
-    public void testPoolReleaseNullError() {
-        Vector2.releaseTempInstance(null);
-    }
+  @Test(expected = RuntimeException.class)
+  public void testPoolReleaseNullError() {
+    Vector2.releaseTempInstance(null);
+  }
 
-    @Test(expected = RuntimeException.class)
-    public void testPoolBadClass() {
-        ObjectPool.create(Poolable.class, 10).fetch();
-    }
+  @Test(expected = RuntimeException.class)
+  public void testPoolBadClass() {
+    ObjectPool.create(Poolable.class, 10).fetch();
+  }
 
-    @Test
-    public void testPoolSize() {
-        final ObjectPool<Vector2> pool = ObjectPool.create(Vector2.class, 10);
-        for (int i = 0; i < 11; i++) {
-            pool.release(new Vector2());
-        }
+  @Test
+  public void testPoolSize() {
+    final ObjectPool<Vector2> pool = ObjectPool.create(Vector2.class, 10);
+    for (int i = 0; i < 11; i++) {
+      pool.release(new Vector2());
     }
+  }
 }

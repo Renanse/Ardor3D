@@ -21,28 +21,29 @@ import com.ardor3d.input.keyboard.Key;
  */
 @Immutable
 public final class KeyReleasedCondition implements Predicate<TwoInputStates> {
-    private final Key key;
+  private final Key key;
 
-    /**
-     * Construct a new KeyReleasedCondition.
-     *
-     * @param key
-     *            the key that should be held
-     * @throws NullPointerException
-     *             if the key is null
-     */
-    public KeyReleasedCondition(final Key key) {
-        if (key == null) {
-            throw new NullPointerException();
-        }
-
-        this.key = key;
+  /**
+   * Construct a new KeyReleasedCondition.
+   *
+   * @param key
+   *          the key that should be held
+   * @throws NullPointerException
+   *           if the key is null
+   */
+  public KeyReleasedCondition(final Key key) {
+    if (key == null) {
+      throw new NullPointerException();
     }
 
-    public boolean test(final TwoInputStates states) {
-        final InputState currentState = states.getCurrent();
-        final InputState previousState = states.getPrevious();
+    this.key = key;
+  }
 
-        return currentState.getKeyboardState().getKeysReleasedSince(previousState.getKeyboardState()).contains(key);
-    }
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final InputState currentState = states.getCurrent();
+    final InputState previousState = states.getPrevious();
+
+    return currentState.getKeyboardState().getKeysReleasedSince(previousState.getKeyboardState()).contains(key);
+  }
 }

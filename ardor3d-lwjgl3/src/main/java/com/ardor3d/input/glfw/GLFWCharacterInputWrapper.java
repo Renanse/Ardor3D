@@ -24,53 +24,53 @@ import com.google.common.collect.PeekingIterator;
 
 public class GLFWCharacterInputWrapper implements CharacterInputWrapper {
 
-    @GuardedBy("this")
-    protected final LinkedList<CharacterInputEvent> _upcomingCharacterEvents = new LinkedList<>();
+  @GuardedBy("this")
+  protected final LinkedList<CharacterInputEvent> _upcomingCharacterEvents = new LinkedList<>();
 
-    @GuardedBy("this")
-    protected CharacterIterator _currentCharacterIterator = null;
+  @GuardedBy("this")
+  protected CharacterIterator _currentCharacterIterator = null;
 
-    @SuppressWarnings("unused")
-    private GLFWCharCallback _charCallback;
+  @SuppressWarnings("unused")
+  private GLFWCharCallback _charCallback;
 
-    private final GLFWCanvas _canvas;
+  private final GLFWCanvas _canvas;
 
-    public GLFWCharacterInputWrapper(final GLFWCanvas canvas) {
-        _canvas = canvas;
+  public GLFWCharacterInputWrapper(final GLFWCanvas canvas) {
+    _canvas = canvas;
+  }
+
+  @Override
+  public void init() {
+    GLFW.glfwSetCharCallback(_canvas.getWindowId(), (_charCallback = new GLFWCharCallback() {
+
+      @Override
+      public void invoke(final long window, final int codepoint) {
+        _upcomingCharacterEvents.add(new CharacterInputEvent((char) codepoint));
+      }
+    }));
+  }
+
+  @Override
+  public synchronized PeekingIterator<CharacterInputEvent> getCharacterEvents() {
+    if (_currentCharacterIterator == null || !_currentCharacterIterator.hasNext()) {
+      _currentCharacterIterator = new CharacterIterator();
     }
 
-    @Override
-    public void init() {
-        GLFW.glfwSetCharCallback(_canvas.getWindowId(), (_charCallback = new GLFWCharCallback() {
+    return _currentCharacterIterator;
+  }
 
-            @Override
-            public void invoke(final long window, final int codepoint) {
-                _upcomingCharacterEvents.add(new CharacterInputEvent((char) codepoint));
-            }
-        }));
-    }
-
+  private class CharacterIterator extends AbstractIterator<CharacterInputEvent>
+      implements PeekingIterator<CharacterInputEvent> {
     @Override
-    public synchronized PeekingIterator<CharacterInputEvent> getCharacterEvents() {
-        if (_currentCharacterIterator == null || !_currentCharacterIterator.hasNext()) {
-            _currentCharacterIterator = new CharacterIterator();
+    protected CharacterInputEvent computeNext() {
+      synchronized (GLFWCharacterInputWrapper.this) {
+        if (_upcomingCharacterEvents.isEmpty()) {
+          return endOfData();
         }
 
-        return _currentCharacterIterator;
+        return _upcomingCharacterEvents.poll();
+      }
     }
-
-    private class CharacterIterator extends AbstractIterator<CharacterInputEvent>
-            implements PeekingIterator<CharacterInputEvent> {
-        @Override
-        protected CharacterInputEvent computeNext() {
-            synchronized (GLFWCharacterInputWrapper.this) {
-                if (_upcomingCharacterEvents.isEmpty()) {
-                    return endOfData();
-                }
-
-                return _upcomingCharacterEvents.poll();
-            }
-        }
-    }
+  }
 
 }

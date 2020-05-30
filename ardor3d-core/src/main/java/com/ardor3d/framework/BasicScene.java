@@ -21,36 +21,35 @@ import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 
 public class BasicScene implements Scene {
-    private final Node _root;
+  private final Node _root;
 
-    public BasicScene() {
-        _root = new Node("root");
-    }
+  public BasicScene() {
+    _root = new Node("root");
+  }
 
-    public PickResults doPick(final com.ardor3d.math.Ray3 pickRay) {
-        final PrimitivePickResults pickResults = new PrimitivePickResults();
-        pickResults.setCheckDistance(true);
-        PickingUtil.findPick(_root, pickRay, pickResults);
-        processPicks(pickResults);
-        return pickResults;
-    }
+  @Override
+  public PickResults doPick(final com.ardor3d.math.Ray3 pickRay) {
+    final PrimitivePickResults pickResults = new PrimitivePickResults();
+    pickResults.setCheckDistance(true);
+    PickingUtil.findPick(_root, pickRay, pickResults);
+    processPicks(pickResults);
+    return pickResults;
+  }
 
-    protected void processPicks(final PrimitivePickResults pickResults) {}
+  protected void processPicks(final PrimitivePickResults pickResults) {}
 
-    public Node getRoot() {
-        return _root;
-    }
+  public Node getRoot() { return _root; }
 
-    @Override
-    public boolean render(final Renderer renderer) {
-        // Execute renderQueue item
-        GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.RENDER)
-                .execute(renderer);
+  @Override
+  public boolean render(final Renderer renderer) {
+    // Execute renderQueue item
+    GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.RENDER)
+        .execute(renderer);
 
-        // Clean up card garbage such as textures, vbos, etc.
-        ContextGarbageCollector.doRuntimeCleanup(renderer);
+    // Clean up card garbage such as textures, vbos, etc.
+    ContextGarbageCollector.doRuntimeCleanup(renderer);
 
-        _root.onDraw(renderer);
-        return true;
-    }
+    _root.onDraw(renderer);
+    return true;
+  }
 }

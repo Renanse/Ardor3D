@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -17,11 +17,12 @@ import com.ardor3d.math.MathUtils;
  */
 public class CheckerFunction3D implements Function3D {
 
-    public double eval(final double x, final double y, final double z) {
-        if ((MathUtils.floor(x) + MathUtils.floor(y) + MathUtils.floor(z)) % 2 == 0) {
-            return -1;
-        } else {
-            return 1;
-        }
+  @Override
+  public double eval(final double x, final double y, final double z) {
+    if ((MathUtils.floor(x) + MathUtils.floor(y) + MathUtils.floor(z)) % 2 == 0) {
+      return -1;
+    } else {
+      return 1;
     }
+  }
 }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -12,14 +12,14 @@ package com.ardor3d.renderer.state.record;
 
 public class WireframeStateRecord extends StateRecord {
 
-    public int frontMode = -1;
-    public int backMode = -1;
+  public int frontMode = -1;
+  public int backMode = -1;
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
+  @Override
+  public void invalidate() {
+    super.invalidate();
 
-        frontMode = -1;
-        backMode = -1;
-    }
+    frontMode = -1;
+    backMode = -1;
+  }
 }

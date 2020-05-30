@@ -21,23 +21,23 @@ import org.junit.Test;
  */
 public class TestLittleEndianRandomAccessDataInput {
 
-    @Test
-    public void testReadUint() throws Exception {
-        // test reading of uint vs int.
-        final byte[] data = new byte[4];
-        data[0] = (byte) 0xff;
-        data[1] = (byte) 0xff;
-        data[2] = (byte) 0xff;
-        data[3] = (byte) 0xff;
+  @Test
+  public void testReadUint() throws Exception {
+    // test reading of uint vs int.
+    final byte[] data = new byte[4];
+    data[0] = (byte) 0xff;
+    data[1] = (byte) 0xff;
+    data[2] = (byte) 0xff;
+    data[3] = (byte) 0xff;
 
-        final ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        final LittleEndianRandomAccessDataInput littleEndien = new LittleEndianRandomAccessDataInput(bais);
+    final ByteArrayInputStream bais = new ByteArrayInputStream(data);
+    final LittleEndianRandomAccessDataInput littleEndien = new LittleEndianRandomAccessDataInput(bais);
 
-        final long val = littleEndien.readUnsignedInt();
-        assertTrue(val == 4294967295L);
+    final long val = littleEndien.readUnsignedInt();
+    assertTrue(val == 4294967295L);
 
-        littleEndien.seek(0);
-        final int val2 = littleEndien.readInt();
-        assertTrue(val2 == -1);
-    }
+    littleEndien.seek(0);
+    final int val2 = littleEndien.readInt();
+    assertTrue(val2 == -1);
+  }
 }

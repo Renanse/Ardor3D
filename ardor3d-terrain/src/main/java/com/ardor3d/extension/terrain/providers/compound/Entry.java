@@ -14,20 +14,16 @@ import com.ardor3d.extension.terrain.client.TerrainSource;
 import com.ardor3d.extension.terrain.providers.compound.function.ICombineFunction;
 
 public class Entry {
-    protected final TerrainSource _source;
-    protected final ICombineFunction _combine;
+  protected final TerrainSource _source;
+  protected final ICombineFunction _combine;
 
-    public Entry(final TerrainSource source, final ICombineFunction combine) {
-        _source = source;
-        _combine = combine;
-    }
+  public Entry(final TerrainSource source, final ICombineFunction combine) {
+    _source = source;
+    _combine = combine;
+  }
 
-    public TerrainSource getSource() {
-        return _source;
-    }
+  public TerrainSource getSource() { return _source; }
 
-    public ICombineFunction getCombine() {
-        return _combine;
-    }
+  public ICombineFunction getCombine() { return _combine; }
 
 }

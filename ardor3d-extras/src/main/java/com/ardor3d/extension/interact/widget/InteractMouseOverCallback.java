@@ -15,7 +15,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.mouse.MouseState;
 
 public interface InteractMouseOverCallback {
-    void mouseEntered(Canvas source, MouseState current, InteractManager manager);
+  void mouseEntered(Canvas source, MouseState current, InteractManager manager);
 
-    void mouseDeparted(Canvas source, MouseState current, InteractManager manager);
+  void mouseDeparted(Canvas source, MouseState current, InteractManager manager);
 }

@@ -20,66 +20,66 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class TextureStateRecord extends StateRecord {
 
-    public HashMap<Integer, TextureRecord> textures;
-    public TextureUnitRecord[] units;
-    public int currentUnit = -1;
+  public HashMap<Integer, TextureRecord> textures;
+  public TextureUnitRecord[] units;
+  public int currentUnit = -1;
 
-    /**
-     * temporary matrix buffer to flatline memory usage.
-     */
-    public final DoubleBuffer tmp_matrixBuffer = BufferUtils.createDoubleBuffer(16);
+  /**
+   * temporary matrix buffer to flatline memory usage.
+   */
+  public final DoubleBuffer tmp_matrixBuffer = BufferUtils.createDoubleBuffer(16);
 
-    public TextureStateRecord() {
-        textures = new HashMap<>();
-        units = new TextureUnitRecord[TextureState.MAX_TEXTURES];
-        for (int i = 0; i < units.length; i++) {
-            units[i] = new TextureUnitRecord();
-        }
+  public TextureStateRecord() {
+    textures = new HashMap<>();
+    units = new TextureUnitRecord[TextureState.MAX_TEXTURES];
+    for (int i = 0; i < units.length; i++) {
+      units[i] = new TextureUnitRecord();
     }
+  }
 
-    public TextureRecord getTextureRecord(final Integer textureId, final Texture.Type type) {
-        TextureRecord tr = textures.get(textureId);
-        if (tr == null) {
-            tr = new TextureRecord();
-            textures.put(textureId, tr);
-        }
-        return tr;
+  public TextureRecord getTextureRecord(final Integer textureId, final Texture.Type type) {
+    TextureRecord tr = textures.get(textureId);
+    if (tr == null) {
+      tr = new TextureRecord();
+      textures.put(textureId, tr);
     }
+    return tr;
+  }
 
-    public void removeTextureRecord(final Integer textureId) {
-        if (textureId == null) {
-            return;
-        }
-        textures.remove(textureId);
-        for (int i = 0; i < units.length; i++) {
-            if (units[i].boundTexture == textureId.intValue()) {
-                units[i].boundTexture = -1;
-            }
-        }
+  public void removeTextureRecord(final Integer textureId) {
+    if (textureId == null) {
+      return;
     }
+    textures.remove(textureId);
+    for (int i = 0; i < units.length; i++) {
+      if (units[i].boundTexture == textureId.intValue()) {
+        units[i].boundTexture = -1;
+      }
+    }
+  }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        currentUnit = -1;
-        final Collection<TextureRecord> texs = textures.values();
-        for (final TextureRecord tr : texs) {
-            tr.invalidate();
-        }
-        for (int i = 0; i < units.length; i++) {
-            units[i].invalidate();
-        }
+  @Override
+  public void invalidate() {
+    super.invalidate();
+    currentUnit = -1;
+    final Collection<TextureRecord> texs = textures.values();
+    for (final TextureRecord tr : texs) {
+      tr.invalidate();
     }
+    for (int i = 0; i < units.length; i++) {
+      units[i].invalidate();
+    }
+  }
 
-    @Override
-    public void validate() {
-        super.validate();
-        final Collection<TextureRecord> texs = textures.values();
-        for (final TextureRecord tr : texs) {
-            tr.validate();
-        }
-        for (int i = 0; i < units.length; i++) {
-            units[i].validate();
-        }
+  @Override
+  public void validate() {
+    super.validate();
+    final Collection<TextureRecord> texs = textures.values();
+    for (final TextureRecord tr : texs) {
+      tr.validate();
     }
+    for (int i = 0; i < units.length; i++) {
+      units[i].validate();
+    }
+  }
 }

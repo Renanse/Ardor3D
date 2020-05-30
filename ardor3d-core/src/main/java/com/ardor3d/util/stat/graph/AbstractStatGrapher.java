@@ -25,171 +25,166 @@ import com.ardor3d.util.stat.StatType;
  */
 public abstract class AbstractStatGrapher implements StatListener {
 
-    protected TextureRenderer _textureRenderer;
-    protected Texture2D _texture;
-    protected int _gWidth, _gHeight;
+  protected TextureRenderer _textureRenderer;
+  protected Texture2D _texture;
+  protected int _gWidth, _gHeight;
 
-    protected TreeMap<StatType, HashMap<String, Object>> _config = new TreeMap<StatType, HashMap<String, Object>>();
+  protected TreeMap<StatType, HashMap<String, Object>> _config = new TreeMap<>();
 
-    protected boolean _enabled = true;
+  protected boolean _enabled = true;
 
-    /**
-     * Must be constructed in the GL thread.
-     *
-     * @param factory
-     */
-    public AbstractStatGrapher(final int width, final int height, final Renderer renderer) {
-        _gWidth = width;
-        _gHeight = height;
-        // prepare our TextureRenderer
-        _textureRenderer = renderer.createTextureRenderer(width, height, 0, 0);
+  /**
+   * Must be constructed in the GL thread.
+   *
+   * @param factory
+   */
+  public AbstractStatGrapher(final int width, final int height, final Renderer renderer) {
+    _gWidth = width;
+    _gHeight = height;
+    // prepare our TextureRenderer
+    _textureRenderer = renderer.createTextureRenderer(width, height, 0, 0);
 
-        if (_textureRenderer != null) {
-            _textureRenderer.setBackgroundColor(new ColorRGBA(ColorRGBA.BLACK));
-        }
+    if (_textureRenderer != null) {
+      _textureRenderer.setBackgroundColor(new ColorRGBA(ColorRGBA.BLACK));
     }
+  }
 
-    // - set a texture for offscreen rendering
-    public void setTexture(final Texture2D tex) {
-        _textureRenderer.setupTexture(tex);
-        _texture = tex;
+  // - set a texture for offscreen rendering
+  public void setTexture(final Texture2D tex) {
+    _textureRenderer.setupTexture(tex);
+    _texture = tex;
+  }
+
+  public TextureRenderer getTextureRenderer() { return _textureRenderer; }
+
+  public void clearConfig() {
+    _config.clear();
+  }
+
+  public void clearConfig(final StatType type) {
+    if (_config.get(type) != null) {
+      _config.get(type).clear();
     }
+  }
 
-    public TextureRenderer getTextureRenderer() {
-        return _textureRenderer;
+  public void clearConfig(final StatType type, final String key) {
+    if (_config.get(type) != null) {
+      _config.get(type).remove(key);
     }
+  }
 
-    public void clearConfig() {
-        _config.clear();
+  public void addConfig(final StatType type, final HashMap<String, Object> configs) {
+    _config.put(type, configs);
+  }
+
+  public void addConfig(final StatType type, final String key, final Object value) {
+    HashMap<String, Object> vals = _config.get(type);
+    if (vals == null) {
+      vals = new HashMap<>();
+      _config.put(type, vals);
     }
+    vals.put(key, value);
+  }
 
-    public void clearConfig(final StatType type) {
-        if (_config.get(type) != null) {
-            _config.get(type).clear();
-        }
+  protected ColorRGBA getColorConfig(final StatType type, final String configName, final ColorRGBA defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof ColorRGBA) {
+        return (ColorRGBA) val;
+      }
     }
+    return defaultVal;
+  }
 
-    public void clearConfig(final StatType type, final String key) {
-        if (_config.get(type) != null) {
-            _config.get(type).remove(key);
-        }
+  protected String getStringConfig(final StatType type, final String configName, final String defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof String) {
+        return (String) val;
+      }
     }
+    return defaultVal;
+  }
 
-    public void addConfig(final StatType type, final HashMap<String, Object> configs) {
-        _config.put(type, configs);
+  protected short getShortConfig(final StatType type, final String configName, final short defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof Number) {
+        return ((Number) val).shortValue();
+      }
     }
+    return defaultVal;
+  }
 
-    public void addConfig(final StatType type, final String key, final Object value) {
-        HashMap<String, Object> vals = _config.get(type);
-        if (vals == null) {
-            vals = new HashMap<String, Object>();
-            _config.put(type, vals);
-        }
-        vals.put(key, value);
+  protected int getIntConfig(final StatType type, final String configName, final int defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof Number) {
+        return ((Number) val).intValue();
+      }
     }
+    return defaultVal;
+  }
 
-    protected ColorRGBA getColorConfig(final StatType type, final String configName, final ColorRGBA defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof ColorRGBA) {
-                return (ColorRGBA) val;
-            }
-        }
-        return defaultVal;
+  protected long getLongConfig(final StatType type, final String configName, final long defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof Number) {
+        return ((Number) val).longValue();
+      }
     }
+    return defaultVal;
+  }
 
-    protected String getStringConfig(final StatType type, final String configName, final String defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof String) {
-                return (String) val;
-            }
-        }
-        return defaultVal;
+  protected float getFloatConfig(final StatType type, final String configName, final float defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof Number) {
+        return ((Number) val).floatValue();
+      }
     }
+    return defaultVal;
+  }
 
-    protected short getShortConfig(final StatType type, final String configName, final short defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof Number) {
-                return ((Number) val).shortValue();
-            }
-        }
-        return defaultVal;
+  protected double getDoubleConfig(final StatType type, final String configName, final double defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof Number) {
+        return ((Number) val).doubleValue();
+      }
     }
+    return defaultVal;
+  }
 
-    protected int getIntConfig(final StatType type, final String configName, final int defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof Number) {
-                return ((Number) val).intValue();
-            }
-        }
-        return defaultVal;
+  protected boolean getBooleanConfig(final StatType type, final String configName, final boolean defaultVal) {
+    final HashMap<String, Object> vals = _config.get(type);
+    if (vals != null && vals.containsKey(configName)) {
+      final Object val = vals.get(configName);
+      if (val instanceof Boolean) {
+        return (Boolean) val;
+      }
     }
+    return defaultVal;
+  }
 
-    protected long getLongConfig(final StatType type, final String configName, final long defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof Number) {
-                return ((Number) val).longValue();
-            }
-        }
-        return defaultVal;
-    }
+  public boolean hasConfig(final StatType type) {
+    return _config.containsKey(type) && !_config.get(type).isEmpty();
+  }
 
-    protected float getFloatConfig(final StatType type, final String configName, final float defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof Number) {
-                return ((Number) val).floatValue();
-            }
-        }
-        return defaultVal;
-    }
+  public boolean isEnabled() { return _enabled; }
 
-    protected double getDoubleConfig(final StatType type, final String configName, final double defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof Number) {
-                return ((Number) val).doubleValue();
-            }
-        }
-        return defaultVal;
-    }
+  public void setEnabled(final boolean enabled) { _enabled = enabled; }
 
-    protected boolean getBooleanConfig(final StatType type, final String configName, final boolean defaultVal) {
-        final HashMap<String, Object> vals = _config.get(type);
-        if (vals != null && vals.containsKey(configName)) {
-            final Object val = vals.get(configName);
-            if (val instanceof Boolean) {
-                return (Boolean) val;
-            }
-        }
-        return defaultVal;
-    }
-
-    public boolean hasConfig(final StatType type) {
-        return _config.containsKey(type) && !_config.get(type).isEmpty();
-    }
-
-    public boolean isEnabled() {
-        return _enabled;
-    }
-
-    public void setEnabled(final boolean enabled) {
-        _enabled = enabled;
-    }
-
-    /**
-     * Called when the graph needs to be reset back to the original display state. (iow, remove all points, lines, etc.)
-     */
-    public abstract void reset();
+  /**
+   * Called when the graph needs to be reset back to the original display state. (iow, remove all
+   * points, lines, etc.)
+   */
+  public abstract void reset();
 }

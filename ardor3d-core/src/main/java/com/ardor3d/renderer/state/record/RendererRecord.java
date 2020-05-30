@@ -17,148 +17,98 @@ import com.ardor3d.math.type.ReadOnlyRectangle2;
 import com.ardor3d.renderer.DrawBufferTarget;
 
 public class RendererRecord extends StateRecord {
-    private int _matrixMode = -1;
-    private int _currentVaoId = -1;
-    private boolean _matrixValid;
-    private boolean _vaoValid;
-    private boolean _clippingTestValid;
-    private boolean _clippingTestEnabled;
-    private transient final ColorRGBA _tempColor = new ColorRGBA();
-    private DrawBufferTarget _drawBufferTarget = null;
-    private final Stack<ReadOnlyRectangle2> _clips = new Stack<ReadOnlyRectangle2>();
-    private int _enabledTextures = 0;
-    private boolean _texturesValid = false;
-    private int _currentTextureArraysUnit = 0;
-    private int _programId;
-    private boolean _shaderPointSize;
+  private int _matrixMode = -1;
+  private int _currentVaoId = -1;
+  private boolean _matrixValid;
+  private boolean _vaoValid;
+  private boolean _clippingTestValid;
+  private boolean _clippingTestEnabled;
+  private transient final ColorRGBA _tempColor = new ColorRGBA();
+  private DrawBufferTarget _drawBufferTarget = null;
+  private final Stack<ReadOnlyRectangle2> _clips = new Stack<>();
+  private int _enabledTextures = 0;
+  private boolean _texturesValid = false;
+  private int _currentTextureArraysUnit = 0;
+  private int _programId;
+  private boolean _shaderPointSize;
 
-    @Override
-    public void invalidate() {
-        invalidateMatrix();
-        invalidateVAO();
-        _drawBufferTarget = null;
-        _clippingTestValid = false;
-        _texturesValid = false;
-        _currentTextureArraysUnit = -1;
-        _programId = -1;
-    }
+  @Override
+  public void invalidate() {
+    invalidateMatrix();
+    invalidateVAO();
+    _drawBufferTarget = null;
+    _clippingTestValid = false;
+    _texturesValid = false;
+    _currentTextureArraysUnit = -1;
+    _programId = -1;
+  }
 
-    @Override
-    public void validate() {
-        // ignore - validate per item or locally
-    }
+  @Override
+  public void validate() {
+    // ignore - validate per item or locally
+  }
 
-    public void invalidateMatrix() {
-        _matrixValid = false;
-        _matrixMode = -1;
-    }
+  public void invalidateMatrix() {
+    _matrixValid = false;
+    _matrixMode = -1;
+  }
 
-    public void invalidateVAO() {
-        _vaoValid = false;
-        _currentVaoId = -1;
-    }
+  public void invalidateVAO() {
+    _vaoValid = false;
+    _currentVaoId = -1;
+  }
 
-    public int getMatrixMode() {
-        return _matrixMode;
-    }
+  public int getMatrixMode() { return _matrixMode; }
 
-    public void setMatrixMode(final int matrixMode) {
-        _matrixMode = matrixMode;
-    }
+  public void setMatrixMode(final int matrixMode) { _matrixMode = matrixMode; }
 
-    public int getCurrentVaoId() {
-        return _currentVaoId;
-    }
+  public int getCurrentVaoId() { return _currentVaoId; }
 
-    public void setCurrentVaoId(final int id) {
-        _currentVaoId = id;
-    }
+  public void setCurrentVaoId(final int id) { _currentVaoId = id; }
 
-    public boolean isMatrixValid() {
-        return _matrixValid;
-    }
+  public boolean isMatrixValid() { return _matrixValid; }
 
-    public void setMatrixValid(final boolean valid) {
-        _matrixValid = valid;
-    }
+  public void setMatrixValid(final boolean valid) { _matrixValid = valid; }
 
-    public boolean isVaoValid() {
-        return _vaoValid;
-    }
+  public boolean isVaoValid() { return _vaoValid; }
 
-    public void setVaoValid(final boolean valid) {
-        _vaoValid = valid;
-    }
+  public void setVaoValid(final boolean valid) { _vaoValid = valid; }
 
-    public ColorRGBA getTempColor() {
-        return _tempColor;
-    }
+  public ColorRGBA getTempColor() { return _tempColor; }
 
-    public DrawBufferTarget getDrawBufferTarget() {
-        return _drawBufferTarget;
-    }
+  public DrawBufferTarget getDrawBufferTarget() { return _drawBufferTarget; }
 
-    public void setDrawBufferTarget(final DrawBufferTarget target) {
-        _drawBufferTarget = target;
-    }
+  public void setDrawBufferTarget(final DrawBufferTarget target) { _drawBufferTarget = target; }
 
-    public Stack<ReadOnlyRectangle2> getScissorClips() {
-        return _clips;
-    }
+  public Stack<ReadOnlyRectangle2> getScissorClips() { return _clips; }
 
-    public boolean isClippingTestEnabled() {
-        return _clippingTestEnabled;
-    }
+  public boolean isClippingTestEnabled() { return _clippingTestEnabled; }
 
-    public void setClippingTestEnabled(final boolean enabled) {
-        _clippingTestEnabled = enabled;
-    }
+  public void setClippingTestEnabled(final boolean enabled) { _clippingTestEnabled = enabled; }
 
-    public boolean isClippingTestValid() {
-        return _clippingTestValid;
-    }
+  public boolean isClippingTestValid() { return _clippingTestValid; }
 
-    public void setClippingTestValid(final boolean valid) {
-        _clippingTestValid = valid;
-    }
+  public void setClippingTestValid(final boolean valid) { _clippingTestValid = valid; }
 
-    public int getEnabledTextures() {
-        return _enabledTextures;
-    }
+  public int getEnabledTextures() { return _enabledTextures; }
 
-    public void setEnabledTextures(final int enabledTextures) {
-        _enabledTextures = enabledTextures;
-    }
+  public void setEnabledTextures(final int enabledTextures) { _enabledTextures = enabledTextures; }
 
-    public boolean isTexturesValid() {
-        return _texturesValid;
-    }
+  public boolean isTexturesValid() { return _texturesValid; }
 
-    public void setTexturesValid(final boolean valid) {
-        _texturesValid = valid;
-    }
+  public void setTexturesValid(final boolean valid) { _texturesValid = valid; }
 
-    public int getCurrentTextureArraysUnit() {
-        return _currentTextureArraysUnit;
-    }
+  public int getCurrentTextureArraysUnit() { return _currentTextureArraysUnit; }
 
-    public void setCurrentTextureArraysUnit(final int currentTextureArraysUnit) {
-        _currentTextureArraysUnit = currentTextureArraysUnit;
-    }
+  public void setCurrentTextureArraysUnit(final int currentTextureArraysUnit) {
+    _currentTextureArraysUnit = currentTextureArraysUnit;
+  }
 
-    public int getProgramId() {
-        return _programId;
-    }
+  public int getProgramId() { return _programId; }
 
-    public void setProgramId(final int programId) {
-        _programId = programId;
-    }
+  public void setProgramId(final int programId) { _programId = programId; }
 
-    public boolean isShaderPointSize() {
-        return _shaderPointSize;
-    }
+  public boolean isShaderPointSize() { return _shaderPointSize; }
 
-    public void setShaderPointSize(final boolean shaderPointSize) {
-        _shaderPointSize = shaderPointSize;
-    }
+  public void setShaderPointSize(final boolean shaderPointSize) { _shaderPointSize = shaderPointSize; }
 }

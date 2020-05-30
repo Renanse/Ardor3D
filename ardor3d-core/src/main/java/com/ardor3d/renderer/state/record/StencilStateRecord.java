@@ -11,12 +11,12 @@
 package com.ardor3d.renderer.state.record;
 
 public class StencilStateRecord extends StateRecord {
-    public boolean enabled = false;
+  public boolean enabled = false;
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
+  @Override
+  public void invalidate() {
+    super.invalidate();
 
-        enabled = false;
-    }
+    enabled = false;
+  }
 }

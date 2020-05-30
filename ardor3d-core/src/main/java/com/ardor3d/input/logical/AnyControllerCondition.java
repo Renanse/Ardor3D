@@ -16,12 +16,13 @@ import com.ardor3d.input.controller.ControllerState;
 
 public final class AnyControllerCondition implements Predicate<TwoInputStates> {
 
-    public boolean test(final TwoInputStates states) {
-        final ControllerState oldState = states.getPrevious().getControllerState();
-        final ControllerState currentState = states.getCurrent().getControllerState();
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final ControllerState oldState = states.getPrevious().getControllerState();
+    final ControllerState currentState = states.getCurrent().getControllerState();
 
-        final boolean apply = !oldState.equals(currentState);
-        return apply;
-    }
+    final boolean apply = !oldState.equals(currentState);
+    return apply;
+  }
 
 }

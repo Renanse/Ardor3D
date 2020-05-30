@@ -20,18 +20,19 @@ import com.ardor3d.input.InputState;
  */
 @Immutable
 public final class MouseMovedCondition implements Predicate<TwoInputStates> {
-    public boolean test(final TwoInputStates states) {
-        final InputState currentState = states.getCurrent();
-        final InputState previousState = states.getPrevious();
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final InputState currentState = states.getCurrent();
+    final InputState previousState = states.getPrevious();
 
-        if (currentState == null) {
-            return false;
-        }
-
-        if (currentState.equals(previousState)) {
-            return false;
-        }
-
-        return currentState.getMouseState().getDx() != 0 || currentState.getMouseState().getDy() != 0;
+    if (currentState == null) {
+      return false;
     }
+
+    if (currentState.equals(previousState)) {
+      return false;
+    }
+
+    return currentState.getMouseState().getDx() != 0 || currentState.getMouseState().getDy() != 0;
+  }
 }

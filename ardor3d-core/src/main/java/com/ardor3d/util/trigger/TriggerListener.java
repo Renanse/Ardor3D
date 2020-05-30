@@ -11,9 +11,9 @@
 package com.ardor3d.util.trigger;
 
 public interface TriggerListener {
-    void onTrigger();
+  void onTrigger();
 
-    void onArm();
+  void onArm();
 
-    void onDisarm();
+  void onDisarm();
 }

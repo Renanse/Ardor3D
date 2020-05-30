@@ -30,138 +30,135 @@ import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.mouse.MouseManager;
 
 /**
- * Implementation of the {@link com.ardor3d.input.mouse.MouseManager} interface for use with AWT windows. This implementation
- * supports the optional {@link #setGrabbed(com.ardor3d.input.mouse.GrabbedState)} and {@link #setPosition(int, int)} methods
- * if an AWT robot can be created on the current system. The constructor takes an AWT {@link java.awt.Component}
- * instance, for which the cursor is set. In a multi-canvas application, each canvas can have its own AwtMouseManager
- * instance, or it is possible to use a single one for the AWT container that includes the canvases.
+ * Implementation of the {@link com.ardor3d.input.mouse.MouseManager} interface for use with AWT
+ * windows. This implementation supports the optional
+ * {@link #setGrabbed(com.ardor3d.input.mouse.GrabbedState)} and {@link #setPosition(int, int)}
+ * methods if an AWT robot can be created on the current system. The constructor takes an AWT
+ * {@link java.awt.Component} instance, for which the cursor is set. In a multi-canvas application,
+ * each canvas can have its own AwtMouseManager instance, or it is possible to use a single one for
+ * the AWT container that includes the canvases.
  */
 public class AwtMouseManager implements MouseManager {
-    private static final Logger logger = Logger.getLogger(AwtMouseManager.class.getName());
+  private static final Logger logger = Logger.getLogger(AwtMouseManager.class.getName());
 
-    private static Cursor _transparentCursor;
+  private static Cursor _transparentCursor;
 
-    private final Component _component;
-    private Robot _robot;
+  private final Component _component;
+  private Robot _robot;
 
-    /** our current grabbed state */
-    private GrabbedState _grabbedState;
+  /** our current grabbed state */
+  private GrabbedState _grabbedState;
 
-    /** Our cursor prior to a setGrabbed(GRABBED) operation. Stored to be used when cursor is "ungrabbed" */
-    private Cursor _pregrabCursor;
+  /**
+   * Our cursor prior to a setGrabbed(GRABBED) operation. Stored to be used when cursor is "ungrabbed"
+   */
+  private Cursor _pregrabCursor;
 
-    public AwtMouseManager(final Component component) {
-        _component = component;
+  public AwtMouseManager(final Component component) {
+    _component = component;
 
-        // Attempt to make
-        try {
-            _robot = new Robot();
-        } catch (final AWTException ex) {
-            logger.warning("Unable to create java.awt.Robot.  setPosition and setGrabbed will not be supported.");
-        }
+    // Attempt to make
+    try {
+      _robot = new Robot();
+    } catch (final AWTException ex) {
+      logger.warning("Unable to create java.awt.Robot.  setPosition and setGrabbed will not be supported.");
+    }
+  }
+
+  @Override
+  public void setCursor(final MouseCursor cursor) {
+    if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
+      if (_grabbedState == GrabbedState.GRABBED) {
+        _pregrabCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+      } else {
+        _component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+      }
+      return;
     }
 
-    public void setCursor(final MouseCursor cursor) {
-        if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
-            if (_grabbedState == GrabbedState.GRABBED) {
-                _pregrabCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-            } else {
-                _component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }
-            return;
-        }
+    final BufferedImage image = AWTImageUtil.convertToAWT(cursor.getImage()).get(0);
 
-        final BufferedImage image = AWTImageUtil.convertToAWT(cursor.getImage()).get(0);
+    // the hotSpot values must be less than the Dimension returned by getBestCursorSize
+    final Dimension bestCursorSize =
+        Toolkit.getDefaultToolkit().getBestCursorSize(cursor.getHotspotX(), cursor.getHotspotY());
+    final Point hotSpot = new Point(Math.min(cursor.getHotspotX(), (int) bestCursorSize.getWidth() - 1),
+        Math.min(cursor.getHotspotY(), (int) bestCursorSize.getHeight() - 1));
 
-        // the hotSpot values must be less than the Dimension returned by getBestCursorSize
-        final Dimension bestCursorSize = Toolkit.getDefaultToolkit().getBestCursorSize(cursor.getHotspotX(),
-                cursor.getHotspotY());
-        final Point hotSpot = new Point(Math.min(cursor.getHotspotX(), (int) bestCursorSize.getWidth() - 1), Math.min(
-                cursor.getHotspotY(), (int) bestCursorSize.getHeight() - 1));
+    final Cursor awtCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, hotSpot, cursor.getName());
+    if (_grabbedState == GrabbedState.GRABBED) {
+      _pregrabCursor = awtCursor;
+    } else {
+      _component.setCursor(awtCursor);
+    }
+  }
 
-        final Cursor awtCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, hotSpot, cursor.getName());
-        if (_grabbedState == GrabbedState.GRABBED) {
-            _pregrabCursor = awtCursor;
-        } else {
-            _component.setCursor(awtCursor);
-        }
+  @Override
+  public void setPosition(final int x, final int y) {
+    if (!isSetPositionSupported()) {
+      throw new UnsupportedOperationException();
     }
 
-    public void setPosition(final int x, final int y) {
-        if (!isSetPositionSupported()) {
-            throw new UnsupportedOperationException();
-        }
+    try {
+      // Only queue up if we are not already in the event thread.
+      if (java.awt.EventQueue.isDispatchThread()) {
+        setMousePosition(x, y);
+      } else {
+        SwingUtilities.invokeAndWait(() -> setMousePosition(x, y));
+      }
+    } catch (final InterruptedException ex) {} catch (final InvocationTargetException ex) {}
+  }
 
-        try {
-            // Only queue up if we are not already in the event thread.
-            if (java.awt.EventQueue.isDispatchThread()) {
-                setMousePosition(x, y);
-            } else {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        setMousePosition(x, y);
-                    }
-                });
-            }
-        } catch (final InterruptedException ex) {
-        } catch (final InvocationTargetException ex) {
-        }
+  private void setMousePosition(final int ardorX, final int ardorY) {
+    Component c = _component;
+    if (c instanceof Frame && ((Frame) c).getComponentCount() > 0) {
+      c = ((Frame) c).getComponent(0);
+    }
+    final Point p = new Point(ardorX, c.getHeight() - ardorY);
+    SwingUtilities.convertPointToScreen(p, c);
+    _robot.mouseMove(p.x, p.y);
+  }
+
+  @Override
+  public void setGrabbed(final GrabbedState grabbedState) {
+    if (!isSetGrabbedSupported()) {
+      throw new UnsupportedOperationException();
     }
 
-    private void setMousePosition(final int ardorX, final int ardorY) {
-        Component c = _component;
-        if (c instanceof Frame && ((Frame) c).getComponentCount() > 0) {
-            c = ((Frame) c).getComponent(0);
-        }
-        final Point p = new Point(ardorX, c.getHeight() - ardorY);
-        SwingUtilities.convertPointToScreen(p, c);
-        _robot.mouseMove(p.x, p.y);
+    // check if we should be here.
+    if (_grabbedState == grabbedState) {
+      return;
     }
 
-    public void setGrabbed(final GrabbedState grabbedState) {
-        if (!isSetGrabbedSupported()) {
-            throw new UnsupportedOperationException();
-        }
+    // remember our grabbed state mode.
+    _grabbedState = grabbedState;
 
-        // check if we should be here.
-        if (_grabbedState == grabbedState) {
-            return;
-        }
+    if (grabbedState == GrabbedState.GRABBED) {
+      // remember our old cursor
+      _pregrabCursor = _component.getCursor();
 
-        // remember our grabbed state mode.
-        _grabbedState = grabbedState;
-
-        if (grabbedState == GrabbedState.GRABBED) {
-            // remember our old cursor
-            _pregrabCursor = _component.getCursor();
-
-            // set our cursor to be invisible
-            _component.setCursor(getTransparentCursor());
-        } else {
-            // restore our old cursor
-            _component.setCursor(_pregrabCursor);
-        }
+      // set our cursor to be invisible
+      _component.setCursor(getTransparentCursor());
+    } else {
+      // restore our old cursor
+      _component.setCursor(_pregrabCursor);
     }
+  }
 
-    private static final Cursor getTransparentCursor() {
-        if (_transparentCursor == null) {
-            final BufferedImage cursorImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-            cursorImage.setRGB(0, 0, 0);
-            _transparentCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImage, new Point(0, 0),
-                    "empty cursor");
-        }
-        return _transparentCursor;
+  private static final Cursor getTransparentCursor() {
+    if (_transparentCursor == null) {
+      final BufferedImage cursorImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+      cursorImage.setRGB(0, 0, 0);
+      _transparentCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImage, new Point(0, 0), "empty cursor");
     }
+    return _transparentCursor;
+  }
 
-    public boolean isSetPositionSupported() {
-        return _robot != null;
-    }
+  @Override
+  public boolean isSetPositionSupported() { return _robot != null; }
 
-    public boolean isSetGrabbedSupported() {
-        return _robot != null;
-    }
+  @Override
+  public boolean isSetGrabbedSupported() { return _robot != null; }
 
-    public GrabbedState getGrabbed() {
-        return _grabbedState;
-    }
+  @Override
+  public GrabbedState getGrabbed() { return _grabbedState; }
 }

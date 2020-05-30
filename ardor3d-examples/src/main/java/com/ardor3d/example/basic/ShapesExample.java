@@ -73,208 +73,210 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * A display of intrinsic shapes (e.g. Box, Cone, Torus).
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.ShapesExample", //
-        thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_ShapesExample.jpg", //
-        maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.basic.ShapesExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_ShapesExample.jpg", //
+    maxHeapMemory = 64)
 public class ShapesExample extends ExampleBase {
-    private int wrapCount;
-    private int index;
-    private BasicText _text;
-    private Node _textNode;
-    private PickResults _pickResults;
-    private Spatial _picked = null;
-    private SpatialController<Spatial> _pickedControl;
+  private int wrapCount;
+  private int index;
+  private BasicText _text;
+  private Node _textNode;
+  private PickResults _pickResults;
+  private Spatial _picked = null;
+  private SpatialController<Spatial> _pickedControl;
 
-    public static void main(final String[] args) {
-        start(ShapesExample.class);
-    }
+  public static void main(final String[] args) {
+    start(ShapesExample.class);
+  }
 
-    @Override
-    protected void initExample() {
-        _canvas.setTitle("Shapes Example");
+  @Override
+  protected void initExample() {
+    _canvas.setTitle("Shapes Example");
 
-        wrapCount = 5;
-        addMesh(new Arrow("Arrow", 3, 1));
-        final AxisRods rods = new AxisRods("AxisRods", true, 3, 0.5);
-        rods.setRenderMaterial("unlit/untextured/basic.yaml");
-        addMesh(rods);
-        addMesh(new Box("Box", new Vector3(), 3, 3, 3));
-        addMesh(new Capsule("Capsule", 5, 5, 5, 2, 5));
-        addMesh(new Cone("Cone", 8, 8, 2, 4));
-        addMesh(new Cylinder("Cylinder", 8, 8, 2, 4));
-        addMesh(new Disk("Disk", 2, 36, 3, 0.5));
-        addMesh(new Dodecahedron("Dodecahedron", 3));
-        addMesh(new Dome("Dome", 8, 8, 3));
-        addMesh(new Hexagon("Hexagon", 3));
-        addMesh(new Icosahedron("Icosahedron", 3));
-        addMesh(new MultiFaceBox("MultiFaceBox", new Vector3(), 3, 3, 3));
-        addMesh(new Octahedron("Octahedron", 3));
-        addMesh(new PQTorus("PQTorus", 5, 4, 1.5, .5, 128, 8));
-        addMesh(new Pyramid("Pyramid", 2, 4));
-        addMesh(new Quad("Quad", 3, 3));
-        addMesh(new RoundedBox("RoundedBox", new Vector3(3, 3, 3)));
-        addMesh(new Sphere("Sphere", 16, 16, 3));
-        addMesh(new GeoSphere("GeoSphere", true, 3, 3, TextureMode.Original));
-        addMesh(new StripBox("StripBox", new Vector3(), 3, 3, 3));
-        addMesh(new Teapot("Teapot"));
-        addMesh(new Torus("Torus", 16, 8, 1.0, 2.5));
-        addMesh(new Tube("Tube", 2, 3, 4));
-        addMesh(createLines());
+    wrapCount = 5;
+    addMesh(new Arrow("Arrow", 3, 1));
+    final AxisRods rods = new AxisRods("AxisRods", true, 3, 0.5);
+    rods.setRenderMaterial("unlit/untextured/basic.yaml");
+    addMesh(rods);
+    addMesh(new Box("Box", new Vector3(), 3, 3, 3));
+    addMesh(new Capsule("Capsule", 5, 5, 5, 2, 5));
+    addMesh(new Cone("Cone", 8, 8, 2, 4));
+    addMesh(new Cylinder("Cylinder", 8, 8, 2, 4));
+    addMesh(new Disk("Disk", 2, 36, 3, 0.5));
+    addMesh(new Dodecahedron("Dodecahedron", 3));
+    addMesh(new Dome("Dome", 8, 8, 3));
+    addMesh(new Hexagon("Hexagon", 3));
+    addMesh(new Icosahedron("Icosahedron", 3));
+    addMesh(new MultiFaceBox("MultiFaceBox", new Vector3(), 3, 3, 3));
+    addMesh(new Octahedron("Octahedron", 3));
+    addMesh(new PQTorus("PQTorus", 5, 4, 1.5, .5, 128, 8));
+    addMesh(new Pyramid("Pyramid", 2, 4));
+    addMesh(new Quad("Quad", 3, 3));
+    addMesh(new RoundedBox("RoundedBox", new Vector3(3, 3, 3)));
+    addMesh(new Sphere("Sphere", 16, 16, 3));
+    addMesh(new GeoSphere("GeoSphere", true, 3, 3, TextureMode.Original));
+    addMesh(new StripBox("StripBox", new Vector3(), 3, 3, 3));
+    addMesh(new Teapot("Teapot"));
+    addMesh(new Torus("Torus", 16, 8, 1.0, 2.5));
+    addMesh(new Tube("Tube", 2, 3, 4));
+    addMesh(createLines());
 
-        final TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                TextureStoreFormat.GuessCompressedFormat, true));
-        _root.setRenderState(ts);
+    final TextureState ts = new TextureState();
+    ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+        TextureStoreFormat.GuessCompressedFormat, true));
+    _root.setRenderState(ts);
 
-        final BlendState bs = new BlendState();
-        bs.setBlendEnabled(true);
-        _root.setRenderState(bs);
+    final BlendState bs = new BlendState();
+    bs.setBlendEnabled(true);
+    _root.setRenderState(bs);
 
-        // Our shapes material
-        _root.setRenderMaterial("lit/textured/basic_phong.yaml");
+    // Our shapes material
+    _root.setRenderMaterial("lit/textured/basic_phong.yaml");
 
-        // Set up a reusable pick results
-        _pickResults = new BoundingPickResults();
-        _pickResults.setCheckDistance(true);
+    // Set up a reusable pick results
+    _pickResults = new BoundingPickResults();
+    _pickResults.setCheckDistance(true);
 
-        setupText();
+    setupText();
 
-        // Set up picked pulse
-        _pickedControl = new SpatialController<Spatial>() {
-            ColorRGBA curr = new ColorRGBA();
-            double t = 0;
+    // Set up picked pulse
+    _pickedControl = new SpatialController<>() {
+      ColorRGBA curr = new ColorRGBA();
+      double t = 0;
 
-            @Override
-            public void update(final double time, final Spatial caller) {
-                t += time;
+      @Override
+      public void update(final double time, final Spatial caller) {
+        t += time;
 
-                final float val = (float) MathUtils.sin(t * 2) * .25f + .75f;
+        final float val = (float) MathUtils.sin(t * 2) * .25f + .75f;
 
-                curr.set(val, val, val, 1.0f);
+        curr.set(val, val, val, 1.0f);
 
-                if (caller instanceof Mesh) {
-                    ((Mesh) caller).setDefaultColor(curr);
-                }
-            }
-        };
-    }
-
-    private void setupText() {
-        // Set up our pick label
-        _textNode = new Node("textNode");
-        _textNode.setTranslation(20, 20, 0);
-        _textNode.getSceneHints().setCullHint(CullHint.Always);
-        _orthoRoot.attachChild(_textNode);
-
-        _text = BasicText.createDefaultTextLabel("", "pick");
-        _text.getSceneHints().setOrthoOrder(0);
-        _textNode.attachChild(_text);
-
-        final Texture border = TextureManager.load("images/border.png", Texture.MinificationFilter.Trilinear, true);
-
-        final BMTextBackground outerBorder = new BMTextBackground("bg1", _text, border);
-        outerBorder.setTexBorderOffsets(0.2f);
-        outerBorder.setContentPadding(10);
-        outerBorder.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-        outerBorder.getSceneHints().setOrthoOrder(2);
-        outerBorder.setBackgroundColor(ColorRGBA.LIGHT_GRAY);
-        _textNode.attachChild(outerBorder);
-
-        final BMTextBackground innerBG = new BMTextBackground("bg2", _text, border);
-        innerBG.setTexBorderOffsets(0.2f);
-        innerBG.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-        innerBG.getSceneHints().setOrthoOrder(1);
-        innerBG.setBackgroundColor(ColorRGBA.BLUE);
-        _textNode.attachChild(innerBG);
-    }
-
-    @Override
-    protected void registerInputTriggers() {
-        super.registerInputTriggers();
-
-        // Add mouse-over to show labels
-
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                // Put together a pick ray
-                final Vector2 pos = Vector2.fetchTempInstance().set(inputStates.getCurrent().getMouseState().getX(),
-                        inputStates.getCurrent().getMouseState().getY());
-                final Ray3 pickRay = Ray3.fetchTempInstance();
-                _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-                Vector2.releaseTempInstance(pos);
-
-                // Do the pick
-                _pickResults.clear();
-                PickingUtil.findPick(_root, pickRay, _pickResults);
-                Ray3.releaseTempInstance(pickRay);
-
-                if (_pickResults.getNumber() > 0) {
-                    // picked something, show label.
-                    _textNode.getSceneHints().setCullHint(CullHint.Never);
-
-                    // set our text to the name of the ancestor of this object that is right under the _root node.
-                    final PickData pick = _pickResults.getPickData(0);
-                    if (pick.getTarget() instanceof Spatial) {
-                        final Spatial topLevel = getTopLevel((Spatial) pick.getTarget());
-                        if (!topLevel.equals(_picked)) {
-                            clearPicked();
-                            _picked = topLevel;
-                            _picked.addController(_pickedControl);
-                        }
-                        if (!_text.getText().equals(topLevel.getName())) {
-                            _text.setText(topLevel.getName());
-                        }
-                    }
-                } else {
-                    // No pick, clear label.
-                    _textNode.getSceneHints().setCullHint(CullHint.Always);
-                    _text.setText("");
-
-                    clearPicked();
-                }
-            }
-
-            private void clearPicked() {
-                if (_picked != null) {
-                    if (_picked instanceof Mesh) {
-                        ((Mesh) _picked).setDefaultColor(ColorRGBA.WHITE);
-                    }
-                    _picked.removeController(_pickedControl);
-                }
-                _picked = null;
-            }
-
-            private Spatial getTopLevel(final Spatial target) {
-                if (target.getParent() == null || target.getParent().equals(_root)) {
-                    return target;
-                } else {
-                    return getTopLevel(target.getParent());
-                }
-            }
-        }));
-
-    }
-
-    private Spatial createLines() {
-        final FloatBuffer verts = BufferUtils.createVector3Buffer(3);
-        verts.put(0).put(0).put(0);
-        verts.put(5).put(5).put(0);
-        verts.put(0).put(5).put(0);
-        final Line line = new Line("Lines", verts, null, null, null);
-        line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        line.setAntialiased(true);
-        line.setLineWidth(1);
-        MaterialUtil.autoMaterials(line);
-
-        return line;
-    }
-
-    private void addMesh(final Spatial spatial) {
-        spatial.setTranslation((index % wrapCount) * 8 - wrapCount * 4, (index / wrapCount) * 8 - wrapCount * 4, -50);
-        if (spatial instanceof Mesh) {
-            ((Mesh) spatial).updateModelBound();
+        if (caller instanceof Mesh) {
+          ((Mesh) caller).setDefaultColor(curr);
         }
-        _root.attachChild(spatial);
-        index++;
+      }
+    };
+  }
+
+  private void setupText() {
+    // Set up our pick label
+    _textNode = new Node("textNode");
+    _textNode.setTranslation(20, 20, 0);
+    _textNode.getSceneHints().setCullHint(CullHint.Always);
+    _orthoRoot.attachChild(_textNode);
+
+    _text = BasicText.createDefaultTextLabel("", "pick");
+    _text.getSceneHints().setOrthoOrder(0);
+    _textNode.attachChild(_text);
+
+    final Texture border = TextureManager.load("images/border.png", Texture.MinificationFilter.Trilinear, true);
+
+    final BMTextBackground outerBorder = new BMTextBackground("bg1", _text, border);
+    outerBorder.setTexBorderOffsets(0.2f);
+    outerBorder.setContentPadding(10);
+    outerBorder.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+    outerBorder.getSceneHints().setOrthoOrder(2);
+    outerBorder.setBackgroundColor(ColorRGBA.LIGHT_GRAY);
+    _textNode.attachChild(outerBorder);
+
+    final BMTextBackground innerBG = new BMTextBackground("bg2", _text, border);
+    innerBG.setTexBorderOffsets(0.2f);
+    innerBG.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+    innerBG.getSceneHints().setOrthoOrder(1);
+    innerBG.setBackgroundColor(ColorRGBA.BLUE);
+    _textNode.attachChild(innerBG);
+  }
+
+  @Override
+  protected void registerInputTriggers() {
+    super.registerInputTriggers();
+
+    // Add mouse-over to show labels
+
+    _logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+      @Override
+      public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+        // Put together a pick ray
+        final Vector2 pos = Vector2.fetchTempInstance().set(inputStates.getCurrent().getMouseState().getX(),
+            inputStates.getCurrent().getMouseState().getY());
+        final Ray3 pickRay = Ray3.fetchTempInstance();
+        _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+        Vector2.releaseTempInstance(pos);
+
+        // Do the pick
+        _pickResults.clear();
+        PickingUtil.findPick(_root, pickRay, _pickResults);
+        Ray3.releaseTempInstance(pickRay);
+
+        if (_pickResults.getNumber() > 0) {
+          // picked something, show label.
+          _textNode.getSceneHints().setCullHint(CullHint.Never);
+
+          // set our text to the name of the ancestor of this object that is right under the _root node.
+          final PickData pick = _pickResults.getPickData(0);
+          if (pick.getTarget() instanceof Spatial) {
+            final Spatial topLevel = getTopLevel((Spatial) pick.getTarget());
+            if (!topLevel.equals(_picked)) {
+              clearPicked();
+              _picked = topLevel;
+              _picked.addController(_pickedControl);
+            }
+            if (!_text.getText().equals(topLevel.getName())) {
+              _text.setText(topLevel.getName());
+            }
+          }
+        } else {
+          // No pick, clear label.
+          _textNode.getSceneHints().setCullHint(CullHint.Always);
+          _text.setText("");
+
+          clearPicked();
+        }
+      }
+
+      private void clearPicked() {
+        if (_picked != null) {
+          if (_picked instanceof Mesh) {
+            ((Mesh) _picked).setDefaultColor(ColorRGBA.WHITE);
+          }
+          _picked.removeController(_pickedControl);
+        }
+        _picked = null;
+      }
+
+      private Spatial getTopLevel(final Spatial target) {
+        if (target.getParent() == null || target.getParent().equals(_root)) {
+          return target;
+        } else {
+          return getTopLevel(target.getParent());
+        }
+      }
+    }));
+
+  }
+
+  private Spatial createLines() {
+    final FloatBuffer verts = BufferUtils.createVector3Buffer(3);
+    verts.put(0).put(0).put(0);
+    verts.put(5).put(5).put(0);
+    verts.put(0).put(5).put(0);
+    final Line line = new Line("Lines", verts, null, null, null);
+    line.getMeshData().setIndexMode(IndexMode.LineStrip);
+    line.setAntialiased(true);
+    line.setLineWidth(1);
+    MaterialUtil.autoMaterials(line);
+
+    return line;
+  }
+
+  private void addMesh(final Spatial spatial) {
+    spatial.setTranslation((index % wrapCount) * 8 - wrapCount * 4, (index / wrapCount) * 8 - wrapCount * 4, -50);
+    if (spatial instanceof Mesh) {
+      ((Mesh) spatial).updateModelBound();
     }
+    _root.attachChild(spatial);
+    index++;
+  }
 }

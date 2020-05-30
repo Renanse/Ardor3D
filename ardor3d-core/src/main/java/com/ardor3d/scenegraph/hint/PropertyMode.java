@@ -12,16 +12,16 @@ package com.ardor3d.scenegraph.hint;
 
 public enum PropertyMode {
 
-    /** Inherit mode from parent. */
-    Inherit,
+  /** Inherit mode from parent. */
+  Inherit,
 
-    /** If we do not have a given property, always return null. */
-    UseOwn,
+  /** If we do not have a given property, always return null. */
+  UseOwn,
 
-    /** If we do not have a given property, check our parent. */
-    UseParentIfUnset,
+  /** If we do not have a given property, check our parent. */
+  UseParentIfUnset,
 
-    /** Only use our property if we ask our parent first and it gives us null. */
-    UseOursLast,
+  /** Only use our property if we ask our parent first and it gives us null. */
+  UseOursLast,
 
 }

@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -21,133 +21,137 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * <code>GameTask</code> is used in <code>GameTaskQueue</code> to manage tasks that have yet to be accomplished.
+ * <code>GameTask</code> is used in <code>GameTaskQueue</code> to manage tasks that have yet to be
+ * accomplished.
  */
 public class GameTask<V> implements Future<V> {
-    protected static final Logger logger = Logger.getLogger(GameTask.class.getName());
+  protected static final Logger logger = Logger.getLogger(GameTask.class.getName());
 
-    protected final Callable<V> callable;
+  protected final Callable<V> callable;
 
-    protected V _result;
-    protected ExecutionException _exception;
-    protected boolean _cancelled, _finished;
-    protected final ReentrantLock _stateLock = new ReentrantLock();
-    protected final Condition _finishedCondition = _stateLock.newCondition();
+  protected V _result;
+  protected ExecutionException _exception;
+  protected boolean _cancelled, _finished;
+  protected final ReentrantLock _stateLock = new ReentrantLock();
+  protected final Condition _finishedCondition = _stateLock.newCondition();
 
-    public GameTask(final Callable<V> callable) {
-        this.callable = callable;
+  public GameTask(final Callable<V> callable) {
+    this.callable = callable;
+  }
+
+  /**
+   * @param mayInterruptIfRunning
+   *          ignored by this implementation.
+   */
+  @Override
+  public boolean cancel(final boolean mayInterruptIfRunning) {
+    _stateLock.lock();
+    try {
+      if (isDone()) {
+        return false;
+      }
+      _cancelled = true;
+
+      _finishedCondition.signalAll();
+
+      return true;
+    } finally {
+      _stateLock.unlock();
     }
+  }
 
-    /**
-     * @param mayInterruptIfRunning
-     *            ignored by this implementation.
-     */
-    public boolean cancel(final boolean mayInterruptIfRunning) {
-        _stateLock.lock();
-        try {
-            if (isDone()) {
-                return false;
-            }
-            _cancelled = true;
-
-            _finishedCondition.signalAll();
-
-            return true;
-        } finally {
-            _stateLock.unlock();
-        }
+  @Override
+  public V get() throws InterruptedException, ExecutionException {
+    _stateLock.lock();
+    try {
+      while (!isDone()) {
+        _finishedCondition.await();
+      }
+      if (_exception != null) {
+        throw _exception;
+      }
+      return _result;
+    } finally {
+      _stateLock.unlock();
     }
+  }
 
-    public V get() throws InterruptedException, ExecutionException {
-        _stateLock.lock();
-        try {
-            while (!isDone()) {
-                _finishedCondition.await();
-            }
-            if (_exception != null) {
-                throw _exception;
-            }
-            return _result;
-        } finally {
-            _stateLock.unlock();
-        }
+  @Override
+  public V get(final long timeout, final TimeUnit unit)
+      throws InterruptedException, ExecutionException, TimeoutException {
+    _stateLock.lock();
+    try {
+      if (!isDone()) {
+        _finishedCondition.await(timeout, unit);
+      }
+      if (_exception != null) {
+        throw _exception;
+      }
+      if (_result == null) {
+        throw new TimeoutException("Object not returned in time allocated.");
+      }
+      return _result;
+    } finally {
+      _stateLock.unlock();
     }
+  }
 
-    public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException,
-            TimeoutException {
-        _stateLock.lock();
-        try {
-            if (!isDone()) {
-                _finishedCondition.await(timeout, unit);
-            }
-            if (_exception != null) {
-                throw _exception;
-            }
-            if (_result == null) {
-                throw new TimeoutException("Object not returned in time allocated.");
-            }
-            return _result;
-        } finally {
-            _stateLock.unlock();
-        }
+  @Override
+  public boolean isCancelled() {
+    _stateLock.lock();
+    try {
+      return _cancelled;
+    } finally {
+      _stateLock.unlock();
     }
+  }
 
-    public boolean isCancelled() {
-        _stateLock.lock();
-        try {
-            return _cancelled;
-        } finally {
-            _stateLock.unlock();
-        }
+  @Override
+  public boolean isDone() {
+    _stateLock.lock();
+    try {
+      return _finished || _cancelled || (_exception != null);
+    } finally {
+      _stateLock.unlock();
     }
+  }
 
-    public boolean isDone() {
-        _stateLock.lock();
-        try {
-            return _finished || _cancelled || (_exception != null);
-        } finally {
-            _stateLock.unlock();
-        }
+  public Callable<V> getCallable() { return callable; }
+
+  public void invoke() {
+    try {
+      final V tmpResult = callable.call();
+
+      _stateLock.lock();
+      try {
+        _result = tmpResult;
+        _finished = true;
+
+        _finishedCondition.signalAll();
+      } finally {
+        _stateLock.unlock();
+      }
+    } catch (final Exception e) {
+      logger.logp(Level.SEVERE, this.getClass().toString(), "invoke()", "Exception", e);
+
+      _stateLock.lock();
+      try {
+        _exception = new ExecutionException(e);
+
+        _finishedCondition.signalAll();
+      } finally {
+        _stateLock.unlock();
+      }
     }
+  }
 
-    public Callable<V> getCallable() {
-        return callable;
+  public ExecutionException getExecutionException() {
+    _stateLock.lock();
+    try {
+      return _exception;
+    } finally {
+      _stateLock.unlock();
     }
-
-    public void invoke() {
-        try {
-            final V tmpResult = callable.call();
-
-            _stateLock.lock();
-            try {
-                _result = tmpResult;
-                _finished = true;
-
-                _finishedCondition.signalAll();
-            } finally {
-                _stateLock.unlock();
-            }
-        } catch (final Exception e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "invoke()", "Exception", e);
-
-            _stateLock.lock();
-            try {
-                _exception = new ExecutionException(e);
-
-                _finishedCondition.signalAll();
-            } finally {
-                _stateLock.unlock();
-            }
-        }
-    }
-
-    public ExecutionException getExecutionException() {
-        _stateLock.lock();
-        try {
-            return _exception;
-        } finally {
-            _stateLock.unlock();
-        }
-    }
+  }
 
 }

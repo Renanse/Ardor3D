@@ -14,18 +14,16 @@ import com.ardor3d.annotation.Immutable;
 
 @Immutable
 public class CharacterInputEvent {
-    private final char _value;
+  private final char _value;
 
-    public CharacterInputEvent(final char value) {
-        _value = value;
-    }
+  public CharacterInputEvent(final char value) {
+    _value = value;
+  }
 
-    public char getValue() {
-        return _value;
-    }
+  public char getValue() { return _value; }
 
-    @Override
-    public String toString() {
-        return "CharacterInputEvent{" + "_value=" + _value + '}';
-    }
+  @Override
+  public String toString() {
+    return "CharacterInputEvent{" + "_value=" + _value + '}';
+  }
 }

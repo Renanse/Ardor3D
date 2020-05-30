@@ -14,12 +14,12 @@ import com.ardor3d.scenegraph.Spatial;
 
 public interface SpatialController<T extends Spatial> {
 
-    /**
-     * @param time
-     *            The time in seconds between the last call to update and the current one
-     * @param caller
-     *            The spatial currently executing this controller.
-     */
-    void update(double time, T caller);
+  /**
+   * @param time
+   *          The time in seconds between the last call to update and the current one
+   * @param caller
+   *          The spatial currently executing this controller.
+   */
+  void update(double time, T caller);
 
 }

@@ -17,12 +17,12 @@ import com.ardor3d.renderer.Renderer;
  * Renderable is the interface for things that can be rendered.
  */
 public interface Renderable {
-    /**
-     * Render the object using the supplied renderer instance.
-     *
-     * @param renderer
-     * @return true if a render occurred
-     */
-    @MainThread
-    boolean render(Renderer renderer);
+  /**
+   * Render the object using the supplied renderer instance.
+   *
+   * @param renderer
+   * @return true if a render occurred
+   */
+  @MainThread
+  boolean render(Renderer renderer);
 }

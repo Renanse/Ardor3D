@@ -18,42 +18,42 @@ import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.input.mouse.MouseState;
 
 /**
- * Filter used to modify {@link SpatialState} information prior to it being applied to a Spatial by the
- * {@link InteractManager}.
+ * Filter used to modify {@link SpatialState} information prior to it being applied to a Spatial by
+ * the {@link InteractManager}.
  */
 public interface UpdateFilter {
 
-    /**
-     * Called after a successful application of mouse/key input.
-     *
-     * @param manager
-     * @param widget
-     */
-    void applyFilter(InteractManager manager, AbstractInteractWidget widget);
+  /**
+   * Called after a successful application of mouse/key input.
+   *
+   * @param manager
+   * @param widget
+   */
+  void applyFilter(InteractManager manager, AbstractInteractWidget widget);
 
-    /**
-     * Callback for when a control begins a drag operation.
-     *
-     * @param manager
-     * @param widget
-     * @param state
-     */
-    void beginDrag(InteractManager manager, AbstractInteractWidget widget, MouseState state);
+  /**
+   * Callback for when a control begins a drag operation.
+   *
+   * @param manager
+   * @param widget
+   * @param state
+   */
+  void beginDrag(InteractManager manager, AbstractInteractWidget widget, MouseState state);
 
-    /**
-     * Callback for when a control ends a drag operation.
-     *
-     * @param manager
-     * @param widget
-     */
-    void endDrag(InteractManager manager, AbstractInteractWidget widget, MouseState state);
+  /**
+   * Callback for when a control ends a drag operation.
+   *
+   * @param manager
+   * @param widget
+   */
+  void endDrag(InteractManager manager, AbstractInteractWidget widget, MouseState state);
 
-    static UpdateFilter applyFilterAdapter(final BiConsumer<InteractManager, AbstractInteractWidget> c) {
-        return new UpdateFilterAdapter() {
-            @Override
-            public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
-                c.accept(manager, widget);
-            }
-        };
-    }
+  static UpdateFilter applyFilterAdapter(final BiConsumer<InteractManager, AbstractInteractWidget> c) {
+    return new UpdateFilterAdapter() {
+      @Override
+      public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
+        c.accept(manager, widget);
+      }
+    };
+  }
 }

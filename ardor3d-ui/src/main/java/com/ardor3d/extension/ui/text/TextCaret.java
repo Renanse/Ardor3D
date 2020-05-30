@@ -23,111 +23,93 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class TextCaret {
 
-    private long _blinkInterval = 500; // ms
-    private long _lastBlink = 0;
-    private boolean _show = true;
-    private int _posX, _posY;
-    private int _index;
+  private long _blinkInterval = 500; // ms
+  private long _lastBlink = 0;
+  private boolean _show = true;
+  private int _posX, _posY;
+  private int _index;
 
-    private final Mesh _strip = new Mesh();
+  private final Mesh _strip = new Mesh();
 
-    /**
-     * Construct a new TextCaret
-     */
-    public TextCaret() {
-        _strip.setRenderMaterial("ui/untextured/default_color.yaml");
+  /**
+   * Construct a new TextCaret
+   */
+  public TextCaret() {
+    _strip.setRenderMaterial("ui/untextured/default_color.yaml");
 
-        final MeshData md = _strip.getMeshData();
-        md.setVertexBuffer(BufferUtils.createVector3Buffer(4));
-        md.setIndices(BufferUtils.createIndexBufferData(new int[] { 0, 1, 3, 2 }, 3));
-        md.setIndexMode(IndexMode.TriangleStrip);
-        final float[] vals = new float[] { 0, 0, 0, //
-                1, 0, 0, //
-                1, 1, 0, //
-                0, 1, 0 //
-        };
-        md.getVertexBuffer().put(vals);
-        _strip.updateGeometricState(0);
+    final MeshData md = _strip.getMeshData();
+    md.setVertexBuffer(BufferUtils.createVector3Buffer(4));
+    md.setIndices(BufferUtils.createIndexBufferData(new int[] {0, 1, 3, 2}, 3));
+    md.setIndexMode(IndexMode.TriangleStrip);
+    final float[] vals = new float[] {0, 0, 0, //
+        1, 0, 0, //
+        1, 1, 0, //
+        0, 1, 0 //
+    };
+    md.getVertexBuffer().put(vals);
+    _strip.updateGeometricState(0);
 
-        setCaretColor(ColorRGBA.BLACK);
+    setCaretColor(ColorRGBA.BLACK);
+  }
+
+  public boolean isShowing() {
+    final long curr = System.currentTimeMillis();
+    if (curr - _lastBlink > _blinkInterval) {
+      _lastBlink = curr;
+      _show = !_show;
     }
 
-    public boolean isShowing() {
-        final long curr = System.currentTimeMillis();
-        if (curr - _lastBlink > _blinkInterval) {
-            _lastBlink = curr;
-            _show = !_show;
-        }
+    return _show;
+  }
 
-        return _show;
+  public void draw(final Renderer renderer, final UIComponent comp, final int height, final double xOffset,
+      final double yOffset) {
+    final long curr = System.currentTimeMillis();
+    if (curr - _lastBlink > _blinkInterval) {
+      _lastBlink = curr;
+      _show = !_show;
+      comp.fireComponentDirty();
     }
 
-    public void draw(final Renderer renderer, final UIComponent comp, final int height, final double xOffset,
-            final double yOffset) {
-        final long curr = System.currentTimeMillis();
-        if (curr - _lastBlink > _blinkInterval) {
-            _lastBlink = curr;
-            _show = !_show;
-            comp.fireComponentDirty();
-        }
-
-        if (!_show) {
-            return;
-        }
-
-        final Vector3 v = Vector3.fetchTempInstance();
-        v.set(getPosX() + xOffset, getPosY() + yOffset, 0);
-
-        final Transform t = Transform.fetchTempInstance();
-        t.set(comp.getWorldTransform());
-        t.applyForwardVector(v);
-        t.translate(v);
-        Vector3.releaseTempInstance(v);
-
-        _strip.setWorldTransform(t);
-        Transform.releaseTempInstance(t);
-
-        _strip.setWorldScale(1, _strip.getWorldScale().getY() * height, 0);
-        _strip.render(renderer);
+    if (!_show) {
+      return;
     }
 
-    public long getBlinkInterval() {
-        return _blinkInterval;
-    }
+    final Vector3 v = Vector3.fetchTempInstance();
+    v.set(getPosX() + xOffset, getPosY() + yOffset, 0);
 
-    public void setBlinkInterval(final long ms) {
-        _blinkInterval = ms;
-    }
+    final Transform t = Transform.fetchTempInstance();
+    t.set(comp.getWorldTransform());
+    t.applyForwardVector(v);
+    t.translate(v);
+    Vector3.releaseTempInstance(v);
 
-    public ReadOnlyColorRGBA getCaretColor() {
-        return _strip.getDefaultColor();
-    }
+    _strip.setWorldTransform(t);
+    Transform.releaseTempInstance(t);
 
-    public void setCaretColor(final ReadOnlyColorRGBA caretColor) {
-        _strip.setDefaultColor(caretColor);
-    }
+    _strip.setWorldScale(1, _strip.getWorldScale().getY() * height, 0);
+    _strip.render(renderer);
+  }
 
-    public int getIndex() {
-        return _index;
-    }
+  public long getBlinkInterval() { return _blinkInterval; }
 
-    public void setIndex(final int index) {
-        _index = index;
-    }
+  public void setBlinkInterval(final long ms) { _blinkInterval = ms; }
 
-    public int getPosX() {
-        return _posX;
-    }
+  public ReadOnlyColorRGBA getCaretColor() { return _strip.getDefaultColor(); }
 
-    public void setPosX(final int posX) {
-        _posX = posX;
-    }
+  public void setCaretColor(final ReadOnlyColorRGBA caretColor) {
+    _strip.setDefaultColor(caretColor);
+  }
 
-    public int getPosY() {
-        return _posY;
-    }
+  public int getIndex() { return _index; }
 
-    public void setPosY(final int posY) {
-        _posY = posY;
-    }
+  public void setIndex(final int index) { _index = index; }
+
+  public int getPosX() { return _posX; }
+
+  public void setPosX(final int posX) { _posX = posX; }
+
+  public int getPosY() { return _posY; }
+
+  public void setPosY(final int posY) { _posY = posY; }
 }

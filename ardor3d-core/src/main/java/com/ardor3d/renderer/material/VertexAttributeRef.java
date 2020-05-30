@@ -12,39 +12,33 @@ package com.ardor3d.renderer.material;
 
 public class VertexAttributeRef {
 
-    protected String _shaderVariableName;
-    protected int _location;
-    protected String _meshDataKey;
+  protected String _shaderVariableName;
+  protected int _location;
+  protected String _meshDataKey;
 
-    public VertexAttributeRef() {}
+  public VertexAttributeRef() {}
 
-    public VertexAttributeRef(final String shaderVariableName, final String meshDataKey) {
-        _shaderVariableName = shaderVariableName;
-        _meshDataKey = meshDataKey;
+  public VertexAttributeRef(final String shaderVariableName, final String meshDataKey) {
+    _shaderVariableName = shaderVariableName;
+    _meshDataKey = meshDataKey;
 
-        _location = -1;
-    }
+    _location = -1;
+  }
 
-    public VertexAttributeRef(final String nameAndKey) {
-        this(nameAndKey, nameAndKey);
-    }
+  public VertexAttributeRef(final String nameAndKey) {
+    this(nameAndKey, nameAndKey);
+  }
 
-    public VertexAttributeRef(final int location, final String meshDataKey) {
-        _location = location;
-        _meshDataKey = meshDataKey;
+  public VertexAttributeRef(final int location, final String meshDataKey) {
+    _location = location;
+    _meshDataKey = meshDataKey;
 
-        _shaderVariableName = null;
-    }
+    _shaderVariableName = null;
+  }
 
-    public int getLocation() {
-        return _location;
-    }
+  public int getLocation() { return _location; }
 
-    public String getShaderVariableName() {
-        return _shaderVariableName;
-    }
+  public String getShaderVariableName() { return _shaderVariableName; }
 
-    public String getMeshDataKey() {
-        return _meshDataKey;
-    }
+  public String getMeshDataKey() { return _meshDataKey; }
 }

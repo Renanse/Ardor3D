@@ -15,27 +15,27 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class TestMathExceptions {
-    @Test
-    public void testInvalidTransformException() {
-        final InvalidTransformException ex1 = new InvalidTransformException();
-        final InvalidTransformException ex2 = new InvalidTransformException("ABC");
-        final Exception a = new Exception();
-        final InvalidTransformException ex3 = new InvalidTransformException(a);
-        final InvalidTransformException ex4 = new InvalidTransformException("DEF", a);
+  @Test
+  public void testInvalidTransformException() {
+    final InvalidTransformException ex1 = new InvalidTransformException();
+    final InvalidTransformException ex2 = new InvalidTransformException("ABC");
+    final Exception a = new Exception();
+    final InvalidTransformException ex3 = new InvalidTransformException(a);
+    final InvalidTransformException ex4 = new InvalidTransformException("DEF", a);
 
-        assertNotNull(ex1);
-        assertEquals("ABC", ex2.getMessage());
-        assertEquals(a, ex3.getCause());
-        assertEquals("DEF", ex4.getMessage());
-        assertEquals(a, ex4.getCause());
-    }
+    assertNotNull(ex1);
+    assertEquals("ABC", ex2.getMessage());
+    assertEquals(a, ex3.getCause());
+    assertEquals("DEF", ex4.getMessage());
+    assertEquals(a, ex4.getCause());
+  }
 
-    @Test
-    public void testTransformException() {
-        final TransformException ex1 = new TransformException();
-        final TransformException ex2 = new TransformException("ABC");
+  @Test
+  public void testTransformException() {
+    final TransformException ex1 = new TransformException();
+    final TransformException ex2 = new TransformException("ABC");
 
-        assertNotNull(ex1);
-        assertEquals("ABC", ex2.getMessage());
-    }
+    assertNotNull(ex1);
+    assertEquals("ABC", ex2.getMessage());
+  }
 }

@@ -14,18 +14,18 @@ import com.ardor3d.renderer.Renderer;
 
 public interface IPopOver {
 
-    void showAt(int x, int y);
+  void showAt(int x, int y);
 
-    void setHud(UIHud hud);
+  void setHud(UIHud hud);
 
-    UIComponent getUIComponent(int hudX, int hudY);
+  UIComponent getUIComponent(int hudX, int hudY);
 
-    void onDraw(Renderer renderer);
+  void onDraw(Renderer renderer);
 
-    void updateGeometricState(double time, boolean initiator);
+  void updateGeometricState(double time, boolean initiator);
 
-    void close();
+  void close();
 
-    boolean isAttachedToHUD();
+  boolean isAttachedToHUD();
 
 }

@@ -10,30 +10,30 @@ import java.util.List;
  * @param <T>
  */
 public class DoubleBufferedList<T> {
-    private List<T> frontList = new ArrayList<>();
-    private List<T> backList = new ArrayList<>();
+  private List<T> frontList = new ArrayList<>();
+  private List<T> backList = new ArrayList<>();
 
-    /**
-     * The add method can be called at any point.
-     *
-     * @param t
-     */
-    public synchronized void add(final T t) {
-        if (!backList.contains(t)) {
-            backList.add(t);
-        }
+  /**
+   * The add method can be called at any point.
+   *
+   * @param t
+   */
+  public synchronized void add(final T t) {
+    if (!backList.contains(t)) {
+      backList.add(t);
     }
+  }
 
-    /**
-     * The switchAndGet call and it's returned list has to be accessed sequencially.
-     *
-     * @return
-     */
-    public synchronized List<T> switchAndGet() {
-        final List<T> tmp = backList;
-        backList = frontList;
-        frontList = tmp;
-        backList.clear();
-        return frontList;
-    }
+  /**
+   * The switchAndGet call and it's returned list has to be accessed sequencially.
+   *
+   * @return
+   */
+  public synchronized List<T> switchAndGet() {
+    final List<T> tmp = backList;
+    backList = frontList;
+    frontList = tmp;
+    backList.clear();
+    return frontList;
+  }
 }

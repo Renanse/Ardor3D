@@ -15,5 +15,5 @@ package com.ardor3d.input.mouse;
  *
  */
 public enum GrabbedState {
-    GRABBED, NOT_GRABBED
+  GRABBED, NOT_GRABBED
 }

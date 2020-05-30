@@ -35,294 +35,291 @@ import com.ardor3d.util.stat.StatType;
 
 public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
-    public static final StatType Vertical = new StatType("_lineGrapher_vert");
-    public static final StatType Horizontal = new StatType("_lineGrapher_horiz");
+  public static final StatType Vertical = new StatType("_lineGrapher_vert");
+  public static final StatType Horizontal = new StatType("_lineGrapher_horiz");
 
-    public enum ConfigKeys {
-        ShowPoints, PointSize, PointColor, Antialias, ShowLines, Width, Color, FrameAverage,
+  public enum ConfigKeys {
+    ShowPoints, PointSize, PointColor, Antialias, ShowLines, Width, Color, FrameAverage,
+  }
+
+  protected Node _graphRoot = new Node("root");
+  protected Line _horizontals, _verticals;
+  protected int _eventCount = 0;
+  protected int _threshold = 1;
+  protected float _startMarker = 0;
+  private float _off;
+  private float _vSpan;
+  private static final int majorHBar = 20;
+  private static final int majorVBar = 10;
+
+  private final HashMap<StatType, LineEntry> _entries = new HashMap<>();
+
+  private BlendState _defBlendState = null;
+
+  public LineGrapher(final int width, final int height, final Renderer renderer) {
+    super(width, height, renderer);
+
+    // Setup our static horizontal graph lines
+    createHLines();
+
+    _defBlendState = new BlendState();
+    _defBlendState.setEnabled(true);
+    _defBlendState.setBlendEnabled(true);
+    _defBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+    _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+    _graphRoot.setRenderState(_defBlendState);
+    _graphRoot.getSceneHints().setCullHint(CullHint.Never);
+  }
+
+  @Override
+  public void statsUpdated() {
+    if (!isEnabled() || !Constants.updateGraphs) {
+      return;
     }
 
-    protected Node _graphRoot = new Node("root");
-    protected Line _horizontals, _verticals;
-    protected int _eventCount = 0;
-    protected int _threshold = 1;
-    protected float _startMarker = 0;
-    private float _off;
-    private float _vSpan;
-    private static final int majorHBar = 20;
-    private static final int majorVBar = 10;
+    // Turn off stat collection while we draw this graph.
+    StatCollector.pause();
 
-    private final HashMap<StatType, LineEntry> _entries = new HashMap<StatType, LineEntry>();
+    // some basic stats:
+    final int texWidth = _gWidth;
+    final int texHeight = _gHeight;
 
-    private BlendState _defBlendState = null;
-
-    public LineGrapher(final int width, final int height, final Renderer renderer) {
-        super(width, height, renderer);
-
-        // Setup our static horizontal graph lines
-        createHLines();
-
-        _defBlendState = new BlendState();
-        _defBlendState.setEnabled(true);
-        _defBlendState.setBlendEnabled(true);
-        _defBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        _graphRoot.setRenderState(_defBlendState);
-        _graphRoot.getSceneHints().setCullHint(CullHint.Never);
+    // On stat event:
+    // - check if enough events have been triggered to cause an update.
+    _eventCount++;
+    _off += StatCollector.getStartOffset();
+    if (_eventCount < _threshold) {
+      return;
+    } else {
+      _eventCount = 0;
     }
 
-    public void statsUpdated() {
-        if (!isEnabled() || !Constants.updateGraphs) {
-            return;
-        }
+    // - (Re)attach horizontal bars.
+    if (!_graphRoot.equals(_horizontals.getParent())) {
+      _graphRoot.attachChild(_horizontals);
+    }
 
-        // Turn off stat collection while we draw this graph.
-        StatCollector.pause();
+    // - Check if we have valid vertical bars:
+    final float newVSpan = calcVSpan();
+    if (_verticals == null || newVSpan != _vSpan) {
+      _vSpan = newVSpan;
+      createVLines();
+    }
+    _off %= (StatCollector.getSampleRate() * majorVBar);
 
-        // some basic stats:
-        final int texWidth = _gWidth;
-        final int texHeight = _gHeight;
+    // - (Re)attach vertical bars.
+    if (!_graphRoot.equals(_verticals.getParent())) {
+      _graphRoot.attachChild(_verticals);
+    }
 
-        // On stat event:
-        // - check if enough events have been triggered to cause an update.
-        _eventCount++;
-        _off += StatCollector.getStartOffset();
-        if (_eventCount < _threshold) {
-            return;
-        } else {
-            _eventCount = 0;
-        }
+    // - shift verticals based on current time
+    shiftVerticals();
 
-        // - (Re)attach horizontal bars.
-        if (!_graphRoot.equals(_horizontals.getParent())) {
-            _graphRoot.attachChild(_horizontals);
-        }
+    for (final StatType type : _entries.keySet()) {
+      _entries.get(type).visited = false;
+      _entries.get(type).verts.clear();
+    }
 
-        // - Check if we have valid vertical bars:
-        final float newVSpan = calcVSpan();
-        if (_verticals == null || newVSpan != _vSpan) {
-            _vSpan = newVSpan;
-            createVLines();
-        }
-        _off %= (StatCollector.getSampleRate() * majorVBar);
-
-        // - (Re)attach vertical bars.
-        if (!_graphRoot.equals(_verticals.getParent())) {
-            _graphRoot.attachChild(_verticals);
-        }
-
-        // - shift verticals based on current time
-        shiftVerticals();
-
-        for (final StatType type : _entries.keySet()) {
-            _entries.get(type).visited = false;
-            _entries.get(type).verts.clear();
-        }
-
-        // - For each sample, add points and extend the lines of the
-        // corresponding Line objects.
-        synchronized (StatCollector.getHistorical()) {
-            for (int i = 0; i < StatCollector.getHistorical().size(); i++) {
-                final MultiStatSample sample = StatCollector.getHistorical().get(i);
-                for (final StatType type : _config.keySet()) {
-                    if (sample.containsStat(type)) {
-                        LineEntry entry = _entries.get(type);
-                        // Prepare our entry object as needed.
-                        if (entry == null || entry.maxSamples != StatCollector.getMaxSamples()) {
-                            entry = new LineEntry(StatCollector.getMaxSamples(), type);
-                            _entries.put(type, entry);
-                        }
-
-                        final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false)
-                                ? sample.getStatValue(type).getAverageValue()
-                                : sample.getStatValue(type).getAccumulatedValue();
-
-                        final Vector3 point = new Vector3(i, value, 0);
-                        // Now, add
-                        entry.verts.add(point);
-
-                        // Update min/max
-                        if (entry.max < value) {
-                            entry.max = value;
-                        }
-
-                        entry.visited = true;
-                    } else {
-                        final LineEntry entry = _entries.get(type);
-                        if (entry != null) {
-                            entry.verts.add(new Vector3(i, 0, 0));
-                        }
-                    }
-                }
-            }
-        }
-
-        for (final Iterator<StatType> i = _entries.keySet().iterator(); i.hasNext();) {
-            final LineEntry entry = _entries.get(i.next());
-            // - Go through the entries list and remove any that were not visited.
-            if (!entry.visited) {
-                entry.line.removeFromParent();
-                entry.point.removeFromParent();
-                i.remove();
-                continue;
+    // - For each sample, add points and extend the lines of the
+    // corresponding Line objects.
+    synchronized (StatCollector.getHistorical()) {
+      for (int i = 0; i < StatCollector.getHistorical().size(); i++) {
+        final MultiStatSample sample = StatCollector.getHistorical().get(i);
+        for (final StatType type : _config.keySet()) {
+          if (sample.containsStat(type)) {
+            LineEntry entry = _entries.get(type);
+            // Prepare our entry object as needed.
+            if (entry == null || entry.maxSamples != StatCollector.getMaxSamples()) {
+              entry = new LineEntry(StatCollector.getMaxSamples(), type);
+              _entries.put(type, entry);
             }
 
-            // - Update the Point and Line params with the verts and count.
-            final FloatBuffer fb = BufferUtils.createFloatBuffer(entry.verts.toArray(new Vector3[entry.verts.size()]));
-            entry.point.getMeshData().setVertexBuffer(fb);
-            final double scaleWidth = texWidth / (StatCollector.getMaxSamples() - 1.0);
-            final double scaleHeight = texHeight / (entry.max * 1.02);
-            entry.point.setScale(new Vector3(scaleWidth, scaleHeight, 1));
-            entry.line.getMeshData().setVertexBuffer(fb);
-            entry.line.setScale(new Vector3(scaleWidth, scaleHeight, 1));
-            fb.rewind();
+            final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false)
+                ? sample.getStatValue(type).getAverageValue()
+                : sample.getStatValue(type).getAccumulatedValue();
 
-            // - attach point/line to root as needed
-            if (!_graphRoot.equals(entry.line.getParent())) {
-                _graphRoot.attachChild(entry.line);
-            }
-            if (!_graphRoot.equals(entry.point.getParent())) {
-                _graphRoot.attachChild(entry.point);
-            }
-        }
+            final Vector3 point = new Vector3(i, value, 0);
+            // Now, add
+            entry.verts.add(point);
 
-        // - Now, draw to texture via a TextureRenderer
-        _graphRoot.updateGeometricState(0, true);
-        _textureRenderer.renderSpatial(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
-
-        // Turn stat collection back on.
-        StatCollector.resume();
-    }
-
-    private float calcVSpan() {
-        return _textureRenderer.getWidth() * majorVBar / StatCollector.getMaxSamples();
-    }
-
-    private void shiftVerticals() {
-        final int texWidth = _textureRenderer.getWidth();
-        final double xOffset = -(_off * texWidth) / (StatCollector.getMaxSamples() * StatCollector.getSampleRate());
-        final ReadOnlyVector3 trans = _verticals.getTranslation();
-        _verticals.setTranslation(xOffset, trans.getY(), trans.getZ());
-    }
-
-    public int getThreshold() {
-        return _threshold;
-    }
-
-    public void setThreshold(final int threshold) {
-        _threshold = threshold;
-    }
-
-    // - Setup horizontal bars
-    private void createHLines() {
-        // some basic stats:
-        final int texWidth = _textureRenderer.getWidth();
-        final int texHeight = _textureRenderer.getHeight();
-
-        final FloatBuffer verts = BufferUtils.createVector3Buffer((100 / majorHBar) * 2);
-
-        final float div = texHeight * majorHBar / 100f;
-
-        for (int y = 0, i = 0; i < verts.capacity(); i += 6, y += div) {
-            verts.put(0).put(y).put(0);
-            verts.put(texWidth).put(y).put(0);
-        }
-
-        _horizontals = new Line("horiz", verts, null, null, null);
-        _horizontals.getMeshData().setIndexMode(IndexMode.Lines);
-        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-
-        _horizontals.setDefaultColor(
-                getColorConfig(LineGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.BLUE)));
-        _horizontals.setLineWidth(getIntConfig(LineGrapher.Horizontal, ConfigKeys.Width.name(), 1));
-    }
-
-    // - Setup enough vertical bars to have one at every (10 X samplerate)
-    // secs... we'll need +1 bar.
-    private void createVLines() {
-        // some basic stats:
-        final int texWidth = _textureRenderer.getWidth();
-        final int texHeight = _textureRenderer.getHeight();
-
-        final FloatBuffer verts = BufferUtils.createVector3Buffer(((int) (texWidth / _vSpan) + 1) * 2);
-
-        for (float x = _vSpan; x <= texWidth + _vSpan; x += _vSpan) {
-            verts.put(x).put(0).put(0);
-            verts.put(x).put(texHeight).put(0);
-        }
-
-        _verticals = new Line("vert", verts, null, null, null);
-        _verticals.getMeshData().setIndexMode(IndexMode.Lines);
-        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-
-        _verticals.setDefaultColor(
-                getColorConfig(LineGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.RED)));
-        _verticals.setLineWidth(getIntConfig(LineGrapher.Vertical, ConfigKeys.Width.name(), 1));
-    }
-
-    class LineEntry {
-        public List<Vector3> verts = new ArrayList<Vector3>();
-        public int maxSamples;
-        public double min = 0;
-        public double max = 10;
-        public boolean visited;
-        public Point point;
-        public Line line;
-
-        public LineEntry(final int maxSamples, final StatType type) {
-            this.maxSamples = maxSamples;
-
-            point = new Point("p", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
-            point.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-
-            point.setDefaultColor(getColorConfig(type, ConfigKeys.PointColor.name(), new ColorRGBA(ColorRGBA.WHITE)));
-            point.setPointSize(getIntConfig(type, ConfigKeys.PointSize.name(), 5));
-            if (!getBooleanConfig(type, ConfigKeys.ShowPoints.name(), false)) {
-                point.getSceneHints().setCullHint(CullHint.Always);
+            // Update min/max
+            if (entry.max < value) {
+              entry.max = value;
             }
 
-            line = new Line("l", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
-            line.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-            line.getMeshData().setIndexMode(IndexMode.LineStrip);
-
-            line.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
-            line.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
-            if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
-                line.getSceneHints().setCullHint(CullHint.Always);
+            entry.visited = true;
+          } else {
+            final LineEntry entry = _entries.get(type);
+            if (entry != null) {
+              entry.verts.add(new Vector3(i, 0, 0));
             }
+          }
         }
+      }
     }
 
-    public Line updateLineKey(final StatType type, Line lineKey) {
-        if (lineKey == null) {
-            lineKey = new Line("lk", BufferUtils.createVector3Buffer(2), null, null, null);
-            final FloatBuffer fb = BufferUtils
-                    .createFloatBuffer(new Vector3[] { new Vector3(0, 0, 0), new Vector3(30, 0, 0) });
-            fb.rewind();
-            lineKey.getMeshData().setVertexBuffer(fb);
-        }
+    for (final Iterator<StatType> i = _entries.keySet().iterator(); i.hasNext();) {
+      final LineEntry entry = _entries.get(i.next());
+      // - Go through the entries list and remove any that were not visited.
+      if (!entry.visited) {
+        entry.line.removeFromParent();
+        entry.point.removeFromParent();
+        i.remove();
+        continue;
+      }
 
-        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-        lineKey.getMeshData().setIndexMode(IndexMode.LineStrip);
+      // - Update the Point and Line params with the verts and count.
+      final FloatBuffer fb = BufferUtils.createFloatBuffer(entry.verts.toArray(new Vector3[entry.verts.size()]));
+      entry.point.getMeshData().setVertexBuffer(fb);
+      final double scaleWidth = texWidth / (StatCollector.getMaxSamples() - 1.0);
+      final double scaleHeight = texHeight / (entry.max * 1.02);
+      entry.point.setScale(new Vector3(scaleWidth, scaleHeight, 1));
+      entry.line.getMeshData().setVertexBuffer(fb);
+      entry.line.setScale(new Vector3(scaleWidth, scaleHeight, 1));
+      fb.rewind();
 
-        lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
-        lineKey.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
-        if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
-            lineKey.getSceneHints().setCullHint(CullHint.Always);
-        }
-
-        return lineKey;
+      // - attach point/line to root as needed
+      if (!_graphRoot.equals(entry.line.getParent())) {
+        _graphRoot.attachChild(entry.line);
+      }
+      if (!_graphRoot.equals(entry.point.getParent())) {
+        _graphRoot.attachChild(entry.point);
+      }
     }
 
-    @Override
-    public void reset() {
-        synchronized (StatCollector.getHistorical()) {
-            for (final Iterator<StatType> i = _entries.keySet().iterator(); i.hasNext();) {
-                final LineEntry entry = _entries.get(i.next());
-                entry.line.removeFromParent();
-                entry.point.removeFromParent();
-                i.remove();
-            }
-        }
+    // - Now, draw to texture via a TextureRenderer
+    _graphRoot.updateGeometricState(0, true);
+    _textureRenderer.renderSpatial(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+
+    // Turn stat collection back on.
+    StatCollector.resume();
+  }
+
+  private float calcVSpan() {
+    return _textureRenderer.getWidth() * majorVBar / StatCollector.getMaxSamples();
+  }
+
+  private void shiftVerticals() {
+    final int texWidth = _textureRenderer.getWidth();
+    final double xOffset = -(_off * texWidth) / (StatCollector.getMaxSamples() * StatCollector.getSampleRate());
+    final ReadOnlyVector3 trans = _verticals.getTranslation();
+    _verticals.setTranslation(xOffset, trans.getY(), trans.getZ());
+  }
+
+  public int getThreshold() { return _threshold; }
+
+  public void setThreshold(final int threshold) { _threshold = threshold; }
+
+  // - Setup horizontal bars
+  private void createHLines() {
+    // some basic stats:
+    final int texWidth = _textureRenderer.getWidth();
+    final int texHeight = _textureRenderer.getHeight();
+
+    final FloatBuffer verts = BufferUtils.createVector3Buffer((100 / majorHBar) * 2);
+
+    final float div = texHeight * majorHBar / 100f;
+
+    for (int y = 0, i = 0; i < verts.capacity(); i += 6, y += div) {
+      verts.put(0).put(y).put(0);
+      verts.put(texWidth).put(y).put(0);
     }
+
+    _horizontals = new Line("horiz", verts, null, null, null);
+    _horizontals.getMeshData().setIndexMode(IndexMode.Lines);
+    _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+
+    _horizontals.setDefaultColor(
+        getColorConfig(LineGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.BLUE)));
+    _horizontals.setLineWidth(getIntConfig(LineGrapher.Horizontal, ConfigKeys.Width.name(), 1));
+  }
+
+  // - Setup enough vertical bars to have one at every (10 X samplerate)
+  // secs... we'll need +1 bar.
+  private void createVLines() {
+    // some basic stats:
+    final int texWidth = _textureRenderer.getWidth();
+    final int texHeight = _textureRenderer.getHeight();
+
+    final FloatBuffer verts = BufferUtils.createVector3Buffer(((int) (texWidth / _vSpan) + 1) * 2);
+
+    for (float x = _vSpan; x <= texWidth + _vSpan; x += _vSpan) {
+      verts.put(x).put(0).put(0);
+      verts.put(x).put(texHeight).put(0);
+    }
+
+    _verticals = new Line("vert", verts, null, null, null);
+    _verticals.getMeshData().setIndexMode(IndexMode.Lines);
+    _verticals.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+
+    _verticals
+        .setDefaultColor(getColorConfig(LineGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.RED)));
+    _verticals.setLineWidth(getIntConfig(LineGrapher.Vertical, ConfigKeys.Width.name(), 1));
+  }
+
+  class LineEntry {
+    public List<Vector3> verts = new ArrayList<>();
+    public int maxSamples;
+    public double min = 0;
+    public double max = 10;
+    public boolean visited;
+    public Point point;
+    public Line line;
+
+    public LineEntry(final int maxSamples, final StatType type) {
+      this.maxSamples = maxSamples;
+
+      point = new Point("p", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
+      point.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+
+      point.setDefaultColor(getColorConfig(type, ConfigKeys.PointColor.name(), new ColorRGBA(ColorRGBA.WHITE)));
+      point.setPointSize(getIntConfig(type, ConfigKeys.PointSize.name(), 5));
+      if (!getBooleanConfig(type, ConfigKeys.ShowPoints.name(), false)) {
+        point.getSceneHints().setCullHint(CullHint.Always);
+      }
+
+      line = new Line("l", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
+      line.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+      line.getMeshData().setIndexMode(IndexMode.LineStrip);
+
+      line.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
+      line.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
+      if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
+        line.getSceneHints().setCullHint(CullHint.Always);
+      }
+    }
+  }
+
+  @Override
+  public Line updateLineKey(final StatType type, Line lineKey) {
+    if (lineKey == null) {
+      lineKey = new Line("lk", BufferUtils.createVector3Buffer(2), null, null, null);
+      final FloatBuffer fb = BufferUtils.createFloatBuffer(new Vector3(0, 0, 0), new Vector3(30, 0, 0));
+      fb.rewind();
+      lineKey.getMeshData().setVertexBuffer(fb);
+    }
+
+    lineKey.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+    lineKey.getMeshData().setIndexMode(IndexMode.LineStrip);
+
+    lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
+    lineKey.setLineWidth(getIntConfig(type, ConfigKeys.Width.name(), 3));
+    if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
+      lineKey.getSceneHints().setCullHint(CullHint.Always);
+    }
+
+    return lineKey;
+  }
+
+  @Override
+  public void reset() {
+    synchronized (StatCollector.getHistorical()) {
+      for (final Iterator<StatType> i = _entries.keySet().iterator(); i.hasNext();) {
+        final LineEntry entry = _entries.get(i.next());
+        entry.line.removeFromParent();
+        entry.point.removeFromParent();
+        i.remove();
+      }
+    }
+  }
 }

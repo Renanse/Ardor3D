@@ -16,22 +16,19 @@ import java.util.List;
 
 public class CharacterInputState {
 
-    public static final CharacterInputState NOTHING = new CharacterInputState();
+  public static final CharacterInputState NOTHING = new CharacterInputState();
 
-    protected final List<CharacterInputEvent> _eventsSinceLastState = new ArrayList<>();
+  protected final List<CharacterInputEvent> _eventsSinceLastState = new ArrayList<>();
 
-    public CharacterInputState() {
-    }
+  public CharacterInputState() {}
 
-    public void addEvent(final CharacterInputEvent event) {
-        _eventsSinceLastState.add(event);
-    }
+  public void addEvent(final CharacterInputEvent event) {
+    _eventsSinceLastState.add(event);
+  }
 
-    public List<CharacterInputEvent> getEvents() {
-        return Collections.unmodifiableList(_eventsSinceLastState);
-    }
+  public List<CharacterInputEvent> getEvents() { return Collections.unmodifiableList(_eventsSinceLastState); }
 
-    public void clearEvents() {
-        _eventsSinceLastState.clear();
-    }
+  public void clearEvents() {
+    _eventsSinceLastState.clear();
+  }
 }

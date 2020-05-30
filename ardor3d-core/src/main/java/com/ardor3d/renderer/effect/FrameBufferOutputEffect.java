@@ -17,29 +17,25 @@ import com.ardor3d.renderer.state.BlendState;
 
 public class FrameBufferOutputEffect extends RenderEffect {
 
-    private BlendState _blend = null;
+  private BlendState _blend = null;
 
-    @Override
-    public void prepare(final EffectManager manager) {
-        _steps.clear();
-        _steps.add(new EffectStep_SetRenderTarget(EffectManager.RT_FRAMEBUFFER));
+  @Override
+  public void prepare(final EffectManager manager) {
+    _steps.clear();
+    _steps.add(new EffectStep_SetRenderTarget(EffectManager.RT_FRAMEBUFFER));
 
-        final EffectStep_RenderScreenOverlay drawStep = new EffectStep_RenderScreenOverlay();
-        drawStep.getTargetMap().put(EffectManager.RT_PREVIOUS, 0);
-        if (_blend != null) {
-            drawStep.setEnforcedState(_blend);
-        }
-        drawStep.setEnforcedMaterial(MaterialManager.INSTANCE.findMaterial("unlit/textured/fsq.yaml"));
-        _steps.add(drawStep);
-
-        super.prepare(manager);
+    final EffectStep_RenderScreenOverlay drawStep = new EffectStep_RenderScreenOverlay();
+    drawStep.getTargetMap().put(EffectManager.RT_PREVIOUS, 0);
+    if (_blend != null) {
+      drawStep.setEnforcedState(_blend);
     }
+    drawStep.setEnforcedMaterial(MaterialManager.INSTANCE.findMaterial("unlit/textured/fsq.yaml"));
+    _steps.add(drawStep);
 
-    public BlendState getBlend() {
-        return _blend;
-    }
+    super.prepare(manager);
+  }
 
-    public void setBlend(final BlendState blend) {
-        _blend = blend;
-    }
+  public BlendState getBlend() { return _blend; }
+
+  public void setBlend(final BlendState blend) { _blend = blend; }
 }

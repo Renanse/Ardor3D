@@ -20,109 +20,109 @@ import com.ardor3d.extension.terrain.providers.inmemory.data.InMemoryTerrainData
 import com.ardor3d.extension.terrain.util.Tile;
 
 public class InMemoryTerrainSource implements TerrainSource {
-    private final int tileSize;
-    private final InMemoryTerrainData inMemoryTerrainData;
-    private final int availableClipmapLevels;
+  private final int tileSize;
+  private final InMemoryTerrainData inMemoryTerrainData;
+  private final int availableClipmapLevels;
 
-    public InMemoryTerrainSource(final int tileSize, final InMemoryTerrainData inMemoryTerrainData) {
-        this.tileSize = tileSize;
-        this.inMemoryTerrainData = inMemoryTerrainData;
-        availableClipmapLevels = inMemoryTerrainData.getClipmapLevels();
-    }
+  public InMemoryTerrainSource(final int tileSize, final InMemoryTerrainData inMemoryTerrainData) {
+    this.tileSize = tileSize;
+    this.inMemoryTerrainData = inMemoryTerrainData;
+    availableClipmapLevels = inMemoryTerrainData.getClipmapLevels();
+  }
 
-    @Override
-    public TerrainConfiguration getConfiguration() throws Exception {
-        return new TerrainConfiguration(availableClipmapLevels, tileSize, inMemoryTerrainData.getScale(),
-                inMemoryTerrainData.getMinHeight(), inMemoryTerrainData.getMaxHeight(), true);
-    }
+  @Override
+  public TerrainConfiguration getConfiguration() throws Exception {
+    return new TerrainConfiguration(availableClipmapLevels, tileSize, inMemoryTerrainData.getScale(),
+        inMemoryTerrainData.getMinHeight(), inMemoryTerrainData.getMaxHeight(), true);
+  }
 
-    @Override
-    public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
+  @Override
+  public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
+      final int numTilesY) throws Exception {
+    final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
 
-        final Set<Tile> validTiles = new HashSet<>();
+    final Set<Tile> validTiles = new HashSet<>();
 
-        final int levelSize = 1 << baseClipmapLevel;
-        final int size = inMemoryTerrainData.getSide();
+    final int levelSize = 1 << baseClipmapLevel;
+    final int size = inMemoryTerrainData.getSide();
 
-        for (int y = 0; y < numTilesY; y++) {
-            for (int x = 0; x < numTilesX; x++) {
-                final int xx = tileX + x;
-                final int yy = tileY + y;
-                if (xx >= 0 && xx * tileSize * levelSize <= size && yy >= 0 && yy * tileSize * levelSize <= size) {
-                    final Tile tile = new Tile(xx, yy);
-                    validTiles.add(tile);
-                }
-            }
+    for (int y = 0; y < numTilesY; y++) {
+      for (int x = 0; x < numTilesX; x++) {
+        final int xx = tileX + x;
+        final int yy = tileY + y;
+        if (xx >= 0 && xx * tileSize * levelSize <= size && yy >= 0 && yy * tileSize * levelSize <= size) {
+          final Tile tile = new Tile(xx, yy);
+          validTiles.add(tile);
         }
-
-        return validTiles;
+      }
     }
 
-    @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        final Set<Tile> updatedTiles[] = inMemoryTerrainData.getUpdatedTerrainTiles();
-        if (updatedTiles == null) {
-            return null;
-        }
+    return validTiles;
+  }
 
-        final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
-
-        final Set<Tile> tiles = new HashSet<>();
-
-        synchronized (updatedTiles[baseClipmapLevel]) {
-            if (updatedTiles[baseClipmapLevel].isEmpty()) {
-                return null;
-            }
-
-            int checkX, checkY;
-            for (final Iterator<Tile> it = updatedTiles[baseClipmapLevel].iterator(); it.hasNext();) {
-                final Tile tile = it.next();
-                checkX = tile.getX();
-                checkY = tile.getY();
-                if (checkX >= tileX && checkX < tileX + numTilesX && checkY >= tileY && checkY < tileY + numTilesY) {
-                    tiles.add(tile);
-                    it.remove();
-                }
-            }
-        }
-
-        return tiles;
+  @Override
+  public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
+      final int numTilesY) throws Exception {
+    final Set<Tile> updatedTiles[] = inMemoryTerrainData.getUpdatedTerrainTiles();
+    if (updatedTiles == null) {
+      return null;
     }
 
-    @Override
-    public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
-        final int tileX = tile.getX();
-        final int tileY = tile.getY();
+    final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
 
-        final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
+    final Set<Tile> tiles = new HashSet<>();
 
-        final int levelSize = 1 << baseClipmapLevel;
+    synchronized (updatedTiles[baseClipmapLevel]) {
+      if (updatedTiles[baseClipmapLevel].isEmpty()) {
+        return null;
+      }
 
-        final int size = inMemoryTerrainData.getSide();
-
-        final float[] heightData = inMemoryTerrainData.getHeightData();
-
-        final float[] data = new float[tileSize * tileSize];
-        for (int y = 0; y < tileSize; y++) {
-            for (int x = 0; x < tileSize; x++) {
-                final int index = x + y * tileSize;
-
-                final int heightX = (tileX * tileSize + x) * levelSize;
-                final int heightY = (tileY * tileSize + y) * levelSize;
-                data[index] = getHeight(heightData, size, heightX, heightY);
-            }
+      int checkX, checkY;
+      for (final Iterator<Tile> it = updatedTiles[baseClipmapLevel].iterator(); it.hasNext();) {
+        final Tile tile = it.next();
+        checkX = tile.getX();
+        checkY = tile.getY();
+        if (checkX >= tileX && checkX < tileX + numTilesX && checkY >= tileY && checkY < tileY + numTilesY) {
+          tiles.add(tile);
+          it.remove();
         }
-        return data;
+      }
     }
 
-    private float getHeight(final float[] heightMap, final int heightMapSize, final int x, final int y) {
-        if (x < 0 || x >= heightMapSize || y < 0 || y >= heightMapSize) {
-            return 0;
-        }
+    return tiles;
+  }
 
-        return heightMap[y * heightMapSize + x];
+  @Override
+  public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
+    final int tileX = tile.getX();
+    final int tileY = tile.getY();
+
+    final int baseClipmapLevel = availableClipmapLevels - clipmapLevel - 1;
+
+    final int levelSize = 1 << baseClipmapLevel;
+
+    final int size = inMemoryTerrainData.getSide();
+
+    final float[] heightData = inMemoryTerrainData.getHeightData();
+
+    final float[] data = new float[tileSize * tileSize];
+    for (int y = 0; y < tileSize; y++) {
+      for (int x = 0; x < tileSize; x++) {
+        final int index = x + y * tileSize;
+
+        final int heightX = (tileX * tileSize + x) * levelSize;
+        final int heightY = (tileY * tileSize + y) * levelSize;
+        data[index] = getHeight(heightData, size, heightX, heightY);
+      }
     }
+    return data;
+  }
+
+  private float getHeight(final float[] heightMap, final int heightMapSize, final int x, final int y) {
+    if (x < 0 || x >= heightMapSize || y < 0 || y >= heightMapSize) {
+      return 0;
+    }
+
+    return heightMap[y * heightMapSize + x];
+  }
 }

@@ -19,27 +19,23 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 
 public class CompoundTerrainDataProvider implements TerrainDataProvider {
 
-    protected CompoundTerrainSource _source;
-    protected List<TextureSource> _texSources = new ArrayList<>();
+  protected CompoundTerrainSource _source;
+  protected List<TextureSource> _texSources = new ArrayList<>();
 
-    public CompoundTerrainDataProvider(final TerrainConfiguration config) {
-        _source = new CompoundTerrainSource(config);
-    }
+  public CompoundTerrainDataProvider(final TerrainConfiguration config) {
+    _source = new CompoundTerrainSource(config);
+  }
 
-    @Override
-    public CompoundTerrainSource getTerrainSource() {
-        return _source;
-    }
+  @Override
+  public CompoundTerrainSource getTerrainSource() { return _source; }
 
-    @Override
-    public List<TextureSource> getTextureSources() {
-        return _texSources;
-    }
+  @Override
+  public List<TextureSource> getTextureSources() { return _texSources; }
 
-    @Override
-    public TextureSource getNormalMapSource() {
-        // TODO Add support in the future
-        return null;
-    }
+  @Override
+  public TextureSource getNormalMapSource() {
+    // TODO Add support in the future
+    return null;
+  }
 
 }

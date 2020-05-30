@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -20,17 +20,17 @@ import com.ardor3d.scenegraph.Spatial;
  */
 public class LinearVector3InterpolationController extends Vector3InterpolationController {
 
-    /** Serial UID */
-    private static final long serialVersionUID = 1L;
+  /** Serial UID */
+  private static final long serialVersionUID = 1L;
 
-    @Override
-    protected Vector3 interpolateVectors(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final double delta,
-            final Vector3 target) {
+  @Override
+  protected Vector3 interpolateVectors(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final double delta,
+      final Vector3 target) {
 
-        assert (null != from) : "parameter 'from' can not be null";
-        assert (null != to) : "parameter 'to' can not be null";
+    assert (null != from) : "parameter 'from' can not be null";
+    assert (null != to) : "parameter 'to' can not be null";
 
-        return target.lerpLocal(from, to, delta);
-    }
+    return target.lerpLocal(from, to, delta);
+  }
 
 }

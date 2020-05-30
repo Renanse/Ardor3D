@@ -34,156 +34,144 @@ import com.ardor3d.renderer.lwjgl3.Lwjgl3Renderer;
 import com.ardor3d.util.Ardor3dException;
 
 public class Lwjgl3CanvasRenderer implements CanvasRenderer {
-    protected Scene _scene;
-    protected Camera _camera;
-    protected boolean _doSwap;
-    protected Lwjgl3Renderer _renderer;
+  protected Scene _scene;
+  protected Camera _camera;
+  protected boolean _doSwap;
+  protected Lwjgl3Renderer _renderer;
 
-    // protected Object _context = new Object();
-    protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
+  // protected Object _context = new Object();
+  protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
-    private RenderContext _currentContext;
-    private Lwjgl3CanvasCallback _canvasCallback;
+  private RenderContext _currentContext;
+  private Lwjgl3CanvasCallback _canvasCallback;
 
-    public Lwjgl3CanvasRenderer(final Scene scene) {
-        _scene = scene;
-        _canvasCallback = new Lwjgl3CanvasAdapter();
+  public Lwjgl3CanvasRenderer(final Scene scene) {
+    _scene = scene;
+    _canvasCallback = new Lwjgl3CanvasAdapter();
+  }
+
+  @MainThread
+  protected ContextCapabilities createContextCapabilities() {
+    return new Lwjgl3ContextCapabilities(GL.createCapabilities());
+  }
+
+  @Override
+  public Lwjgl3Renderer createRenderer() {
+    return new Lwjgl3Renderer();
+  }
+
+  /**
+   * Note: this requires the OpenGL context is already current.
+   */
+  @Override
+  public void init(final Canvas canvas, final DisplaySettings settings, final boolean doSwap) {
+    _doSwap = doSwap;
+
+    // Grab a shared context, if one is given.
+    RenderContext sharedContext = null;
+    if (settings.getShareContext() != null) {
+      sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext().getContextKey());
     }
 
-    @MainThread
-    protected ContextCapabilities createContextCapabilities() {
-        return new Lwjgl3ContextCapabilities(GL.createCapabilities());
+    _canvasCallback.makeCurrent(true);
+
+    final ContextCapabilities caps = createContextCapabilities();
+    _currentContext = new RenderContext(this, caps, sharedContext);
+
+    ContextManager.addContext(this, _currentContext);
+    ContextManager.switchContext(this);
+    ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
+
+    _renderer = createRenderer();
+
+    if (settings.getSamples() != 0) {
+      GL11C.glEnable(GL13C.GL_MULTISAMPLE);
     }
 
-    @Override
-    public Lwjgl3Renderer createRenderer() {
-        return new Lwjgl3Renderer();
+    _renderer.setBackgroundColor(ColorRGBA.BLACK);
+
+    final float aspectRatio = (float) canvas.getContentWidth() / (float) canvas.getContentHeight();
+
+    if (_camera == null) {
+      /** Set up how our camera sees. */
+      _camera = new Camera(canvas.getContentWidth(), canvas.getContentHeight());
+      _camera.setFrustumPerspective(45.0f, aspectRatio, 1, 1000);
+      _camera.setProjectionMode(ProjectionMode.Perspective);
+
+      final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
+      final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+      final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+      final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
+      /** Move our camera to a correct place and orientation. */
+      _camera.setFrame(loc, left, up, dir);
+    } else {
+      // use new width and height to set ratio.
+      _camera.setFrustumPerspective(_camera.getFovY(), aspectRatio, _camera.getFrustumNear(), _camera.getFrustumFar());
+    }
+  }
+
+  @Override
+  public boolean draw() {
+    // set up context for rendering this canvas
+    makeCurrentContext();
+
+    // render stuff, first apply our camera if we have one
+    if (_camera != null) {
+      _camera.apply(_renderer);
+    }
+    _renderer.clearBuffers(_frameClear);
+
+    final boolean drew = _scene.render(_renderer);
+    _renderer.flushFrame(drew && _doSwap);
+    if (drew && _doSwap) {
+      _canvasCallback.doSwap();
     }
 
-    /**
-     * Note: this requires the OpenGL context is already current.
-     */
-    @Override
-    public void init(final Canvas canvas, final DisplaySettings settings, final boolean doSwap) {
-        _doSwap = doSwap;
-
-        // Grab a shared context, if one is given.
-        RenderContext sharedContext = null;
-        if (settings.getShareContext() != null) {
-            sharedContext = ContextManager
-                    .getContextForKey(settings.getShareContext().getRenderContext().getContextKey());
-        }
-
-        _canvasCallback.makeCurrent(true);
-
-        final ContextCapabilities caps = createContextCapabilities();
-        _currentContext = new RenderContext(this, caps, sharedContext);
-
-        ContextManager.addContext(this, _currentContext);
-        ContextManager.switchContext(this);
-        ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
-
-        _renderer = createRenderer();
-
-        if (settings.getSamples() != 0) {
-            GL11C.glEnable(GL13C.GL_MULTISAMPLE);
-        }
-
-        _renderer.setBackgroundColor(ColorRGBA.BLACK);
-
-        final float aspectRatio = (float) canvas.getContentWidth() / (float) canvas.getContentHeight();
-
-        if (_camera == null) {
-            /** Set up how our camera sees. */
-            _camera = new Camera(canvas.getContentWidth(), canvas.getContentHeight());
-            _camera.setFrustumPerspective(45.0f, aspectRatio, 1, 1000);
-            _camera.setProjectionMode(ProjectionMode.Perspective);
-
-            final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
-            final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-            final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
-            final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
-            /** Move our camera to a correct place and orientation. */
-            _camera.setFrame(loc, left, up, dir);
-        } else {
-            // use new width and height to set ratio.
-            _camera.setFrustumPerspective(_camera.getFovY(), aspectRatio, _camera.getFrustumNear(),
-                    _camera.getFrustumFar());
-        }
+    // release the context if we're done (swapped and all)
+    if (_doSwap) {
+      releaseCurrentContext();
     }
 
-    @Override
-    public boolean draw() {
-        // set up context for rendering this canvas
-        makeCurrentContext();
+    return drew;
+  }
 
-        // render stuff, first apply our camera if we have one
-        if (_camera != null) {
-            _camera.apply(_renderer);
-        }
-        _renderer.clearBuffers(_frameClear);
+  @Override
+  public Camera getCamera() { return _camera; }
 
-        final boolean drew = _scene.render(_renderer);
-        _renderer.flushFrame(drew && _doSwap);
-        if (drew && _doSwap) {
-            _canvasCallback.doSwap();
-        }
+  @Override
+  public Scene getScene() { return _scene; }
 
-        // release the context if we're done (swapped and all)
-        if (_doSwap) {
-            releaseCurrentContext();
-        }
+  @Override
+  public void setScene(final Scene scene) { _scene = scene; }
 
-        return drew;
-    }
+  public Lwjgl3CanvasCallback getCanvasCallback() { return _canvasCallback; }
 
-    public Camera getCamera() {
-        return _camera;
-    }
+  public void setCanvasCallback(final Lwjgl3CanvasCallback canvasCallback) { _canvasCallback = canvasCallback; }
 
-    public Scene getScene() {
-        return _scene;
-    }
+  @Override
+  public Renderer getRenderer() { return _renderer; }
 
-    public void setScene(final Scene scene) {
-        _scene = scene;
-    }
+  @Override
+  public void makeCurrentContext() throws Ardor3dException {
+    _canvasCallback.makeCurrent(false);
+    ContextManager.switchContext(this);
+    ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
+  }
 
-    public Lwjgl3CanvasCallback getCanvasCallback() {
-        return _canvasCallback;
-    }
+  @Override
+  public void releaseCurrentContext() {
+    _canvasCallback.releaseContext(false);
+  }
 
-    public void setCanvasCallback(final Lwjgl3CanvasCallback canvasCallback) {
-        _canvasCallback = canvasCallback;
-    }
+  @Override
+  public void setCamera(final Camera camera) { _camera = camera; }
 
-    public Renderer getRenderer() {
-        return _renderer;
-    }
+  @Override
+  public RenderContext getRenderContext() { return _currentContext; }
 
-    public void makeCurrentContext() throws Ardor3dException {
-        _canvasCallback.makeCurrent(false);
-        ContextManager.switchContext(this);
-        ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
-    }
+  @Override
+  public int getFrameClear() { return _frameClear; }
 
-    public void releaseCurrentContext() {
-        _canvasCallback.releaseContext(false);
-    }
-
-    public void setCamera(final Camera camera) {
-        _camera = camera;
-    }
-
-    public RenderContext getRenderContext() {
-        return _currentContext;
-    }
-
-    public int getFrameClear() {
-        return _frameClear;
-    }
-
-    public void setFrameClear(final int buffers) {
-        _frameClear = buffers;
-    }
+  @Override
+  public void setFrameClear(final int buffers) { _frameClear = buffers; }
 }

@@ -15,161 +15,161 @@ import java.nio.IntBuffer;
 
 public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferData<T> {
 
-    /**
-     * @return the next value from this object, as an int, incrementing our position by 1 entry. Buffer types smaller
-     *         than an int should return unsigned values.
-     */
-    public abstract int get();
+  /**
+   * @return the next value from this object, as an int, incrementing our position by 1 entry. Buffer
+   *         types smaller than an int should return unsigned values.
+   */
+  public abstract int get();
 
-    /**
-     * @param index
-     *            the absolute position to get our value from. This is in entries, not bytes, and is 0 based. So for a
-     *            ShortBuffer, 2 would be the 3rd short from the beginning, etc.
-     * @return the value from this object, as an int, at the given absolute entry position. Buffer types smaller than an
-     *         int should return unsigned values.
-     */
-    public abstract int get(int index);
+  /**
+   * @param index
+   *          the absolute position to get our value from. This is in entries, not bytes, and is 0
+   *          based. So for a ShortBuffer, 2 would be the 3rd short from the beginning, etc.
+   * @return the value from this object, as an int, at the given absolute entry position. Buffer types
+   *         smaller than an int should return unsigned values.
+   */
+  public abstract int get(int index);
 
-    /**
-     * @return a new, non-direct IntBuffer containing a snapshot of the contents of this buffer.
-     */
-    public abstract IntBuffer asIntBuffer();
+  /**
+   * @return a new, non-direct IntBuffer containing a snapshot of the contents of this buffer.
+   */
+  public abstract IntBuffer asIntBuffer();
 
-    /**
-     * Sets the value of this buffer at the current position, incrementing our position by 1 entry.
-     *
-     * @param value
-     *            the value to place into this object at the current position.
-     * @return this object, for chaining.
-     */
-    public abstract IndexBufferData<T> put(int value);
+  /**
+   * Sets the value of this buffer at the current position, incrementing our position by 1 entry.
+   *
+   * @param value
+   *          the value to place into this object at the current position.
+   * @return this object, for chaining.
+   */
+  public abstract IndexBufferData<T> put(int value);
 
-    /**
-     * Sets the value of this buffer at the given index.
-     *
-     * @param index
-     *            the absolute position to put our value at. This is in entries, not bytes, and is 0 based. So for a
-     *            ShortBuffer, 2 would be the 3rd short from the beginning, etc.
-     * @param value
-     *            the value to place into this object
-     * @return
-     */
-    public abstract IndexBufferData<T> put(int index, int value);
+  /**
+   * Sets the value of this buffer at the given index.
+   *
+   * @param index
+   *          the absolute position to put our value at. This is in entries, not bytes, and is 0
+   *          based. So for a ShortBuffer, 2 would be the 3rd short from the beginning, etc.
+   * @param value
+   *          the value to place into this object
+   * @return
+   */
+  public abstract IndexBufferData<T> put(int index, int value);
 
-    /**
-     * Write the contents of the given IndexBufferData into this one. Note that data conversion is handled using the
-     * get/put methods in IndexBufferData.
-     *
-     * @param buf
-     *            the source buffer object.
-     */
-    public abstract IndexBufferData<?> put(IndexBufferData<?> buf);
+  /**
+   * Write the contents of the given IndexBufferData into this one. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param buf
+   *          the source buffer object.
+   */
+  public abstract IndexBufferData<?> put(IndexBufferData<?> buf);
 
-    /**
-     * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
-     * the get/put methods in IndexBufferData.
-     *
-     * @param array
-     *            the source int array.
-     */
-    public abstract IndexBufferData<?> put(int[] array);
+  /**
+   * Write the contents of the given int array into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   */
+  public abstract IndexBufferData<?> put(int[] array);
 
-    /**
-     * Write the contents of the given int array into this IndexBufferData. Note that data conversion is handled using
-     * the get/put methods in IndexBufferData.
-     *
-     * @param array
-     *            the source int array.
-     * @param offset
-     * @param length
-     */
-    public abstract IndexBufferData<?> put(int[] array, int offset, int length);
+  /**
+   * Write the contents of the given int array into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   * @param offset
+   * @param length
+   */
+  public abstract IndexBufferData<?> put(int[] array, int offset, int length);
 
-    /**
-     * Write the contents of the given IntBuffer into this IndexBufferData. Note that data conversion is handled using
-     * the get/put methods in IndexBufferData.
-     *
-     * @param array
-     *            the source int array.
-     */
-    public abstract IndexBufferData<?> put(IntBuffer buffer);
+  /**
+   * Write the contents of the given IntBuffer into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   */
+  public abstract IndexBufferData<?> put(IntBuffer buffer);
 
-    /**
-     * Get the underlying nio buffer.
-     */
-    @Override
-    public abstract T getBuffer();
+  /**
+   * Get the underlying nio buffer.
+   */
+  @Override
+  public abstract T getBuffer();
 
-    /**
-     * @see Buffer#remaining();
-     */
-    public int remaining() {
-        return getBuffer().remaining();
-    }
+  /**
+   * @see Buffer#remaining();
+   */
+  public int remaining() {
+    return getBuffer().remaining();
+  }
 
-    /**
-     * @see Buffer#position();
-     */
-    public int position() {
-        return getBuffer().position();
-    }
+  /**
+   * @see Buffer#position();
+   */
+  public int position() {
+    return getBuffer().position();
+  }
 
-    /**
-     * @see Buffer#position(int);
-     */
-    public void position(final int position) {
-        getBuffer().position(position);
-    }
+  /**
+   * @see Buffer#position(int);
+   */
+  public void position(final int position) {
+    getBuffer().position(position);
+  }
 
-    /**
-     * @see Buffer#limit();
-     */
-    public int limit() {
-        return getBuffer().limit();
-    }
+  /**
+   * @see Buffer#limit();
+   */
+  public int limit() {
+    return getBuffer().limit();
+  }
 
-    /**
-     * @see Buffer#limit(int);
-     */
-    public void limit(final int limit) {
-        getBuffer().limit(limit);
-    }
+  /**
+   * @see Buffer#limit(int);
+   */
+  public void limit(final int limit) {
+    getBuffer().limit(limit);
+  }
 
-    /**
-     * @see Buffer#capacity();
-     */
-    public int capacity() {
-        return getBuffer().capacity();
-    }
+  /**
+   * @see Buffer#capacity();
+   */
+  public int capacity() {
+    return getBuffer().capacity();
+  }
 
-    /**
-     * @see Buffer#rewind();
-     */
-    public void rewind() {
-        getBuffer().rewind();
-    }
+  /**
+   * @see Buffer#rewind();
+   */
+  public void rewind() {
+    getBuffer().rewind();
+  }
 
-    /**
-     * @see Buffer#flip();
-     */
-    public void flip() {
-        getBuffer().flip();
-    }
+  /**
+   * @see Buffer#flip();
+   */
+  public void flip() {
+    getBuffer().flip();
+  }
 
-    /**
-     * @see Buffer#clear();
-     */
-    public void clear() {
-        getBuffer().clear();
-    }
+  /**
+   * @see Buffer#clear();
+   */
+  public void clear() {
+    getBuffer().clear();
+  }
 
-    /**
-     * @see Buffer#reset();
-     */
-    public void reset() {
-        getBuffer().reset();
-    }
+  /**
+   * @see Buffer#reset();
+   */
+  public void reset() {
+    getBuffer().reset();
+  }
 
-    @Override
-    public abstract IndexBufferData<T> makeCopy();
+  @Override
+  public abstract IndexBufferData<T> makeCopy();
 }

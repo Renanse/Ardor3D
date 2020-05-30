@@ -14,30 +14,22 @@ import org.lwjgl.nuklear.NkContext;
 
 public abstract class NuklearWindow {
 
-	protected int _xOffset;
-	protected int _yOffset;
+  protected int _xOffset;
+  protected int _yOffset;
 
-	public abstract void layout(NkContext ctx);
+  public abstract void layout(NkContext ctx);
 
-	public int getXOffset() {
-		return _xOffset;
-	}
+  public int getXOffset() { return _xOffset; }
 
-	public void setXOffset(final int x) {
-		_xOffset = x;
-	}
+  public void setXOffset(final int x) { _xOffset = x; }
 
-	public int getYOffset() {
-		return _yOffset;
-	}
+  public int getYOffset() { return _yOffset; }
 
-	public void setYOffset(final int y) {
-		_yOffset = y;
-	}
+  public void setYOffset(final int y) { _yOffset = y; }
 
-	public void setOffSet(final int x, final int y) {
-		_xOffset = x;
-		_yOffset = y;
-	}
+  public void setOffSet(final int x, final int y) {
+    _xOffset = x;
+    _yOffset = y;
+  }
 
 }

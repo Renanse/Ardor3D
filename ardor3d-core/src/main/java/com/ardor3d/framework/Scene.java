@@ -15,15 +15,15 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.scenegraph.Renderable;
 
 /**
- * Owns all the data that is related to the scene. This class should not really know anything about rendering or the
- * screen, it's just the scene data.
+ * Owns all the data that is related to the scene. This class should not really know anything about
+ * rendering or the screen, it's just the scene data.
  */
 public interface Scene extends Renderable {
-    /**
-     * A scene should be able to handle a pick execution as it is the only thing that has a complete picture of the
-     * scenegraph(s).
-     *
-     * @param pickRay
-     */
-    PickResults doPick(Ray3 pickRay);
+  /**
+   * A scene should be able to handle a pick execution as it is the only thing that has a complete
+   * picture of the scenegraph(s).
+   *
+   * @param pickRay
+   */
+  PickResults doPick(Ray3 pickRay);
 }

@@ -12,53 +12,53 @@ package com.ardor3d.renderer;
 
 public enum DrawBufferTarget {
 
-    /**
-     * No color buffers
-     */
-    None,
+  /**
+   * No color buffers
+   */
+  None,
 
-    /**
-     * The front left color buffer
-     */
-    FrontLeft,
+  /**
+   * The front left color buffer
+   */
+  FrontLeft,
 
-    /**
-     * The front right color buffer
-     */
-    FrontRight,
+  /**
+   * The front right color buffer
+   */
+  FrontRight,
 
-    /**
-     * The back left color buffer
-     */
-    BackLeft,
+  /**
+   * The back left color buffer
+   */
+  BackLeft,
 
-    /**
-     * The back right color buffer
-     */
-    BackRight,
+  /**
+   * The back right color buffer
+   */
+  BackRight,
 
-    /**
-     * The front left and front right (if exists) color buffers.
-     */
-    Front,
+  /**
+   * The front left and front right (if exists) color buffers.
+   */
+  Front,
 
-    /**
-     * The back left and front right (if exists) color buffers.
-     */
-    Back,
+  /**
+   * The back left and front right (if exists) color buffers.
+   */
+  Back,
 
-    /**
-     * The front left and back left (if exists) color buffers.
-     */
-    Left,
+  /**
+   * The front left and back left (if exists) color buffers.
+   */
+  Left,
 
-    /**
-     * The front right and back right (if exists) color buffers.
-     */
-    Right,
+  /**
+   * The front right and back right (if exists) color buffers.
+   */
+  Right,
 
-    /**
-     * All of FrontLeft, FrontRight, BackLeft, BackRight, if exists.
-     */
-    FrontAndBack,
+  /**
+   * All of FrontLeft, FrontRight, BackLeft, BackRight, if exists.
+   */
+  FrontAndBack,
 }

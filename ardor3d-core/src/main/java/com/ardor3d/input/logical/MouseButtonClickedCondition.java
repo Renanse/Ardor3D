@@ -17,34 +17,35 @@ import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
 
 /**
- * A condition that is true if a given button was clicked (has a click count) when going from the previous input state
- * to the current one.
+ * A condition that is true if a given button was clicked (has a click count) when going from the
+ * previous input state to the current one.
  */
 @Immutable
 public final class MouseButtonClickedCondition implements Predicate<TwoInputStates> {
-    private final MouseButton _button;
+  private final MouseButton _button;
 
-    /**
-     * Construct a new MouseButtonClickedCondition.
-     *
-     * @param button
-     *            the button that should be "clicked" to trigger this condition
-     * @throws NullPointerException
-     *             if the button is null
-     */
-    public MouseButtonClickedCondition(final MouseButton button) {
-        if (button == null) {
-            throw new NullPointerException();
-        }
-
-        _button = button;
+  /**
+   * Construct a new MouseButtonClickedCondition.
+   *
+   * @param button
+   *          the button that should be "clicked" to trigger this condition
+   * @throws NullPointerException
+   *           if the button is null
+   */
+  public MouseButtonClickedCondition(final MouseButton button) {
+    if (button == null) {
+      throw new NullPointerException();
     }
 
-    public boolean test(final TwoInputStates states) {
-        final MouseState currentState = states.getCurrent().getMouseState();
-        final MouseState previousState = states.getPrevious().getMouseState();
+    _button = button;
+  }
 
-        return !currentState.getButtonsReleasedSince(previousState).isEmpty()
-                && currentState.getButtonsClicked().contains(_button);
-    }
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final MouseState currentState = states.getCurrent().getMouseState();
+    final MouseState previousState = states.getPrevious().getMouseState();
+
+    return !currentState.getButtonsReleasedSince(previousState).isEmpty()
+        && currentState.getButtonsClicked().contains(_button);
+  }
 }

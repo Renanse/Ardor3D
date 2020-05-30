@@ -26,68 +26,67 @@ import com.google.common.collect.PeekingIterator;
 
 public class GLFWKeyboardWrapper implements KeyboardWrapper {
 
-    @GuardedBy("this")
-    protected final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<>();
+  @GuardedBy("this")
+  protected final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<>();
 
-    @SuppressWarnings("unused")
-    private GLFWKeyCallback _keyCallback;
+  @SuppressWarnings("unused")
+  private GLFWKeyCallback _keyCallback;
 
-    private KeyboardIterator _currentIterator;
+  private KeyboardIterator _currentIterator;
 
-    private final GLFWCanvas _canvas;
+  private final GLFWCanvas _canvas;
 
-    public GLFWKeyboardWrapper(final GLFWCanvas canvas) {
-        _canvas = canvas;
-    }
+  public GLFWKeyboardWrapper(final GLFWCanvas canvas) {
+    _canvas = canvas;
+  }
 
-    @Override
-    public void init() {
-        GLFW.glfwSetKeyCallback(_canvas.getWindowId(), (_keyCallback = new GLFWKeyCallback() {
+  @Override
+  public void init() {
+    GLFW.glfwSetKeyCallback(_canvas.getWindowId(), (_keyCallback = new GLFWKeyCallback() {
 
-            @Override
-            public void invoke(final long window, final int keyCode, final int scancode, final int action,
-                    final int mods) {
+      @Override
+      public void invoke(final long window, final int keyCode, final int scancode, final int action, final int mods) {
 
-                final Key key = GLFWKey.findByCode(keyCode);
-                final KeyState state;
-                switch (action) {
-                    case GLFW.GLFW_PRESS:
-                        state = KeyState.DOWN;
-                        break;
-                    case GLFW.GLFW_RELEASE:
-                        state = KeyState.UP;
-                        break;
-                    case GLFW.GLFW_REPEAT:
-                    default:
-                        // do nothing on REPEAT?
-                        return;
-                }
-
-                _upcomingEvents.add(new KeyEvent(key, state));
-            }
-        }));
-    }
-
-    @Override
-    public synchronized PeekingIterator<KeyEvent> getKeyEvents() {
-        if (_currentIterator == null || !_currentIterator.hasNext()) {
-            _currentIterator = new KeyboardIterator();
+        final Key key = GLFWKey.findByCode(keyCode);
+        final KeyState state;
+        switch (action) {
+          case GLFW.GLFW_PRESS:
+            state = KeyState.DOWN;
+            break;
+          case GLFW.GLFW_RELEASE:
+            state = KeyState.UP;
+            break;
+          case GLFW.GLFW_REPEAT:
+          default:
+            // do nothing on REPEAT?
+            return;
         }
 
-        return _currentIterator;
+        _upcomingEvents.add(new KeyEvent(key, state));
+      }
+    }));
+  }
+
+  @Override
+  public synchronized PeekingIterator<KeyEvent> getKeyEvents() {
+    if (_currentIterator == null || !_currentIterator.hasNext()) {
+      _currentIterator = new KeyboardIterator();
     }
 
-    private class KeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
-        @Override
-        protected KeyEvent computeNext() {
-            synchronized (GLFWKeyboardWrapper.this) {
-                if (_upcomingEvents.isEmpty()) {
-                    return endOfData();
-                }
+    return _currentIterator;
+  }
 
-                return _upcomingEvents.poll();
-            }
+  private class KeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
+    @Override
+    protected KeyEvent computeNext() {
+      synchronized (GLFWKeyboardWrapper.this) {
+        if (_upcomingEvents.isEmpty()) {
+          return endOfData();
         }
+
+        return _upcomingEvents.poll();
+      }
     }
+  }
 
 }

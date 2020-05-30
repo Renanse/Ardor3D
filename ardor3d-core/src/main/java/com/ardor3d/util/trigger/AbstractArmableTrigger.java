@@ -12,47 +12,41 @@ package com.ardor3d.util.trigger;
 
 public abstract class AbstractArmableTrigger {
 
-    protected enum State {
-        Unarmed, Armed, Triggered
+  protected enum State {
+    Unarmed, Armed, Triggered
+  }
+
+  protected TriggerListener _listener;
+
+  protected State _state = State.Unarmed;
+
+  public boolean isUnarmed() { return _state == State.Unarmed; }
+
+  public boolean isArmed() { return _state == State.Armed; }
+
+  public boolean isTriggered() { return _state == State.Triggered; }
+
+  public void arm() {
+    _state = State.Armed;
+    if (_listener != null) {
+      _listener.onArm();
     }
+  }
 
-    protected TriggerListener _listener;
-
-    protected State _state = State.Unarmed;
-
-    public boolean isUnarmed() {
-        return _state == State.Unarmed;
+  public void trigger() {
+    _state = State.Triggered;
+    if (_listener != null) {
+      _listener.onTrigger();
     }
+  }
 
-    public boolean isArmed() {
-        return _state == State.Armed;
+  public void disarm() {
+    _state = State.Unarmed;
+    if (_listener != null) {
+      _listener.onDisarm();
     }
+  }
 
-    public boolean isTriggered() {
-        return _state == State.Triggered;
-    }
-
-    public void arm() {
-        _state = State.Armed;
-        if (_listener != null) {
-            _listener.onArm();
-        }
-    }
-
-    public void trigger() {
-        _state = State.Triggered;
-        if (_listener != null) {
-            _listener.onTrigger();
-        }
-    }
-
-    public void disarm() {
-        _state = State.Unarmed;
-        if (_listener != null) {
-            _listener.onDisarm();
-        }
-    }
-
-    public abstract void checkTrigger();
+  public abstract void checkTrigger();
 
 }

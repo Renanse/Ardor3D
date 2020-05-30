@@ -29,135 +29,145 @@ import com.ardor3d.extension.terrain.providers.procedural.ProceduralTerrainSourc
 
 public class CompoundTerrainSourcePanel extends JPanel {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    final private CompoundTerrainSource _source;
-    final private JSplitPane _splitPane;
+  final private CompoundTerrainSource _source;
+  final private JSplitPane _splitPane;
 
-    private JTree _layerTree;
-    private LayerTreeModel _layerTreeModel;
+  private JTree _layerTree;
+  private LayerTreeModel _layerTreeModel;
 
-    private JPanel _bottomPanel;
+  private JPanel _bottomPanel;
 
-    public CompoundTerrainSourcePanel(final CompoundTerrainSource terrainSource) {
+  public CompoundTerrainSourcePanel(final CompoundTerrainSource terrainSource) {
 
-        _source = terrainSource;
-        _splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        setupLayerTree();
-        setupPropsPanel();
-        setLayout(new BorderLayout());
-        add(_splitPane, BorderLayout.CENTER);
-        add(new JLabel("TerrainSource Tree:"), BorderLayout.NORTH);
-        _splitPane.setDividerLocation(100);
+    _source = terrainSource;
+    _splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    setupLayerTree();
+    setupPropsPanel();
+    setLayout(new BorderLayout());
+    add(_splitPane, BorderLayout.CENTER);
+    add(new JLabel("TerrainSource Tree:"), BorderLayout.NORTH);
+    _splitPane.setDividerLocation(100);
 
-        updatePropsPanel();
+    updatePropsPanel();
+  }
+
+  private void setupLayerTree() {
+    _layerTreeModel = new LayerTreeModel(_source);
+    _layerTree = new JTree(_layerTreeModel) {
+      /**
+      *
+      */
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public String convertValueToText(final Object value, final boolean selected, final boolean expanded,
+          final boolean leaf, final int row, final boolean hasFocus) {
+        if (value instanceof CompoundTerrainSource) {
+          return "Compound Terrain Source";
+        }
+        if (value instanceof ExampleEntry) {
+          return ((ExampleEntry) value).getName();
+        }
+        return "?";
+      }
+    };
+
+    _layerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    final DefaultTreeCellRenderer cellRenderer = new DefaultTreeCellRenderer();
+    cellRenderer.setLeafIcon(null);
+    _layerTree.setCellRenderer(cellRenderer);
+
+    _layerTree.getSelectionModel().addTreeSelectionListener(e -> updatePropsPanel());
+
+    final JScrollPane sp = new JScrollPane(_layerTree);
+    _splitPane.setTopComponent(sp);
+  }
+
+  private void setupPropsPanel() {
+    _bottomPanel = new JPanel();
+    _splitPane.setBottomComponent(_bottomPanel);
+  }
+
+  protected void updatePropsPanel() {
+    ExampleEntry selectedEntry = null;
+    // just take the first selected node
+    final TreePath tp = _layerTree.getSelectionPath();
+    if (tp != null) {
+      final Object selected = tp.getLastPathComponent();
+      if (selected instanceof ExampleEntry) {
+        selectedEntry = (ExampleEntry) selected;
+        if (selectedEntry.getSource() instanceof ProceduralTerrainSource) {
+          final ProceduralTerrainSource src = (ProceduralTerrainSource) selectedEntry.getSource();
+          if (src.getFunction() instanceof UIEditableFunction) {
+            ((UIEditableFunction) src.getFunction()).setupFunctionEditPanel(_bottomPanel, src);
+            return;
+          }
+        }
+      }
+    }
+    _bottomPanel.removeAll();
+  }
+
+  class LayerTreeModel implements TreeModel {
+
+    private final CompoundTerrainSource _source;
+
+    public LayerTreeModel(final CompoundTerrainSource source) {
+      _source = source;
     }
 
-    @SuppressWarnings("serial")
-    private void setupLayerTree() {
-        _layerTreeModel = new LayerTreeModel(_source);
-        _layerTree = new JTree(_layerTreeModel) {
-            @Override
-            public String convertValueToText(final Object value, final boolean selected, final boolean expanded,
-                    final boolean leaf, final int row, final boolean hasFocus) {
-                if (value instanceof CompoundTerrainSource) {
-                    return "Compound Terrain Source";
-                }
-                if (value instanceof ExampleEntry) {
-                    return ((ExampleEntry) value).getName();
-                }
-                return "?";
-            }
-        };
+    @Override
+    public Object getChild(final Object parent, final int index) {
+      if (parent instanceof CompoundTerrainSource) {
+        final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
+        return parentSource.getEntry(index);
+      }
 
-        _layerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        final DefaultTreeCellRenderer cellRenderer = new DefaultTreeCellRenderer();
-        cellRenderer.setLeafIcon(null);
-        _layerTree.setCellRenderer(cellRenderer);
-
-        _layerTree.getSelectionModel().addTreeSelectionListener(e -> updatePropsPanel());
-
-        final JScrollPane sp = new JScrollPane(_layerTree);
-        _splitPane.setTopComponent(sp);
+      return null;
     }
 
-    private void setupPropsPanel() {
-        _bottomPanel = new JPanel();
-        _splitPane.setBottomComponent(_bottomPanel);
+    @Override
+    public int getChildCount(final Object parent) {
+      if (parent instanceof CompoundTerrainSource) {
+        final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
+        return parentSource.getEntries().size();
+      }
+      return 0;
     }
 
-    protected void updatePropsPanel() {
-        ExampleEntry selectedEntry = null;
-        // just take the first selected node
-        final TreePath tp = _layerTree.getSelectionPath();
-        if (tp != null) {
-            final Object selected = tp.getLastPathComponent();
-            if (selected instanceof ExampleEntry) {
-                selectedEntry = (ExampleEntry) selected;
-                if (selectedEntry.getSource() instanceof ProceduralTerrainSource) {
-                    final ProceduralTerrainSource src = (ProceduralTerrainSource) selectedEntry.getSource();
-                    if (src.getFunction() instanceof UIEditableFunction) {
-                        ((UIEditableFunction) src.getFunction()).setupFunctionEditPanel(_bottomPanel, src);
-                        return;
-                    }
-                }
-            }
-        }
-        _bottomPanel.removeAll();
+    @Override
+    public int getIndexOfChild(final Object parent, final Object child) {
+      if (parent instanceof CompoundTerrainSource) {
+        final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
+        return parentSource.getEntries().indexOf(child);
+      }
+      return 0;
     }
 
-    class LayerTreeModel implements TreeModel {
+    @Override
+    public Object getRoot() { return _source; }
 
-        private final CompoundTerrainSource _source;
-
-        public LayerTreeModel(final CompoundTerrainSource source) {
-            _source = source;
-        }
-
-        public Object getChild(final Object parent, final int index) {
-            if (parent instanceof CompoundTerrainSource) {
-                final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
-                return parentSource.getEntry(index);
-            }
-
-            return null;
-        }
-
-        public int getChildCount(final Object parent) {
-            if (parent instanceof CompoundTerrainSource) {
-                final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
-                return parentSource.getEntries().size();
-            }
-            return 0;
-        }
-
-        public int getIndexOfChild(final Object parent, final Object child) {
-            if (parent instanceof CompoundTerrainSource) {
-                final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
-                return parentSource.getEntries().indexOf(child);
-            }
-            return 0;
-        }
-
-        public Object getRoot() {
-            return _source;
-        }
-
-        public boolean isLeaf(final Object node) {
-            return !(node instanceof CompoundTerrainSource);
-        }
-
-        public void addTreeModelListener(final TreeModelListener l) {
-            // Left empty
-        }
-
-        public void removeTreeModelListener(final TreeModelListener l) {
-            // Left empty
-        }
-
-        public void valueForPathChanged(final TreePath path, final Object newValue) {
-            // Left empty
-        }
+    @Override
+    public boolean isLeaf(final Object node) {
+      return !(node instanceof CompoundTerrainSource);
     }
+
+    @Override
+    public void addTreeModelListener(final TreeModelListener l) {
+      // Left empty
+    }
+
+    @Override
+    public void removeTreeModelListener(final TreeModelListener l) {
+      // Left empty
+    }
+
+    @Override
+    public void valueForPathChanged(final TreePath path, final Object newValue) {
+      // Left empty
+    }
+  }
 
 }

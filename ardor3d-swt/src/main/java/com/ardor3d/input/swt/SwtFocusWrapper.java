@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -22,31 +22,35 @@ import com.ardor3d.input.Focus.FocusWrapper;
  * Focus Listener wrapper class for use with SWT.
  */
 public class SwtFocusWrapper implements FocusWrapper, FocusListener {
-    private volatile boolean _focusLost = false;
+  private volatile boolean _focusLost = false;
 
-    private final Control _control;
+  private final Control _control;
 
-    public SwtFocusWrapper(final Control control) {
-        _control = checkNotNull(control, "control");
-    }
+  public SwtFocusWrapper(final Control control) {
+    _control = checkNotNull(control, "control");
+  }
 
-    public void focusGained(final FocusEvent focusEvent) {
+  @Override
+  public void focusGained(final FocusEvent focusEvent) {
     // nothing to do
-    }
+  }
 
-    public void focusLost(final FocusEvent focusEvent) {
-        _focusLost = true;
-    }
+  @Override
+  public void focusLost(final FocusEvent focusEvent) {
+    _focusLost = true;
+  }
 
-    public boolean getAndClearFocusLost() {
-        final boolean result = _focusLost;
+  @Override
+  public boolean getAndClearFocusLost() {
+    final boolean result = _focusLost;
 
-        _focusLost = false;
+    _focusLost = false;
 
-        return result;
-    }
+    return result;
+  }
 
-    public void init() {
-        _control.addFocusListener(this);
-    }
+  @Override
+  public void init() {
+    _control.addFocusListener(this);
+  }
 }

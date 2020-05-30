@@ -21,8 +21,6 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
-import com.ardor3d.extension.ui.event.ActionEvent;
-import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.GridLayout;
 import com.ardor3d.extension.ui.layout.GridLayoutData;
 import com.ardor3d.extension.ui.text.UIDoubleField;
@@ -42,135 +40,133 @@ import com.ardor3d.util.TextureManager;
 /**
  * Example of data entry UI types in action.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.DataEntryUIExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_DataEntryUIExample.jpg", //
-maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.ui.DataEntryUIExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_DataEntryUIExample.jpg", //
+    maxHeapMemory = 64)
 public class DataEntryUIExample extends ExampleBase {
-    UIHud hud;
-    private UIFrame frame;
+  UIHud hud;
+  private UIFrame frame;
 
-    public static void main(final String[] args) {
-        start(DataEntryUIExample.class);
-    }
+  public static void main(final String[] args) {
+    start(DataEntryUIExample.class);
+  }
 
-    @Override
-    protected void initExample() {
-        _canvas.setTitle("Data Entry Example");
+  @Override
+  protected void initExample() {
+    _canvas.setTitle("Data Entry Example");
 
-        UIComponent.setUseTransparency(true);
+    UIComponent.setUseTransparency(true);
 
-        // Add a spinning 3D box to show behind UI.
-        add3DSceneDecoration();
+    // Add a spinning 3D box to show behind UI.
+    add3DSceneDecoration();
 
-        final UIPanel panel = makeNumericPanel();
+    final UIPanel panel = makeNumericPanel();
 
-        final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
-        pane.add(panel, "numeric");
-        pane.setMinimumContentSize(400, 300);
+    final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
+    pane.add(panel, "numeric");
+    pane.setMinimumContentSize(400, 300);
 
-        frame = new UIFrame("Data Entry Example");
-        frame.setContentPanel(pane);
-        frame.pack();
+    frame = new UIFrame("Data Entry Example");
+    frame.setContentPanel(pane);
+    frame.pack();
 
-        frame.setUseStandin(true);
-        frame.setOpacity(1f);
-        frame.setName("sample");
+    frame.setUseStandin(true);
+    frame.setOpacity(1f);
+    frame.setName("sample");
 
-        hud = new UIHud(_canvas);
-        hud.add(frame);
-        hud.setupInput(_physicalLayer, _logicalLayer);
-        hud.setMouseManager(_mouseManager);
+    hud = new UIHud(_canvas);
+    hud.add(frame);
+    hud.setupInput(_physicalLayer, _logicalLayer);
+    hud.setMouseManager(_mouseManager);
 
-        frame.centerOn(hud);
-    }
+    frame.centerOn(hud);
+  }
 
-    private void add3DSceneDecoration() {
-        final Box box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
-        box.setModelBound(new BoundingBox());
-        box.setTranslation(new Vector3(0, 0, -15));
-        box.addController(new SpatialController<Box>() {
-            private final Matrix3 rotate = new Matrix3();
-            private double angle = 0;
-            private final Vector3 axis = new Vector3(1, 1, 0.5f).normalizeLocal();
+  private void add3DSceneDecoration() {
+    final Box box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
+    box.setModelBound(new BoundingBox());
+    box.setTranslation(new Vector3(0, 0, -15));
+    box.addController(new SpatialController<Box>() {
+      private final Matrix3 rotate = new Matrix3();
+      private double angle = 0;
+      private final Vector3 axis = new Vector3(1, 1, 0.5f).normalizeLocal();
 
-            public void update(final double time, final Box caller) {
-                angle += time * 50;
-                angle %= 360;
-                rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
-                caller.setRotation(rotate);
-            }
-        });
-        // Add a texture to the box.
-        final TextureState ts = new TextureState();
+      @Override
+      public void update(final double time, final Box caller) {
+        angle += time * 50;
+        angle %= 360;
+        rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
+        caller.setRotation(rotate);
+      }
+    });
+    // Add a texture to the box.
+    final TextureState ts = new TextureState();
 
-        final Texture tex = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                true);
-        ts.setTexture(tex);
-        box.setRenderState(ts);
-        _root.attachChild(box);
-    }
+    final Texture tex = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true);
+    ts.setTexture(tex);
+    box.setRenderState(ts);
+    _root.attachChild(box);
+  }
 
-    private UIPanel makeNumericPanel() {
-        final UIPanel panel = new UIPanel(new GridLayout());
+  private UIPanel makeNumericPanel() {
+    final UIPanel panel = new UIPanel(new GridLayout());
 
-        final UILabel lHeader = new UILabel("Various Numeric Fields");
-        lHeader.setLayoutData(new GridLayoutData(2, true, true));
-        panel.add(lHeader);
+    final UILabel lHeader = new UILabel("Various Numeric Fields");
+    lHeader.setLayoutData(new GridLayoutData(2, true, true));
+    panel.add(lHeader);
 
-        final UILabel lInteger = new UILabel("Integer Field");
-        final UIIntegerField tfInteger = new UIIntegerField();
-        tfInteger.setValue(42);
-        tfInteger.setLayoutData(GridLayoutData.WrapAndGrow);
-        panel.add(lInteger);
-        panel.add(tfInteger);
+    final UILabel lInteger = new UILabel("Integer Field");
+    final UIIntegerField tfInteger = new UIIntegerField();
+    tfInteger.setValue(42);
+    tfInteger.setLayoutData(GridLayoutData.WrapAndGrow);
+    panel.add(lInteger);
+    panel.add(tfInteger);
 
-        final UILabel lInteger2 = new UILabel("Integer Roller");
-        final UIIntegerRollerField tfInteger2 = new UIIntegerRollerField();
-        tfInteger2.setMinimumValue(0);
-        tfInteger2.setMaximumValue(100);
-        tfInteger2.setValue(50);
-        tfInteger2.setLayoutData(GridLayoutData.WrapAndGrow);
-        panel.add(lInteger2);
-        panel.add(tfInteger2);
+    final UILabel lInteger2 = new UILabel("Integer Roller");
+    final UIIntegerRollerField tfInteger2 = new UIIntegerRollerField();
+    tfInteger2.setMinimumValue(0);
+    tfInteger2.setMaximumValue(100);
+    tfInteger2.setValue(50);
+    tfInteger2.setLayoutData(GridLayoutData.WrapAndGrow);
+    panel.add(lInteger2);
+    panel.add(tfInteger2);
 
-        final UILabel lDouble = new UILabel("Double Field");
-        final UIDoubleField tfDouble = new UIDoubleField();
-        tfDouble.setValue(3.14e2);
-        tfDouble.setDisplayScientific(true);
-        tfDouble.setLayoutData(GridLayoutData.WrapAndGrow);
-        panel.add(lDouble);
-        panel.add(tfDouble);
+    final UILabel lDouble = new UILabel("Double Field");
+    final UIDoubleField tfDouble = new UIDoubleField();
+    tfDouble.setValue(3.14e2);
+    tfDouble.setDisplayScientific(true);
+    tfDouble.setLayoutData(GridLayoutData.WrapAndGrow);
+    panel.add(lDouble);
+    panel.add(tfDouble);
 
-        final UICheckBox dblSciTrue = new UICheckBox("sci. notation");
-        dblSciTrue.setSelected(true);
-        dblSciTrue.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                tfDouble.setDisplayScientific(!tfDouble.isDisplayScientific());
-                tfDouble.refreshState();
-            }
-        });
-        dblSciTrue.setLayoutData(GridLayoutData.WrapAndGrow);
-        panel.add(new UILabel(" "));
-        panel.add(dblSciTrue);
+    final UICheckBox dblSciTrue = new UICheckBox("sci. notation");
+    dblSciTrue.setSelected(true);
+    dblSciTrue.addActionListener(event -> {
+      tfDouble.setDisplayScientific(!tfDouble.isDisplayScientific());
+      tfDouble.refreshState();
+    });
+    dblSciTrue.setLayoutData(GridLayoutData.WrapAndGrow);
+    panel.add(new UILabel(" "));
+    panel.add(dblSciTrue);
 
-        return panel;
-    }
+    return panel;
+  }
 
-    @Override
-    protected void updateLogicalLayer(final ReadOnlyTimer timer) {
-        hud.getLogicalLayer().checkTriggers(timer.getTimePerFrame());
-    }
+  @Override
+  protected void updateLogicalLayer(final ReadOnlyTimer timer) {
+    hud.getLogicalLayer().checkTriggers(timer.getTimePerFrame());
+  }
 
-    @Override
-    protected void renderExample(final Renderer renderer) {
-        super.renderExample(renderer);
-        renderer.renderBuckets();
-        renderer.draw(hud);
-    }
+  @Override
+  protected void renderExample(final Renderer renderer) {
+    super.renderExample(renderer);
+    renderer.renderBuckets();
+    renderer.draw(hud);
+  }
 
-    @Override
-    protected void updateExample(final ReadOnlyTimer timer) {
-        hud.updateGeometricState(timer.getTimePerFrame());
-    }
+  @Override
+  protected void updateExample(final ReadOnlyTimer timer) {
+    hud.updateGeometricState(timer.getTimePerFrame());
+  }
 }

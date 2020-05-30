@@ -40,174 +40,179 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>
- * This lwjgl3-based example is meant to show how to use Ardor3D at the most primitive level, forsaking the use of
- * ExampleBase and much of Ardor3D's framework classes and interfaces.
+ * This lwjgl3-based example is meant to show how to use Ardor3D at the most primitive level,
+ * forsaking the use of ExampleBase and much of Ardor3D's framework classes and interfaces.
  * </p>
  *
  * <p>
- * Also of note, this example does not allow choosing of properties on launch. It also does not handle input or show any
- * special debugging. This is to simplify the example to the basic essentials.
+ * Also of note, this example does not allow choosing of properties on launch. It also does not
+ * handle input or show any special debugging. This is to simplify the example to the basic
+ * essentials.
  * </p>
  */
 
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.LwjglBasicExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_LwjglBasicExample.jpg", //
-maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.basic.LwjglBasicExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_LwjglBasicExample.jpg", //
+    maxHeapMemory = 64)
 public class LwjglBasicExample implements Scene {
 
-    // Our native window, not the gl surface itself.
-    private final GLFWCanvas _canvas;
+  // Our native window, not the gl surface itself.
+  private final GLFWCanvas _canvas;
 
-    // Our timer.
-    private final Timer _timer = new Timer();
+  // Our timer.
+  private final Timer _timer = new Timer();
 
-    // A boolean allowing us to "pull the plug" from anywhere.
-    private boolean _exit = false;
+  // A boolean allowing us to "pull the plug" from anywhere.
+  private boolean _exit = false;
 
-    // The root of our scene
-    private final Node _root = new Node();
+  // The root of our scene
+  private final Node _root = new Node();
 
-    public static void main(final String[] args) {
-        final LwjglBasicExample example = new LwjglBasicExample();
-        example.start();
+  public static void main(final String[] args) {
+    final LwjglBasicExample example = new LwjglBasicExample();
+    example.start();
+  }
+
+  /**
+   * Constructs the example class, also creating the native window and GL surface.
+   */
+  public LwjglBasicExample() {
+    _canvas = initLwjgl();
+    _canvas.init();
+  }
+
+  /**
+   * Kicks off the example logic, first setting up the scene, then continuously updating and rendering
+   * it until exit is flagged. Afterwards, the scene and gl surface are cleaned up.
+   */
+  private void start() {
+    initExample();
+
+    // Run in this same thread.
+    while (!_exit) {
+      updateExample();
+      _canvas.draw(null);
+      Thread.yield();
     }
+    _canvas.getCanvasRenderer().makeCurrentContext();
 
-    /**
-     * Constructs the example class, also creating the native window and GL surface.
-     */
-    public LwjglBasicExample() {
-        _canvas = initLwjgl();
-        _canvas.init();
-    }
+    // Done, do cleanup
+    ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
+    _canvas.close();
 
-    /**
-     * Kicks off the example logic, first setting up the scene, then continuously updating and rendering it until exit
-     * is flagged. Afterwards, the scene and gl surface are cleaned up.
-     */
-    private void start() {
-        initExample();
+    _canvas.getCanvasRenderer().releaseCurrentContext();
+  }
 
-        // Run in this same thread.
-        while (!_exit) {
-            updateExample();
-            _canvas.draw(null);
-            Thread.yield();
-        }
-        _canvas.getCanvasRenderer().makeCurrentContext();
+  /**
+   * Setup an lwjgl canvas and canvas renderer.
+   *
+   * @return the canvas.
+   */
+  private GLFWCanvas initLwjgl() {
+    final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(this);
+    final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0, 0, 8, 0, 0, false, false);
+    return new GLFWCanvas(settings, canvasRenderer);
+  }
 
-        // Done, do cleanup
-        ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
-        _canvas.close();
+  /**
+   * Initialize our scene.
+   */
+  private void initExample() {
+    _canvas.setTitle("LwjglBasicExample - close window to exit");
 
-        _canvas.getCanvasRenderer().releaseCurrentContext();
-    }
+    // Make a box...
+    final Box _box = new Box("Box", Vector3.ZERO, 5, 5, 5);
 
-    /**
-     * Setup an lwjgl canvas and canvas renderer.
-     *
-     * @return the canvas.
-     */
-    private GLFWCanvas initLwjgl() {
-        final Lwjgl3CanvasRenderer canvasRenderer = new Lwjgl3CanvasRenderer(this);
-        final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0, 0, 8, 0, 0, false, false);
-        return new GLFWCanvas(settings, canvasRenderer);
-    }
+    // Make it a bit more colorful.
+    _box.setRandomColors();
 
-    /**
-     * Initialize our scene.
-     */
-    private void initExample() {
-        _canvas.setTitle("LwjglBasicExample - close window to exit");
+    // Setup a bounding box for it.
+    _box.setModelBound(new BoundingBox());
 
-        // Make a box...
-        final Box _box = new Box("Box", Vector3.ZERO, 5, 5, 5);
+    // Set its location in space.
+    _box.setTranslation(new Vector3(0, 0, -15));
 
-        // Make it a bit more colorful.
-        _box.setRandomColors();
+    // Add to root.
+    _root.attachChild(_box);
 
-        // Setup a bounding box for it.
-        _box.setModelBound(new BoundingBox());
+    // set it to rotate:
+    _box.addController(new SpatialController<>() {
+      private final Vector3 _axis = new Vector3(1, 1, 0.5f).normalizeLocal();
+      private final Matrix3 _rotate = new Matrix3();
+      private double _angle = 0;
 
-        // Set its location in space.
-        _box.setTranslation(new Vector3(0, 0, -15));
-
-        // Add to root.
-        _root.attachChild(_box);
-
-        // set it to rotate:
-        _box.addController(new SpatialController<Spatial>() {
-            private final Vector3 _axis = new Vector3(1, 1, 0.5f).normalizeLocal();
-            private final Matrix3 _rotate = new Matrix3();
-            private double _angle = 0;
-
-            public void update(final double time, final Spatial caller) {
-                // update our rotation
-                _angle = _angle + (_timer.getTimePerFrame() * 25);
-                if (_angle > 180) {
-                    _angle = -180;
-                }
-
-                _rotate.fromAngleNormalAxis(_angle * MathUtils.DEG_TO_RAD, _axis);
-                _box.setRotation(_rotate);
-            }
-        });
-
-        // Add our awt based image loader.
-        AWTImageLoader.registerLoader();
-
-        // Set the location of our example resources.
-        try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
-                    LwjglBasicExample.class, "com/ardor3d/example/media/"));
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-        } catch (final URISyntaxException ex) {
-            ex.printStackTrace();
+      @Override
+      public void update(final double time, final Spatial caller) {
+        // update our rotation
+        _angle = _angle + (_timer.getTimePerFrame() * 25);
+        if (_angle > 180) {
+          _angle = -180;
         }
 
-        // Create a ZBuffer to display pixels closest to the camera above farther ones.
-        final ZBufferState buf = new ZBufferState();
-        buf.setEnabled(true);
-        buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
-        _root.setRenderState(buf);
+        _rotate.fromAngleNormalAxis(_angle * MathUtils.DEG_TO_RAD, _axis);
+        _box.setRotation(_rotate);
+      }
+    });
 
-        // Create a texture from the Ardor3D logo.
-        final TextureState ts = new TextureState();
-        ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
-        _root.setRenderState(ts);
+    // Add our awt based image loader.
+    AWTImageLoader.registerLoader();
+
+    // Set the location of our example resources.
+    try {
+      final SimpleResourceLocator srl = new SimpleResourceLocator(
+          ResourceLocatorTool.getClassPathResource(LwjglBasicExample.class, "com/ardor3d/example/media/"));
+      ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+    } catch (final URISyntaxException ex) {
+      ex.printStackTrace();
     }
 
-    /**
-     * Update our scene... Check if the window is closing. Then update our timer and finally update the geometric state
-     * of the root and its children.
-     */
-    private void updateExample() {
-        if (_canvas.isClosing()) {
-            _exit = true;
-            return;
-        }
+    // Create a ZBuffer to display pixels closest to the camera above farther ones.
+    final ZBufferState buf = new ZBufferState();
+    buf.setEnabled(true);
+    buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
+    _root.setRenderState(buf);
 
-        _timer.update();
+    // Create a texture from the Ardor3D logo.
+    final TextureState ts = new TextureState();
+    ts.setEnabled(true);
+    ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
+    _root.setRenderState(ts);
+  }
 
-        // Update controllers/render states/transforms/bounds for rootNode.
-        _root.updateGeometricState(_timer.getTimePerFrame(), true);
+  /**
+   * Update our scene... Check if the window is closing. Then update our timer and finally update the
+   * geometric state of the root and its children.
+   */
+  private void updateExample() {
+    if (_canvas.isClosing()) {
+      _exit = true;
+      return;
     }
 
-    // ------ Scene methods ------
+    _timer.update();
 
-    public boolean render(final Renderer renderer) {
-        if (!_canvas.isClosing()) {
+    // Update controllers/render states/transforms/bounds for rootNode.
+    _root.updateGeometricState(_timer.getTimePerFrame(), true);
+  }
 
-            // Draw the root and all its children.
-            renderer.draw(_root);
+  // ------ Scene methods ------
 
-            return true;
-        }
-        return false;
+  @Override
+  public boolean render(final Renderer renderer) {
+    if (!_canvas.isClosing()) {
+
+      // Draw the root and all its children.
+      renderer.draw(_root);
+
+      return true;
     }
+    return false;
+  }
 
-    public PickResults doPick(final Ray3 pickRay) {
-        // Ignore
-        return null;
-    }
+  @Override
+  public PickResults doPick(final Ray3 pickRay) {
+    // Ignore
+    return null;
+  }
 }

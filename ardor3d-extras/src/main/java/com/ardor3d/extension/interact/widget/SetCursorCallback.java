@@ -18,41 +18,41 @@ import com.ardor3d.input.mouse.MouseState;
 
 public class SetCursorCallback implements InteractMouseOverCallback {
 
-    private final MouseCursor _cursor;
-    private Canvas _lastEnteredCanvas;
+  private final MouseCursor _cursor;
+  private Canvas _lastEnteredCanvas;
 
-    public SetCursorCallback(final MouseCursor cursor) {
-        _cursor = cursor;
+  public SetCursorCallback(final MouseCursor cursor) {
+    _cursor = cursor;
+  }
+
+  @Override
+  public void mouseEntered(final Canvas source, final MouseState current, final InteractManager manager) {
+    if (source == null) {
+      return;
     }
 
-    @Override
-    public void mouseEntered(final Canvas source, final MouseState current, final InteractManager manager) {
-        if (source == null) {
-            return;
-        }
+    final MouseManager mm = source.getMouseManager();
+    if (mm != null) {
+      _lastEnteredCanvas = source;
+      mm.setCursor(_cursor);
+    }
+  }
 
-        final MouseManager mm = source.getMouseManager();
-        if (mm != null) {
-            _lastEnteredCanvas = source;
-            mm.setCursor(_cursor);
-        }
+  @Override
+  public void mouseDeparted(Canvas source, final MouseState current, final InteractManager manager) {
+    if (source == null) {
+      if (_lastEnteredCanvas != null) {
+        source = _lastEnteredCanvas;
+      } else {
+        return;
+      }
     }
 
-    @Override
-    public void mouseDeparted(Canvas source, final MouseState current, final InteractManager manager) {
-        if (source == null) {
-            if (_lastEnteredCanvas != null) {
-                source = _lastEnteredCanvas;
-            } else {
-                return;
-            }
-        }
-
-        final MouseManager mm = source.getMouseManager();
-        if (mm != null) {
-            mm.setCursor(null);
-        }
-        _lastEnteredCanvas = null;
+    final MouseManager mm = source.getMouseManager();
+    if (mm != null) {
+      mm.setCursor(null);
     }
+    _lastEnteredCanvas = null;
+  }
 
 }

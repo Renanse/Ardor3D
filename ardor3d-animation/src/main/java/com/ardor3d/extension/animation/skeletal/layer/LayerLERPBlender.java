@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -23,47 +23,40 @@ import com.ardor3d.extension.animation.skeletal.blendtree.BinaryLERPSource;
  */
 public class LayerLERPBlender implements LayerBlender {
 
-    /** A key into the related AnimationManager's values store for pulling blend weight. */
-    private String _blendKey;
+  /** A key into the related AnimationManager's values store for pulling blend weight. */
+  private String _blendKey;
 
-    /** Our first layer... generally the "prior" layer. */
-    private AnimationLayer _layerA;
+  /** Our first layer... generally the "prior" layer. */
+  private AnimationLayer _layerA;
 
-    /** Our second layer... generally the layer we were added to. */
-    private AnimationLayer _layerB;
+  /** Our second layer... generally the layer we were added to. */
+  private AnimationLayer _layerB;
 
-    public String getBlendKey() {
-        return _blendKey;
-    }
+  @Override
+  public String getBlendKey() { return _blendKey; }
 
-    public void setBlendKey(final String blendKey) {
-        _blendKey = blendKey;
-    }
+  @Override
+  public void setBlendKey(final String blendKey) { _blendKey = blendKey; }
 
-    public AnimationLayer getLayerA() {
-        return _layerA;
-    }
+  public AnimationLayer getLayerA() { return _layerA; }
 
-    public void setLayerA(final AnimationLayer layer) {
-        _layerA = layer;
-    }
+  @Override
+  public void setLayerA(final AnimationLayer layer) { _layerA = layer; }
 
-    public AnimationLayer getLayerB() {
-        return _layerB;
-    }
+  public AnimationLayer getLayerB() { return _layerB; }
 
-    public void setLayerB(final AnimationLayer layer) {
-        _layerB = layer;
-    }
+  @Override
+  public void setLayerB(final AnimationLayer layer) { _layerB = layer; }
 
-    public Map<String, ? extends Object> getBlendedSourceData(final AnimationManager manager) {
-        // grab our data maps from the two layers...
-        // set A
-        final Map<String, ? extends Object> sourceAData = getLayerA().getCurrentSourceData();
-        // set B
-        final Map<String, ? extends Object> sourceBData = getLayerB().getCurrentState() != null ? getLayerB()
-                .getCurrentState().getCurrentSourceData(manager) : null;
+  @Override
+  public Map<String, ? extends Object> getBlendedSourceData(final AnimationManager manager) {
+    // grab our data maps from the two layers...
+    // set A
+    final Map<String, ? extends Object> sourceAData = getLayerA().getCurrentSourceData();
+    // set B
+    final Map<String, ? extends Object> sourceBData =
+        getLayerB().getCurrentState() != null ? getLayerB().getCurrentState().getCurrentSourceData(manager) : null;
 
-        return BinaryLERPSource.combineSourceData(sourceAData, sourceBData, manager.getValuesStore().get(_blendKey));
-    }
+    return BinaryLERPSource.combineSourceData(sourceAData, sourceBData, manager.getValuesStore().get(_blendKey));
+  }
 }

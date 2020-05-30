@@ -12,13 +12,13 @@ package com.ardor3d.util.trigger;
 
 public class BasicTriggerListener implements TriggerListener {
 
-    @Override
-    public void onTrigger() {}
+  @Override
+  public void onTrigger() {}
 
-    @Override
-    public void onArm() {}
+  @Override
+  public void onArm() {}
 
-    @Override
-    public void onDisarm() {}
+  @Override
+  public void onDisarm() {}
 
 }

@@ -33,133 +33,120 @@ import com.ardor3d.input.mouse.MouseManager;
  */
 public class Lwjgl3AwtCanvas extends AWTGLCanvas implements Canvas {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	protected CanvasRenderer _canvasRenderer;
-	protected boolean _inited = false;
+  protected CanvasRenderer _canvasRenderer;
+  protected boolean _inited = false;
 
-	protected List<ICanvasListener> _listeners = new ArrayList<>();
+  protected List<ICanvasListener> _listeners = new ArrayList<>();
 
-	public Lwjgl3AwtCanvas(GLData data) {
-		super(data);
+  public Lwjgl3AwtCanvas(final GLData data) {
+    super(data);
 
-		addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-				if (_listeners.isEmpty()) {
-					return;
-				}
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(final ComponentEvent e) {
+        if (_listeners.isEmpty()) {
+          return;
+        }
 
-				final int width = getContentWidth();
-				final int height = getContentHeight();
+        final int width = getContentWidth();
+        final int height = getContentHeight();
 
-				for (final ICanvasListener l : _listeners) {
-					l.onResize(width, height);
-				}
-			}
-		});
-	}
+        for (final ICanvasListener l : _listeners) {
+          l.onResize(width, height);
+        }
+      }
+    });
+  }
 
-	public Lwjgl3AwtCanvas(GLData data, Lwjgl3CanvasRenderer renderer) {
-		this(data);
-		setCanvasRenderer(renderer);
-	}
+  public Lwjgl3AwtCanvas(final GLData data, final Lwjgl3CanvasRenderer renderer) {
+    this(data);
+    setCanvasRenderer(renderer);
+  }
 
-	@Override
-	@MainThread
-	public void init() {
-	}
+  @Override
+  @MainThread
+  public void init() {}
 
-	@Override
-	public void initGL() {
-		GL.createCapabilities();
-		privateInit();
-	}
+  @Override
+  public void initGL() {
+    GL.createCapabilities();
+    privateInit();
+  }
 
-	@Override
-	public void paintGL() {
-		if (!_inited) {
-			privateInit();
-		}
+  @Override
+  public void paintGL() {
+    if (!_inited) {
+      privateInit();
+    }
 
-		if (isVisible()) {
-			if (_canvasRenderer.draw()) {
-				swapBuffers();
-				// no need to release context - AwtGLCanvas does that already
-			}
-		}
-	}
+    if (isVisible()) {
+      if (_canvasRenderer.draw()) {
+        swapBuffers();
+        // no need to release context - AwtGLCanvas does that already
+      }
+    }
+  }
 
-	@Override
-	public CanvasRenderer getCanvasRenderer() {
-		return _canvasRenderer;
-	}
+  @Override
+  public CanvasRenderer getCanvasRenderer() { return _canvasRenderer; }
 
-	public void setCanvasRenderer(final CanvasRenderer renderer) {
-		_canvasRenderer = renderer;
-	}
+  public void setCanvasRenderer(final CanvasRenderer renderer) { _canvasRenderer = renderer; }
 
-	protected MouseManager _manager;
+  protected MouseManager _manager;
 
-	@Override
-	public MouseManager getMouseManager() {
-		return _manager;
-	}
+  @Override
+  public MouseManager getMouseManager() { return _manager; }
 
-	@Override
-	public void setMouseManager(final MouseManager manager) {
-		_manager = manager;
-	}
+  @Override
+  public void setMouseManager(final MouseManager manager) { _manager = manager; }
 
-	@MainThread
-	private void privateInit() {
-		// tell our parent to lay us out so we have the right starting size.
-		getParent().doLayout();
-		final int w = getContentWidth();
-		final int h = getContentHeight();
+  @MainThread
+  private void privateInit() {
+    // tell our parent to lay us out so we have the right starting size.
+    getParent().doLayout();
+    final int w = getContentWidth();
+    final int h = getContentHeight();
 
-		final DisplaySettings settings = new DisplaySettings(w, h, 0, 0, data.alphaSize, data.depthSize,
-				data.stencilSize, data.samples, false, data.stereo);
+    final DisplaySettings settings = new DisplaySettings(w, h, 0, 0, data.alphaSize, data.depthSize, data.stencilSize,
+        data.samples, false, data.stereo);
 
-		_canvasRenderer.init(this, settings, false);
-		_inited = true;
-	}
+    _canvasRenderer.init(this, settings, false);
+    _inited = true;
+  }
 
-	@Override
-	@MainThread
-	public void draw(final CountDownLatch latch) {
-		try {
-			if (!isValid())
-				return;
+  @Override
+  @MainThread
+  public void draw(final CountDownLatch latch) {
+    try {
+      if (!isValid()) {
+        return;
+      }
 
-			render();
-		} finally {
-			if (latch != null)
-				latch.countDown();
-		}
-	}
+      render();
+    } finally {
+      if (latch != null) {
+        latch.countDown();
+      }
+    }
+  }
 
-	@Override
-	public int getContentHeight() {
-		return (int) Math.round(scaleToScreenDpi(getSize().getHeight()));
-	}
+  @Override
+  public int getContentHeight() { return (int) Math.round(scaleToScreenDpi(getSize().getHeight())); }
 
-	@Override
-	public int getContentWidth() {
-		return (int) Math.round(scaleToScreenDpi(getSize().getWidth()));
-	}
+  @Override
+  public int getContentWidth() { return (int) Math.round(scaleToScreenDpi(getSize().getWidth())); }
 
-	@Override
-	public void addListener(final ICanvasListener listener) {
-		_listeners.add(listener);
-	}
+  @Override
+  public void addListener(final ICanvasListener listener) {
+    _listeners.add(listener);
+  }
 
-	@Override
-	public boolean removeListener(final ICanvasListener listener) {
-		return _listeners.remove(listener);
-	}
+  @Override
+  public boolean removeListener(final ICanvasListener listener) {
+    return _listeners.remove(listener);
+  }
 
-	public boolean isInited() {
-		return _inited;
-	}
+  public boolean isInited() { return _inited; }
 }

@@ -18,24 +18,24 @@ import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
- * <code>RenderPass</code> renders the spatials attached to it as normal, including rendering the renderqueue at the end
- * of the pass.
+ * <code>RenderPass</code> renders the spatials attached to it as normal, including rendering the
+ * renderqueue at the end of the pass.
  */
 public class RenderPass extends Pass {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Override
-    public void doRender(final Renderer r) {
-        for (int i = 0, sSize = _spatials.size(); i < sSize; i++) {
-            final Spatial s = _spatials.get(i);
-            r.draw(s);
-        }
-        r.renderBuckets();
+  @Override
+  public void doRender(final Renderer r) {
+    for (int i = 0, sSize = _spatials.size(); i < sSize; i++) {
+      final Spatial s = _spatials.get(i);
+      r.draw(s);
     }
+    r.renderBuckets();
+  }
 
-    @Override
-    public void doRender(final TextureRenderer r, final int clear, final List<Texture> texs) {
-        r.renderSpatials(_spatials, texs, clear);
-    }
+  @Override
+  public void doRender(final TextureRenderer r, final int clear, final List<Texture> texs) {
+    r.renderSpatials(_spatials, texs, clear);
+  }
 }

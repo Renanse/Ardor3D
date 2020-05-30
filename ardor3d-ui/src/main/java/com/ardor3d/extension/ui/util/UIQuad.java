@@ -20,86 +20,82 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * Defines a four sided quad with its origin at the lower left corner. By default, this mesh only contains vertices (in
- * the two dimensional space) and texture coordinates.
+ * Defines a four sided quad with its origin at the lower left corner. By default, this mesh only
+ * contains vertices (in the two dimensional space) and texture coordinates.
  */
 public class UIQuad extends Mesh {
 
-    /** The width of this ui quad */
-    protected double _width = 0;
-    /** The height of this ui quad */
-    protected double _height = 0;
+  /** The width of this ui quad */
+  protected double _width = 0;
+  /** The height of this ui quad */
+  protected double _height = 0;
 
-    /** Construct a new 1x1 UI quad. */
-    public UIQuad() {
-        this(null);
-    }
+  /** Construct a new 1x1 UI quad. */
+  public UIQuad() {
+    this(null);
+  }
 
-    /**
-     * Construct a new 1x1 UI quad with the given name.
-     *
-     * @param name
-     */
-    public UIQuad(final String name) {
-        this(name, 1, 1);
-    }
+  /**
+   * Construct a new 1x1 UI quad with the given name.
+   *
+   * @param name
+   */
+  public UIQuad(final String name) {
+    this(name, 1, 1);
+  }
 
-    /**
-     * Construct a new UI quad with the given name and dimensions.
-     *
-     * @param name
-     * @param width
-     * @param height
-     */
-    public UIQuad(final String name, final double width, final double height) {
-        super(name);
-        initialize();
-        resize(width, height);
-    }
+  /**
+   * Construct a new UI quad with the given name and dimensions.
+   *
+   * @param name
+   * @param width
+   * @param height
+   */
+  public UIQuad(final String name, final double width, final double height) {
+    super(name);
+    initialize();
+    resize(width, height);
+  }
 
-    /**
-     * Alter the vertices of this Ui quad so that it of the given size.
-     *
-     * @param width
-     * @param height
-     */
-    public void resize(final double width, final double height) {
-        _width = width;
-        _height = height;
+  /**
+   * Alter the vertices of this Ui quad so that it of the given size.
+   *
+   * @param width
+   * @param height
+   */
+  public void resize(final double width, final double height) {
+    _width = width;
+    _height = height;
 
-        FloatBuffer vertexBuffer = _meshData.getVertexBuffer();
-        vertexBuffer.clear();
-        vertexBuffer.put(0).put((float) _height);
-        vertexBuffer.put(0).put(0);
-        vertexBuffer.put((float) _width).put(0);
-        vertexBuffer.put((float) _width).put((float) _height);
-        _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
-    }
+    final FloatBuffer vertexBuffer = _meshData.getVertexBuffer();
+    vertexBuffer.clear();
+    vertexBuffer.put(0).put((float) _height);
+    vertexBuffer.put(0).put(0);
+    vertexBuffer.put((float) _width).put(0);
+    vertexBuffer.put((float) _width).put((float) _height);
+    _meshData.markBufferDirty(MeshData.KEY_VertexCoords);
+  }
 
-    /**
-     * Set the basic data for this mesh such as texture coordinates, index mode and our vertex buffer.
-     */
-    private void initialize() {
-        final FloatBufferData vbuf = new FloatBufferData(BufferUtils.createVector2Buffer(4), 2);
-        vbuf.setVboAccessMode(VBOAccessMode.DynamicDraw);
-        _meshData.setVertexCoords(vbuf);
-        final FloatBuffer tbuf = BufferUtils.createVector2Buffer(4);
-        _meshData.setTextureBuffer(tbuf, 0);
-        _meshData.getTextureCoords(0).setVboAccessMode(VBOAccessMode.DynamicDraw);
+  /**
+   * Set the basic data for this mesh such as texture coordinates, index mode and our vertex buffer.
+   */
+  private void initialize() {
+    final FloatBufferData vbuf = new FloatBufferData(BufferUtils.createVector2Buffer(4), 2);
+    vbuf.setVboAccessMode(VBOAccessMode.DynamicDraw);
+    _meshData.setVertexCoords(vbuf);
+    final FloatBuffer tbuf = BufferUtils.createVector2Buffer(4);
+    _meshData.setTextureBuffer(tbuf, 0);
+    _meshData.getTextureCoords(0).setVboAccessMode(VBOAccessMode.DynamicDraw);
 
-        tbuf.put(0).put(1);
-        tbuf.put(0).put(0);
-        tbuf.put(1).put(0);
-        tbuf.put(1).put(1);
+    tbuf.put(0).put(1);
+    tbuf.put(0).put(0);
+    tbuf.put(1).put(0);
+    tbuf.put(1).put(1);
 
-        _meshData.setIndexMode(IndexMode.TriangleFan);
-    }
+    _meshData.setIndexMode(IndexMode.TriangleFan);
+  }
 
-    public double getWidth() {
-        return _width;
-    }
+  public double getWidth() { return _width; }
 
-    public double getHeight() {
-        return _height;
-    }
+  public double getHeight() { return _height; }
 }

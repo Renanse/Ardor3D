@@ -15,25 +15,23 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class SpatialState {
 
-    protected Transform _transform = new Transform();
+  protected Transform _transform = new Transform();
 
-    public SpatialState() {}
+  public SpatialState() {}
 
-    /** copy constructor */
-    public SpatialState(final SpatialState toCopy) {
-        _transform.set(toCopy._transform);
-    }
+  /** copy constructor */
+  public SpatialState(final SpatialState toCopy) {
+    _transform.set(toCopy._transform);
+  }
 
-    public Transform getTransform() {
-        return _transform;
-    }
+  public Transform getTransform() { return _transform; }
 
-    public void copyState(final Spatial source) {
-        _transform.set(source.getTransform());
-    }
+  public void copyState(final Spatial source) {
+    _transform.set(source.getTransform());
+  }
 
-    public void applyState(final Spatial target) {
-        target.setTransform(_transform);
-    }
+  public void applyState(final Spatial target) {
+    target.setTransform(_transform);
+  }
 
 }

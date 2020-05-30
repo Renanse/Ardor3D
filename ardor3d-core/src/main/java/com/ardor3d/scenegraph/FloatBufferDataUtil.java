@@ -15,27 +15,27 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class FloatBufferDataUtil {
-    public static FloatBufferData makeNew(final ReadOnlyVector2[] coords) {
-        if (coords == null) {
-            return null;
-        }
-
-        return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 2);
+  public static FloatBufferData makeNew(final ReadOnlyVector2[] coords) {
+    if (coords == null) {
+      return null;
     }
 
-    public static FloatBufferData makeNew(final ReadOnlyVector3[] coords) {
-        if (coords == null) {
-            return null;
-        }
+    return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 2);
+  }
 
-        return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 3);
+  public static FloatBufferData makeNew(final ReadOnlyVector3[] coords) {
+    if (coords == null) {
+      return null;
     }
 
-    public static FloatBufferData makeNew(final float[] coords) {
-        if (coords == null) {
-            return null;
-        }
+    return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 3);
+  }
 
-        return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 1);
+  public static FloatBufferData makeNew(final float[] coords) {
+    if (coords == null) {
+      return null;
     }
+
+    return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 1);
+  }
 }

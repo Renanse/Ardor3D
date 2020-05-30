@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -28,54 +28,56 @@ import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
 import com.ardor3d.util.TextureManager;
 
 /**
- * Simple example showing differences between GeoSphere and Sphere and their various texture mappings.
+ * Simple example showing differences between GeoSphere and Sphere and their various texture
+ * mappings.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.SphereComparisonsExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_SphereComparisonsExample.jpg", //
-maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.renderer.SphereComparisonsExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_SphereComparisonsExample.jpg", //
+    maxHeapMemory = 64)
 public class SphereComparisonsExample extends ExampleBase {
 
-    public static void main(final String[] args) {
-        start(SphereComparisonsExample.class);
+  public static void main(final String[] args) {
+    start(SphereComparisonsExample.class);
+  }
+
+  @Override
+  protected void initExample() {
+    final TextureState ts = new TextureState();
+    ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+        TextureStoreFormat.GuessCompressedFormat, true));
+    _root.setRenderState(ts);
+
+    final Node globesNode = new Node("globes");
+
+    Sphere sphere = new Sphere("Linear mapping", Vector3.ZERO, 65, 65, 1, TextureMode.Linear);
+    globesNode.attachChild(sphere);
+
+    sphere = new Sphere("With mapping", 65, 65, 1);
+    sphere = new Sphere("Projected mapping", Vector3.ZERO, 65, 65, 1, TextureMode.Projected);
+    globesNode.attachChild(sphere);
+
+    GeoSphere geoSphere = new GeoSphere("UV geo sphere - original", true, 2.0, 3, GeoSphere.TextureMode.Original);
+    globesNode.attachChild(geoSphere);
+
+    geoSphere = new GeoSphere("UV geo sphere - projected", true, 2.0, 3, GeoSphere.TextureMode.Projected);
+    globesNode.attachChild(geoSphere);
+
+    sphere = new Sphere("Projected mapping, radius 2", Vector3.ZERO, 65, 65, 2, TextureMode.Projected);
+    globesNode.attachChild(sphere);
+
+    globesNode.setRotation(new Quaternion().fromAngleAxis(-MathUtils.HALF_PI, Vector3.UNIT_X));
+    int startX = -globesNode.getChildren().size() / 2;
+    for (final Spatial s : globesNode.getChildren()) {
+      final Mesh m = (Mesh) s;
+      m.updateModelBound();
+      startX += ((BoundingSphere) m.getModelBound(null)).getRadius() * 2;
+      s.setTranslation(startX, 0, 0);
     }
 
-    @Override
-    protected void initExample() {
-        final TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                TextureStoreFormat.GuessCompressedFormat, true));
-        _root.setRenderState(ts);
-
-        final Node globesNode = new Node("globes");
-
-        Sphere sphere = new Sphere("Linear mapping", Vector3.ZERO, 65, 65, 1, TextureMode.Linear);
-        globesNode.attachChild(sphere);
-
-        sphere = new Sphere("With mapping", 65, 65, 1);
-        sphere = new Sphere("Projected mapping", Vector3.ZERO, 65, 65, 1, TextureMode.Projected);
-        globesNode.attachChild(sphere);
-
-        GeoSphere geoSphere = new GeoSphere("UV geo sphere - original", true, 2.0, 3, GeoSphere.TextureMode.Original);
-        globesNode.attachChild(geoSphere);
-
-        geoSphere = new GeoSphere("UV geo sphere - projected", true, 2.0, 3, GeoSphere.TextureMode.Projected);
-        globesNode.attachChild(geoSphere);
-
-        sphere = new Sphere("Projected mapping, radius 2", Vector3.ZERO, 65, 65, 2, TextureMode.Projected);
-        globesNode.attachChild(sphere);
-
-        globesNode.setRotation(new Quaternion().fromAngleAxis(-MathUtils.HALF_PI, Vector3.UNIT_X));
-        int startX = -globesNode.getChildren().size() / 2;
-        for (final Spatial s : globesNode.getChildren()) {
-            final Mesh m = (Mesh) s;
-            m.updateModelBound();
-            startX += ((BoundingSphere) m.getModelBound(null)).getRadius() * 2;
-            s.setTranslation(startX, 0, 0);
-        }
-
-        _root.attachChild(globesNode);
-        _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 0, 10));
-        _lightState.setEnabled(false);
-    }
+    _root.attachChild(globesNode);
+    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 0, 10));
+    _lightState.setEnabled(false);
+  }
 
 }

@@ -15,35 +15,39 @@ import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.google.common.collect.PeekingIterator;
 
 /**
- * A "do-nothing" implementation of KeyboardWrapper useful when you want to ignore (or do not need) key events.
+ * A "do-nothing" implementation of KeyboardWrapper useful when you want to ignore (or do not need)
+ * key events.
  */
 public class DummyKeyboardWrapper implements KeyboardWrapper {
-    public static final DummyKeyboardWrapper INSTANCE = new DummyKeyboardWrapper();
+  public static final DummyKeyboardWrapper INSTANCE = new DummyKeyboardWrapper();
 
-    PeekingIterator<KeyEvent> empty = new PeekingIterator<KeyEvent>() {
+  PeekingIterator<KeyEvent> empty = new PeekingIterator<>() {
 
-        public boolean hasNext() {
-            return false;
-        }
-
-        public void remove() {
-        }
-
-        public KeyEvent peek() {
-            return null;
-        }
-
-        public KeyEvent next() {
-            return null;
-        }
-    };
-
-    public PeekingIterator<KeyEvent> getKeyEvents() {
-        return empty;
+    @Override
+    public boolean hasNext() {
+      return false;
     }
 
-    public void init() {
-        ; // ignore, does nothing.
+    @Override
+    public void remove() {}
+
+    @Override
+    public KeyEvent peek() {
+      return null;
     }
+
+    @Override
+    public KeyEvent next() {
+      return null;
+    }
+  };
+
+  @Override
+  public PeekingIterator<KeyEvent> getKeyEvents() { return empty; }
+
+  @Override
+  public void init() {
+    // ignore, does nothing.
+  }
 
 }

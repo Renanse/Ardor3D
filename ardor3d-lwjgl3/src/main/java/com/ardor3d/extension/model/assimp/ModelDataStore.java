@@ -20,27 +20,23 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.surface.ColorSurface;
 
 public class ModelDataStore {
-    private Node _scene;
+  private Node _scene;
 
-    public Map<Integer, ColorSurface> materialSurfaces = new HashMap<>();
-    public Map<Integer, Texture> materialDiffuseTexs = new HashMap<>();
-    public Map<Integer, Map<RenderState.StateType, RenderState>> renderStateMap = new HashMap<>();
+  public Map<Integer, ColorSurface> materialSurfaces = new HashMap<>();
+  public Map<Integer, Texture> materialDiffuseTexs = new HashMap<>();
+  public Map<Integer, Map<RenderState.StateType, RenderState>> renderStateMap = new HashMap<>();
 
-    public Node getScene() {
-        return _scene;
+  public Node getScene() { return _scene; }
+
+  public void setScene(final Node scene) { _scene = scene; }
+
+  public void addRenderState(final int materialIndex, final RenderState toAdd) {
+    Map<StateType, RenderState> stateMap = renderStateMap.getOrDefault(materialIndex, null);
+    if (stateMap == null) {
+      stateMap = new HashMap<>();
+      renderStateMap.put(materialIndex, stateMap);
     }
 
-    public void setScene(final Node scene) {
-        _scene = scene;
-    }
-
-    public void addRenderState(final int materialIndex, final RenderState toAdd) {
-        Map<StateType, RenderState> stateMap = renderStateMap.getOrDefault(materialIndex, null);
-        if (stateMap == null) {
-            stateMap = new HashMap<>();
-            renderStateMap.put(materialIndex, stateMap);
-        }
-
-        stateMap.put(toAdd.getType(), toAdd);
-    }
+    stateMap.put(toAdd.getType(), toAdd);
+  }
 }

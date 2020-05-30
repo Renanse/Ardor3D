@@ -17,22 +17,22 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class TextureRecord extends StateRecord {
 
-    public int wrapS, wrapT, wrapR;
-    public int magFilter, minFilter;
-    public int depthTextureCompareFunc, depthTextureCompareMode;
-    public float anisoLevel = -1;
-    public static FloatBuffer colorBuffer = BufferUtils.createColorBuffer(1);
-    public ColorRGBA borderColor = new ColorRGBA(-1, -1, -1, -1);
+  public int wrapS, wrapT, wrapR;
+  public int magFilter, minFilter;
+  public int depthTextureCompareFunc, depthTextureCompareMode;
+  public float anisoLevel = -1;
+  public static FloatBuffer colorBuffer = BufferUtils.createColorBuffer(1);
+  public ColorRGBA borderColor = new ColorRGBA(-1, -1, -1, -1);
 
-    public TextureRecord() {}
+  public TextureRecord() {}
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        wrapS = wrapT = wrapR = 0;
-        magFilter = minFilter = 0;
-        depthTextureCompareFunc = depthTextureCompareMode = 0;
-        anisoLevel = -1;
-        borderColor.set(-1, -1, -1, -1);
-    }
+  @Override
+  public void invalidate() {
+    super.invalidate();
+    wrapS = wrapT = wrapR = 0;
+    magFilter = minFilter = 0;
+    depthTextureCompareFunc = depthTextureCompareMode = 0;
+    anisoLevel = -1;
+    borderColor.set(-1, -1, -1, -1);
+  }
 }

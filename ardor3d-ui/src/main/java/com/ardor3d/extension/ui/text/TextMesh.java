@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -21,17 +21,17 @@ import com.ardor3d.scenegraph.hint.TextureCombineMode;
  */
 public class TextMesh extends Mesh {
 
-    public TextMesh() {
-        super("text");
-        getMeshData().setIndexMode(IndexMode.Triangles);
-        getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+  public TextMesh() {
+    super("text");
+    getMeshData().setIndexMode(IndexMode.Triangles);
+    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
-        // -- never cull
-        setModelBound(null);
-        getSceneHints().setCullHint(CullHint.Never);
+    // -- never cull
+    setModelBound(null);
+    getSceneHints().setCullHint(CullHint.Never);
 
-        // -- default to non-pickable
-        getSceneHints().setAllPickingHints(false);
-    }
+    // -- default to non-pickable
+    getSceneHints().setAllPickingHints(false);
+  }
 }

@@ -18,24 +18,22 @@ import com.ardor3d.math.Rectangle2;
 @Immutable
 public class LongPressGestureEvent extends AbstractGestureEvent {
 
-    public int _touches;
+  public int _touches;
 
-    public LongPressGestureEvent(final Rectangle2 bounds, final int touches) {
-        this(System.nanoTime(), bounds, touches);
-    }
+  public LongPressGestureEvent(final Rectangle2 bounds, final int touches) {
+    this(System.nanoTime(), bounds, touches);
+  }
 
-    public LongPressGestureEvent(final long nanos, final Rectangle2 bounds, final int touches) {
-        super(nanos, false, bounds);
-        _touches = touches;
-    }
+  public LongPressGestureEvent(final long nanos, final Rectangle2 bounds, final int touches) {
+    super(nanos, false, bounds);
+    _touches = touches;
+  }
 
-    public int getTouches() {
-        return _touches;
-    }
+  public int getTouches() { return _touches; }
 
-    @Override
-    public String toString() {
-        return MessageFormat.format("LongPressGestureEvent: touches={0}", _touches);
-    }
+  @Override
+  public String toString() {
+    return MessageFormat.format("LongPressGestureEvent: touches={0}", _touches);
+  }
 
 }

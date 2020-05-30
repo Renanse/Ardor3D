@@ -18,37 +18,39 @@ import com.ardor3d.input.mouse.ButtonState;
 import com.ardor3d.input.mouse.MouseButton;
 
 /**
- * A condition that is true if a given button was pressed when going from the previous input state to the current one.
+ * A condition that is true if a given button was pressed when going from the previous input state
+ * to the current one.
  */
 @Immutable
 public final class MouseButtonPressedCondition implements Predicate<TwoInputStates> {
-    private final MouseButton _button;
+  private final MouseButton _button;
 
-    /**
-     * Construct a new MouseButtonPressedCondition.
-     *
-     * @param button
-     *            the button that should be pressed to trigger this condition
-     * @throws NullPointerException
-     *             if the button is null
-     */
-    public MouseButtonPressedCondition(final MouseButton button) {
-        if (button == null) {
-            throw new NullPointerException();
-        }
-
-        _button = button;
+  /**
+   * Construct a new MouseButtonPressedCondition.
+   *
+   * @param button
+   *          the button that should be pressed to trigger this condition
+   * @throws NullPointerException
+   *           if the button is null
+   */
+  public MouseButtonPressedCondition(final MouseButton button) {
+    if (button == null) {
+      throw new NullPointerException();
     }
 
-    public boolean test(final TwoInputStates states) {
-        final InputState currentState = states.getCurrent();
-        final InputState previousState = states.getPrevious();
+    _button = button;
+  }
 
-        if (currentState == null || previousState == null
-                || !currentState.getMouseState().hasButtonState(ButtonState.DOWN)) {
-            return false;
-        }
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final InputState currentState = states.getCurrent();
+    final InputState previousState = states.getPrevious();
 
-        return currentState.getMouseState().getButtonsPressedSince(previousState.getMouseState()).contains(_button);
+    if (currentState == null || previousState == null
+        || !currentState.getMouseState().hasButtonState(ButtonState.DOWN)) {
+      return false;
     }
+
+    return currentState.getMouseState().getButtonsPressedSince(previousState.getMouseState()).contains(_button);
+  }
 }

@@ -24,83 +24,72 @@ import com.ardor3d.input.mouse.MouseState;
  */
 @Immutable
 public class InputState {
-    public static final InputState LOST_FOCUS = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
-            ControllerState.NOTHING, GestureState.NOTHING, CharacterInputState.NOTHING);
-    public static final InputState EMPTY = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
-            ControllerState.NOTHING, GestureState.NOTHING, CharacterInputState.NOTHING);
+  public static final InputState LOST_FOCUS = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
+      ControllerState.NOTHING, GestureState.NOTHING, CharacterInputState.NOTHING);
+  public static final InputState EMPTY = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
+      ControllerState.NOTHING, GestureState.NOTHING, CharacterInputState.NOTHING);
 
-    private final KeyboardState _keyboardState;
-    private final MouseState _mouseState;
-    private final ControllerState _controllerState;
-    private final GestureState _gestureState;
-    private final CharacterInputState _characterState;
+  private final KeyboardState _keyboardState;
+  private final MouseState _mouseState;
+  private final ControllerState _controllerState;
+  private final GestureState _gestureState;
+  private final CharacterInputState _characterState;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param keyboardState
-     *            a non-null KeyboardState instance
-     * @param mouseState
-     *            a non-null MouseState instance
-     * @param controllerState
-     *            a non-null ControllerState instance
-     * @param gestureState
-     *            a non-null GestureState instance
-     * @param characterState
-     *            a non-null CharacterInputState instance
-     * @throws NullPointerException
-     *             if any parameter is null
-     */
-    public InputState(final KeyboardState keyboardState, final MouseState mouseState,
-            final ControllerState controllerState, final GestureState gestureState,
-            final CharacterInputState characterState) {
-        if (keyboardState == null) {
-            throw new NullPointerException("Keyboard state");
-        }
-
-        if (mouseState == null) {
-            throw new NullPointerException("Mouse state");
-        }
-
-        if (controllerState == null) {
-            throw new NullPointerException("Controller state");
-        }
-
-        if (gestureState == null) {
-            throw new NullPointerException("Gesture state");
-        }
-
-        _keyboardState = keyboardState;
-        _mouseState = mouseState;
-        _controllerState = controllerState;
-        _gestureState = gestureState;
-        _characterState = characterState;
+  /**
+   * Creates a new instance.
+   *
+   * @param keyboardState
+   *          a non-null KeyboardState instance
+   * @param mouseState
+   *          a non-null MouseState instance
+   * @param controllerState
+   *          a non-null ControllerState instance
+   * @param gestureState
+   *          a non-null GestureState instance
+   * @param characterState
+   *          a non-null CharacterInputState instance
+   * @throws NullPointerException
+   *           if any parameter is null
+   */
+  public InputState(final KeyboardState keyboardState, final MouseState mouseState,
+    final ControllerState controllerState, final GestureState gestureState, final CharacterInputState characterState) {
+    if (keyboardState == null) {
+      throw new NullPointerException("Keyboard state");
     }
 
-    public KeyboardState getKeyboardState() {
-        return _keyboardState;
+    if (mouseState == null) {
+      throw new NullPointerException("Mouse state");
     }
 
-    public MouseState getMouseState() {
-        return _mouseState;
+    if (controllerState == null) {
+      throw new NullPointerException("Controller state");
     }
 
-    public ControllerState getControllerState() {
-        return _controllerState;
+    if (gestureState == null) {
+      throw new NullPointerException("Gesture state");
     }
 
-    public GestureState getGestureState() {
-        return _gestureState;
-    }
+    _keyboardState = keyboardState;
+    _mouseState = mouseState;
+    _controllerState = controllerState;
+    _gestureState = gestureState;
+    _characterState = characterState;
+  }
 
-    public CharacterInputState getCharacterState() {
-        return _characterState;
-    }
+  public KeyboardState getKeyboardState() { return _keyboardState; }
 
-    @Override
-    public String toString() {
-        return MessageFormat.format(
-                "InputState[keyboardState={0}, mouseState={1}, controllerState={2}, gestureState={3}, characterState={4}]",
-                _keyboardState, _mouseState, _controllerState, _gestureState, _characterState);
-    }
+  public MouseState getMouseState() { return _mouseState; }
+
+  public ControllerState getControllerState() { return _controllerState; }
+
+  public GestureState getGestureState() { return _gestureState; }
+
+  public CharacterInputState getCharacterState() { return _characterState; }
+
+  @Override
+  public String toString() {
+    return MessageFormat.format(
+        "InputState[keyboardState={0}, mouseState={1}, controllerState={2}, gestureState={3}, characterState={4}]",
+        _keyboardState, _mouseState, _controllerState, _gestureState, _characterState);
+  }
 }

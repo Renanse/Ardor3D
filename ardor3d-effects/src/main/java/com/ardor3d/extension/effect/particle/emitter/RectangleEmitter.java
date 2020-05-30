@@ -19,47 +19,46 @@ import com.ardor3d.util.export.OutputCapsule;
 
 public class RectangleEmitter extends SavableParticleEmitter {
 
-    private Rectangle3 _source;
+  private Rectangle3 _source;
 
-    public RectangleEmitter() {
-        _source = new Rectangle3();
+  public RectangleEmitter() {
+    _source = new Rectangle3();
+  }
+
+  /**
+   * @param source
+   *          the rectangle to use as our source
+   */
+  public RectangleEmitter(final Rectangle3 source) {
+    _source = source;
+  }
+
+  public void setSource(final Rectangle3 source) { _source = source; }
+
+  public Rectangle3 getSource() { return _source; }
+
+  @Override
+  public Vector3 randomEmissionPoint(final Vector3 store) {
+    Vector3 rVal = store;
+    if (rVal == null) {
+      rVal = new Vector3();
     }
 
-    /**
-     * @param source
-     *            the rectangle to use as our source
-     */
-    public RectangleEmitter(final Rectangle3 source) {
-        _source = source;
-    }
+    getSource().random(rVal);
+    return rVal;
+  }
 
-    public void setSource(final Rectangle3 source) {
-        _source = source;
-    }
+  // /////////////////
+  // Methods for Savable
+  // /////////////////
 
-    public Rectangle3 getSource() {
-        return _source;
-    }
+  @Override
+  public void read(final InputCapsule capsule) throws IOException {
+    _source = capsule.readSavable("source", null);
+  }
 
-    public Vector3 randomEmissionPoint(final Vector3 store) {
-        Vector3 rVal = store;
-        if (rVal == null) {
-            rVal = new Vector3();
-        }
-
-        getSource().random(rVal);
-        return rVal;
-    }
-
-    // /////////////////
-    // Methods for Savable
-    // /////////////////
-
-    public void read(final InputCapsule capsule) throws IOException {
-        _source = capsule.readSavable("source", null);
-    }
-
-    public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_source, "source", null);
-    }
+  @Override
+  public void write(final OutputCapsule capsule) throws IOException {
+    capsule.write(_source, "source", null);
+  }
 }

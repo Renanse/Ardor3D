@@ -17,11 +17,11 @@ import org.lwjgl.stb.STBTTPackedchar;
 
 public class StbTtfInfo {
 
-    public STBTTFontinfo info;
-    public STBTTPackedchar.Buffer charData;
-    public float scale;
-    public float descent;
-    public int textureId;
-    public ByteBuffer ttf;
+  public STBTTFontinfo info;
+  public STBTTPackedchar.Buffer charData;
+  public float scale;
+  public float descent;
+  public int textureId;
+  public ByteBuffer ttf;
 
 }

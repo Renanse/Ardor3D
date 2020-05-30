@@ -11,5 +11,5 @@
 package com.ardor3d.renderer.material;
 
 public enum ShaderType {
-    Fragment, Vertex, Geometry, TessellationControl, TessellationEvaluation
+  Fragment, Vertex, Geometry, TessellationControl, TessellationEvaluation
 }

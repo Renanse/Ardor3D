@@ -13,7 +13,7 @@ package com.ardor3d.ui.text;
 import com.ardor3d.math.type.ReadOnlyVector2;
 
 public interface BMTextChangeListener {
-    public void textSizeChanged(BMText text, ReadOnlyVector2 size);
+  void textSizeChanged(BMText text, ReadOnlyVector2 size);
 
-    public void textAlphaChanged(BMText text, float alpha);
+  void textAlphaChanged(BMText text, float alpha);
 }

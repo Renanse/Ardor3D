@@ -14,49 +14,47 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class MockInputStream extends InputStream {
-    private int bytesAvailable = 0;
-    private boolean eof = false;
+  private int bytesAvailable = 0;
+  private boolean eof = false;
 
-    @Override
-    public int read() throws IOException {
-        while (true) {
-            final int result = returnSomething();
+  @Override
+  public int read() throws IOException {
+    while (true) {
+      final int result = returnSomething();
 
-            if (result != 0) {
-                return result;
-            }
+      if (result != 0) {
+        return result;
+      }
 
-            try {
-                Thread.sleep(2);
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+      try {
+        Thread.sleep(2);
+      } catch (final InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
+  private synchronized int returnSomething() {
+    if (eof) {
+      return -1;
     }
 
-    private synchronized int returnSomething() {
-        if (eof) {
-            return -1;
-        }
-
-        if (bytesAvailable > 0) {
-            bytesAvailable--;
-            return 1;
-        }
-
-        return 0;
+    if (bytesAvailable > 0) {
+      bytesAvailable--;
+      return 1;
     }
 
-    @Override
-    public synchronized int available() throws IOException {
-        return bytesAvailable;
-    }
+    return 0;
+  }
 
-    public synchronized void addBytesAvailable(final int bytesAvailable) {
-        this.bytesAvailable += bytesAvailable;
-    }
+  @Override
+  public synchronized int available() throws IOException {
+    return bytesAvailable;
+  }
 
-    public synchronized void setEof(final boolean eof) {
-        this.eof = eof;
-    }
+  public synchronized void addBytesAvailable(final int bytesAvailable) {
+    this.bytesAvailable += bytesAvailable;
+  }
+
+  public synchronized void setEof(final boolean eof) { this.eof = eof; }
 }

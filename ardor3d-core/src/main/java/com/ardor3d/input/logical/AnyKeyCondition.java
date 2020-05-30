@@ -18,10 +18,11 @@ import com.ardor3d.input.InputState;
  * Applicable whenever 'any' key has been pressed.
  */
 public class AnyKeyCondition implements Predicate<TwoInputStates> {
-    public boolean test(final TwoInputStates twoInputStates) {
-        final InputState currentState = twoInputStates.getCurrent();
-        final InputState previousState = twoInputStates.getPrevious();
+  @Override
+  public boolean test(final TwoInputStates twoInputStates) {
+    final InputState currentState = twoInputStates.getCurrent();
+    final InputState previousState = twoInputStates.getPrevious();
 
-        return !currentState.getKeyboardState().getKeysPressedSince(previousState.getKeyboardState()).isEmpty();
-    }
+    return !currentState.getKeyboardState().getKeysPressedSince(previousState.getKeyboardState()).isEmpty();
+  }
 }

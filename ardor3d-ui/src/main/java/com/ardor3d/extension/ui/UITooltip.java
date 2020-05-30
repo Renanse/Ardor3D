@@ -15,30 +15,28 @@ package com.ardor3d.extension.ui;
  */
 public class UITooltip extends UIContainer {
 
-    private final AbstractLabelUIComponent _label;
+  private final AbstractLabelUIComponent _label;
 
-    /**
-     * Construct a new UITooltip.
-     */
-    public UITooltip() {
-        // setup our text label
-        _label = new UILabel("");
-        add(_label);
+  /**
+   * Construct a new UITooltip.
+   */
+  public UITooltip() {
+    // setup our text label
+    _label = new UILabel("");
+    add(_label);
 
-        // initially this is not visible
-        setVisible(false);
-    }
+    // initially this is not visible
+    setVisible(false);
+  }
 
-    /**
-     * @return the label used to display tips.
-     */
-    public AbstractLabelUIComponent getLabel() {
-        return _label;
-    }
+  /**
+   * @return the label used to display tips.
+   */
+  public AbstractLabelUIComponent getLabel() { return _label; }
 
-    @Override
-    public UIComponent getUIComponent(final int hudX, final int hudY) {
-        // We don't want the tool tip to be "pickable", so always return null.
-        return null;
-    }
+  @Override
+  public UIComponent getUIComponent(final int hudX, final int hudY) {
+    // We don't want the tool tip to be "pickable", so always return null.
+    return null;
+  }
 }

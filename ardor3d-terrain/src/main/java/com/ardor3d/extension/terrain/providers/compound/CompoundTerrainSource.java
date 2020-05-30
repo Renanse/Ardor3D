@@ -21,94 +21,88 @@ import com.ardor3d.extension.terrain.util.Tile;
 
 public class CompoundTerrainSource implements TerrainSource {
 
-    protected List<Entry> _sourceList = new ArrayList<>();
-    protected TerrainConfiguration _terrainConfig;
+  protected List<Entry> _sourceList = new ArrayList<>();
+  protected TerrainConfiguration _terrainConfig;
 
-    public CompoundTerrainSource(final TerrainConfiguration config) {
-        _terrainConfig = config;
-    }
+  public CompoundTerrainSource(final TerrainConfiguration config) {
+    _terrainConfig = config;
+  }
 
-    @Override
-    public TerrainConfiguration getConfiguration() throws Exception {
-        return _terrainConfig;
-    }
+  @Override
+  public TerrainConfiguration getConfiguration() throws Exception { return _terrainConfig; }
 
-    public void setTerrainConfig(final TerrainConfiguration config) {
-        _terrainConfig = config;
-    }
+  public void setTerrainConfig(final TerrainConfiguration config) { _terrainConfig = config; }
 
-    public void addEntry(final Entry entry) {
-        _sourceList.add(entry);
-    }
+  public void addEntry(final Entry entry) {
+    _sourceList.add(entry);
+  }
 
-    public List<Entry> getEntries() {
-        return _sourceList;
-    }
+  public List<Entry> getEntries() { return _sourceList; }
 
-    public Entry getEntry(final int index) {
-        return _sourceList.get(index);
-    }
+  public Entry getEntry(final int index) {
+    return _sourceList.get(index);
+  }
 
-    /**
-     * @return the intersection of all non-null sets returned from the sources contained herein.
-     */
-    @Override
-    public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        Set<Tile> set;
-        Set<Tile> rVal = null;
-        for (final Entry src : _sourceList) {
-            set = src.getSource() == null ? null
-                    : src.getSource().getValidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
-            if (set != null) {
-                if (rVal == null) {
-                    rVal = new HashSet<>(set);
-                } else {
-                    rVal.retainAll(set);
-                }
-            }
+  /**
+   * @return the intersection of all non-null sets returned from the sources contained herein.
+   */
+  @Override
+  public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
+      final int numTilesY) throws Exception {
+    Set<Tile> set;
+    Set<Tile> rVal = null;
+    for (final Entry src : _sourceList) {
+      set = src.getSource() == null ? null
+          : src.getSource().getValidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+      if (set != null) {
+        if (rVal == null) {
+          rVal = new HashSet<>(set);
+        } else {
+          rVal.retainAll(set);
         }
-        return rVal;
+      }
     }
+    return rVal;
+  }
 
-    /**
-     * @return the union of all non-null sets returned from the sources contained herein.
-     */
-    @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        Set<Tile> set;
-        Set<Tile> rVal = null;
-        for (final Entry src : _sourceList) {
-            set = src.getSource() == null ? null
-                    : src.getSource().getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
-            if (set != null) {
-                if (rVal == null) {
-                    rVal = new HashSet<>(set);
-                } else {
-                    rVal.addAll(set);
-                }
-            }
+  /**
+   * @return the union of all non-null sets returned from the sources contained herein.
+   */
+  @Override
+  public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
+      final int numTilesY) throws Exception {
+    Set<Tile> set;
+    Set<Tile> rVal = null;
+    for (final Entry src : _sourceList) {
+      set = src.getSource() == null ? null
+          : src.getSource().getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+      if (set != null) {
+        if (rVal == null) {
+          rVal = new HashSet<>(set);
+        } else {
+          rVal.addAll(set);
         }
-        return rVal;
+      }
     }
+    return rVal;
+  }
 
-    @Override
-    public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
-        float[] data = null;
+  @Override
+  public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
+    float[] data = null;
 
-        for (final Entry entry : _sourceList) {
-            if (entry.getSource() != null) {
-                final float[] srcData = entry.getSource().getTile(clipmapLevel, tile);
-                if (entry.getCombine() == null) {
-                    data = srcData;
-                } else {
-                    data = entry.getCombine().apply(data, srcData);
-                }
-            }
+    for (final Entry entry : _sourceList) {
+      if (entry.getSource() != null) {
+        final float[] srcData = entry.getSource().getTile(clipmapLevel, tile);
+        if (entry.getCombine() == null) {
+          data = srcData;
+        } else {
+          data = entry.getCombine().apply(data, srcData);
         }
-
-        return data;
+      }
     }
+
+    return data;
+  }
 
 }

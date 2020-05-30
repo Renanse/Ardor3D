@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -24,32 +24,34 @@ import com.ardor3d.util.export.Savable;
  * Part of the ardor3d XML IO system
  */
 public class XMLExporter implements Ardor3dExporter {
-    public static final String ELEMENT_MAPENTRY = "MapEntry";
-    public static final String ELEMENT_KEY = "Key";
-    public static final String ELEMENT_VALUE = "Value";
-    public static final String ELEMENT_FLOATBUFFER = "FloatBuffer";
-    public static final String ATTRIBUTE_SIZE = "size";
+  public static final String ELEMENT_MAPENTRY = "MapEntry";
+  public static final String ELEMENT_KEY = "Key";
+  public static final String ELEMENT_VALUE = "Value";
+  public static final String ELEMENT_FLOATBUFFER = "FloatBuffer";
+  public static final String ATTRIBUTE_SIZE = "size";
 
-    public XMLExporter() {
+  public XMLExporter() {
 
+  }
+
+  @Override
+  public void save(final Savable object, final OutputStream os) throws IOException {
+    try {
+      // Initialize Document when saving so we don't retain state of previous exports
+      final DOMOutputCapsule _domOut =
+          new DOMOutputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
+      _domOut.write(object, object.getClass().getName(), null);
+      DOM_PrettyPrint.serialize(_domOut.getDoc(), os);
+      os.flush();
+    } catch (final Exception ex) {
+      final IOException e = new IOException();
+      e.initCause(ex);
+      throw e;
     }
+  }
 
-    public void save(final Savable object, final OutputStream os) throws IOException {
-        try {
-            // Initialize Document when saving so we don't retain state of previous exports
-            final DOMOutputCapsule _domOut = new DOMOutputCapsule(DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder().newDocument());
-            _domOut.write(object, object.getClass().getName(), null);
-            DOM_PrettyPrint.serialize(_domOut.getDoc(), os);
-            os.flush();
-        } catch (final Exception ex) {
-            final IOException e = new IOException();
-            e.initCause(ex);
-            throw e;
-        }
-    }
-
-    public void save(final Savable object, final File f) throws IOException {
-        save(object, new FileOutputStream(f));
-    }
+  @Override
+  public void save(final Savable object, final File f) throws IOException {
+    save(object, new FileOutputStream(f));
+  }
 }

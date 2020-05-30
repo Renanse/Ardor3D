@@ -20,24 +20,24 @@ import com.ardor3d.renderer.state.record.ColorMaskStateRecord;
 
 public abstract class Lwjgl3ColorMaskStateUtil {
 
-    public static void apply(final ColorMaskState state) {
-        // ask for the current state record
-        final RenderContext context = ContextManager.getCurrentContext();
-        final ColorMaskStateRecord record = (ColorMaskStateRecord) context.getStateRecord(StateType.ColorMask);
-        context.setCurrentState(StateType.ColorMask, state);
+  public static void apply(final ColorMaskState state) {
+    // ask for the current state record
+    final RenderContext context = ContextManager.getCurrentContext();
+    final ColorMaskStateRecord record = (ColorMaskStateRecord) context.getStateRecord(StateType.ColorMask);
+    context.setCurrentState(StateType.ColorMask, state);
 
-        if (state.isEnabled()) {
-            if (!record.isValid() || !record.is(state.getRed(), state.getGreen(), state.getBlue(), state.getAlpha())) {
-                GL11C.glColorMask(state.getRed(), state.getGreen(), state.getBlue(), state.getAlpha());
-                record.set(state.getRed(), state.getGreen(), state.getBlue(), state.getAlpha());
-            }
-        } else if (!record.isValid() || !record.is(true, true, true, true)) {
-            GL11C.glColorMask(true, true, true, true);
-            record.set(true, true, true, true);
-        }
-
-        if (!record.isValid()) {
-            record.validate();
-        }
+    if (state.isEnabled()) {
+      if (!record.isValid() || !record.is(state.getRed(), state.getGreen(), state.getBlue(), state.getAlpha())) {
+        GL11C.glColorMask(state.getRed(), state.getGreen(), state.getBlue(), state.getAlpha());
+        record.set(state.getRed(), state.getGreen(), state.getBlue(), state.getAlpha());
+      }
+    } else if (!record.isValid() || !record.is(true, true, true, true)) {
+      GL11C.glColorMask(true, true, true, true);
+      record.set(true, true, true, true);
     }
+
+    if (!record.isValid()) {
+      record.validate();
+    }
+  }
 }

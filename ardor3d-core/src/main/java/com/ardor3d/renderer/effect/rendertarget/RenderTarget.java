@@ -23,12 +23,12 @@ import com.ardor3d.scenegraph.Spatial;
 
 public interface RenderTarget {
 
-    void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
-            RenderMaterial enforcedMaterial, EnumMap<StateType, RenderState> enforcedStates);
+  void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
+      RenderMaterial enforcedMaterial, EnumMap<StateType, RenderState> enforcedStates);
 
-    void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
-            RenderMaterial enforcedMaterial, EnumMap<StateType, RenderState> enforcedStates);
+  void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
+      RenderMaterial enforcedMaterial, EnumMap<StateType, RenderState> enforcedStates);
 
-    Texture getTexture();
+  Texture getTexture();
 
 }

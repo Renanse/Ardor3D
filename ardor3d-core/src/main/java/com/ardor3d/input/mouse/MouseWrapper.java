@@ -16,20 +16,20 @@ import com.google.common.collect.PeekingIterator;
  * Defines the API for mouse wrappers.
  */
 public interface MouseWrapper {
-    /**
-     * Allows the mouse wrapper implementation to initialize itself.
-     */
-    public void init();
+  /**
+   * Allows the mouse wrapper implementation to initialize itself.
+   */
+  void init();
 
-    /**
-     * Returns a peeking iterator that allows the client to loop through all mouse events that have not yet been
-     * handled.
-     *
-     * @return an iterator that allows the client to check which events have still not been handled
-     */
-    public PeekingIterator<MouseState> getMouseEvents();
+  /**
+   * Returns a peeking iterator that allows the client to loop through all mouse events that have not
+   * yet been handled.
+   *
+   * @return an iterator that allows the client to check which events have still not been handled
+   */
+  PeekingIterator<MouseState> getMouseEvents();
 
-    public void setIgnoreInput(boolean ignore);
+  void setIgnoreInput(boolean ignore);
 
-    public boolean isIgnoreInput();
+  boolean isIgnoreInput();
 }

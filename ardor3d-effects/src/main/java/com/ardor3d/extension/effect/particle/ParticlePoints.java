@@ -26,119 +26,112 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class ParticlePoints extends ParticleSystem {
 
-    public ParticlePoints() {
+  public ParticlePoints() {}
+
+  public ParticlePoints(final String name, final int numParticles) {
+    super(name, numParticles);
+  }
+
+  @Override
+  protected void initializeParticles(final int numParticles) {
+    Vector2 sharedTextureData[];
+
+    // setup texture coords
+    sharedTextureData = new Vector2[] {new Vector2(0.0, 0.0)};
+
+    final int verts = getVertsForParticleType(getParticleType());
+
+    _geometryCoordinates = BufferUtils.createVector3Buffer(numParticles * verts);
+
+    _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
+    _particles = new Particle[numParticles];
+
+    if (_particleMesh != null) {
+      detachChild(_particleMesh);
+    }
+    _particleMesh = new Point(getName() + "_points", _geometryCoordinates, null, _appearanceColors, null) {
+
+      @Override
+      public void updateWorldTransform(final boolean recurse) {
+        // Do nothing.
+      }
+
+      @Override
+      public void updateWorldBound(final boolean recurse) {
+        super.updateWorldTransform(recurse);
+        super.updateWorldBound(recurse);
+      }
+    };
+    _particleMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles), 0);
+    attachChild(_particleMesh);
+    getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
+    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+
+    for (int k = 0; k < numParticles; k++) {
+      _particles[k] = new Particle(this);
+      _particles[k].init();
+      _particles[k].setStartIndex(k * verts);
+      for (int a = verts - 1; a >= 0; a--) {
+        final int ind = (k * verts) + a;
+        BufferUtils.setInBuffer(sharedTextureData[a],
+            getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer(), ind);
+        BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
+      }
+
+    }
+    updateWorldRenderStates(true);
+    _particleMesh.getSceneHints().setCastsShadows(false);
+  }
+
+  @Override
+  public ParticleType getParticleType() { return ParticleSystem.ParticleType.Point; }
+
+  @Override
+  public void draw(final Renderer r) {
+    final Camera camera = Camera.getCurrentCamera();
+    boolean anyAlive = false;
+    for (int i = 0; i < _particles.length; i++) {
+      final Particle particle = _particles[i];
+      if (particle.getStatus() == Particle.Status.Alive) {
+        particle.updateVerts(camera);
+        anyAlive = true;
+      }
     }
 
-    public ParticlePoints(final String name, final int numParticles) {
-        super(name, numParticles);
+    // Since we've updated our verts, update the model boundary where applicable
+    if (getParticleGeometry().getWorldBound() != null && anyAlive) {
+      getParticleGeometry().updateModelBound();
     }
 
-    @Override
-    protected void initializeParticles(final int numParticles) {
-        Vector2 sharedTextureData[];
-
-        // setup texture coords
-        sharedTextureData = new Vector2[] { new Vector2(0.0, 0.0) };
-
-        final int verts = getVertsForParticleType(getParticleType());
-
-        _geometryCoordinates = BufferUtils.createVector3Buffer(numParticles * verts);
-
-        _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
-        _particles = new Particle[numParticles];
-
-        if (_particleMesh != null) {
-            detachChild(_particleMesh);
-        }
-        _particleMesh = new Point(getName() + "_points", _geometryCoordinates, null, _appearanceColors, null) {
-
-            @Override
-            public void updateWorldTransform(final boolean recurse) {
-                ; // Do nothing.
-            }
-
-            @Override
-            public void updateWorldBound(final boolean recurse) {
-                super.updateWorldTransform(recurse);
-                super.updateWorldBound(recurse);
-            }
-        };
-        _particleMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles), 0);
-        attachChild(_particleMesh);
-        getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
-        getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-
-        for (int k = 0; k < numParticles; k++) {
-            _particles[k] = new Particle(this);
-            _particles[k].init();
-            _particles[k].setStartIndex(k * verts);
-            for (int a = verts - 1; a >= 0; a--) {
-                final int ind = (k * verts) + a;
-                BufferUtils.setInBuffer(sharedTextureData[a],
-                        getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer(), ind);
-                BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
-            }
-
-        }
-        updateWorldRenderStates(true);
-        _particleMesh.getSceneHints().setCastsShadows(false);
+    if (!_particlesInWorldCoords) {
+      getParticleGeometry().setWorldTransform(getWorldTransform());
+    } else {
+      getParticleGeometry().setWorldTranslation(Vector3.ZERO);
+      getParticleGeometry().setWorldRotation(Matrix3.IDENTITY);
+      getParticleGeometry().setWorldScale(getWorldScale());
     }
 
-    @Override
-    public ParticleType getParticleType() {
-        return ParticleSystem.ParticleType.Point;
-    }
+    getParticleGeometry().draw(r);
+  }
 
-    @Override
-    public void draw(final Renderer r) {
-        final Camera camera = Camera.getCurrentCamera();
-        boolean anyAlive = false;
-        for (int i = 0; i < _particles.length; i++) {
-            final Particle particle = _particles[i];
-            if (particle.getStatus() == Particle.Status.Alive) {
-                particle.updateVerts(camera);
-                anyAlive = true;
-            }
-        }
+  /**
+   * @return the pixel size of each point.
+   */
+  public float getPointSize() { return getParticleGeometry().getPointSize(); }
 
-        // Since we've updated our verts, update the model boundary where applicable
-        if (getParticleGeometry().getWorldBound() != null && anyAlive) {
-            getParticleGeometry().updateModelBound();
-        }
+  /**
+   * Sets the pixel width of the points when drawn. Non anti-aliased point sizes are rounded to the
+   * nearest whole number by opengl.
+   *
+   * @param size
+   *          The size to set.
+   */
+  public void setPointSize(final float size) {
+    getParticleGeometry().setPointSize(size);
+  }
 
-        if (!_particlesInWorldCoords) {
-            getParticleGeometry().setWorldTransform(getWorldTransform());
-        } else {
-            getParticleGeometry().setWorldTranslation(Vector3.ZERO);
-            getParticleGeometry().setWorldRotation(Matrix3.IDENTITY);
-            getParticleGeometry().setWorldScale(getWorldScale());
-        }
-
-        getParticleGeometry().draw(r);
-    }
-
-    /**
-     * @return the pixel size of each point.
-     */
-    public float getPointSize() {
-        return getParticleGeometry().getPointSize();
-    }
-
-    /**
-     * Sets the pixel width of the points when drawn. Non anti-aliased point sizes are rounded to the nearest whole
-     * number by opengl.
-     *
-     * @param size
-     *            The size to set.
-     */
-    public void setPointSize(final float size) {
-        getParticleGeometry().setPointSize(size);
-    }
-
-    @Override
-    public Point getParticleGeometry() {
-        return (Point) _particleMesh;
-    }
+  @Override
+  public Point getParticleGeometry() { return (Point) _particleMesh; }
 
 }

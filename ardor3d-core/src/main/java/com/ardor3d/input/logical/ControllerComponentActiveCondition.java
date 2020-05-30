@@ -15,43 +15,44 @@ import java.util.function.Predicate;
 
 public final class ControllerComponentActiveCondition implements Predicate<TwoInputStates> {
 
-    private final String controllerName;
-    private final String[] componentNames;
+  private final String controllerName;
+  private final String[] componentNames;
 
-    public ControllerComponentActiveCondition(final String controller, final String... components) {
-        controllerName = controller;
-        componentNames = components;
+  public ControllerComponentActiveCondition(final String controller, final String... components) {
+    controllerName = controller;
+    componentNames = components;
+  }
+
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final Map<String, Float> currentStates =
+        states.getCurrent().getControllerState().getControllerComponentValues(controllerName);
+    final Map<String, Float> previousStates =
+        states.getPrevious().getControllerState().getControllerComponentValues(controllerName);
+
+    if (currentStates == null) {
+      return false;
     }
 
-    public boolean test(final TwoInputStates states) {
-        final Map<String, Float> currentStates = states.getCurrent().getControllerState()
-                .getControllerComponentValues(controllerName);
-        final Map<String, Float> previousStates = states.getPrevious().getControllerState()
-                .getControllerComponentValues(controllerName);
+    Float prev, curr;
+    for (final String component : componentNames) {
+      curr = currentStates.get(component);
+      if (curr == null) {
+        continue;
+      }
+      if (curr.floatValue() != 0) {
+        return true;
+      }
 
-        if (currentStates == null) {
-            return false;
+      if (previousStates != null) {
+        prev = previousStates.get(component);
+
+        if (prev != null && curr.floatValue() != prev.floatValue()) {
+          return true;
         }
-
-        Float prev, curr;
-        for (final String component : componentNames) {
-            curr = currentStates.get(component);
-            if (curr == null) {
-                continue;
-            }
-            if (curr.floatValue() != 0) {
-                return true;
-            }
-
-            if (previousStates != null) {
-                prev = previousStates.get(component);
-
-                if (prev != null && curr.floatValue() != prev.floatValue()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+      }
     }
+
+    return false;
+  }
 }

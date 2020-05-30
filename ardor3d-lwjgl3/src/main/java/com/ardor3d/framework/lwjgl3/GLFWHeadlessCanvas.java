@@ -15,72 +15,64 @@ import java.util.logging.Logger;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Image;
 import com.ardor3d.util.Ardor3dException;
 
 public class GLFWHeadlessCanvas extends GLFWCanvas {
-    private static final Logger logger = Logger.getLogger(GLFWCanvas.class.getName());
+  private static final Logger logger = Logger.getLogger(GLFWCanvas.class.getName());
 
-    public GLFWHeadlessCanvas(final DisplaySettings settings, final Lwjgl3CanvasRenderer canvasRenderer) {
-    	super(settings, canvasRenderer);
+  public GLFWHeadlessCanvas(final DisplaySettings settings, final Lwjgl3CanvasRenderer canvasRenderer) {
+    super(settings, canvasRenderer);
+  }
+
+  @Override
+  public void init() {
+    if (_inited) {
+      return;
     }
 
-    @Override
-    public void init() {
-        if (_inited) {
-            return;
-        }
+    GLFW.glfwSetErrorCallback(_errorCallback = GLFWErrorCallback.createPrint(System.err));
 
-        GLFW.glfwSetErrorCallback(_errorCallback = GLFWErrorCallback.createPrint(System.err));
-
-        if (!GLFW.glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW");
-        }
-
-        try {
-            setWindowHints();
-            _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
-
-            if (_windowId == 0) {
-                throw new RuntimeException("Failed to create the GLFW window");
-            }
-
-            GLFW.glfwMakeContextCurrent(_windowId);
-            _canvasRenderer.setCanvasCallback(new GLFWCanvasCallback(this::getWindowId));
-
-            updateContentSize();
-
-            GLFW.glfwSetWindowSizeCallback(_windowId, _resizeCallback = new GLFWWindowSizeCallbackI() {
-                @Override
-                public void invoke(final long window, final int width, final int height) {
-                    updateContentSize();
-                }
-            });
-        } catch (final Exception e) {
-            logger.severe("Cannot create window");
-            logger.logp(Level.SEVERE, this.getClass().toString(), "initDisplay()", "Exception", e);
-            throw new Ardor3dException("Cannot create window: " + e.getMessage());
-        }
-
-        _canvasRenderer.init(this, _settings, _doSwap); // true - do swap in renderer.
-        _inited = true;
+    if (!GLFW.glfwInit()) {
+      throw new IllegalStateException("Unable to initialize GLFW");
     }
 
-    @Override
-    public boolean isActive() {
-        return false;
+    try {
+      setWindowHints();
+      _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
+
+      if (_windowId == 0) {
+        throw new RuntimeException("Failed to create the GLFW window");
+      }
+
+      GLFW.glfwMakeContextCurrent(_windowId);
+      _canvasRenderer.setCanvasCallback(new GLFWCanvasCallback(this::getWindowId));
+
+      updateContentSize();
+
+      GLFW.glfwSetWindowSizeCallback(_windowId, _resizeCallback = (window, width, height) -> updateContentSize());
+    } catch (final Exception e) {
+      logger.severe("Cannot create window");
+      logger.logp(Level.SEVERE, this.getClass().toString(), "initDisplay()", "Exception", e);
+      throw new Ardor3dException("Cannot create window: " + e.getMessage());
     }
 
-    @Override
-    public void setTitle(final String title) {}
+    _canvasRenderer.init(this, _settings, _doSwap); // true - do swap in renderer.
+    _inited = true;
+  }
 
-    @Override
-    public void setIcon(final Image[] iconImages) {}
+  @Override
+  public boolean isActive() { return false; }
 
-    @Override
-    public void moveWindowTo(final int locX, final int locY) {}
+  @Override
+  public void setTitle(final String title) {}
+
+  @Override
+  public void setIcon(final Image[] iconImages) {}
+
+  @Override
+  public void moveWindowTo(final int locX, final int locY) {}
 
 }

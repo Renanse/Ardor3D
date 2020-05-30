@@ -17,29 +17,29 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class TextureProjector extends Camera {
 
-    private final static ReadOnlyMatrix4 BIAS = new Matrix4( //
-            0.5, 0.0, 0.0, 0.0, //
-            0.0, 0.5, 0.0, 0.0, //
-            0.0, 0.0, 0.5, 0.0, //
-            0.5, 0.5, 0.5, 1.0);
+  private final static ReadOnlyMatrix4 BIAS = new Matrix4( //
+      0.5, 0.0, 0.0, 0.0, //
+      0.0, 0.5, 0.0, 0.0, //
+      0.0, 0.0, 0.5, 0.0, //
+      0.5, 0.5, 0.5, 1.0);
 
-    public TextureProjector() {
-        super(1, 1);
-    }
+  public TextureProjector() {
+    super(1, 1);
+  }
 
-    public void updateTextureMatrix(final Spatial store, final String key) {
-        Matrix4 texMat = store.getProperty(key, null);
-        if (texMat == null) {
-            texMat = new Matrix4();
-            store.setProperty(key, texMat);
-        }
-        updateTextureMatrix(texMat);
+  public void updateTextureMatrix(final Spatial store, final String key) {
+    Matrix4 texMat = store.getProperty(key, null);
+    if (texMat == null) {
+      texMat = new Matrix4();
+      store.setProperty(key, texMat);
     }
+    updateTextureMatrix(texMat);
+  }
 
-    public void updateTextureMatrix(final Matrix4 matrixStore) {
-        update();
-        final ReadOnlyMatrix4 projectorView = getViewMatrix();
-        final ReadOnlyMatrix4 projectorProjection = getProjectionMatrix();
-        matrixStore.set(projectorView).multiplyLocal(projectorProjection).multiplyLocal(BIAS);
-    }
+  public void updateTextureMatrix(final Matrix4 matrixStore) {
+    update();
+    final ReadOnlyMatrix4 projectorView = getViewMatrix();
+    final ReadOnlyMatrix4 projectorProjection = getProjectionMatrix();
+    matrixStore.set(projectorView).multiplyLocal(projectorProjection).multiplyLocal(BIAS);
+  }
 }

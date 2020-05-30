@@ -20,86 +20,86 @@ import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class ArrayTerrainSource implements TerrainSource {
-    private final int tileSize;
-    private final List<float[]> heightMaps;
-    private final List<Integer> heightMapSizes;
-    private final ReadOnlyVector3 scale;
-    private final float heightMin;
-    private final float heightMax;
+  private final int tileSize;
+  private final List<float[]> heightMaps;
+  private final List<Integer> heightMapSizes;
+  private final ReadOnlyVector3 scale;
+  private final float heightMin;
+  private final float heightMax;
 
-    private final ThreadLocal<float[]> tileDataPool = new ThreadLocal<float[]>() {
-        @Override
-        protected float[] initialValue() {
-            return new float[tileSize * tileSize];
-        }
-    };
-
-    public ArrayTerrainSource(final int tileSize, final List<float[]> heightMaps, final List<Integer> heightMapSizes,
-            final ReadOnlyVector3 scale, final float heightMin, final float heightMax) {
-        this.tileSize = tileSize;
-        this.heightMaps = heightMaps;
-        this.heightMapSizes = heightMapSizes;
-        this.scale = scale;
-        this.heightMin = heightMin;
-        this.heightMax = heightMax;
-    }
-
+  private final ThreadLocal<float[]> tileDataPool = new ThreadLocal<>() {
     @Override
-    public TerrainConfiguration getConfiguration() throws Exception {
-        return new TerrainConfiguration(heightMaps.size(), tileSize, scale, heightMin, heightMax, true);
+    protected float[] initialValue() {
+      return new float[tileSize * tileSize];
     }
+  };
 
-    @Override
-    public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        final Set<Tile> validTiles = new HashSet<>();
+  public ArrayTerrainSource(final int tileSize, final List<float[]> heightMaps, final List<Integer> heightMapSizes,
+    final ReadOnlyVector3 scale, final float heightMin, final float heightMax) {
+    this.tileSize = tileSize;
+    this.heightMaps = heightMaps;
+    this.heightMapSizes = heightMapSizes;
+    this.scale = scale;
+    this.heightMin = heightMin;
+    this.heightMax = heightMax;
+  }
 
-        final int heightMapSize = heightMapSizes.get(clipmapLevel);
-        for (int y = 0; y < numTilesY; y++) {
-            for (int x = 0; x < numTilesX; x++) {
-                final int xx = tileX + x;
-                final int yy = tileY + y;
-                if (xx >= 0 && xx * tileSize <= heightMapSize && yy >= 0 && yy * tileSize <= heightMapSize) {
-                    validTiles.add(new Tile(xx, yy));
-                }
-            }
+  @Override
+  public TerrainConfiguration getConfiguration() throws Exception {
+    return new TerrainConfiguration(heightMaps.size(), tileSize, scale, heightMin, heightMax, true);
+  }
+
+  @Override
+  public Set<Tile> getValidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
+      final int numTilesY) throws Exception {
+    final Set<Tile> validTiles = new HashSet<>();
+
+    final int heightMapSize = heightMapSizes.get(clipmapLevel);
+    for (int y = 0; y < numTilesY; y++) {
+      for (int x = 0; x < numTilesX; x++) {
+        final int xx = tileX + x;
+        final int yy = tileY + y;
+        if (xx >= 0 && xx * tileSize <= heightMapSize && yy >= 0 && yy * tileSize <= heightMapSize) {
+          validTiles.add(new Tile(xx, yy));
         }
-
-        return validTiles;
+      }
     }
 
-    @Override
-    public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
-            final int numTilesY) throws Exception {
-        return null;
+    return validTiles;
+  }
+
+  @Override
+  public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
+      final int numTilesY) throws Exception {
+    return null;
+  }
+
+  @Override
+  public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
+    final int tileX = tile.getX();
+    final int tileY = tile.getY();
+
+    final float[] heightMap = heightMaps.get(clipmapLevel);
+    final int heightMapSize = heightMapSizes.get(clipmapLevel);
+
+    final float[] data = tileDataPool.get();
+    for (int y = 0; y < tileSize; y++) {
+      for (int x = 0; x < tileSize; x++) {
+        final int index = x + y * tileSize;
+
+        final int heightX = tileX * tileSize + x;
+        final int heightY = tileY * tileSize + y;
+        data[index] = getHeight(heightMap, heightMapSize, heightX, heightY);
+      }
+    }
+    return data;
+  }
+
+  private float getHeight(final float[] heightMap, final int heightMapSize, final int x, final int y) {
+    if (x < 0 || x >= heightMapSize || y < 0 || y >= heightMapSize) {
+      return 0;
     }
 
-    @Override
-    public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
-        final int tileX = tile.getX();
-        final int tileY = tile.getY();
-
-        final float[] heightMap = heightMaps.get(clipmapLevel);
-        final int heightMapSize = heightMapSizes.get(clipmapLevel);
-
-        final float[] data = tileDataPool.get();
-        for (int y = 0; y < tileSize; y++) {
-            for (int x = 0; x < tileSize; x++) {
-                final int index = x + y * tileSize;
-
-                final int heightX = tileX * tileSize + x;
-                final int heightY = tileY * tileSize + y;
-                data[index] = getHeight(heightMap, heightMapSize, heightX, heightY);
-            }
-        }
-        return data;
-    }
-
-    private float getHeight(final float[] heightMap, final int heightMapSize, final int x, final int y) {
-        if (x < 0 || x >= heightMapSize || y < 0 || y >= heightMapSize) {
-            return 0;
-        }
-
-        return heightMap[y * heightMapSize + x];
-    }
+    return heightMap[y * heightMapSize + x];
+  }
 }

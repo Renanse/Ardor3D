@@ -16,30 +16,30 @@ import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.math.Rectangle2;
 
 public abstract class AbstractTouchInterpreter {
-    protected final int _touches;
-    protected final String[] _lastArmedIds;
-    protected long _lastArmed;
-    protected final Rectangle2 _lastBounds = new Rectangle2();
+  protected final int _touches;
+  protected final String[] _lastArmedIds;
+  protected long _lastArmed;
+  protected final Rectangle2 _lastBounds = new Rectangle2();
 
-    protected ArmState _state = ArmState.Ready;
+  protected ArmState _state = ArmState.Ready;
 
-    protected enum ArmState {
-        Ready, Armed, Triggered, Unknown
-    }
+  protected enum ArmState {
+    Ready, Armed, Triggered, Unknown
+  }
 
-    protected AbstractTouchInterpreter(final int touches) {
-        _touches = touches;
-        _lastArmedIds = new String[touches];
-    }
+  protected AbstractTouchInterpreter(final int touches) {
+    _touches = touches;
+    _lastArmedIds = new String[touches];
+  }
 
-    public abstract AbstractGestureEvent examine(final List<TouchHistory> touchInfo, int up, int valid);
+  public abstract AbstractGestureEvent examine(final List<TouchHistory> touchInfo, int up, int valid);
 
-    public AbstractGestureEvent update() {
-        return null;
-    }
+  public AbstractGestureEvent update() {
+    return null;
+  }
 
-    public AbstractGestureEvent touchEnd() {
-        return null;
-    }
+  public AbstractGestureEvent touchEnd() {
+    return null;
+  }
 
 }

@@ -16,16 +16,16 @@ import com.google.common.collect.PeekingIterator;
  * Defines the API for keyboard wrappers.
  */
 public interface KeyboardWrapper {
-    /**
-     * Allows the keyboard wrapper implementation to initialise itself.
-     */
-    public void init();
+  /**
+   * Allows the keyboard wrapper implementation to initialise itself.
+   */
+  void init();
 
-    /**
-     * Returns a peeking iterator that allows the client to loop through all keyboard events that have not yet been
-     * handled.
-     *
-     * @return an iterator that allows the client to check which events have still not been handled
-     */
-    public PeekingIterator<KeyEvent> getKeyEvents();
+  /**
+   * Returns a peeking iterator that allows the client to loop through all keyboard events that have
+   * not yet been handled.
+   *
+   * @return an iterator that allows the client to check which events have still not been handled
+   */
+  PeekingIterator<KeyEvent> getKeyEvents();
 }

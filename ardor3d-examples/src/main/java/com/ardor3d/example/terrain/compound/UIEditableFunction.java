@@ -15,5 +15,5 @@ import java.awt.Container;
 import com.ardor3d.extension.terrain.providers.procedural.ProceduralTerrainSource;
 
 public interface UIEditableFunction {
-    void setupFunctionEditPanel(Container parent, ProceduralTerrainSource terrainSource);
+  void setupFunctionEditPanel(Container parent, ProceduralTerrainSource terrainSource);
 }

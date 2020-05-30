@@ -20,56 +20,62 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class SceneTreeModel implements TreeModel {
 
-    private final Node _rootNode;
+  private final Node _rootNode;
 
-    public SceneTreeModel(final Node root) {
-        _rootNode = root;
+  public SceneTreeModel(final Node root) {
+    _rootNode = root;
+  }
+
+  @Override
+  public Object getChild(final Object parent, final int index) {
+    if (parent instanceof UIFrame) {
+      return index == 0 ? ((UIFrame) parent).getContentPanel() : null;
     }
 
-    public Object getChild(final Object parent, final int index) {
-        if (parent instanceof UIFrame) {
-            return index == 0 ? ((UIFrame) parent).getContentPanel() : null;
-        }
-
-        if (parent instanceof Node) {
-            final Node parentNode = (Node) parent;
-            return parentNode.getChild(index);
-        }
-
-        return null;
+    if (parent instanceof Node) {
+      final Node parentNode = (Node) parent;
+      return parentNode.getChild(index);
     }
 
-    public int getChildCount(final Object parent) {
-        if (parent instanceof UIFrame) {
-            return 1;
-        }
+    return null;
+  }
 
-        if (parent instanceof Node) {
-            final Node parentNode = (Node) parent;
-            return parentNode.getNumberOfChildren();
-        }
-        return 0;
+  @Override
+  public int getChildCount(final Object parent) {
+    if (parent instanceof UIFrame) {
+      return 1;
     }
 
-    public int getIndexOfChild(final Object parent, final Object child) {
-        if (parent instanceof Node && child instanceof Spatial) {
-            final Node parentNode = (Node) parent;
-            return parentNode.getChildIndex((Spatial) child);
-        }
-        return 0;
+    if (parent instanceof Node) {
+      final Node parentNode = (Node) parent;
+      return parentNode.getNumberOfChildren();
     }
+    return 0;
+  }
 
-    public Object getRoot() {
-        return _rootNode;
+  @Override
+  public int getIndexOfChild(final Object parent, final Object child) {
+    if (parent instanceof Node && child instanceof Spatial) {
+      final Node parentNode = (Node) parent;
+      return parentNode.getChildIndex((Spatial) child);
     }
+    return 0;
+  }
 
-    public boolean isLeaf(final Object node) {
-        return !(node instanceof Node);
-    }
+  @Override
+  public Object getRoot() { return _rootNode; }
 
-    public void addTreeModelListener(final TreeModelListener l) {}
+  @Override
+  public boolean isLeaf(final Object node) {
+    return !(node instanceof Node);
+  }
 
-    public void removeTreeModelListener(final TreeModelListener l) {}
+  @Override
+  public void addTreeModelListener(final TreeModelListener l) {}
 
-    public void valueForPathChanged(final TreePath path, final Object newValue) {}
+  @Override
+  public void removeTreeModelListener(final TreeModelListener l) {}
+
+  @Override
+  public void valueForPathChanged(final TreePath path, final Object newValue) {}
 }

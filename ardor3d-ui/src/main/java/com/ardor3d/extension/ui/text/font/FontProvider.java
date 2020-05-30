@@ -17,18 +17,18 @@ import com.ardor3d.framework.IDpiScaleProvider;
 
 public interface FontProvider {
 
-    /**
-     * Get the closest font this provider has to the given criteria.
-     *
-     * @param currentStyles
-     *            a map of style information.
-     * @param dpiScaler
-     *            optional dpi scaling utility object. If null is passed, no extra DPI scale is applied.
-     * @param scale
-     *            stores the scale needed to match out requested size.
-     * @return the found font, or null if none is found.
-     */
-    UIFont getClosestMatchingFont(Map<String, Object> currentStyles, IDpiScaleProvider dpiScaler,
-            AtomicReference<Double> scale);
+  /**
+   * Get the closest font this provider has to the given criteria.
+   *
+   * @param currentStyles
+   *          a map of style information.
+   * @param dpiScaler
+   *          optional dpi scaling utility object. If null is passed, no extra DPI scale is applied.
+   * @param scale
+   *          stores the scale needed to match out requested size.
+   * @return the found font, or null if none is found.
+   */
+  UIFont getClosestMatchingFont(Map<String, Object> currentStyles, IDpiScaleProvider dpiScaler,
+      AtomicReference<Double> scale);
 
 }

@@ -18,27 +18,27 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class MinMaxScaleFilter extends UpdateFilterAdapter {
-    protected Vector3 _minScale = new Vector3();
-    protected Vector3 _maxScale = new Vector3();
+  protected Vector3 _minScale = new Vector3();
+  protected Vector3 _maxScale = new Vector3();
 
-    public MinMaxScaleFilter(final double min, final double max) {
-        _minScale.set(min, min, min);
-        _maxScale.set(max, max, max);
-    }
+  public MinMaxScaleFilter(final double min, final double max) {
+    _minScale.set(min, min, min);
+    _maxScale.set(max, max, max);
+  }
 
-    public MinMaxScaleFilter(final ReadOnlyVector3 min, final ReadOnlyVector3 max) {
-        _minScale.set(min);
-        _maxScale.set(max);
-    }
+  public MinMaxScaleFilter(final ReadOnlyVector3 min, final ReadOnlyVector3 max) {
+    _minScale.set(min);
+    _maxScale.set(max);
+  }
 
-    @Override
-    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
-        final SpatialState state = manager.getSpatialState();
-        final ReadOnlyVector3 scale = state.getTransform().getScale();
-        final double x = MathUtils.clamp(scale.getX(), _minScale.getX(), _maxScale.getX());
-        final double y = MathUtils.clamp(scale.getY(), _minScale.getY(), _maxScale.getY());
-        final double z = MathUtils.clamp(scale.getZ(), _minScale.getZ(), _maxScale.getZ());
+  @Override
+  public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
+    final SpatialState state = manager.getSpatialState();
+    final ReadOnlyVector3 scale = state.getTransform().getScale();
+    final double x = MathUtils.clamp(scale.getX(), _minScale.getX(), _maxScale.getX());
+    final double y = MathUtils.clamp(scale.getY(), _minScale.getY(), _maxScale.getY());
+    final double z = MathUtils.clamp(scale.getZ(), _minScale.getZ(), _maxScale.getZ());
 
-        state.getTransform().setScale(x, y, z);
-    }
+    state.getTransform().setScale(x, y, z);
+  }
 }

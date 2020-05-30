@@ -22,20 +22,20 @@ import com.ardor3d.extension.terrain.util.Tile;
  *
  */
 public interface TextureCache {
-    void setCurrentPosition(final int x, final int y);
+  void setCurrentPosition(final int x, final int y);
 
-    int getColor(final int x, final int z);
+  int getColor(final int x, final int z);
 
-    int getSubColor(final float x, final float z);
+  int getSubColor(final float x, final float z);
 
-    void updateRegion(ByteBuffer destinationData, final int sourceX, final int sourceY, final int destX,
-            final int destY, final int width, final int height);
+  void updateRegion(ByteBuffer destinationData, final int sourceX, final int sourceY, final int destX, final int destY,
+      final int width, final int height);
 
-    boolean isValid();
+  boolean isValid();
 
-    void setMailBox(final DoubleBufferedList<Region> mailBox);
+  void setMailBox(final DoubleBufferedList<Region> mailBox);
 
-    Set<Tile> handleUpdateRequests();
+  Set<Tile> handleUpdateRequests();
 
-    void checkForUpdates();
+  void checkForUpdates();
 }

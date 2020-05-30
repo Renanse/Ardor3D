@@ -39,328 +39,326 @@ import com.google.common.collect.PeekingIterator;
  * Mouse wrapper class for use with AWT.
  */
 public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelListener, MouseMotionListener {
-    @GuardedBy("this")
-    protected final LinkedList<MouseState> _upcomingEvents = new LinkedList<>();
+  @GuardedBy("this")
+  protected final LinkedList<MouseState> _upcomingEvents = new LinkedList<>();
 
-    @GuardedBy("this")
-    protected AwtMouseIterator _currentIterator = null;
+  @GuardedBy("this")
+  protected AwtMouseIterator _currentIterator = null;
 
-    @GuardedBy("this")
-    protected MouseState _lastState = null;
+  @GuardedBy("this")
+  protected MouseState _lastState = null;
 
-    protected boolean _consumeEvents = false;
-    protected boolean _ignoreInput;
+  protected boolean _consumeEvents = false;
+  protected boolean _ignoreInput;
 
-    protected final Component _component;
-    protected final Frame _frame;
-    protected final MouseManager _manager;
+  protected final Component _component;
+  protected final Frame _frame;
+  protected final MouseManager _manager;
 
-    protected final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
-    protected final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
-    protected final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
+  protected final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
+  protected final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
+  protected final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
-    protected int _ignoreX = Integer.MAX_VALUE;
-    protected int _ignoreY = Integer.MAX_VALUE;
+  protected int _ignoreX = Integer.MAX_VALUE;
+  protected int _ignoreY = Integer.MAX_VALUE;
 
-    protected boolean _flipY = true;
+  protected boolean _flipY = true;
 
-    public AwtMouseWrapper(final Component component, final MouseManager manager) {
-        _manager = manager;
-        if (component instanceof Frame) {
-            _frame = (Frame) (_component = component);
-        } else {
-            _component = checkNotNull(component, "component");
-            _frame = null;
-        }
-        for (final MouseButton mb : MouseButton.values()) {
-            _lastClickTime.put(mb, 0L);
-        }
+  public AwtMouseWrapper(final Component component, final MouseManager manager) {
+    _manager = manager;
+    if (component instanceof Frame) {
+      _frame = (Frame) (_component = component);
+    } else {
+      _component = checkNotNull(component, "component");
+      _frame = null;
+    }
+    for (final MouseButton mb : MouseButton.values()) {
+      _lastClickTime.put(mb, 0L);
+    }
+  }
+
+  @Override
+  public void init() {
+    _component.addMouseListener(this);
+    _component.addMouseMotionListener(this);
+    _component.addMouseWheelListener(this);
+  }
+
+  @Override
+  public synchronized PeekingIterator<MouseState> getMouseEvents() {
+    expireClickEvents();
+
+    if (_currentIterator == null || !_currentIterator.hasNext()) {
+      _currentIterator = new AwtMouseIterator();
     }
 
-    public void init() {
-        _component.addMouseListener(this);
-        _component.addMouseMotionListener(this);
-        _component.addMouseWheelListener(this);
-    }
+    return _currentIterator;
+  }
 
-    public synchronized PeekingIterator<MouseState> getMouseEvents() {
-        expireClickEvents();
-
-        if (_currentIterator == null || !_currentIterator.hasNext()) {
-            _currentIterator = new AwtMouseIterator();
+  protected void expireClickEvents() {
+    if (!_clicks.isEmpty()) {
+      for (final MouseButton mb : MouseButton.values()) {
+        if (System.currentTimeMillis() - _lastClickTime.get(mb) > MouseState.CLICK_TIME_MS) {
+          _clicks.setCount(mb, 0);
         }
+      }
+    }
+  }
 
-        return _currentIterator;
+  public boolean isFlipY() { return _flipY; }
+
+  public void setFlipY(final boolean flipY) { _flipY = flipY; }
+
+  @Override
+  public synchronized void mousePressed(final MouseEvent e) {
+    if (_ignoreInput) {
+      return;
     }
 
-    protected void expireClickEvents() {
-        if (!_clicks.isEmpty()) {
-            for (final MouseButton mb : MouseButton.values()) {
-                if (System.currentTimeMillis() - _lastClickTime.get(mb) > MouseState.CLICK_TIME_MS) {
-                    _clicks.setCount(mb, 0);
-                }
-            }
-        }
+    final MouseButton b = getButtonForEvent(e);
+    if (_clickArmed.contains(b)) {
+      _clicks.setCount(b, 0);
+    }
+    _clickArmed.add(b);
+    _lastClickTime.put(b, System.currentTimeMillis());
+
+    initState(e);
+    if (_consumeEvents) {
+      e.consume();
     }
 
-    public boolean isFlipY() {
-        return _flipY;
+    final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
+
+    setStateForButton(e, buttons, ButtonState.DOWN);
+
+    addNewState(e, buttons, null);
+  }
+
+  @Override
+  public synchronized void mouseReleased(final MouseEvent e) {
+    if (_ignoreInput) {
+      return;
     }
 
-    public void setFlipY(final boolean flipY) {
-        _flipY = flipY;
+    initState(e);
+    if (_consumeEvents) {
+      e.consume();
     }
 
-    public synchronized void mousePressed(final MouseEvent e) {
-        if (_ignoreInput) {
-            return;
-        }
+    final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
 
-        final MouseButton b = getButtonForEvent(e);
-        if (_clickArmed.contains(b)) {
-            _clicks.setCount(b, 0);
-        }
-        _clickArmed.add(b);
-        _lastClickTime.put(b, System.currentTimeMillis());
+    setStateForButton(e, buttons, ButtonState.UP);
 
-        initState(e);
-        if (_consumeEvents) {
-            e.consume();
-        }
+    final MouseButton b = getButtonForEvent(e);
+    if (_clickArmed.contains(b) && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
+      _clicks.add(b); // increment count of clicks for button b.
+      // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
+      addNewState(e, buttons, EnumMultiset.create(_clicks));
+    } else {
+      _clicks.setCount(b, 0); // clear click count for button b.
+    }
+    _clickArmed.remove(b);
 
-        final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
+    addNewState(e, buttons, null);
+  }
 
-        setStateForButton(e, buttons, ButtonState.DOWN);
+  @Override
+  public synchronized void mouseDragged(final MouseEvent e) {
+    // forward to mouseMoved.
+    mouseMoved(e);
+  }
 
-        addNewState(e, buttons, null);
+  @Override
+  public synchronized void mouseMoved(final MouseEvent e) {
+    if (_ignoreInput) {
+      return;
     }
 
-    public synchronized void mouseReleased(final MouseEvent e) {
-        if (_ignoreInput) {
-            return;
-        }
+    _clickArmed.clear();
+    _clicks.clear();
 
-        initState(e);
-        if (_consumeEvents) {
-            e.consume();
-        }
-
-        final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
-
-        setStateForButton(e, buttons, ButtonState.UP);
-
-        final MouseButton b = getButtonForEvent(e);
-        if (_clickArmed.contains(b)
-                && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
-            _clicks.add(b); // increment count of clicks for button b.
-            // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
-            addNewState(e, buttons, EnumMultiset.create(_clicks));
-        } else {
-            _clicks.setCount(b, 0); // clear click count for button b.
-        }
-        _clickArmed.remove(b);
-
-        addNewState(e, buttons, null);
+    // check that we have a valid _lastState
+    initState(e);
+    if (_consumeEvents) {
+      e.consume();
     }
 
-    public synchronized void mouseDragged(final MouseEvent e) {
-        // forward to mouseMoved.
-        mouseMoved(e);
+    // remember our current ardor3d position
+    final int oldX = _lastState.getX(), oldY = _lastState.getY();
+
+    // check the state against the "ignore next" values
+    if (_ignoreX != Integer.MAX_VALUE // shortcut to prevent dx/dy calculations
+        && (_ignoreX == getDX(e) && _ignoreY == getDY(e))) {
+
+      // we matched, so we'll consider this a "mouse pointer reset move"
+      // so reset ignore to let the next move event through.
+      _ignoreX = Integer.MAX_VALUE;
+      _ignoreY = Integer.MAX_VALUE;
+
+      // exit without adding an event to our queue
+      return;
     }
 
-    public synchronized void mouseMoved(final MouseEvent e) {
-        if (_ignoreInput) {
-            return;
-        }
+    // save our old "last state."
+    final MouseState _savedState = _lastState;
 
-        _clickArmed.clear();
-        _clicks.clear();
+    // Add our latest state info to the queue
+    addNewState(e, _lastState.getButtonStates(), null);
 
-        // check that we have a valid _lastState
-        initState(e);
-        if (_consumeEvents) {
-            e.consume();
-        }
+    // If we have a valid move... should always be the case, but occasionally something slips through.
+    if (_lastState.getDx() != 0 || _lastState.getDy() != 0) {
 
-        // remember our current ardor3d position
-        final int oldX = _lastState.getX(), oldY = _lastState.getY();
+      // Ask our manager if we're currently "captured"
+      if (_manager.getGrabbed() == GrabbedState.GRABBED) {
 
-        // check the state against the "ignore next" values
-        if (_ignoreX != Integer.MAX_VALUE // shortcut to prevent dx/dy calculations
-                && (_ignoreX == getDX(e) && _ignoreY == getDY(e))) {
+        // if so, set "ignore next" to the inverse of this move
+        _ignoreX = -_lastState.getDx();
+        _ignoreY = -_lastState.getDy();
 
-            // we matched, so we'll consider this a "mouse pointer reset move"
-            // so reset ignore to let the next move event through.
-            _ignoreX = Integer.MAX_VALUE;
-            _ignoreY = Integer.MAX_VALUE;
+        // Move us back to our last position.
+        _manager.setPosition(oldX, oldY);
 
-            // exit without adding an event to our queue
-            return;
-        }
+        // And finally, revert our _lastState.
+        _lastState = _savedState;
+      } else {
+        // otherwise, set us to not ignore anything. This may be unnecessary, but prevents any possible
+        // "ignore" bleeding.
+        _ignoreX = Integer.MAX_VALUE;
+        _ignoreY = Integer.MAX_VALUE;
+      }
+    }
+  }
 
-        // save our old "last state."
-        final MouseState _savedState = _lastState;
-
-        // Add our latest state info to the queue
-        addNewState(e, _lastState.getButtonStates(), null);
-
-        // If we have a valid move... should always be the case, but occasionally something slips through.
-        if (_lastState.getDx() != 0 || _lastState.getDy() != 0) {
-
-            // Ask our manager if we're currently "captured"
-            if (_manager.getGrabbed() == GrabbedState.GRABBED) {
-
-                // if so, set "ignore next" to the inverse of this move
-                _ignoreX = -_lastState.getDx();
-                _ignoreY = -_lastState.getDy();
-
-                // Move us back to our last position.
-                _manager.setPosition(oldX, oldY);
-
-                // And finally, revert our _lastState.
-                _lastState = _savedState;
-            } else {
-                // otherwise, set us to not ignore anything. This may be unnecessary, but prevents any possible
-                // "ignore" bleeding.
-                _ignoreX = Integer.MAX_VALUE;
-                _ignoreY = Integer.MAX_VALUE;
-            }
-        }
+  @Override
+  public void mouseWheelMoved(final MouseWheelEvent e) {
+    if (_ignoreInput) {
+      return;
     }
 
-    public void mouseWheelMoved(final MouseWheelEvent e) {
-        if (_ignoreInput) {
-            return;
-        }
+    initState(e);
 
-        initState(e);
-
-        addNewState(e, _lastState.getButtonStates(), null);
-        if (_consumeEvents) {
-            e.consume();
-        }
+    addNewState(e, _lastState.getButtonStates(), null);
+    if (_consumeEvents) {
+      e.consume();
     }
+  }
 
-    protected void initState(final MouseEvent mouseEvent) {
-        if (_lastState == null) {
-            _lastState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), 0, 0, 0, null, null);
-        }
+  protected void initState(final MouseEvent mouseEvent) {
+    if (_lastState == null) {
+      _lastState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), 0, 0, 0, null, null);
     }
+  }
 
-    protected void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
-            final Multiset<MouseButton> clicks) {
-        final MouseState newState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent),
-                getDY(mouseEvent),
-                (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent).getWheelRotation() : 0),
-                enumMap, clicks);
+  protected void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
+      final Multiset<MouseButton> clicks) {
+    final MouseState newState =
+        new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent), getDY(mouseEvent),
+            (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent).getWheelRotation() : 0), enumMap,
+            clicks);
 
-        synchronized (AwtMouseWrapper.this) {
-            _upcomingEvents.add(newState);
-        }
-        _lastState = newState;
+    synchronized (AwtMouseWrapper.this) {
+      _upcomingEvents.add(newState);
     }
+    _lastState = newState;
+  }
 
-    protected int getDX(final MouseEvent e) {
-        return e.getX() - _lastState.getX();
+  protected int getDX(final MouseEvent e) {
+    return e.getX() - _lastState.getX();
+  }
+
+  protected int getDY(final MouseEvent e) {
+    return getArdor3DY(e) - _lastState.getY();
+  }
+
+  /**
+   * @param e
+   *          our mouseEvent
+   * @return the Y coordinate of the event, flipped relative to the component since we expect an
+   *         origin in the lower left corner.
+   */
+  protected int getArdor3DY(final MouseEvent e) {
+    if (_flipY) {
+      final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
+          : _component.getHeight();
+      return height - e.getY();
+    } else {
+      return e.getY();
     }
+  }
 
-    protected int getDY(final MouseEvent e) {
-        return getArdor3DY(e) - _lastState.getY();
+  protected void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
+      final ButtonState buttonState) {
+    final MouseButton button = getButtonForEvent(e);
+    buttons.put(button, buttonState);
+  }
+
+  protected MouseButton getButtonForEvent(final MouseEvent e) {
+    MouseButton button;
+    switch (e.getButton()) {
+      case MouseEvent.BUTTON1:
+        button = MouseButton.LEFT;
+        break;
+      case MouseEvent.BUTTON2:
+        button = MouseButton.MIDDLE;
+        break;
+      case MouseEvent.BUTTON3:
+        button = MouseButton.RIGHT;
+        break;
+      default:
+        throw new RuntimeException("unknown button: " + e.getButton());
     }
+    return button;
+  }
 
-    /**
-     * @param e
-     *            our mouseEvent
-     * @return the Y coordinate of the event, flipped relative to the component since we expect an origin in the lower
-     *         left corner.
-     */
-    protected int getArdor3DY(final MouseEvent e) {
-        if (_flipY) {
-            final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
-                    : _component.getHeight();
-            return height - e.getY();
-        } else {
-            return e.getY();
-        }
-    }
-
-    protected void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
-            final ButtonState buttonState) {
-        final MouseButton button = getButtonForEvent(e);
-        buttons.put(button, buttonState);
-    }
-
-    protected MouseButton getButtonForEvent(final MouseEvent e) {
-        MouseButton button;
-        switch (e.getButton()) {
-            case MouseEvent.BUTTON1:
-                button = MouseButton.LEFT;
-                break;
-            case MouseEvent.BUTTON2:
-                button = MouseButton.MIDDLE;
-                break;
-            case MouseEvent.BUTTON3:
-                button = MouseButton.RIGHT;
-                break;
-            default:
-                throw new RuntimeException("unknown button: " + e.getButton());
-        }
-        return button;
-    }
-
-    protected class AwtMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
-        @Override
-        protected MouseState computeNext() {
-            synchronized (AwtMouseWrapper.this) {
-                if (_upcomingEvents.isEmpty()) {
-                    return endOfData();
-                }
-
-                return _upcomingEvents.poll();
-            }
-
-        }
-    }
-
-    // -- The following interface methods are not used. --
-
-    public synchronized void mouseClicked(final MouseEvent e) {
-        // Yes, we could use the click count here, but in the interests of this working the same way as SWT and Native,
-        // we will do it the same way they do it.
-        if (_consumeEvents) {
-            e.consume();
-        }
-    }
-
-    public synchronized void mouseEntered(final MouseEvent e) {
-        // ignore this
-        if (_consumeEvents) {
-            e.consume();
-        }
-    }
-
-    public synchronized void mouseExited(final MouseEvent e) {
-        // ignore this
-        if (_consumeEvents) {
-            e.consume();
-        }
-    }
-
-    public boolean isConsumeEvents() {
-        return _consumeEvents;
-    }
-
-    public void setConsumeEvents(final boolean consumeEvents) {
-        _consumeEvents = consumeEvents;
-    }
-
+  protected class AwtMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
     @Override
-    public void setIgnoreInput(final boolean ignore) {
-        _ignoreInput = ignore;
-    }
+    protected MouseState computeNext() {
+      synchronized (AwtMouseWrapper.this) {
+        if (_upcomingEvents.isEmpty()) {
+          return endOfData();
+        }
 
-    @Override
-    public boolean isIgnoreInput() {
-        return _ignoreInput;
+        return _upcomingEvents.poll();
+      }
+
     }
+  }
+
+  // -- The following interface methods are not used. --
+
+  @Override
+  public synchronized void mouseClicked(final MouseEvent e) {
+    // Yes, we could use the click count here, but in the interests of this working the same way as SWT
+    // and Native,
+    // we will do it the same way they do it.
+    if (_consumeEvents) {
+      e.consume();
+    }
+  }
+
+  @Override
+  public synchronized void mouseEntered(final MouseEvent e) {
+    // ignore this
+    if (_consumeEvents) {
+      e.consume();
+    }
+  }
+
+  @Override
+  public synchronized void mouseExited(final MouseEvent e) {
+    // ignore this
+    if (_consumeEvents) {
+      e.consume();
+    }
+  }
+
+  public boolean isConsumeEvents() { return _consumeEvents; }
+
+  public void setConsumeEvents(final boolean consumeEvents) { _consumeEvents = consumeEvents; }
+
+  @Override
+  public void setIgnoreInput(final boolean ignore) { _ignoreInput = ignore; }
+
+  @Override
+  public boolean isIgnoreInput() { return _ignoreInput; }
 }

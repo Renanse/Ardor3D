@@ -14,55 +14,45 @@ import com.ardor3d.math.MathUtils;
 
 public class UIIntegerField extends UITextField {
 
-    protected int _minValue = Integer.MIN_VALUE;
-    protected int _maxValue = Integer.MAX_VALUE;
-    protected int _value;
+  protected int _minValue = Integer.MIN_VALUE;
+  protected int _maxValue = Integer.MAX_VALUE;
+  protected int _value;
 
-    @Override
-    protected String validateInputText(final String inputText, final String oldText) {
-        String valText = super.validateInputText(inputText, oldText);
-        if (valText == null) {
-            return null;
-        }
-
-        // remove any non integer items
-        valText = valText.replaceAll("[^\\d-]", "");
-        final boolean neg = valText.charAt(0) == '-';
-        valText = (neg ? "-" : "") + valText.replaceAll("[^\\d]", "");
-        return valText;
+  @Override
+  protected String validateInputText(final String inputText, final String oldText) {
+    String valText = super.validateInputText(inputText, oldText);
+    if (valText == null) {
+      return null;
     }
 
-    public void setValue(final int value) {
-        _value = MathUtils.clamp(value, _minValue, _maxValue);
-        setText(Integer.toString(_value));
-    }
+    // remove any non integer items
+    valText = valText.replaceAll("[^\\d-]", "");
+    final boolean neg = valText.charAt(0) == '-';
+    valText = (neg ? "-" : "") + valText.replaceAll("[^\\d]", "");
+    return valText;
+  }
 
-    public int getValue() {
-        return _value;
-    }
+  public void setValue(final int value) {
+    _value = MathUtils.clamp(value, _minValue, _maxValue);
+    setText(Integer.toString(_value));
+  }
 
-    public void setMinimumValue(final int value) {
-        _minValue = value;
-    }
+  public int getValue() { return _value; }
 
-    public int getMinimumValue() {
-        return _minValue;
-    }
+  public void setMinimumValue(final int value) { _minValue = value; }
 
-    public void setMaximumValue(final int value) {
-        _maxValue = value;
-    }
+  public int getMinimumValue() { return _minValue; }
 
-    public int getMaximumValue() {
-        return _maxValue;
-    }
+  public void setMaximumValue(final int value) { _maxValue = value; }
 
-    @Override
-    public void lostFocus() {
-        // force a clamp to [min, max] range
-        final String text = getText();
-        _value = text == "" ? 0 : MathUtils.clamp(Integer.parseInt(text), _minValue, _maxValue);
+  public int getMaximumValue() { return _maxValue; }
 
-        super.lostFocus();
-    }
+  @Override
+  public void lostFocus() {
+    // force a clamp to [min, max] range
+    final String text = getText();
+    _value = text == "" ? 0 : MathUtils.clamp(Integer.parseInt(text), _minValue, _maxValue);
+
+    super.lostFocus();
+  }
 }

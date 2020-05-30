@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -23,141 +23,107 @@ import com.ardor3d.util.TextureKey;
 
 public class TextureParameter {
 
-    private final Mesh mesh;
-    private final Texture texture;
-    private final int textureIndex;
-    private final int targetTextureIndex;
-    private final TextureKey textureKey;
+  private final Mesh mesh;
+  private final Texture texture;
+  private final int textureIndex;
+  private final int targetTextureIndex;
+  private final TextureKey textureKey;
 
-    private int atlasIndex;
-    private float diffX;
-    private float diffY;
-    private float offsetX;
-    private float offsetY;
+  private int atlasIndex;
+  private float diffX;
+  private float diffY;
+  private float offsetX;
+  private float offsetY;
 
-    public TextureParameter(final Mesh mesh, final int textureIndex, final int targetTextureIndex) {
-        if (mesh == null) {
-            throw new IllegalArgumentException("Mesh is null");
-        }
-
-        this.mesh = mesh;
-        this.textureIndex = textureIndex;
-        this.targetTextureIndex = targetTextureIndex;
-
-        if (mesh.isDirty(DirtyType.RenderState)) {
-            mesh.updateWorldRenderStates(false);
-            mesh.clearDirty(DirtyType.RenderState);
-        }
-
-        final RenderState textureState = mesh.getWorldRenderState(StateType.Texture);
-        if (textureState == null) {
-            throw new Ardor3dException("No texture state found for mesh: " + mesh);
-        }
-
-        texture = ((TextureState) textureState).getTexture(textureIndex);
-        textureKey = texture != null ? texture.getTextureKey() : null;
+  public TextureParameter(final Mesh mesh, final int textureIndex, final int targetTextureIndex) {
+    if (mesh == null) {
+      throw new IllegalArgumentException("Mesh is null");
     }
 
-    public Mesh getMesh() {
-        return mesh;
+    this.mesh = mesh;
+    this.textureIndex = textureIndex;
+    this.targetTextureIndex = targetTextureIndex;
+
+    if (mesh.isDirty(DirtyType.RenderState)) {
+      mesh.updateWorldRenderStates(false);
+      mesh.clearDirty(DirtyType.RenderState);
     }
 
-    public Texture getTexture() {
-        return texture;
+    final RenderState textureState = mesh.getWorldRenderState(StateType.Texture);
+    if (textureState == null) {
+      throw new Ardor3dException("No texture state found for mesh: " + mesh);
     }
 
-    public FloatBuffer getTextureCoords() {
-        return mesh.getMeshData().getTextureBuffer(textureIndex);
-    }
+    texture = ((TextureState) textureState).getTexture(textureIndex);
+    textureKey = texture != null ? texture.getTextureKey() : null;
+  }
 
-    public int getWidth() {
-        return texture.getImage().getWidth();
-    }
+  public Mesh getMesh() { return mesh; }
 
-    public int getHeight() {
-        return texture.getImage().getHeight();
-    }
+  public Texture getTexture() { return texture; }
 
-    public void setAtlasIndex(final int atlasIndex) {
-        this.atlasIndex = atlasIndex;
-    }
+  public FloatBuffer getTextureCoords() { return mesh.getMeshData().getTextureBuffer(textureIndex); }
 
-    public int getAtlasIndex() {
-        return atlasIndex;
-    }
+  public int getWidth() { return texture.getImage().getWidth(); }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (textureKey == null ? 0 : textureKey.hashCode());
-        return result;
-    }
+  public int getHeight() { return texture.getImage().getHeight(); }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof TextureParameter)) {
-            return false;
-        }
-        final TextureParameter other = (TextureParameter) obj;
-        if (textureKey == null) {
-            if (other.textureKey != null) {
-                return false;
-            }
-        } else if (!textureKey.equals(other.textureKey)) {
-            return false;
-        }
-        return true;
-    }
+  public void setAtlasIndex(final int atlasIndex) { this.atlasIndex = atlasIndex; }
 
-    public int getTargetTextureIndex() {
-        return targetTextureIndex;
-    }
+  public int getAtlasIndex() { return atlasIndex; }
 
-    public float getDiffX() {
-        return diffX;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (textureKey == null ? 0 : textureKey.hashCode());
+    return result;
+  }
 
-    public void setDiffX(final float diffX) {
-        this.diffX = diffX;
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
     }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof TextureParameter)) {
+      return false;
+    }
+    final TextureParameter other = (TextureParameter) obj;
+    if (textureKey == null) {
+      if (other.textureKey != null) {
+        return false;
+      }
+    } else if (!textureKey.equals(other.textureKey)) {
+      return false;
+    }
+    return true;
+  }
 
-    public float getDiffY() {
-        return diffY;
-    }
+  public int getTargetTextureIndex() { return targetTextureIndex; }
 
-    public void setDiffY(final float diffY) {
-        this.diffY = diffY;
-    }
+  public float getDiffX() { return diffX; }
 
-    public float getOffsetX() {
-        return offsetX;
-    }
+  public void setDiffX(final float diffX) { this.diffX = diffX; }
 
-    public void setOffsetX(final float offsetX) {
-        this.offsetX = offsetX;
-    }
+  public float getDiffY() { return diffY; }
 
-    public float getOffsetY() {
-        return offsetY;
-    }
+  public void setDiffY(final float diffY) { this.diffY = diffY; }
 
-    public void setOffsetY(final float offsetY) {
-        this.offsetY = offsetY;
-    }
+  public float getOffsetX() { return offsetX; }
 
-    public int getTextureIndex() {
-        return textureIndex;
-    }
+  public void setOffsetX(final float offsetX) { this.offsetX = offsetX; }
 
-    @Override
-    public String toString() {
-        return "TextureParameter [mesh=" + mesh + ", textureIndex=" + textureIndex + "]";
-    }
+  public float getOffsetY() { return offsetY; }
+
+  public void setOffsetY(final float offsetY) { this.offsetY = offsetY; }
+
+  public int getTextureIndex() { return textureIndex; }
+
+  @Override
+  public String toString() {
+    return "TextureParameter [mesh=" + mesh + ", textureIndex=" + textureIndex + "]";
+  }
 }

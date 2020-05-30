@@ -20,53 +20,47 @@ import com.ardor3d.input.mouse.MouseManager;
 
 public class GLFWMouseManager implements MouseManager {
 
-    private final GLFWCanvas _canvas;
+  private final GLFWCanvas _canvas;
 
-    private GrabbedState _grabbedState;
+  private GrabbedState _grabbedState;
 
-    public GLFWMouseManager(final GLFWCanvas canvas) {
-        _canvas = canvas;
+  public GLFWMouseManager(final GLFWCanvas canvas) {
+    _canvas = canvas;
+  }
+
+  @Override
+  public void setCursor(final MouseCursor cursor) {
+    if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
+      GLFW.glfwSetCursor(_canvas.getWindowId(), 0);
+      return;
     }
 
-    @Override
-    public void setCursor(final MouseCursor cursor) {
-        if (cursor == MouseCursor.SYSTEM_DEFAULT || cursor == null) {
-            GLFW.glfwSetCursor(_canvas.getWindowId(), 0);
-            return;
-        }
+    final GLFWImage glfwImage = GLFWImage.create();
+    glfwImage.set(cursor.getWidth(), cursor.getHeight(), cursor.getImage().getData(0));
 
-        final GLFWImage glfwImage = GLFWImage.create();
-        glfwImage.set(cursor.getWidth(), cursor.getHeight(), cursor.getImage().getData(0));
+    final long cptr = GLFW.glfwCreateCursor(glfwImage, cursor.getHotspotX(), cursor.getHotspotY());
+    GLFW.glfwSetCursor(_canvas.getWindowId(), cptr);
+  }
 
-        final long cptr = GLFW.glfwCreateCursor(glfwImage, cursor.getHotspotX(), cursor.getHotspotY());
-        GLFW.glfwSetCursor(_canvas.getWindowId(), cptr);
-    }
+  @Override
+  public void setPosition(final int x, final int y) {
+    GLFW.glfwSetCursorPos(_canvas.getWindowId(), x, _canvas.getContentHeight() - y);
+  }
 
-    @Override
-    public void setPosition(final int x, final int y) {
-        GLFW.glfwSetCursorPos(_canvas.getWindowId(), x, _canvas.getContentHeight() - y);
-    }
+  @Override
+  public boolean isSetPositionSupported() { return true; }
 
-    @Override
-    public boolean isSetPositionSupported() {
-        return true;
-    }
+  @Override
+  public void setGrabbed(final GrabbedState grabbedState) {
+    _grabbedState = grabbedState;
+    GLFW.glfwSetInputMode(_canvas.getWindowId(), GLFW.GLFW_CURSOR,
+        grabbedState == GrabbedState.GRABBED ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
+  }
 
-    @Override
-    public void setGrabbed(final GrabbedState grabbedState) {
-        _grabbedState = grabbedState;
-        GLFW.glfwSetInputMode(_canvas.getWindowId(), GLFW.GLFW_CURSOR,
-                grabbedState == GrabbedState.GRABBED ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
-    }
+  @Override
+  public GrabbedState getGrabbed() { return _grabbedState; }
 
-    @Override
-    public GrabbedState getGrabbed() {
-        return _grabbedState;
-    }
-
-    @Override
-    public boolean isSetGrabbedSupported() {
-        return true;
-    }
+  @Override
+  public boolean isSetGrabbedSupported() { return true; }
 
 }

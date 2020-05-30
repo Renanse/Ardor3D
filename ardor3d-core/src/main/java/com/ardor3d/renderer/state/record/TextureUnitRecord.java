@@ -14,16 +14,16 @@ package com.ardor3d.renderer.state.record;
  * Represents a texture unit in opengl
  */
 public class TextureUnitRecord extends StateRecord {
-    public int boundTexture = -1;
-    public float lodBias = 0f;
+  public int boundTexture = -1;
+  public float lodBias = 0f;
 
-    public TextureUnitRecord() {}
+  public TextureUnitRecord() {}
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
+  @Override
+  public void invalidate() {
+    super.invalidate();
 
-        boundTexture = -1;
-        lodBias = 0;
-    }
+    boundTexture = -1;
+    lodBias = 0;
+  }
 }

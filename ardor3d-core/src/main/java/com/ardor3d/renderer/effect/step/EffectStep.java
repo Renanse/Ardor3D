@@ -17,11 +17,11 @@ import com.ardor3d.renderer.effect.EffectManager;
  */
 public interface EffectStep {
 
-    /**
-     * Apply this step.
-     *
-     * @param manager
-     */
-    public void apply(final EffectManager manager);
+  /**
+   * Apply this step.
+   *
+   * @param manager
+   */
+  void apply(final EffectManager manager);
 
 }

@@ -15,17 +15,17 @@ import com.google.common.collect.PeekingIterator;
 
 public interface GestureWrapper {
 
-    /**
-     * Allows the gesture wrapper implementation to initialize itself.
-     */
-    public void init();
+  /**
+   * Allows the gesture wrapper implementation to initialize itself.
+   */
+  void init();
 
-    /**
-     * Returns a peeking iterator that allows the client to loop through all gesture events that have not yet been
-     * handled.
-     *
-     * @return an iterator that allows the client to check which events have still not been handled
-     */
-    public PeekingIterator<AbstractGestureEvent> getGestureEvents();
+  /**
+   * Returns a peeking iterator that allows the client to loop through all gesture events that have
+   * not yet been handled.
+   *
+   * @return an iterator that allows the client to check which events have still not been handled
+   */
+  PeekingIterator<AbstractGestureEvent> getGestureEvents();
 
 }

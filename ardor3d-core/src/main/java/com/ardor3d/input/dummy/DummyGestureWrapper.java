@@ -16,30 +16,34 @@ import com.google.common.collect.PeekingIterator;
 
 public class DummyGestureWrapper implements GestureWrapper {
 
-    public static final DummyGestureWrapper INSTANCE = new DummyGestureWrapper();
+  public static final DummyGestureWrapper INSTANCE = new DummyGestureWrapper();
 
-    PeekingIterator<AbstractGestureEvent> empty = new PeekingIterator<AbstractGestureEvent>() {
-        public boolean hasNext() {
-            return false;
-        }
-
-        public void remove() {}
-
-        public AbstractGestureEvent peek() {
-            return null;
-        }
-
-        public AbstractGestureEvent next() {
-            return null;
-        }
-    };
-
-    public PeekingIterator<AbstractGestureEvent> getGestureEvents() {
-        return empty;
+  PeekingIterator<AbstractGestureEvent> empty = new PeekingIterator<>() {
+    @Override
+    public boolean hasNext() {
+      return false;
     }
 
-    public void init() {
-        ; // ignore, does nothing
+    @Override
+    public void remove() {}
+
+    @Override
+    public AbstractGestureEvent peek() {
+      return null;
     }
+
+    @Override
+    public AbstractGestureEvent next() {
+      return null;
+    }
+  };
+
+  @Override
+  public PeekingIterator<AbstractGestureEvent> getGestureEvents() { return empty; }
+
+  @Override
+  public void init() {
+    // ignore, does nothing
+  }
 
 }

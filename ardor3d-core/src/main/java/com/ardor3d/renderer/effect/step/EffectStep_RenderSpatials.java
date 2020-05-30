@@ -22,47 +22,38 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
 
 public class EffectStep_RenderSpatials implements EffectStep {
-    private final EnumMap<StateType, RenderState> _states = new EnumMap<>(StateType.class);
-    private RenderMaterial _enforcedMaterial;
-    private final List<Spatial> _spatials = new ArrayList<>();
-    private final Camera _trackedCamera;
+  private final EnumMap<StateType, RenderState> _states = new EnumMap<>(StateType.class);
+  private RenderMaterial _enforcedMaterial;
+  private final List<Spatial> _spatials = new ArrayList<>();
+  private final Camera _trackedCamera;
 
-    public EffectStep_RenderSpatials(final Camera trackedCamera) {
-        _trackedCamera = trackedCamera;
-    }
+  public EffectStep_RenderSpatials(final Camera trackedCamera) {
+    _trackedCamera = trackedCamera;
+  }
 
-    @Override
-    public void apply(final EffectManager manager) {
-        manager.getCurrentRenderTarget().render(manager,
-                _trackedCamera != null ? _trackedCamera : manager.getSceneCamera(), _spatials, _enforcedMaterial,
-                _states);
-    }
+  @Override
+  public void apply(final EffectManager manager) {
+    manager.getCurrentRenderTarget().render(manager, _trackedCamera != null ? _trackedCamera : manager.getSceneCamera(),
+        _spatials, _enforcedMaterial, _states);
+  }
 
-    public void addSpatial(final Spatial spat) {
-        _spatials.add(spat);
-    }
+  public void addSpatial(final Spatial spat) {
+    _spatials.add(spat);
+  }
 
-    public List<Spatial> getSpatials() {
-        return _spatials;
-    }
+  public List<Spatial> getSpatials() { return _spatials; }
 
-    public void setEnforcedState(final RenderState state) {
-        _states.put(state.getType(), state);
-    }
+  public void setEnforcedState(final RenderState state) {
+    _states.put(state.getType(), state);
+  }
 
-    public void clearEnforcedState(final StateType type) {
-        _states.remove(type);
-    }
+  public void clearEnforcedState(final StateType type) {
+    _states.remove(type);
+  }
 
-    public EnumMap<StateType, RenderState> getEnforcedStates() {
-        return _states;
-    }
+  public EnumMap<StateType, RenderState> getEnforcedStates() { return _states; }
 
-    public void setEnforcedMaterial(final RenderMaterial enforcedMaterial) {
-        _enforcedMaterial = enforcedMaterial;
-    }
+  public void setEnforcedMaterial(final RenderMaterial enforcedMaterial) { _enforcedMaterial = enforcedMaterial; }
 
-    public RenderMaterial getEnforcedMaterial() {
-        return _enforcedMaterial;
-    }
+  public RenderMaterial getEnforcedMaterial() { return _enforcedMaterial; }
 }

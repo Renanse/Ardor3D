@@ -20,27 +20,28 @@ import com.ardor3d.util.MaterialUtil;
 /**
  * Simplest example of loading a Wavefront OBJ model using Assimp.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleAssimpExample", //
-        thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleAssimpExample.jpg", //
-        maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleAssimpExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleAssimpExample.jpg", //
+    maxHeapMemory = 64)
 public class SimpleAssimpExample extends ExampleBase {
-    public static void main(final String[] args) {
-        ExampleBase.start(SimpleAssimpExample.class);
-    }
+  public static void main(final String[] args) {
+    ExampleBase.start(SimpleAssimpExample.class);
+  }
 
-    @Override
-    protected void initExample() {
-        _canvas.setTitle("Ardor3D - Simple Assimp Obj Example");
-        _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 5, 20));
+  @Override
+  protected void initExample() {
+    _canvas.setTitle("Ardor3D - Simple Assimp Obj Example");
+    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 5, 20));
 
-        // Load the scene
-        final long time = System.currentTimeMillis();
-        final AssimpModelImporter importer = new AssimpModelImporter();
-        final ModelDataStore storage = importer.load("obj/pitcher.obj");
-        System.out.println("Importing Took " + (System.currentTimeMillis() - time) + " ms");
+    // Load the scene
+    final long time = System.currentTimeMillis();
+    final AssimpModelImporter importer = new AssimpModelImporter();
+    final ModelDataStore storage = importer.load("obj/pitcher.obj");
+    System.out.println("Importing Took " + (System.currentTimeMillis() - time) + " ms");
 
-        _root.attachChild(storage.getScene());
-        _root.updateWorldRenderStates(true);
-        MaterialUtil.autoMaterials(_root);
-    }
+    _root.attachChild(storage.getScene());
+    _root.updateWorldRenderStates(true);
+    MaterialUtil.autoMaterials(_root);
+  }
 }

@@ -27,87 +27,85 @@ import com.ardor3d.renderer.state.BlendState.SourceFunction;
  */
 public class SolidBackdrop extends UIBackdrop {
 
-    /** The color to draw */
-    private final ColorRGBA _color = new ColorRGBA(ColorRGBA.GRAY);
-    /** The quad used across all solid backdrops to render with. */
-    private static UIQuad _standin = SolidBackdrop.createStandinQuad();
-    static {
-        SolidBackdrop._standin.setRenderMaterial("ui/untextured/default_color.yaml");
+  /** The color to draw */
+  private final ColorRGBA _color = new ColorRGBA(ColorRGBA.GRAY);
+  /** The quad used across all solid backdrops to render with. */
+  private static UIQuad _standin = SolidBackdrop.createStandinQuad();
+  static {
+    SolidBackdrop._standin.setRenderMaterial("ui/untextured/default_color.yaml");
+  }
+
+  /**
+   * Construct this backdrop, using the given color.
+   *
+   * @param color
+   *          the color of the backdrop
+   */
+  public SolidBackdrop(final ReadOnlyColorRGBA color) {
+    setColor(color);
+  }
+
+  /**
+   * @return the color of this back drop.
+   */
+  public ReadOnlyColorRGBA getColor() { return _color; }
+
+  /**
+   * Set the color of this back drop.
+   *
+   * @param color
+   *          the color to use
+   */
+  public void setColor(final ReadOnlyColorRGBA color) {
+    if (color != null) {
+      _color.set(color);
+    }
+  }
+
+  @Override
+  public void draw(final Renderer renderer, final UIComponent comp) {
+
+    final float oldA = _color.getAlpha();
+    if (oldA == 0) {
+      // no need to draw.
+      return;
     }
 
-    /**
-     * Construct this backdrop, using the given color.
-     *
-     * @param color
-     *            the color of the backdrop
-     */
-    public SolidBackdrop(final ReadOnlyColorRGBA color) {
-        setColor(color);
-    }
+    _color.setAlpha(oldA * UIComponent.getCurrentOpacity());
+    SolidBackdrop._standin.setDefaultColor(_color);
 
-    /**
-     * @return the color of this back drop.
-     */
-    public ReadOnlyColorRGBA getColor() {
-        return _color;
-    }
+    final Vector3 v = Vector3.fetchTempInstance();
+    final Insets margin = comp.getMargin() != null ? comp.getMargin() : Insets.EMPTY;
+    final Insets border = comp.getBorder() != null ? comp.getBorder() : Insets.EMPTY;
+    v.set(margin.getLeft() + border.getLeft(), margin.getBottom() + border.getBottom(), 0);
 
-    /**
-     * Set the color of this back drop.
-     *
-     * @param color
-     *            the color to use
-     */
-    public void setColor(final ReadOnlyColorRGBA color) {
-        if (color != null) {
-            _color.set(color);
-        }
-    }
+    final Transform t = Transform.fetchTempInstance();
+    t.set(comp.getWorldTransform());
+    t.applyForwardVector(v);
+    t.translate(v);
+    Vector3.releaseTempInstance(v);
 
-    @Override
-    public void draw(final Renderer renderer, final UIComponent comp) {
+    SolidBackdrop._standin.setWorldTransform(t);
+    Transform.releaseTempInstance(t);
 
-        final float oldA = _color.getAlpha();
-        if (oldA == 0) {
-            // no need to draw.
-            return;
-        }
+    final float width = UIBackdrop.getBackdropWidth(comp);
+    final float height = UIBackdrop.getBackdropHeight(comp);
+    SolidBackdrop._standin.resize(width, height);
+    SolidBackdrop._standin.render(renderer);
 
-        _color.setAlpha(oldA * UIComponent.getCurrentOpacity());
-        SolidBackdrop._standin.setDefaultColor(_color);
+    _color.setAlpha(oldA);
+  }
 
-        final Vector3 v = Vector3.fetchTempInstance();
-        final Insets margin = comp.getMargin() != null ? comp.getMargin() : Insets.EMPTY;
-        final Insets border = comp.getBorder() != null ? comp.getBorder() : Insets.EMPTY;
-        v.set(margin.getLeft() + border.getLeft(), margin.getBottom() + border.getBottom(), 0);
+  private static UIQuad createStandinQuad() {
+    final UIQuad quad = new UIQuad("standin", 1, 1);
 
-        final Transform t = Transform.fetchTempInstance();
-        t.set(comp.getWorldTransform());
-        t.applyForwardVector(v);
-        t.translate(v);
-        Vector3.releaseTempInstance(v);
+    final BlendState blend = new BlendState();
+    blend.setBlendEnabled(true);
+    blend.setSourceFunction(SourceFunction.SourceAlpha);
+    blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
+    quad.setRenderState(blend);
+    quad.updateWorldRenderStates(false);
 
-        SolidBackdrop._standin.setWorldTransform(t);
-        Transform.releaseTempInstance(t);
-
-        final float width = UIBackdrop.getBackdropWidth(comp);
-        final float height = UIBackdrop.getBackdropHeight(comp);
-        SolidBackdrop._standin.resize(width, height);
-        SolidBackdrop._standin.render(renderer);
-
-        _color.setAlpha(oldA);
-    }
-
-    private static UIQuad createStandinQuad() {
-        final UIQuad quad = new UIQuad("standin", 1, 1);
-
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        blend.setSourceFunction(SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
-        quad.setRenderState(blend);
-        quad.updateWorldRenderStates(false);
-
-        return quad;
-    }
+    return quad;
+  }
 }

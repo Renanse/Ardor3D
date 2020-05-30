@@ -16,30 +16,28 @@ import com.ardor3d.extension.ui.util.SubTex;
 
 public class BallComponent extends UILabel {
 
-    private final Ball _ball;
-    private final int _areaWidth;
-    private final int _areaHeight;
+  private final Ball _ball;
+  private final int _areaWidth;
+  private final int _areaHeight;
 
-    public BallComponent(final String name, final SubTex tex, final int width, final int height, final int areaWidth,
-            final int areaHeight) {
-        super("", tex);
-        setName(name);
-        setIconDimensions(new Dimension(width, height));
-        _areaWidth = areaWidth;
-        _areaHeight = areaHeight;
-        _ball = new Ball();
-        _ball.setRandomPositionIn(_areaWidth, _areaHeight);
-        setLocalXY((int) _ball._x, (int) _ball._y);
-    }
+  public BallComponent(final String name, final SubTex tex, final int width, final int height, final int areaWidth,
+    final int areaHeight) {
+    super("", tex);
+    setName(name);
+    setIconDimensions(new Dimension(width, height));
+    _areaWidth = areaWidth;
+    _areaHeight = areaHeight;
+    _ball = new Ball();
+    _ball.setRandomPositionIn(_areaWidth, _areaHeight);
+    setLocalXY((int) _ball._x, (int) _ball._y);
+  }
 
-    @Override
-    public void updateGeometricState(final double time, final boolean initiator) {
-        super.updateGeometricState(time, initiator);
-        _ball.move(_areaWidth, _areaHeight, time);
-        setLocalXY((int) _ball._x, (int) _ball._y);
-    }
+  @Override
+  public void updateGeometricState(final double time, final boolean initiator) {
+    super.updateGeometricState(time, initiator);
+    _ball.move(_areaWidth, _areaHeight, time);
+    setLocalXY((int) _ball._x, (int) _ball._y);
+  }
 
-    public Ball getBall() {
-        return _ball;
-    }
+  public Ball getBall() { return _ball; }
 }

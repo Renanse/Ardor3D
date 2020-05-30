@@ -33,185 +33,174 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class ParticleMesh extends ParticleSystem {
 
-    private boolean _useMeshTexCoords = true;
-    private boolean _useTriangleNormalEmit = true;
+  private boolean _useMeshTexCoords = true;
+  private boolean _useTriangleNormalEmit = true;
 
-    public ParticleMesh() {}
+  public ParticleMesh() {}
 
-    public ParticleMesh(final String name, final int numParticles) {
-        super(name, numParticles);
-        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-        getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+  public ParticleMesh(final String name, final int numParticles) {
+    super(name, numParticles);
+    getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+  }
+
+  public ParticleMesh(final String name, final int numParticles, final ParticleSystem.ParticleType type) {
+    super(name, numParticles, type);
+    getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+  }
+
+  public ParticleMesh(final String name, final Mesh sourceMesh) {
+    super(name, 0, ParticleSystem.ParticleType.GeomMesh);
+    _numParticles = sourceMesh.getMeshData().getTotalPrimitiveCount();
+    setParticleEmitter(new MeshEmitter(sourceMesh, false));
+    getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+    initializeParticles(_numParticles);
+  }
+
+  @Override
+  protected void initializeParticles(final int numParticles) {
+    setRenderMaterial("particles/particle_mesh.yaml");
+
+    if (_particleMesh != null) {
+      detachChild(_particleMesh);
+    }
+    final Mesh mesh = new Mesh(getName() + "_mesh") {
+
+      @Override
+      public void updateWorldTransform(final boolean recurse) {
+        // Do nothing.
+      }
+
+      @Override
+      public void updateWorldBound(final boolean recurse) {
+        super.updateWorldTransform(recurse);
+        super.updateWorldBound(recurse);
+      }
+    };
+    _particleMesh = mesh;
+    attachChild(mesh);
+    _particles = new Particle[numParticles];
+    if (numParticles == 0) {
+      return;
+    }
+    Vector2 sharedTextureData[];
+
+    // setup texture coords and index mode
+    final MeshData meshData = mesh.getMeshData();
+    switch (getParticleType()) {
+      case GeomMesh:
+      case Triangle:
+        sharedTextureData = new Vector2[] {new Vector2(2.0, 0.0), new Vector2(0.0, 2.0), new Vector2(0.0, 0.0)};
+        meshData.setIndexMode(IndexMode.Triangles);
+        break;
+      default:
+        throw new IllegalStateException(
+            "Particle Mesh may only have particle type of ParticleType.GeomMesh or ParticleType.Triangle");
     }
 
-    public ParticleMesh(final String name, final int numParticles, final ParticleSystem.ParticleType type) {
-        super(name, numParticles, type);
-        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-        getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-    }
+    final int verts = getVertsForParticleType(getParticleType());
 
-    public ParticleMesh(final String name, final Mesh sourceMesh) {
-        super(name, 0, ParticleSystem.ParticleType.GeomMesh);
-        _numParticles = sourceMesh.getMeshData().getTotalPrimitiveCount();
-        setParticleEmitter(new MeshEmitter(sourceMesh, false));
-        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-        getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-        initializeParticles(_numParticles);
-    }
+    _geometryCoordinates = BufferUtils.createVector3Buffer(numParticles * verts);
+    _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
 
-    @Override
-    protected void initializeParticles(final int numParticles) {
-        setRenderMaterial("particles/particle_mesh.yaml");
+    meshData.setVertexBuffer(_geometryCoordinates);
+    meshData.setColorBuffer(_appearanceColors);
+    meshData.setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * verts), 0);
 
-        if (_particleMesh != null) {
-            detachChild(_particleMesh);
-        }
-        final Mesh mesh = new Mesh(getName() + "_mesh") {
-
-            @Override
-            public void updateWorldTransform(final boolean recurse) {
-                ; // Do nothing.
-            }
-
-            @Override
-            public void updateWorldBound(final boolean recurse) {
-                super.updateWorldTransform(recurse);
-                super.updateWorldBound(recurse);
-            }
-        };
-        _particleMesh = mesh;
-        attachChild(mesh);
-        _particles = new Particle[numParticles];
-        if (numParticles == 0) {
-            return;
-        }
-        Vector2 sharedTextureData[];
-
-        // setup texture coords and index mode
-        final MeshData meshData = mesh.getMeshData();
-        switch (getParticleType()) {
-            case GeomMesh:
-            case Triangle:
-                sharedTextureData = new Vector2[] { new Vector2(2.0, 0.0), new Vector2(0.0, 2.0),
-                        new Vector2(0.0, 0.0) };
-                meshData.setIndexMode(IndexMode.Triangles);
-                break;
-            default:
-                throw new IllegalStateException(
-                        "Particle Mesh may only have particle type of ParticleType.GeomMesh or ParticleType.Triangle");
-        }
-
-        final int verts = getVertsForParticleType(getParticleType());
-
-        _geometryCoordinates = BufferUtils.createVector3Buffer(numParticles * verts);
-        _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
-
-        meshData.setVertexBuffer(_geometryCoordinates);
-        meshData.setColorBuffer(_appearanceColors);
-        meshData.setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * verts), 0);
-
-        final Vector2 temp = Vector2.fetchTempInstance();
-        for (int k = 0; k < numParticles; k++) {
-            _particles[k] = new Particle(this);
-            _particles[k].init();
-            _particles[k].setStartIndex(k * verts);
-            for (int a = verts - 1; a >= 0; a--) {
-                final int ind = (k * verts) + a;
-                if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
-                    final MeshEmitter source = (MeshEmitter) getParticleEmitter();
-                    final Mesh sourceMesh = source.getSource();
-                    final int index = sourceMesh.getMeshData().getIndices() != null
-                            ? sourceMesh.getMeshData().getIndices().get(ind)
-                            : ind;
-                    BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
-                            index);
-                    BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
-                } else {
-                    BufferUtils.setInBuffer(sharedTextureData[a], meshData.getTextureCoords(0).getBuffer(), ind);
-                }
-                BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
-            }
-
-        }
-        Vector2.releaseTempInstance(temp);
-        updateWorldRenderStates(true);
-        _particleMesh.getSceneHints().setCastsShadows(false);
-    }
-
-    @Override
-    public void draw(final Renderer r) {
-        final Camera camera = Camera.getCurrentCamera();
-        boolean anyAlive = false;
-        for (int i = 0; i < _particles.length; i++) {
-            final Particle particle = _particles[i];
-            if (particle.getStatus() == Particle.Status.Alive) {
-                particle.updateVerts(camera);
-                anyAlive = true;
-            }
-        }
-
-        // Since we've updated our verts, update the model boundary where applicable
-        if (getParticleGeometry().getWorldBound() != null && anyAlive) {
-            getParticleGeometry().updateModelBound();
-        }
-
-        if (!_particlesInWorldCoords) {
-            getParticleGeometry().setWorldTransform(getWorldTransform());
+    final Vector2 temp = Vector2.fetchTempInstance();
+    for (int k = 0; k < numParticles; k++) {
+      _particles[k] = new Particle(this);
+      _particles[k].init();
+      _particles[k].setStartIndex(k * verts);
+      for (int a = verts - 1; a >= 0; a--) {
+        final int ind = (k * verts) + a;
+        if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
+          final MeshEmitter source = (MeshEmitter) getParticleEmitter();
+          final Mesh sourceMesh = source.getSource();
+          final int index =
+              sourceMesh.getMeshData().getIndices() != null ? sourceMesh.getMeshData().getIndices().get(ind) : ind;
+          BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(), index);
+          BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
         } else {
-            getParticleGeometry().setWorldTranslation(Vector3.ZERO);
-            getParticleGeometry().setWorldRotation(Matrix3.IDENTITY);
-            getParticleGeometry().setWorldScale(getWorldScale());
+          BufferUtils.setInBuffer(sharedTextureData[a], meshData.getTextureCoords(0).getBuffer(), ind);
         }
+        BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
+      }
 
-        getParticleGeometry().draw(r);
+    }
+    Vector2.releaseTempInstance(temp);
+    updateWorldRenderStates(true);
+    _particleMesh.getSceneHints().setCastsShadows(false);
+  }
+
+  @Override
+  public void draw(final Renderer r) {
+    final Camera camera = Camera.getCurrentCamera();
+    boolean anyAlive = false;
+    for (int i = 0; i < _particles.length; i++) {
+      final Particle particle = _particles[i];
+      if (particle.getStatus() == Particle.Status.Alive) {
+        particle.updateVerts(camera);
+        anyAlive = true;
+      }
     }
 
-    @Override
-    public void resetParticleVelocity(final int i) {
-        if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useTriangleNormalEmit) {
-            _particles[i].getVelocity().set(_particles[i].getTriangleModel().getNormal());
-            _particles[i].getVelocity().multiplyLocal(_emissionDirection);
-            _particles[i].getVelocity().multiplyLocal(getInitialVelocity());
-        } else {
-            super.resetParticleVelocity(i);
-        }
+    // Since we've updated our verts, update the model boundary where applicable
+    if (getParticleGeometry().getWorldBound() != null && anyAlive) {
+      getParticleGeometry().updateModelBound();
     }
 
-    public boolean isUseMeshTexCoords() {
-        return _useMeshTexCoords;
+    if (!_particlesInWorldCoords) {
+      getParticleGeometry().setWorldTransform(getWorldTransform());
+    } else {
+      getParticleGeometry().setWorldTranslation(Vector3.ZERO);
+      getParticleGeometry().setWorldRotation(Matrix3.IDENTITY);
+      getParticleGeometry().setWorldScale(getWorldScale());
     }
 
-    public void setUseMeshTexCoords(final boolean useMeshTexCoords) {
-        _useMeshTexCoords = useMeshTexCoords;
-    }
+    getParticleGeometry().draw(r);
+  }
 
-    public boolean isUseTriangleNormalEmit() {
-        return _useTriangleNormalEmit;
+  @Override
+  public void resetParticleVelocity(final int i) {
+    if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useTriangleNormalEmit) {
+      _particles[i].getVelocity().set(_particles[i].getTriangleModel().getNormal());
+      _particles[i].getVelocity().multiplyLocal(_emissionDirection);
+      _particles[i].getVelocity().multiplyLocal(getInitialVelocity());
+    } else {
+      super.resetParticleVelocity(i);
     }
+  }
 
-    public void setUseTriangleNormalEmit(final boolean useTriangleNormalEmit) {
-        _useTriangleNormalEmit = useTriangleNormalEmit;
-    }
+  public boolean isUseMeshTexCoords() { return _useMeshTexCoords; }
 
-    @Override
-    public void write(final OutputCapsule capsule) throws IOException {
-        super.write(capsule);
-        capsule.write(_useMeshTexCoords, "useMeshTexCoords", true);
-        capsule.write(_useTriangleNormalEmit, "useTriangleNormalEmit", true);
-    }
+  public void setUseMeshTexCoords(final boolean useMeshTexCoords) { _useMeshTexCoords = useMeshTexCoords; }
 
-    @Override
-    public void read(final InputCapsule capsule) throws IOException {
-        super.read(capsule);
-        _useMeshTexCoords = capsule.readBoolean("useMeshTexCoords", true);
-        _useTriangleNormalEmit = capsule.readBoolean("useTriangleNormalEmit", true);
-    }
+  public boolean isUseTriangleNormalEmit() { return _useTriangleNormalEmit; }
 
-    @Override
-    public Mesh getParticleGeometry() {
-        return _particleMesh;
-    }
+  public void setUseTriangleNormalEmit(final boolean useTriangleNormalEmit) {
+    _useTriangleNormalEmit = useTriangleNormalEmit;
+  }
+
+  @Override
+  public void write(final OutputCapsule capsule) throws IOException {
+    super.write(capsule);
+    capsule.write(_useMeshTexCoords, "useMeshTexCoords", true);
+    capsule.write(_useTriangleNormalEmit, "useTriangleNormalEmit", true);
+  }
+
+  @Override
+  public void read(final InputCapsule capsule) throws IOException {
+    super.read(capsule);
+    _useMeshTexCoords = capsule.readBoolean("useMeshTexCoords", true);
+    _useTriangleNormalEmit = capsule.readBoolean("useTriangleNormalEmit", true);
+  }
+
+  @Override
+  public Mesh getParticleGeometry() { return _particleMesh; }
 }

@@ -29,85 +29,77 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class RenderTarget_Texture2D implements RenderTarget {
 
-    private final Texture2D _texture = new Texture2D();
-    private final int _width, _height;
-    private boolean _texSetup = false;
-    private final ColorRGBA _backgroundColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
+  private final Texture2D _texture = new Texture2D();
+  private final int _width, _height;
+  private boolean _texSetup = false;
+  private final ColorRGBA _backgroundColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
 
-    public RenderTarget_Texture2D(final int width, final int height) {
-        this(width, height, TextureStoreFormat.RGB8);
+  public RenderTarget_Texture2D(final int width, final int height) {
+    this(width, height, TextureStoreFormat.RGB8);
+  }
+
+  public RenderTarget_Texture2D(final int width, final int height, final TextureStoreFormat format) {
+    _width = width;
+    _height = height;
+    _texture.setTextureStoreFormat(format);
+  }
+
+  @Override
+  public void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
+      final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+    render(effectManager.getCurrentRenderer(), camera, spatials, null, enforcedMaterial, enforcedStates);
+  }
+
+  @Override
+  public void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
+      final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+    render(effectManager.getCurrentRenderer(), camera, null, spatial, enforcedMaterial, enforcedStates);
+  }
+
+  protected void render(final Renderer renderer, final Camera camera, final List<Spatial> spatials,
+      final Spatial spatial, final RenderMaterial enforcedMaterial,
+      final EnumMap<StateType, RenderState> enforcedStates) {
+    final TextureRenderer texRend = TextureRendererPool.fetch(_width, _height, renderer);
+    if (!_texSetup) {
+      texRend.setupTexture(_texture);
+      _texSetup = true;
     }
 
-    public RenderTarget_Texture2D(final int width, final int height, final TextureStoreFormat format) {
-        _width = width;
-        _height = height;
-        _texture.setTextureStoreFormat(format);
+    // set desired bg color
+    texRend.setBackgroundColor(_backgroundColor);
+
+    // setup camera
+    if (camera != null) {
+      texRend.getCamera().setFrame(camera);
+      texRend.getCamera().setFrustum(camera);
+      texRend.getCamera().setProjectionMode(camera.getProjectionMode());
     }
 
-    @Override
-    public void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
-            final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
-        render(effectManager.getCurrentRenderer(), camera, spatials, null, enforcedMaterial, enforcedStates);
+    texRend.enforceMaterial(enforcedMaterial);
+    texRend.enforceStates(enforcedStates);
+
+    // draw to texture
+    if (spatial != null) {
+      texRend.renderSpatial(spatial, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+    } else {
+      texRend.renderSpatials(spatials, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
     }
 
-    @Override
-    public void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
-            final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
-        render(effectManager.getCurrentRenderer(), camera, null, spatial, enforcedMaterial, enforcedStates);
-    }
+    texRend.clearEnforcedStates();
+    texRend.enforceMaterial(null);
+    TextureRendererPool.release(texRend);
+  }
 
-    protected void render(final Renderer renderer, final Camera camera, final List<Spatial> spatials,
-            final Spatial spatial, final RenderMaterial enforcedMaterial,
-            final EnumMap<StateType, RenderState> enforcedStates) {
-        final TextureRenderer texRend = TextureRendererPool.fetch(_width, _height, renderer);
-        if (!_texSetup) {
-            texRend.setupTexture(_texture);
-            _texSetup = true;
-        }
+  @Override
+  public Texture2D getTexture() { return _texture; }
 
-        // set desired bg color
-        texRend.setBackgroundColor(_backgroundColor);
+  public int getWidth() { return _width; }
 
-        // setup camera
-        if (camera != null) {
-            texRend.getCamera().setFrame(camera);
-            texRend.getCamera().setFrustum(camera);
-            texRend.getCamera().setProjectionMode(camera.getProjectionMode());
-        }
+  public int getHeight() { return _height; }
 
-        texRend.enforceMaterial(enforcedMaterial);
-        texRend.enforceStates(enforcedStates);
+  public ReadOnlyColorRGBA getBackgroundColor() { return _backgroundColor; }
 
-        // draw to texture
-        if (spatial != null) {
-            texRend.renderSpatial(spatial, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
-        } else {
-            texRend.renderSpatials(spatials, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
-        }
-
-        texRend.clearEnforcedStates();
-        texRend.enforceMaterial(null);
-        TextureRendererPool.release(texRend);
-    }
-
-    @Override
-    public Texture2D getTexture() {
-        return _texture;
-    }
-
-    public int getWidth() {
-        return _width;
-    }
-
-    public int getHeight() {
-        return _height;
-    }
-
-    public ReadOnlyColorRGBA getBackgroundColor() {
-        return _backgroundColor;
-    }
-
-    public void setBackgroundColor(final ReadOnlyColorRGBA color) {
-        _backgroundColor.set(color);
-    }
+  public void setBackgroundColor(final ReadOnlyColorRGBA color) {
+    _backgroundColor.set(color);
+  }
 }

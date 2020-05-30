@@ -14,18 +14,18 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Spatial;
 
 public interface RenderBucket {
-    void add(Spatial spatial);
+  void add(Spatial spatial);
 
-    void remove(Spatial spatial);
+  void remove(Spatial spatial);
 
-    void clear();
+  void clear();
 
-    void sort();
+  void sort();
 
-    void render(Renderer renderer);
+  void render(Renderer renderer);
 
-    void pushBucket();
+  void pushBucket();
 
-    void popBucket();
+  void popBucket();
 
 }

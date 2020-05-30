@@ -23,39 +23,40 @@ import com.ardor3d.input.mouse.MouseButton;
  */
 @Immutable
 public final class MouseButtonCondition implements Predicate<TwoInputStates> {
-    private final EnumMap<MouseButton, ButtonState> _states = new EnumMap<>(MouseButton.class);
+  private final EnumMap<MouseButton, ButtonState> _states = new EnumMap<>(MouseButton.class);
 
-    public MouseButtonCondition(final EnumMap<MouseButton, ButtonState> states) {
-        _states.putAll(states);
+  public MouseButtonCondition(final EnumMap<MouseButton, ButtonState> states) {
+    _states.putAll(states);
+  }
+
+  public MouseButtonCondition(final ButtonState left, final ButtonState right, final ButtonState middle) {
+    if (left != ButtonState.UNDEFINED) {
+      _states.put(MouseButton.LEFT, left);
+    }
+    if (right != ButtonState.UNDEFINED) {
+      _states.put(MouseButton.RIGHT, right);
+    }
+    if (middle != ButtonState.UNDEFINED) {
+      _states.put(MouseButton.MIDDLE, middle);
+    }
+  }
+
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final InputState currentState = states.getCurrent();
+
+    if (currentState == null) {
+      return false;
     }
 
-    public MouseButtonCondition(final ButtonState left, final ButtonState right, final ButtonState middle) {
-        if (left != ButtonState.UNDEFINED) {
-            _states.put(MouseButton.LEFT, left);
+    for (final MouseButton button : _states.keySet()) {
+      final ButtonState required = _states.get(button);
+      if (required != ButtonState.UNDEFINED) {
+        if (currentState.getMouseState().getButtonState(button) != required) {
+          return false;
         }
-        if (right != ButtonState.UNDEFINED) {
-            _states.put(MouseButton.RIGHT, right);
-        }
-        if (middle != ButtonState.UNDEFINED) {
-            _states.put(MouseButton.MIDDLE, middle);
-        }
+      }
     }
-
-    public boolean test(final TwoInputStates states) {
-        final InputState currentState = states.getCurrent();
-
-        if (currentState == null) {
-            return false;
-        }
-
-        for (final MouseButton button : _states.keySet()) {
-            final ButtonState required = _states.get(button);
-            if (required != ButtonState.UNDEFINED) {
-                if (currentState.getMouseState().getButtonState(button) != required) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+    return true;
+  }
 }

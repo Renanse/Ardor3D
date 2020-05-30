@@ -17,32 +17,34 @@ import com.ardor3d.input.InputState;
 import com.ardor3d.input.keyboard.Key;
 
 /**
- * A condition that is true if a given key was pressed when going from the previous input state to the current one.
+ * A condition that is true if a given key was pressed when going from the previous input state to
+ * the current one.
  */
 @Immutable
 public final class KeyPressedCondition implements Predicate<TwoInputStates> {
-    private final Key key;
+  private final Key key;
 
-    /**
-     * Construct a new KeyPressedCondition.
-     *
-     * @param key
-     *            the key that should be held
-     * @throws NullPointerException
-     *             if the key is null
-     */
-    public KeyPressedCondition(final Key key) {
-        if (key == null) {
-            throw new NullPointerException();
-        }
-
-        this.key = key;
+  /**
+   * Construct a new KeyPressedCondition.
+   *
+   * @param key
+   *          the key that should be held
+   * @throws NullPointerException
+   *           if the key is null
+   */
+  public KeyPressedCondition(final Key key) {
+    if (key == null) {
+      throw new NullPointerException();
     }
 
-    public boolean test(final TwoInputStates states) {
-        final InputState currentState = states.getCurrent();
-        final InputState previousState = states.getPrevious();
+    this.key = key;
+  }
 
-        return currentState.getKeyboardState().getKeysPressedSince(previousState.getKeyboardState()).contains(key);
-    }
+  @Override
+  public boolean test(final TwoInputStates states) {
+    final InputState currentState = states.getCurrent();
+    final InputState previousState = states.getPrevious();
+
+    return currentState.getKeyboardState().getKeysPressedSince(previousState.getKeyboardState()).contains(key);
+  }
 }

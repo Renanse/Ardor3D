@@ -12,37 +12,29 @@ package com.ardor3d.tool.editor.particle.swing.panel;
 
 import java.awt.BorderLayout;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import com.ardor3d.extension.effect.particle.SimpleParticleInfluenceFactory;
 import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 
 public class DragInfluencePanel extends InfluenceEditPanel {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final ValuePanel _dragCoefficientPanel = new ValuePanel("Drag Coefficient: ", "", 0.0, Double.MAX_VALUE,
-            0.1);
+  private final ValuePanel _dragCoefficientPanel = new ValuePanel("Drag Coefficient: ", "", 0.0, Double.MAX_VALUE, 0.1);
 
-    public DragInfluencePanel() {
-        super();
-        setLayout(new BorderLayout());
+  public DragInfluencePanel() {
+    super();
+    setLayout(new BorderLayout());
 
-        _dragCoefficientPanel.setBorder(createTitledBorder(" DRAG PARAMETERS "));
-        _dragCoefficientPanel.addChangeListener(new ChangeListener() {
-            public void stateChanged(final ChangeEvent e) {
-                ((SimpleParticleInfluenceFactory.BasicDrag) getEdittedInfluence())
-                .setDragCoefficient(_dragCoefficientPanel.getFloatValue());
-            }
-        });
-        add(_dragCoefficientPanel, BorderLayout.CENTER);
-    }
+    _dragCoefficientPanel.setBorder(createTitledBorder(" DRAG PARAMETERS "));
+    _dragCoefficientPanel.addChangeListener(e -> ((SimpleParticleInfluenceFactory.BasicDrag) getEdittedInfluence())
+        .setDragCoefficient(_dragCoefficientPanel.getFloatValue()));
+    add(_dragCoefficientPanel, BorderLayout.CENTER);
+  }
 
-    @Override
-    public void updateWidgets() {
-        _dragCoefficientPanel.setValue(((SimpleParticleInfluenceFactory.BasicDrag) getEdittedInfluence())
-                .getDragCoefficient());
-    }
+  @Override
+  public void updateWidgets() {
+    _dragCoefficientPanel
+        .setValue(((SimpleParticleInfluenceFactory.BasicDrag) getEdittedInfluence()).getDragCoefficient());
+  }
 
 }

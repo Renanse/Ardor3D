@@ -27,68 +27,70 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and sharing of mesh data.
+ * Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and
+ * sharing of mesh data.
  */
-@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MeshDataSharingExample", //
-        thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
-        maxHeapMemory = 64)
+@Purpose(
+    htmlDescriptionKey = "com.ardor3d.example.renderer.MeshDataSharingExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
+    maxHeapMemory = 64)
 public class MeshDataSharingExample extends ExampleBase {
 
-    public static void main(final String[] args) {
-        start(MeshDataSharingExample.class);
+  public static void main(final String[] args) {
+    start(MeshDataSharingExample.class);
+  }
+
+  double counter = 0;
+  int frames = 0;
+
+  @Override
+  protected void updateExample(final ReadOnlyTimer timer) {
+    counter += timer.getTimePerFrame();
+    frames++;
+    if (counter > 1) {
+      final double fps = (frames / counter);
+      counter = 0;
+      frames = 0;
+      System.out.printf("%7.1f FPS\n", fps);
+    }
+  }
+
+  @Override
+  protected void initExample() {
+    _canvas.setTitle("TestSharedMesh");
+
+    final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
+    sphere.setModelBound(new BoundingBox());
+
+    final CullState cs = new CullState();
+    cs.setCullFace(CullState.Face.Back);
+    cs.setEnabled(true);
+    _root.setRenderState(cs);
+
+    final TextureState ts = new TextureState();
+    ts.setEnabled(true);
+    ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+        TextureStoreFormat.GuessCompressedFormat, true));
+
+    sphere.setRenderState(ts);
+
+    final Node n1 = new Node("n1");
+    n1.setTranslation(new Vector3(-50, 0, -200));
+
+    _root.attachChild(n1);
+
+    final Random rand = new Random(1337);
+    for (int i = 0; i < 500; i++) {
+      final Mesh sm = sphere.makeCopy(true);
+
+      sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
+          rand.nextDouble() * 100.0 - 50.0));
+      n1.attachChild(sm);
     }
 
-    double counter = 0;
-    int frames = 0;
+    final Node n2 = n1.makeCopy(true);
+    n2.setTranslation(new Vector3(50, 0, -200));
 
-    @Override
-    protected void updateExample(final ReadOnlyTimer timer) {
-        counter += timer.getTimePerFrame();
-        frames++;
-        if (counter > 1) {
-            final double fps = (frames / counter);
-            counter = 0;
-            frames = 0;
-            System.out.printf("%7.1f FPS\n", fps);
-        }
-    }
-
-    @Override
-    protected void initExample() {
-        _canvas.setTitle("TestSharedMesh");
-
-        final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
-        sphere.setModelBound(new BoundingBox());
-
-        final CullState cs = new CullState();
-        cs.setCullFace(CullState.Face.Back);
-        cs.setEnabled(true);
-        _root.setRenderState(cs);
-
-        final TextureState ts = new TextureState();
-        ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                TextureStoreFormat.GuessCompressedFormat, true));
-
-        sphere.setRenderState(ts);
-
-        final Node n1 = new Node("n1");
-        n1.setTranslation(new Vector3(-50, 0, -200));
-
-        _root.attachChild(n1);
-
-        final Random rand = new Random(1337);
-        for (int i = 0; i < 500; i++) {
-            final Mesh sm = sphere.makeCopy(true);
-
-            sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
-                    rand.nextDouble() * 100.0 - 50.0));
-            n1.attachChild(sm);
-        }
-
-        final Node n2 = n1.makeCopy(true);
-        n2.setTranslation(new Vector3(50, 0, -200));
-
-        _root.attachChild(n2);
-    }
+    _root.attachChild(n2);
+  }
 }

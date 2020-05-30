@@ -17,20 +17,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 public class ParticleEditorMain {
-    private static final Logger logger = Logger.getLogger(ParticleEditorMain.class.getName());
+  private static final Logger logger = Logger.getLogger(ParticleEditorMain.class.getName());
 
-    public static void main(final String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (final Exception e) {
-                    logger.logp(Level.SEVERE, ParticleEditorFrame.class.toString(), "main(args)", "Exception", e);
-                }
-                new ParticleEditorFrame();
-            }
-        });
-    }
+  public static void main(final String[] args) {
+    SwingUtilities.invokeLater(() -> {
+      try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      } catch (final Exception e) {
+        logger.logp(Level.SEVERE, ParticleEditorFrame.class.toString(), "main(args)", "Exception", e);
+      }
+      new ParticleEditorFrame();
+    });
+  }
 
 }

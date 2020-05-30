@@ -12,41 +12,35 @@ package com.ardor3d.extension.ui.text;
 
 public class UIPasswordField extends UITextField {
 
-    protected char _passwordChar = '*';
+  protected char _passwordChar = '*';
 
-    public UIPasswordField() {
-        super.setCopyable(false);
-    }
+  public UIPasswordField() {
+    super.setCopyable(false);
+  }
 
-    public char getPasswordChar() {
-        return _passwordChar;
-    }
+  public char getPasswordChar() { return _passwordChar; }
 
-    public void setPasswordChar(final char passwordChar) {
-        _passwordChar = passwordChar;
-    }
+  public void setPasswordChar(final char passwordChar) { _passwordChar = passwordChar; }
 
-    @Override
-    public void setText(final String rawText) {
-        final StringBuilder newText = new StringBuilder();
-        if (rawText != null) {
-            for (int i = rawText.length(); --i >= 0;) {
-                newText.append(_passwordChar);
-            }
-        }
-        super.setText(newText.toString());
-        if (_uiText != null) {
-            _uiText.setRawText(rawText);
-        }
+  @Override
+  public void setText(final String rawText) {
+    final StringBuilder newText = new StringBuilder();
+    if (rawText != null) {
+      for (int i = rawText.length(); --i >= 0;) {
+        newText.append(_passwordChar);
+      }
     }
+    super.setText(newText.toString());
+    if (_uiText != null) {
+      _uiText.setRawText(rawText);
+    }
+  }
 
-    @Override
-    public void setCopyable(final boolean copyable) {
-        ; // ignore
-    }
+  @Override
+  public void setCopyable(final boolean copyable) {
+    // ignore
+  }
 
-    @Override
-    public boolean isCopyable() {
-        return false;
-    }
+  @Override
+  public boolean isCopyable() { return false; }
 }

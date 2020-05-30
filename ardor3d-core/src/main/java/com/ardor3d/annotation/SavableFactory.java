@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <https://git.io/fjRmv>.
  */
@@ -17,18 +17,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Tells the Savable system to instantiate objects of this type using a specific static method. The method should take
- * no arguments and return a new instance of the annotated class.
- * 
+ * Tells the Savable system to instantiate objects of this type using a specific static method. The
+ * method should take no arguments and return a new instance of the annotated class.
+ *
  * It is recommended the method be named something indicating use for Savable system.
  */
-@Target( { TYPE })
+@Target({TYPE})
 @Retention(RUNTIME)
 public @interface SavableFactory {
 
-    /**
-     * @return the name of the static method to use to build this class.
-     */
-    String factoryMethod();
+  /**
+   * @return the name of the static method to use to build this class.
+   */
+  String factoryMethod();
 
 }

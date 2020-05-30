@@ -20,25 +20,26 @@ import com.ardor3d.input.keyboard.Key;
  */
 @Immutable
 public final class KeyHeldCondition implements Predicate<TwoInputStates> {
-    private final Key key;
+  private final Key key;
 
-    /**
-     * Construct a new KeyHeldCondition.
-     *
-     * @param key
-     *            the key that should be held
-     * @throws NullPointerException
-     *             if the key is null
-     */
-    public KeyHeldCondition(final Key key) {
-        if (key == null) {
-            throw new NullPointerException();
-        }
-
-        this.key = key;
+  /**
+   * Construct a new KeyHeldCondition.
+   *
+   * @param key
+   *          the key that should be held
+   * @throws NullPointerException
+   *           if the key is null
+   */
+  public KeyHeldCondition(final Key key) {
+    if (key == null) {
+      throw new NullPointerException();
     }
 
-    public boolean test(final TwoInputStates states) {
-        return states.getCurrent().getKeyboardState().isDown(key);
-    }
+    this.key = key;
+  }
+
+  @Override
+  public boolean test(final TwoInputStates states) {
+    return states.getCurrent().getKeyboardState().isDown(key);
+  }
 }

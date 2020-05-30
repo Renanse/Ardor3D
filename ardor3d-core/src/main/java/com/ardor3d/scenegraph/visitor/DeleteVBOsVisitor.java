@@ -20,19 +20,20 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 
 public class DeleteVBOsVisitor implements Visitor {
-    final IShaderUtils _utils;
+  final IShaderUtils _utils;
 
-    public DeleteVBOsVisitor(final IShaderUtils utils) {
-        _utils = utils;
-    }
+  public DeleteVBOsVisitor(final IShaderUtils utils) {
+    _utils = utils;
+  }
 
-    public void visit(final Spatial spatial) {
-        if (spatial instanceof Mesh) {
-            final Mesh mesh = (Mesh) spatial;
-            final MeshData meshData = mesh.getMeshData();
-            for (final Entry<String, AbstractBufferData<? extends Buffer>> entry : meshData.listDataItems()) {
-                _utils.deleteBuffer(entry.getValue());
-            }
-        }
+  @Override
+  public void visit(final Spatial spatial) {
+    if (spatial instanceof Mesh) {
+      final Mesh mesh = (Mesh) spatial;
+      final MeshData meshData = mesh.getMeshData();
+      for (final Entry<String, AbstractBufferData<? extends Buffer>> entry : meshData.listDataItems()) {
+        _utils.deleteBuffer(entry.getValue());
+      }
     }
+  }
 }

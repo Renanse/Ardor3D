@@ -15,27 +15,25 @@ import com.ardor3d.extension.ui.util.Alignment;
 
 public class UITextArea extends AbstractUITextEntryComponent {
 
-    protected UIKeyHandler _keyHandler;
+  protected UIKeyHandler _keyHandler;
 
-    public UITextArea() {
-        setAlignment(Alignment.TOP_LEFT);
-        _disabledState = new UIState();
-        _defaultState = new DefaultTextEntryState();
-        _writingState = new TextEntryWritingState(this);
-        setEditable(true);
-        applySkin();
-        switchState(getDefaultState());
-    }
+  public UITextArea() {
+    setAlignment(Alignment.TOP_LEFT);
+    _disabledState = new UIState();
+    _defaultState = new DefaultTextEntryState();
+    _writingState = new TextEntryWritingState(this);
+    setEditable(true);
+    applySkin();
+    switchState(getDefaultState());
+  }
 
-    @Override
-    protected UIKeyHandler getKeyHandler() {
-        if (_keyHandler == null) {
-            _keyHandler = new DefaultLatinTextEntryKeyHandler(this);
-        }
-        return _keyHandler;
+  @Override
+  protected UIKeyHandler getKeyHandler() {
+    if (_keyHandler == null) {
+      _keyHandler = new DefaultLatinTextEntryKeyHandler(this);
     }
+    return _keyHandler;
+  }
 
-    public void setKeyHandler(final UIKeyHandler handler) {
-        _keyHandler = handler;
-    }
+  public void setKeyHandler(final UIKeyHandler handler) { _keyHandler = handler; }
 }

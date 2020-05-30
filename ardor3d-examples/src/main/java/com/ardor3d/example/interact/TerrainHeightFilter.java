@@ -19,21 +19,21 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class TerrainHeightFilter extends UpdateFilterAdapter {
 
-    protected Terrain _terrain;
-    protected double _offsetHeight;
+  protected Terrain _terrain;
+  protected double _offsetHeight;
 
-    public TerrainHeightFilter(final Terrain sourceTerrain, final double offsetHeight) {
-        _terrain = sourceTerrain;
-        _offsetHeight = offsetHeight;
-    }
+  public TerrainHeightFilter(final Terrain sourceTerrain, final double offsetHeight) {
+    _terrain = sourceTerrain;
+    _offsetHeight = offsetHeight;
+  }
 
-    @Override
-    public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
-        final SpatialState state = manager.getSpatialState();
-        final ReadOnlyVector3 trans = state.getTransform().getTranslation();
-        final double height = _terrain.getHeightAt(trans.getX(), trans.getZ());
-        if (height != trans.getY()) {
-            state.getTransform().translate(0, _offsetHeight + height - trans.getY(), 0);
-        }
+  @Override
+  public void applyFilter(final InteractManager manager, final AbstractInteractWidget widget) {
+    final SpatialState state = manager.getSpatialState();
+    final ReadOnlyVector3 trans = state.getTransform().getTranslation();
+    final double height = _terrain.getHeightAt(trans.getX(), trans.getZ());
+    if (height != trans.getY()) {
+      state.getTransform().translate(0, _offsetHeight + height - trans.getY(), 0);
     }
+  }
 }

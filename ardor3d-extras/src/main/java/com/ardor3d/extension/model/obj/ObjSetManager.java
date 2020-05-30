@@ -16,37 +16,31 @@ import java.util.List;
 import java.util.Map;
 
 public class ObjSetManager {
-    private final Map<ObjIndexSet, Integer> _store = new LinkedHashMap<>();
-    private final List<Integer> _indices = new ArrayList<>();
-    private final List<Integer> _lengths = new ArrayList<>();
+  private final Map<ObjIndexSet, Integer> _store = new LinkedHashMap<>();
+  private final List<Integer> _indices = new ArrayList<>();
+  private final List<Integer> _lengths = new ArrayList<>();
 
-    public int findSet(final ObjIndexSet set) {
-        if (_store.containsKey(set)) {
-            return _store.get(set);
-        }
-
-        final int index = _store.size();
-        _store.put(set, index);
-        return index;
+  public int findSet(final ObjIndexSet set) {
+    if (_store.containsKey(set)) {
+      return _store.get(set);
     }
 
-    public void addIndex(final int index) {
-        _indices.add(index);
-    }
+    final int index = _store.size();
+    _store.put(set, index);
+    return index;
+  }
 
-    public void addLength(final int length) {
-        _lengths.add(length);
-    }
+  public void addIndex(final int index) {
+    _indices.add(index);
+  }
 
-    public Map<ObjIndexSet, Integer> getStore() {
-        return _store;
-    }
+  public void addLength(final int length) {
+    _lengths.add(length);
+  }
 
-    public List<Integer> getIndices() {
-        return _indices;
-    }
+  public Map<ObjIndexSet, Integer> getStore() { return _store; }
 
-    public List<Integer> getLengths() {
-        return _lengths;
-    }
+  public List<Integer> getIndices() { return _indices; }
+
+  public List<Integer> getLengths() { return _lengths; }
 }

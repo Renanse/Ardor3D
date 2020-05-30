@@ -14,31 +14,31 @@ import com.ardor3d.framework.IDpiScaleProvider;
 
 public enum SwtDpiScaler implements IDpiScaleProvider {
 
-    INSTANCE;
+  INSTANCE;
 
-    @Override
-    public double scaleToScreenDpi(final double size) {
-        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp((int) Math.round(size)) : size;
-    }
+  @Override
+  public double scaleToScreenDpi(final double size) {
+    return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp((int) Math.round(size)) : size;
+  }
 
-    @Override
-    public double scaleFromScreenDpi(final double size) {
-        return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown((int) Math.round(size)) : size;
-    }
+  @Override
+  public double scaleFromScreenDpi(final double size) {
+    return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown((int) Math.round(size)) : size;
+  }
 
-    public int scaleToScreenDpiInt(final double size) {
-        return (int) Math.round(scaleToScreenDpi(size));
-    }
+  public int scaleToScreenDpiInt(final double size) {
+    return (int) Math.round(scaleToScreenDpi(size));
+  }
 
-    public int scaleFromScreenDpiInt(final double size) {
-        return (int) Math.round(scaleFromScreenDpi(size));
-    }
+  public int scaleFromScreenDpiInt(final double size) {
+    return (int) Math.round(scaleFromScreenDpi(size));
+  }
 
-    public static boolean ApplyScale = true;
-    static {
-        final String os = System.getProperty("os.name").toLowerCase();
-        if (os.startsWith("mac os x")) {
-            ApplyScale = false;
-        }
+  public static boolean ApplyScale = true;
+  static {
+    final String os = System.getProperty("os.name").toLowerCase();
+    if (os.startsWith("mac os x")) {
+      ApplyScale = false;
     }
+  }
 }

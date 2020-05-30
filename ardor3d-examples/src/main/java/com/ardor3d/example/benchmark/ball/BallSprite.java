@@ -16,39 +16,37 @@ import com.ardor3d.scenegraph.shape.Quad;
 
 public class BallSprite extends Quad {
 
-    private final Ball _ball;
-    private int _areaWidth;
-    private int _areaHeight;
+  private final Ball _ball;
+  private int _areaWidth;
+  private int _areaHeight;
 
-    public BallSprite(final String name, final int areaWidth, final int areaHeight) {
-        this(name, areaWidth, areaHeight, 1.0);
-    }
+  public BallSprite(final String name, final int areaWidth, final int areaHeight) {
+    this(name, areaWidth, areaHeight, 1.0);
+  }
 
-    public BallSprite(final String name, final int areaWidth, final int areaHeight, final double scale) {
-        super(name, Ball.radius * 2, Ball.radius * 2);
-        _areaWidth = areaWidth;
-        _areaHeight = areaHeight;
-        _ball = new Ball(scale);
-        _ball.setRandomPositionIn(_areaWidth, _areaHeight);
-        setTranslation(_ball._x + _ball.getCurrentRadius(), _ball._y + _ball.getCurrentRadius(), 0);
-        getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-        setModelBound(null);
-        getSceneHints().setCullHint(CullHint.Never);
-    }
+  public BallSprite(final String name, final int areaWidth, final int areaHeight, final double scale) {
+    super(name, Ball.radius * 2, Ball.radius * 2);
+    _areaWidth = areaWidth;
+    _areaHeight = areaHeight;
+    _ball = new Ball(scale);
+    _ball.setRandomPositionIn(_areaWidth, _areaHeight);
+    setTranslation(_ball._x + _ball.getCurrentRadius(), _ball._y + _ball.getCurrentRadius(), 0);
+    getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+    setModelBound(null);
+    getSceneHints().setCullHint(CullHint.Never);
+  }
 
-    @Override
-    public void updateGeometricState(final double time, final boolean initiator) {
-        super.updateGeometricState(time, initiator);
-        _ball.move(_areaWidth, _areaHeight, time);
-        setTranslation(_ball._x + _ball.getCurrentRadius(), _ball._y + _ball.getCurrentRadius(), 0);
-    }
+  @Override
+  public void updateGeometricState(final double time, final boolean initiator) {
+    super.updateGeometricState(time, initiator);
+    _ball.move(_areaWidth, _areaHeight, time);
+    setTranslation(_ball._x + _ball.getCurrentRadius(), _ball._y + _ball.getCurrentRadius(), 0);
+  }
 
-    public Ball getBall() {
-        return _ball;
-    }
+  public Ball getBall() { return _ball; }
 
-    public void updateAreaDimensions(final int width, final int height) {
-        _areaWidth = width;
-        _areaHeight = height;
-    }
+  public void updateAreaDimensions(final int width, final int height) {
+    _areaWidth = width;
+    _areaHeight = height;
+  }
 }

@@ -22,60 +22,54 @@ import com.ardor3d.extension.terrain.util.NormalMapUtil;
 import com.ardor3d.image.Image;
 
 public class InMemoryTerrainDataProvider implements TerrainDataProvider {
-    private static final int tileSize = 128;
-    private final InMemoryTerrainData inMemoryTerrainData;
+  private static final int tileSize = 128;
+  private final InMemoryTerrainData inMemoryTerrainData;
 
-    private boolean generateNormalMap;
+  private boolean generateNormalMap;
 
-    public InMemoryTerrainDataProvider(final InMemoryTerrainData inMemoryTerrainData) {
-        this(inMemoryTerrainData, false);
-    }
+  public InMemoryTerrainDataProvider(final InMemoryTerrainData inMemoryTerrainData) {
+    this(inMemoryTerrainData, false);
+  }
 
-    public InMemoryTerrainDataProvider(final InMemoryTerrainData inMemoryTerrainData, final boolean generateNormalMap) {
-        this.inMemoryTerrainData = inMemoryTerrainData;
-        this.generateNormalMap = generateNormalMap;
-    }
+  public InMemoryTerrainDataProvider(final InMemoryTerrainData inMemoryTerrainData, final boolean generateNormalMap) {
+    this.inMemoryTerrainData = inMemoryTerrainData;
+    this.generateNormalMap = generateNormalMap;
+  }
 
-    @Override
-    public TerrainSource getTerrainSource() {
-        return new InMemoryTerrainSource(tileSize, inMemoryTerrainData);
-    }
+  @Override
+  public TerrainSource getTerrainSource() { return new InMemoryTerrainSource(tileSize, inMemoryTerrainData); }
 
-    @Override
-    public List<TextureSource> getTextureSources() {
-        final List<TextureSource> rVal = new ArrayList<>(1);
-        rVal.add(new InMemoryTextureSource(tileSize, inMemoryTerrainData));
-        return rVal;
-    }
+  @Override
+  public List<TextureSource> getTextureSources() {
+    final List<TextureSource> rVal = new ArrayList<>(1);
+    rVal.add(new InMemoryTextureSource(tileSize, inMemoryTerrainData));
+    return rVal;
+  }
 
-    @Override
-    public TextureSource getNormalMapSource() {
-        if (generateNormalMap) {
-            try {
-                final Image normalImage = NormalMapUtil.constructNormalMap(inMemoryTerrainData.getHeightData(),
-                        inMemoryTerrainData.getSide(), inMemoryTerrainData.getMaxHeight(),
-                        inMemoryTerrainData.getScale().getX(), inMemoryTerrainData.getScale().getY());
+  @Override
+  public TextureSource getNormalMapSource() {
+    if (generateNormalMap) {
+      try {
+        final Image normalImage = NormalMapUtil.constructNormalMap(inMemoryTerrainData.getHeightData(),
+            inMemoryTerrainData.getSide(), inMemoryTerrainData.getMaxHeight(), inMemoryTerrainData.getScale().getX(),
+            inMemoryTerrainData.getScale().getY());
 
-                final List<Integer> heightMapSizes = new ArrayList<>();
-                int currentSize = inMemoryTerrainData.getSide();
-                heightMapSizes.add(currentSize);
-                for (int i = 0; i < inMemoryTerrainData.getClipmapLevels(); i++) {
-                    currentSize /= 2;
-                    heightMapSizes.add(0, currentSize);
-                }
-                return new ImageTextureSource(tileSize, normalImage, heightMapSizes);
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
+        final List<Integer> heightMapSizes = new ArrayList<>();
+        int currentSize = inMemoryTerrainData.getSide();
+        heightMapSizes.add(currentSize);
+        for (int i = 0; i < inMemoryTerrainData.getClipmapLevels(); i++) {
+          currentSize /= 2;
+          heightMapSizes.add(0, currentSize);
         }
-        return null;
+        return new ImageTextureSource(tileSize, normalImage, heightMapSizes);
+      } catch (final Exception e) {
+        e.printStackTrace();
+      }
     }
+    return null;
+  }
 
-    public boolean isGenerateNormalMap() {
-        return generateNormalMap;
-    }
+  public boolean isGenerateNormalMap() { return generateNormalMap; }
 
-    public void setGenerateNormalMap(final boolean generateNormalMap) {
-        this.generateNormalMap = generateNormalMap;
-    }
+  public void setGenerateNormalMap(final boolean generateNormalMap) { this.generateNormalMap = generateNormalMap; }
 }

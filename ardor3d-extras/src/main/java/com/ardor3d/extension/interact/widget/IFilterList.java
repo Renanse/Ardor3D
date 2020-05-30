@@ -15,24 +15,25 @@ import com.ardor3d.extension.interact.filter.UpdateFilter;
 import com.ardor3d.input.mouse.MouseState;
 
 /**
- * Provides a clean way to capture all of beginDrag, endDrag, and applyFilters. This scheme allows a compound widget to
- * implement IFilterList and pass itself to leaf widgets, who can then forward calls to the parent list.
+ * Provides a clean way to capture all of beginDrag, endDrag, and applyFilters. This scheme allows a
+ * compound widget to implement IFilterList and pass itself to leaf widgets, who can then forward
+ * calls to the parent list.
  */
 public interface IFilterList extends Iterable<UpdateFilter> {
 
-    public void applyFilters(final InteractManager manager, final AbstractInteractWidget widget);
+  void applyFilters(final InteractManager manager, final AbstractInteractWidget widget);
 
-    public void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state);
+  void beginDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state);
 
-    public void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state);
+  void endDrag(final InteractManager manager, final AbstractInteractWidget widget, final MouseState state);
 
-    public int size();
+  int size();
 
-    public UpdateFilter get(final int index);
+  UpdateFilter get(final int index);
 
-    public boolean add(final UpdateFilter filter);
+  boolean add(final UpdateFilter filter);
 
-    public boolean remove(final UpdateFilter filter);
+  boolean remove(final UpdateFilter filter);
 
-    public void clear();
+  void clear();
 }

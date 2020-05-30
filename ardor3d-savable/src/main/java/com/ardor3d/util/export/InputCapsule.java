@@ -21,126 +21,124 @@ import java.util.Map;
 
 public interface InputCapsule {
 
-    // byte primitive
+  // byte primitive
 
-    public byte readByte(String name, byte defVal) throws IOException;
+  byte readByte(String name, byte defVal) throws IOException;
 
-    public byte[] readByteArray(String name, byte[] defVal) throws IOException;
+  byte[] readByteArray(String name, byte[] defVal) throws IOException;
 
-    public byte[][] readByteArray2D(String name, byte[][] defVal) throws IOException;
+  byte[][] readByteArray2D(String name, byte[][] defVal) throws IOException;
 
-    // int primitive
+  // int primitive
 
-    public int readInt(String name, int defVal) throws IOException;
+  int readInt(String name, int defVal) throws IOException;
 
-    public int[] readIntArray(String name, int[] defVal) throws IOException;
+  int[] readIntArray(String name, int[] defVal) throws IOException;
 
-    public int[][] readIntArray2D(String name, int[][] defVal) throws IOException;
+  int[][] readIntArray2D(String name, int[][] defVal) throws IOException;
 
-    // float primitive
+  // float primitive
 
-    public float readFloat(String name, float defVal) throws IOException;
+  float readFloat(String name, float defVal) throws IOException;
 
-    public float[] readFloatArray(String name, float[] defVal) throws IOException;
+  float[] readFloatArray(String name, float[] defVal) throws IOException;
 
-    public float[][] readFloatArray2D(String name, float[][] defVal) throws IOException;
+  float[][] readFloatArray2D(String name, float[][] defVal) throws IOException;
 
-    // double primitive
+  // double primitive
 
-    public double readDouble(String name, double defVal) throws IOException;
+  double readDouble(String name, double defVal) throws IOException;
 
-    public double[] readDoubleArray(String name, double[] defVal) throws IOException;
+  double[] readDoubleArray(String name, double[] defVal) throws IOException;
 
-    public double[][] readDoubleArray2D(String name, double[][] defVal) throws IOException;
+  double[][] readDoubleArray2D(String name, double[][] defVal) throws IOException;
 
-    // long primitive
+  // long primitive
 
-    public long readLong(String name, long defVal) throws IOException;
+  long readLong(String name, long defVal) throws IOException;
 
-    public long[] readLongArray(String name, long[] defVal) throws IOException;
+  long[] readLongArray(String name, long[] defVal) throws IOException;
 
-    public long[][] readLongArray2D(String name, long[][] defVal) throws IOException;
+  long[][] readLongArray2D(String name, long[][] defVal) throws IOException;
 
-    // short primitive
+  // short primitive
 
-    public short readShort(String name, short defVal) throws IOException;
+  short readShort(String name, short defVal) throws IOException;
 
-    public short[] readShortArray(String name, short[] defVal) throws IOException;
+  short[] readShortArray(String name, short[] defVal) throws IOException;
 
-    public short[][] readShortArray2D(String name, short[][] defVal) throws IOException;
+  short[][] readShortArray2D(String name, short[][] defVal) throws IOException;
 
-    // boolean primitive
+  // boolean primitive
 
-    public boolean readBoolean(String name, boolean defVal) throws IOException;
+  boolean readBoolean(String name, boolean defVal) throws IOException;
 
-    public boolean[] readBooleanArray(String name, boolean[] defVal) throws IOException;
+  boolean[] readBooleanArray(String name, boolean[] defVal) throws IOException;
 
-    public boolean[][] readBooleanArray2D(String name, boolean[][] defVal) throws IOException;
+  boolean[][] readBooleanArray2D(String name, boolean[][] defVal) throws IOException;
 
-    // String
+  // String
 
-    public String readString(String name, String defVal) throws IOException;
+  String readString(String name, String defVal) throws IOException;
 
-    public String[] readStringArray(String name, String[] defVal) throws IOException;
+  String[] readStringArray(String name, String[] defVal) throws IOException;
 
-    public String[][] readStringArray2D(String name, String[][] defVal) throws IOException;
+  String[][] readStringArray2D(String name, String[][] defVal) throws IOException;
 
-    // BitSet
+  // BitSet
 
-    public BitSet readBitSet(String name, BitSet defVal) throws IOException;
+  BitSet readBitSet(String name, BitSet defVal) throws IOException;
 
-    // BinarySavable
+  // BinarySavable
 
-    public <E extends Savable> E readSavable(String name, E defVal) throws IOException;
+  <E extends Savable> E readSavable(String name, E defVal) throws IOException;
 
-    public <E extends Savable> E[] readSavableArray(String name, E[] defVal) throws IOException;
+  <E extends Savable> E[] readSavableArray(String name, E[] defVal) throws IOException;
 
-    public <E extends Savable> E[][] readSavableArray2D(String name, E[][] defVal) throws IOException;
+  <E extends Savable> E[][] readSavableArray2D(String name, E[][] defVal) throws IOException;
 
-    // Lists
+  // Lists
 
-    public <E extends Savable> List<E> readSavableList(String name, List<E> defVal) throws IOException;
+  <E extends Savable> List<E> readSavableList(String name, List<E> defVal) throws IOException;
 
-    public <E extends Savable> List<E>[] readSavableListArray(String name, List<E>[] defVal) throws IOException;
+  <E extends Savable> List<E>[] readSavableListArray(String name, List<E>[] defVal) throws IOException;
 
-    public <E extends Savable> List<E>[][] readSavableListArray2D(String name, List<E>[][] defVal) throws IOException;
+  <E extends Savable> List<E>[][] readSavableListArray2D(String name, List<E>[][] defVal) throws IOException;
 
-    public List<FloatBuffer> readFloatBufferList(String name, List<FloatBuffer> defVal) throws IOException;
+  List<FloatBuffer> readFloatBufferList(String name, List<FloatBuffer> defVal) throws IOException;
 
-    public List<ByteBuffer> readByteBufferList(String name, List<ByteBuffer> defVal) throws IOException;
+  List<ByteBuffer> readByteBufferList(String name, List<ByteBuffer> defVal) throws IOException;
 
-    // Maps
+  // Maps
 
-    public <K extends Savable, V extends Savable> Map<K, V> readSavableMap(String name, Map<K, V> defVal)
-            throws IOException;
+  <K extends Savable, V extends Savable> Map<K, V> readSavableMap(String name, Map<K, V> defVal) throws IOException;
 
-    public <V extends Savable> Map<String, V> readStringSavableMap(String name, Map<String, V> defVal)
-            throws IOException;
+  <V extends Savable> Map<String, V> readStringSavableMap(String name, Map<String, V> defVal) throws IOException;
 
-    public Map<String, Object> readStringObjectMap(String name, Map<String, Object> defVal) throws IOException;
+  Map<String, Object> readStringObjectMap(String name, Map<String, Object> defVal) throws IOException;
 
-    // NIO BUFFERS
-    // float buffer
+  // NIO BUFFERS
+  // float buffer
 
-    public FloatBuffer readFloatBuffer(String name, FloatBuffer defVal) throws IOException;
+  FloatBuffer readFloatBuffer(String name, FloatBuffer defVal) throws IOException;
 
-    // int buffer
+  // int buffer
 
-    public IntBuffer readIntBuffer(String name, IntBuffer defVal) throws IOException;
+  IntBuffer readIntBuffer(String name, IntBuffer defVal) throws IOException;
 
-    // byte buffer
+  // byte buffer
 
-    public ByteBuffer readByteBuffer(String name, ByteBuffer defVal) throws IOException;
+  ByteBuffer readByteBuffer(String name, ByteBuffer defVal) throws IOException;
 
-    // short buffer
+  // short buffer
 
-    public ShortBuffer readShortBuffer(String name, ShortBuffer defVal) throws IOException;
+  ShortBuffer readShortBuffer(String name, ShortBuffer defVal) throws IOException;
 
-    // enums
+  // enums
 
-    public <T extends Enum<T>> T readEnum(String name, Class<T> enumType, T defVal) throws IOException;
+  <T extends Enum<T>> T readEnum(String name, Class<T> enumType, T defVal) throws IOException;
 
-    public <T extends Enum<T>> T[] readEnumArray(final String name, final Class<T> enumType, final T[] defVal)
-            throws IOException;
+  <T extends Enum<T>> T[] readEnumArray(final String name, final Class<T> enumType, final T[] defVal)
+      throws IOException;
 
 }

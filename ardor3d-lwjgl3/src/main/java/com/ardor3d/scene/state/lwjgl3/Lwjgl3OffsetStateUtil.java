@@ -22,64 +22,64 @@ import com.ardor3d.renderer.state.record.OffsetStateRecord;
 
 public abstract class Lwjgl3OffsetStateUtil {
 
-    public static void apply(final Lwjgl3Renderer renderer, final OffsetState state) {
-        // ask for the current state record
-        final RenderContext context = ContextManager.getCurrentContext();
-        final OffsetStateRecord record = (OffsetStateRecord) context.getStateRecord(StateType.Offset);
-        context.setCurrentState(StateType.Offset, state);
+  public static void apply(final Lwjgl3Renderer renderer, final OffsetState state) {
+    // ask for the current state record
+    final RenderContext context = ContextManager.getCurrentContext();
+    final OffsetStateRecord record = (OffsetStateRecord) context.getStateRecord(StateType.Offset);
+    context.setCurrentState(StateType.Offset, state);
 
-        if (state.isEnabled()) {
-            // enable any set offset types
-            setOffsetEnabled(OffsetType.Fill, state.isTypeEnabled(OffsetType.Fill), record);
-            setOffsetEnabled(OffsetType.Line, state.isTypeEnabled(OffsetType.Line), record);
-            setOffsetEnabled(OffsetType.Point, state.isTypeEnabled(OffsetType.Point), record);
+    if (state.isEnabled()) {
+      // enable any set offset types
+      setOffsetEnabled(OffsetType.Fill, state.isTypeEnabled(OffsetType.Fill), record);
+      setOffsetEnabled(OffsetType.Line, state.isTypeEnabled(OffsetType.Line), record);
+      setOffsetEnabled(OffsetType.Point, state.isTypeEnabled(OffsetType.Point), record);
 
-            // set factor and units.
-            setOffset(state.getFactor(), state.getUnits(), record);
-        } else {
-            // disable all offset types
-            setOffsetEnabled(OffsetType.Fill, false, record);
-            setOffsetEnabled(OffsetType.Line, false, record);
-            setOffsetEnabled(OffsetType.Point, false, record);
+      // set factor and units.
+      setOffset(state.getFactor(), state.getUnits(), record);
+    } else {
+      // disable all offset types
+      setOffsetEnabled(OffsetType.Fill, false, record);
+      setOffsetEnabled(OffsetType.Line, false, record);
+      setOffsetEnabled(OffsetType.Point, false, record);
 
-            // set factor and units to default 0, 0.
-            setOffset(0, 0, record);
-        }
-
-        if (!record.isValid()) {
-            record.validate();
-        }
+      // set factor and units to default 0, 0.
+      setOffset(0, 0, record);
     }
 
-    private static void setOffsetEnabled(final OffsetType type, final boolean typeEnabled,
-            final OffsetStateRecord record) {
-        final int glType = getGLType(type);
-        if (!record.isValid() || typeEnabled != record.enabledOffsets.contains(type)) {
-            if (typeEnabled) {
-                GL11C.glEnable(glType);
-            } else {
-                GL11C.glDisable(glType);
-            }
-        }
+    if (!record.isValid()) {
+      record.validate();
     }
+  }
 
-    private static void setOffset(final float factor, final float units, final OffsetStateRecord record) {
-        if (!record.isValid() || record.factor != factor || record.units != units) {
-            GL11C.glPolygonOffset(factor, units);
-            record.factor = factor;
-            record.units = units;
-        }
+  private static void setOffsetEnabled(final OffsetType type, final boolean typeEnabled,
+      final OffsetStateRecord record) {
+    final int glType = getGLType(type);
+    if (!record.isValid() || typeEnabled != record.enabledOffsets.contains(type)) {
+      if (typeEnabled) {
+        GL11C.glEnable(glType);
+      } else {
+        GL11C.glDisable(glType);
+      }
     }
+  }
 
-    private static int getGLType(final OffsetType type) {
-        switch (type) {
-            case Fill:
-                return GL11C.GL_POLYGON_OFFSET_FILL;
-            case Line:
-                return GL11C.GL_POLYGON_OFFSET_LINE;
-            case Point:
-                return GL11C.GL_POLYGON_OFFSET_POINT;
-        }
-        throw new IllegalArgumentException("invalid type: " + type);
+  private static void setOffset(final float factor, final float units, final OffsetStateRecord record) {
+    if (!record.isValid() || record.factor != factor || record.units != units) {
+      GL11C.glPolygonOffset(factor, units);
+      record.factor = factor;
+      record.units = units;
     }
+  }
+
+  private static int getGLType(final OffsetType type) {
+    switch (type) {
+      case Fill:
+        return GL11C.GL_POLYGON_OFFSET_FILL;
+      case Line:
+        return GL11C.GL_POLYGON_OFFSET_LINE;
+      case Point:
+        return GL11C.GL_POLYGON_OFFSET_POINT;
+    }
+    throw new IllegalArgumentException("invalid type: " + type);
+  }
 }

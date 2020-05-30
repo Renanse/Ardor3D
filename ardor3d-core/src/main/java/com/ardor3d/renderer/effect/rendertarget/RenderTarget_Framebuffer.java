@@ -26,43 +26,42 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class RenderTarget_Framebuffer implements RenderTarget {
 
-    @Override
-    public void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
-            final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
-        render(effectManager.getCurrentRenderer(), camera, spatials, null, enforcedMaterial, enforcedStates);
+  @Override
+  public void render(final EffectManager effectManager, final Camera camera, final List<Spatial> spatials,
+      final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+    render(effectManager.getCurrentRenderer(), camera, spatials, null, enforcedMaterial, enforcedStates);
+  }
+
+  @Override
+  public void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
+      final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+    render(effectManager.getCurrentRenderer(), camera, null, spatial, enforcedMaterial, enforcedStates);
+  }
+
+  public void render(final Renderer renderer, final Camera camera, final List<Spatial> spatials, final Spatial spatial,
+      final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
+    camera.apply(renderer);
+
+    final RenderContext context = ContextManager.getCurrentContext();
+
+    context.enforceMaterial(enforcedMaterial);
+    context.enforceStates(enforcedStates);
+
+    if (spatial != null) {
+      spatial.onDraw(renderer);
+    } else {
+      for (final Spatial spat : spatials) {
+        spat.onDraw(renderer);
+      }
     }
 
-    @Override
-    public void render(final EffectManager effectManager, final Camera camera, final Spatial spatial,
-            final RenderMaterial enforcedMaterial, final EnumMap<StateType, RenderState> enforcedStates) {
-        render(effectManager.getCurrentRenderer(), camera, null, spatial, enforcedMaterial, enforcedStates);
-    }
+    renderer.renderBuckets();
+    context.clearEnforcedStates();
+    context.enforceMaterial(null);
+  }
 
-    public void render(final Renderer renderer, final Camera camera, final List<Spatial> spatials,
-            final Spatial spatial, final RenderMaterial enforcedMaterial,
-            final EnumMap<StateType, RenderState> enforcedStates) {
-        camera.apply(renderer);
-
-        final RenderContext context = ContextManager.getCurrentContext();
-
-        context.enforceMaterial(enforcedMaterial);
-        context.enforceStates(enforcedStates);
-
-        if (spatial != null) {
-            spatial.onDraw(renderer);
-        } else {
-            for (final Spatial spat : spatials) {
-                spat.onDraw(renderer);
-            }
-        }
-
-        renderer.renderBuckets();
-        context.clearEnforcedStates();
-        context.enforceMaterial(null);
-    }
-
-    @Override
-    public Texture getTexture() {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public Texture getTexture() {
+    throw new UnsupportedOperationException();
+  }
 }
