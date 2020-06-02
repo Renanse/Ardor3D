@@ -49,6 +49,7 @@ import com.ardor3d.renderer.RenderMatrixType;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3Renderer;
 import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.renderer.material.ShaderType;
+import com.ardor3d.renderer.material.VertexAttributeRef;
 import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformType;
@@ -685,9 +686,14 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
   }
 
   @Override
-  public void bindVertexAttribute(final int location, final AbstractBufferData<? extends Buffer> buffer) {
-    GL20C.glVertexAttribPointer(location, buffer.getValuesPerTuple(), getGLDataType(buffer.getBuffer()), false, 0, 0);
-    GL20C.glEnableVertexAttribArray(location);
+  public void bindVertexAttribute(final VertexAttributeRef attrib, final AbstractBufferData<? extends Buffer> buffer) {
+    int strideBytes = buffer.getByteCount() * attrib.getStride();
+    long offsetBytes = buffer.getByteCount() * attrib.getOffset();
+
+    GL20C.glVertexAttribPointer(attrib.getLocation(), buffer.getValuesPerTuple(), getGLDataType(buffer.getBuffer()),
+        attrib.isNormalized(), strideBytes, offsetBytes);
+    GL40C.glVertexAttribDivisor(attrib.getLocation(), attrib.getDivisor());
+    GL20C.glEnableVertexAttribArray(attrib.getLocation());
   }
 
   protected static int getGLDataType(final Buffer buffer) {

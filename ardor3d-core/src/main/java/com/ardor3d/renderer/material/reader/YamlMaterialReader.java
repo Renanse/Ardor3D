@@ -16,7 +16,9 @@ import java.nio.Buffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +62,8 @@ public class YamlMaterialReader {
     final Map<String, RenderMaterial> rVal = new HashMap<>();
 
     if (source == null) {
-      if (logger.isLoggable(Level.WARNING)) {
-        logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "loadAll(ResourceSource)",
+      if (YamlMaterialReader.logger.isLoggable(Level.WARNING)) {
+        YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "loadAll(ResourceSource)",
             "source was null.  Returning empty map.");
       }
 
@@ -82,7 +84,7 @@ public class YamlMaterialReader {
     try {
       return loadChecked(sourceUrl);
     } catch (final IOException ex) {
-      logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(String)",
+      YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(String)",
           "Unable to locate '" + sourceUrl + "'");
       ex.printStackTrace();
       return null;
@@ -103,7 +105,7 @@ public class YamlMaterialReader {
     try {
       return loadChecked(stream);
     } catch (final IOException ex) {
-      logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(String)",
+      YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(String)",
           "Unable to read from stream. " + ex.getMessage());
       ex.printStackTrace();
       return null;
@@ -113,8 +115,8 @@ public class YamlMaterialReader {
   public static RenderMaterial loadChecked(final InputStream stream) throws IOException {
 
     if (stream == null) {
-      if (logger.isLoggable(Level.WARNING)) {
-        logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
+      if (YamlMaterialReader.logger.isLoggable(Level.WARNING)) {
+        YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
             "stream was null.  Returning null.");
       }
 
@@ -130,7 +132,7 @@ public class YamlMaterialReader {
     try {
       return loadChecked(source);
     } catch (final IOException ex) {
-      logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
+      YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
           "Unable to load '" + source + "'");
       return null;
     }
@@ -140,8 +142,8 @@ public class YamlMaterialReader {
   public static RenderMaterial loadChecked(final ResourceSource source) throws IOException {
 
     if (source == null) {
-      if (logger.isLoggable(Level.WARNING)) {
-        logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
+      if (YamlMaterialReader.logger.isLoggable(Level.WARNING)) {
+        YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "load(ResourceSource)",
             "source was null.  Returning null.");
       }
 
@@ -300,7 +302,7 @@ public class YamlMaterialReader {
     final String srcSingle = getString(properties, "source", null);
     final List<Object> srcObjs = getList(properties.get("sources"), false);
     if (program != null && (srcSingle != null || srcObjs != null)) {
-      logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "readShaderPrograms(Object)",
+      YamlMaterialReader.logger.logp(Level.WARNING, YamlMaterialReader.class.getName(), "readShaderPrograms(Object)",
           "Found both program and source nodes in pass.  There can be only one.  Ignoring source.");
     }
 
@@ -359,16 +361,27 @@ public class YamlMaterialReader {
     // override key
     final String key = getString(properties, "key", null);
 
+    VertexAttributeRef rVal;
+    final String meshKey = getString(properties, "meshKey", key);
+
     // Figure out which key type we are
     final int location = getInt(properties, "location", -1);
     if (location >= 0) {
-      final String meshKey = getString(properties, "meshKey", key);
-      return new VertexAttributeRef(location, meshKey);
+      rVal = new VertexAttributeRef(location, meshKey);
     }
 
-    final String meshKey = getString(properties, "meshKey", key);
-    final String shaderKey = getString(properties, "shaderKey", key);
-    return new VertexAttributeRef(shaderKey, meshKey);
+    else {
+      final String shaderKey = getString(properties, "shaderKey", key);
+      rVal = new VertexAttributeRef(shaderKey, meshKey);
+    }
+
+    // optional buffer properties
+    rVal.setStride(getInt(properties, "stride", 0));
+    rVal.setOffset(getInt(properties, "offset", 0));
+    rVal.setDivisor(getInt(properties, "divisor", 0));
+    rVal.setNormalized(getBoolean(properties, "normalized", false));
+
+    return rVal;
   }
 
   private static void readUniforms(final Object doc, final TechniquePass pass) {
@@ -662,6 +675,15 @@ public class YamlMaterialReader {
     return getInt(properties.get(key));
   }
 
+  protected static boolean getBoolean(final Map<String, Object> properties, final String key,
+      final boolean defaultVal) {
+    if (!properties.containsKey(key)) {
+      return defaultVal;
+    }
+
+    return getBoolean(properties.get(key));
+  }
+
   protected static String getString(final Map<String, Object> properties, final String key, final String defaultVal) {
     if (!properties.containsKey(key)) {
       return defaultVal;
@@ -671,6 +693,24 @@ public class YamlMaterialReader {
   }
 
   /// YAML NODE CONVERTERS
+
+  private static final List<String> YAML_YES_VALUES = Arrays.asList("y", "yes", "true", "on");
+  private static final List<String> YAML_NO_VALUES = Arrays.asList("n", "no", "false", "off");
+
+  protected static boolean getBoolean(final Object doc) {
+    if (doc instanceof Boolean) {
+      return ((Boolean) doc).booleanValue();
+    } else {
+      final String value = doc.toString().trim().toLowerCase();
+      if (YamlMaterialReader.YAML_YES_VALUES.contains(value)) {
+        return true;
+      }
+      if (YamlMaterialReader.YAML_NO_VALUES.contains(value)) {
+        return false;
+      }
+      throw new Ardor3dException(MessageFormat.format("Invalid yaml boolean value: ''{0}''", value));
+    }
+  }
 
   protected static int getInt(final Object doc) {
     if (doc instanceof Number) {

@@ -35,7 +35,7 @@ public interface IShaderUtils {
 
   int setupBufferObject(final AbstractBufferData<? extends Buffer> buffer, boolean isEBO, RenderContext context);
 
-  void bindVertexAttribute(int location, AbstractBufferData<? extends Buffer> buffer);
+  void bindVertexAttribute(VertexAttributeRef attribute, AbstractBufferData<? extends Buffer> buffer);
 
   int findUniformLocation(int programId, String uniformName);
 

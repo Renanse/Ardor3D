@@ -74,7 +74,7 @@ public class TechniquePass {
     }
 
     if (_shaderIdCache == null) {
-      _shaderIdCache = ContextValueReference.newReference(this, _shaderRefQueue);
+      _shaderIdCache = ContextValueReference.newReference(this, TechniquePass._shaderRefQueue);
     }
     _shaderIdCache.put(context.getSharableContextRef(), id);
   }
@@ -206,14 +206,14 @@ public class TechniquePass {
         if (location < 0) {
           continue;
         }
-        attribute._location = location;
+        attribute.setLocation(location);
       }
 
       // Make sure our buffer has a vbo and its data is on the card.
       shaderUtils.setupBufferObject(buffer, false, context);
 
       // Bind our buffer to the attribute location
-      shaderUtils.bindVertexAttribute(location, buffer);
+      shaderUtils.bindVertexAttribute(attribute, buffer);
     }
 
     // make sure any index buffer we have is also up to date on the card
