@@ -64,8 +64,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
    * The compiled list of renderstates for this mesh, taking into account ancestors states - updated
    * with updateRenderStates()
    */
-  protected final EnumMap<RenderState.StateType, RenderState> _states =
-      new EnumMap<>(RenderState.StateType.class);
+  protected final EnumMap<RenderState.StateType, RenderState> _states = new EnumMap<>(RenderState.StateType.class);
 
   /** The compiled lightState for this mesh */
   protected transient LightState _lightState;

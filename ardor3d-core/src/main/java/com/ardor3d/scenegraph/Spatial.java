@@ -82,8 +82,7 @@ public abstract class Spatial implements Savable, Hintable {
   protected List<SpatialController<?>> _controllers;
 
   /** The local render states of this spatial. */
-  protected EnumMap<RenderState.StateType, RenderState> _renderStateList =
-      new EnumMap<>(RenderState.StateType.class);
+  protected EnumMap<RenderState.StateType, RenderState> _renderStateList = new EnumMap<>(RenderState.StateType.class);
 
   /** Listener for dirty events. */
   protected DirtyEventListener _listener;
@@ -104,7 +103,7 @@ public abstract class Spatial implements Savable, Hintable {
   protected RenderMaterial _material;
 
   /** This spatial's layer; defaults to {@link #LAYER_DEFAULT}. */
-  protected int _layer = LAYER_INHERIT;
+  protected int _layer = Spatial.LAYER_INHERIT;
 
   public transient double _queueDistance = Double.NEGATIVE_INFINITY;
 
@@ -169,11 +168,11 @@ public abstract class Spatial implements Savable, Hintable {
    * @return this Spatial's layer, used for render filtering. Defaults to {@link #LAYER_INHERIT}
    */
   public int getLayer() {
-    if (_layer == LAYER_INHERIT) {
+    if (_layer == Spatial.LAYER_INHERIT) {
       if (_parent != null) {
         return _parent.getLayer();
       }
-      return LAYER_DEFAULT;
+      return Spatial.LAYER_DEFAULT;
     }
     return _layer;
   }
@@ -285,28 +284,28 @@ public abstract class Spatial implements Savable, Hintable {
   protected void markDirty(final Spatial caller, final DirtyType dirtyType) {
     switch (dirtyType) {
       case Transform:
-        propagateDirtyDown(ON_DIRTY_TRANSFORM);
+        propagateDirtyDown(Spatial.ON_DIRTY_TRANSFORM);
         if (_parent != null) {
-          _parent.propagateDirtyUp(ON_DIRTY_BOUNDING);
+          _parent.propagateDirtyUp(Spatial.ON_DIRTY_BOUNDING);
         }
         break;
       case RenderState:
-        propagateDirtyDown(ON_DIRTY_RENDERSTATE);
+        propagateDirtyDown(Spatial.ON_DIRTY_RENDERSTATE);
         break;
       case Bounding:
         // not just _parent here, on purpose
-        propagateDirtyUp(ON_DIRTY_BOUNDING);
+        propagateDirtyUp(Spatial.ON_DIRTY_BOUNDING);
         break;
       case Attached:
-        propagateDirtyDown(ON_DIRTY_ATTACHED);
+        propagateDirtyDown(Spatial.ON_DIRTY_ATTACHED);
         if (_parent != null) {
-          _parent.propagateDirtyUp(ON_DIRTY_BOUNDING);
+          _parent.propagateDirtyUp(Spatial.ON_DIRTY_BOUNDING);
         }
         break;
       case Detached:
       case Destroyed:
         if (_parent != null) {
-          _parent.propagateDirtyUp(ON_DIRTY_BOUNDING);
+          _parent.propagateDirtyUp(Spatial.ON_DIRTY_BOUNDING);
         }
         break;
       default:
@@ -1063,7 +1062,7 @@ public abstract class Spatial implements Savable, Hintable {
    * @deprecated Use {@link #getProperty(String)} instead.
    */
   @Deprecated
-  public Object getUserData() { return getLocalProperty(KEY_UserData, null); }
+  public Object getUserData() { return getLocalProperty(Spatial.KEY_UserData, null); }
 
   /**
    * Sets the Spatial specific user data.
@@ -1075,7 +1074,7 @@ public abstract class Spatial implements Savable, Hintable {
    */
   @Deprecated
   public void setUserData(final Object userData) {
-    setProperty(KEY_UserData, userData);
+    setProperty(Spatial.KEY_UserData, userData);
   }
 
   /**
@@ -1197,15 +1196,15 @@ public abstract class Spatial implements Savable, Hintable {
   }
 
   public void setDefaultColor(final float r, final float g, final float b, final float a) {
-    final ColorRGBA store = getLocalProperty(KEY_DefaultColor, null);
+    final ColorRGBA store = getLocalProperty(Spatial.KEY_DefaultColor, null);
     if (store != null) {
       store.set(r, g, b, a);
     } else {
-      setProperty(KEY_DefaultColor, new ColorRGBA(r, g, b, a));
+      setProperty(Spatial.KEY_DefaultColor, new ColorRGBA(r, g, b, a));
     }
   }
 
-  public ReadOnlyColorRGBA getDefaultColor() { return getProperty(KEY_DefaultColor, ColorRGBA.WHITE); }
+  public ReadOnlyColorRGBA getDefaultColor() { return getProperty(Spatial.KEY_DefaultColor, ColorRGBA.WHITE); }
 
   /**
    * Adds a SpatialController to this Spatial's list of controllers.
@@ -1414,22 +1413,22 @@ public abstract class Spatial implements Savable, Hintable {
         spat = (Spatial) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null, (Object[]) null);
       }
     } catch (final InstantiationException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
+      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     } catch (final IllegalAccessException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
+      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     } catch (final NoSuchMethodException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
+      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     } catch (final IllegalArgumentException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
+      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     } catch (final SecurityException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
+      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     } catch (final InvocationTargetException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
+      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     }
     return spat;
@@ -1510,7 +1509,7 @@ public abstract class Spatial implements Savable, Hintable {
       }
     }
 
-    _layer = capsule.readInt("layer", LAYER_INHERIT);
+    _layer = capsule.readInt("layer", Spatial.LAYER_INHERIT);
   }
 
   /**
@@ -1541,6 +1540,6 @@ public abstract class Spatial implements Savable, Hintable {
       capsule.writeSavableList(list, "controllers", null);
     }
 
-    capsule.write(_layer, "layer", LAYER_INHERIT);
+    capsule.write(_layer, "layer", Spatial.LAYER_INHERIT);
   }
 }

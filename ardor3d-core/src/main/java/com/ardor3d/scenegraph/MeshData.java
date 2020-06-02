@@ -61,10 +61,10 @@ public class MeshData implements Savable {
   public final static String KEY_ColorCoords = "color";
   public final static String KEY_TangentCoords = "tangent";
   public final static String KEY_TextureCoordsPrefix = "uv";
-  public final static String KEY_TextureCoords0 = KEY_TextureCoordsPrefix + 0;
-  public final static String KEY_TextureCoords1 = KEY_TextureCoordsPrefix + 1;
-  public final static String KEY_TextureCoords2 = KEY_TextureCoordsPrefix + 2;
-  public final static String KEY_TextureCoords3 = KEY_TextureCoordsPrefix + 3;
+  public final static String KEY_TextureCoords0 = MeshData.KEY_TextureCoordsPrefix + 0;
+  public final static String KEY_TextureCoords1 = MeshData.KEY_TextureCoordsPrefix + 1;
+  public final static String KEY_TextureCoords2 = MeshData.KEY_TextureCoordsPrefix + 2;
+  public final static String KEY_TextureCoords3 = MeshData.KEY_TextureCoordsPrefix + 3;
 
   /** The Constant logger. */
   private static final Logger logger = Logger.getLogger(MeshData.class.getName());
@@ -106,7 +106,7 @@ public class MeshData implements Savable {
   private InstancingManager _instancingManager;
 
   public MeshData() {
-    _identityCache.put(this, STATIC_REF);
+    MeshData._identityCache.put(this, MeshData.STATIC_REF);
     if (Constants.useMultipleContexts) {
       _uploadedContexts = new HashSet<>();
     }
@@ -189,7 +189,7 @@ public class MeshData implements Savable {
     }
 
     if (_vaoIdCache == null) {
-      _vaoIdCache = ContextValueReference.newReference(this, _vaoRefQueue);
+      _vaoIdCache = ContextValueReference.newReference(this, MeshData._vaoRefQueue);
     }
     _vaoIdCache.put(context.getUniqueContextRef(), id);
   }
@@ -356,7 +356,7 @@ public class MeshData implements Savable {
    *
    * @return the vertex buffer
    */
-  public FloatBuffer getVertexBuffer() { return getBuffer(KEY_VertexCoords); }
+  public FloatBuffer getVertexBuffer() { return getBuffer(MeshData.KEY_VertexCoords); }
 
   /**
    * Sets the vertex buffer.
@@ -377,7 +377,7 @@ public class MeshData implements Savable {
    *
    * @return the vertex coords
    */
-  public FloatBufferData getVertexCoords() { return getCoords(KEY_VertexCoords); }
+  public FloatBufferData getVertexCoords() { return getCoords(MeshData.KEY_VertexCoords); }
 
   /**
    * Sets the vertex coords.
@@ -386,7 +386,7 @@ public class MeshData implements Savable {
    *          the new vertex coords
    */
   public void setVertexCoords(final FloatBufferData bufferData) {
-    setCoords(KEY_VertexCoords, bufferData);
+    setCoords(MeshData.KEY_VertexCoords, bufferData);
     updateVertexCount();
   }
 
@@ -395,7 +395,7 @@ public class MeshData implements Savable {
    *
    * @return the normal buffer
    */
-  public FloatBuffer getNormalBuffer() { return getBuffer(KEY_NormalCoords); }
+  public FloatBuffer getNormalBuffer() { return getBuffer(MeshData.KEY_NormalCoords); }
 
   /**
    * Sets the normal buffer.
@@ -416,7 +416,7 @@ public class MeshData implements Savable {
    *
    * @return the normal coords
    */
-  public FloatBufferData getNormalCoords() { return getCoords(KEY_NormalCoords); }
+  public FloatBufferData getNormalCoords() { return getCoords(MeshData.KEY_NormalCoords); }
 
   /**
    * Sets the normal coords.
@@ -425,7 +425,7 @@ public class MeshData implements Savable {
    *          the new normal coords
    */
   public void setNormalCoords(final FloatBufferData bufferData) {
-    setCoords(KEY_NormalCoords, bufferData);
+    setCoords(MeshData.KEY_NormalCoords, bufferData);
   }
 
   /**
@@ -433,7 +433,7 @@ public class MeshData implements Savable {
    *
    * @return the color buffer
    */
-  public FloatBuffer getColorBuffer() { return getBuffer(KEY_ColorCoords); }
+  public FloatBuffer getColorBuffer() { return getBuffer(MeshData.KEY_ColorCoords); }
 
   /**
    * Sets the color buffer.
@@ -454,7 +454,7 @@ public class MeshData implements Savable {
    *
    * @return the color coords
    */
-  public FloatBufferData getColorCoords() { return getCoords(KEY_ColorCoords); }
+  public FloatBufferData getColorCoords() { return getCoords(MeshData.KEY_ColorCoords); }
 
   /**
    * Sets the color coords.
@@ -463,7 +463,7 @@ public class MeshData implements Savable {
    *          the new color coords
    */
   public void setColorCoords(final FloatBufferData bufferData) {
-    setCoords(KEY_ColorCoords, bufferData);
+    setCoords(MeshData.KEY_ColorCoords, bufferData);
   }
 
   /**
@@ -471,7 +471,7 @@ public class MeshData implements Savable {
    *
    * @return the tangent buffer
    */
-  public FloatBuffer getTangentBuffer() { return getBuffer(KEY_TangentCoords); }
+  public FloatBuffer getTangentBuffer() { return getBuffer(MeshData.KEY_TangentCoords); }
 
   /**
    * Sets the tangent buffer.
@@ -492,7 +492,7 @@ public class MeshData implements Savable {
    *
    * @return the tangent coords
    */
-  public FloatBufferData getTangentCoords() { return getCoords(KEY_TangentCoords); }
+  public FloatBufferData getTangentCoords() { return getCoords(MeshData.KEY_TangentCoords); }
 
   /**
    * Sets the tangent coords.
@@ -501,7 +501,7 @@ public class MeshData implements Savable {
    *          the new tangent coords
    */
   public void setTangentCoords(final FloatBufferData bufferData) {
-    setCoords(KEY_TangentCoords, bufferData);
+    setCoords(MeshData.KEY_TangentCoords, bufferData);
   }
 
   /**
@@ -513,7 +513,7 @@ public class MeshData implements Savable {
    * @return the texture buffer for the given index, or null if none was set.
    */
   public FloatBuffer getTextureBuffer(final int index) {
-    return getBuffer(KEY_TextureCoordsPrefix + index);
+    return getBuffer(MeshData.KEY_TextureCoordsPrefix + index);
   }
 
   /**
@@ -543,7 +543,7 @@ public class MeshData implements Savable {
    * @return the texture coords
    */
   public FloatBufferData getTextureCoords(final int index) {
-    return getCoords(KEY_TextureCoordsPrefix + index);
+    return getCoords(MeshData.KEY_TextureCoordsPrefix + index);
   }
 
   /**
@@ -555,7 +555,7 @@ public class MeshData implements Savable {
    *          the unit index
    */
   public void setTextureCoords(final FloatBufferData textureCoords, final int index) {
-    setCoords(KEY_TextureCoordsPrefix + index, textureCoords);
+    setCoords(MeshData.KEY_TextureCoordsPrefix + index, textureCoords);
   }
 
   public void clearAllTextureCoords() {
@@ -563,7 +563,7 @@ public class MeshData implements Savable {
 
     while (items.hasNext()) {
       final Entry<String, AbstractBufferData<? extends Buffer>> entry = items.next();
-      if (entry.getKey().startsWith(KEY_TextureCoordsPrefix)) {
+      if (entry.getKey().startsWith(MeshData.KEY_TextureCoordsPrefix)) {
         items.remove();
       }
     }
@@ -616,16 +616,16 @@ public class MeshData implements Savable {
    *          a multiple to apply to the T channel when copying
    */
   public void copyTextureCoordinates(final int fromIndex, final int toIndex, final float factorS, final float factorT) {
-    final FloatBufferData src = getCoords(KEY_TextureCoordsPrefix + fromIndex);
+    final FloatBufferData src = getCoords(MeshData.KEY_TextureCoordsPrefix + fromIndex);
     if (src == null) {
       return;
     }
 
-    FloatBufferData dest = getCoords(KEY_TextureCoordsPrefix + toIndex);
+    FloatBufferData dest = getCoords(MeshData.KEY_TextureCoordsPrefix + toIndex);
 
     if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
       dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()), src.getValuesPerTuple());
-      setCoords(KEY_TextureCoordsPrefix + toIndex, dest);
+      setCoords(MeshData.KEY_TextureCoordsPrefix + toIndex, dest);
     }
     dest.getBuffer().clear();
     final int oldLimit = src.getBuffer().limit();
@@ -650,8 +650,8 @@ public class MeshData implements Savable {
   public int getMaxTextureUnitUsed() {
     int max = -1;
     for (final String key : _vertexDataItems.keySet()) {
-      if (key.startsWith(KEY_TextureCoordsPrefix)) {
-        final int unit = Integer.parseInt(key.substring(KEY_TextureCoordsPrefix.length()));
+      if (key.startsWith(MeshData.KEY_TextureCoordsPrefix)) {
+        final int unit = Integer.parseInt(key.substring(MeshData.KEY_TextureCoordsPrefix.length()));
         if (unit > max) {
           max = unit;
         }
@@ -1014,7 +1014,7 @@ public class MeshData implements Savable {
         index += primitiveIndex + point;
         break;
       default:
-        logger.warning("unimplemented index mode: " + getIndexMode(0));
+        MeshData.logger.warning("unimplemented index mode: " + getIndexMode(0));
         return -1;
     }
     return index;
@@ -1312,7 +1312,7 @@ public class MeshData implements Savable {
     gatherGCdIds(idMap);
 
     // Walk through the cached items and delete those too.
-    for (final MeshData data : _identityCache.keySet()) {
+    for (final MeshData data : MeshData._identityCache.keySet()) {
       if (data._vaoIdCache != null) {
         if (Constants.useMultipleContexts) {
           final Set<RenderContextRef> renderRefs = data._vaoIdCache.getContextRefs();
@@ -1339,7 +1339,7 @@ public class MeshData implements Savable {
 
     final RenderContextRef uniqueRef = context.getUniqueContextRef();
     // Walk through the cached items and delete those too.
-    for (final MeshData data : _identityCache.keySet()) {
+    for (final MeshData data : MeshData._identityCache.keySet()) {
       // only worry about data that have received ids.
       if (data._vaoIdCache != null) {
         final Integer id = data._vaoIdCache.removeValue(uniqueRef);
@@ -1356,7 +1356,7 @@ public class MeshData implements Savable {
   private static final Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
     // Pull all expired vaos from ref queue and add to an id multimap.
     ContextValueReference<MeshData, Integer> valRef;
-    while ((valRef = (ContextValueReference<MeshData, Integer>) _vaoRefQueue.poll()) != null) {
+    while ((valRef = (ContextValueReference<MeshData, Integer>) MeshData._vaoRefQueue.poll()) != null) {
       if (Constants.useMultipleContexts) {
         final Set<RenderContextRef> contextRefs = valRef.getContextRefs();
         for (final RenderContextRef rep : contextRefs) {
