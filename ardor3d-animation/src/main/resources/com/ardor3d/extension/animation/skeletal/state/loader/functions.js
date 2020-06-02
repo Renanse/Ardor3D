@@ -19,6 +19,35 @@ importPackage(Packages.com.ardor3d.extension.animation.skeletal.state);
  */
  
 /**
+ * Populate derivatives of ClipSource with instance values such as time scale.
+ * 
+ * @param source
+ *            our ClipSource-based class.
+ * @param clip
+ *            our AnimationClip
+ * @param root
+ *            our json root data object.
+ * @return void
+ */
+function _populateClipSource(source, clip, root) {
+	// clip instance params...
+	// add time scaling, if present
+	if (root.timeScale) {
+		MANAGER.getClipInstance(clip).setTimeScale(root.timeScale);
+	}
+	// add loop count
+	if (root.loopCount) {
+		MANAGER.getClipInstance(clip).setLoopCount(root.loopCount);
+	}
+	// add active flag
+	if (root.active) {
+		MANAGER.getClipInstance(clip).setActive(root.active);
+	}
+
+	return;
+}
+
+/**
  * Parse a BlendTreeSource Java object from the given json data structure.
  * 
  * @param json
@@ -216,35 +245,6 @@ function _steadyState(json) {
 	MANAGER.findAnimationLayer(layerName).addSteadyState(state);
 
 	return state;
-}
-
-/**
- * Populate derivatives of ClipSource with instance values such as time scale.
- * 
- * @param source
- *            our ClipSource-based class.
- * @param clip
- *            our AnimationClip
- * @param root
- *            our json root data object.
- * @return void
- */
-function _populateClipSource(source, clip, root) {
-	// clip instance params...
-	// add time scaling, if present
-	if (root.timeScale) {
-		MANAGER.getClipInstance(clip).setTimeScale(root.timeScale);
-	}
-	// add loop count
-	if (root.loopCount) {
-		MANAGER.getClipInstance(clip).setLoopCount(root.loopCount);
-	}
-	// add active flag
-	if (root.active) {
-		MANAGER.getClipInstance(clip).setActive(root.active);
-	}
-
-	return;
 }
 
 /**
