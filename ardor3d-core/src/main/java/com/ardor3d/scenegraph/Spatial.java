@@ -1371,7 +1371,7 @@ public abstract class Spatial implements Savable, Hintable {
    * @return the copy as described.
    */
   public Spatial makeCopy(final boolean shareGeometricData) {
-    final Spatial spat = duplicate();
+    final Spatial spat = newInstance();
 
     // copy basic spatial info
     spat.setName(getName());
@@ -1402,7 +1402,7 @@ public abstract class Spatial implements Savable, Hintable {
     return spat;
   }
 
-  private Spatial duplicate() {
+  private Spatial newInstance() {
     Spatial spat = null;
     final Class<? extends Spatial> clazz = getClass();
     try {
@@ -1443,8 +1443,7 @@ public abstract class Spatial implements Savable, Hintable {
    * @return an instanced copy of this node
    */
   public Spatial makeInstanced() {
-
-    final Spatial spat = duplicate();
+    final Spatial spat = newInstance();
 
     // copy basic spatial info
     spat.setName(getName());
