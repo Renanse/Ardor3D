@@ -25,11 +25,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ardor3d.input.Focus.FocusWrapper;
 import com.ardor3d.input.character.CharacterInputEvent;
 import com.ardor3d.input.character.CharacterInputWrapper;
 import com.ardor3d.input.controller.ControllerEvent;
 import com.ardor3d.input.controller.ControllerWrapper;
+import com.ardor3d.input.focus.FocusWrapper;
 import com.ardor3d.input.gesture.GestureWrapper;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.keyboard.Key;

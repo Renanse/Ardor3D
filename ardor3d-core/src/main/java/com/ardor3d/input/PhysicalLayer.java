@@ -18,7 +18,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.ardor3d.input.Focus.FocusWrapper;
 import com.ardor3d.input.character.CharacterInputEvent;
 import com.ardor3d.input.character.CharacterInputState;
 import com.ardor3d.input.character.CharacterInputWrapper;
@@ -31,6 +30,7 @@ import com.ardor3d.input.dummy.DummyFocusWrapper;
 import com.ardor3d.input.dummy.DummyGestureWrapper;
 import com.ardor3d.input.dummy.DummyKeyboardWrapper;
 import com.ardor3d.input.dummy.DummyMouseWrapper;
+import com.ardor3d.input.focus.FocusWrapper;
 import com.ardor3d.input.gesture.GestureState;
 import com.ardor3d.input.gesture.GestureWrapper;
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;

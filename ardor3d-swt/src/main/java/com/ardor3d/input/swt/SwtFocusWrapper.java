@@ -16,7 +16,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
 
-import com.ardor3d.input.Focus.FocusWrapper;
+import com.ardor3d.input.focus.FocusWrapper;
 
 /**
  * Focus Listener wrapper class for use with SWT.

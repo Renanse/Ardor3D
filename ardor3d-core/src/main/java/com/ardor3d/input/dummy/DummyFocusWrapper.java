@@ -10,7 +10,7 @@
 
 package com.ardor3d.input.dummy;
 
-import com.ardor3d.input.Focus.FocusWrapper;
+import com.ardor3d.input.focus.FocusWrapper;
 
 /**
  * A "do-nothing" implementation of FocusWrapper useful when you want to ignore (or do not need)

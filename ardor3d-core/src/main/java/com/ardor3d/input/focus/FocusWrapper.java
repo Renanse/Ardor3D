@@ -8,7 +8,7 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.input.Focus;
+package com.ardor3d.input.focus;
 
 /**
  * Describes the interface to implement to keep track of focus changes.

@@ -36,7 +36,7 @@ import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.input.Focus.FocusWrapper;
+import com.ardor3d.input.focus.FocusWrapper;
 import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
