@@ -23,7 +23,7 @@ public class TurbulenceFunction3D implements Function3D {
 
   /**
    * Construct a new turbulence function with the given values.
-   * 
+   *
    * @param source
    *          the source function to send our distorted coordinates to.
    * @param power

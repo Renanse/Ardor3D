@@ -28,7 +28,7 @@ public class FbmFunction3D implements Function3D {
 
   /**
    * Construct a new FbmFunction with the given params.
-   * 
+   *
    * @param source
    *          the source function we will operate on.
    * @param octaves

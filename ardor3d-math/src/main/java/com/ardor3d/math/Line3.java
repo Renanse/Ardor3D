@@ -28,7 +28,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
   /**
    * Constructs a new line using the supplied origin point and unit length direction vector
-   * 
+   *
    * @param origin
    *          the origin of the line.
    * @param direction
@@ -40,7 +40,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
   /**
    * Constructs a new line using the supplied source line
-   * 
+   *
    * @param source
    */
   public Line3(final ReadOnlyLine3 source) {
@@ -49,7 +49,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
   /**
    * Copies the values of the given source line into this line.
-   * 
+   *
    * @param source
    * @return this line for chaining
    * @throws NullPointerException
@@ -94,7 +94,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
   /**
    * Check a line... if it is null or the values of its origin or direction are NaN or infinite,
    * return false. Else return true.
-   * 
+   *
    * @param line
    *          the line to check
    * @return true or false as stated above.
@@ -161,7 +161,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
   /**
    * Releases a Line3 back to be used by a future call to fetchTempInstance. TAKE CARE: this Line3
    * object should no longer have other classes referencing it or "Bad Things" will happen.
-   * 
+   *
    * @param line
    *          the Line3 to release.
    */

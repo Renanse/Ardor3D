@@ -18,7 +18,7 @@ public interface Ardor3dExporter {
 
   /**
    * Save a Savable object to the given stream.
-   * 
+   *
    * @param savable
    * @param os
    * @throws IOException
@@ -27,7 +27,7 @@ public interface Ardor3dExporter {
 
   /**
    * Save a Savable object to the given file.
-   * 
+   *
    * @param savable
    * @param file
    * @throws IOException

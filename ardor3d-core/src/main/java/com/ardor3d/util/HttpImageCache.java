@@ -92,9 +92,7 @@ public enum HttpImageCache {
    *          the maximum total size, in bytes, of the Images we will hold in our memory cache. When
    *          we hit this limit, we will flush items out of memory based on LRU logic.
    */
-  public void setMaxMemoryCacheSize(final long maxMemoryCacheSize) {
-    this.maxMemoryCacheSize = maxMemoryCacheSize;
-  }
+  public void setMaxMemoryCacheSize(final long maxMemoryCacheSize) { this.maxMemoryCacheSize = maxMemoryCacheSize; }
 
   /**
    * @return the minimum time, in seconds, between checking an image for remote modification. Default
@@ -106,9 +104,7 @@ public enum HttpImageCache {
    * @param minModCheckSeconds
    *          the minimum time, in seconds, between checking an image for remote modification.
    */
-  public void setMinModCheckSeconds(final long minModCheckSeconds) {
-    this.minModCheckSeconds = minModCheckSeconds;
-  }
+  public void setMinModCheckSeconds(final long minModCheckSeconds) { this.minModCheckSeconds = minModCheckSeconds; }
 
   /**
    * Attempt to retrieve an image, first from the local cache, then from the given URI. Runs
@@ -362,8 +358,8 @@ public enum HttpImageCache {
     final char[] hexChars = new char[bytes.length * 2];
     for (int j = 0; j < bytes.length; j++) {
       final int v = bytes[j] & 0xFF;
-      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+      hexChars[j * 2] = HttpImageCache.HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HttpImageCache.HEX_ARRAY[v & 0x0F];
     }
     return new String(hexChars);
   }
@@ -386,7 +382,7 @@ public enum HttpImageCache {
       return part1 + part2 + ".abi";
     } catch (final NoSuchAlgorithmException ex) {
       String rt = "";
-      final Matcher matcher = NameRegex.matcher(urlText);
+      final Matcher matcher = HttpImageCache.NameRegex.matcher(urlText);
       while (matcher.find()) {
         rt += matcher.group() + "_";
       }

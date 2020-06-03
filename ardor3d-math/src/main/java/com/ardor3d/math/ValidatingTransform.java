@@ -26,7 +26,7 @@ public class ValidatingTransform extends Transform {
 
   /**
    * Copy constructor
-   * 
+   *
    * @param source
    */
   public ValidatingTransform(final ReadOnlyTransform source) {

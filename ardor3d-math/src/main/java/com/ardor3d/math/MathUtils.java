@@ -62,7 +62,7 @@ public class MathUtils {
    * x86 processor (-45 degrees to +45 degrees) The results may be very slightly off from what the
    * Math and StrictMath trig functions give due to rounding in the angle reduction but it will be
    * very very close.
-   * 
+   *
    * note: code from wiki posting on java.net by jeffpk
    */
   private static double reduceSinAngle(double radians) {
@@ -79,9 +79,9 @@ public class MathUtils {
 
   /**
    * Returns sine of a value.
-   * 
+   *
    * note: code from wiki posting on java.net by jeffpk
-   * 
+   *
    * @param dValue
    *          The value to sine, in radians.
    * @return The sine of dValue.
@@ -98,7 +98,7 @@ public class MathUtils {
 
   /**
    * Returns cos of a value.
-   * 
+   *
    * @param dValue
    *          The value to cosine, in radians.
    * @return The cosine of dValue.
@@ -135,7 +135,7 @@ public class MathUtils {
   /**
    * Converts a point from Spherical coordinates to Cartesian (using positive Y as up) and stores the
    * results in the store var.
-   * 
+   *
    * @param sphereCoords
    *          (Radius, Azimuth, Polar)
    * @param store
@@ -158,7 +158,7 @@ public class MathUtils {
   /**
    * Converts a point from Cartesian coordinates (using positive Y as up) to Spherical and stores the
    * results in the store var. (Radius, Azimuth, Polar)
-   * 
+   *
    * @param cartCoords
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -183,7 +183,7 @@ public class MathUtils {
   /**
    * Converts a point from Spherical coordinates to Cartesian (using positive Z as up) and stores the
    * results in the store var.
-   * 
+   *
    * @param sphereCoords
    *          (Radius, Azimuth, Polar)
    * @param store
@@ -206,7 +206,7 @@ public class MathUtils {
   /**
    * Converts a point from Cartesian coordinates (using positive Z as up) to Spherical and stores the
    * results in the store var. (Radius, Azimuth, Polar)
-   * 
+   *
    * @param cartCoords
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -230,12 +230,12 @@ public class MathUtils {
 
   /**
    * Returns true if the number is a power of 2 (2,4,8,16...)
-   * 
+   *
    * A good implementation found on the Java boards. note: a number is a power of two if and only if
    * it is the smallest number with that number of significant bits. Therefore, if you subtract 1, you
    * know that the new number will have fewer bits, so ANDing the original number with anything less
    * than it will give 0.
-   * 
+   *
    * @param number
    *          The number to test.
    * @return True if it is a power of two.
@@ -264,7 +264,7 @@ public class MathUtils {
 
   /**
    * Sets the seed to use for "random" operations. The default is the current system milliseconds.
-   * 
+   *
    * @param seed
    */
   public static void setRandomSeed(final long seed) {
@@ -273,7 +273,7 @@ public class MathUtils {
 
   /**
    * Returns a random double between 0 and 1.
-   * 
+   *
    * @return A random double between <tt>0.0</tt> (inclusive) to <tt>1.0</tt> (exclusive).
    */
   public static double nextRandomDouble() {
@@ -282,7 +282,7 @@ public class MathUtils {
 
   /**
    * Returns a random float between 0 and 1.
-   * 
+   *
    * @return A random float between <tt>0.0f</tt> (inclusive) to <tt>1.0f</tt> (exclusive).
    */
   public static float nextRandomFloat() {
@@ -298,7 +298,7 @@ public class MathUtils {
 
   /**
    * Returns a random int between min and max.
-   * 
+   *
    * @return A random int between <tt>min</tt> (inclusive) to <tt>max</tt> (inclusive).
    */
   public static int nextRandomInt(final int min, final int max) {
@@ -306,7 +306,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param percent
    * @param startValue
    * @param endValue
@@ -320,7 +320,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param percent
    * @param startValue
    * @param endValue
@@ -335,7 +335,7 @@ public class MathUtils {
 
   /**
    * plot a given value on the cubic S-curve: 3t^2 - 2t^3
-   * 
+   *
    * @param t
    *          our input value
    * @return the plotted value
@@ -348,7 +348,7 @@ public class MathUtils {
 
   /**
    * plot a given value on the cubic S-curve: 3t^2 - 2t^3
-   * 
+   *
    * @param t
    *          our input value
    * @return the plotted value
@@ -361,7 +361,7 @@ public class MathUtils {
 
   /**
    * plot a given value on the quintic S-curve: 6t^5 - 15t^4 + 10t^3
-   * 
+   *
    * @param t
    *          our input value
    * @return the plotted value
@@ -375,7 +375,7 @@ public class MathUtils {
 
   /**
    * plot a given value on the quintic S-curve: 6t^5 - 15t^4 + 10t^3
-   * 
+   *
    * @param t
    *          our input value
    * @return the plotted value
@@ -388,7 +388,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param left
    * @param right
    * @param bottom
@@ -410,7 +410,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param left
    * @param right
    * @param bottom
@@ -426,7 +426,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param fovY
    * @param aspect
    * @param zNear
@@ -442,7 +442,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param position
    * @param target
    * @param up
@@ -472,7 +472,7 @@ public class MathUtils {
   }
 
   /**
-   * 
+   *
    * @param position
    * @param target
    * @param up
@@ -499,7 +499,7 @@ public class MathUtils {
   /**
    * Faster floor function. Does not handle NaN and Infinity. (Not handled when doing Math.floor and
    * just casting anyways, so question is if we want to handle it or not)
-   * 
+   *
    * @param val
    *          Value to floor
    * @return Floored int value
@@ -512,7 +512,7 @@ public class MathUtils {
   /**
    * Faster floor function. Does not handle NaN and Infinity. (Not handled when doing Math.floor and
    * just casting anyways, so question is if we want to handle it or not)
-   * 
+   *
    * @param val
    *          Value to floor
    * @return Floored long value
@@ -570,7 +570,7 @@ public class MathUtils {
 
   /**
    * Simple 2^x
-   * 
+   *
    * @param x
    *          power
    * @return 2^x

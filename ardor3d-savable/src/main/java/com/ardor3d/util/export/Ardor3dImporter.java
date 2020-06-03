@@ -19,7 +19,7 @@ public interface Ardor3dImporter {
 
   /**
    * Load a Savable object from the given stream.
-   * 
+   *
    * @param is
    * @return the savable object.
    * @throws IOException
@@ -28,7 +28,7 @@ public interface Ardor3dImporter {
 
   /**
    * Load a Savable object from the given URL.
-   * 
+   *
    * @param url
    * @return the savable object.
    * @throws IOException
@@ -37,7 +37,7 @@ public interface Ardor3dImporter {
 
   /**
    * Load a Savable object from the given file.
-   * 
+   *
    * @param file
    * @return the savable object.
    * @throws IOException
@@ -46,7 +46,7 @@ public interface Ardor3dImporter {
 
   /**
    * Load a Savable object from the given byte array, starting at the first index.
-   * 
+   *
    * @param data
    * @return the savable object.
    * @throws IOException

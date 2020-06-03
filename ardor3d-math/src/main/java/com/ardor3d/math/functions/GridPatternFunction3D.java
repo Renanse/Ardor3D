@@ -22,7 +22,7 @@ public class GridPatternFunction3D implements Function3D {
 
   /**
    * Create the grid pattern function. The x-scale and y-scale will both default to 1.0.
-   * 
+   *
    * @param grid
    *          A grid of values in the range of -1 to 1.
    */
@@ -32,7 +32,7 @@ public class GridPatternFunction3D implements Function3D {
 
   /**
    * Create the grid pattern function.
-   * 
+   *
    * @param grid
    *          A grid of values in the range of -1 to 1.
    * @param xScaleFactor
@@ -48,7 +48,7 @@ public class GridPatternFunction3D implements Function3D {
 
   /**
    * Evaluate the x and y valus (ignores z) to determine the value to return.
-   * 
+   *
    * @return
    */
   @Override

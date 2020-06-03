@@ -30,7 +30,7 @@ public class ArchimedeanSpiralFunction3D implements Function3D {
 
   /**
    * Create the function for the specified number of arms, and optionally use the default turbulence.
-   * 
+   *
    * @param numArms
    *          The number of arms of the spiral (1 or more).
    * @param useDefaultTurbulence
@@ -42,7 +42,7 @@ public class ArchimedeanSpiralFunction3D implements Function3D {
 
   /**
    * Create the function for the specified number of arms, with the specified turbulence.
-   * 
+   *
    * @param numArms
    *          The number of arms of the spiral (1 or more).
    * @param turbulenceFunction
@@ -55,7 +55,7 @@ public class ArchimedeanSpiralFunction3D implements Function3D {
 
   /**
    * Evaluate the function.
-   * 
+   *
    * @return A result which is generally, but not always, in the -1 to 1 range.
    */
   @Override

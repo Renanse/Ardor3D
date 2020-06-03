@@ -41,7 +41,7 @@ public class VoroniFunction3D implements Function3D {
 
   /**
    * Construct a new Voronoi graph function.
-   * 
+   *
    * @param frequency
    *          used to modulate input coordinates
    * @param displacement

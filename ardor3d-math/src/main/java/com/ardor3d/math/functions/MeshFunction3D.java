@@ -29,7 +29,7 @@ public class MeshFunction3D implements Function3D {
   /**
    * Create a MeshFunction3D with the specified lineSize. Lower lineSize values will result in thinner
    * lines.
-   * 
+   *
    * @param lineSize
    *          The line size, which should be greater than zero.
    */

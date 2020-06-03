@@ -29,7 +29,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
   /**
    * Copy constructor.
-   * 
+   *
    * @param source
    *          the ray to copy from.
    */
@@ -39,7 +39,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
   /**
    * Constructs a new ray using the supplied origin point and unit length direction vector
-   * 
+   *
    * @param origin
    * @param direction
    *          - unit length
@@ -50,7 +50,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
   /**
    * Copies the values of the given source ray into this ray.
-   * 
+   *
    * @param source
    * @return this ray for chaining
    * @throws NullPointerException
@@ -179,7 +179,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
   /**
    * Ray vs triangle implementation.
-   * 
+   *
    * @param pointA
    * @param pointB
    * @param pointC
@@ -317,7 +317,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
   /**
    * Check a ray... if it is null or the values of its origin or direction are NaN or infinite, return
    * false. Else return true.
-   * 
+   *
    * @param ray
    *          the ray to check
    * @return true or false as stated above.
@@ -384,7 +384,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
   /**
    * Releases a Ray back to be used by a future call to fetchTempInstance. TAKE CARE: this Ray object
    * should no longer have other classes referencing it or "Bad Things" will happen.
-   * 
+   *
    * @param ray
    *          the Ray to release.
    */

@@ -18,7 +18,7 @@ public final class CapsuleUtils {
 
   /**
    * Convert an object array to a Savable array for easier use during export.
-   * 
+   *
    * @param values
    *          our object array, should be of a class type that implements Savable.
    * @return the array as Savable.
@@ -33,7 +33,7 @@ public final class CapsuleUtils {
 
   /**
    * Converts from a Savable array to a particular class type for import operations.
-   * 
+   *
    * @param <T>
    *          The class type to convert to.
    * @param array

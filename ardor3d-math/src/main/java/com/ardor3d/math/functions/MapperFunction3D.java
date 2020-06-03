@@ -28,7 +28,7 @@ public class MapperFunction3D implements Function3D {
   /**
    * Construct a mapper function using the given map function and a start and end for the domain we'll
    * use.
-   * 
+   *
    * @param mapFunction
    * @param domainStart
    * @param domainEnd
@@ -98,7 +98,7 @@ public class MapperFunction3D implements Function3D {
   /**
    * Add a new source function to the end of our set of ranged functions. Our place in the range is
    * based on the place of the previous source function and the offsetStart provided.
-   * 
+   *
    * @param source
    *          the new function to add
    * @param offsetStart

@@ -47,7 +47,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
   /**
    * Constructor creates a new <code>Rectangle2</code> with using the given x,y,width and height
    * values.
-   * 
+   *
    */
   public Rectangle2(final int x, final int y, final int width, final int height) {
     setX(x);
@@ -59,7 +59,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
   /**
    * Constructor creates a new <code>Rectangle2</code> using the values of the provided source
    * rectangle.
-   * 
+   *
    * @param source
    *          the rectangle to copy from
    */
@@ -219,7 +219,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
 
   /**
    * Used with serialization. Not to be called manually.
-   * 
+   *
    * @param in
    *          ObjectInput
    * @throws IOException
@@ -235,7 +235,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
 
   /**
    * Used with serialization. Not to be called manually.
-   * 
+   *
    * @param out
    *          ObjectOutput
    * @throws IOException
@@ -268,7 +268,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
   /**
    * Releases a Rectangle2 back to be used by a future call to fetchTempInstance. TAKE CARE: this
    * object should no longer have other classes referencing it or "Bad Things" will happen.
-   * 
+   *
    * @param rectangle
    *          the Rectangle2 to release.
    */

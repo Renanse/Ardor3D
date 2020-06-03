@@ -22,7 +22,7 @@ public class CylinderFunction3D implements Function3D {
 
   /**
    * Construct a new CylinderFunction3D with the given frequency
-   * 
+   *
    * @param frequency
    *          the number of rings per unit
    */

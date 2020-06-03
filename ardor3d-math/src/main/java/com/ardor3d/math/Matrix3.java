@@ -65,7 +65,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Constructs a new, mutable matrix using the given matrix values (names are mRC = m[ROW][COL])
-   * 
+   *
    * @param m00
    * @param m01
    * @param m02
@@ -92,7 +92,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Constructs a new, mutable matrix using the values from the given matrix
-   * 
+   *
    * @param source
    */
   public Matrix3(final ReadOnlyMatrix3 source) {
@@ -203,7 +203,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Same as set(IDENTITY)
-   * 
+   *
    * @return this matrix for chaining
    */
   public Matrix3 setIdentity() {
@@ -218,7 +218,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets the value of this matrix at row, column to the given value.
-   * 
+   *
    * @param row
    * @param column
    * @param value
@@ -285,7 +285,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets the values of this matrix to the values given.
-   * 
+   *
    * @param m00
    * @param m01
    * @param m02
@@ -315,7 +315,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets the values of this matrix to the values of the provided source matrix.
-   * 
+   *
    * @param source
    * @return this matrix for chaining
    * @throws NullPointerException
@@ -339,7 +339,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets the values of this matrix to the rotational value of the given quaternion.
-   * 
+   *
    * @param quaternion
    * @return this matrix for chaining
    */
@@ -391,7 +391,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Note: data is cast to floats.
-   * 
+   *
    * @param store
    *          the buffer to read our matrix data from.
    * @return this matrix for chaining.
@@ -402,7 +402,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Note: data is cast to floats.
-   * 
+   *
    * @param store
    *          the buffer to read our matrix data from.
    * @param rowMajor
@@ -437,7 +437,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets the values of this matrix to the values of the provided double array.
-   * 
+   *
    * @param source
    * @return this matrix for chaining
    * @throws NullPointerException
@@ -451,7 +451,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets the values of this matrix to the values of the provided double array.
-   * 
+   *
    * @param source
    * @param rowMajor
    * @return this matrix for chaining
@@ -487,7 +487,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Replaces a column in this matrix with the values of the given vector.
-   * 
+   *
    * @param columnIndex
    * @param columnData
    * @return this matrix for chaining
@@ -521,7 +521,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Replaces a row in this matrix with the values of the given vector.
-   * 
+   *
    * @param rowIndex
    * @param rowData
    * @return this matrix for chaining
@@ -555,7 +555,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Set the values of this matrix from the axes (columns) provided.
-   * 
+   *
    * @param uAxis
    * @param vAxis
    * @param wAxis
@@ -574,7 +574,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    * Sets this matrix to the rotation indicated by the given angle and axis of rotation. Note: This
    * method creates an object, so use fromAngleNormalAxis when possible, particularly if your axis is
    * already normalized.
-   * 
+   *
    * @param angle
    *          the angle to rotate (in radians).
    * @param axis
@@ -593,7 +593,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Sets this matrix to the rotation indicated by the given angle and a unit-length axis of rotation.
-   * 
+   *
    * @param angle
    *          the angle to rotate (in radians).
    * @param axis
@@ -632,11 +632,11 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * XXX: Need to redo this again... or at least correct the terms. YRP are arbitrary terms, based on
    * a specific frame of axis.
-   * 
+   *
    * Updates this matrix from the given Euler rotation angles (y,r,p). Note that we are applying in
    * order: roll, pitch, yaw but we've ordered them in x, y, and z for convenience. See:
    * http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
-   * 
+   *
    * @param yaw
    *          the Euler yaw of rotation (in radians). (aka Bank, often rot around x)
    * @param roll
@@ -707,7 +707,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Apply rotation around X (Mrx * this)
-   * 
+   *
    * @param angle
    * @return
    */
@@ -733,7 +733,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Apply rotation around Y (Mry * this)
-   * 
+   *
    * @param angle
    * @return
    */
@@ -759,7 +759,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Apply rotation around Z (Mrz * this)
-   * 
+   *
    * @param angle
    * @return
    */
@@ -915,7 +915,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Note: data is cast to floats.
-   * 
+   *
    * @param store
    *          the buffer to store our matrix data in. Must not be null. Data is entered starting at
    *          current buffer position.
@@ -933,7 +933,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Note: data is cast to floats.
-   * 
+   *
    * @param store
    *          the buffer to store our matrix data in. Must not be null. Data is entered starting at
    *          current buffer position.
@@ -1031,7 +1031,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * converts this matrix to Euler rotation angles (yaw, roll, pitch). See
    * http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/index.htm
-   * 
+   *
    * @param store
    *          the double[] array to store the computed angles in. If null, a new double[] will be
    *          created
@@ -1114,7 +1114,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Multiplies this matrix by the diagonal matrix formed by the given vector (v^D * M). If supplied,
    * the result is stored into the supplied "store" matrix.
-   * 
+   *
    * @param vec
    * @param store
    *          a matrix to store the result in. If store is null, a new matrix is created. Note that it
@@ -1141,7 +1141,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Multiplies this matrix by the diagonal matrix formed by the given vector (M * v^D). If supplied,
    * the result is stored into the supplied "store" matrix.
-   * 
+   *
    * @param vec
    * @param store
    *          a matrix to store the result in. If store is null, a new matrix is created. Note that it
@@ -1167,7 +1167,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Internally scales all values of this matrix by the given scalar.
-   * 
+   *
    * @param scalar
    * @return this matrix for chaining.
    */
@@ -1216,7 +1216,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Internally adds the values of the given matrix to this matrix.
-   * 
+   *
    * @param matrix
    *          the matrix to add to this.
    * @return this matrix for chaining
@@ -1259,7 +1259,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Internally subtracts the values of the given matrix from this matrix.
-   * 
+   *
    * @param matrix
    *          the matrix to subtract from this.
    * @return this matrix for chaining
@@ -1272,7 +1272,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Applies the given scale to this matrix and returns the result as a new matrix
-   * 
+   *
    * @param scale
    * @param store
    *          a matrix to store the result in. If store is null, a new matrix is created.
@@ -1295,7 +1295,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Applies the given scale to this matrix values internally
-   * 
+   *
    * @param scale
    * @return this matrix for chaining.
    * @throws NullPointerException
@@ -1307,7 +1307,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * transposes this matrix as a new matrix, basically flipping it across the diagonal
-   * 
+   *
    * @param store
    *          a matrix to store the result in. If store is null, a new matrix is created.
    * @return this matrix for chaining.
@@ -1334,7 +1334,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * transposes this matrix in place
-   * 
+   *
    * @return this matrix for chaining.
    * @see <a href="http://en.wikipedia.org/wiki/Transpose">wikipedia.org-Transpose</a>
    */
@@ -1356,7 +1356,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    *          a matrix to store the result in. If store is null, a new matrix is created. Note that it
    *          IS safe for store == this.
    * @return a matrix that represents this matrix, inverted.
-   * 
+   *
    *         if store is not null and is read only
    * @throws ArithmeticException
    *           if this matrix can not be inverted.
@@ -1389,7 +1389,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Inverts this matrix locally.
-   * 
+   *
    * @return this matrix inverted internally.
    * @throws ArithmeticException
    *           if this matrix can not be inverted.
@@ -1445,7 +1445,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * A function for creating a rotation matrix that rotates a vector called "start" into another
    * vector called "end".
-   * 
+   *
    * @param start
    *          normalized non-zero starting vector
    * @param end
@@ -1528,7 +1528,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Multiplies the given vector by this matrix (v * M). If supplied, the result is stored into the
    * supplied "store" vector.
-   * 
+   *
    * @param vec
    *          the vector to multiply this matrix by.
    * @param store
@@ -1558,7 +1558,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Multiplies the given vector by this matrix (M * v). If supplied, the result is stored into the
    * supplied "store" vector.
-   * 
+   *
    * @param vec
    *          the vector to multiply this matrix by.
    * @param store
@@ -1588,7 +1588,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Modifies this matrix to equal the rotation required to point the z-axis at 'direction' and the
    * y-axis to 'up'.
-   * 
+   *
    * @param direction
    *          where to 'look' at
    * @param up
@@ -1614,7 +1614,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Check a matrix... if it is null or its doubles are NaN or infinite, return false. Else return
    * true.
-   * 
+   *
    * @param matrix
    *          the vector to check
    * @return true or false as stated above.
@@ -1863,7 +1863,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Used with serialization. Not to be called manually.
-   * 
+   *
    * @param in
    *          ObjectInput
    * @throws IOException
@@ -1884,7 +1884,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * Used with serialization. Not to be called manually.
-   * 
+   *
    * @param out
    *          ObjectOutput
    * @throws IOException
@@ -1922,7 +1922,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * Releases a Matrix3 back to be used by a future call to fetchTempInstance. TAKE CARE: this Matrix3
    * object should no longer have other classes referencing it or "Bad Things" will happen.
-   * 
+   *
    * @param mat
    *          the Matrix3 to release.
    */

@@ -99,7 +99,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Constructs a new vector set to the (x, y, z, w) values of the given source vector.
-   * 
+   *
    * @param src
    */
   public Vector4(final ReadOnlyVector4 src) {
@@ -108,7 +108,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Constructs a new vector set to (x, y, z, w).
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -186,7 +186,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    *          to set to one of x, y, z or w.
    * @throws IllegalArgumentException
    *           if index is not one of 0, 1, 2, 3.
-   * 
+   *
    *           if this vector is read only
    */
   public void setValue(final int index, final double value) {
@@ -209,7 +209,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Stores the double values of this vector in the given double array.
-   * 
+   *
    * @param store
    *          if null, a new double[4] array is created.
    * @return the double array
@@ -231,35 +231,35 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Sets the first component of this vector to the given double value.
-   * 
+   *
    * @param x
    */
   public void setX(final double x) { _x = x; }
 
   /**
    * Sets the second component of this vector to the given double value.
-   * 
+   *
    * @param y
    */
   public void setY(final double y) { _y = y; }
 
   /**
    * Sets the third component of this vector to the given double value.
-   * 
+   *
    * @param z
    */
   public void setZ(final double z) { _z = z; }
 
   /**
    * Sets the fourth component of this vector to the given double value.
-   * 
+   *
    * @param w
    */
   public void setW(final double w) { _w = w; }
 
   /**
    * Sets the value of this vector to (x, y, z, w)
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -276,7 +276,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Sets the value of this vector to the (x, y, z, w) values of the provided source vector.
-   * 
+   *
    * @param source
    * @return this vector for chaining
    * @throws NullPointerException
@@ -292,7 +292,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Sets the value of this vector to (0, 0, 0, 0)
-   * 
+   *
    * @return this vector for chaining
    */
   public Vector4 zero() {
@@ -301,7 +301,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Adds the given values to those of this vector and returns them in store.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -323,7 +323,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Increments the values of this vector with the given x, y, z and w values.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -336,7 +336,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Adds the values of the given source vector to those of this vector and returns them in store.
-   * 
+   *
    * @param source
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -352,7 +352,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Increments the values of this vector with the x, y, z and w values of the given vector.
-   * 
+   *
    * @param source
    * @return this vector for chaining
    * @throws NullPointerException
@@ -364,7 +364,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Subtracts the given values from those of this vector and returns them in store.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -386,7 +386,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Decrements the values of this vector by the given x, y, z and w values.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -400,7 +400,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   /**
    * Subtracts the values of the given source vector from those of this vector and returns them in
    * store.
-   * 
+   *
    * @param source
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -416,7 +416,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Decrements the values of this vector by the x, y, z and w values from the given source vector.
-   * 
+   *
    * @param source
    * @return this vector for chaining
    * @throws NullPointerException
@@ -428,7 +428,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Multiplies the values of this vector by the given scalar value and returns the result in store.
-   * 
+   *
    * @param scalar
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -447,7 +447,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Internally modifies the values of this vector by multiplying them each by the given scalar value.
-   * 
+   *
    * @param scalar
    * @return this vector for chaining
    */
@@ -457,7 +457,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Multiplies the values of this vector by the given scalar value and returns the result in store.
-   * 
+   *
    * @param scale
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -476,7 +476,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Internally modifies the values of this vector by multiplying them each by the given scale values.
-   * 
+   *
    * @param scale
    * @return this vector for chaining
    */
@@ -486,7 +486,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Multiplies the values of this vector by the given scalar value and returns the result in store.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -508,7 +508,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Internally modifies the values of this vector by multiplying them each by the given scale values.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -521,7 +521,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Divides the values of this vector by the given scalar value and returns the result in store.
-   * 
+   *
    * @param scalar
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -540,11 +540,11 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Internally modifies the values of this vector by dividing them each by the given scalar value.
-   * 
+   *
    * @param scalar
    * @return this vector for chaining
-   * 
-   * 
+   *
+   *
    * @throws ArithmeticException
    *           if scalar is 0
    */
@@ -556,7 +556,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Divides the values of this vector by the given scale values and returns the result in store.
-   * 
+   *
    * @param scale
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
@@ -575,7 +575,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Internally modifies the values of this vector by dividing them each by the given scale values.
-   * 
+   *
    * @param scale
    * @return this vector for chaining
    */
@@ -585,7 +585,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Divides the values of this vector by the given scale values and returns the result in store.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -607,7 +607,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Internally modifies the values of this vector by dividing them each by the given scale values.
-   * 
+   *
    * @param x
    * @param y
    * @param z
@@ -619,10 +619,10 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   }
 
   /**
-   * 
+   *
    * Internally modifies this vector by multiplying its values with a given scale value, then adding a
    * given "add" value.
-   * 
+   *
    * @param scale
    *          the value to multiply this vector by.
    * @param add
@@ -640,7 +640,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   /**
    * Scales this vector by multiplying its values with a given scale value, then adding a given "add"
    * value. The result is store in the given store parameter.
-   * 
+   *
    * @param scale
    *          the value to multiply by.
    * @param add
@@ -685,7 +685,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   /**
    * Creates a new unit length vector from this one by dividing by length. If the length is 0, (ie, if
    * the vector is 0, 0, 0, 0) then a new vector (0, 0, 0, 0) is returned.
-   * 
+   *
    * @param store
    *          the vector to store the result in for return. If null, a new vector object is created
    *          and returned.
@@ -704,7 +704,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   /**
    * Converts this vector into a unit vector by dividing it internally by its length. If the length is
    * 0, (ie, if the vector is 0, 0, 0, 0) then no action is taken.
-   * 
+   *
    * @return this vector for chaining
    */
   public Vector4 normalizeLocal() {
@@ -721,7 +721,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * scalar as a percent. iow, if changeAmnt is closer to 0, the result will be closer to the current
    * value of this vector and if it is closer to 1, the result will be closer to the end value. The
    * result is returned as a new vector object.
-   * 
+   *
    * @param endVec
    * @param scalar
    * @param store
@@ -750,12 +750,12 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * scalar as a percent. iow, if changeAmnt is closer to 0, the result will be closer to the current
    * value of this vector and if it is closer to 1, the result will be closer to the end value. The
    * result is stored back in this vector.
-   * 
+   *
    * @param endVec
    * @param scalar
    * @return this vector for chaining
-   * 
-   * 
+   *
+   *
    * @throws NullPointerException
    *           if endVec is null.
    */
@@ -772,7 +772,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * as a percent. iow, if changeAmnt is closer to 0, the result will be closer to the begin value and
    * if it is closer to 1, the result will be closer to the end value. The result is returned as a new
    * vector object.
-   * 
+   *
    * @param beginVec
    * @param endVec
    * @param scalar
@@ -803,14 +803,14 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * as a percent. iow, if changeAmnt is closer to 0, the result will be closer to the begin value and
    * if it is closer to 1, the result will be closer to the end value. The result is stored back in
    * this vector.
-   * 
+   *
    * @param beginVec
    * @param endVec
    * @param changeAmnt
    *          the scalar as a percent.
    * @return this vector for chaining
-   * 
-   * 
+   *
+   *
    * @throws NullPointerException
    *           if beginVec or endVec are null.
    */
@@ -921,7 +921,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   /**
    * Check a vector... if it is null or its doubles are NaN or infinite, return false. Else return
    * true.
-   * 
+   *
    * @param vector
    *          the vector to check
    * @return true or false as stated above.
@@ -1027,7 +1027,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Used with serialization. Not to be called manually.
-   * 
+   *
    * @param in
    *          ObjectInput
    * @throws IOException
@@ -1043,7 +1043,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
   /**
    * Used with serialization. Not to be called manually.
-   * 
+   *
    * @param out
    *          ObjectOutput
    * @throws IOException
@@ -1076,7 +1076,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   /**
    * Releases a Vector4 back to be used by a future call to fetchTempInstance. TAKE CARE: this Vector4
    * object should no longer have other classes referencing it or "Bad Things" will happen.
-   * 
+   *
    * @param vec
    *          the Vector4 to release.
    */

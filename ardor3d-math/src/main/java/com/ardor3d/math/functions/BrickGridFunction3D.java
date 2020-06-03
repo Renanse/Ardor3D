@@ -43,7 +43,7 @@ public class BrickGridFunction3D extends GridPatternFunction3D {
 
   /**
    * Create a brick pattern with values specified by the caller.
-   * 
+   *
    * @param brickLength
    *          The number of grid cells used for the length of a brick (default 12).
    * @param brickHeight

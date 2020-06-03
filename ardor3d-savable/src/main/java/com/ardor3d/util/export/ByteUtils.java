@@ -23,7 +23,7 @@ public abstract class ByteUtils {
 
   /**
    * Takes an InputStream and returns the complete byte content of it
-   * 
+   *
    * @param inputStream
    *          The input stream to read from
    * @return The byte array containing the data from the input stream
@@ -54,7 +54,7 @@ public abstract class ByteUtils {
 
   /**
    * Writes a short out to an OutputStream.
-   * 
+   *
    * @param outputStream
    *          The OutputStream the short will be written to
    * @param value
@@ -80,7 +80,7 @@ public abstract class ByteUtils {
 
   /**
    * Read in a short from an InputStream
-   * 
+   *
    * @param inputStream
    *          The InputStream used to read the short
    * @return A short, which is the next 2 bytes converted from the InputStream
@@ -112,7 +112,7 @@ public abstract class ByteUtils {
 
   /**
    * Writes an integer out to an OutputStream.
-   * 
+   *
    * @param outputStream
    *          The OutputStream the integer will be written to
    * @param integer
@@ -140,7 +140,7 @@ public abstract class ByteUtils {
 
   /**
    * Read in an integer from an InputStream
-   * 
+   *
    * @param inputStream
    *          The InputStream used to read the integer
    * @return An int, which is the next 4 bytes converted from the InputStream
@@ -173,7 +173,7 @@ public abstract class ByteUtils {
 
   /**
    * Writes a long out to an OutputStream.
-   * 
+   *
    * @param outputStream
    *          The OutputStream the long will be written to
    * @param value
@@ -213,7 +213,7 @@ public abstract class ByteUtils {
 
   /**
    * Read in a long from an InputStream
-   * 
+   *
    * @param inputStream
    *          The InputStream used to read the long
    * @return A long, which is the next 8 bytes converted from the InputStream
@@ -247,7 +247,7 @@ public abstract class ByteUtils {
 
   /**
    * Writes a double out to an OutputStream.
-   * 
+   *
    * @param outputStream
    *          The OutputStream the double will be written to
    * @param value
@@ -270,7 +270,7 @@ public abstract class ByteUtils {
 
   /**
    * Read in a double from an InputStream
-   * 
+   *
    * @param inputStream
    *          The InputStream used to read the double
    * @return A double, which is the next 8 bytes converted from the InputStream
@@ -302,7 +302,7 @@ public abstract class ByteUtils {
 
   /**
    * Writes an float out to an OutputStream.
-   * 
+   *
    * @param outputStream
    *          The OutputStream the float will be written to
    * @param fVal
@@ -325,7 +325,7 @@ public abstract class ByteUtils {
 
   /**
    * Read in a float from an InputStream
-   * 
+   *
    * @param inputStream
    *          The InputStream used to read the float
    * @return A float, which is the next 4 bytes converted from the InputStream
@@ -357,7 +357,7 @@ public abstract class ByteUtils {
 
   /**
    * Writes a boolean out to an OutputStream.
-   * 
+   *
    * @param outputStream
    *          The OutputStream the boolean will be written to
    * @param bVal
@@ -381,7 +381,7 @@ public abstract class ByteUtils {
 
   /**
    * Read in a boolean from an InputStream
-   * 
+   *
    * @param inputStream
    *          The InputStream used to read the boolean
    * @return A boolean, which is the next byte converted from the InputStream (iow, byte != 0)
