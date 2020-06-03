@@ -393,17 +393,17 @@ public enum HttpImageCache {
   }
 
   private class ImageCacheItem {
-    String id;
-    String type;
-    boolean flipped;
+    private final String id;
+    private final String type;
+    private final boolean flipped;
 
-    Image value;
+    private Image value;
 
-    Instant lastModified;
-    Instant lastAccessed = Instant.now();
-    Instant lastChecked = Instant.ofEpochMilli(0L);
+    private Instant lastModified;
+    private Instant lastAccessed = Instant.now();
+    private Instant lastChecked = Instant.ofEpochMilli(0L);
 
-    int memorySize = -1;
+    private int memorySize = -1;
 
     public ImageCacheItem(final String id, final String type, final boolean flipped) {
       this.id = id;
