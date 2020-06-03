@@ -18,13 +18,13 @@ public enum MouseButton {
   public static EnumMap<MouseButton, ButtonState> makeMap(final ButtonState left, final ButtonState right,
       final ButtonState middle) {
     if (left == null) {
-      throw new NullPointerException("left");
+      throw new IllegalArgumentException("left was null");
     }
     if (right == null) {
-      throw new NullPointerException("right");
+      throw new IllegalArgumentException("right was null");
     }
     if (middle == null) {
-      throw new NullPointerException("middle");
+      throw new IllegalArgumentException("middle was null");
     }
     final EnumMap<MouseButton, ButtonState> map = new EnumMap<>(MouseButton.class);
     map.put(LEFT, left);

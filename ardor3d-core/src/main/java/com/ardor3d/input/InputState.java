@@ -48,25 +48,29 @@ public class InputState {
    *          a non-null GestureState instance
    * @param characterState
    *          a non-null CharacterInputState instance
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if any parameter is null
    */
   public InputState(final KeyboardState keyboardState, final MouseState mouseState,
     final ControllerState controllerState, final GestureState gestureState, final CharacterInputState characterState) {
     if (keyboardState == null) {
-      throw new NullPointerException("Keyboard state");
+      throw new IllegalArgumentException("keyboardState was null");
     }
 
     if (mouseState == null) {
-      throw new NullPointerException("Mouse state");
+      throw new IllegalArgumentException("mouseState was null");
     }
 
     if (controllerState == null) {
-      throw new NullPointerException("Controller state");
+      throw new IllegalArgumentException("controllerState was null");
     }
 
     if (gestureState == null) {
-      throw new NullPointerException("Gesture state");
+      throw new IllegalArgumentException("gestureState was null");
+    }
+
+    if (characterState == null) {
+      throw new IllegalArgumentException("characterState was null");
     }
 
     _keyboardState = keyboardState;

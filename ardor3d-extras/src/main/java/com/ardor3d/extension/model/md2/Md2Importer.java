@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.model.md2;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,16 +91,20 @@ public class Md2Importer {
    * @param resource
    *          a resource pointing to the model we wish to load.
    * @return an Md2DataStore data object containing the scene and other useful elements.
+   * @throws IllegalArgumentException
+   *           is resource is null
+   * @throws IOException
+   *           if resource.openStream() returns null.
    */
   public Md2DataStore load(final ResourceSource resource) {
     if (resource == null) {
-      throw new NullPointerException("Unable to load null resource");
+      throw new IllegalArgumentException("resource was null");
     }
 
     try {
       final InputStream md2Stream = resource.openStream();
       if (md2Stream == null) {
-        throw new NullPointerException("Unable to load null streams");
+        throw new IOException("resource stream was null");
       }
       // final Md2DataStore store = new Md2DataStore();
       final LittleEndianRandomAccessDataInput bis = new LittleEndianRandomAccessDataInput(md2Stream);

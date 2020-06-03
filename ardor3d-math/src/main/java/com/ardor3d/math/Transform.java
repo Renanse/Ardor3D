@@ -83,10 +83,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * Constructs a new Transform object from the information stored in the given source Transform.
    *
    * @param source
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if source is null.
    */
   public Transform(final ReadOnlyTransform source) {
+    MathUtils.checkArgumentNotNull(source, "source");
+
     _matrix.set(source.getMatrix());
     _scale.set(source.getScale());
     _translation.set(source.getTranslation());
@@ -106,11 +108,15 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param identity
    * @param rotationMatrix
    * @param uniformScale
-   * @throws NullPointerException
-   *           if a param is null.
+   * @throws IllegalArgumentException
+   *           if any object param is null.
    */
   protected Transform(final ReadOnlyMatrix3 matrix, final ReadOnlyVector3 scale, final ReadOnlyVector3 translation,
     final boolean identity, final boolean rotationMatrix, final boolean uniformScale) {
+    MathUtils.checkArgumentNotNull(matrix, "matrix");
+    MathUtils.checkArgumentNotNull(scale, "scale");
+    MathUtils.checkArgumentNotNull(translation, "translation");
+
     _matrix.set(matrix);
     _scale.set(scale);
     _translation.set(translation);
@@ -172,11 +178,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param rotation
    *          our new matrix.
    * @return this transform for chaining.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if rotation is null.
    * @see Matrix3#isOrthonormal()
    */
   public Transform setRotation(final ReadOnlyMatrix3 rotation) {
+    MathUtils.checkArgumentNotNull(rotation, "rotation");
     _matrix.set(rotation);
     updateFlags(false);
     return this;
@@ -188,10 +195,11 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param rotation
    * @return this transform for chaining.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if rotation is null.
    */
   public Transform setRotation(final ReadOnlyQuaternion rotation) {
+    MathUtils.checkArgumentNotNull(rotation, "rotation");
     _matrix.set(rotation);
     updateFlags(true);
     return this;
@@ -202,10 +210,11 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param translation
    * @return this transform for chaining.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if translation is null.
    */
   public Transform setTranslation(final ReadOnlyVector3 translation) {
+    MathUtils.checkArgumentNotNull(translation, "translation");
     _translation.set(translation);
     _identity = false;
     return this;
@@ -230,14 +239,13 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param scale
    * @return this transform for chaining.
-   * @throws NullPointerException
-   *           if scale is null.
+   * @throws IllegalArgumentException
+   *           if scale is null or ZERO.
    * @throws TransformException
    *           if this transform has a generic 3x3 matrix set.
-   * @throws IllegalArgumentException
-   *           if scale is (0,0,0)
    */
   public Transform setScale(final ReadOnlyVector3 scale) {
+    MathUtils.checkArgumentNotNull(scale, "scale");
     if (!_rotationMatrix) {
       throw new TransformException(
           "Scale is already provided by 3x3 matrix.  If this is a mistake, consider using setRotation instead of setMatrix.");
@@ -259,8 +267,6 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param y
    * @param z
    * @return this transform for chaining.
-   * @throws NullPointerException
-   *           if scale is null.
    * @throws TransformException
    *           if this transform has a generic 3x3 matrix set.
    * @throws IllegalArgumentException
@@ -311,10 +317,11 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param source
    * @return this transform for chaining.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if source is null.
    */
   public Transform set(final ReadOnlyTransform source) {
+    MathUtils.checkArgumentNotNull(source, "source");
     if (source.isIdentity()) {
       setIdentity();
     } else {
@@ -348,8 +355,11 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param vec
    * @return this transform for chaining.
+   * @throws IllegalArgumentException
+   *           if vec is null.
    */
   public Transform translate(final ReadOnlyVector3 vec) {
+    MathUtils.checkArgumentNotNull(vec, "vec");
     _translation.addLocal(vec);
     _identity = _identity && _translation.equals(Vector3.ZERO);
     return this;
@@ -360,14 +370,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param point
    * @return the transformed point.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if point is null.
    */
   @Override
   public Vector3 applyForward(final Vector3 point) {
-    if (point == null) {
-      throw new NullPointerException();
-    }
+    MathUtils.checkArgumentNotNull(point, "point");
 
     if (_identity) {
       // No need to make changes
@@ -400,11 +408,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param store
    *          the vector to store our result in. if null, a new vector will be created.
    * @return the transformed point.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if point is null.
    */
   @Override
   public Vector3 applyForward(final ReadOnlyVector3 point, final Vector3 store) {
+    MathUtils.checkArgumentNotNull(point, "point");
     Vector3 result = store;
     if (result == null) {
       result = new Vector3();
@@ -418,14 +427,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param point
    * @return the transformed point.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if point is null.
    */
   @Override
   public Vector3 applyInverse(final Vector3 point) {
-    if (point == null) {
-      throw new NullPointerException();
-    }
+    MathUtils.checkArgumentNotNull(point, "point");
 
     if (_identity) {
       // No need to make changes
@@ -465,11 +472,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param store
    *          the vector to store our result in. if null, a new vector will be created.
    * @return the transformed point.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if point is null.
    */
   @Override
   public Vector3 applyInverse(final ReadOnlyVector3 point, final Vector3 store) {
+    MathUtils.checkArgumentNotNull(point, "point");
     Vector3 result = store;
     if (result == null) {
       result = new Vector3();
@@ -483,14 +491,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param vector
    * @return the transformed vector.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if vector is null.
    */
   @Override
   public Vector3 applyForwardVector(final Vector3 vector) {
-    if (vector == null) {
-      throw new NullPointerException();
-    }
+    MathUtils.checkArgumentNotNull(vector, "vector");
 
     if (_identity) {
       // No need to make changes
@@ -510,7 +516,6 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     // V' = M*V
     _matrix.applyPost(vector, vector);
     return vector;
-
   }
 
   /**
@@ -521,11 +526,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param store
    *          the vector to store our result in. if null, a new vector will be created.
    * @return the transformed vector.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if vector is null.
    */
   @Override
   public Vector3 applyForwardVector(final ReadOnlyVector3 vector, final Vector3 store) {
+    MathUtils.checkArgumentNotNull(vector, "vector");
     Vector3 result = store;
     if (result == null) {
       result = new Vector3();
@@ -539,14 +545,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param vector
    * @return the transformed vector.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if vector is null.
    */
   @Override
   public Vector3 applyInverseVector(final Vector3 vector) {
-    if (vector == null) {
-      throw new NullPointerException();
-    }
+    MathUtils.checkArgumentNotNull(vector, "vector");
 
     if (_identity) {
       // No need to make changes
@@ -583,11 +587,13 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param store
    *          the vector to store our result in. if null, a new vector will be created.
    * @return the transformed vector.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if vector is null.
    */
   @Override
   public Vector3 applyInverseVector(final ReadOnlyVector3 vector, final Vector3 store) {
+    MathUtils.checkArgumentNotNull(vector, "vector");
+
     Vector3 result = store;
     if (result == null) {
       result = new Vector3();
@@ -606,11 +612,13 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *          created and returned. It is NOT safe for store to be the same object as transformBy or
    *          "this".
    * @return the product
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if transformBy is null.
    */
   @Override
   public Transform multiply(final ReadOnlyTransform transformBy, final Transform store) {
+    MathUtils.checkArgumentNotNull(transformBy, "transformBy");
+
     Transform result = store;
     if (result == null) {
       result = new Transform();
@@ -864,10 +872,11 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *
    * @param matrix
    * @return this matrix for chaining.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if matrix is null.
    */
   public Transform fromHomogeneousMatrix(final ReadOnlyMatrix4 matrix) {
+    MathUtils.checkArgumentNotNull(matrix, "matrix");
     _matrix.set(matrix.getM00(), matrix.getM01(), matrix.getM02(), matrix.getM10(), matrix.getM11(), matrix.getM12(),
         matrix.getM20(), matrix.getM21(), matrix.getM22());
     _translation.set(matrix.getM03(), matrix.getM13(), matrix.getM23());

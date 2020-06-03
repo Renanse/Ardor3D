@@ -581,4 +581,10 @@ public class MathUtils {
     }
     return 2 << x - 1;
   }
+
+  protected static void checkArgumentNotNull(final Object obj, final String argName) {
+    if (obj == null) {
+      throw new IllegalArgumentException(argName + "was null");
+    }
+  }
 }

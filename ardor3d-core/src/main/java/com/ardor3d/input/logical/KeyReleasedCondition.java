@@ -28,12 +28,12 @@ public final class KeyReleasedCondition implements Predicate<TwoInputStates> {
    *
    * @param key
    *          the key that should be held
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if the key is null
    */
   public KeyReleasedCondition(final Key key) {
     if (key == null) {
-      throw new NullPointerException();
+      throw new IllegalArgumentException("key was null");
     }
 
     this.key = key;

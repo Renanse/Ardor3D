@@ -10,8 +10,6 @@
 
 package com.ardor3d.input.logical;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.function.Predicate;
 
 import com.ardor3d.annotation.Immutable;
@@ -45,11 +43,13 @@ public final class MouseButtonLongPressedCondition implements Predicate<TwoInput
    * @param maxDrift
    *          how far the mouse / cursor can move from the initial long press location before
    *          invalidating the long press.
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if the supplied button argument is null
    */
   public MouseButtonLongPressedCondition(final MouseButton button, final long triggerTimeMS, final double maxDrift) {
-    checkNotNull(button);
+    if (button == null) {
+      throw new IllegalArgumentException("button was null");
+    }
 
     _button = button;
     _triggerTimeMS = triggerTimeMS;

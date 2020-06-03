@@ -213,6 +213,8 @@ public class EarClipTriangulator {
             // as a last resort, try splitting the remaining polygon into two
             splitEarcut(ear, indices, minX, minY, invSize);
             break;
+          default:
+            throw new IllegalArgumentException("unhandled pass value: " + pass);
         }
 
         break;

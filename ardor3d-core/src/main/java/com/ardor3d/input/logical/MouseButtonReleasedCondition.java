@@ -30,12 +30,12 @@ public final class MouseButtonReleasedCondition implements Predicate<TwoInputSta
    *
    * @param button
    *          the button that should be pressed to trigger this condition
-   * @throws NullPointerException
+   * @throws IllegalArgumentException
    *           if the button is null
    */
   public MouseButtonReleasedCondition(final MouseButton button) {
     if (button == null) {
-      throw new NullPointerException();
+      throw new IllegalArgumentException("button was null");
     }
 
     _button = button;

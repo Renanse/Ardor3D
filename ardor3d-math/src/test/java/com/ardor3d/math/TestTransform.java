@@ -216,25 +216,25 @@ public class TestTransform {
     assertEquals(orig, vec3);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testApplyFail1() {
     final Transform trans = new Transform();
     trans.applyForward(null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testApplyFail2() {
     final Transform trans = new Transform();
     trans.applyForwardVector(null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testApplyFail3() {
     final Transform trans = new Transform();
     trans.applyInverse(null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testApplyFail4() {
     final Transform trans = new Transform();
     trans.applyInverseVector(null);

@@ -66,7 +66,7 @@ public class TestStandardConditions {
     assertTrue("empty4", kh.test(new TwoInputStates(InputState.EMPTY, is2)));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testKeyHeld2() throws Exception {
     new KeyHeldCondition(null);
   }
@@ -91,7 +91,7 @@ public class TestStandardConditions {
     assertTrue("empty4", kh.test(new TwoInputStates(InputState.EMPTY, is2)));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testKeyPressedNull() throws Exception {
     new KeyPressedCondition(null);
   }
@@ -116,7 +116,7 @@ public class TestStandardConditions {
     assertFalse("empty4", kh.test(new TwoInputStates(InputState.EMPTY, is2)));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testKeyReleasedNull() throws Exception {
     new KeyReleasedCondition(null);
   }
