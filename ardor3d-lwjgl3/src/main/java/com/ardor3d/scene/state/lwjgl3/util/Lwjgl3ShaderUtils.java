@@ -30,6 +30,7 @@ import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL21C;
 import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL32C;
+import org.lwjgl.opengl.GL33C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.system.MemoryStack;
 
@@ -687,13 +688,29 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
   @Override
   public void bindVertexAttribute(final VertexAttributeRef attrib, final AbstractBufferData<? extends Buffer> buffer) {
-    int strideBytes = buffer.getByteCount() * attrib.getStride();
-    long offsetBytes = buffer.getByteCount() * attrib.getOffset();
+    final int tupleSize = buffer.getValuesPerTuple();
+    final int bytesPerTuple = tupleSize * buffer.getByteCount();
+    final int strideBytes = bytesPerTuple * attrib.getStride();
+    final long offsetBytes = bytesPerTuple * attrib.getOffset();
+    final int glDataType = getGLDataType(buffer.getBuffer());
+    final boolean normalized = attrib.isNormalized();
+    final int span = attrib.getSpan();
+    final int loc = attrib.getLocation();
+    final int divisor = attrib.getDivisor();
 
-    GL20C.glVertexAttribPointer(attrib.getLocation(), buffer.getValuesPerTuple(), getGLDataType(buffer.getBuffer()),
-        attrib.isNormalized(), strideBytes, offsetBytes);
-    GL40C.glVertexAttribDivisor(attrib.getLocation(), attrib.getDivisor());
-    GL20C.glEnableVertexAttribArray(attrib.getLocation());
+    if (span <= 1) {
+      GL20C.glEnableVertexAttribArray(loc);
+      GL20C.glVertexAttribPointer(loc, tupleSize, glDataType, normalized, strideBytes, offsetBytes);
+      GL33C.glVertexAttribDivisor(loc, divisor);
+    } else {
+      final int matrixStride = strideBytes != 0 ? strideBytes : span * bytesPerTuple;
+      for (int i = 0; i < span; i++) {
+        GL20C.glEnableVertexAttribArray(loc + i);
+        GL20C.glVertexAttribPointer(loc + i, tupleSize, glDataType, normalized, matrixStride,
+            strideBytes + i * bytesPerTuple);
+        GL33C.glVertexAttribDivisor(loc + i, divisor);
+      }
+    }
   }
 
   protected static int getGLDataType(final Buffer buffer) {

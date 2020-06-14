@@ -2,6 +2,9 @@
 
 in vec3 vertex;
 in vec3 normal;
+#ifdef INSTANCED
+in mat4 instanceMatrix;
+#endif
 
 uniform mat4 model;
 uniform mat4 view;
@@ -49,9 +52,20 @@ out vec4 DiffuseColor;
 
 void main()
 {
-    WorldPos = vec3(model * vec4(vertex, 1.0));
+
+    WorldPos = vec3( 
+		model *
+#ifdef INSTANCED
+    	instanceMatrix *
+#endif
+	    vec4(vertex, 1.0));
     ViewPos = view * vec4(WorldPos, 1.0);
+#ifdef INSTANCED
+    // expensive perhaps.  Could provide this as another instance attribute.
+    Normal = normalize(mat3(transpose(inverse(model * instanceMatrix))) * normal);
+#else
     Normal = normalize(normalMat * normal);
+#endif
 
 #ifndef VERT_COLORS
     DiffuseColor = defaultColor;

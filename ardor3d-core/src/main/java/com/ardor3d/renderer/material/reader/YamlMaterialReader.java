@@ -376,6 +376,7 @@ public class YamlMaterialReader {
     }
 
     // optional buffer properties
+    rVal.setSpan(getInt(properties, "span", 1));
     rVal.setStride(getInt(properties, "stride", 0));
     rVal.setOffset(getInt(properties, "offset", 0));
     rVal.setDivisor(getInt(properties, "divisor", 0));

@@ -17,6 +17,7 @@ public class VertexAttributeRef {
   protected int _stride = 0;
   protected int _offset = 0;
   protected int _divisor = 0;
+  protected int _span = 1;
   protected boolean _normalized = false;
   protected String _meshDataKey;
 
@@ -57,6 +58,10 @@ public class VertexAttributeRef {
   public int getOffset() { return _offset; }
 
   public void setOffset(final int offset) { _offset = offset; }
+
+  public int getSpan() { return _span; }
+
+  public void setSpan(final int span) { _span = span; }
 
   public boolean isNormalized() { return _normalized; }
 

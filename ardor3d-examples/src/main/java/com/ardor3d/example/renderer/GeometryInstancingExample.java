@@ -19,9 +19,14 @@ import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -30,7 +35,7 @@ import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
- * Demonstrates the use of geometry instancing and compares it to VBO.
+ * Demonstrates the use of geometry instancing and compares framerate with and without instancing.
  */
 @Purpose(
     htmlDescriptionKey = "com.ardor3d.example.renderer.GeometryInstancingExample", //
@@ -62,9 +67,6 @@ public class GeometryInstancingExample extends ExampleBase {
       startTime = now;
       frames = 0;
     }
-    final Vector3 trans = new Vector3(Math.sin(timer.getTime() / 1000000000.0) * 70 - 35, 0, -100);
-    _base.setTranslation(trans);
-    light.setLocation(trans);
     frames++;
   }
 
@@ -83,36 +85,29 @@ public class GeometryInstancingExample extends ExampleBase {
     cs.setEnabled(true);
     _root.setRenderState(cs);
 
-    // _shader = new ShaderState();
-    // try {
-    // _shader.setShader(ShaderType.Vertex, "geometryBasic",
-    // ResourceLocatorTool.getClassPathResourceAsString(
-    // GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.vert.glsl"));
-    // _shader.setShader(ShaderType.Fragment, "geometryBasic",
-    // ResourceLocatorTool.getClassPathResourceAsString(
-    // GLSLRibbonExample.class, "com/ardor3d/example/media/shaders/geometryBasic.frag.glsl"));
-    //
-    // } catch (final IOException ex) {
-    // ex.printStackTrace();
-    // }
-
     _base = new Node("node");
+    _base.addTranslation(0, -20, -100);
+    _canvas.getCanvasRenderer().getCamera().lookAt(_base.getTranslation(), Vector3.UNIT_Y);
     _root.attachChild(_base);
 
+    final Sphere center = new Sphere("center", 64, 64, 20);
+    center.setRandomColors();
+    _base.attachChild(center);
+
     final Node instancedBase = new Node("instancedBase");
-    // instancedBase.setRenderState(_shader);
     _base.attachChild(instancedBase);
+    instancedBase.setRenderMaterial("lit/untextured/basic_phong_instanced.yaml");
     instancedBase.getSceneHints().setCullHint(CullHint.Dynamic);
 
     final Node unInstancedBase = new Node("unInstancedBase");
-    // unInstancedBase.setRenderState(_shader);
     _base.attachChild(unInstancedBase);
+    unInstancedBase.setRenderMaterial("lit/untextured/basic_phong.yaml");
     unInstancedBase.getSceneHints().setCullHint(CullHint.Always);
 
-    final int nrOfObjects = 500;
+    final int nrOfObjects = 1000;
 
-    // generateSpheres(instancedBase, true, nrOfObjects);
-    // generateSpheres(unInstancedBase, false, nrOfObjects);
+    generateSpheres(instancedBase, true, nrOfObjects);
+    generateSpheres(unInstancedBase, false, nrOfObjects);
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), (source, inputStates, tpf) -> {
       instancingEnabled = !instancingEnabled;
@@ -120,12 +115,10 @@ public class GeometryInstancingExample extends ExampleBase {
         t2.setText("[I] Instancing On");
         instancedBase.getSceneHints().setCullHint(CullHint.Dynamic);
         unInstancedBase.getSceneHints().setCullHint(CullHint.Always);
-
       } else {
         t2.setText("[I] Instancing Off");
         instancedBase.getSceneHints().setCullHint(CullHint.Always);
         unInstancedBase.getSceneHints().setCullHint(CullHint.Dynamic);
-
       }
     }));
 
@@ -135,27 +128,48 @@ public class GeometryInstancingExample extends ExampleBase {
         _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getHeight(), 0);
     frameRateLabel.setTextColor(ColorRGBA.WHITE);
     frameRateLabel.getSceneHints().setOrthoOrder(-1);
-    _root.attachChild(frameRateLabel);
+    _orthoRoot.attachChild(frameRateLabel);
   }
 
   protected void generateSpheres(final Node modelBase, final boolean useInstancing, final int nrOfObjects) {
-    final Random rand = new Random(1337);
+    final Sphere sphereroot = new Sphere("Sphere", 16, 16, 2);
 
-    final Sphere sphereroot = new Sphere("Sphere", 8, 8, 2);
-    for (int i = 0; i < nrOfObjects; i++) {
-      Sphere sphere;
-      if (useInstancing) {
-        sphere = (Sphere) sphereroot.makeInstanced();
-      } else {
-        sphere = (Sphere) sphereroot.makeCopy(true);
+    Random rand = new Random(1337);
+    if (useInstancing) {
+      modelBase.attachChild(sphereroot);
+      sphereroot.setInstanceCount(nrOfObjects);
+      final FloatBufferData matrixStore = new FloatBufferData(nrOfObjects * 16, 4);
+      sphereroot.getMeshData().setCoords(MeshData.KEY_InstanceMatrix, matrixStore);
+
+      for (int i = 0; i < nrOfObjects; i++) {
+        final Transform trans = generateAsteroidTransform(rand, (i / (double) nrOfObjects) * MathUtils.TWO_PI);
+        trans.getGLApplyMatrix(matrixStore.getBuffer());
       }
-      sphere.setRandomColors();
+      matrixStore.getBuffer().flip();
+
+      return;
+    }
+
+    rand = new Random(1337);
+    for (int i = 0; i < nrOfObjects; i++) {
+      final Sphere sphere = (Sphere) sphereroot.makeCopy(true);
       sphere.setModelBound(new BoundingSphere());
-      sphere.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0,
-          rand.nextDouble() * 100.0 - 250.0));
+      final Transform trans = generateAsteroidTransform(rand, (i / (double) nrOfObjects) * MathUtils.TWO_PI);
+      sphere.setTransform(trans);
       sphere.getSceneHints().setCullHint(CullHint.Dynamic);
       modelBase.attachChild(sphere);
     }
+  }
 
+  private Transform generateAsteroidTransform(final Random rand, final double angle) {
+    final Transform trans = new Transform();
+    final double radius = 50;
+    final double offsetX = rand.nextDouble() * 5 - 2.5;
+    final double offsetY = (rand.nextDouble() * 5 - 2.5) * .4;
+    final double offsetZ = rand.nextDouble() * 5 - 2.5;
+    trans.translate(Math.sin(angle) * radius + offsetX, offsetY, Math.cos(angle) * radius + offsetZ);
+    trans.setScale(rand.nextDouble() * 0.2 + .05, rand.nextDouble() * 0.2 + .05, rand.nextDouble() * 0.2 + .05);
+    trans.setRotation(new Quaternion().fromAngleAxis(rand.nextDouble() * MathUtils.TWO_PI, new Vector3(.4, .6, .8)));
+    return trans;
   }
 }

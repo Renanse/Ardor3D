@@ -388,11 +388,13 @@ public class TestTransform {
     trans.setTranslation(10, 11, 12);
     final DoubleBuffer db = DoubleBuffer.allocate(16);
     trans.getGLApplyMatrix(db);
+    db.flip();
     for (final double val : new double[] {0, 3, 6, 0, 1, 4, 7, 0, 2, 5, 8, 0, 10, 11, 12, 1}) {
       assertTrue(val == db.get());
     }
     final FloatBuffer fb = FloatBuffer.allocate(16);
     trans.getGLApplyMatrix(fb);
+    fb.flip();
     for (final float val : new float[] {0, 3, 6, 0, 1, 4, 7, 0, 2, 5, 8, 0, 10, 11, 12, 1}) {
       assertTrue(val == fb.get());
     }
@@ -404,6 +406,7 @@ public class TestTransform {
     trans.setScale(2, 3, 4);
     db.rewind();
     trans.getGLApplyMatrix(db);
+    db.flip();
     for (final double val : new double[] {2 * Math.cos(a), 2 * 0, 2 * -Math.sin(a), 0, //
         3 * 0, 3 * 1, 3 * 0, 0, //
         4 * Math.sin(a), 4 * 0, 4 * Math.cos(a), 0, //
@@ -412,6 +415,7 @@ public class TestTransform {
     }
     fb.rewind();
     trans.getGLApplyMatrix(fb);
+    fb.flip();
     for (final float val : new float[] {(float) (2 * Math.cos(a)), 2 * 0, (float) (2 * -Math.sin(a)), 0, //
         3 * 0, 3 * 1, 3 * 0, 0, //
         (float) (4 * Math.sin(a)), 4 * 0, (float) (4 * Math.cos(a)), 0, //

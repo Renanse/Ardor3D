@@ -57,7 +57,7 @@ public interface Renderer {
   /**
    * Convenience for those that find it too hard to do bitwise or. :)
    */
-  int BUFFER_COLOR_AND_DEPTH = BUFFER_COLOR | BUFFER_DEPTH;
+  int BUFFER_COLOR_AND_DEPTH = Renderer.BUFFER_COLOR | Renderer.BUFFER_DEPTH;
 
   /**
    * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel
@@ -153,8 +153,7 @@ public interface Renderer {
    */
   void grabScreenContents(ByteBuffer store, ImageDataFormat format, int x, int y, int w, int h);
 
-  void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type, final int x,
-      final int y, final int w, final int h);
+  void grabScreenContents(ByteBuffer store, ImageDataFormat format, PixelDataType type, int x, int y, int w, int h);
 
   /**
    * Gets the expected size (in bytes) of the buffer used to call <code>grabScreenContents</code>
@@ -169,8 +168,7 @@ public interface Renderer {
    *          - height of block
    * @return the expected size (in bytes) of the buffer used to call <code>grabScreenContents</code>
    */
-  int getExpectedBufferSizeToGrabScreenContents(final ImageDataFormat format, final PixelDataType type, final int w,
-      final int h);
+  int getExpectedBufferSizeToGrabScreenContents(ImageDataFormat format, PixelDataType type, int w, int h);
 
   /**
    * <code>draw</code> renders a scene. As it receives a base class of <code>Spatial</code> the
@@ -233,14 +231,9 @@ public interface Renderer {
    */
   void draw(Renderable renderable);
 
-  void drawArrays(int start, int count, IndexMode mode);
+  void drawArrays(int start, int count, IndexMode mode, int instanceCount);
 
-  void drawArraysInstanced(int start, int count, IndexMode mode, int instanceCount);
-
-  void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode);
-
-  void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode,
-      int instanceCount);
+  void drawElements(IndexBufferData<?> indices, int start, int count, IndexMode mode, int instanceCount);
 
   FloatBuffer getMatrix(RenderMatrixType type);
 
@@ -272,7 +265,7 @@ public interface Renderer {
    * @param staticPointSize
    *          the size to make our points, only used if <code>shaderSizeControl</code> is false;
    */
-  void setPointSize(final boolean shaderSizeControl, final float staticPointSize);
+  void setPointSize(boolean shaderSizeControl, float staticPointSize);
 
   /**
    * Apply the given state to the current RenderContext using this Renderer.
@@ -320,6 +313,6 @@ public interface Renderer {
    * @param samples
    * @return the texture renderer
    */
-  TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits, final int samples);
+  TextureRenderer createTextureRenderer(int width, int height, int depthBits, int samples);
 
 }

@@ -14,8 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.scenegraph.InstancingManager;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
@@ -67,31 +65,12 @@ public class RenderQueue {
       throw new Ardor3dException("Can't add spatial to bucket of type: " + type);
     }
 
-    if (prepareForInstancing(spatial)) {
-      return;
-    }
-
     final RenderBucket renderBucket = getRenderBucket(type);
     if (renderBucket != null) {
       renderBucket.add(spatial);
     } else {
       throw new Ardor3dException("No bucket exists of type: " + type);
     }
-  }
-
-  private final boolean prepareForInstancing(final Spatial spatial) {
-    boolean skipRenderQueue = false;
-
-    if (spatial instanceof Mesh) {
-      final Mesh mesh = (Mesh) spatial;
-      final InstancingManager instancing = mesh.getMeshData().getInstancingManager();
-      // Only one instance needs to be added to the render queue
-      if (instancing != null) {
-        skipRenderQueue = instancing.isAddedToRenderQueue();
-        instancing.registerMesh(mesh);
-      }
-    }
-    return skipRenderQueue;
   }
 
   public void removeFromQueue(final Spatial spatial, final RenderBucketType type) {

@@ -1434,35 +1434,6 @@ public abstract class Spatial implements Savable, Hintable {
     return spat;
   }
 
-  /**
-   * Creates and returns a new instance of this spatial. Used for instanced rendering. All instances
-   * visible on the screen will be drawn in one draw call. The new instance will share all data
-   * (meshData and renderStates) with the current mesh and all other instances created from this
-   * spatial.
-   *
-   * @return an instanced copy of this node
-   */
-  public Spatial makeInstanced() {
-    final Spatial spat = newInstance();
-
-    // copy basic spatial info
-    spat.setName(getName());
-    spat._sceneHints = _sceneHints;
-    spat.setTransform(_localTransform);
-
-    // copy local render states
-    spat._renderStateList = _renderStateList;
-
-    // copy controllers
-    if (_controllers != null) {
-      for (final SpatialController<?> sc : _controllers) {
-        spat.addController(sc);
-      }
-    }
-
-    return spat;
-  }
-
   // /////////////////
   // Methods for Savable
   // /////////////////

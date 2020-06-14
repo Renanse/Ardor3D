@@ -1,0 +1,21 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: normal
+          - key: color
+          - key: instanceMatrix
+            divisor: 1
+            span: 4
+          
+        uniforms: 
+          - builtIn: [model, view, projection, cameraLoc, lights4, colorSurface, alphaTest]
+            
+        shaders: 
+          Vertex: 
+            source: phong/phong.vert
+            defines: [VERT_COLORS, INSTANCED]
+          Fragment:
+            source: phong/phong_modulate.frag

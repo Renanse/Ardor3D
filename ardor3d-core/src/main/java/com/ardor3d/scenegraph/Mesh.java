@@ -72,6 +72,9 @@ public class Mesh extends Spatial implements Renderable, Pickable {
   /** Visibility setting that can be used after the scenegraph hierarchical culling */
   protected boolean _isVisible = true;
 
+  /** Number of instances drawn for this Mesh. */
+  protected int _instanceCount = 1;
+
   /**
    * Constructs a new Mesh.
    */
@@ -181,6 +184,22 @@ public class Mesh extends Spatial implements Renderable, Pickable {
   }
 
   /**
+   *
+   * @return number of instances drawn for this Mesh. By default, this is 1.
+   */
+  public int getInstanceCount() { return _instanceCount; }
+
+  /**
+   * Set how many instances of this Mesh to draw during render. This is accomplished via Instanced
+   * rendering, and often requires setting up vertex attributes appropriately in order to give each
+   * instance a unique transform, color, look, etc.
+   *
+   * @param instanceCount
+   *          number of instances to render. Default value is 1.
+   */
+  public void setInstanceCount(final int instanceCount) { _instanceCount = instanceCount; }
+
+  /**
    * translates/rotates and scales the vectors of this Mesh to world coordinates based on its world
    * settings. The results are stored in the given FloatBuffer. If given FloatBuffer is null, one is
    * created.
@@ -258,16 +277,16 @@ public class Mesh extends Spatial implements Renderable, Pickable {
       // setup for drawing this pass - shaders, data, states, etc.
       pass.setupForDraw(renderer, this, meshData);
 
-      // Now we draw ourselves - (TODO: Instancing support)
+      // Now we draw ourselves
       final IndexMode[] modes = meshData.getIndexModes();
       final int[] indexLengths = meshData.getIndexLengths();
       final IndexBufferData<?> indices = meshData.getIndices();
 
       if (indexLengths == null) {
         if (indices != null) {
-          renderer.drawElements(indices, 0, indices.getBufferLimit(), modes[0]);
+          renderer.drawElements(indices, 0, indices.getBufferLimit(), modes[0], _instanceCount);
         } else {
-          renderer.drawArrays(0, meshData.getVertexCount(), modes[0]);
+          renderer.drawArrays(0, meshData.getVertexCount(), modes[0], _instanceCount);
         }
       } else {
         int offset = 0;
@@ -276,9 +295,9 @@ public class Mesh extends Spatial implements Renderable, Pickable {
           final int count = indexLengths[i];
 
           if (indices != null) {
-            renderer.drawElements(indices, offset, count, modes[modeIndex]);
+            renderer.drawElements(indices, offset, count, modes[modeIndex], _instanceCount);
           } else {
-            renderer.drawArrays(offset, count, modes[modeIndex]);
+            renderer.drawArrays(offset, count, modes[modeIndex], _instanceCount);
           }
 
           offset += count;
@@ -527,18 +546,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     return mesh;
   }
 
-  @Override
-  public Mesh makeInstanced() {
-    final Mesh mesh = (Mesh) super.makeInstanced();
-    if (_meshData.getInstancingManager() == null) {
-      _meshData.setInstancingManager(new InstancingManager());
-    }
-    mesh.setMeshData(_meshData);
-    mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
-    mesh.setVisible(_isVisible);
-    return mesh;
-  }
-
   /**
    * Let this mesh know we want to change its indices to the provided new order. Override this to
    * provide extra functionality for sub types as needed.
@@ -647,6 +654,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     capsule.write(_meshData, "meshData", null);
     capsule.write(_modelBound, "modelBound", null);
     capsule.write(_isVisible, "visible", true);
+    capsule.write(_instanceCount, "instanceCount", 1);
   }
 
   @Override
@@ -655,5 +663,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     _meshData = capsule.readSavable("meshData", null);
     _modelBound = capsule.readSavable("modelBound", null);
     _isVisible = capsule.readBoolean("visible", true);
+    _instanceCount = capsule.readInt("instanceCount", 1);
   }
 }

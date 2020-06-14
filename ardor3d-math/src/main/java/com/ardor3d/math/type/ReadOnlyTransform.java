@@ -54,19 +54,19 @@ public interface ReadOnlyTransform {
 
   /**
    * Populates an nio double buffer with data from this transform to use as a model view matrix in
-   * OpenGL. Does not modify the position of store.
+   * OpenGL. Data is inserted at the buffer's current position and position is moved forward by 16.
    *
    * @param store
-   *          double buffer to store in. Assumes a size of 16.
+   *          double buffer to store in.
    */
   void getGLApplyMatrix(DoubleBuffer store);
 
   /**
    * Populates an nio float buffer with data from this transform to use as a model view matrix in
-   * OpenGL. Does not modify the position of store.
+   * OpenGL. Data is inserted at the buffer's current position and position is moved forward by 16.
    *
    * @param store
-   *          float buffer to store in. Assumes a size of 16.
+   *          float buffer to store in.
    */
   void getGLApplyMatrix(FloatBuffer store);
 

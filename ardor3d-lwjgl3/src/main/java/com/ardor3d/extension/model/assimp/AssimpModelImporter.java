@@ -24,6 +24,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
@@ -86,6 +88,8 @@ import com.ardor3d.util.resource.ResourceSource;
  * </p>
  */
 public class AssimpModelImporter {
+
+  private static final Logger logger = Logger.getLogger(AssimpModelImporter.class.getName());
 
   private boolean _loadTextures = true;
   private ResourceLocator _textureLocator;
@@ -150,7 +154,7 @@ public class AssimpModelImporter {
             source = _modelLocator.locateResource(fileNameUtf8);
           }
           applyRootResource(source);
-          System.err.println("loading resource: " + fileNameUtf8);
+          logger.log(Level.FINE, () -> "loading resource: " + fileNameUtf8);
           data = loadResourceAsByteBuffer(source, 8192);
         } catch (final Exception e) {
           throw new RuntimeException("Could not open file: " + fileNameUtf8);
@@ -275,7 +279,7 @@ public class AssimpModelImporter {
 
   private Node processNode(final AINode node, final AIScene scene, final ModelDataStore store) {
     final Node rVal = new Node(node.mName().dataString());
-    System.err.println("processing node: " + rVal);
+    logger.log(Level.FINE, () -> "processing node: " + rVal);
 
     rVal.setTransform(new Transform().fromHomogeneousMatrix(toMatrix4(node.mTransformation(), new Matrix4())));
 
@@ -297,7 +301,7 @@ public class AssimpModelImporter {
 
   private Spatial processMesh(final AIMesh mesh, final AIScene scene, final ModelDataStore store) {
     final Mesh rVal = new Mesh(mesh.mName().dataString());
-    System.err.println("processing mesh: " + rVal);
+    logger.log(Level.FINE, () -> "processing mesh: " + rVal);
 
     final MeshData meshData = rVal.getMeshData();
 
@@ -435,7 +439,7 @@ public class AssimpModelImporter {
 
         final AIString string = AIString.create();
         Assimp.aiGetMaterialString(mat, Assimp.AI_MATKEY_NAME, Assimp.aiTextureType_NONE, 0, string);
-        System.err.println("reading material: " + string.dataString());
+        logger.log(Level.FINE, () -> "reading material: " + string.dataString());
 
         final ColorSurface surface = new ColorSurface();
         store.materialSurfaces.put(i, surface);
@@ -530,9 +534,10 @@ public class AssimpModelImporter {
       p = _originalResource.getName();
     }
 
-    System.err.println("looking for texture: " + p);
+    final String tex = p;
+    logger.log(Level.FINE, () -> "looking for texture: " + tex);
 
-    return p;
+    return tex;
   }
 
   private boolean readMaterialColor(final AIMaterial mat, final String key, final AIColor4D store) {

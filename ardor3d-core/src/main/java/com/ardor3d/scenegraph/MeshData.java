@@ -65,6 +65,7 @@ public class MeshData implements Savable {
   public final static String KEY_TextureCoords1 = MeshData.KEY_TextureCoordsPrefix + 1;
   public final static String KEY_TextureCoords2 = MeshData.KEY_TextureCoordsPrefix + 2;
   public final static String KEY_TextureCoords3 = MeshData.KEY_TextureCoordsPrefix + 3;
+  public static final String KEY_InstanceMatrix = "instanceMatrix";
 
   /** The Constant logger. */
   private static final Logger logger = Logger.getLogger(MeshData.class.getName());
@@ -102,8 +103,6 @@ public class MeshData implements Savable {
 
   /** if true, we believe we are fully uploaded to OpenGL. For use in single-context mode. */
   protected transient boolean _uploaded;
-
-  private InstancingManager _instancingManager;
 
   public MeshData() {
     MeshData._identityCache.put(this, MeshData.STATIC_REF);
@@ -1300,10 +1299,6 @@ public class MeshData implements Savable {
 
     updatePrimitiveCounts();
   }
-
-  public InstancingManager getInstancingManager() { return _instancingManager; }
-
-  public void setInstancingManager(final InstancingManager info) { _instancingManager = info; }
 
   public static void cleanAllVertexArrays(final IShaderUtils utils) {
     final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();

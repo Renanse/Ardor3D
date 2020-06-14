@@ -363,51 +363,35 @@ public class Lwjgl3Renderer extends AbstractRenderer {
   }
 
   @Override
-  public void drawArrays(final int start, final int count, final IndexMode mode) {
+  public void drawArrays(final int start, final int count, final IndexMode mode, final int instanceCount) {
     final int glIndexMode = getGLIndexMode(mode);
 
-    GL11C.glDrawArrays(glIndexMode, start, count);
+    if (instanceCount == 1) {
+      GL11C.glDrawArrays(glIndexMode, start, count);
+    } else {
+      GL31C.glDrawArraysInstanced(glIndexMode, start, count, instanceCount);
+    }
 
     if (Constants.stats) {
-      addStats(mode, count);
+      addStats(mode, count * (instanceCount > 0 ? instanceCount : 1));
     }
   }
 
   @Override
-  public void drawArraysInstanced(final int start, final int count, final IndexMode mode, final int instanceCount) {
-    final int glIndexMode = getGLIndexMode(mode);
-
-    GL31C.glDrawArraysInstanced(glIndexMode, start, count, instanceCount);
-
-    if (Constants.stats) {
-      addStats(mode, count * instanceCount);
-    }
-  }
-
-  @Override
-  public void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode) {
+  public void drawElements(final IndexBufferData<?> indices, final int start, final int count, final IndexMode mode,
+      final int instanceCount) {
     final int type = getGLDataType(indices);
     final int byteSize = indices.getByteCount();
     final int glIndexMode = getGLIndexMode(mode);
 
-    GL11C.glDrawElements(glIndexMode, count, type, (long) start * byteSize);
-
-    if (Constants.stats) {
-      addStats(mode, count);
+    if (instanceCount == 1) {
+      GL11C.glDrawElements(glIndexMode, count, type, (long) start * byteSize);
+    } else {
+      GL31C.glDrawElementsInstanced(glIndexMode, count, type, (long) start * byteSize, instanceCount);
     }
-  }
-
-  @Override
-  public void drawElementsInstanced(final IndexBufferData<?> indices, final int start, final int count,
-      final IndexMode mode, final int instanceCount) {
-    final int type = getGLDataType(indices);
-    final int byteSize = indices.getByteCount();
-    final int glIndexMode = getGLIndexMode(mode);
-
-    GL31C.glDrawElementsInstanced(glIndexMode, count, type, (long) start * byteSize, instanceCount);
 
     if (Constants.stats) {
-      addStats(mode, count * instanceCount);
+      addStats(mode, count * (instanceCount > 0 ? instanceCount : 1));
     }
   }
 

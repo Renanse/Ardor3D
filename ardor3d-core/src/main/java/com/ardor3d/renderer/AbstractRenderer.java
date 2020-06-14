@@ -218,6 +218,7 @@ public abstract class AbstractRenderer implements Renderer {
     final FloatBuffer dst = _matrixStore.get(type);
     dst.clear();
     transform.getGLApplyMatrix(dst);
+    dst.flip();
     if (type == RenderMatrixType.Model) {
       updateMVP();
     }

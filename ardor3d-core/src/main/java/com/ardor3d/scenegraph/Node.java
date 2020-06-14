@@ -93,8 +93,8 @@ public class Node extends Spatial {
         child.setParent(this);
         _children.add(child);
         child.markDirty(DirtyType.Attached);
-        if (logger.isLoggable(Level.FINE)) {
-          logger.fine("Child (" + child.getName() + ") attached to this" + " node (" + getName() + ")");
+        if (Node.logger.isLoggable(Level.FINE)) {
+          Node.logger.fine("Child (" + child.getName() + ") attached to this" + " node (" + getName() + ")");
         }
       }
     }
@@ -124,8 +124,8 @@ public class Node extends Spatial {
         child.setParent(this);
         _children.add(index, child);
         child.markDirty(DirtyType.Attached);
-        if (logger.isLoggable(Level.FINE)) {
-          logger.fine("Child (" + child.getName() + ") attached to this" + " node (" + getName() + ")");
+        if (Node.logger.isLoggable(Level.FINE)) {
+          Node.logger.fine("Child (" + child.getName() + ") attached to this" + " node (" + getName() + ")");
         }
       }
     }
@@ -195,8 +195,8 @@ public class Node extends Spatial {
       if (child.getListener() != null) {
         child.setListener(null);
       }
-      if (logger.isLoggable(Level.INFO)) {
-        logger.fine("Child removed.");
+      if (Node.logger.isLoggable(Level.INFO)) {
+        Node.logger.fine("Child removed.");
       }
     }
     return child;
@@ -210,7 +210,7 @@ public class Node extends Spatial {
     for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
       detachChildAt(i);
     }
-    logger.fine("All children removed.");
+    Node.logger.fine("All children removed.");
   }
 
   /**
@@ -450,18 +450,6 @@ public class Node extends Spatial {
     }
 
     // return
-    return node;
-  }
-
-  @Override
-  public Node makeInstanced() {
-    // get copy of basic spatial info
-    final Node node = (Node) super.makeInstanced();
-    // add copy of children
-    for (final Spatial child : getChildren()) {
-      final Spatial copy = child.makeInstanced();
-      node.attachChild(copy);
-    }
     return node;
   }
 
