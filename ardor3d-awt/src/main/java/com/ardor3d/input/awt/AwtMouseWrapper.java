@@ -304,6 +304,24 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
       case MouseEvent.BUTTON3:
         button = MouseButton.RIGHT;
         break;
+      case 4:
+        button = MouseButton.FOUR;
+        break;
+      case 5:
+        button = MouseButton.FIVE;
+        break;
+      case 6:
+        button = MouseButton.SIX;
+        break;
+      case 7:
+        button = MouseButton.SEVEN;
+        break;
+      case 8:
+        button = MouseButton.EIGHT;
+        break;
+      case 9:
+        button = MouseButton.NINE;
+        break;
       default:
         throw new RuntimeException("unknown button: " + e.getButton());
     }
