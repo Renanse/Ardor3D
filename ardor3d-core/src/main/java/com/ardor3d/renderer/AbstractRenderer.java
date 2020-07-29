@@ -258,27 +258,32 @@ public abstract class AbstractRenderer implements Renderer {
 
   @Override
   public void computeNormalMatrix(final boolean modelIsUniformScale) {
-    final Matrix3 normal = Matrix3.fetchTempInstance();
     final FloatBuffer dst = _matrixStore.get(RenderMatrixType.Normal);
     dst.clear();
 
+    final Matrix3 normal = Matrix3.fetchTempInstance();
     final Matrix4 model = Matrix4.fetchTempInstance();
-    final FloatBuffer modelBuff = _matrixStore.get(RenderMatrixType.Model);
-    modelBuff.clear();
-    model.fromFloatBuffer(modelBuff);
+    try {
+      final FloatBuffer modelBuff = _matrixStore.get(RenderMatrixType.Model);
+      modelBuff.clear();
+      model.fromFloatBuffer(modelBuff);
 
-    if (modelIsUniformScale) {
-      // normal matrix is just the 3x3 of the model matrix
-      model.toMatrix3(normal);
-    } else {
-      // normal matrix is the inverse transpose of the 3x3 model matrix
-      model.toMatrix3(normal);
-      try {
-        normal.invertLocal().transposeLocal();
-      } catch (final ArithmeticException ex) {
-        // silently ignore for now - non invertable
+      if (modelIsUniformScale) {
+        // normal matrix is just the 3x3 of the model matrix
+        model.toMatrix3(normal);
+      } else {
+        // normal matrix is the inverse transpose of the 3x3 model matrix
+        model.toMatrix3(normal);
+        try {
+          normal.invertLocal().transposeLocal();
+        } catch (final ArithmeticException ex) {
+          // silently ignore for now - non invertable
+        }
       }
+      normal.toFloatBuffer(dst);
+    } finally {
+      Matrix3.releaseTempInstance(normal);
+      Matrix4.releaseTempInstance(model);
     }
-    normal.toFloatBuffer(dst);
   }
 }
