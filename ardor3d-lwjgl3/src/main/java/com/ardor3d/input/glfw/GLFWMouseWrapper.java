@@ -48,14 +48,14 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
   private MouseIterator _currentIterator = null;
 
-  private static final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
-  private static final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
-  private static final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
+  private final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
+  private final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
+  private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
   private final EnumMap<MouseButton, ButtonState> _lastButtonState = new EnumMap<>(MouseButton.class);
 
-  private static boolean _sendClickState = false;
-  private static boolean _ignoreInput;
+  private boolean _sendClickState = false;
+  private boolean _ignoreInput;
   private MouseState _lastState;
 
   private final GLFWCanvas _canvas;
