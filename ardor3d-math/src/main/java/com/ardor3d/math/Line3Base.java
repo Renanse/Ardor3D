@@ -20,7 +20,7 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
-public abstract class Line3Base implements Savable, Externalizable {
+public abstract class Line3Base implements Savable, Externalizable, Cloneable {
 
   protected final Vector3 _origin = new Vector3();
   protected final Vector3 _direction = new Vector3();

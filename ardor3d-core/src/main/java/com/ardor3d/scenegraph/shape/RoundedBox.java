@@ -20,7 +20,7 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class RoundedBox extends Mesh {
+public class RoundedBox extends Mesh implements Cloneable {
 
   private final Vector3 _extent = new Vector3(0.5, 0.5, 0.5);
   private final Vector3 _border = new Vector3(0.05, 0.05, 0.05);
