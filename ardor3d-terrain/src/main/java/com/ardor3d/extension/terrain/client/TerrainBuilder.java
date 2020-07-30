@@ -21,9 +21,8 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import com.ardor3d.extension.terrain.util.BresenhamYUpGridTracer;
+import com.ardor3d.extension.terrain.util.GridCacheDebugPanel;
 import com.ardor3d.extension.terrain.util.PriorityExecutors;
-import com.ardor3d.extension.terrain.util.TerrainGridCachePanel;
-import com.ardor3d.extension.terrain.util.TextureGridCachePanel;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -163,12 +162,15 @@ public class TerrainBuilder {
     logger.fine("client clipmapLevels: " + cacheList.size());
 
     if (buildConfig.showDebugPanels) {
-      final TerrainGridCachePanel panel = new TerrainGridCachePanel(cacheList, cacheSize);
+      final var cacheStream = cacheList.stream().map(c -> (AbstractGridCache) c);
+      final var panel = new GridCacheDebugPanel(cacheStream, cacheSize);
       final JFrame frame = new JFrame("Terrain Cache Debug");
       frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       frame.getContentPane().add(panel);
       frame.setBounds(10, 10, panel.getSize().width, panel.getSize().height);
       frame.setVisible(true);
+
+      new Thread(panel, "repaintalot").start();
     }
 
     return terrain;
@@ -197,7 +199,7 @@ public class TerrainBuilder {
     logger.fine("meshLevel: " + meshLevel);
 
     for (int i = baseLevel; i < clipmapLevels; i++) {
-      final TextureCache gridCache = new TextureGridCache(parentCache, cacheSize, source, tileSize,
+      final var gridCache = new TextureGridCache(parentCache, cacheSize, source, tileSize,
           buildConfig.clipmapTextureSize, textureConfiguration, meshLevel--, i, buildConfig.tileThreadService);
 
       parentCache = gridCache;
@@ -211,12 +213,15 @@ public class TerrainBuilder {
         new TextureClipmap(cacheList, buildConfig.clipmapTextureSize, textureConfiguration, source);
 
     if (buildConfig.showDebugPanels) {
-      final TextureGridCachePanel panel = new TextureGridCachePanel(cacheList, cacheSize);
+      final var cacheStream = cacheList.stream().map(c -> (AbstractGridCache) c);
+      final var panel = new GridCacheDebugPanel(cacheStream, cacheSize);
       final JFrame frame = new JFrame("Texture Cache Debug");
       frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       frame.getContentPane().add(panel);
       frame.setBounds(10, 120, panel.getSize().width, panel.getSize().height);
       frame.setVisible(true);
+
+      new Thread(panel, "repaintalot").start();
     }
 
     return textureClipmap;

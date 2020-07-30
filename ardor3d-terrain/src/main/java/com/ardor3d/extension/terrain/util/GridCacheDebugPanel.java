@@ -13,40 +13,46 @@ package com.ardor3d.extension.terrain.util;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.ardor3d.extension.terrain.client.AbstractGridCache;
 import com.ardor3d.extension.terrain.client.AbstractGridCache.TileLoadingData;
-import com.ardor3d.extension.terrain.client.TextureCache;
-import com.ardor3d.extension.terrain.client.TextureGridCache;
 import com.ardor3d.math.MathUtils;
 
-public class TextureGridCachePanel extends JPanel {
+public class GridCacheDebugPanel extends JPanel implements Runnable {
   private static final long serialVersionUID = 1L;
 
-  private final List<TextureCache> cacheList;
-  private final int cacheSize;
+  protected final List<AbstractGridCache> cacheList = new ArrayList<>();
+  protected final int cacheSize;
 
-  private final int size = 4;
+  protected final int size = 4;
 
-  public TextureGridCachePanel(final List<TextureCache> cacheList, final int cacheSize) {
-    this.cacheList = cacheList;
+  protected boolean _run;
+
+  public GridCacheDebugPanel(final Stream<AbstractGridCache> cacheStream, final int cacheSize) {
+    cacheStream.forEach(cacheList::add);
     this.cacheSize = cacheSize;
-
-    new Thread((Runnable) () -> {
-      while (true) {
-        SwingUtilities.invokeLater(() -> repaint());
-        try {
-          Thread.sleep(100);
-        } catch (final InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-    }, "repaintalot").start();
-
     setSize(cacheList.size() * (size * cacheSize + 5) + 60, 100);
+  }
+
+  @Override
+  public void run() {
+    _run = true;
+    while (_run) {
+      SwingUtilities.invokeLater(() -> repaint());
+      try {
+        Thread.sleep(250);
+      } catch (final InterruptedException e) {}
+    }
+  }
+
+  public void stop() {
+    _run = false;
   }
 
   @Override
@@ -56,7 +62,7 @@ public class TextureGridCachePanel extends JPanel {
     final Graphics2D g2 = (Graphics2D) g;
 
     for (int i = 0; i < cacheList.size(); i++) {
-      final TextureGridCache cache = (TextureGridCache) cacheList.get(i);
+      final var cache = cacheList.get(i);
       for (final TileLoadingData data : cache.getDebugTiles()) {
         switch (data.state) {
           case cancelled:
