@@ -63,27 +63,27 @@ public final class Debugger {
 
   private static final Sphere boundingSphere = new Sphere("bsphere", 10, 10, 1);
   static {
-    boundingSphere.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
-    boundingSphere.getSceneHints().setNormalsMode(NormalsMode.Off);
-    boundingSphere.setRenderState(new WireframeState());
-    boundingSphere.setRenderState(new ZBufferState());
-    boundingSphere.updateWorldRenderStates(false);
+    Debugger.boundingSphere.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+    Debugger.boundingSphere.getSceneHints().setNormalsMode(NormalsMode.Off);
+    Debugger.boundingSphere.setRenderState(new WireframeState());
+    Debugger.boundingSphere.setRenderState(new ZBufferState());
+    Debugger.boundingSphere.updateWorldRenderStates(false);
   }
   private static final Box boundingBox = new Box("bbox", new Vector3(), 1, 1, 1);
   static {
-    boundingBox.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
-    boundingBox.getSceneHints().setNormalsMode(NormalsMode.Off);
-    boundingBox.setRenderState(new WireframeState());
-    boundingBox.setRenderState(new ZBufferState());
-    boundingBox.updateWorldRenderStates(false);
+    Debugger.boundingBox.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+    Debugger.boundingBox.getSceneHints().setNormalsMode(NormalsMode.Off);
+    Debugger.boundingBox.setRenderState(new WireframeState());
+    Debugger.boundingBox.setRenderState(new ZBufferState());
+    Debugger.boundingBox.updateWorldRenderStates(false);
   }
   private static final OrientedBox boundingOB = new OrientedBox("bobox");
   static {
-    boundingOB.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
-    boundingOB.getSceneHints().setNormalsMode(NormalsMode.Off);
-    boundingOB.setRenderState(new WireframeState());
-    boundingOB.setRenderState(new ZBufferState());
-    boundingOB.updateWorldRenderStates(false);
+    Debugger.boundingOB.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+    Debugger.boundingOB.getSceneHints().setNormalsMode(NormalsMode.Off);
+    Debugger.boundingOB.setRenderState(new WireframeState());
+    Debugger.boundingOB.setRenderState(new ZBufferState());
+    Debugger.boundingOB.updateWorldRenderStates(false);
   }
 
   /**
@@ -152,42 +152,42 @@ public final class Debugger {
   }
 
   public static void setBoundsColor(final ReadOnlyColorRGBA color) {
-    boundingBox.setDefaultColor(color);
-    boundingOB.setDefaultColor(color);
-    boundingSphere.setDefaultColor(color);
+    Debugger.boundingBox.setDefaultColor(color);
+    Debugger.boundingOB.setDefaultColor(color);
+    Debugger.boundingSphere.setDefaultColor(color);
   }
 
   public static void drawBoundingSphere(final BoundingSphere sphere, final Renderer r) {
-    boundingSphere.setData(sphere.getCenter(), 10, 10, sphere.getRadius());
-    boundingSphere.draw(r);
+    Debugger.boundingSphere.setData(sphere.getCenter(), 10, 10, sphere.getRadius());
+    Debugger.boundingSphere.draw(r);
   }
 
   public static void drawBoundingBox(final BoundingBox box, final Renderer r) {
-    boundingBox.setData(box.getCenter(), box.getXExtent(), box.getYExtent(), box.getZExtent());
-    boundingBox.draw(r);
+    Debugger.boundingBox.setData(box.getCenter(), box.getXExtent(), box.getYExtent(), box.getZExtent());
+    Debugger.boundingBox.draw(r);
   }
 
   public static void drawOBB(final OrientedBoundingBox box, final Renderer r) {
-    boundingOB.getCenter().set(box.getCenter());
-    boundingOB.getxAxis().set(box.getXAxis());
-    boundingOB.getYAxis().set(box.getYAxis());
-    boundingOB.getZAxis().set(box.getZAxis());
-    boundingOB.getExtent().set(box.getExtent());
-    boundingOB.computeInformation();
-    boundingOB.draw(r);
+    Debugger.boundingOB.getCenter().set(box.getCenter());
+    Debugger.boundingOB.getxAxis().set(box.getXAxis());
+    Debugger.boundingOB.getYAxis().set(box.getYAxis());
+    Debugger.boundingOB.getZAxis().set(box.getZAxis());
+    Debugger.boundingOB.getExtent().set(box.getExtent());
+    Debugger.boundingOB.computeInformation();
+    Debugger.boundingOB.draw(r);
   }
 
   // -- **** METHODS FOR DRAWING NORMALS **** -- //
 
   private static final Line normalLines = new Line("normLine");
   static {
-    normalLines.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
-    normalLines.setRenderState(new ZBufferState());
-    normalLines.getMeshData().setIndexMode(IndexMode.Lines);
-    normalLines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
-    normalLines.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(500));
-    normalLines.updateWorldRenderStates(false);
-    MaterialUtil.autoMaterials(normalLines);
+    Debugger.normalLines.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+    Debugger.normalLines.setRenderState(new ZBufferState());
+    Debugger.normalLines.getMeshData().setIndexMode(IndexMode.Lines);
+    Debugger.normalLines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
+    Debugger.normalLines.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(500));
+    Debugger.normalLines.updateWorldRenderStates(false);
+    MaterialUtil.autoMaterials(Debugger.normalLines);
   }
   private static final Vector3 _normalVect = new Vector3(), _normalVect2 = new Vector3();
   public static final ColorRGBA NORMAL_COLOR_BASE = new ColorRGBA(ColorRGBA.RED);
@@ -245,13 +245,13 @@ public final class Debugger {
       if (rSize == -1) {
         final BoundingVolume vol = element.getWorldBound();
         if (vol != null) {
-          measureBox.setCenter(vol.getCenter());
-          measureBox.setXExtent(0);
-          measureBox.setYExtent(0);
-          measureBox.setZExtent(0);
-          measureBox.mergeLocal(vol);
-          rSize =
-              AUTO_NORMAL_RATIO * ((measureBox.getXExtent() + measureBox.getYExtent() + measureBox.getZExtent()) / 3);
+          Debugger.measureBox.setCenter(vol.getCenter());
+          Debugger.measureBox.setXExtent(0);
+          Debugger.measureBox.setYExtent(0);
+          Debugger.measureBox.setZExtent(0);
+          Debugger.measureBox.mergeLocal(vol);
+          rSize = Debugger.AUTO_NORMAL_RATIO * ((Debugger.measureBox.getXExtent() + Debugger.measureBox.getYExtent()
+              + Debugger.measureBox.getZExtent()) / 3);
         } else {
           rSize = 1.0;
         }
@@ -264,7 +264,7 @@ public final class Debugger {
       final FloatBuffer norms = mesh.getMeshData().getNormalBuffer();
       final FloatBuffer verts = mesh.getMeshData().getVertexBuffer();
       if (norms != null && verts != null && norms.limit() == verts.limit()) {
-        final MeshData normMD = normalLines.getMeshData();
+        final MeshData normMD = Debugger.normalLines.getMeshData();
         FloatBuffer lineVerts = normMD.getVertexBuffer();
         if (lineVerts.capacity() < (3 * (2 * mesh.getMeshData().getVertexCount()))) {
           normMD.setVertexBuffer(null);
@@ -302,30 +302,30 @@ public final class Debugger {
         lineInds.getBuffer().rewind();
 
         for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
-          _normalVect.set(verts.get(), verts.get(), verts.get());
-          mesh.getWorldTransform().applyForward(_normalVect);
-          lineVerts.put(_normalVect.getXf());
-          lineVerts.put(_normalVect.getYf());
-          lineVerts.put(_normalVect.getZf());
+          Debugger._normalVect.set(verts.get(), verts.get(), verts.get());
+          mesh.getWorldTransform().applyForward(Debugger._normalVect);
+          lineVerts.put(Debugger._normalVect.getXf());
+          lineVerts.put(Debugger._normalVect.getYf());
+          lineVerts.put(Debugger._normalVect.getZf());
 
-          lineColors.put(NORMAL_COLOR_BASE.getRed());
-          lineColors.put(NORMAL_COLOR_BASE.getGreen());
-          lineColors.put(NORMAL_COLOR_BASE.getBlue());
-          lineColors.put(NORMAL_COLOR_BASE.getAlpha());
+          lineColors.put(Debugger.NORMAL_COLOR_BASE.getRed());
+          lineColors.put(Debugger.NORMAL_COLOR_BASE.getGreen());
+          lineColors.put(Debugger.NORMAL_COLOR_BASE.getBlue());
+          lineColors.put(Debugger.NORMAL_COLOR_BASE.getAlpha());
 
           lineInds.put(x * 2);
 
-          _normalVect2.set(norms.get(), norms.get(), norms.get());
-          mesh.getWorldTransform().applyForwardVector(_normalVect2).normalizeLocal().multiplyLocal(rSize);
-          _normalVect.addLocal(_normalVect2);
-          lineVerts.put(_normalVect.getXf());
-          lineVerts.put(_normalVect.getYf());
-          lineVerts.put(_normalVect.getZf());
+          Debugger._normalVect2.set(norms.get(), norms.get(), norms.get());
+          mesh.getWorldTransform().applyForwardVector(Debugger._normalVect2).normalizeLocal().multiplyLocal(rSize);
+          Debugger._normalVect.addLocal(Debugger._normalVect2);
+          lineVerts.put(Debugger._normalVect.getXf());
+          lineVerts.put(Debugger._normalVect.getYf());
+          lineVerts.put(Debugger._normalVect.getZf());
 
-          lineColors.put(NORMAL_COLOR_TIP.getRed());
-          lineColors.put(NORMAL_COLOR_TIP.getGreen());
-          lineColors.put(NORMAL_COLOR_TIP.getBlue());
-          lineColors.put(NORMAL_COLOR_TIP.getAlpha());
+          lineColors.put(Debugger.NORMAL_COLOR_TIP.getRed());
+          lineColors.put(Debugger.NORMAL_COLOR_TIP.getGreen());
+          lineColors.put(Debugger.NORMAL_COLOR_TIP.getBlue());
+          lineColors.put(Debugger.NORMAL_COLOR_TIP.getAlpha());
 
           lineInds.put((x * 2) + 1);
         }
@@ -334,7 +334,7 @@ public final class Debugger {
         normMD.markBufferDirty(MeshData.KEY_ColorCoords);
         normMD.markBuffersDirty();
         normMD.markIndicesDirty();
-        normalLines.onDraw(r);
+        Debugger.normalLines.onDraw(r);
       }
 
     }
@@ -369,13 +369,13 @@ public final class Debugger {
       if (rSize == -1) {
         final BoundingVolume vol = element.getWorldBound();
         if (vol != null) {
-          measureBox.setCenter(vol.getCenter());
-          measureBox.setXExtent(0);
-          measureBox.setYExtent(0);
-          measureBox.setZExtent(0);
-          measureBox.mergeLocal(vol);
-          rSize =
-              AUTO_NORMAL_RATIO * ((measureBox.getXExtent() + measureBox.getYExtent() + measureBox.getZExtent()) / 3f);
+          Debugger.measureBox.setCenter(vol.getCenter());
+          Debugger.measureBox.setXExtent(0);
+          Debugger.measureBox.setYExtent(0);
+          Debugger.measureBox.setZExtent(0);
+          Debugger.measureBox.mergeLocal(vol);
+          rSize = Debugger.AUTO_NORMAL_RATIO * ((Debugger.measureBox.getXExtent() + Debugger.measureBox.getYExtent()
+              + Debugger.measureBox.getZExtent()) / 3f);
         } else {
           rSize = 1.0;
         }
@@ -384,35 +384,35 @@ public final class Debugger {
       final FloatBuffer norms = mesh.getMeshData().getTangentBuffer();
       final FloatBuffer verts = mesh.getMeshData().getVertexBuffer();
       if (norms != null && verts != null && norms.limit() == verts.limit()) {
-        FloatBuffer lineVerts = normalLines.getMeshData().getVertexBuffer();
+        FloatBuffer lineVerts = Debugger.normalLines.getMeshData().getVertexBuffer();
         if (lineVerts.capacity() < (3 * (2 * mesh.getMeshData().getVertexCount()))) {
-          normalLines.getMeshData().setVertexBuffer(null);
+          Debugger.normalLines.getMeshData().setVertexBuffer(null);
           lineVerts = BufferUtils.createVector3Buffer(mesh.getMeshData().getVertexCount() * 2);
-          normalLines.getMeshData().setVertexBuffer(lineVerts);
+          Debugger.normalLines.getMeshData().setVertexBuffer(lineVerts);
         } else {
           lineVerts.clear();
           lineVerts.limit(3 * 2 * mesh.getMeshData().getVertexCount());
-          normalLines.getMeshData().setVertexBuffer(lineVerts);
+          Debugger.normalLines.getMeshData().setVertexBuffer(lineVerts);
         }
 
-        FloatBuffer lineColors = normalLines.getMeshData().getColorBuffer();
+        FloatBuffer lineColors = Debugger.normalLines.getMeshData().getColorBuffer();
         if (lineColors.capacity() < (4 * (2 * mesh.getMeshData().getVertexCount()))) {
-          normalLines.getMeshData().setColorBuffer(null);
+          Debugger.normalLines.getMeshData().setColorBuffer(null);
           lineColors = BufferUtils.createColorBuffer(mesh.getMeshData().getVertexCount() * 2);
-          normalLines.getMeshData().setColorBuffer(lineColors);
+          Debugger.normalLines.getMeshData().setColorBuffer(lineColors);
         } else {
           lineColors.clear();
         }
 
-        IndexBufferData<?> lineInds = normalLines.getMeshData().getIndices();
-        if (lineInds == null || lineInds.getBufferCapacity() < (normalLines.getMeshData().getVertexCount())) {
-          normalLines.getMeshData().setIndices(null);
+        IndexBufferData<?> lineInds = Debugger.normalLines.getMeshData().getIndices();
+        if (lineInds == null || lineInds.getBufferCapacity() < (Debugger.normalLines.getMeshData().getVertexCount())) {
+          Debugger.normalLines.getMeshData().setIndices(null);
           lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2,
-              normalLines.getMeshData().getVertexCount() - 1);
-          normalLines.getMeshData().setIndices(lineInds);
+              Debugger.normalLines.getMeshData().getVertexCount() - 1);
+          Debugger.normalLines.getMeshData().setIndices(lineInds);
         } else {
           lineInds.getBuffer().clear();
-          lineInds.getBuffer().limit(normalLines.getMeshData().getVertexCount());
+          lineInds.getBuffer().limit(Debugger.normalLines.getMeshData().getVertexCount());
         }
 
         verts.rewind();
@@ -421,35 +421,35 @@ public final class Debugger {
         lineInds.getBuffer().rewind();
 
         for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
-          _normalVect.set(verts.get(), verts.get(), verts.get());
-          _normalVect.multiplyLocal(mesh.getWorldScale());
-          lineVerts.put(_normalVect.getXf());
-          lineVerts.put(_normalVect.getYf());
-          lineVerts.put(_normalVect.getZf());
+          Debugger._normalVect.set(verts.get(), verts.get(), verts.get());
+          Debugger._normalVect.multiplyLocal(mesh.getWorldScale());
+          lineVerts.put(Debugger._normalVect.getXf());
+          lineVerts.put(Debugger._normalVect.getYf());
+          lineVerts.put(Debugger._normalVect.getZf());
 
-          lineColors.put(TANGENT_COLOR_BASE.getRed());
-          lineColors.put(TANGENT_COLOR_BASE.getGreen());
-          lineColors.put(TANGENT_COLOR_BASE.getBlue());
-          lineColors.put(TANGENT_COLOR_BASE.getAlpha());
+          lineColors.put(Debugger.TANGENT_COLOR_BASE.getRed());
+          lineColors.put(Debugger.TANGENT_COLOR_BASE.getGreen());
+          lineColors.put(Debugger.TANGENT_COLOR_BASE.getBlue());
+          lineColors.put(Debugger.TANGENT_COLOR_BASE.getAlpha());
 
           lineInds.put(x * 2);
 
-          _normalVect.addLocal(norms.get() * rSize, norms.get() * rSize, norms.get() * rSize);
-          lineVerts.put(_normalVect.getXf());
-          lineVerts.put(_normalVect.getYf());
-          lineVerts.put(_normalVect.getZf());
+          Debugger._normalVect.addLocal(norms.get() * rSize, norms.get() * rSize, norms.get() * rSize);
+          lineVerts.put(Debugger._normalVect.getXf());
+          lineVerts.put(Debugger._normalVect.getYf());
+          lineVerts.put(Debugger._normalVect.getZf());
 
-          lineColors.put(TANGENT_COLOR_TIP.getRed());
-          lineColors.put(TANGENT_COLOR_TIP.getGreen());
-          lineColors.put(TANGENT_COLOR_TIP.getBlue());
-          lineColors.put(TANGENT_COLOR_TIP.getAlpha());
+          lineColors.put(Debugger.TANGENT_COLOR_TIP.getRed());
+          lineColors.put(Debugger.TANGENT_COLOR_TIP.getGreen());
+          lineColors.put(Debugger.TANGENT_COLOR_TIP.getBlue());
+          lineColors.put(Debugger.TANGENT_COLOR_TIP.getAlpha());
 
           lineInds.put((x * 2) + 1);
         }
 
-        normalLines.setWorldTranslation(mesh.getWorldTranslation());
-        normalLines.setWorldRotation(mesh.getWorldRotation());
-        normalLines.onDraw(r);
+        Debugger.normalLines.setWorldTranslation(mesh.getWorldTranslation());
+        Debugger.normalLines.setWorldRotation(mesh.getWorldRotation());
+        Debugger.normalLines.onDraw(r);
       }
 
     }
@@ -468,7 +468,7 @@ public final class Debugger {
 
   private static final AxisRods rods = new AxisRods("debug_rods", true, 1);
   static {
-    rods.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+    Debugger.rods.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
   }
   private static boolean axisInited = false;
 
@@ -477,14 +477,14 @@ public final class Debugger {
   }
 
   public static void drawAxis(final Spatial spat, final Renderer r, final boolean drawChildren, final boolean drawAll) {
-    if (!axisInited) {
+    if (!Debugger.axisInited) {
       final BlendState blendState = new BlendState();
       blendState.setBlendEnabled(true);
       blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
       blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-      rods.setRenderState(blendState);
-      rods.updateGeometricState(0, false);
-      axisInited = true;
+      Debugger.rods.setRenderState(blendState);
+      Debugger.rods.updateGeometricState(0, false);
+      Debugger.axisInited = true;
     }
 
     if (drawAll || (spat instanceof Mesh)) {
@@ -492,26 +492,27 @@ public final class Debugger {
         double rSize;
         final BoundingVolume vol = spat.getWorldBound();
         if (vol != null) {
-          measureBox.setCenter(vol.getCenter());
-          measureBox.setXExtent(0);
-          measureBox.setYExtent(0);
-          measureBox.setZExtent(0);
-          measureBox.mergeLocal(vol);
-          rSize = 1 * ((measureBox.getXExtent() + measureBox.getYExtent() + measureBox.getZExtent()) / 3);
+          Debugger.measureBox.setCenter(vol.getCenter());
+          Debugger.measureBox.setXExtent(0);
+          Debugger.measureBox.setYExtent(0);
+          Debugger.measureBox.setZExtent(0);
+          Debugger.measureBox.mergeLocal(vol);
+          rSize = 1 * ((Debugger.measureBox.getXExtent() + Debugger.measureBox.getYExtent()
+              + Debugger.measureBox.getZExtent()) / 3);
         } else {
           rSize = 1.0;
         }
 
-        rods.setTranslation(spat.getWorldBound().getCenter());
-        rods.setScale(rSize);
+        Debugger.rods.setTranslation(spat.getWorldBound().getCenter());
+        Debugger.rods.setScale(rSize);
       } else {
-        rods.setTranslation(spat.getWorldTranslation());
-        rods.setScale(spat.getWorldScale());
+        Debugger.rods.setTranslation(spat.getWorldTranslation());
+        Debugger.rods.setScale(spat.getWorldScale());
       }
-      rods.setRotation(spat.getWorldRotation());
-      rods.updateGeometricState(0, false);
+      Debugger.rods.setRotation(spat.getWorldRotation());
+      Debugger.rods.updateGeometricState(0, false);
 
-      rods.draw(r);
+      Debugger.rods.draw(r);
     }
 
     if ((spat instanceof Node) && drawChildren) {
@@ -536,8 +537,8 @@ public final class Debugger {
   private static TextureRenderer bufTexRend;
 
   static {
-    bQuad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    bQuad.getSceneHints().setCullHint(CullHint.Never);
+    Debugger.bQuad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
+    Debugger.bQuad.getSceneHints().setCullHint(CullHint.Never);
   }
 
   public static void drawBuffer(final TextureStoreFormat rttFormat, final int location, final Renderer r) {
@@ -550,12 +551,12 @@ public final class Debugger {
     final Camera cam = Camera.getCurrentCamera();
     r.flushGraphics();
     double locationX = cam.getWidth(), locationY = cam.getHeight();
-    bQuad.resize(size, (cam.getHeight() / (double) cam.getWidth()) * size);
-    if (bQuad.getLocalRenderState(RenderState.StateType.Texture) == null) {
+    Debugger.bQuad.resize(size, (cam.getHeight() / (double) cam.getWidth()) * size);
+    if (Debugger.bQuad.getLocalRenderState(RenderState.StateType.Texture) == null) {
       final TextureState ts = new TextureState();
-      bufTexture = new Texture2D();
-      ts.setTexture(bufTexture);
-      bQuad.setRenderState(ts);
+      Debugger.bufTexture = new Texture2D();
+      ts.setTexture(Debugger.bufTexture);
+      Debugger.bQuad.setRenderState(ts);
     }
 
     int width = cam.getWidth();
@@ -565,8 +566,8 @@ public final class Debugger {
         newWidth <<= 1;
 
       } while (newWidth < width);
-      bQuad.getMeshData().getTextureBuffer(0).put(4, width / (float) newWidth);
-      bQuad.getMeshData().getTextureBuffer(0).put(6, width / (float) newWidth);
+      Debugger.bQuad.getMeshData().getTextureBuffer(0).put(4, width / (float) newWidth);
+      Debugger.bQuad.getMeshData().getTextureBuffer(0).put(6, width / (float) newWidth);
       width = newWidth;
     }
 
@@ -577,15 +578,15 @@ public final class Debugger {
         newHeight <<= 1;
 
       } while (newHeight < height);
-      bQuad.getMeshData().getTextureBuffer(0).put(1, height / (float) newHeight);
-      bQuad.getMeshData().getTextureBuffer(0).put(7, height / (float) newHeight);
+      Debugger.bQuad.getMeshData().getTextureBuffer(0).put(1, height / (float) newHeight);
+      Debugger.bQuad.getMeshData().getTextureBuffer(0).put(7, height / (float) newHeight);
       height = newHeight;
     }
-    if (bufTexRend == null) {
-      bufTexRend = r.createTextureRenderer(width, height, 0, 0);
-      bufTexRend.setupTexture(bufTexture);
+    if (Debugger.bufTexRend == null) {
+      Debugger.bufTexRend = r.createTextureRenderer(width, height, 0, 0);
+      Debugger.bufTexRend.setupTexture(Debugger.bufTexture);
     }
-    bufTexRend.copyToTexture(bufTexture, 0, 0, width, height, 0, 0);
+    Debugger.bufTexRend.copyToTexture(Debugger.bufTexture, 0, 0, width, height, 0, 0);
 
     final double loc = size * .75;
     switch (location) {
@@ -608,10 +609,10 @@ public final class Debugger {
         break;
     }
 
-    bQuad.setWorldTranslation(locationX, locationY, 0);
+    Debugger.bQuad.setWorldTranslation(locationX, locationY, 0);
 
-    bQuad.updateGeometricState(0);
-    bQuad.onDraw(r);
+    Debugger.bQuad.updateGeometricState(0);
+    Debugger.bQuad.onDraw(r);
     r.flushGraphics();
   }
 
@@ -626,41 +627,42 @@ public final class Debugger {
 
   public static void drawCameraFrustum(final Renderer r, final Camera camera, final double fNear, final double fFar,
       final ReadOnlyColorRGBA color, final short pattern, final boolean drawOriginConnector) {
-    if (lineFrustum == null) {
+    if (Debugger.lineFrustum == null) {
       final FloatBuffer verts = BufferUtils.createVector3Buffer(24);
       final FloatBuffer colors = BufferUtils.createColorBuffer(24);
 
-      lineFrustum = new Line("Lines", verts, null, colors, null);
-      lineFrustum.getMeshData()
+      final Line line = new Line("Lines", verts, null, colors, null);
+      line.getMeshData()
           .setIndexModes(new IndexMode[] {IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines});
-      lineFrustum.getMeshData().setIndexLengths(new int[] {4, 4, 8, 8});
-      lineFrustum.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+      line.getMeshData().setIndexLengths(new int[] {4, 4, 8, 8});
+      line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
       final BlendState lineBlendState = new BlendState();
       lineBlendState.setEnabled(true);
       lineBlendState.setBlendEnabled(true);
       lineBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
       lineBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-      lineFrustum.setRenderState(lineBlendState);
+      line.setRenderState(lineBlendState);
 
       // set alpha testing
-      lineFrustum.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
-      lineFrustum.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
+      line.setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
+      line.setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
 
       final ZBufferState zstate = new ZBufferState();
-      lineFrustum.setRenderState(zstate);
-      lineFrustum.updateGeometricState(0.0);
+      line.setRenderState(zstate);
+      line.updateGeometricState(0.0);
 
-      lineFrustum.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+      line.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+      Debugger.lineFrustum = line;
     }
 
-    lineFrustum.setDefaultColor(color);
-    MaterialUtil.autoMaterials(lineFrustum);
+    Debugger.lineFrustum.setDefaultColor(color);
+    MaterialUtil.autoMaterials(Debugger.lineFrustum);
 
-    extendedCamera.set(camera);
-    extendedCamera.calculateFrustum(fNear, fFar);
+    Debugger.extendedCamera.set(camera);
+    Debugger.extendedCamera.calculateFrustum(fNear, fFar);
 
-    final FloatBuffer colors = lineFrustum.getMeshData().getColorBuffer();
+    final FloatBuffer colors = Debugger.lineFrustum.getMeshData().getColorBuffer();
     for (int i = 0; i < 16; i++) {
       BufferUtils.setInBuffer(color, colors, i);
     }
@@ -673,9 +675,9 @@ public final class Debugger {
       colors.put(alpha);
     }
 
-    final Vector3[] corners = extendedCamera.getCorners();
+    final Vector3[] corners = Debugger.extendedCamera.getCorners();
 
-    final FloatBuffer verts = lineFrustum.getMeshData().getVertexBuffer();
+    final FloatBuffer verts = Debugger.lineFrustum.getMeshData().getVertexBuffer();
     BufferUtils.setInBuffer(corners[0], verts, 0);
     BufferUtils.setInBuffer(corners[1], verts, 1);
     BufferUtils.setInBuffer(corners[2], verts, 2);
@@ -695,16 +697,16 @@ public final class Debugger {
     BufferUtils.setInBuffer(corners[3], verts, 14);
     BufferUtils.setInBuffer(corners[7], verts, 15);
 
-    BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 16);
+    BufferUtils.setInBuffer(Debugger.extendedCamera.getLocation(), verts, 16);
     BufferUtils.setInBuffer(corners[0], verts, 17);
-    BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 18);
+    BufferUtils.setInBuffer(Debugger.extendedCamera.getLocation(), verts, 18);
     BufferUtils.setInBuffer(corners[1], verts, 19);
-    BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 20);
+    BufferUtils.setInBuffer(Debugger.extendedCamera.getLocation(), verts, 20);
     BufferUtils.setInBuffer(corners[2], verts, 21);
-    BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 22);
+    BufferUtils.setInBuffer(Debugger.extendedCamera.getLocation(), verts, 22);
     BufferUtils.setInBuffer(corners[3], verts, 23);
 
-    lineFrustum.draw(r);
+    Debugger.lineFrustum.draw(r);
   }
 
 }

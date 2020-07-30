@@ -798,7 +798,7 @@ public class DOMOutputCapsule implements OutputCapsule {
     }
     if (value instanceof FloatBuffer) {
       write(BinaryClassField.FLOATBUFFER, "type", (byte) -1);
-      write((ByteBuffer) value, "value", null);
+      write((FloatBuffer) value, "value", null);
       return;
     }
     if (value instanceof Integer) {

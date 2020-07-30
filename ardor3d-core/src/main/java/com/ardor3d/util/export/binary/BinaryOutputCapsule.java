@@ -451,6 +451,12 @@ public class BinaryOutputCapsule implements OutputCapsule {
     return Arrays.equals(_bytes, other);
   }
 
+  @Override
+  public int hashCode() {
+    assert false : "hashCode not designed";
+    return 42;
+  }
+
   public void finish() {
     // renamed to finish as 'finalize' in java.lang.Object should not be
     // overridden like this
