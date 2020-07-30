@@ -53,9 +53,9 @@ public class OpaqueRenderBucket extends AbstractRenderBucket {
       final TextureState ts2 = (TextureState) mesh2.getWorldRenderState(RenderState.StateType.Texture);
       if (ts1 == ts2) {
         return 0;
-      } else if (ts1 == null && ts2 != null) {
+      } else if (ts1 == null) {
         return -1;
-      } else if (ts2 == null && ts1 != null) {
+      } else if (ts2 == null) {
         return 1;
       }
 

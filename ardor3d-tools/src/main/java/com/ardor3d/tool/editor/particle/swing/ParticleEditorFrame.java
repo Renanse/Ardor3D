@@ -286,7 +286,7 @@ public class ParticleEditorFrame extends JFrame {
   }
 
   private void updateTitle() {
-    setTitle("Ardor3D Particle System Editor" + (openFile == null ? "" : (" - " + openFile)));
+    setTitle("Ardor3D Particle System Editor" + (openFile == null ? "" : " - " + openFile));
   }
 
   private JMenuBar createMenuBar() {
@@ -738,7 +738,7 @@ public class ParticleEditorFrame extends JFrame {
 
   private void deleteLayer() {
     final int idx = layerTable.getSelectedRow(),
-        sidx = (idx == editScene.particleNode.getNumberOfChildren() - 1) ? idx - 1 : idx;
+        sidx = idx == editScene.particleNode.getNumberOfChildren() - 1 ? idx - 1 : idx;
     layerTable.clearSelection();
     editScene.particleNode.detachChildAt(idx);
     layerModel.fireTableRowsDeleted(idx, idx);
@@ -830,7 +830,7 @@ public class ParticleEditorFrame extends JFrame {
       editScene.particleGeom
           .addInfluence(SimpleParticleInfluenceFactory.createBasicGravity(new Vector3(0, -3f, 0), true));
       editScene.particleGeom.setEmissionDirection(new Vector3(0.0f, -1.0f, 0.0f));
-      editScene.particleGeom.setMaximumAngle(3.1415927f);
+      editScene.particleGeom.setMaximumAngle(MathUtils.PI);
       editScene.particleGeom.setMinimumAngle(0);
       editScene.particleGeom.getParticleController().setSpeed(0.5f);
       editScene.particleGeom.setMinimumLifeTime(1626.0f);
@@ -848,7 +848,7 @@ public class ParticleEditorFrame extends JFrame {
       editScene.particleGeom
           .addInfluence(SimpleParticleInfluenceFactory.createBasicGravity(new Vector3(0, -3f, 0), true));
       editScene.particleGeom.setEmissionDirection(new Vector3(0.0f, -1.0f, 0.0f));
-      editScene.particleGeom.setMaximumAngle(1.5707964f);
+      editScene.particleGeom.setMaximumAngle(MathUtils.HALF_PI);
       editScene.particleGeom.setMinimumAngle(0);
       editScene.particleGeom.getParticleController().setSpeed(0.2f);
       editScene.particleGeom.setMinimumLifeTime(1057.0f);
@@ -880,7 +880,7 @@ public class ParticleEditorFrame extends JFrame {
       editScene.particleGeom.getParticleController().setRepeatType(RepeatType.WRAP);
     } else if ("EXPLOSION".equalsIgnoreCase(examType)) {
       editScene.particleGeom.setEmissionDirection(new Vector3(0.0f, 1.0f, 0.0f));
-      editScene.particleGeom.setMaximumAngle(3.1415927f);
+      editScene.particleGeom.setMaximumAngle(MathUtils.PI);
       editScene.particleGeom.setMinimumAngle(0);
       editScene.particleGeom.getParticleController().setSpeed(1.4f);
       editScene.particleGeom.setMinimumLifeTime(1000.0f);
@@ -893,8 +893,8 @@ public class ParticleEditorFrame extends JFrame {
       editScene.particleGeom.getParticleController().setRepeatType(RepeatType.CLAMP);
     } else if ("GROUND FOG".equalsIgnoreCase(examType)) {
       editScene.particleGeom.setEmissionDirection(new Vector3(0.0f, 0.3f, 0.0f));
-      editScene.particleGeom.setMaximumAngle(1.5707964f);
-      editScene.particleGeom.setMinimumAngle(1.5707964f);
+      editScene.particleGeom.setMaximumAngle(MathUtils.HALF_PI);
+      editScene.particleGeom.setMinimumAngle(MathUtils.HALF_PI);
       editScene.particleGeom.getParticleController().setSpeed(0.5f);
       editScene.particleGeom.setMinimumLifeTime(1774.0f);
       editScene.particleGeom.setMaximumLifeTime(2800.0f);
@@ -1134,8 +1134,8 @@ public class ParticleEditorFrame extends JFrame {
       if (axis.equals(cam.getLeft())) {
         final double elevation = -Math.asin(cam.getDirection().getZ());
         // keep the camera constrained to -89 -> 89 degrees elevation
-        amount = Math.min(Math.max(elevation + amount, -(MathUtils.DEG_TO_RAD * 89)), (MathUtils.DEG_TO_RAD * 89))
-            - elevation;
+        amount =
+            Math.min(Math.max(elevation + amount, -(MathUtils.DEG_TO_RAD * 89)), MathUtils.DEG_TO_RAD * 89) - elevation;
       }
       rot.fromAngleAxis(amount, axis);
       cam.getLocation().subtract(focus, vector);
@@ -1205,7 +1205,7 @@ public class ParticleEditorFrame extends JFrame {
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
       final ParticleSystem pmesh = (ParticleSystem) editScene.particleNode.getChild(rowIndex);
-      return (columnIndex == 0) ? pmesh.getName()
+      return columnIndex == 0 ? pmesh.getName()
           : Boolean.valueOf(pmesh.getSceneHints().getCullHint() != CullHint.Always);
     }
 

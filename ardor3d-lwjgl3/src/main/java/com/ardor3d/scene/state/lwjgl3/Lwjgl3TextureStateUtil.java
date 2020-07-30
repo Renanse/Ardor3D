@@ -460,7 +460,7 @@ public abstract class Lwjgl3TextureStateUtil {
 
         // check for invalid textures - ones that have no opengl id and
         // no image data
-        if (texture == null || (texture != null && textureId == 0 && texture.getImage() == null)) {
+        if (texture == null || texture != null && textureId == 0 && texture.getImage() == null) {
           continue;
         }
 
@@ -636,7 +636,7 @@ public abstract class Lwjgl3TextureStateUtil {
     if (caps.isAnisoSupported()) {
       float aniso = texture.getAnisotropicFilterPercent() * (caps.getMaxAnisotropic() - 1.0f);
       aniso += 1.0f;
-      if (!texRecord.isValid() || (texRecord.anisoLevel - aniso > MathUtils.ZERO_TOLERANCE)) {
+      if (!texRecord.isValid() || texRecord.anisoLevel - aniso > MathUtils.ZERO_TOLERANCE) {
         checkAndSetUnit(unit, record, caps);
         GL11C.glTexParameterf(getGLType(type), GL46C.GL_TEXTURE_MAX_ANISOTROPY, aniso);
         texRecord.anisoLevel = aniso;
@@ -833,9 +833,7 @@ public abstract class Lwjgl3TextureStateUtil {
     if (Constants.stats) {
       StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
     }
-    if (record != null) {
-      record.units[unit].boundTexture = id;
-    }
+    record.units[unit].boundTexture = id;
   }
 
   public static int getGLType(final Type type) {

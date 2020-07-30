@@ -496,6 +496,10 @@ public class MathUtils {
     Vector3.releaseTempInstance(direction);
   }
 
+  public static boolean approximately(final float a, final float b) {
+    return Math.abs(b - a) < MathUtils.EPSILON;
+  }
+
   /**
    * Faster floor function. Does not handle NaN and Infinity. (Not handled when doing Math.floor and
    * just casting anyways, so question is if we want to handle it or not)

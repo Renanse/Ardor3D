@@ -84,7 +84,7 @@ public class UIDisk extends Mesh {
     final Vector2 texCoord = new Vector2();
 
     float txOff = 0f, tyOff = 0f, txScale = 1f, tyScale = 1f;
-    if (subTex != null && subTex.getTexture() != null && subTex.getTexture() != null) {
+    if (subTex != null && subTex.getTexture() != null && subTex.getTexture().getImage() != null) {
       txOff = subTex.getStartX();
       tyOff = subTex.getStartY();
       txScale = subTex.getEndX() - subTex.getStartX();

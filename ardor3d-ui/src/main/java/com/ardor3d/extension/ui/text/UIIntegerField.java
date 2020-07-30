@@ -51,7 +51,7 @@ public class UIIntegerField extends UITextField {
   public void lostFocus() {
     // force a clamp to [min, max] range
     final String text = getText();
-    _value = text == "" ? 0 : MathUtils.clamp(Integer.parseInt(text), _minValue, _maxValue);
+    _value = text.isBlank() ? 0 : MathUtils.clamp(Integer.parseInt(text), _minValue, _maxValue);
 
     super.lostFocus();
   }

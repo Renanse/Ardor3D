@@ -89,7 +89,7 @@ public class UIArc extends Mesh {
     float txOff = 0f, tyOff = 0f, txScale = 1f, tyScale = 1f;
     int topBrd = 0, leftBrd = 0, bottomBrd = 0, rightBrd = 0;
     float topOffTx = 0f, leftOffTx = 0f, bottomOffTx = 0f, rightOffTx = 0f;
-    if (subTex != null && subTex.getTexture() != null && subTex.getTexture() != null) {
+    if (subTex != null && subTex.getTexture() != null && subTex.getTexture().getImage() != null) {
       txOff = subTex.getStartX();
       tyOff = subTex.getStartY();
       txScale = subTex.getEndX() - subTex.getStartX();

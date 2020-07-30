@@ -156,7 +156,7 @@ public class UIDoubleField extends UITextField {
   public void lostFocus() {
     // force a clamp to [min, max] range
     final String text = getText();
-    _value = text.trim() == "" ? 0.0 : MathUtils.clamp(Double.parseDouble(text), _minValue, _maxValue);
+    _value = text.isBlank() ? 0.0 : MathUtils.clamp(Double.parseDouble(text), _minValue, _maxValue);
 
     super.lostFocus();
   }
