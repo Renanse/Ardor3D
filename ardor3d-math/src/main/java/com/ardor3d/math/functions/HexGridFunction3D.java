@@ -67,7 +67,7 @@ public class HexGridFunction3D extends GridPatternFunction3D {
         final double y = scaledY - gridY;
 
         // If a grid block has a negative slope, flip it.
-        if (((gridX + gridY) % 2) == 1) {
+        if (((gridX + gridY) % 2) != 0) {
           x = 1.0 - x;
         }
 

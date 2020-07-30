@@ -989,7 +989,7 @@ public class MeshData implements Savable {
         break;
       case TriangleStrip:
         // NB: we need to flip point 0 and 1 on odd primitiveIndex values
-        if (point < 2 && primitiveIndex % 2 == 1) {
+        if (point < 2 && primitiveIndex % 2 != 0) {
           index += primitiveIndex + (point == 0 ? 1 : 0);
         } else {
           index += primitiveIndex + point;
