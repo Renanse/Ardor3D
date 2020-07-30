@@ -52,8 +52,6 @@ public class MoveWidget extends AbstractInteractWidget {
   protected ColorRGBA _yColor = new ColorRGBA(0, 1, 0, .65f);
   protected ColorRGBA _zColor = new ColorRGBA(0, 0, 1, .65f);
 
-  protected InteractMatrix _interactMatrix = InteractMatrix.World;
-
   public static MouseCursor DEFAULT_CURSOR = null;
 
   public MoveWidget() {
@@ -252,12 +250,6 @@ public class MoveWidget extends AbstractInteractWidget {
 
     return _calcVec3D.subtractLocal(_calcVec3C);
   }
-
-  @Override
-  public void setInteractMatrix(final InteractMatrix matrix) { _interactMatrix = matrix; }
-
-  @Override
-  public InteractMatrix getInteractMatrix() { return _interactMatrix; }
 
   public InteractArrow getXArrow() { return _xArrow; }
 

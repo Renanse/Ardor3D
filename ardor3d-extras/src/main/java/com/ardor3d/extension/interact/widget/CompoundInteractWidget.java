@@ -43,8 +43,6 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
 
   protected AbstractInteractWidget _lastInputWidget = null;
 
-  protected InteractMatrix _interactMatrix;
-
   public CompoundInteractWidget() {
     _handle = new Node("handleRoot");
   }
@@ -325,14 +323,11 @@ public class CompoundInteractWidget extends AbstractInteractWidget {
 
   @Override
   public void setInteractMatrix(final InteractMatrix matrix) {
-    _interactMatrix = matrix;
+    super.setInteractMatrix(matrix);
     for (final AbstractInteractWidget widget : _widgets.values()) {
       widget.setInteractMatrix(matrix);
     }
   }
-
-  @Override
-  public InteractMatrix getInteractMatrix() { return _interactMatrix; }
 
   @Override
   public void update(final ReadOnlyTimer timer, final InteractManager manager) {
