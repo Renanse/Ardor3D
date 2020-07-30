@@ -152,6 +152,7 @@ public class ObjImporter {
 
         // grab our "keyword"
         final String keyword = tokens[0];
+        final int argCount = tokens.length - 1;
 
         // Act on our keyword...
 
@@ -159,7 +160,7 @@ public class ObjImporter {
         // if vertex
         if ("v".equals(keyword)) {
           // XXX: support optional weight?
-          // final double w = tokens.length > 4 ? Double.valueOf(tokens[4]) : 1.0;
+          // final double w = argCount >= 4 ? Double.valueOf(tokens[4]) : 1.0;
 
           final Vector3 vertex =
               new Vector3(Double.valueOf(tokens[1]), Double.valueOf(tokens[2]), Double.valueOf(tokens[3]));
@@ -168,8 +169,8 @@ public class ObjImporter {
 
         // if texture coords
         else if ("vt".equals(keyword)) {
-          final double v = tokens.length > 2 ? Double.valueOf(tokens[2]) : 0;
-          final double w = tokens.length > 3 ? Double.valueOf(tokens[3]) : 0;
+          final double v = argCount >= 2 ? Double.valueOf(tokens[2]) : 0;
+          final double w = argCount >= 3 ? Double.valueOf(tokens[3]) : 0;
           final Vector3 coord = new Vector3(Double.valueOf(tokens[1]), v, w);
           store.getDataStore().getUvs().add(coord);
         }
@@ -215,7 +216,7 @@ public class ObjImporter {
 
         // if group name(s)
         else if ("g".equals(keyword)) {
-          if (tokens.length < 2) {
+          if (argCount <= 2) {
             store.setCurrentGroupNames(null);
             continue;
             // throw new Error("wrong number of args. g must have at least 1 argument. (line " + lineNo
@@ -223,14 +224,14 @@ public class ObjImporter {
           }
 
           // Each token is a name
-          final String[] currentGroupNames = new String[tokens.length - 1];
+          final String[] currentGroupNames = new String[argCount];
           store.setCurrentGroupNames(currentGroupNames);
-          System.arraycopy(tokens, 1, currentGroupNames, 0, tokens.length - 1);
+          System.arraycopy(tokens, 1, currentGroupNames, 0, argCount);
         }
 
         // if smoothing group
         else if ("s".equals(keyword)) {
-          if (tokens.length != 2) {
+          if (argCount != 1) {
             throw new Error("wrong number of args.  s must have 1 argument.  (line " + lineNo + ") " + line);
           }
 
@@ -249,7 +250,7 @@ public class ObjImporter {
 
         // if object name
         else if ("o".equals(keyword)) {
-          if (tokens.length < 2) {
+          if (argCount < 1) {
             throw new Error("wrong number of args.  o must have 1 argument.  (line " + lineNo + ") " + line);
           }
           store.setCurrentObjectName(tokens[1]);
@@ -259,20 +260,20 @@ public class ObjImporter {
 
         // if material library(ies)
         else if ("mtllib".equals(keyword)) {
-          if (tokens.length < 2) {
+          if (argCount < 1) {
             throw new Error(
                 "wrong number of args.  mtllib must have at least 1 argument.  (line " + lineNo + ") " + line);
           }
 
           // load material libraries
-          for (int i = 1; i < tokens.length; i++) {
+          for (int i = 1; i <= argCount; i++) {
             loadMaterialLibrary(tokens[i], resource, store.getMaterialLibrary());
           }
         }
 
         // if use material command
         else if ("usemtl".equals(keyword)) {
-          if (tokens.length != 2) {
+          if (argCount != 1) {
             throw new Error("wrong number of args.  usemtl must have 1 argument.  (line " + lineNo + ") " + line);
           }
 
@@ -283,42 +284,34 @@ public class ObjImporter {
         // -------- ELEMENTS KEYWORDS --------
 
         // if point
-        else if ("p".equals(keyword) && tokens.length > 1) {
-          if (tokens.length < 2) {
-            throw new Error("wrong number of args.  p must have at least 1 vertex.  (line " + lineNo + ") " + line);
-          }
-
+        else if ("p".equals(keyword) && argCount >= 1) {
           // Each token corresponds to 1 vertex entry
           final List<ObjIndexSet> indices = new ArrayList<>();
-          for (int i = 1; i < tokens.length; i++) {
+          for (int i = 1; i <= argCount; i++) {
             indices.add(new ObjIndexSet(tokens[i], store.getDataStore(), currentSmoothGroup));
           }
           store.addPoints(indices);
         }
 
         // if line
-        else if ("l".equals(keyword) && tokens.length > 1) {
-          if (tokens.length < 3) {
-            throw new Error("wrong number of args.  l must have at least 2 vertices.  (line " + lineNo + ") " + line);
-          }
-
+        else if ("l".equals(keyword) && argCount >= 1) {
           // Each token corresponds to 1 vertex entry and possibly one texture entry
           final List<ObjIndexSet> indices = new ArrayList<>();
-          for (int i = 1; i < tokens.length; i++) {
+          for (int i = 1; i <= argCount; i++) {
             indices.add(new ObjIndexSet(tokens[i], store.getDataStore(), currentSmoothGroup));
           }
           store.addLine(indices);
         }
 
         // if face
-        else if (("f".equals(keyword) || "fo".equals(keyword)) && tokens.length > 1) {
-          if (tokens.length < 4) {
+        else if (("f".equals(keyword) || "fo".equals(keyword)) && argCount > 0) {
+          if (argCount < 3) {
             throw new Error("wrong number of args.  f must have at least 3 vertices.  (line " + lineNo + ") " + line);
           }
 
           // Each token corresponds to 1 vertex entry and possibly one texture entry and normal entry.
           final List<ObjIndexSet> indices = new ArrayList<>();
-          for (int i = 1; i < tokens.length; i++) {
+          for (int i = 1; i <= argCount; i++) {
             indices.add(new ObjIndexSet(tokens[i], store.getDataStore(), currentSmoothGroup));
           }
           store.addFace(indices);
@@ -437,19 +430,19 @@ public class ObjImporter {
         // if ambient value
         if ("Ka".equals(keyword)) {
           currentMaterial.Ka =
-              new float[] {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
+              new double[] {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
         }
 
         // if diffuse value
         else if ("Kd".equals(keyword)) {
           currentMaterial.Kd =
-              new float[] {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
+              new double[] {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
         }
 
         // if specular value
         else if ("Ks".equals(keyword)) {
           currentMaterial.Ks =
-              new float[] {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
+              new double[] {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
         }
 
         // if illumination style

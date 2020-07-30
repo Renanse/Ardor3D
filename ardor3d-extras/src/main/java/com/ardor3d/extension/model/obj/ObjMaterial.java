@@ -23,10 +23,10 @@ import com.ardor3d.surface.ColorSurface;
 public class ObjMaterial {
   private final String name;
 
-  float[] Ka = null;
-  float[] Kd = null;
-  float[] Ks = null;
-  float Ns = -1;
+  double[] Ka = null;
+  double[] Kd = null;
+  double[] Ks = null;
+  double Ns = -1;
 
   String textureName;
   Texture map_Kd = null;
@@ -34,7 +34,7 @@ public class ObjMaterial {
   int illumType = 2;
 
   boolean forceBlend = false;
-  float d = -1;
+  double d = -1;
 
   public ObjMaterial(final String name) {
     this.name = name;
@@ -69,19 +69,19 @@ public class ObjMaterial {
     if (Ka != null || Kd != null || Ks != null || d != -1 || Ns != -1) {
       final ColorSurface surface = new ColorSurface();
       spat.setProperty(ColorSurface.DefaultPropertyKey, surface);
-      final float alpha = d != -1 ? MathUtils.clamp(d, 0, 1) : 1;
+      final float alpha = (float) (d != -1 ? MathUtils.clamp(d, 0.0, 1.0) : 1.0);
       if (Ka != null) {
-        surface.setAmbient(new ColorRGBA(Ka[0], Ka[1], Ka[2], alpha));
+        surface.setAmbient(new ColorRGBA((float) Ka[0], (float) Ka[1], (float) Ka[2], alpha));
       }
       if (Kd != null) {
-        surface.setDiffuse(new ColorRGBA(Kd[0], Kd[1], Kd[2], alpha));
+        surface.setDiffuse(new ColorRGBA((float) Kd[0], (float) Kd[1], (float) Kd[2], alpha));
       }
       if (Ks != null) {
-        surface.setSpecular(new ColorRGBA(Ks[0], Ks[1], Ks[2], alpha));
+        surface.setSpecular(new ColorRGBA((float) Ks[0], (float) Ks[1], (float) Ks[2], alpha));
       }
 
       if (Ns != -1) {
-        surface.setShininess(Ns);
+        surface.setShininess((float) Ns);
       }
     }
   }

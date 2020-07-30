@@ -167,11 +167,11 @@ public class ObjExporter {
         final ColorSurface surface = mesh.getLocalProperty(ColorSurface.DefaultPropertyKey, null);
         if (surface != null) {
           currentMtl.d = surface.getAmbient().getAlpha();
-          currentMtl.Ka = new float[] {surface.getAmbient().getRed(), surface.getAmbient().getGreen(),
+          currentMtl.Ka = new double[] {surface.getAmbient().getRed(), surface.getAmbient().getGreen(),
               surface.getAmbient().getBlue()};
-          currentMtl.Kd = new float[] {surface.getDiffuse().getRed(), surface.getDiffuse().getGreen(),
+          currentMtl.Kd = new double[] {surface.getDiffuse().getRed(), surface.getDiffuse().getGreen(),
               surface.getDiffuse().getBlue()};
-          currentMtl.Ks = new float[] {surface.getSpecular().getRed(), surface.getSpecular().getGreen(),
+          currentMtl.Ks = new double[] {surface.getSpecular().getRed(), surface.getSpecular().getGreen(),
               surface.getSpecular().getBlue()};
           currentMtl.Ns = surface.getShininess();
         }
@@ -218,21 +218,21 @@ public class ObjExporter {
           }
           if (currentMtl.Ka != null) {
             mtlPw.print("Ka");
-            for (final float KaCoef : currentMtl.Ka) {
+            for (final double KaCoef : currentMtl.Ka) {
               mtlPw.print(" " + KaCoef);
             }
             mtlPw.println();
           }
           if (currentMtl.Kd != null) {
             mtlPw.print("Kd");
-            for (final float KdCoef : currentMtl.Kd) {
+            for (final double KdCoef : currentMtl.Kd) {
               mtlPw.print(" " + KdCoef);
             }
             mtlPw.println();
           }
           if (currentMtl.Ks != null) {
             mtlPw.print("Ks");
-            for (final float KsCoef : currentMtl.Ks) {
+            for (final double KsCoef : currentMtl.Ks) {
               mtlPw.print(" " + KsCoef);
             }
             mtlPw.println();
