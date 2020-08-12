@@ -37,7 +37,7 @@ float calcFogAmount(const float fogCoord)
 			return calcExponentialFogAmount(fogParams.density, 2, fogCoord);
 	}
 	
-	return 0;
+	return 0.0;
 }
 
 
