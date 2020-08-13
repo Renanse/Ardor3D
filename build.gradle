@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 allprojects  {
 	apply plugin: 'java-library'
 	group = 'com.ardor3d'
-	version = '1.5.1'
+	version = '1.5.2'
     project.ext.lwjglVersion = "3.2.3"
     
 	switch ( OperatingSystem.current() ) {
