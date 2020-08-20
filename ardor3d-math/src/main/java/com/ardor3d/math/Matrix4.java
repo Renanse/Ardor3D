@@ -2382,7 +2382,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   public final static Matrix4 fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return Matrix4.MAT_POOL.fetch();
+      return Matrix4.MAT_POOL.fetch().setIdentity();
     } else {
       return new Matrix4();
     }

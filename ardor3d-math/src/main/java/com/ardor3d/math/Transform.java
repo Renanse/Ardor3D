@@ -1059,7 +1059,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    */
   public final static Transform fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return Transform.TRANS_POOL.fetch();
+      return Transform.TRANS_POOL.fetch().setIdentity();
     } else {
       return new Transform();
     }

@@ -1530,7 +1530,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    */
   public final static Quaternion fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return Quaternion.QUAT_POOL.fetch();
+      return Quaternion.QUAT_POOL.fetch().setIdentity();
     } else {
       return new Quaternion();
     }

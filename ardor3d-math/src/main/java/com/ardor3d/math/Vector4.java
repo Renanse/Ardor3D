@@ -1067,7 +1067,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   public final static Vector4 fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return Vector4.VEC_POOL.fetch();
+      return Vector4.VEC_POOL.fetch().zero();
     } else {
       return new Vector4();
     }

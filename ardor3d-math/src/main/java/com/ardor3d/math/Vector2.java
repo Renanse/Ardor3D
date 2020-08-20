@@ -1015,7 +1015,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   public final static Vector2 fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return Vector2.VEC_POOL.fetch();
+      return Vector2.VEC_POOL.fetch().zero();
     } else {
       return new Vector2();
     }

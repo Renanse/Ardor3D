@@ -1913,7 +1913,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   public final static Matrix3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return Matrix3.MAT_POOL.fetch();
+      return Matrix3.MAT_POOL.fetch().setIdentity();
     } else {
       return new Matrix3();
     }
