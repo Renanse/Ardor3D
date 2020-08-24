@@ -72,6 +72,46 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
    * @param array
    *          the source int array.
    */
+  public abstract IndexBufferData<?> put(byte[] array);
+
+  /**
+   * Write the contents of the given int array into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   * @param offset
+   * @param length
+   */
+  public abstract IndexBufferData<?> put(byte[] array, int offset, int length);
+
+  /**
+   * Write the contents of the given int array into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   */
+  public abstract IndexBufferData<?> put(short[] array);
+
+  /**
+   * Write the contents of the given int array into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   * @param offset
+   * @param length
+   */
+  public abstract IndexBufferData<?> put(short[] array, int offset, int length);
+
+  /**
+   * Write the contents of the given int array into this IndexBufferData. Note that data conversion is
+   * handled using the get/put methods in IndexBufferData.
+   *
+   * @param array
+   *          the source int array.
+   */
   public abstract IndexBufferData<?> put(int[] array);
 
   /**

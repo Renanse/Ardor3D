@@ -106,7 +106,10 @@ public class ClipmapLevel extends Mesh {
   /**
    * Possible nio speedup when storing indices
    */
-  private int[] tmpIndices;
+  private byte[] tmpIndicesByte;
+  private short[] tmpIndicesShort;
+  private int[] tmpIndicesInt;
+  private int indexType;
 
   /**
    * Should cull blocks outside camera frustum
@@ -180,7 +183,18 @@ public class ClipmapLevel extends Mesh {
     final int indicesSize = 4 * (3 * frameSize * frameSize + clipSideSize * clipSideSize / 2 + 4 * frameSize - 10);
     final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(indicesSize, vertices.getBufferCapacity() - 1);
     indices.setVboAccessMode(VBOAccessMode.DynamicDraw);
-    tmpIndices = new int[indicesSize];
+    indexType = indices.getByteCount();
+    switch (indexType) {
+      case 2:
+        tmpIndicesShort = new short[indicesSize];
+        break;
+      case 4:
+        tmpIndicesInt = new int[indicesSize];
+        break;
+      case 1:
+        tmpIndicesByte = new byte[indicesSize];
+        break;
+    }
     meshData.setIndices(indices);
 
     // Go through all rows and fill them with vertexindices.
@@ -445,7 +459,17 @@ public class ClipmapLevel extends Mesh {
     final MeshData meshData = getMeshData();
     final IndexBufferData<?> indices = meshData.getIndices();
     indices.clear();
-    indices.put(tmpIndices, 0, getStripIndex());
+    switch (indexType) {
+      case 2:
+        indices.put(tmpIndicesShort, 0, getStripIndex());
+        break;
+      case 4:
+        indices.put(tmpIndicesInt, 0, getStripIndex());
+        break;
+      case 1:
+        indices.put(tmpIndicesByte, 0, getStripIndex());
+        break;
+    }
     indices.flip();
     meshData.markIndicesDirty();
   }
@@ -556,7 +580,17 @@ public class ClipmapLevel extends Mesh {
    */
   private void addIndex(final int x, final int z) {
     // add the index and increment counter.
-    tmpIndices[stripIndex++] = x + z * clipSideSize;
+    switch (indexType) {
+      case 2:
+        tmpIndicesShort[stripIndex++] = (short) (x + z * clipSideSize);
+        break;
+      case 4:
+        tmpIndicesInt[stripIndex++] = x + z * clipSideSize;
+        break;
+      case 1:
+        tmpIndicesByte[stripIndex++] = (byte) (x + z * clipSideSize);
+        break;
+    }
   }
 
   /**

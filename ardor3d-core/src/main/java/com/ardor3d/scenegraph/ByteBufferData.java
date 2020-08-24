@@ -106,6 +106,34 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
   }
 
   @Override
+  public ByteBufferData put(final byte[] array) {
+    _buffer.put(array);
+    return this;
+  }
+
+  @Override
+  public ByteBufferData put(final byte[] array, final int offset, final int length) {
+    _buffer.put(array, offset, length);
+    return this;
+  }
+
+  @Override
+  public ByteBufferData put(final short[] array) {
+    for (int i = 0; i < array.length; i++) {
+      put(array[i]);
+    }
+    return this;
+  }
+
+  @Override
+  public ByteBufferData put(final short[] array, final int offset, final int length) {
+    for (int i = offset, max = offset + length; i < max; i++) {
+      put(array[i]);
+    }
+    return this;
+  }
+
+  @Override
   public ByteBufferData put(final int[] array) {
     for (int i = 0; i < array.length; i++) {
       put(array[i]);

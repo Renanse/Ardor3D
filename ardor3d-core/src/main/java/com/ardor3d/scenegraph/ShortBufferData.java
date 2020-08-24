@@ -106,6 +106,34 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
   }
 
   @Override
+  public ShortBufferData put(final byte[] array) {
+    for (int i = 0; i < array.length; i++) {
+      put(array[i]);
+    }
+    return this;
+  }
+
+  @Override
+  public ShortBufferData put(final byte[] array, final int offset, final int length) {
+    for (int i = offset, max = offset + length; i < max; i++) {
+      put(array[i]);
+    }
+    return this;
+  }
+
+  @Override
+  public ShortBufferData put(final short[] array) {
+    _buffer.put(array);
+    return this;
+  }
+
+  @Override
+  public ShortBufferData put(final short[] array, final int offset, final int length) {
+    _buffer.put(array, offset, length);
+    return this;
+  }
+
+  @Override
   public ShortBufferData put(final int[] array) {
     for (int i = 0; i < array.length; i++) {
       put(array[i]);
