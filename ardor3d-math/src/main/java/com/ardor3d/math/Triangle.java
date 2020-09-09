@@ -264,6 +264,18 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     return true;
   }
 
+  @Override
+  public double getArea() {
+    final Vector3 temp1 = Vector3.fetchTempInstance();
+    final Vector3 temp2 = Vector3.fetchTempInstance();
+    try {
+      return 0.5 * _pointB.subtract(_pointA, temp1).crossLocal(_pointC.subtract(_pointA, temp2)).length();
+    } finally {
+      Vector3.releaseTempInstance(temp2);
+      Vector3.releaseTempInstance(temp1);
+    }
+  }
+
   /**
    * @return the string representation of this triangle.
    */

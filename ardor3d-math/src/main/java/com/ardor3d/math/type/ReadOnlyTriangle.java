@@ -27,5 +27,7 @@ public interface ReadOnlyTriangle {
 
   ReadOnlyVector3 getCenter();
 
+  double getArea();
+
   Triangle clone();
 }
