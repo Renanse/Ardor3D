@@ -45,7 +45,7 @@ public enum SwtKey {
   SWT_P('p', Key.P), //
   SWT_LBRACKET('(', Key.LEFT_BRACKET), //
   SWT_RBRACKET(')', Key.RIGHT_BRACKET), //
-  SWT_RETURN(SWT.LF, Key.ENTER), //
+  SWT_RETURN(SWT.CR, Key.ENTER), //
   SWT_LCONTROL(SWT.CTRL, Key.LEFT_CONTROL), //
   SWT_A('a', Key.A), //
   SWT_S('s', Key.S), //
