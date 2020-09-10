@@ -10,6 +10,7 @@
 
 package com.ardor3d.math.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -37,6 +38,10 @@ public class TriangleSubdivisionUtil {
     TriangleCenter,
   }
 
+  protected static class SimpleTri {
+    public int a, b, c, depth;
+  }
+
   /**
    * Performs triangle subdivision on the provided vertices, with the assumption that they are
    * specified as triangles.
@@ -54,11 +59,11 @@ public class TriangleSubdivisionUtil {
    *           if our vertices list size is not divisible by 3 or the subdivision method passed is not
    *           currently supported.
    */
-  public static LinkedList<Integer> subdivide(final Method method, final List<ReadOnlyVector3> vertices,
+  public static List<Integer> subdivide(final Method method, final List<ReadOnlyVector3> vertices,
       final Predicate<Triangle> stopCriteria) {
-    final var indices = new LinkedList<Integer>();
+    final var indices = new ArrayList<Integer>();
     for (int i = 0, maxI = vertices.size(); i < maxI; i++) {
-      indices.addLast(i);
+      indices.add(i);
     }
     subdivide(method, vertices, indices, stopCriteria);
     return indices;
@@ -82,32 +87,45 @@ public class TriangleSubdivisionUtil {
    *           if our vertices list size is not divisible by 3 or the subdivision method passed is not
    *           currently supported.
    */
-  public static void subdivide(final Method method, final List<ReadOnlyVector3> vertices,
-      final LinkedList<Integer> indices, final Predicate<Triangle> stopCriteria) {
+  public static void subdivide(final Method method, final List<ReadOnlyVector3> vertices, final List<Integer> indices,
+      final Predicate<Triangle> stopCriteria) {
     if (indices.size() % 3 != 0) {
       throw new IllegalArgumentException("indices should describe triangles and thus be a size divisible by 3.");
     }
 
-    // initialize our depth list - used for tracking how many splits we have done to get to a given
-    // triangle.
-    final var depthList = new LinkedList<Integer>();
-    for (int i = 0, maxI = indices.size() / 3; i < maxI; i++) {
-      depthList.add(0);
+    // set up our triangle data to work on.
+    final var workingTris = new LinkedList<SimpleTri>();
+    for (final var it = indices.iterator(); it.hasNext();) {
+      final var tri = new SimpleTri();
+      tri.a = it.next();
+      tri.b = it.next();
+      tri.c = it.next();
+      tri.depth = 0;
+      workingTris.add(tri);
     }
 
-    final Triangle tri = Triangle.fetchTempInstance();
+    // clear out the indices we were given so we can write in new data.
+    indices.clear();
+
+    final Triangle testTri = Triangle.fetchTempInstance();
     try {
       int a, b, c, ctr, ab, bc, ca, depth;
-      // walk through our indices
-      for (int i = 0; i < indices.size(); i += 3) {
-        // grab next triangle
-        tri.setA(vertices.get(a = indices.get(i + 0)));
-        tri.setB(vertices.get(b = indices.get(i + 1)));
-        tri.setC(vertices.get(c = indices.get(i + 2)));
-        tri.setIndex(depth = depthList.get(i / 3));
+      // walk through our triangles
+      while (!workingTris.isEmpty()) {
+        final var tri = workingTris.poll();
 
-        // Are we small enough?
-        if (stopCriteria.test(tri)) {
+        // setup our math triangle for testing
+        testTri.setA(vertices.get(a = tri.a));
+        testTri.setB(vertices.get(b = tri.b));
+        testTri.setC(vertices.get(c = tri.c));
+        testTri.setIndex(depth = tri.depth);
+
+        // Test if the triangle done?
+        if (stopCriteria.test(testTri)) {
+          // save indices to output
+          indices.add(a);
+          indices.add(b);
+          indices.add(c);
           continue;
         }
 
@@ -115,36 +133,28 @@ public class TriangleSubdivisionUtil {
         if (method == Method.TriangleCenter) {
           // Add triangle center to our vertices
           ctr = vertices.size();
-          vertices.add(new Vector3(tri.getCenter()));
+          vertices.add(new Vector3(testTri.getCenter()));
 
-          // Remove current triangle indices and set back our current index
-          removeCurrentTriangle(indices, depthList, i);
-          i -= 3;
-
-          addTriangle(indices, depthList, a, b, ctr, depth + 1);
-          addTriangle(indices, depthList, b, c, ctr, depth + 1);
-          addTriangle(indices, depthList, c, a, ctr, depth + 1);
+          // Add 3 sub-triangles
+          workingTris.add(makeTriangle(a, b, ctr, depth + 1));
+          workingTris.add(makeTriangle(b, c, ctr, depth + 1));
+          workingTris.add(makeTriangle(c, a, ctr, depth + 1));
         }
 
         else if (method == Method.EdgeCenter) {
           // add edge centers to our vertices
           ab = vertices.size();
-          vertices.add(tri.getA().add(tri.getB(), null).multiplyLocal(0.5));
-          bc = vertices.size();
-          vertices.add(tri.getB().add(tri.getC(), null).multiplyLocal(0.5));
-          ca = vertices.size();
-          vertices.add(tri.getC().add(tri.getA(), null).multiplyLocal(0.5));
+          bc = ab + 1;
+          ca = bc + 1;
+          vertices.add(testTri.getA().add(testTri.getB(), null).multiplyLocal(0.5));
+          vertices.add(testTri.getB().add(testTri.getC(), null).multiplyLocal(0.5));
+          vertices.add(testTri.getC().add(testTri.getA(), null).multiplyLocal(0.5));
 
-          // Remove current triangle indices and set back our current index
-          removeCurrentTriangle(indices, depthList, i);
-          i -= 3;
-
-          // Add indices for our 4 sub-triangles
-          // We add to the end so we can process siblings first before diving deeper.
-          addTriangle(indices, depthList, a, ab, ca, depth + 1);
-          addTriangle(indices, depthList, ab, b, bc, depth + 1);
-          addTriangle(indices, depthList, bc, c, ca, depth + 1);
-          addTriangle(indices, depthList, ab, bc, ca, depth + 1);
+          // Add 4 sub-triangles
+          workingTris.add(makeTriangle(a, ab, ca, depth + 1));
+          workingTris.add(makeTriangle(ab, b, bc, depth + 1));
+          workingTris.add(makeTriangle(bc, c, ca, depth + 1));
+          workingTris.add(makeTriangle(ab, bc, ca, depth + 1));
         }
 
         else {
@@ -152,23 +162,16 @@ public class TriangleSubdivisionUtil {
         }
       }
     } finally {
-      Triangle.releaseTempInstance(tri);
+      Triangle.releaseTempInstance(testTri);
     }
   }
 
-  protected static void removeCurrentTriangle(final LinkedList<Integer> indices, final LinkedList<Integer> depthList,
-      final int i) {
-    indices.remove(i);
-    indices.remove(i);
-    indices.remove(i);
-    depthList.remove(i / 3);
-  }
-
-  protected static void addTriangle(final LinkedList<Integer> indices, final LinkedList<Integer> depthList, final int a,
-      final int b, final int c, final int depth) {
-    indices.addLast(a);
-    indices.addLast(b);
-    indices.addLast(c);
-    depthList.add(depth);
+  private static SimpleTri makeTriangle(final int a, final int b, final int c, final int depth) {
+    final var tri = new SimpleTri();
+    tri.a = a;
+    tri.b = b;
+    tri.c = c;
+    tri.depth = depth;
+    return tri;
   }
 }
