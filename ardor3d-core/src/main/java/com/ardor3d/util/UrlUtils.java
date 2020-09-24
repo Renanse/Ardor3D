@@ -10,16 +10,21 @@
 
 package com.ardor3d.util;
 
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class UrlUtils {
+
+  private static Authenticator s_injectedAuth;
 
   /**
    * Create a new URL by resolving a given relative string (such as "mydir/myfile.ext") against a
    * given url (such as "http://www.company.com/mycontent/content.html"). This method is necessary
    * because new URL(URL, String) does not handle primaryUrls that contain %2F instead of a slash.
-   * 
+   *
    * @param primaryUrl
    *          the primary or base URL.
    * @param relativeLoc
@@ -41,4 +46,19 @@ public class UrlUtils {
     return new URL(new URL(url), relativeLoc);
   }
 
+  public static void setUrlConnectionAuthenticator(final Authenticator auth) { UrlUtils.s_injectedAuth = auth; }
+
+  /**
+   *
+   * @param connection
+   */
+  public static void injectAuthenticator(final URLConnection connection) {
+    if (UrlUtils.s_injectedAuth == null) {
+      return;
+    }
+
+    if (connection instanceof HttpURLConnection) {
+      ((HttpURLConnection) connection).setAuthenticator(UrlUtils.s_injectedAuth);
+    }
+  }
 }

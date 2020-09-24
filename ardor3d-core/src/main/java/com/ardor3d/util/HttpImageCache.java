@@ -233,6 +233,7 @@ public enum HttpImageCache {
         if (connection instanceof HttpURLConnection) {
           connection.setIfModifiedSince(cacheItem.lastModified.toEpochMilli());
           connection.connect();
+          UrlUtils.injectAuthenticator(connection);
           final HttpURLConnection httpConnection = (HttpURLConnection) connection;
           final int responseCode = httpConnection.getResponseCode();
           if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
@@ -298,9 +299,12 @@ public enum HttpImageCache {
 
   public static boolean deleteDirectory(final File dir) {
     if (dir.isDirectory()) {
-      for (final File element : dir.listFiles()) {
-        if (!deleteDirectory(element)) {
-          return false;
+      final var files = dir.listFiles();
+      if (files != null) {
+        for (final var file : files) {
+          if (!deleteDirectory(file)) {
+            return false;
+          }
         }
       }
     }

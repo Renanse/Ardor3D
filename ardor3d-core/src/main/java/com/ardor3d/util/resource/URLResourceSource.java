@@ -58,7 +58,7 @@ public class URLResourceSource implements ResourceSource {
       if (dot >= 0) {
         _type = fileName.substring(dot);
       } else {
-        _type = UNKNOWN_TYPE;
+        _type = ResourceSource.UNKNOWN_TYPE;
       }
     }
   }
@@ -92,8 +92,8 @@ public class URLResourceSource implements ResourceSource {
 
       }
     } catch (final MalformedURLException ex) {} catch (final IOException ex) {}
-    if (logger.isLoggable(Level.FINEST)) {
-      logger.logp(Level.FINEST, getClass().getName(), "getRelativeSource(String)",
+    if (URLResourceSource.logger.isLoggable(Level.FINEST)) {
+      URLResourceSource.logger.logp(Level.FINEST, getClass().getName(), "getRelativeSource(String)",
           "Unable to find relative file {0} from {1}.", new Object[] {name, _url});
     }
     return null;
@@ -124,6 +124,7 @@ public class URLResourceSource implements ResourceSource {
   public InputStream openStream() throws IOException {
     final URLConnection connection = _url.openConnection();
     connection.connect();
+    UrlUtils.injectAuthenticator(connection);
     _lastModifiedValue = connection.getLastModified();
     return connection.getInputStream();
   }
