@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -49,7 +50,9 @@ import com.ardor3d.input.logical.GestureEventCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonClickedCondition;
 import com.ardor3d.input.logical.MouseButtonLongPressedCondition;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.GrabbedState;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseCursor;
@@ -229,6 +232,12 @@ public class LwjglSwtExample {
         .build();
 
     logicalLayer.registerInput(canvas1, pl);
+
+    final Predicate<TwoInputStates> clickLeftOrRight =
+        new MouseButtonClickedCondition(MouseButton.LEFT).or(new MouseButtonClickedCondition(MouseButton.RIGHT));
+
+    logicalLayer.registerTrigger(new InputTrigger(clickLeftOrRight, (source, inputStates, tpf) -> System.err
+        .println("clicked: " + inputStates.getCurrent().getMouseState().getClickCounts())));
 
     logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), (source, inputStates, tpf) -> {
       if (source != canvas1) {

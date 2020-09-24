@@ -10,7 +10,6 @@
 
 package com.ardor3d.input.glfw;
 
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -27,6 +26,7 @@ import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Vector2;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Multiset;
@@ -54,7 +54,8 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
   private final EnumMap<MouseButton, ButtonState> _lastButtonState = new EnumMap<>(MouseButton.class);
 
-  private boolean _sendClickState = false;
+  private final Vector2 _lastClickLocation = new Vector2();
+
   private boolean _ignoreInput;
   private MouseState _lastState;
 
@@ -64,10 +65,10 @@ public class GLFWMouseWrapper implements MouseWrapper {
     _canvas = canvas;
 
     // fill our button state map with undefined
-    Arrays.asList(MouseButton.values()).forEach((final MouseButton b) -> {
-      _lastButtonState.put(b, ButtonState.UNDEFINED);
-      _lastClickTime.put(b, 0L);
-    });
+    for (final MouseButton mb : MouseButton.values()) {
+      _lastButtonState.put(mb, ButtonState.UNDEFINED);
+      _lastClickTime.put(mb, 0L);
+    }
   }
 
   @Override
@@ -81,20 +82,19 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
         final MouseButton mb = getButtonByIndex(button);
 
-        final boolean down = action == GLFW.GLFW_PRESS;
-        final ButtonState state = down ? ButtonState.DOWN : ButtonState.UP;
+        final ButtonState state = action == GLFW.GLFW_PRESS ? ButtonState.DOWN : ButtonState.UP;
+        final int x = _lastState != null ? _lastState.getX() : 0;
+        final int y = _lastState != null ? _lastState.getY() : 0;
 
         // check for clicks
-        processButtonForClick(mb, down);
+        processButtonForClick(x, y, mb, state);
 
         // save our state
         _lastButtonState.put(mb, state);
 
         // Add our new state
-        final int x = _lastState != null ? _lastState.getX() : 0;
-        final int y = _lastState != null ? _lastState.getY() : 0;
         addNextState(new MouseState(x, y, 0, 0, 0, new EnumMap<>(_lastButtonState),
-            _sendClickState && !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null));
+            !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null));
       }
     });
 
@@ -107,15 +107,8 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
         final int x = (int) MathUtils.round(xpos);
         final int y = _canvas.getContentHeight() - (int) MathUtils.round(ypos);
-
         final int dx = _lastState != null ? x - _lastState.getX() : 0;
         final int dy = _lastState != null ? y - _lastState.getY() : 0;
-
-        if (dx != 0.0 || dy != 0.0) {
-          _clickArmed.clear();
-          _clicks.clear();
-          _sendClickState = false;
-        }
 
         // Add our new state
         final MouseState event = new MouseState(x, y, dx, dy, 0, new EnumMap<>(_lastButtonState), null);
@@ -142,6 +135,16 @@ public class GLFWMouseWrapper implements MouseWrapper {
         addNextState(event);
       }
     });
+  }
+
+  @Override
+  public PeekingIterator<MouseState> getMouseEvents() {
+    // only create a new iterator if there isn't an existing, valid, one.
+    if (_currentIterator == null || !_currentIterator.hasNext()) {
+      _currentIterator = new MouseIterator();
+    }
+
+    return _currentIterator;
   }
 
   protected void addNextState(final MouseState nextState) {
@@ -173,49 +176,58 @@ public class GLFWMouseWrapper implements MouseWrapper {
   }
 
   @Override
-  public PeekingIterator<MouseState> getMouseEvents() {
-    // only create a new iterator if there isn't an existing, valid, one.
-    if (_currentIterator == null || !_currentIterator.hasNext()) {
-      _currentIterator = new MouseIterator();
-    }
-
-    return _currentIterator;
-  }
-
-  @Override
   public void setIgnoreInput(final boolean ignore) { _ignoreInput = ignore; }
 
   @Override
   public boolean isIgnoreInput() { return _ignoreInput; }
 
-  private void processButtonForClick(final MouseButton b, final boolean down) {
-    boolean expired = false;
-    if (System.currentTimeMillis() - _lastClickTime.get(b) > MouseState.CLICK_TIME_MS) {
-      _clicks.setCount(b, 0);
-      expired = true;
+  private void processButtonForClick(final int x, final int y, final MouseButton b, final ButtonState state) {
+    // clean out click states if we've moved the mouse or they've expired
+    boolean clear = false;
+    final double comp = MouseState.CLICK_MAX_DELTA;
+    if (_lastClickLocation.distanceSquared(x, y) > comp * comp) {
+      clear = true;
     }
-    if (down) {
+    for (final var button : MouseButton.values()) {
+      if (clear || System.currentTimeMillis() - _lastClickTime.get(button) > MouseState.CLICK_TIME_MS) {
+        _clicks.setCount(button, 0);
+        _clickArmed.remove(button);
+      }
+    }
+
+    if (_clicks.isEmpty()) {
+      _lastClickLocation.set(x, y);
+    }
+
+    if (state == ButtonState.DOWN) {
+      // MOUSE DOWN
+      // check if armed makes sense - if not, clear clicks for this button.
       if (_clickArmed.contains(b)) {
         _clicks.setCount(b, 0);
       }
+
+      // arm click for this button
       _clickArmed.add(b);
+
+      // remember when we clicked this button
       _lastClickTime.put(b, System.currentTimeMillis());
-    } else {
-      if (!expired && _clickArmed.contains(b)) {
-        _clicks.add(b); // increment count of clicks for button b.
-        // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
-        _sendClickState = true;
+    } else if (state == ButtonState.UP) {
+      // MOUSE UP
+      // if we are not too late, and are armed...
+      // ... and we have not moved too far since our last click (of any kind)
+      if (_clickArmed.contains(b)) {
+        // increment count of clicks for button b.
+        _clicks.add(b);
       } else {
-        _clicks.setCount(b, 0); // clear click count for button b.
+        // clear click count for button b.
+        _clicks.setCount(b, 0);
       }
+      // disarm click check for this button now that we've handled it
       _clickArmed.remove(b);
     }
   }
 
   private class MouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
-
-    public MouseIterator() {}
-
     @Override
     protected MouseState computeNext() {
       synchronized (GLFWMouseWrapper.this) {
@@ -226,6 +238,5 @@ public class GLFWMouseWrapper implements MouseWrapper {
         return _upcomingEvents.poll();
       }
     }
-
   }
 }

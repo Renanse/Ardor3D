@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,7 +44,11 @@ import com.ardor3d.input.awt.AwtMouseWrapper;
 import com.ardor3d.input.character.CharacterInputWrapper;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.keyboard.KeyboardWrapper;
+import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonClickedCondition;
+import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -76,6 +81,12 @@ public class LwjglAwtExample {
 
     final BasicScene scene2 = new BasicScene();
     final RotatingCubeGame game2 = new RotatingCubeGame(scene2, exit, logicalLayer, Key.G);
+
+    final Predicate<TwoInputStates> clickLeftOrRight =
+        new MouseButtonClickedCondition(MouseButton.LEFT).or(new MouseButtonClickedCondition(MouseButton.RIGHT));
+
+    logicalLayer.registerTrigger(new InputTrigger(clickLeftOrRight, (source, inputStates, tpf) -> System.err
+        .println("clicked: " + inputStates.getCurrent().getMouseState().getClickCounts())));
 
     frameWork.addUpdater(game1);
     frameWork.addUpdater(game2);

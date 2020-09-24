@@ -26,7 +26,18 @@ import com.google.common.collect.Multiset;
 @Immutable
 public class MouseState {
   public static final MouseState NOTHING = new MouseState(0, 0, 0, 0, 0, null, null);
+
+  /**
+   * How many milliseconds can pass between mouse press and release before we do not count the
+   * interaction as a click.
+   */
   public static long CLICK_TIME_MS = 500;
+
+  /**
+   * How many pixels a mouse can drift between the position when pressed and the position when
+   * released before we ignore the click. Some input platforms may not honor this value.
+   */
+  public static double CLICK_MAX_DELTA = 15.0;
 
   private final int _x;
   private final int _y;
@@ -217,7 +228,8 @@ public class MouseState {
    * </nl>
    *
    * Whether or not a mouse press/release sequence counts as a click (or double-click) depends on the
-   * time passed between them. See {@link #CLICK_TIME_MS}.
+   * time passed between them as well as any distance the mouse traveled. See {@link #CLICK_TIME_MS}
+   * and {@link #CLICK_MAX_DELTA}.
    *
    *
    * @param button
