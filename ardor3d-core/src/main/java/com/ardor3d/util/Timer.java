@@ -43,7 +43,7 @@ public class Timer implements ReadOnlyTimer {
   public double getTimePerFrame() { return _tpf; }
 
   @Override
-  public double getPreviousFrameTime() { return _previousFrameTime; }
+  public long getPreviousFrameTime() { return _previousFrameTime; }
 
   /**
    * Update should be called once per frame to correctly update "time per frame" and "frame rate

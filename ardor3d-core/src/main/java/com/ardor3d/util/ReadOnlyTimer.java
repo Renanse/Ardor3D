@@ -58,6 +58,6 @@ public interface ReadOnlyTimer {
    * @return Time, in resolution specified by implementation, when last time per frame and frame rate
    *         was updated.
    */
-  double getPreviousFrameTime();
+  long getPreviousFrameTime();
 
 }
