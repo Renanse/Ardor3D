@@ -37,10 +37,12 @@ import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.texture.ITextureUtils;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.geom.BufferUtils;
 
 public class Lwjgl3TextureUtils implements ITextureUtils {
 
@@ -221,6 +223,37 @@ public class Lwjgl3TextureUtils implements ITextureUtils {
         GL11C.glPixelStorei(GL12C.GL_UNPACK_SKIP_IMAGES, origSkipImages);
       }
     }
+  }
+
+  @Override
+  public ByteBuffer readTextureContents(final Texture texture, final int level, final int baseWidth,
+      final int baseHeight, final ImageDataFormat imageFormat, final PixelDataType pixelType, final ByteBuffer store) {
+    var rVal = store;
+
+    // make sure texture is current
+    Lwjgl3TextureStateUtil.doTextureBind(texture, 0, true);
+
+    // make sure our buffer is big enough
+    final int width = baseWidth >> level;
+    final int height = baseHeight >> level;
+    final int size = width * height * ImageUtils.getPixelByteSize(imageFormat, pixelType);
+    if (rVal == null || rVal.capacity() < size) {
+      rVal = BufferUtils.createByteBuffer(size);
+    } else {
+      rVal.limit(size);
+      rVal.rewind();
+    }
+
+    // grab texture data in the specified format
+    GL11C.glGetTexImage(//
+        Lwjgl3TextureStateUtil.getGLType(texture.getType()), // type
+        level, // level
+        getGLPixelFormat(imageFormat), //
+        getGLPixelDataType(pixelType), //
+        rVal // buffer
+    );
+
+    return rVal;
   }
 
   public static int getGLInternalFormat(final TextureStoreFormat format) {

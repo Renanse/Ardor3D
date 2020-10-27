@@ -12,8 +12,6 @@ package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -77,8 +75,7 @@ public class DataCache {
     _xPathExpressions = new HashMap<>();
     _pattern = Pattern.compile("\\s");
 
-    _transformTypes =
-        Collections.unmodifiableList(Arrays.asList("lookat", "matrix", "rotate", "scale", "scew", "translate"));
+    _transformTypes = List.of("lookat", "matrix", "rotate", "scale", "scew", "translate");
 
     _floatArrays = new HashMap<>();
     _doubleArrays = new HashMap<>();

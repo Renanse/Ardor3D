@@ -13,6 +13,8 @@ package com.ardor3d.renderer.texture;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
@@ -156,4 +158,6 @@ public interface ITextureUtils {
       int dstOffsetY, int dstWidth, int dstHeight, ByteBuffer source, int srcOffsetX, int srcOffsetY,
       int srcTotalWidth);
 
+  ByteBuffer readTextureContents(Texture texture, int level, int baseWidth, int baseHeight, ImageDataFormat imageFormat,
+      PixelDataType pixelType, ByteBuffer store);
 }

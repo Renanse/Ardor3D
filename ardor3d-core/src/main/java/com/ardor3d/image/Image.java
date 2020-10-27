@@ -296,6 +296,20 @@ public class Image implements Serializable, Savable {
   public int[] getMipMapByteSizes() { return _mipMapSizes; }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + getWidth();
+    result = prime * result + getHeight();
+    result = prime * result + getDepth();
+    result = prime * result + ((getData() == null) ? 0 : getData().hashCode());
+    result = prime * result + ((getDataFormat() == null) ? 0 : getDataFormat().hashCode());
+    result = prime * result + Arrays.hashCode(getMipMapByteSizes());
+    result = prime * result + ((getDataType() == null) ? 0 : getDataType().hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(final Object other) {
     if (other == this) {
       return true;
@@ -319,10 +333,7 @@ public class Image implements Serializable, Savable {
     if (!this.getData().equals(that.getData())) {
       return false;
     }
-    if (getMipMapByteSizes() != null && !Arrays.equals(getMipMapByteSizes(), that.getMipMapByteSizes())) {
-      return false;
-    }
-    if (getMipMapByteSizes() == null && that.getMipMapByteSizes() != null) {
+    if (!Arrays.equals(getMipMapByteSizes(), that.getMipMapByteSizes())) {
       return false;
     }
 

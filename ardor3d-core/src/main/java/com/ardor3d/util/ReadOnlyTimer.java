@@ -17,9 +17,9 @@ package com.ardor3d.util;
 public interface ReadOnlyTimer {
   /**
    * Get elapsed time in seconds since this timer was created or reset.
-   * 
+   *
    * @see #getTime()
-   * 
+   *
    * @return Time in seconds
    */
   double getTimeInSeconds();
@@ -27,33 +27,37 @@ public interface ReadOnlyTimer {
   /**
    * Get elapsed time since this timer was created or reset, in the resolution specified by the
    * implementation (usually in nanoseconds).
-   * 
+   *
    * @see #getResolution()
    * @see #getTimeInSeconds()
-   * 
+   *
    * @return Time in resolution specified by implementation
    */
   long getTime();
 
   /**
    * Get the resolution used by this timer. Nanosecond resolution would return 10^9
-   * 
+   *
    * @return Timer resolution
    */
   long getResolution();
 
   /**
    * Get the current number of frames per second (fps).
-   * 
+   *
    * @return Current frames per second (fps)
    */
   double getFrameRate();
 
   /**
-   * Get the time elapsed between the latest two frames, in seconds.
-   * 
-   * @return Time between frames, in seconds
+   * @return Time in resolution specified by implementation
    */
   double getTimePerFrame();
+
+  /**
+   * @return Time, in resolution specified by implementation, when last time per frame and frame rate
+   *         was updated.
+   */
+  double getPreviousFrameTime();
 
 }
