@@ -890,13 +890,13 @@ public class BinaryInputCapsule implements InputCapsule {
      * to check if the byte data is valid UTF-8.
      *
      * If it is not UTF-8 it is most likely saved with the BinaryOutputCapsule bug, that saves Strings
-     * using their native encoding. Unfortunatly there is no way to know what encoding was used, so
+     * using their native encoding. Unfortunately there is no way to know what encoding was used, so
      * we'll parse using the most common one in that case; latin-1 aka ISO8859_1
      *
      * Encoding of "low" ASCII codepoint (in plain speak: when no special characters are used) will
      * usually look the same for UTF-8 and the other 1 byte codepoint encodings (espc true for numbers
      * and regular letters of the alphabet). So these are valid UTF-8 and will give the same result (at
-     * most a few charakters will appear different, such as the euro sign).
+     * most a few characters will appear different, such as the euro sign).
      *
      * However, when "high" codepoints are used (any codepoint that over 0x7F, in other words where the
      * first bit is a 1) it's a different matter and UTF-8 and the 1 byte encoding greatly will differ,
@@ -904,8 +904,8 @@ public class BinaryInputCapsule implements InputCapsule {
      *
      * It is impossible to detect which one-byte encoding is used. Since UTF8 and practically all 1-byte
      * encodings share the most used characters (the "none-high" ones) parsing them will give the same
-     * result. However, not all byte sequences are legal in UTF-8 (see explantion above). If not UTF-8
-     * encoded content is detected we therefor fallback on latin1. We also log a warning.
+     * result. However, not all byte sequences are legal in UTF-8 (see explanation above). If not UTF-8
+     * encoded content is detected we therefore fallback on latin1. We also log a warning.
      *
      * By this method we detect all use of 1 byte encoding if they: - use a "high" codepoint after a
      * "low" codepoint or a sequence of codepoints that is valid as UTF-8 bytes, that starts with 1000 -
@@ -954,8 +954,8 @@ public class BinaryInputCapsule implements InputCapsule {
         // Java misspells UTF-8 as UTF8 for official use in java.lang
         return new String(bytes, "UTF8");
       } else {
-        logger.log(Level.WARNING,
-            "Your export has been saved with an incorrect encoding for it's String fields which means it might not load correctly "
+        BinaryInputCapsule.logger.log(Level.WARNING,
+            "Your export has been saved with an incorrect encoding for its String fields which means it might not load correctly "
                 + "due to encoding issues.");
         // We use ISO8859_1 to be consistent across platforms. We could default to native encoding, but this
         // would lead to inconsistent

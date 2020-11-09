@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.TransformException;
 import com.ardor3d.math.Vector2;
@@ -244,7 +245,7 @@ public class BMText extends Mesh {
     _fontScale = scale;
 
     if (_autoScale == AutoScale.Off) {
-      final double scaledScale = _scaleProvider == null ? scale : _scaleProvider.scaleToScreenDpi(scale);
+      final double scaledScale = BMText._scaleProvider == null ? scale : BMText._scaleProvider.scaleToScreenDpi(scale);
       final double s = scaledScale / _font.getSize();
       this.setScale(s, s, -s);
     }
@@ -331,7 +332,7 @@ public class BMText extends Mesh {
       if (_rot.isOrthonormal()) {
         _worldTransform.setRotation(_rot);
       } else {
-        logger.warning("BMText: non-orthonormal rotation matrix :" + getName());
+        BMText.logger.warning("BMText: non-orthonormal rotation matrix :" + getName());
       }
     }
     _worldTransform.setScale(_localTransform.getScale());
@@ -347,35 +348,35 @@ public class BMText extends Mesh {
     _look.set(cam.getLocation());
     _look.negateLocal().addLocal(_worldTransform.getTranslation());
 
+    // since camera direction is normalized, a dot product gives us the projected distance of look along
+    // the direction axis, thus depth.
     final double zDepth = cam.getDirection().dot(_look);
+
+    // check if our depth is outside the frustum boundaries
     if (zDepth > cam.getFrustumFar() || zDepth < cam.getFrustumNear()) {
       // it is out of the picture.
       return;
     }
-
-    // calculate the height in world units of the screen at that depth
-    final double heightAtZ;
-    if (cam.getProjectionMode().equals(ProjectionMode.Orthographic)) {
-      heightAtZ = cam.getFrustumBottom();
-    } else {
-      heightAtZ = zDepth * cam.getFrustumTop() / cam.getFrustumNear();
+    // calculate the screen height at the calculated depth.
+    // for ortho mode cameras, that's just a constant defined by the top and bottom of the frustum.
+    double heightAtZ = (cam.getFrustumTop() - cam.getFrustumBottom());
+    if (cam.getProjectionMode().equals(ProjectionMode.Perspective)) {
+      // for perspective cameras, we take the size at the near frustum, normalize to a depth of 1, then
+      // use the field of view (y) to determine our size at the given depth.
+      heightAtZ = (heightAtZ / cam.getFrustumNear()) * MathUtils.tan(cam.getFovY() * MathUtils.DEG_TO_RAD) * zDepth;
     }
 
-    // determine a unit/pixel ratio using height
-    final double screenHeight = cam.getHeight();
-    final double pixelRatio = heightAtZ / screenHeight;
+    // Now determine a unit/pixel ratio using our camera's pixel height: screen height units per pixel.
+    final double pixelRatio = heightAtZ / cam.getHeight();
 
-    final double capSize = 1.0 / (_fontScale * _font.getSize());
-
-    // scale value used to maintain uniform size in screen coords.
-    // when depthScale > unitFont, text is far away
-    final double depthScale = 2 * pixelRatio;
+    // for capping our scale by font size if we are set to do so
+    final double capScale = 1.0 / (_fontScale * _font.getSize());
 
     if (_autoScale != AutoScale.Off) {
-      double finalScale = depthScale;
+      double finalScale = pixelRatio;
       if (_autoScale == AutoScale.CapScreenSize) {
-        if (finalScale > capSize) {
-          finalScale = capSize;
+        if (finalScale > capScale) {
+          finalScale = capScale;
         }
       }
       finalScale *= _fontScale;
@@ -406,10 +407,10 @@ public class BMText extends Mesh {
         distanceAlphaFade(_distanceAlphaRange, _look.length());
         break;
       case FixedPixelSize:
-        screenSizeCapAlphaFade(1.0 / _fixedPixelAlphaThresh, depthScale, _screenSizeAlphaFalloff);
+        screenSizeCapAlphaFade(1.0 / _fixedPixelAlphaThresh, pixelRatio, _screenSizeAlphaFalloff);
         break;
       case CapScreenSize:
-        screenSizeCapAlphaFade(capSize, depthScale, _screenSizeAlphaFalloff);
+        screenSizeCapAlphaFade(capScale, pixelRatio, _screenSizeAlphaFalloff);
         break;
     }
     final float newAlpha = getDefaultColor().getAlpha();
@@ -423,14 +424,14 @@ public class BMText extends Mesh {
   /**
    * Set transparency based on native screen size.
    *
-   * @param capSize
+   * @param capScale
    *          1/(font point size)
    * @param depthScale
    * @param alphaFallof
    */
-  protected void screenSizeCapAlphaFade(final double capSize, final double depthScale, final float alphaFallof) {
-    if (capSize < depthScale) {
-      final float unit = (float) ((depthScale - capSize) / capSize);
+  protected void screenSizeCapAlphaFade(final double capScale, final double depthScale, final float alphaFallof) {
+    if (capScale < depthScale) {
+      final float unit = (float) ((depthScale - capScale) / capScale);
       float f = alphaFallof - unit;
       f = (f < 0) ? 0 : f / alphaFallof;
       final float alpha = _textClr.getAlpha() * f;
@@ -800,8 +801,8 @@ public class BMText extends Mesh {
     return text;
   }
 
-  public static void setDpiScaleProvider(final IDpiScaleProvider provider) { _scaleProvider = provider; }
+  public static void setDpiScaleProvider(final IDpiScaleProvider provider) { BMText._scaleProvider = provider; }
 
-  public static IDpiScaleProvider getDpiScaleProvider() { return _scaleProvider; }
+  public static IDpiScaleProvider getDpiScaleProvider() { return BMText._scaleProvider; }
 
 }

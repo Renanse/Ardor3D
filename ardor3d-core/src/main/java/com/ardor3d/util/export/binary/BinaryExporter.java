@@ -203,8 +203,7 @@ public class BinaryExporter implements Ardor3dExporter {
       // write out data to a seperate stream
       int location = 0;
       // keep track of location for each piece
-      final HashMap<String, List<BinaryIdContentPair>> alreadySaved =
-          new HashMap<>(_contentTable.size());
+      final Map<String, List<BinaryIdContentPair>> alreadySaved = new HashMap<>(_contentTable.size());
       for (final Savable savable : _contentKeys) {
         // look back at previous written data for matches
         final String savableName = savable.getClassTag().getName();

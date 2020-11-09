@@ -662,6 +662,8 @@ public class Camera implements Savable, Externalizable {
       _logger.warning("Invalid aspect given to setFrustumPerspective: " + aspect);
       return;
     }
+
+    _projectionMode = ProjectionMode.Perspective;
     _fovY = fovY;
     final double h = Math.tan(_fovY * MathUtils.DEG_TO_RAD * .5) * near;
     final double w = h * aspect;

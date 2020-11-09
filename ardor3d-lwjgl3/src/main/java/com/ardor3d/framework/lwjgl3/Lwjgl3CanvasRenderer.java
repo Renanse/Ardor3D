@@ -22,7 +22,6 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -96,7 +95,6 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
       /** Set up how our camera sees. */
       _camera = new Camera(canvas.getContentWidth(), canvas.getContentHeight());
       _camera.setFrustumPerspective(45.0f, aspectRatio, 1, 1000);
-      _camera.setProjectionMode(ProjectionMode.Perspective);
 
       final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
       final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
