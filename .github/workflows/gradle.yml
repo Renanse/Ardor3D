@@ -28,6 +28,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Package
-        path: |
-          /**/build/libs
-          !build/libs
+        path: ardor3d-*/build/libs
