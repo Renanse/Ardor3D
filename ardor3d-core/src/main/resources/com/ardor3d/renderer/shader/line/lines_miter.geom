@@ -1,5 +1,7 @@
 #version 330 core
 
+@import include/transform_functions.glsl
+
 // Handles converting lines or line segments to triangle strips and connecting them with miter joints.
 // portions inspired by https://github.com/paulhoux/Cinder-Samples/tree/master/GeometryShader
 
@@ -31,34 +33,37 @@ out VertexData{
 	noperspective float distance;
 } VertexOut;
 
+@import line/line_shared_geom.glsl
 
-vec3 toScreenSpace(vec4 clipSpacePos)
+void main()
 {
-	vec3 ndcSpacePos = (clipSpacePos.xyz / clipSpacePos.w);
-	vec2 windowSpacePos = ((ndcSpacePos.xy + 1.0) / (2.0 * sign(clipSpacePos.w))) * viewSize + viewOffset;
-	return vec3(windowSpacePos, ndcSpacePos.z);
-}
+	vec4 cs0 = gl_in[0].gl_Position;
+	vec4 cs1 = gl_in[1].gl_Position;
+	vec4 cs2 = gl_in[2].gl_Position;
+	vec4 cs3 = gl_in[3].gl_Position;
 
-vec4 toNDCSpace(vec3 point, vec2 offset) {
-    return vec4((2.0 * (point.xy + offset - viewOffset) / viewSize) - 1.0, point.z, 1.0);
-}
-
-void main(void)
-{
-	// ignore lines that are behind us.
-	if (gl_in[1].gl_Position.w <= 0 &&
-		gl_in[2].gl_Position.w <= 0) return;
+	// ignore lines that are completely behind us.
+	if (cs1.w <= 0 && cs2.w <= 0) return;
+		
+	// now clamp points so they end at roughly our view plane if they 
+	// are behind us.  This eliminates texturing and other issues.
+	if (cs1.w <= 0) cs1 = vec4(cs2.xyz + normalize(cs1.xyz - cs2.xyz) * cs2.w, 0.01);
+	if (cs2.w <= 0) cs2 = vec4(cs1.xyz + normalize(cs2.xyz - cs1.xyz) * cs1.w, 0.01);
 		
 	// convert the vertices passed to the shader to screen space:
-	vec3 p0 = toScreenSpace(gl_in[0].gl_Position);	// start of previous segment
-	vec3 p1 = toScreenSpace(gl_in[1].gl_Position);	// end of previous segment, start of current segment
-	vec3 p2 = toScreenSpace(gl_in[2].gl_Position);	// end of current segment, start of next segment
-	vec3 p3 = toScreenSpace(gl_in[3].gl_Position);	// end of next segment
+	vec3 ndc0 = clipToNDC(cs0);
+	vec3 ndc1 = clipToNDC(cs1);
+	vec3 ndc2 = clipToNDC(cs2);
+	vec3 ndc3 = clipToNDC(cs3);
+	vec2 p0 = ndcToScreen2D(ndc0, viewSize, viewOffset);	// start of previous segment
+	vec2 p1 = ndcToScreen2D(ndc1, viewSize, viewOffset);	// end of previous segment, start of current segment
+	vec2 p2 = ndcToScreen2D(ndc2, viewSize, viewOffset);	// end of current segment, start of next segment
+	vec2 p3 = ndcToScreen2D(ndc3, viewSize, viewOffset);	// end of next segment
 
 	// determine the direction of each of the 3 segments (previous, current, next)
-	vec2 dirPrev = normalize(p1.xy - p0.xy);
-	vec2 dirCurr = normalize(p2.xy - p1.xy);
-	vec2 dirNext = normalize(p3.xy - p2.xy);
+	vec2 dirPrev = normalize(p1 - p0);
+	vec2 dirCurr = normalize(p2 - p1);
+	vec2 dirNext = normalize(p3 - p2);
 
 	// determine the normal of each of the 3 segments (previous, current, next)
 	vec2 normPrev = vec2(-dirPrev.y, dirPrev.x);
@@ -79,41 +84,17 @@ void main(void)
 		length_a = lineWidth * 0.5;
 
 		// close the gap
-		// XXX: we don't add antialiasing to the miter joint, but we could?
+		// XXX: we don't add anti-aliasing to the miter joint, but we could?
 		if(dot(dirPrev, normCurr) > 0) {
-			VertexOut.uv0 = vec2(0, 0);
-			VertexOut.color = VertexIn[1].color;
-			gl_Position = toNDCSpace(p1, lineWidth * 0.5 * normPrev);
-			EmitVertex();
-
-			VertexOut.uv0 = vec2(0, 0);
-			VertexOut.color = VertexIn[1].color;
-			gl_Position = toNDCSpace(p1, lineWidth * 0.5 * normCurr);
-			EmitVertex();
-
-			VertexOut.uv0 = vec2(0, 0.5);
-			VertexOut.color = VertexIn[1].color;
-			gl_Position = toNDCSpace(p1, vec2(0.0));
-			EmitVertex();
-
+			emitVert(p1 + lineWidth * 0.5 * normPrev, ndc1.z, VertexIn[1].color, 0, vec2(0, 0));
+			emitVert(p1 + lineWidth * 0.5 * normCurr, ndc1.z, VertexIn[1].color, 0, vec2(0, 0));
+			emitVert(p1, ndc1.z, VertexIn[1].color, 0, vec2(0.5, 0));
 			EndPrimitive();
 		}
 		else {
-			VertexOut.uv0 = vec2(0, 1);
-			VertexOut.color = VertexIn[1].color;
-			gl_Position = toNDCSpace(p1, -lineWidth * 0.5 * normCurr);
-			EmitVertex();
-
-			VertexOut.uv0 = vec2(0, 1);
-			VertexOut.color = VertexIn[1].color;
-			gl_Position = toNDCSpace(p1, -lineWidth * 0.5 * normPrev);
-			EmitVertex();
-
-			VertexOut.uv0 = vec2(0, 0.5);
-			VertexOut.color = VertexIn[1].color;
-			gl_Position = toNDCSpace(p1, vec2(0.0));
-			EmitVertex();
-
+			emitVert(p1 - lineWidth * 0.5 * normCurr, ndc1.z, VertexIn[1].color, 0, vec2(1, 0));
+			emitVert(p1 - lineWidth * 0.5 * normPrev, ndc1.z, VertexIn[1].color, 0, vec2(1, 0));
+			emitVert(p1, ndc1.z, VertexIn[1].color, 0, vec2(0.5, 0));
 			EndPrimitive();
 		}
 	}
@@ -130,82 +111,24 @@ void main(void)
 	float distanceB = distanceA + length(p2-p1);
 
 #ifndef ANTIALIAS
-	// generate the triangle strip
-	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = VertexIn[1].color;
-	VertexOut.distance = distanceA;
-	gl_Position = toNDCSpace(p1, offsetA);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = VertexIn[1].color;
-	VertexOut.distance = distanceA;
-	gl_Position = toNDCSpace(p1, -offsetA);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = VertexIn[2].color;
-	VertexOut.distance = distanceB;
-	gl_Position = toNDCSpace(p2, offsetB);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = VertexIn[2].color;
-	VertexOut.distance = distanceB;
-	gl_Position = toNDCSpace(p2, -offsetB);
-	EmitVertex();
+	// generate the triangle strip using two triangles
+	emitVert(p1 + offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(1, 0));
+	emitVert(p1 - offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(0, 0));
+	emitVert(p2 + offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(1, 0));
+	emitVert(p2 - offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(0, 0));
 #else
 	vec2 offsetFeatherA = (featherWidth + (length_a)) * miter_a;
 	vec2 offsetFeatherB = (featherWidth + (length_b)) * miter_b;
-	// generate the triangle strip using 6 triangles
-	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
-	VertexOut.distance = distanceA;
-	gl_Position = toNDCSpace(p1, offsetFeatherA);
-	EmitVertex();
 
-	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = vec4(VertexIn[2].color.xyz, 0.0);
-	VertexOut.distance = distanceB;
-	gl_Position = toNDCSpace(p2, offsetFeatherB);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = VertexIn[1].color;
-	VertexOut.distance = distanceA;
-	gl_Position = toNDCSpace(p1, offsetA);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(1, 0);
-	VertexOut.color = VertexIn[2].color;
-	VertexOut.distance = distanceB;
-	gl_Position = toNDCSpace(p2, offsetB);
-	EmitVertex();
-	
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = VertexIn[1].color;
-	VertexOut.distance = distanceA;
-	gl_Position = toNDCSpace(p1, -offsetA);
-	EmitVertex();
-	
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = VertexIn[2].color;
-	VertexOut.distance = distanceB;
-	gl_Position = toNDCSpace(p2, -offsetB);
-	EmitVertex();
-	
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = vec4(VertexIn[1].color.xyz, 0.0);
-	VertexOut.distance = distanceA;
-	gl_Position = toNDCSpace(p1, -offsetFeatherA);
-	EmitVertex();
-
-	VertexOut.uv0 = vec2(0, 0);
-	VertexOut.color = vec4(VertexIn[2].color.xyz, 0.0);
-	VertexOut.distance = distanceB;
-	gl_Position = toNDCSpace(p2, -offsetFeatherB);
-	EmitVertex();
+	// generate the triangle strip using six triangles
+	emitVert(p2 + offsetFeatherB, ndc2.z, vec4(VertexIn[2].color.xyz, 0.0), distanceB, vec2(1, 0));
+	emitVert(p1 + offsetFeatherA, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceA, vec2(1, 0));
+	emitVert(p2 + offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(1, 0));
+	emitVert(p1 + offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(1, 0));
+	emitVert(p2 - offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(0, 0));
+	emitVert(p1 - offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(0, 0));
+	emitVert(p2 - offsetFeatherB, ndc2.z, vec4(VertexIn[2].color.xyz, 0.0), distanceB, vec2(0, 0));
+	emitVert(p1 - offsetFeatherA, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceA, vec2(0, 0));
 #endif
-
 	EndPrimitive();
 }

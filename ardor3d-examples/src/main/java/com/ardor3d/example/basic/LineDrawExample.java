@@ -33,6 +33,8 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
+import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -73,6 +75,7 @@ public class LineDrawExample extends ExampleBase {
   protected void initExample() {
     _canvas.setTitle("Ardor3D - Line Drawing Example");
     _canvas.setBackgroundColor(ColorRGBA.DARK_GRAY);
+
     setupLine();
     recreateInstructions();
   }
@@ -173,6 +176,12 @@ public class LineDrawExample extends ExampleBase {
     addPointToLine(0, 0);
     addPointToLine(400, 0);
     addPointToLine(400, 600);
+    addPointToLine(0, 600);
+
+    final CullState cull = new CullState();
+    cull.setCullFace(Face.Back);
+    cull.setEnabled(true);
+    line.setRenderState(cull);
 
     final BlendState blend = new BlendState();
     blend.setBlendEnabled(true);
