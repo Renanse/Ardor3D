@@ -44,11 +44,10 @@ void main()
 
 	// ignore lines that are completely behind us.
 	if (cs1.w <= 0 && cs2.w <= 0) return;
-		
-	// now clamp points so they end at roughly our view plane if they 
-	// are behind us.  This eliminates texturing and other issues.
-	if (cs1.w <= 0) cs1 = vec4(cs2.xyz + normalize(cs1.xyz - cs2.xyz) * cs2.w, 0.01);
-	if (cs2.w <= 0) cs2 = vec4(cs1.xyz + normalize(cs2.xyz - cs1.xyz) * cs1.w, 0.01);
+	
+	// now clamp points so they end at roughly our view plane if they are behind us.  
+	// This eliminates texturing issues and oddly flipped vertices.
+	clampCSW(cs1, cs2, 0.1);
 		
 	// convert the vertices passed to the shader to screen space:
 	vec3 ndc0 = clipToNDC(cs0);
