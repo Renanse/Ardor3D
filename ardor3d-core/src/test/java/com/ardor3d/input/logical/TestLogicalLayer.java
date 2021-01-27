@@ -59,7 +59,6 @@ public class TestLogicalLayer {
 
   Object[] mocks;
 
-  @SuppressWarnings({"unchecked"})
   @Before
   public void setup() throws Exception {
     pl = createMock("Physicallayer", PhysicalLayer.class);

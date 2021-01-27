@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 description = 'Ardor 3D SWT'
 
-project.ext.swtVersion = "3.114.0"
+project.ext.swtVersion = "3.115.0"
 
 switch ( OperatingSystem.current() ) {
 	case OperatingSystem.WINDOWS:

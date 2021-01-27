@@ -1,7 +1,7 @@
 
 description = 'Ardor 3D LWJGL3 AWT'
 
-project.ext.lwjglAwtVersion = "0.1.7"
+project.ext.lwjglAwtVersion = "0.1.8"
 
 dependencies {
 	api project(":ardor3d-lwjgl3")

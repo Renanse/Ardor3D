@@ -10,8 +10,8 @@
 
 package com.ardor3d.input.logical;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.EnumMap;
 import java.util.EnumSet;

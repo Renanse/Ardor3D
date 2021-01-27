@@ -10,9 +10,8 @@
 
 package com.ardor3d.extension.terrain.util;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class TestRegion {
   @Test

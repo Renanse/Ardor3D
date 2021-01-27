@@ -10,13 +10,13 @@
 
 package com.ardor3d.extension.shadow.map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-
-import junit.framework.Assert;
 
 public class TestPSSMCamera {
   @Test
@@ -53,7 +53,7 @@ public class TestPSSMCamera {
 
     Assert.assertEquals(new Vector3(2, 2, 2), camera.getExtents());
 
-    Assert.assertEquals(boxNear1, boxNear2);
-    Assert.assertEquals(boxFar1, boxFar2);
+    Assert.assertEquals(boxNear1, boxNear2, MathUtils.EPSILON);
+    Assert.assertEquals(boxFar1, boxFar2, MathUtils.EPSILON);
   }
 }
