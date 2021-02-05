@@ -105,10 +105,10 @@ public class TestRing {
     MathUtils.setRandomSeed(0);
     final Ring ring1 = new Ring();
     final Vector3 store = ring1.random(null);
-    assertEquals(new Vector3(0.7454530390475868, 0.0, -0.4186496466746111), store);
+    assertTrue(new Vector3(0.7454530390475868, 0.0, -0.4186496466746111).equals(store, MathUtils.EPSILON));
 
     ring1.setUp(Vector3.UNIT_X);
     ring1.random(store);
-    assertEquals(new Vector3(0.0, 0.30386186434027496, -0.3849731927481824), store);
+    assertTrue(new Vector3(0.0, 0.3038618643402747, -0.38497319274818265).equals(store, MathUtils.EPSILON));
   }
 }

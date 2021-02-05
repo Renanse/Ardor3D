@@ -79,4 +79,6 @@ public interface ReadOnlyVector2 {
   double smallestAngleBetween(ReadOnlyVector2 otherVector);
 
   Vector2 clone();
+
+  boolean equals(ReadOnlyVector2 v, double epsilon);
 }

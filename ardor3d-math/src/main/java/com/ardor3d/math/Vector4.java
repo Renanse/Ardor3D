@@ -984,6 +984,25 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
         && EqualsUtil.areEqual(getW(), comp.getW());
   }
 
+  /**
+   * @param v
+   *          the vector to compare for equality
+   * @param epsilon
+   *          epsilon
+   * @return true if this vector and the provided vector are close in value, as determined per axis by
+   *         epsilon.
+   */
+  @Override
+  public boolean equals(final ReadOnlyVector4 v, final double epsilon) {
+    if (this == v) {
+      return true;
+    }
+    return EqualsUtil.areEqual(getX(), v.getX(), epsilon) //
+        && EqualsUtil.areEqual(getY(), v.getY(), epsilon) //
+        && EqualsUtil.areEqual(getZ(), v.getZ(), epsilon) //
+        && EqualsUtil.areEqual(getW(), v.getW(), epsilon);
+  }
+
   // /////////////////
   // Method for Cloneable
   // /////////////////

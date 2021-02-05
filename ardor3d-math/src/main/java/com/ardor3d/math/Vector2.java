@@ -942,6 +942,23 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
         && EqualsUtil.areEqual(getY(), comp.getY());
   }
 
+  /**
+   * @param v
+   *          the vector to compare for equality
+   * @param epsilon
+   *          epsilon
+   * @return true if this vector and the provided vector are close in value, as determined per axis by
+   *         epsilon.
+   */
+  @Override
+  public boolean equals(final ReadOnlyVector2 v, final double epsilon) {
+    if (this == v) {
+      return true;
+    }
+    return EqualsUtil.areEqual(getX(), v.getX(), epsilon) //
+        && EqualsUtil.areEqual(getY(), v.getY(), epsilon);
+  }
+
   // /////////////////
   // Method for Cloneable
   // /////////////////

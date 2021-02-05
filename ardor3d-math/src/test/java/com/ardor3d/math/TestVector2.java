@@ -290,8 +290,8 @@ public class TestVector2 {
     final Vector2 vec1 = new Vector2(1, 0);
     final Vector2 vec2 = vec1.rotateAroundOrigin(MathUtils.HALF_PI, true, null);
     final Vector2 vec2B = vec1.rotateAroundOrigin(MathUtils.HALF_PI, false, new Vector2());
-    assertEquals(new Vector2(0, -1), vec2);
-    assertEquals(new Vector2(0, 1), vec2B);
+    assertTrue(new Vector2(0, -1).equals(vec2, MathUtils.EPSILON));
+    assertTrue(new Vector2(0, 1).equals(vec2B, MathUtils.EPSILON));
     vec2.rotateAroundOriginLocal(MathUtils.HALF_PI, false);
     assertEquals(new Vector2(1, 0), vec2);
     vec2.rotateAroundOriginLocal(MathUtils.PI, true);

@@ -79,4 +79,6 @@ public interface ReadOnlyVector4 {
   double[] toArray(double[] store);
 
   Vector4 clone();
+
+  boolean equals(ReadOnlyVector4 v, double epsilon);
 }

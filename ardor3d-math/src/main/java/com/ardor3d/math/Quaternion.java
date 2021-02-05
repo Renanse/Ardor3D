@@ -1439,8 +1439,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     final ReadOnlyQuaternion comp = (ReadOnlyQuaternion) o;
     return EqualsUtil.areEqual(getX(), comp.getX()) //
         && EqualsUtil.areEqual(getY(), comp.getY()) //
-        && EqualsUtil.areEqual(getW(), comp.getZ()) //
-        && EqualsUtil.areEqual(getZ(), comp.getW());
+        && EqualsUtil.areEqual(getZ(), comp.getZ()) //
+        && EqualsUtil.areEqual(getW(), comp.getW());
   }
 
   // /////////////////

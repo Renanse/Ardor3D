@@ -69,6 +69,18 @@ public class EqualsUtil {
   }
 
   /**
+   *
+   * @param a
+   * @param b
+   * @param epsilon
+   * @return true if abs(a - b) is less than or equals to epsilon, or in other words, the value a is
+   *         "close enough" to the value b.
+   */
+  public static boolean areEqual(final float a, final float b, final float epsilon) {
+    return Math.abs(a - b) <= epsilon;
+  }
+
+  /**
    * @param a
    * @param b
    * @return true if a is equal to b, for purposes of class equality. Note that 0.0 and -0.0 are not
@@ -77,6 +89,18 @@ public class EqualsUtil {
    */
   public static boolean areEqual(final double a, final double b) {
     return Double.doubleToLongBits(a) == Double.doubleToLongBits(b);
+  }
+
+  /**
+   *
+   * @param a
+   * @param b
+   * @param epsilon
+   * @return true if abs(a - b) is less than or equals to epsilon, or in other words, the value a is
+   *         "close enough" to the value b.
+   */
+  public static boolean areEqual(final double a, final double b, final double epsilon) {
+    return Math.abs(a - b) <= epsilon;
   }
 
   /**
