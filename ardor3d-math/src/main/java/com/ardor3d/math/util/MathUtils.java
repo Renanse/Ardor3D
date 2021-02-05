@@ -10,8 +10,6 @@
 
 package com.ardor3d.math.util;
 
-import static java.lang.Math.*;
-
 import java.util.Random;
 
 import com.ardor3d.math.Matrix3;
@@ -77,10 +75,10 @@ public class MathUtils {
    *          and returned.
    */
   public static Vector3 sphericalToCartesian(final ReadOnlyVector3 sphereCoords, final Vector3 store) {
-    final double a = sphereCoords.getX() * cos(sphereCoords.getZ());
-    final double x = a * cos(sphereCoords.getY());
-    final double y = sphereCoords.getX() * sin(sphereCoords.getZ());
-    final double z = a * sin(sphereCoords.getY());
+    final double a = sphereCoords.getX() * Math.cos(sphereCoords.getZ());
+    final double x = a * Math.cos(sphereCoords.getY());
+    final double y = sphereCoords.getX() * Math.sin(sphereCoords.getZ());
+    final double z = a * Math.sin(sphereCoords.getY());
 
     Vector3 rVal = store;
     if (rVal == null) {
@@ -103,9 +101,9 @@ public class MathUtils {
     final double cartY = cartCoords.getY();
     final double cartZ = cartCoords.getZ();
 
-    final double x = sqrt(cartX * cartX + cartY * cartY + cartZ * cartZ);
-    final double y = atan(cartZ / cartX) + (cartX < 0.0 ? MathUtils.PI : 0);
-    final double z = asin(cartY / x);
+    final double x = Math.sqrt(cartX * cartX + cartY * cartY + cartZ * cartZ);
+    final double y = Math.atan(cartZ / cartX) + (cartX < 0.0 ? MathUtils.PI : 0);
+    final double z = Math.asin(cartY / x);
 
     Vector3 rVal = store;
     if (rVal == null) {
@@ -125,10 +123,10 @@ public class MathUtils {
    *          and returned.
    */
   public static Vector3 sphericalToCartesianZ(final ReadOnlyVector3 sphereCoords, final Vector3 store) {
-    final double a = sphereCoords.getX() * cos(sphereCoords.getZ());
-    final double x = a * cos(sphereCoords.getY());
-    final double y = a * sin(sphereCoords.getY());
-    final double z = sphereCoords.getX() * sin(sphereCoords.getZ());
+    final double a = sphereCoords.getX() * Math.cos(sphereCoords.getZ());
+    final double x = a * Math.cos(sphereCoords.getY());
+    final double y = a * Math.sin(sphereCoords.getY());
+    final double z = sphereCoords.getX() * Math.sin(sphereCoords.getZ());
 
     Vector3 rVal = store;
     if (rVal == null) {
@@ -151,9 +149,9 @@ public class MathUtils {
     final double cartY = cartCoords.getY();
     final double cartZ = cartCoords.getZ();
 
-    final double x = sqrt(cartX * cartX + cartY * cartY + cartZ * cartZ);
-    final double y = asin(cartY / x);
-    final double z = atan(cartZ / cartX) + (cartX < 0.0 ? MathUtils.PI : 0);
+    final double x = Math.sqrt(cartX * cartX + cartY * cartY + cartZ * cartZ);
+    final double y = Math.asin(cartY / x);
+    final double z = Math.atan(cartZ / cartX) + (cartX < 0.0 ? MathUtils.PI : 0);
 
     Vector3 rVal = store;
     if (rVal == null) {
@@ -369,7 +367,7 @@ public class MathUtils {
    */
   public static void matrixPerspective(final double fovY, final double aspect, final double zNear, final double zFar,
       final Matrix4 store) {
-    final double height = zNear * tan(fovY * 0.5 * MathUtils.DEG_TO_RAD);
+    final double height = zNear * Math.tan(fovY * 0.5 * MathUtils.DEG_TO_RAD);
     final double width = height * aspect;
 
     matrixFrustum(-width, width, -height, height, zNear, zFar, store);

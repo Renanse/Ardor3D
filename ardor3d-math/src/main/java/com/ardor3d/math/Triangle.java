@@ -259,12 +259,9 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     if (triangle == null) {
       return false;
     }
-    if (!Vector3.isFinite(triangle._pointA) || !Vector3.isFinite(triangle._pointB)
-        || !Vector3.isFinite(triangle._pointC)) {
-      return false;
-    }
-
-    return true;
+    return Vector3.isFinite(triangle._pointA) //
+        && Vector3.isFinite(triangle._pointB) //
+        && Vector3.isFinite(triangle._pointC);
   }
 
   @Override
