@@ -29,10 +29,10 @@ import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector4;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class AwtTextureSource implements TextureSource, ElementUpdateListener {

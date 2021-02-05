@@ -13,9 +13,9 @@ package com.ardor3d.extension.interact.filter;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.data.SpatialState;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 
 public class MinMaxScaleFilter extends UpdateFilterAdapter {
   protected Vector3 _minScale = new Vector3();

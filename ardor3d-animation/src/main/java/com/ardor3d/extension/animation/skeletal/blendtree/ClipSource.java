@@ -15,7 +15,7 @@ import java.util.Map;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * A blend tree leaf node that samples and returns values from the channels of an AnimationClip.

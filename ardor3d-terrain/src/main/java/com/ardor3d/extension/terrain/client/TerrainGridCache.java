@@ -18,8 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.terrain.util.Tile;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Special tile/grid based cache for terrain data

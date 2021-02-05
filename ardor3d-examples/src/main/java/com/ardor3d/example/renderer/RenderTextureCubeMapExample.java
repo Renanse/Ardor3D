@@ -14,9 +14,9 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureCubeMap;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.CubeMapRenderUtil;
@@ -66,7 +66,7 @@ public class RenderTextureCubeMapExample extends ExampleBase {
     // add some moving "scenery"
     final Pyramid b = new Pyramid("box", 2, 3);
     b.setRotation(new Quaternion().fromAngleNormalAxis(MathUtils.PI, Vector3.UNIT_X));
-    b.addController((time, caller) -> b.setTranslation(-3, 6 * MathUtils.sin(_timer.getTimeInSeconds()), 0));
+    b.addController((time, caller) -> b.setTranslation(-3, 6 * Math.sin(_timer.getTimeInSeconds()), 0));
     _root.attachChild(b);
 
     // texture our scenery

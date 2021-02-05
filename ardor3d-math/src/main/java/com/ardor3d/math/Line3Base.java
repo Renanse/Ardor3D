@@ -16,6 +16,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -70,10 +72,29 @@ public abstract class Line3Base implements Savable, Externalizable, Cloneable {
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _origin.hashCode();
-    result += 31 * result + _direction.hashCode();
+    result = HashUtil.hash(result, _origin);
+    result = HashUtil.hash(result, _direction);
 
     return result;
+  }
+
+  /**
+   * @param o
+   *          the object to compare for equality
+   * @return true if this line3base and the provided line3base have the same origin and direction
+   *         values.
+   */
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Line3Base)) {
+      return false;
+    }
+    final Line3Base comp = (Line3Base) o;
+    return EqualsUtil.areEqual(getOrigin(), comp.getOrigin()) //
+        && EqualsUtil.areEqual(getDirection(), comp.getDirection());
   }
 
   // /////////////////

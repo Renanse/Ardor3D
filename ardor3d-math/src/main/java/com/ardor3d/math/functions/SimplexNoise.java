@@ -12,7 +12,7 @@ package com.ardor3d.math.functions;
 
 import java.util.BitSet;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Simplex noise in 2D, 3D and 4D

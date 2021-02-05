@@ -13,8 +13,8 @@ package com.ardor3d.extension.ui.layout;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.util.Insets;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Spatial;
 
 /**

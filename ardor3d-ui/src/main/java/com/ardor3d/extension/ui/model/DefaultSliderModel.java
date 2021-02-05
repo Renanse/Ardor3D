@@ -11,7 +11,7 @@
 package com.ardor3d.extension.ui.model;
 
 import com.ardor3d.extension.ui.UISlider;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * A backing data model for UISlider.

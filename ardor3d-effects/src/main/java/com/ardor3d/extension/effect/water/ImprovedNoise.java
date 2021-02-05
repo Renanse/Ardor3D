@@ -10,7 +10,7 @@
 
 package com.ardor3d.extension.effect.water;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * <code>ImprovedNoise</code> Fast perlin noise.

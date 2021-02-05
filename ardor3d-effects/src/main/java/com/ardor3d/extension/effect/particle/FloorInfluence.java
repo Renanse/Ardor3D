@@ -12,11 +12,11 @@ package com.ardor3d.extension.effect.particle;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 

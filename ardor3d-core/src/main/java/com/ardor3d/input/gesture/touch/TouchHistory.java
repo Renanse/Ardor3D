@@ -10,7 +10,7 @@
 
 package com.ardor3d.input.gesture.touch;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 public class TouchHistory {
 
@@ -51,14 +51,14 @@ public class TouchHistory {
     final double dx = other.currX - currX;
     final double dy = other.currY - currY;
 
-    return MathUtils.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   public double distanceFromInitial() {
     final double dx = initialX - currX;
     final double dy = initialY - currY;
 
-    return MathUtils.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   public double distanceFromInitialSq() {
@@ -72,7 +72,7 @@ public class TouchHistory {
     final double dx = prevX - currX;
     final double dy = prevY - currY;
 
-    return MathUtils.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   public double angleBetween(final TouchHistory other) {
@@ -82,8 +82,8 @@ public class TouchHistory {
     double angle;
     // avoid divide by 0
     if (Math.abs(dx) < 0.001) {
-      final double h = MathUtils.sqrt(dx * dx + dy * dy);
-      angle = (h < 0.001) ? 0 : MathUtils.asin(dy / h);
+      final double h = Math.sqrt(dx * dx + dy * dy);
+      angle = (h < 0.001) ? 0 : Math.asin(dy / h);
     } else {
       angle = Math.atan2(dy, dx);
     }

@@ -12,8 +12,8 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
@@ -93,17 +93,17 @@ public class PQTorus extends Mesh {
       final double circleFraction = ((double) i) / (double) _steps;
 
       // Find the point on the torus
-      r = (0.5 * (2.0 + MathUtils.sin(_q * theta)) * _radius);
-      x = (r * MathUtils.cos(_p * theta) * _radius);
-      y = (r * MathUtils.sin(_p * theta) * _radius);
-      z = (r * MathUtils.cos(_q * theta) * _radius);
+      r = (0.5 * (2.0 + Math.sin(_q * theta)) * _radius);
+      x = (r * Math.cos(_p * theta) * _radius);
+      y = (r * Math.sin(_p * theta) * _radius);
+      z = (r * Math.cos(_q * theta) * _radius);
       toruspoints[i] = new Vector3(x, y, z);
 
       // Now find a point slightly farther along the torus
-      r = (0.5 * (2.0 + MathUtils.sin(_q * (theta + 0.01))) * _radius);
-      x = (r * MathUtils.cos(_p * (theta + 0.01)) * _radius);
-      y = (r * MathUtils.sin(_p * (theta + 0.01)) * _radius);
-      z = (r * MathUtils.cos(_q * (theta + 0.01)) * _radius);
+      r = (0.5 * (2.0 + Math.sin(_q * (theta + 0.01))) * _radius);
+      x = (r * Math.cos(_p * (theta + 0.01)) * _radius);
+      y = (r * Math.sin(_p * (theta + 0.01)) * _radius);
+      z = (r * Math.cos(_q * (theta + 0.01)) * _radius);
       pointB.set(x, y, z);
 
       // Approximate the Frenet Frame
@@ -120,8 +120,8 @@ public class PQTorus extends Mesh {
       beta = 0.0;
       for (int j = 0; j < _radialSamples; j++) {
         beta += BETA_STEP;
-        final double cx = MathUtils.cos(beta) * _width;
-        final double cy = MathUtils.sin(beta) * _width;
+        final double cx = Math.cos(beta) * _width;
+        final double cy = Math.sin(beta) * _width;
         final double radialFraction = ((double) j) / _radialSamples;
         tempNormA.setX((cx * N.getX() + cy * B.getX()));
         tempNormA.setY((cx * N.getY() + cy * B.getY()));

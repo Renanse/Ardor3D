@@ -21,10 +21,10 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyTransform;
+import com.ardor3d.math.util.MathUtils;
 
 public class AwtShapeElement extends AbstractAwtElement {
 

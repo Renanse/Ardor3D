@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestRing {
 
   @Test
@@ -47,17 +49,17 @@ public class TestRing {
   }
 
   @Test
-  public void testValid() {
-    assertTrue(Ring.isValid(new Ring()));
-    assertFalse(Ring.isValid(null));
-    assertFalse(Ring.isValid(new Ring(Vector3.ZERO, Vector3.UNIT_Y, 0.0, Double.NaN)));
-    assertFalse(Ring.isValid(new Ring(Vector3.ZERO, Vector3.UNIT_Y, 0.0, Double.POSITIVE_INFINITY)));
-    assertFalse(Ring.isValid(new Ring(Vector3.ZERO, Vector3.UNIT_Y, Double.NaN, 1.0)));
-    assertFalse(Ring.isValid(new Ring(Vector3.ZERO, Vector3.UNIT_Y, Double.NEGATIVE_INFINITY, 1.0)));
-    assertFalse(Ring.isValid(new Ring(Vector3.ZERO, new Vector3(Double.NaN, 0, 0), 0.0, 1.0)));
-    assertFalse(Ring.isValid(new Ring(Vector3.ZERO, new Vector3(Double.POSITIVE_INFINITY, 0, 0), 0.0, 1.0)));
-    assertFalse(Ring.isValid(new Ring(new Vector3(Double.NaN, 0, 0), Vector3.UNIT_Y, 0.0, 1.0)));
-    assertFalse(Ring.isValid(new Ring(new Vector3(Double.NEGATIVE_INFINITY, 0, 0), Vector3.UNIT_Y, 0.0, 1.0)));
+  public void testFinite() {
+    assertTrue(Ring.isFinite(new Ring()));
+    assertFalse(Ring.isFinite(null));
+    assertFalse(Ring.isFinite(new Ring(Vector3.ZERO, Vector3.UNIT_Y, 0.0, Double.NaN)));
+    assertFalse(Ring.isFinite(new Ring(Vector3.ZERO, Vector3.UNIT_Y, 0.0, Double.POSITIVE_INFINITY)));
+    assertFalse(Ring.isFinite(new Ring(Vector3.ZERO, Vector3.UNIT_Y, Double.NaN, 1.0)));
+    assertFalse(Ring.isFinite(new Ring(Vector3.ZERO, Vector3.UNIT_Y, Double.NEGATIVE_INFINITY, 1.0)));
+    assertFalse(Ring.isFinite(new Ring(Vector3.ZERO, new Vector3(Double.NaN, 0, 0), 0.0, 1.0)));
+    assertFalse(Ring.isFinite(new Ring(Vector3.ZERO, new Vector3(Double.POSITIVE_INFINITY, 0, 0), 0.0, 1.0)));
+    assertFalse(Ring.isFinite(new Ring(new Vector3(Double.NaN, 0, 0), Vector3.UNIT_Y, 0.0, 1.0)));
+    assertFalse(Ring.isFinite(new Ring(new Vector3(Double.NEGATIVE_INFINITY, 0, 0), Vector3.UNIT_Y, 0.0, 1.0)));
 
     // couple of equals validity tests
     final Ring ring1 = new Ring();

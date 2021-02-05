@@ -13,6 +13,7 @@ package com.ardor3d.math;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 
 public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
@@ -322,12 +323,13 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
    *          the ray to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyRay3 ray) {
+  public static boolean isFinite(final ReadOnlyRay3 ray) {
     if (ray == null) {
       return false;
     }
 
-    return Vector3.isValid(ray.getDirection()) && Vector3.isValid(ray.getOrigin());
+    return Vector3.isFinite(ray.getDirection()) //
+        && Vector3.isFinite(ray.getOrigin());
   }
 
   /**
@@ -341,7 +343,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
   /**
    * @param o
    *          the object to compare for equality
-   * @return true if this ray and the provided ray have the same constant and normal values.
+   * @return true if this line and the provided ray have the same origin and direction values.
    */
   @Override
   public boolean equals(final Object o) {

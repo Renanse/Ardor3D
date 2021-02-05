@@ -874,7 +874,7 @@ public class ParallelSplitShadowMapPass extends Pass {
    * @return
    */
   private boolean boundIsValid(final BoundingVolume volume) {
-    if (!Vector3.isValid(volume.getCenter())) {
+    if (!Vector3.isFinite(volume.getCenter())) {
       return false;
     }
     switch (volume.getType()) {
@@ -892,7 +892,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
       case OBB: {
         final OrientedBoundingBox obb = (OrientedBoundingBox) volume;
-        return Vector3.isValid(obb.getExtent());
+        return Vector3.isFinite(obb.getExtent());
       }
 
       default:

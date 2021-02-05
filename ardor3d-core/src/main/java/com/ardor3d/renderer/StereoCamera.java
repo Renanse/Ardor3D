@@ -10,8 +10,8 @@
 
 package com.ardor3d.renderer;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Extension of Camera useful for tracking and updating a Stereo view camera. See
@@ -88,7 +88,7 @@ public class StereoCamera extends Camera {
 
     // Set frustum:
     final double aspectRatio = (getWidth() / (double) getHeight() / (_sideBySideMode ? 2.0 : 1.0));
-    final double halfView = getFrustumNear() * MathUtils.tan(_aperture / 2);
+    final double halfView = getFrustumNear() * Math.tan(_aperture / 2);
 
     final double top = halfView;
     final double bottom = -halfView;

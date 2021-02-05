@@ -35,13 +35,13 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.functions.FbmFunction3D;
 import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.functions.Functions;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -105,7 +105,7 @@ public class ShapesPlusProceduralTerrainExample extends ExampleBase {
     awtCounter += timer.getTimePerFrame();
     if (awtCounter > awtUpdate) {
       final double tis = timer.getTimeInSeconds() * 0.75;
-      ovalTrans.setTranslation(250 * MathUtils.sin(-tis), 150 * MathUtils.cos(tis), 0);
+      ovalTrans.setTranslation(250 * Math.sin(-tis), 150 * Math.cos(tis), 0);
       oval.setTransform(ovalTrans);
       awtCounter -= awtUpdate;
     }

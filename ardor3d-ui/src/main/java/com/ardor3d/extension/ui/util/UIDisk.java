@@ -10,8 +10,8 @@
 
 package com.ardor3d.extension.ui.util;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -94,8 +94,8 @@ public class UIDisk extends Mesh {
     final Vector2 radialInner = new Vector2();
     for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
       final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
-      final double cos = MathUtils.cos(angle);
-      final double sin = MathUtils.sin(angle);
+      final double cos = Math.cos(angle);
+      final double sin = Math.sin(angle);
       final Vector2 radial = new Vector2(cos, sin);
       radialInner.set(radial).multiplyLocal(_innerRadius);
 

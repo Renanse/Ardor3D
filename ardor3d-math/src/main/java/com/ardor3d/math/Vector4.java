@@ -16,6 +16,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyVector4;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -829,7 +832,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double length() {
-    return MathUtils.sqrt(lengthSquared());
+    return Math.sqrt(lengthSquared());
   }
 
   /**
@@ -881,7 +884,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double distance(final double x, final double y, final double z, final double w) {
-    return MathUtils.sqrt(distanceSquared(x, y, z, w));
+    return Math.sqrt(distanceSquared(x, y, z, w));
   }
 
   /**
@@ -892,7 +895,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double distance(final ReadOnlyVector4 destination) {
-    return MathUtils.sqrt(distanceSquared(destination));
+    return Math.sqrt(distanceSquared(destination));
   }
 
   /**
@@ -925,20 +928,16 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * @param vector
    *          the vector to check
    * @return true or false as stated above.
+   * @see java.lang.Double#isFinite(double)
    */
-  public static boolean isValid(final ReadOnlyVector4 vector) {
+  public static boolean isFinite(final ReadOnlyVector4 vector) {
     if (vector == null) {
       return false;
     }
-    if (Double.isNaN(vector.getX()) || Double.isNaN(vector.getY()) || Double.isNaN(vector.getZ())
-        || Double.isNaN(vector.getW())) {
-      return false;
-    }
-    if (Double.isInfinite(vector.getX()) || Double.isInfinite(vector.getY()) || Double.isInfinite(vector.getZ())
-        || Double.isInfinite(vector.getW())) {
-      return false;
-    }
-    return true;
+    return Double.isFinite(vector.getX()) //
+        && Double.isFinite(vector.getY()) //
+        && Double.isFinite(vector.getZ()) //
+        && Double.isFinite(vector.getW());
   }
 
   /**
@@ -957,17 +956,10 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   public int hashCode() {
     int result = 17;
 
-    final long x = Double.doubleToLongBits(getX());
-    result += 31 * result + (int) (x ^ x >>> 32);
-
-    final long y = Double.doubleToLongBits(getY());
-    result += 31 * result + (int) (y ^ y >>> 32);
-
-    final long z = Double.doubleToLongBits(getZ());
-    result += 31 * result + (int) (z ^ z >>> 32);
-
-    final long w = Double.doubleToLongBits(getW());
-    result += 31 * result + (int) (w ^ w >>> 32);
+    result = HashUtil.hash(result, getX());
+    result = HashUtil.hash(result, getY());
+    result = HashUtil.hash(result, getZ());
+    result = HashUtil.hash(result, getW());
 
     return result;
   }
@@ -986,7 +978,10 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
       return false;
     }
     final ReadOnlyVector4 comp = (ReadOnlyVector4) o;
-    return getX() == comp.getX() && getY() == comp.getY() && getZ() == comp.getZ() && getW() == comp.getW();
+    return EqualsUtil.areEqual(getX(), comp.getX()) //
+        && EqualsUtil.areEqual(getY(), comp.getY()) //
+        && EqualsUtil.areEqual(getZ(), comp.getZ()) //
+        && EqualsUtil.areEqual(getW(), comp.getW());
   }
 
   // /////////////////

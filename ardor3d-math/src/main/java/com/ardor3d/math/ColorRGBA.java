@@ -16,6 +16,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -807,20 +810,16 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
    * @param color
    *          the color to check
    * @return true or false as stated above.
+   * @see java.lang.Float#isFinite(float)
    */
-  public static boolean isValid(final ReadOnlyColorRGBA color) {
+  public static boolean isFinite(final ReadOnlyColorRGBA color) {
     if (color == null) {
       return false;
     }
-    if (Float.isNaN(color.getRed()) || Float.isNaN(color.getGreen()) || Float.isNaN(color.getBlue())
-        || Float.isNaN(color.getAlpha())) {
-      return false;
-    }
-    if (Float.isInfinite(color.getRed()) || Float.isInfinite(color.getGreen()) || Float.isInfinite(color.getBlue())
-        || Float.isInfinite(color.getAlpha())) {
-      return false;
-    }
-    return true;
+    return Float.isFinite(color.getRed()) //
+        && Float.isFinite(color.getGreen()) //
+        && Float.isFinite(color.getBlue()) //
+        && Float.isFinite(color.getAlpha());
   }
 
   /**
@@ -840,17 +839,10 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
   public int hashCode() {
     int result = 17;
 
-    final int r = Float.floatToIntBits(getRed());
-    result += 31 * result + r;
-
-    final int g = Float.floatToIntBits(getGreen());
-    result += 31 * result + g;
-
-    final int b = Float.floatToIntBits(getBlue());
-    result += 31 * result + b;
-
-    final int a = Float.floatToIntBits(getAlpha());
-    result += 31 * result + a;
+    result = HashUtil.hash(result, getRed());
+    result = HashUtil.hash(result, getGreen());
+    result = HashUtil.hash(result, getBlue());
+    result = HashUtil.hash(result, getAlpha());
 
     return result;
   }
@@ -869,8 +861,10 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
       return false;
     }
     final ReadOnlyColorRGBA comp = (ReadOnlyColorRGBA) o;
-    return getRed() == comp.getRed() && getGreen() == comp.getGreen() && getBlue() == comp.getBlue()
-        && getAlpha() == comp.getAlpha();
+    return EqualsUtil.areEqual(getRed(), comp.getRed()) //
+        && EqualsUtil.areEqual(getGreen(), comp.getGreen()) //
+        && EqualsUtil.areEqual(getBlue(), comp.getBlue()) //
+        && EqualsUtil.areEqual(getAlpha(), comp.getAlpha());
   }
 
   // /////////////////

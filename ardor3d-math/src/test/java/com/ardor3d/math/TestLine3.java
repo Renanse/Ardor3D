@@ -74,19 +74,19 @@ public class TestLine3 {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Line3 line1 = new Line3();
     final Line3 line2 = new Line3(new Vector3(Double.NaN, 0, 0), Vector3.UNIT_Z);
     final Line3 line3 = new Line3(Vector3.ZERO, new Vector3(Double.NaN, 0, 0));
 
-    assertTrue(Line3.isValid(line1));
-    assertFalse(Line3.isValid(line2));
-    assertFalse(Line3.isValid(line3));
+    assertTrue(Line3.isFinite(line1));
+    assertFalse(Line3.isFinite(line2));
+    assertFalse(Line3.isFinite(line3));
 
     line2.setOrigin(Vector3.ZERO);
-    assertTrue(Line3.isValid(line2));
+    assertTrue(Line3.isFinite(line2));
 
-    assertFalse(Line3.isValid(null));
+    assertFalse(Line3.isFinite(null));
   }
 
   @Test

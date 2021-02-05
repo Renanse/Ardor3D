@@ -10,7 +10,7 @@
 
 package com.ardor3d.extension.ui.text;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 public class UIIntegerField extends UITextField {
 

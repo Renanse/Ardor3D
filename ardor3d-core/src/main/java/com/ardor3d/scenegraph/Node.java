@@ -394,7 +394,7 @@ public class Node extends Spatial {
           worldBound.mergeLocal(child.getWorldBound());
 
           // simple check to catch NaN issues
-          if (!Vector3.isValid(worldBound.getCenter())) {
+          if (!Vector3.isFinite(worldBound.getCenter())) {
             throw new Ardor3dException("WorldBound center is invalid after merge between " + this + " and " + child);
           }
         } else {

@@ -16,7 +16,6 @@ import java.util.List;
 
 import com.ardor3d.extension.terrain.client.ClipmapLevel;
 import com.ardor3d.extension.terrain.util.AbstractBresenhamTracer.Direction;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Triangle;
 import com.ardor3d.math.Vector2;
@@ -24,6 +23,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.Ardor3dException;
 
 /**

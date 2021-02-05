@@ -13,7 +13,7 @@ package com.ardor3d.math.functions;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * This function takes a "map" function and uses the value it returns at a certain point to look up

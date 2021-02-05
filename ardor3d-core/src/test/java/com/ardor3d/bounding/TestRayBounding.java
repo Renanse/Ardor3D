@@ -17,11 +17,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.ardor3d.intersection.IntersectionRecord;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 
 public class TestRayBounding {
   @Test

@@ -139,11 +139,11 @@ public class AbstractRenderBucket implements RenderBucket {
 
     final Camera cam = Camera.getCurrentCamera();
 
-    if (spat.getWorldBound() != null && Vector3.isValid(spat.getWorldBound().getCenter())) {
+    if (spat.getWorldBound() != null && Vector3.isFinite(spat.getWorldBound().getCenter())) {
       spat._queueDistance = spat.getWorldBound().distanceToEdge(cam.getLocation());
     } else {
       final ReadOnlyVector3 spatPosition = spat.getWorldTranslation();
-      if (!Vector3.isValid(spatPosition)) {
+      if (!Vector3.isFinite(spatPosition)) {
         spat._queueDistance = Double.POSITIVE_INFINITY;
       } else {
         spat._queueDistance = cam.getLocation().distance(spatPosition);

@@ -21,6 +21,9 @@ import java.nio.FloatBuffer;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -603,8 +606,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    *           if axis is null.
    */
   public Matrix3 fromAngleNormalAxis(final double angle, final ReadOnlyVector3 axis) {
-    final double fCos = MathUtils.cos(angle);
-    final double fSin = MathUtils.sin(angle);
+    final double fCos = Math.cos(angle);
+    final double fSin = Math.sin(angle);
     final double fOneMinusCos = 1.0 - fCos;
     final double fX2 = axis.getX() * axis.getX();
     final double fY2 = axis.getY() * axis.getY();
@@ -1619,32 +1622,20 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    *          the vector to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyMatrix3 matrix) {
+  public static boolean isFinite(final ReadOnlyMatrix3 matrix) {
     if (matrix == null) {
       return false;
     }
 
-    if (Double.isNaN(matrix.getM00()) || Double.isInfinite(matrix.getM00())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM01()) || Double.isInfinite(matrix.getM01())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM02()) || Double.isInfinite(matrix.getM02())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM10()) || Double.isInfinite(matrix.getM10())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM11()) || Double.isInfinite(matrix.getM11())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM12()) || Double.isInfinite(matrix.getM12())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM20()) || Double.isInfinite(matrix.getM20())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM21()) || Double.isInfinite(matrix.getM21())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM22()) || Double.isInfinite(matrix.getM22())) {
-      return false;
-    }
-
-    return true;
+    return Double.isFinite(matrix.getM00()) //
+        && Double.isFinite(matrix.getM01()) //
+        && Double.isFinite(matrix.getM02()) //
+        && Double.isFinite(matrix.getM10()) //
+        && Double.isFinite(matrix.getM11()) //
+        && Double.isFinite(matrix.getM12()) //
+        && Double.isFinite(matrix.getM20()) //
+        && Double.isFinite(matrix.getM21()) //
+        && Double.isFinite(matrix.getM22());
   }
 
   /**
@@ -1717,26 +1708,17 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   public int hashCode() {
     int result = 17;
 
-    long val = Double.doubleToLongBits(_m00);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m01);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m02);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m00);
+    result = HashUtil.hash(result, _m01);
+    result = HashUtil.hash(result, _m02);
 
-    val = Double.doubleToLongBits(_m10);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m11);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m12);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m10);
+    result = HashUtil.hash(result, _m11);
+    result = HashUtil.hash(result, _m12);
 
-    val = Double.doubleToLongBits(_m20);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m21);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m22);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m20);
+    result = HashUtil.hash(result, _m21);
+    result = HashUtil.hash(result, _m22);
 
     return result;
   }
@@ -1792,27 +1774,15 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
       return false;
     }
     final ReadOnlyMatrix3 comp = (ReadOnlyMatrix3) o;
-    if (getM00() != comp.getM00()) {
-      return false;
-    } else if (getM01() != comp.getM01()) {
-      return false;
-    } else if (getM02() != comp.getM02()) {
-      return false;
-    } else if (getM10() != comp.getM10()) {
-      return false;
-    } else if (getM11() != comp.getM11()) {
-      return false;
-    } else if (getM12() != comp.getM12()) {
-      return false;
-    } else if (getM20() != comp.getM20()) {
-      return false;
-    } else if (getM21() != comp.getM21()) {
-      return false;
-    } else if (getM22() != comp.getM22()) {
-      return false;
-    }
-
-    return true;
+    return EqualsUtil.areEqual(getM00(), comp.getM00()) //
+        && EqualsUtil.areEqual(getM01(), comp.getM01()) //
+        && EqualsUtil.areEqual(getM02(), comp.getM02()) //
+        && EqualsUtil.areEqual(getM10(), comp.getM10()) //
+        && EqualsUtil.areEqual(getM11(), comp.getM11()) //
+        && EqualsUtil.areEqual(getM12(), comp.getM12()) //
+        && EqualsUtil.areEqual(getM20(), comp.getM20()) //
+        && EqualsUtil.areEqual(getM21(), comp.getM21()) //
+        && EqualsUtil.areEqual(getM22(), comp.getM22());
   }
 
   // /////////////////

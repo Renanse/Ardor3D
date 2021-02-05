@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import com.ardor3d.annotation.SavableFactory;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.export.Ardor3dImporter;
 import com.ardor3d.util.export.ByteUtils;

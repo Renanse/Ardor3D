@@ -14,13 +14,13 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.intersection.IntersectionRecord;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -94,7 +94,7 @@ public class BoundingBox extends BoundingVolume {
   public double getZExtent() { return _zExtent; }
 
   @Override
-  public double getRadius() { return MathUtils.sqrt(_xExtent * _xExtent + _yExtent * _yExtent + _zExtent * _zExtent); }
+  public double getRadius() { return Math.sqrt(_xExtent * _xExtent + _yExtent * _yExtent + _zExtent * _zExtent); }
 
   // Some transform matrices are not in decomposed form and in this
   // situation we need to use a different, more robust, algorithm
@@ -609,7 +609,7 @@ public class BoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersectsSphere(final BoundingSphere bs) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(bs._center)) {
       return false;
     }
 
@@ -624,7 +624,7 @@ public class BoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersectsBoundingBox(final BoundingBox bb) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(bb._center)) {
       return false;
     }
 
@@ -649,7 +649,7 @@ public class BoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersects(final ReadOnlyRay3 ray) {
-    if (!Vector3.isValid(_center)) {
+    if (!Vector3.isFinite(_center)) {
       return false;
     }
 
@@ -688,7 +688,7 @@ public class BoundingBox extends BoundingVolume {
 
   @Override
   public IntersectionRecord intersectsWhere(final ReadOnlyRay3 ray) {
-    if (!Vector3.isValid(_center)) {
+    if (!Vector3.isFinite(_center)) {
       return null;
     }
 

@@ -25,12 +25,12 @@ import com.ardor3d.extension.model.collada.jdom.data.ControllerStore;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.JointNode;
 import com.ardor3d.extension.model.collada.jdom.data.NodeType;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 

@@ -13,9 +13,9 @@ package com.ardor3d.extension.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
@@ -207,8 +207,8 @@ public class UIPieMenu extends UIPopupMenu implements IPopOver {
       final UIComponent comp = comps.get(i);
 
       final Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
-      final int x = (int) MathUtils.round(radius * MathUtils.sin(position));
-      final int y = (int) MathUtils.round(radius * MathUtils.cos(position));
+      final int x = (int) MathUtils.round(radius * Math.sin(position));
+      final int y = (int) MathUtils.round(radius * Math.cos(position));
 
       comp.setLocalXY(x - rect.getWidth() / 2, y - rect.getHeight() / 2);
 

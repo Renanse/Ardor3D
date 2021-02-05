@@ -12,8 +12,8 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -167,8 +167,8 @@ public class Dome extends Mesh {
     final double[] afCos = new double[(_radialSamples)];
     for (int iR = 0; iR < _radialSamples; iR++) {
       final double fAngle = MathUtils.TWO_PI * fInvRS * iR;
-      afCos[iR] = MathUtils.cos(fAngle);
-      afSin[iR] = MathUtils.sin(fAngle);
+      afCos[iR] = Math.cos(fAngle);
+      afSin[iR] = Math.sin(fAngle);
     }
 
     // generate the dome itself

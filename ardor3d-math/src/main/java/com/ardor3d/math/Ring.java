@@ -17,6 +17,9 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyRing;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -190,8 +193,8 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
     }
     b1.normalizeLocal();
     _up.cross(b1, b2);
-    result.set(b1).multiplyLocal(r * MathUtils.cos(theta)).addLocal(_center);
-    b2.scaleAdd(r * MathUtils.sin(theta), result, result);
+    result.set(b1).multiplyLocal(r * Math.cos(theta)).addLocal(_center);
+    b2.scaleAdd(r * Math.sin(theta), result, result);
 
     Vector3.releaseTempInstance(b1);
     Vector3.releaseTempInstance(b2);
@@ -207,18 +210,15 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
    *          the ring to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyRing ring) {
+  public static boolean isFinite(final ReadOnlyRing ring) {
     if (ring == null) {
       return false;
     }
-    if (Double.isNaN(ring.getInnerRadius()) || Double.isInfinite(ring.getInnerRadius())) {
-      return false;
-    }
-    if (Double.isNaN(ring.getOuterRadius()) || Double.isInfinite(ring.getOuterRadius())) {
-      return false;
-    }
 
-    return Vector3.isValid(ring.getCenter()) && Vector3.isValid(ring.getUp());
+    return Double.isFinite(ring.getInnerRadius()) //
+        && Double.isFinite(ring.getOuterRadius()) //
+        && Vector3.isFinite(ring.getCenter()) //
+        && Vector3.isFinite(ring.getUp());
   }
 
   /**
@@ -238,14 +238,10 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _center.hashCode();
-    result += 31 * result + _up.hashCode();
-
-    final long ir = Double.doubleToLongBits(getInnerRadius());
-    result += 31 * result + (int) (ir ^ ir >>> 32);
-
-    final long or = Double.doubleToLongBits(getOuterRadius());
-    result += 31 * result + (int) (or ^ or >>> 32);
+    result = HashUtil.hash(result, _center);
+    result = HashUtil.hash(result, _up);
+    result = HashUtil.hash(result, _innerRadius);
+    result = HashUtil.hash(result, _outerRadius);
 
     return result;
   }
@@ -264,9 +260,10 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
       return false;
     }
     final ReadOnlyRing comp = (ReadOnlyRing) o;
-    return getInnerRadius() == comp.getInnerRadius() && getOuterRadius() == comp.getOuterRadius()
-        && _up.equals(comp.getUp()) && _center.equals(comp.getCenter());
-
+    return EqualsUtil.areEqual(getInnerRadius(), comp.getInnerRadius()) //
+        && EqualsUtil.areEqual(getOuterRadius(), comp.getOuterRadius()) //
+        && EqualsUtil.areEqual(getUp(), comp.getUp()) //
+        && EqualsUtil.areEqual(getCenter(), comp.getCenter());
   }
 
   // /////////////////

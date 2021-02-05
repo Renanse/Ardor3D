@@ -10,7 +10,7 @@
 
 package com.ardor3d.math.functions;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Creates a hexagon pattern in the XY plane. This is not really 3D, since it ignores the z factor.

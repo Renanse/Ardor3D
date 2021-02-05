@@ -28,11 +28,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;

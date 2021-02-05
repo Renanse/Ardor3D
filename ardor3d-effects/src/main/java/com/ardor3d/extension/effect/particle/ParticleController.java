@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
 import com.ardor3d.renderer.ContextManager;

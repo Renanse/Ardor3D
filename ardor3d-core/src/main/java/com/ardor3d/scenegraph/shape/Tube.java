@@ -12,7 +12,7 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -114,8 +114,8 @@ public class Tube extends Mesh {
 
     for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
       final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
-      cos[radialCount] = MathUtils.cos(angle);
-      sin[radialCount] = MathUtils.sin(angle);
+      cos[radialCount] = Math.cos(angle);
+      sin[radialCount] = Math.sin(angle);
     }
 
     // outer cylinder

@@ -35,8 +35,8 @@ public class ValidatingTransform extends Transform {
   }
 
   private void validate() {
-    if (!Transform.isValid(this)) {
-      throw new InvalidTransformException("Transform is invalid: " + this);
+    if (!Transform.isFinite(this)) {
+      throw new InvalidTransformException("Transform is not finite: " + this);
     }
   }
 
@@ -113,8 +113,8 @@ public class ValidatingTransform extends Transform {
   @Override
   public Transform multiply(final ReadOnlyTransform transformBy, final Transform store) {
     final Transform transform = super.multiply(transformBy, store);
-    if (!Transform.isValid(transform)) {
-      throw new InvalidTransformException("Transform is invalid");
+    if (!Transform.isFinite(transform)) {
+      throw new InvalidTransformException("Resulting Transform is not finite");
     }
     return transform;
   }
@@ -122,8 +122,8 @@ public class ValidatingTransform extends Transform {
   @Override
   public Transform invert(final Transform store) {
     final Transform transform = super.invert(store);
-    if (!Transform.isValid(transform)) {
-      throw new InvalidTransformException("Transform is invalid");
+    if (!Transform.isFinite(transform)) {
+      throw new InvalidTransformException("Resulting Transform is not finite");
     }
     return transform;
   }

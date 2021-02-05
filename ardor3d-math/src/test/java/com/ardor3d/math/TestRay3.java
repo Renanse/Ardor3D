@@ -38,16 +38,16 @@ public class TestRay3 {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Ray3 ray1 = new Ray3(new Vector3(0, 0, 0), new Vector3(0, 0, 1));
     final Ray3 ray2 = new Ray3(new Vector3(Double.POSITIVE_INFINITY, 0, 0), new Vector3(0, 0, 1));
     final Ray3 ray3 = new Ray3(new Vector3(0, 0, 0), new Vector3(Double.POSITIVE_INFINITY, 0, 1));
 
-    assertTrue(Ray3.isValid(ray1));
-    assertFalse(Ray3.isValid(ray2));
-    assertFalse(Ray3.isValid(ray3));
+    assertTrue(Ray3.isFinite(ray1));
+    assertFalse(Ray3.isFinite(ray2));
+    assertFalse(Ray3.isFinite(ray3));
 
-    assertFalse(Ray3.isValid(null));
+    assertFalse(Ray3.isFinite(null));
 
     // couple if equals validity tests
     assertEquals(ray1, ray1);

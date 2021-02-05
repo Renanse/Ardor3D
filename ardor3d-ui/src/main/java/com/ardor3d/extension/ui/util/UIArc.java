@@ -13,8 +13,8 @@ package com.ardor3d.extension.ui.util;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.image.Image;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
@@ -125,7 +125,7 @@ public class UIArc extends Mesh {
       double angle = startAngle;
       for (int x = 0; x < radialVerts; x++) {
         final float radialU = txOff + leftOffTx + (txScale - leftOffTx - rightOffTx) * ((float) x / (radialVerts - 1));
-        final Vector2 radial = new Vector2(MathUtils.sin(angle), MathUtils.cos(angle));
+        final Vector2 radial = new Vector2(Math.sin(angle), Math.cos(angle));
         radialOffset.set(radial).multiplyLocal(_innerRadius);
 
         // inner edge
@@ -160,7 +160,7 @@ public class UIArc extends Mesh {
         angle = startAngle + MathUtils.HALF_PI;
         final float radialU1 = txOff;
         final float radialU2 = txOff + leftOffTx;
-        final Vector2 radial = new Vector2(MathUtils.sin(angle), MathUtils.cos(angle));
+        final Vector2 radial = new Vector2(Math.sin(angle), Math.cos(angle));
         radialOffset.set(radial).multiplyLocal(leftBrd);
 
         for (int s = 0; s < 4; s++) {
@@ -193,7 +193,7 @@ public class UIArc extends Mesh {
         angle = startAngle + arcLength - MathUtils.HALF_PI;
         final float radialU1 = txOff + txScale - rightOffTx;
         final float radialU2 = txOff + txScale;
-        final Vector2 radial = new Vector2(MathUtils.sin(angle), MathUtils.cos(angle));
+        final Vector2 radial = new Vector2(Math.sin(angle), Math.cos(angle));
         radialOffset.set(radial).multiplyLocal(rightBrd);
 
         for (int s = 0; s < 4; s++) {

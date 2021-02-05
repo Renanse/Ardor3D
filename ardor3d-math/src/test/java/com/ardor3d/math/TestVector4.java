@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestVector4 {
 
   @Test
@@ -314,7 +316,7 @@ public class TestVector4 {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Vector4 vec1 = new Vector4(0, 0, 0, 0);
     final Vector4 vec2A = new Vector4(Double.POSITIVE_INFINITY, 0, 0, 0);
     final Vector4 vec2B = new Vector4(0, Double.NEGATIVE_INFINITY, 0, 0);
@@ -325,20 +327,20 @@ public class TestVector4 {
     final Vector4 vec3C = new Vector4(0, 0, Double.NaN, 0);
     final Vector4 vec3D = new Vector4(0, 0, 0, Double.NaN);
 
-    assertTrue(Vector4.isValid(vec1));
-    assertFalse(Vector4.isValid(vec2A));
-    assertFalse(Vector4.isValid(vec2B));
-    assertFalse(Vector4.isValid(vec2C));
-    assertFalse(Vector4.isValid(vec2D));
-    assertFalse(Vector4.isValid(vec3A));
-    assertFalse(Vector4.isValid(vec3B));
-    assertFalse(Vector4.isValid(vec3C));
-    assertFalse(Vector4.isValid(vec3D));
+    assertTrue(Vector4.isFinite(vec1));
+    assertFalse(Vector4.isFinite(vec2A));
+    assertFalse(Vector4.isFinite(vec2B));
+    assertFalse(Vector4.isFinite(vec2C));
+    assertFalse(Vector4.isFinite(vec2D));
+    assertFalse(Vector4.isFinite(vec3A));
+    assertFalse(Vector4.isFinite(vec3B));
+    assertFalse(Vector4.isFinite(vec3C));
+    assertFalse(Vector4.isFinite(vec3D));
 
     vec3C.zero();
-    assertTrue(Vector4.isValid(vec3C));
+    assertTrue(Vector4.isFinite(vec3C));
 
-    assertFalse(Vector4.isValid(null));
+    assertFalse(Vector4.isFinite(null));
 
     // couple of equals validity tests
     assertEquals(vec1, vec1);

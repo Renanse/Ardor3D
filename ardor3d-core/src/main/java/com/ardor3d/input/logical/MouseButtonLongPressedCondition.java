@@ -17,7 +17,6 @@ import com.ardor3d.input.InputState;
 import com.ardor3d.input.mouse.ButtonState;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
-import com.ardor3d.math.MathUtils;
 
 /**
  * A condition that is true if a given button was pressed when going from the previous input state
@@ -92,7 +91,7 @@ public final class MouseButtonLongPressedCondition implements Predicate<TwoInput
     // we must be armed, so check if we should still be armed... Button should be down and we should not
     // have
     // drifted too far from our initial pressed location.
-    if (mouseState.getButtonState(_button) != ButtonState.DOWN || MathUtils.sqrt(dx * dx + dy * dy) > _maxDrift) {
+    if (mouseState.getButtonState(_button) != ButtonState.DOWN || Math.sqrt(dx * dx + dy * dy) > _maxDrift) {
       _armed = false;
       return false;
     }

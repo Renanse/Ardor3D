@@ -10,7 +10,7 @@
 
 package com.ardor3d.math.functions;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * A simple checker board pattern, with each unit cube alternating between -1 and 1 in value.

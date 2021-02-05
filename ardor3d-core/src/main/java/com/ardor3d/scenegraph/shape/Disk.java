@@ -12,9 +12,9 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -115,8 +115,8 @@ public class Disk extends Mesh {
 
       for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
         final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
-        final double cos = MathUtils.cos(angle);
-        final double sin = MathUtils.sin(angle);
+        final double cos = Math.cos(angle);
+        final double sin = Math.sin(angle);
         final Vector3 radial = new Vector3(cos, sin, 0);
 
         for (int shellCount = 1; shellCount < _shellSamples; shellCount++) {
@@ -137,8 +137,8 @@ public class Disk extends Mesh {
       final Vector3 radialInner = new Vector3();
       for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
         final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
-        final double cos = MathUtils.cos(angle);
-        final double sin = MathUtils.sin(angle);
+        final double cos = Math.cos(angle);
+        final double sin = Math.sin(angle);
         final Vector3 radial = new Vector3(cos, sin, 0);
         radialInner.set(radial).multiplyLocal(_innerRadius);
 

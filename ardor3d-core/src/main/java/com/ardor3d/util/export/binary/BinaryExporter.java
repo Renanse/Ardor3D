@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.Ardor3dExporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.Savable;

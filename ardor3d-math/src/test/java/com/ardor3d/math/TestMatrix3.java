@@ -17,6 +17,8 @@ import java.nio.FloatBuffer;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestMatrix3 {
 
   @Test
@@ -668,22 +670,22 @@ public class TestMatrix3 {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Matrix3 mat3 = new Matrix3();
-    assertTrue(Matrix3.isValid(mat3));
+    assertTrue(Matrix3.isFinite(mat3));
     for (int i = 0; i < 9; i++) {
       mat3.setIdentity();
       mat3.setValue(i / 3, i % 3, Double.NaN);
-      assertFalse(Matrix3.isValid(mat3));
+      assertFalse(Matrix3.isFinite(mat3));
       mat3.setIdentity();
       mat3.setValue(i / 3, i % 3, Double.POSITIVE_INFINITY);
-      assertFalse(Matrix3.isValid(mat3));
+      assertFalse(Matrix3.isFinite(mat3));
     }
 
     mat3.setIdentity();
-    assertTrue(Matrix3.isValid(mat3));
+    assertTrue(Matrix3.isFinite(mat3));
 
-    assertFalse(Matrix3.isValid(null));
+    assertFalse(Matrix3.isFinite(null));
 
     // couple of equals validity tests
     assertEquals(mat3, mat3);

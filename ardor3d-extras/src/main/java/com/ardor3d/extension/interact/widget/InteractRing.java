@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
@@ -118,7 +117,7 @@ public class InteractRing extends Mesh {
   }
 
   protected void normalize(final int i, final float[] nrm) {
-    final float length = (float) MathUtils.sqrt(nrm[i] * nrm[i] + nrm[i + 1] * nrm[i + 1] + nrm[i + 2] * nrm[i + 2]);
+    final float length = (float) Math.sqrt(nrm[i] * nrm[i] + nrm[i + 1] * nrm[i + 1] + nrm[i + 2] * nrm[i + 2]);
     nrm[i] /= length;
     nrm[i + 1] /= length;
     nrm[i + 2] /= length;

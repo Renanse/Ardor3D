@@ -22,7 +22,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -30,6 +29,7 @@ import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.IndexBufferData;

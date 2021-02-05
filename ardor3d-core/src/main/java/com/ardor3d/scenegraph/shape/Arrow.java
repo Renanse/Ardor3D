@@ -12,9 +12,9 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.export.InputCapsule;

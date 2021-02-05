@@ -15,7 +15,6 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.extension.effect.particle.ParticleSystem.ParticleType;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Triangle;
 import com.ardor3d.math.Vector3;
@@ -153,8 +152,8 @@ public class Particle implements Savable {
         bbX.set(camLeft).multiplyLocal(currSize);
         bbY.set(camUp).multiplyLocal(currSize);
       } else {
-        final double cA = MathUtils.cos(orient) * currSize;
-        final double sA = MathUtils.sin(orient) * currSize;
+        final double cA = Math.cos(orient) * currSize;
+        final double sA = Math.sin(orient) * currSize;
         bbX.set(camLeft).multiplyLocal(cA).addLocal(camUp.getX() * sA, camUp.getY() * sA, camUp.getZ() * sA);
         bbY.set(camLeft).multiplyLocal(-sA).addLocal(camUp.getX() * cA, camUp.getY() * cA, camUp.getZ() * cA);
       }
@@ -169,8 +168,8 @@ public class Particle implements Savable {
         bbX.set(left).multiplyLocal(currSize);
         bbY.set(up).multiplyLocal(currSize);
       } else {
-        final double cA = MathUtils.cos(orient) * currSize;
-        final double sA = MathUtils.sin(orient) * currSize;
+        final double cA = Math.cos(orient) * currSize;
+        final double sA = Math.sin(orient) * currSize;
         bbX.set(left).multiplyLocal(cA).addLocal(up.getX() * sA, up.getY() * sA, up.getZ() * sA);
         bbY.set(left).multiplyLocal(-sA).addLocal(up.getX() * cA, up.getY() * cA, up.getZ() * cA);
       }

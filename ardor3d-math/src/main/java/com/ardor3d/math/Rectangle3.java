@@ -17,6 +17,9 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyRectangle3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -182,9 +185,9 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _a.hashCode();
-    result += 31 * result + _b.hashCode();
-    result += 31 * result + _c.hashCode();
+    result = HashUtil.hash(result, _a);
+    result = HashUtil.hash(result, _b);
+    result = HashUtil.hash(result, _c);
 
     return result;
   }
@@ -203,7 +206,9 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
       return false;
     }
     final ReadOnlyRectangle3 comp = (ReadOnlyRectangle3) o;
-    return _a.equals(comp.getA()) && _b.equals(comp.getB()) && _c.equals(comp.getC());
+    return EqualsUtil.areEqual(getA(), comp.getA()) //
+        && EqualsUtil.areEqual(getB(), comp.getB()) //
+        && EqualsUtil.areEqual(getC(), comp.getC());
   }
 
   // /////////////////

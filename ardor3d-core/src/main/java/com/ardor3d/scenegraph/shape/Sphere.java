@@ -12,9 +12,9 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
@@ -183,8 +183,8 @@ public class Sphere extends Mesh {
     final double[] afCos = new double[(_radialSamples + 1)];
     for (int iR = 0; iR < _radialSamples; iR++) {
       final double fAngle = MathUtils.TWO_PI * fInvRS * iR;
-      afCos[iR] = MathUtils.cos(fAngle);
-      afSin[iR] = MathUtils.sin(fAngle);
+      afCos[iR] = Math.cos(fAngle);
+      afSin[iR] = Math.sin(fAngle);
     }
     afSin[_radialSamples] = afSin[0];
     afCos[_radialSamples] = afCos[0];
@@ -196,7 +196,7 @@ public class Sphere extends Mesh {
     final Vector3 tempVc = Vector3.fetchTempInstance();
     for (int iZ = 1; iZ < (_zSamples - 1); iZ++) {
       final double fAFraction = MathUtils.HALF_PI * (-1.0f + fZFactor * iZ); // in (-pi/2, pi/2)
-      final double fZFraction = MathUtils.sin(fAFraction); // in (-1,1)
+      final double fZFraction = Math.sin(fAFraction); // in (-1,1)
       final double fZ = _radius * fZFraction;
 
       // compute center of slice

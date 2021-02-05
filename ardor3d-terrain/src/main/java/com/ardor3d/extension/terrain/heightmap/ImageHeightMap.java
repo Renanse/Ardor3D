@@ -12,7 +12,7 @@ package com.ardor3d.extension.terrain.heightmap;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 public class ImageHeightMap {
 

@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestColorRGBA {
 
   @Test
@@ -332,7 +334,7 @@ public class TestColorRGBA {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final ColorRGBA clr1 = new ColorRGBA(0, 0, 0, 0);
     final ColorRGBA clr2A = new ColorRGBA(Float.POSITIVE_INFINITY, 0, 0, 0);
     final ColorRGBA clr2B = new ColorRGBA(0, Float.NEGATIVE_INFINITY, 0, 0);
@@ -343,20 +345,20 @@ public class TestColorRGBA {
     final ColorRGBA clr3C = new ColorRGBA(0, 0, Float.NaN, 0);
     final ColorRGBA clr3D = new ColorRGBA(0, 0, 0, Float.NaN);
 
-    assertTrue(ColorRGBA.isValid(clr1));
-    assertFalse(ColorRGBA.isValid(clr2A));
-    assertFalse(ColorRGBA.isValid(clr2B));
-    assertFalse(ColorRGBA.isValid(clr2C));
-    assertFalse(ColorRGBA.isValid(clr2D));
-    assertFalse(ColorRGBA.isValid(clr3A));
-    assertFalse(ColorRGBA.isValid(clr3B));
-    assertFalse(ColorRGBA.isValid(clr3C));
-    assertFalse(ColorRGBA.isValid(clr3D));
+    assertTrue(ColorRGBA.isFinite(clr1));
+    assertFalse(ColorRGBA.isFinite(clr2A));
+    assertFalse(ColorRGBA.isFinite(clr2B));
+    assertFalse(ColorRGBA.isFinite(clr2C));
+    assertFalse(ColorRGBA.isFinite(clr2D));
+    assertFalse(ColorRGBA.isFinite(clr3A));
+    assertFalse(ColorRGBA.isFinite(clr3B));
+    assertFalse(ColorRGBA.isFinite(clr3C));
+    assertFalse(ColorRGBA.isFinite(clr3D));
 
     clr3C.zero();
-    assertTrue(ColorRGBA.isValid(clr3C));
+    assertTrue(ColorRGBA.isFinite(clr3C));
 
-    assertFalse(ColorRGBA.isValid(null));
+    assertFalse(ColorRGBA.isFinite(null));
 
     // couple of equals validity tests
     assertEquals(clr1, clr1);

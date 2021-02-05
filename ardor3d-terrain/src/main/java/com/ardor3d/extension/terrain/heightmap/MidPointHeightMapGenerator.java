@@ -13,7 +13,7 @@ package com.ardor3d.extension.terrain.heightmap;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.Ardor3dException;
 
 public class MidPointHeightMapGenerator {

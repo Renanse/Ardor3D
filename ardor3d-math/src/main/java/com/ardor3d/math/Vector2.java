@@ -16,6 +16,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyVector2;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -643,8 +646,8 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (clockwise) {
       angle = -angle;
     }
-    final double newX = MathUtils.cos(angle) * getX() - MathUtils.sin(angle) * getY();
-    final double newY = MathUtils.sin(angle) * getX() + MathUtils.cos(angle) * getY();
+    final double newX = Math.cos(angle) * getX() - Math.sin(angle) * getY();
+    final double newY = Math.sin(angle) * getX() + Math.cos(angle) * getY();
     return result.set(newX, newY);
   }
 
@@ -661,8 +664,8 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (clockwise) {
       angle = -angle;
     }
-    final double newX = MathUtils.cos(angle) * getX() - MathUtils.sin(angle) * getY();
-    final double newY = MathUtils.sin(angle) * getX() + MathUtils.cos(angle) * getY();
+    final double newX = Math.cos(angle) * getX() - Math.sin(angle) * getY();
+    final double newY = Math.sin(angle) * getX() + Math.cos(angle) * getY();
     return set(newX, newY);
   }
 
@@ -766,7 +769,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double length() {
-    return MathUtils.sqrt(lengthSquared());
+    return Math.sqrt(lengthSquared());
   }
 
   /**
@@ -811,7 +814,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double distance(final double x, final double y) {
-    return MathUtils.sqrt(distanceSquared(x, y));
+    return Math.sqrt(distanceSquared(x, y));
   }
 
   /**
@@ -822,7 +825,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double distance(final ReadOnlyVector2 destination) {
-    return MathUtils.sqrt(distanceSquared(destination));
+    return Math.sqrt(distanceSquared(destination));
   }
 
   /**
@@ -879,7 +882,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   @Override
   public double smallestAngleBetween(final ReadOnlyVector2 otherVector) {
     final double dotProduct = dot(otherVector);
-    return MathUtils.acos(dotProduct);
+    return Math.acos(dotProduct);
   }
 
   /**
@@ -889,18 +892,14 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * @param vector
    *          the vector to check
    * @return true or false as stated above.
+   * @see java.lang.Double#isFinite(double)
    */
-  public static boolean isValid(final ReadOnlyVector2 vector) {
+  public static boolean isFinite(final ReadOnlyVector2 vector) {
     if (vector == null) {
       return false;
     }
-    if (Double.isNaN(vector.getX()) || Double.isNaN(vector.getY())) {
-      return false;
-    }
-    if (Double.isInfinite(vector.getX()) || Double.isInfinite(vector.getY())) {
-      return false;
-    }
-    return true;
+    return Double.isFinite(vector.getX()) //
+        && Double.isFinite(vector.getY());
   }
 
   /**
@@ -919,11 +918,8 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   public int hashCode() {
     int result = 17;
 
-    final long x = Double.doubleToLongBits(getX());
-    result += 31 * result + (int) (x ^ x >>> 32);
-
-    final long y = Double.doubleToLongBits(getY());
-    result += 31 * result + (int) (y ^ y >>> 32);
+    result = HashUtil.hash(result, getX());
+    result = HashUtil.hash(result, getY());
 
     return result;
   }
@@ -942,7 +938,8 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
       return false;
     }
     final ReadOnlyVector2 comp = (ReadOnlyVector2) o;
-    return getX() == comp.getX() && getY() == comp.getY();
+    return EqualsUtil.areEqual(getX(), comp.getX()) //
+        && EqualsUtil.areEqual(getY(), comp.getY());
   }
 
   // /////////////////

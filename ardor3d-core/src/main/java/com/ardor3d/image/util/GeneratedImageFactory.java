@@ -18,9 +18,9 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class GeneratedImageFactory {

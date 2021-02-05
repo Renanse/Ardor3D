@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestLineSegment3 {
 
   @Test
@@ -104,23 +106,23 @@ public class TestLineSegment3 {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final LineSegment3 seg1 = new LineSegment3();
     final LineSegment3 seg2 = new LineSegment3(new Vector3(Double.NaN, 0, 0), Vector3.UNIT_Z, 0.5);
     final LineSegment3 seg3 = new LineSegment3(Vector3.ZERO, new Vector3(Double.NaN, 0, 0), 0.5);
     final LineSegment3 seg4 = new LineSegment3(Vector3.ZERO, Vector3.UNIT_Z, Double.NaN);
     final LineSegment3 seg5 = new LineSegment3(Vector3.ZERO, Vector3.UNIT_Z, Double.POSITIVE_INFINITY);
 
-    assertTrue(LineSegment3.isValid(seg1));
-    assertFalse(LineSegment3.isValid(seg2));
-    assertFalse(LineSegment3.isValid(seg3));
-    assertFalse(LineSegment3.isValid(seg4));
-    assertFalse(LineSegment3.isValid(seg5));
+    assertTrue(LineSegment3.isFinite(seg1));
+    assertFalse(LineSegment3.isFinite(seg2));
+    assertFalse(LineSegment3.isFinite(seg3));
+    assertFalse(LineSegment3.isFinite(seg4));
+    assertFalse(LineSegment3.isFinite(seg5));
 
     seg5.setExtent(1);
-    assertTrue(LineSegment3.isValid(seg5));
+    assertTrue(LineSegment3.isFinite(seg5));
 
-    assertFalse(LineSegment3.isValid(null));
+    assertFalse(LineSegment3.isFinite(null));
   }
 
   @Test

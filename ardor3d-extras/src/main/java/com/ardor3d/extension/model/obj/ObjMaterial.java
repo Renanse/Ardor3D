@@ -12,7 +12,7 @@ package com.ardor3d.extension.model.obj;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;

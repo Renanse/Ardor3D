@@ -10,7 +10,7 @@
 
 package com.ardor3d.math.functions;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * An implementation of an Archimedean spiral which supports any number of spiral arms and optional

@@ -14,8 +14,8 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.surface.PbrSurface;
@@ -75,7 +75,7 @@ public class SimplePbrExample extends ExampleBase {
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + MathUtils.sin(timer.getTimeInSeconds() * 2) * 15,
+      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
           ((i / 2) % 2 == 1) ? -30 : 30, 30f);
     }
   }

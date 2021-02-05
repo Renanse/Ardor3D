@@ -12,8 +12,8 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -87,8 +87,8 @@ public class Torus extends Mesh {
       // compute center point on torus circle at specified angle
       final double circleFraction = circleCount * inverseCircleSamples;
       final double theta = MathUtils.TWO_PI * circleFraction;
-      final double cosTheta = MathUtils.cos(theta);
-      final double sinTheta = MathUtils.sin(theta);
+      final double cosTheta = Math.cos(theta);
+      final double sinTheta = Math.sin(theta);
       radialAxis.set(cosTheta, sinTheta, 0);
       radialAxis.multiply(_centerRadius, torusMiddle);
 
@@ -98,8 +98,8 @@ public class Torus extends Mesh {
         final double radialFraction = radialCount * inverseRadialSamples;
         // in [0,1)
         final double phi = MathUtils.TWO_PI * radialFraction;
-        final double cosPhi = MathUtils.cos(phi);
-        final double sinPhi = MathUtils.sin(phi);
+        final double cosPhi = Math.cos(phi);
+        final double sinPhi = Math.sin(phi);
         tempNormal.set(radialAxis).multiplyLocal(cosPhi);
         tempNormal.setZ(tempNormal.getZ() + sinPhi);
         tempNormal.normalizeLocal();

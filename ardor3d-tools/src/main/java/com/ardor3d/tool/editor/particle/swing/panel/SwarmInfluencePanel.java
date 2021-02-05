@@ -15,7 +15,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import com.ardor3d.extension.effect.particle.SwarmInfluence;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 import com.ardor3d.tool.editor.swing.widget.Vector3Panel;
 

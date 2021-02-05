@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestRectangle3 {
 
   @Test

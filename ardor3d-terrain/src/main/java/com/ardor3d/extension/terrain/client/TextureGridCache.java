@@ -22,7 +22,7 @@ import com.ardor3d.extension.terrain.client.functions.SourceCacheFunction;
 import com.ardor3d.extension.terrain.util.IntColorUtils;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Special tile/grid based cache for texture data

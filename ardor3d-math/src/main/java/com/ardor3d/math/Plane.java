@@ -17,6 +17,8 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -190,15 +192,12 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
    *          the plane to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyPlane plane) {
+  public static boolean isFinite(final ReadOnlyPlane plane) {
     if (plane == null) {
       return false;
     }
-    if (Double.isNaN(plane.getConstant()) || Double.isInfinite(plane.getConstant())) {
-      return false;
-    }
-
-    return Vector3.isValid(plane.getNormal());
+    return Vector3.isFinite(plane.getNormal()) //
+        && Double.isFinite(plane.getConstant());
   }
 
   /**
@@ -217,10 +216,8 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _normal.hashCode();
-
-    final long c = Double.doubleToLongBits(getConstant());
-    result += 31 * result + (int) (c ^ c >>> 32);
+    result = HashUtil.hash(result, getNormal());
+    result = HashUtil.hash(result, getConstant());
 
     return result;
   }
@@ -239,7 +236,8 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
       return false;
     }
     final ReadOnlyPlane comp = (ReadOnlyPlane) o;
-    return getConstant() == comp.getConstant() && _normal.equals(comp.getNormal());
+    return EqualsUtil.areEqual(getConstant(), comp.getConstant()) //
+        && EqualsUtil.areEqual(getNormal(), comp.getNormal());
   }
 
   // /////////////////

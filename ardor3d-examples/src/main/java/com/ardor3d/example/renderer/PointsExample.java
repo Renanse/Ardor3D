@@ -14,7 +14,7 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.util.geom.BufferUtils;

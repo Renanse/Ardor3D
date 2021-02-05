@@ -16,6 +16,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyRectangle2;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -155,10 +157,10 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _x;
-    result += 31 * result + _y;
-    result += 31 * result + _width;
-    result += 31 * result + _height;
+    result = HashUtil.hash(result, _x);
+    result = HashUtil.hash(result, _y);
+    result = HashUtil.hash(result, _width);
+    result = HashUtil.hash(result, _height);
 
     return result;
   }
@@ -177,8 +179,10 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
       return false;
     }
     final ReadOnlyRectangle2 comp = (ReadOnlyRectangle2) o;
-    return comp.getX() == getX() && comp.getY() == getY() && comp.getWidth() == getWidth()
-        && comp.getHeight() == getHeight();
+    return EqualsUtil.areEqual(getX(), comp.getX()) //
+        && EqualsUtil.areEqual(getY(), comp.getY()) //
+        && EqualsUtil.areEqual(getWidth(), comp.getWidth()) //
+        && EqualsUtil.areEqual(getHeight(), comp.getHeight());
   }
 
   // /////////////////

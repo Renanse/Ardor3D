@@ -13,8 +13,8 @@ package com.ardor3d.ui.text;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;

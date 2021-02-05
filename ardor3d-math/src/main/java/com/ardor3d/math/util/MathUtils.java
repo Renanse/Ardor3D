@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2020 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2021 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -8,10 +8,15 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.math;
+package com.ardor3d.math.util;
+
+import static java.lang.Math.*;
 
 import java.util.Random;
 
+import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Matrix4;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class MathUtils {
@@ -57,79 +62,8 @@ public class MathUtils {
   /** A precreated random object for random numbers. */
   public static final Random rand = new Random(System.currentTimeMillis());
 
-  /**
-   * Fast Trig functions for x86. This forces the trig functiosn to stay within the safe area on the
-   * x86 processor (-45 degrees to +45 degrees) The results may be very slightly off from what the
-   * Math and StrictMath trig functions give due to rounding in the angle reduction but it will be
-   * very very close.
-   *
-   * note: code from wiki posting on java.net by jeffpk
-   */
-  private static double reduceSinAngle(double radians) {
-    radians %= MathUtils.TWO_PI; // put us in -2PI to +2PI space
-    if (Math.abs(radians) > MathUtils.PI) { // put us in -PI to +PI space
-      radians = radians - MathUtils.TWO_PI;
-    }
-    if (Math.abs(radians) > MathUtils.HALF_PI) {// put us in -PI/2 to +PI/2 space
-      radians = MathUtils.PI - radians;
-    }
-
-    return radians;
-  }
-
-  /**
-   * Returns sine of a value.
-   *
-   * note: code from wiki posting on java.net by jeffpk
-   *
-   * @param dValue
-   *          The value to sine, in radians.
-   * @return The sine of dValue.
-   * @see java.lang.Math#sin(double)
-   */
-  public static double sin(double dValue) {
-    dValue = reduceSinAngle(dValue); // limits angle to between -PI/2 and +PI/2
-    if (Math.abs(dValue) <= MathUtils.QUARTER_PI) {
-      return MathConstants.useFastMath ? FastMath.sin(dValue) : Math.sin(dValue);
-    }
-
-    return MathConstants.useFastMath ? FastMath.cos(MathUtils.HALF_PI - dValue) : Math.cos(MathUtils.HALF_PI - dValue);
-  }
-
-  /**
-   * Returns cos of a value.
-   *
-   * @param dValue
-   *          The value to cosine, in radians.
-   * @return The cosine of dValue.
-   * @see java.lang.Math#cos(double)
-   */
-  public static double cos(final double dValue) {
-    return sin(dValue + MathUtils.HALF_PI);
-  }
-
-  public static double sqrt(final double dValue) {
-    return MathConstants.useFastMath ? FastMath.sqrt(dValue) : Math.sqrt(dValue);
-  }
-
-  public static double inverseSqrt(final double dValue) {
-    return MathConstants.useFastMath ? FastMath.inverseSqrt(dValue) : 1 / Math.sqrt(dValue);
-  }
-
-  public static double atan(final double dValue) {
-    return MathConstants.useFastMath ? FastMath.atan(dValue) : Math.atan(dValue);
-  }
-
-  public static double asin(final double dValue) {
-    return MathConstants.useFastMath ? FastMath.asin(dValue) : Math.asin(dValue);
-  }
-
-  public static double tan(final double dValue) {
-    return MathConstants.useFastMath ? FastMath.tan(dValue) : Math.tan(dValue);
-  }
-
-  public static double acos(final double dValue) {
-    return MathConstants.useFastMath ? FastMath.acos(dValue) : Math.acos(dValue);
+  public static double inverseSqrt(final double value) {
+    return 1.0 / Math.sqrt(value);
   }
 
   /**
@@ -584,11 +518,5 @@ public class MathUtils {
       return 1;
     }
     return 2 << x - 1;
-  }
-
-  protected static void checkArgumentNotNull(final Object obj, final String argName) {
-    if (obj == null) {
-      throw new IllegalArgumentException(argName + "was null");
-    }
   }
 }

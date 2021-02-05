@@ -18,9 +18,9 @@ import java.util.concurrent.Future;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.PriorityExecutors.PriorityRunnable;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.extension.terrain.util.Tile;
-import com.ardor3d.math.MathUtils;
 
 public abstract class AbstractGridCache {
 

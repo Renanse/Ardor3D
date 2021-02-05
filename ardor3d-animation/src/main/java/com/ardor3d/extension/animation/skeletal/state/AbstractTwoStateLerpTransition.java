@@ -16,7 +16,7 @@ import java.util.Map;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.BinaryLERPSource;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * An abstract transition state that blends between two other states.

@@ -17,9 +17,9 @@ import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.type.ReadOnlyVector2;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 

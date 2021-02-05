@@ -10,9 +10,9 @@
 
 package com.ardor3d.math.functions;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Utility class containing a set of easy to use functions.

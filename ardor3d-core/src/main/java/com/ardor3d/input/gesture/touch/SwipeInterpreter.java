@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
 import com.ardor3d.input.gesture.event.SwipeGestureEvent;
-import com.ardor3d.math.MathUtils;
 
 public class SwipeInterpreter extends AbstractTouchInterpreter {
 
@@ -79,7 +78,7 @@ public class SwipeInterpreter extends AbstractTouchInterpreter {
       final int dx = _currX - _prevX;
       final int dy = _currY - _prevY;
 
-      final double dist = MathUtils.sqrt(dx * dx + dy * dy);
+      final double dist = Math.sqrt(dx * dx + dy * dy);
       final double velocity = dist / (_currTime - _prevTime);
       if (velocity < _minVelocity) {
         return null;

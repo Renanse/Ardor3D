@@ -61,7 +61,7 @@ import com.ardor3d.input.swt.SwtFocusWrapper;
 import com.ardor3d.input.swt.SwtGestureWrapper;
 import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseWrapper;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.lwjgl3.Lwjgl3CanvasCallback;
 import com.ardor3d.renderer.material.uniform.AlphaTestConsts;

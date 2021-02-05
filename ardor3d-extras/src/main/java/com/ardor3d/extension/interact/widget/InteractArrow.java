@@ -12,8 +12,8 @@ package com.ardor3d.extension.interact.widget;
 
 import java.io.IOException;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.shape.Arrow;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Pyramid;

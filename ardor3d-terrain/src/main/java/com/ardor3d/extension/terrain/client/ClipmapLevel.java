@@ -14,8 +14,8 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.terrain.util.Region;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
 import com.ardor3d.renderer.IndexMode;

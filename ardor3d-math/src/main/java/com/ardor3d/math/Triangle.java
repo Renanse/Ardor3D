@@ -17,6 +17,9 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -252,12 +255,12 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
    *          the triangle to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final Triangle triangle) {
+  public static boolean isFinite(final Triangle triangle) {
     if (triangle == null) {
       return false;
     }
-    if (!Vector3.isValid(triangle._pointA) || !Vector3.isValid(triangle._pointB)
-        || !Vector3.isValid(triangle._pointC)) {
+    if (!Vector3.isFinite(triangle._pointA) || !Vector3.isFinite(triangle._pointB)
+        || !Vector3.isFinite(triangle._pointC)) {
       return false;
     }
 
@@ -293,10 +296,10 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _pointA.hashCode();
-    result += 31 * result + _pointB.hashCode();
-    result += 31 * result + _pointC.hashCode();
-    result += 31 * result + _index;
+    result = HashUtil.hash(result, _pointA);
+    result = HashUtil.hash(result, _pointB);
+    result = HashUtil.hash(result, _pointC);
+    result = HashUtil.hash(result, _index);
 
     return result;
   }
@@ -315,8 +318,10 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
       return false;
     }
     final ReadOnlyTriangle comp = (ReadOnlyTriangle) o;
-    return _index == comp.getIndex() && _pointA.equals(comp.getA()) && _pointB.equals(comp.getB())
-        && _pointC.equals(comp.getC());
+    return EqualsUtil.areEqual(_index, comp.getIndex()) //
+        && EqualsUtil.areEqual(_pointA, comp.getA()) //
+        && EqualsUtil.areEqual(_pointB, comp.getB()) //
+        && EqualsUtil.areEqual(_pointC, comp.getC());
   }
 
   // /////////////////

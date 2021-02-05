@@ -10,7 +10,7 @@
 
 package com.ardor3d.math.functions;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Based on Multifractal code originally written by F. Kenton "Doc Mojo" Musgrave, 1998. Modified by

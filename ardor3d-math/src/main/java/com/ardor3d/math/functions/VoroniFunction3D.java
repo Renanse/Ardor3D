@@ -13,8 +13,8 @@ package com.ardor3d.math.functions;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Function that produces a <a href="http://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi graph</a>
@@ -71,11 +71,11 @@ public class VoroniFunction3D implements Function3D {
     final Vector3 minPoint = new Vector3();
     double nearestSq = Double.MAX_VALUE;
     // Each cube has a point... Walk through all nearby cubes and see where our closest point lies.
-    for (int a = ix - SEARCH_RADIUS; a <= ix + SEARCH_RADIUS; a++) {
+    for (int a = ix - VoroniFunction3D.SEARCH_RADIUS; a <= ix + VoroniFunction3D.SEARCH_RADIUS; a++) {
       k.x = a;
-      for (int b = iy - SEARCH_RADIUS; b <= iy + SEARCH_RADIUS; b++) {
+      for (int b = iy - VoroniFunction3D.SEARCH_RADIUS; b <= iy + VoroniFunction3D.SEARCH_RADIUS; b++) {
         k.y = b;
-        for (int c = iz - SEARCH_RADIUS; c <= iz + SEARCH_RADIUS; c++) {
+        for (int c = iz - VoroniFunction3D.SEARCH_RADIUS; c <= iz + VoroniFunction3D.SEARCH_RADIUS; c++) {
           k.z = c;
           Vector3 point = _points.get(k);
           if (point == null) {
@@ -103,7 +103,7 @@ public class VoroniFunction3D implements Function3D {
     double value;
     if (_useDistance) {
       // Determine the distance to the nearest point.
-      value = MathUtils.sqrt(nearestSq);
+      value = Math.sqrt(nearestSq);
     } else {
       value = 0.0;
     }
@@ -153,9 +153,9 @@ public class VoroniFunction3D implements Function3D {
     public int hashCode() {
       int result = 17;
 
-      result += 31 * result + x;
-      result += 31 * result + y;
-      result += 31 * result + z;
+      result = 31 * result + x;
+      result = 31 * result + y;
+      result = 31 * result + z;
 
       return result;
     }

@@ -18,13 +18,13 @@ import java.util.logging.Logger;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.TransformException;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.IndexMode;
@@ -363,7 +363,7 @@ public class BMText extends Mesh {
     if (cam.getProjectionMode().equals(ProjectionMode.Perspective)) {
       // for perspective cameras, we take the size at the near frustum, normalize to a depth of 1, then
       // use the field of view (y) to determine our size at the given depth.
-      heightAtZ = (heightAtZ / cam.getFrustumNear()) * MathUtils.tan(cam.getFovY() * MathUtils.DEG_TO_RAD) * zDepth;
+      heightAtZ = (heightAtZ / cam.getFrustumNear()) * Math.tan(cam.getFovY() * MathUtils.DEG_TO_RAD) * zDepth;
     }
 
     // Now determine a unit/pixel ratio using our camera's pixel height: screen height units per pixel.

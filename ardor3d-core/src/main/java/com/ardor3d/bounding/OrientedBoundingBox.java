@@ -773,7 +773,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersectsSphere(final BoundingSphere bs) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(bs._center)) {
       return false;
     }
 
@@ -795,7 +795,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersectsBoundingBox(final BoundingBox bb) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(bb._center)) {
       return false;
     }
 
@@ -1002,7 +1002,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersectsOrientedBoundingBox(final OrientedBoundingBox obb) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(obb._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(obb._center)) {
       return false;
     }
 
@@ -1197,7 +1197,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
   @Override
   public boolean intersects(final ReadOnlyRay3 ray) {
-    if (!Vector3.isValid(_center)) {
+    if (!Vector3.isFinite(_center)) {
       return false;
     }
 

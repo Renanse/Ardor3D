@@ -16,11 +16,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.intersection.IntersectionRecord;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -624,7 +624,7 @@ public class BoundingSphere extends BoundingVolume {
 
   @Override
   public boolean intersectsSphere(final BoundingSphere bs) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(bs._center)) {
       return false;
     }
 
@@ -635,7 +635,7 @@ public class BoundingSphere extends BoundingVolume {
 
   @Override
   public boolean intersectsBoundingBox(final BoundingBox bb) {
-    if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
+    if (!Vector3.isFinite(_center) || !Vector3.isFinite(bb._center)) {
       return false;
     }
 
@@ -655,7 +655,7 @@ public class BoundingSphere extends BoundingVolume {
 
   @Override
   public boolean intersects(final ReadOnlyRay3 ray) {
-    if (!Vector3.isValid(_center)) {
+    if (!Vector3.isFinite(_center)) {
       return false;
     }
 

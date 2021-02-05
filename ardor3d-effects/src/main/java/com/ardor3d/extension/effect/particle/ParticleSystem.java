@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
 import com.ardor3d.extension.effect.particle.emitter.SavableParticleEmitter;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Triangle;
@@ -27,6 +26,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -711,9 +711,9 @@ public abstract class ParticleSystem extends Node {
     if (result == null) {
       result = new Vector3();
     }
-    result.setX(MathUtils.cos(randDir) * MathUtils.sin(randAngle));
-    result.setY(MathUtils.cos(randAngle));
-    result.setZ(MathUtils.sin(randDir) * MathUtils.sin(randAngle));
+    result.setX(Math.cos(randDir) * Math.sin(randAngle));
+    result.setY(Math.cos(randAngle));
+    result.setZ(Math.sin(randDir) * Math.sin(randAngle));
     rotateVectorSpeed(result);
     result.multiplyLocal(getInitialVelocity());
     return result;

@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestVector2 {
 
   @Test
@@ -323,23 +325,23 @@ public class TestVector2 {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Vector2 vec1 = new Vector2(0, 0);
     final Vector2 vec2 = new Vector2(Double.POSITIVE_INFINITY, 0);
     final Vector2 vec3 = new Vector2(0, Double.NEGATIVE_INFINITY);
     final Vector2 vec4 = new Vector2(Double.NaN, 0);
     final Vector2 vec5 = new Vector2(0, Double.NaN);
 
-    assertTrue(Vector2.isValid(vec1));
-    assertFalse(Vector2.isValid(vec2));
-    assertFalse(Vector2.isValid(vec3));
-    assertFalse(Vector2.isValid(vec4));
-    assertFalse(Vector2.isValid(vec5));
+    assertTrue(Vector2.isFinite(vec1));
+    assertFalse(Vector2.isFinite(vec2));
+    assertFalse(Vector2.isFinite(vec3));
+    assertFalse(Vector2.isFinite(vec4));
+    assertFalse(Vector2.isFinite(vec5));
 
     vec5.zero();
-    assertTrue(Vector2.isValid(vec5));
+    assertTrue(Vector2.isFinite(vec5));
 
-    assertFalse(Vector2.isValid(null));
+    assertFalse(Vector2.isFinite(null));
 
     // couple of equals validity tests
     assertEquals(vec1, vec1);

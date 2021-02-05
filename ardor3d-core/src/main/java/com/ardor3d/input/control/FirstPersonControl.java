@@ -21,10 +21,10 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.MouseState;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 
 public class FirstPersonControl {

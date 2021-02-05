@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 
 public class TestQuaternion {
 
@@ -494,32 +495,32 @@ public class TestQuaternion {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Quaternion quat = new Quaternion();
-    assertTrue(Quaternion.isValid(quat));
+    assertTrue(Quaternion.isFinite(quat));
 
     quat.set(Double.NaN, 0, 0, 0);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
     quat.set(0, Double.NaN, 0, 0);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
     quat.set(0, 0, Double.NaN, 0);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
     quat.set(0, 0, 0, Double.NaN);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
 
     quat.set(Double.NEGATIVE_INFINITY, 0, 0, 0);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
     quat.set(0, Double.NEGATIVE_INFINITY, 0, 0);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
     quat.set(0, 0, Double.NEGATIVE_INFINITY, 0);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
     quat.set(0, 0, 0, Double.NEGATIVE_INFINITY);
-    assertFalse(Quaternion.isValid(quat));
+    assertFalse(Quaternion.isFinite(quat));
 
     quat.setIdentity();
-    assertTrue(Quaternion.isValid(quat));
+    assertTrue(Quaternion.isFinite(quat));
 
-    assertFalse(Quaternion.isValid(null));
+    assertFalse(Quaternion.isFinite(null));
 
     // couple of equals validity tests
     assertEquals(quat, quat);

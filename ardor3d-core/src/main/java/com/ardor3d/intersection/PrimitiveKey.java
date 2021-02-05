@@ -33,8 +33,8 @@ public class PrimitiveKey {
   public int hashCode() {
     int result = 17;
 
-    result += 31 * result + _primitiveIndex;
-    result += 31 * result + _section;
+    result = 31 * result + _primitiveIndex;
+    result = 31 * result + _section;
 
     return result;
   }

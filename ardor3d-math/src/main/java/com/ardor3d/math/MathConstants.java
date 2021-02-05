@@ -18,8 +18,6 @@ public class MathConstants {
 
   public static final boolean useMathPools;
 
-  public static final boolean useFastMath;
-
   public static final int maxMathPoolSize;
 
   static {
@@ -34,13 +32,11 @@ public class MathConstants {
 
     if (hasPropertyAccess) {
       useMathPools = (System.getProperty("ardor3d.noMathPools") == null);
-      useFastMath = (System.getProperty("ardor3d.useFastMath") != null);
       maxMathPoolSize = (System.getProperty("ardor3d.maxMathPoolSize") != null
           ? Integer.parseInt(System.getProperty("ardor3d.maxMathPoolSize"))
           : 11);
     } else {
       useMathPools = true;
-      useFastMath = false;
       maxMathPoolSize = 11;
     }
   }

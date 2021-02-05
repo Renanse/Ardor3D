@@ -13,7 +13,6 @@ package com.ardor3d.math.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.type.ReadOnlyVector2;
 

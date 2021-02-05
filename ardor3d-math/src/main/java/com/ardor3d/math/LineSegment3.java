@@ -16,6 +16,9 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyLineSegment3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -194,13 +197,14 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
    *          the segment to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyLineSegment3 segment) {
+  public static boolean isFinite(final ReadOnlyLineSegment3 segment) {
     if (segment == null) {
       return false;
     }
 
-    return Vector3.isValid(segment.getDirection()) && Vector3.isValid(segment.getOrigin())
-        && !Double.isInfinite(segment.getExtent()) && !Double.isNaN(segment.getExtent());
+    return Vector3.isFinite(segment.getDirection()) //
+        && Vector3.isFinite(segment.getOrigin()) //
+        && Double.isFinite(segment.getExtent());
   }
 
   /**
@@ -215,7 +219,8 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
   /**
    * @param o
    *          the object to compare for equality
-   * @return true if this segment and the provided segment have the same constant and normal values.
+   * @return true if this segment and the provided segment have the same origin, direction and extent
+   *         values.
    */
   @Override
   public boolean equals(final Object o) {
@@ -226,7 +231,9 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
       return false;
     }
     final ReadOnlyLineSegment3 comp = (ReadOnlyLineSegment3) o;
-    return _origin.equals(comp.getOrigin()) && _direction.equals(comp.getDirection()) && _extent == comp.getExtent();
+    return EqualsUtil.areEqual(getOrigin(), comp.getOrigin()) //
+        && EqualsUtil.areEqual(getDirection(), comp.getDirection()) //
+        && EqualsUtil.areEqual(getExtent(), comp.getExtent());
   }
 
   /**
@@ -234,12 +241,9 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
    */
   @Override
   public int hashCode() {
-    int result = 17;
+    int result = super.hashCode();
 
-    result += 31 * result + _origin.hashCode();
-    result += 31 * result + _direction.hashCode();
-    final long ex = Double.doubleToLongBits(_extent);
-    result += 31 * result + (int) (ex ^ ex >>> 32);
+    result = HashUtil.hash(result, _extent);
 
     return result;
   }

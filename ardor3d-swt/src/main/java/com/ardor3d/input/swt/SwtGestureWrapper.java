@@ -35,7 +35,7 @@ import com.ardor3d.input.gesture.touch.SwipeInterpreter;
 import com.ardor3d.input.gesture.touch.TouchHistory;
 import com.ardor3d.input.gesture.touch.TouchStatus;
 import com.ardor3d.input.mouse.MouseWrapper;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
 

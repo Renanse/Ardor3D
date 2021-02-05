@@ -19,8 +19,8 @@ import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
@@ -144,7 +144,7 @@ public class SimplePbrDiffuseIrradianceExample extends ExampleBase {
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + MathUtils.sin(timer.getTimeInSeconds() * 2) * 15,
+      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
           ((i / 2) % 2 == 1) ? -30 : 30, 30f);
     }
   }

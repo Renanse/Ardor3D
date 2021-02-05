@@ -10,11 +10,11 @@
 
 package com.ardor3d.extension.terrain.util;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * An implementation of AbstractBresenhamTracer that works on the XY plane, with positive Z as up.

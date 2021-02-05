@@ -14,7 +14,7 @@ import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.input.mouse.MouseState;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * UpdateFilter useful for delaying drag interactions. Delaying the drag interaction is useful in

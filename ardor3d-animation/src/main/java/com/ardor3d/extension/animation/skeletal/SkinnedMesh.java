@@ -653,7 +653,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
       int result = 17;
 
       // only care about joint
-      result += 31 * result + joint;
+      result = 31 * result + joint;
 
       return result;
     }

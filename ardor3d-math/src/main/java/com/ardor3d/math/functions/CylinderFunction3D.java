@@ -10,7 +10,7 @@
 
 package com.ardor3d.math.functions;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  * Function describing a set of concentric rings, centered around the origin on the x/z plane, each
@@ -36,7 +36,7 @@ public class CylinderFunction3D implements Function3D {
     final double dz = z * _frequency;
 
     // get the radius to our point -- see the equation of a circle
-    double radius = MathUtils.sqrt(dx * dx + dz * dz);
+    double radius = Math.sqrt(dx * dx + dz * dz);
 
     // get fractional part
     radius = radius - MathUtils.floor(radius);

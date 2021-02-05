@@ -55,9 +55,9 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -192,7 +192,7 @@ public class InteractUIExample extends ExampleBase {
         final double pulseSpeed = data.pulseSpeed;
         if (pulseSpeed != 0.0) {
           _scaleTime = _scaleTime + (_timer.getTimePerFrame() * pulseSpeed);
-          final double scale = MathUtils.sin(_scaleTime) * .99 + 1.0;
+          final double scale = Math.sin(_scaleTime) * .99 + 1.0;
           t.setScale(scale);
         } else {
           t.setScale(1.0);

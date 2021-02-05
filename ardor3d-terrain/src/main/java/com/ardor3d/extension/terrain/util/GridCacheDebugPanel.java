@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities;
 
 import com.ardor3d.extension.terrain.client.AbstractGridCache;
 import com.ardor3d.extension.terrain.client.AbstractGridCache.TileLoadingData;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 public class GridCacheDebugPanel extends JPanel implements Runnable {
   private static final long serialVersionUID = 1L;

@@ -15,12 +15,12 @@ import java.util.Set;
 
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.functions.FbmFunction3D;
 import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.functions.Functions;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.MathUtils;
 
 public class InMemoryTerrainData {
 
@@ -170,7 +170,7 @@ public class InMemoryTerrainData {
       dy = Math.abs(y - i);
       for (int j = minX; j <= maxX; j++) {
         dx = Math.abs(x - j);
-        r = (float) MathUtils.sqrt(dx * dx + dy * dy);
+        r = (float) Math.sqrt(dx * dx + dy * dy);
         if (r <= radius) {
           dr = (radius - r) / radius;
           index = i * side + j;

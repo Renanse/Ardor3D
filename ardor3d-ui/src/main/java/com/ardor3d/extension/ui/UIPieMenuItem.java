@@ -12,8 +12,8 @@ package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.util.SubTex;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 
 /**
  *

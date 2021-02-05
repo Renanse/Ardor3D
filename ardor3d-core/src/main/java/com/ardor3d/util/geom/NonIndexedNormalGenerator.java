@@ -12,8 +12,8 @@ package com.ardor3d.util.geom;
 
 import java.util.Arrays;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 
 /**

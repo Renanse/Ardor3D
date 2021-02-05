@@ -17,9 +17,9 @@ import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.mouse.MouseButton;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 
 public class UIDrawerBar extends UIPanel {
 

@@ -105,21 +105,21 @@ public class TestTriangle {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Triangle vec1 = new Triangle();
     final Triangle vec2 = new Triangle(new Vector3(0, 0, Double.NaN), Vector3.ZERO, Vector3.ZERO);
     final Triangle vec3 = new Triangle(Vector3.ZERO, new Vector3(0, 0, Double.NaN), Vector3.ZERO);
     final Triangle vec4 = new Triangle(Vector3.ZERO, Vector3.ZERO, new Vector3(0, 0, Double.NaN));
 
-    assertTrue(Triangle.isValid(vec1));
-    assertFalse(Triangle.isValid(vec2));
-    assertFalse(Triangle.isValid(vec3));
-    assertFalse(Triangle.isValid(vec4));
+    assertTrue(Triangle.isFinite(vec1));
+    assertFalse(Triangle.isFinite(vec2));
+    assertFalse(Triangle.isFinite(vec3));
+    assertFalse(Triangle.isFinite(vec4));
 
     vec4.setC(Vector3.ZERO);
-    assertTrue(Triangle.isValid(vec4));
+    assertTrue(Triangle.isFinite(vec4));
 
-    assertFalse(Triangle.isValid(null));
+    assertFalse(Triangle.isFinite(null));
   }
 
   @Test

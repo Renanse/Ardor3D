@@ -57,10 +57,10 @@ public class ObjIndexSet {
   @Override
   public int hashCode() {
     int result = 17;
-    result += 31 * result + _vIndex;
-    result += 31 * result + _vtIndex;
-    result += 31 * result + _vnIndex;
-    result += 31 * result + _sGroup;
+    result = 31 * result + _vIndex;
+    result = 31 * result + _vtIndex;
+    result = 31 * result + _vnIndex;
+    result = 31 * result + (int) (_sGroup ^ _sGroup >>> 32);
     return result;
   }
 

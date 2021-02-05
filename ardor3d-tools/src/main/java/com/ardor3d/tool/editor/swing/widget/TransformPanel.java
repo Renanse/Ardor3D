@@ -19,11 +19,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
+import com.ardor3d.math.util.MathUtils;
 
 public class TransformPanel extends JPanel {
 

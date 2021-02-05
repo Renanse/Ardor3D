@@ -21,7 +21,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.MouseInputAdapter;
 
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 
 public class ValueSpinner extends JSpinner {
   private static final long serialVersionUID = 1L;

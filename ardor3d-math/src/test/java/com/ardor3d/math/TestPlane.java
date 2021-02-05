@@ -80,21 +80,21 @@ public class TestPlane {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Plane plane1 = new Plane();
     final Plane plane2 = new Plane(new Vector3(Double.NaN, 0, 0), 0.5);
     final Plane plane3 = new Plane(Vector3.UNIT_X, Double.NaN);
     final Plane plane4 = new Plane(Vector3.UNIT_X, Double.POSITIVE_INFINITY);
 
-    assertTrue(Plane.isValid(plane1));
-    assertFalse(Plane.isValid(plane2));
-    assertFalse(Plane.isValid(plane3));
-    assertFalse(Plane.isValid(plane4));
+    assertTrue(Plane.isFinite(plane1));
+    assertFalse(Plane.isFinite(plane2));
+    assertFalse(Plane.isFinite(plane3));
+    assertFalse(Plane.isFinite(plane4));
 
     plane4.setConstant(1);
-    assertTrue(Plane.isValid(plane4));
+    assertTrue(Plane.isFinite(plane4));
 
-    assertFalse(Plane.isValid(null));
+    assertFalse(Plane.isFinite(null));
   }
 
   @Test

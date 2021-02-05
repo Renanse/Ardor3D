@@ -26,7 +26,6 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -149,7 +148,7 @@ public class ShapesExample extends ExampleBase {
       public void update(final double time, final Spatial caller) {
         t += time;
 
-        final float val = (float) MathUtils.sin(t * 2) * .25f + .75f;
+        final float val = (float) Math.sin(t * 2) * .25f + .75f;
 
         curr.set(val, val, val, 1.0f);
 

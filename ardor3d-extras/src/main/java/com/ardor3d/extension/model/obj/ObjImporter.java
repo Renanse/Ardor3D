@@ -19,8 +19,8 @@ import java.util.logging.Logger;
 
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;

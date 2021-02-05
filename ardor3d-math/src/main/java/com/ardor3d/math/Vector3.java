@@ -16,6 +16,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -803,7 +806,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double length() {
-    return MathUtils.sqrt(lengthSquared());
+    return Math.sqrt(lengthSquared());
   }
 
   /**
@@ -852,7 +855,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double distance(final double x, final double y, final double z) {
-    return MathUtils.sqrt(distanceSquared(x, y, z));
+    return Math.sqrt(distanceSquared(x, y, z));
   }
 
   /**
@@ -863,7 +866,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double distance(final ReadOnlyVector3 destination) {
-    return MathUtils.sqrt(distanceSquared(destination));
+    return Math.sqrt(distanceSquared(destination));
   }
 
   /**
@@ -959,7 +962,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double smallestAngleBetween(final ReadOnlyVector3 otherVector) {
-    return MathUtils.acos(MathUtils.clamp(dot(otherVector), -1.0, 1.0));
+    return Math.acos(MathUtils.clamp(dot(otherVector), -1.0, 1.0));
   }
 
   /**
@@ -969,18 +972,15 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * @param vector
    *          the vector to check
    * @return true or false as stated above.
+   * @see java.lang.Double#isFinite(double)
    */
-  public static boolean isValid(final ReadOnlyVector3 vector) {
+  public static boolean isFinite(final ReadOnlyVector3 vector) {
     if (vector == null) {
       return false;
     }
-    if (Double.isNaN(vector.getX()) || Double.isNaN(vector.getY()) || Double.isNaN(vector.getZ())) {
-      return false;
-    }
-    if (Double.isInfinite(vector.getX()) || Double.isInfinite(vector.getY()) || Double.isInfinite(vector.getZ())) {
-      return false;
-    }
-    return true;
+    return Double.isFinite(vector.getX()) //
+        && Double.isFinite(vector.getY()) //
+        && Double.isFinite(vector.getZ());
   }
 
   /**
@@ -994,10 +994,9 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (vector == null) {
       return false;
     }
-    if (Double.isInfinite(vector.getX()) || Double.isInfinite(vector.getY()) || Double.isInfinite(vector.getZ())) {
-      return true;
-    }
-    return false;
+    return Double.isInfinite(vector.getX()) //
+        || Double.isInfinite(vector.getY()) //
+        || Double.isInfinite(vector.getZ());
   }
 
   /**
@@ -1016,14 +1015,9 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
   public int hashCode() {
     int result = 17;
 
-    final long x = Double.doubleToLongBits(getX());
-    result += 31 * result + (int) (x ^ x >>> 32);
-
-    final long y = Double.doubleToLongBits(getY());
-    result += 31 * result + (int) (y ^ y >>> 32);
-
-    final long z = Double.doubleToLongBits(getZ());
-    result += 31 * result + (int) (z ^ z >>> 32);
+    result = HashUtil.hash(result, getX());
+    result = HashUtil.hash(result, getY());
+    result = HashUtil.hash(result, getZ());
 
     return result;
   }
@@ -1042,7 +1036,9 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
       return false;
     }
     final ReadOnlyVector3 comp = (ReadOnlyVector3) o;
-    return getX() == comp.getX() && getY() == comp.getY() && getZ() == comp.getZ();
+    return EqualsUtil.areEqual(getX(), comp.getX()) //
+        && EqualsUtil.areEqual(getY(), comp.getY()) //
+        && EqualsUtil.areEqual(getZ(), comp.getZ());
   }
 
   // /////////////////

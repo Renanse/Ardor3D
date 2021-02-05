@@ -23,6 +23,9 @@ import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyVector4;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -797,8 +800,8 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    *           if axis is null.
    */
   public Matrix4 fromAngleNormalAxis(final double angle, final ReadOnlyVector3 axis) {
-    final double fCos = MathUtils.cos(angle);
-    final double fSin = MathUtils.sin(angle);
+    final double fCos = Math.cos(angle);
+    final double fSin = Math.sin(angle);
     final double fOneMinusCos = 1.0 - fCos;
     final double fX2 = axis.getX() * axis.getX();
     final double fY2 = axis.getY() * axis.getY();
@@ -1938,46 +1941,27 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    *          the vector to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyMatrix4 matrix) {
+  public static boolean isFinite(final ReadOnlyMatrix4 matrix) {
     if (matrix == null) {
       return false;
     }
 
-    if (Double.isNaN(matrix.getM00()) || Double.isInfinite(matrix.getM00())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM01()) || Double.isInfinite(matrix.getM01())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM02()) || Double.isInfinite(matrix.getM02())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM03()) || Double.isInfinite(matrix.getM03())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM10()) || Double.isInfinite(matrix.getM10())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM11()) || Double.isInfinite(matrix.getM11())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM12()) || Double.isInfinite(matrix.getM12())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM13()) || Double.isInfinite(matrix.getM13())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM20()) || Double.isInfinite(matrix.getM20())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM21()) || Double.isInfinite(matrix.getM21())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM22()) || Double.isInfinite(matrix.getM22())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM23()) || Double.isInfinite(matrix.getM23())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM30()) || Double.isInfinite(matrix.getM30())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM31()) || Double.isInfinite(matrix.getM31())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM32()) || Double.isInfinite(matrix.getM32())) {
-      return false;
-    } else if (Double.isNaN(matrix.getM33()) || Double.isInfinite(matrix.getM33())) {
-      return false;
-    }
-
-    return true;
+    return Double.isFinite(matrix.getM00()) //
+        && Double.isFinite(matrix.getM01()) //
+        && Double.isFinite(matrix.getM02()) //
+        && Double.isFinite(matrix.getM03()) //
+        && Double.isFinite(matrix.getM10()) //
+        && Double.isFinite(matrix.getM11()) //
+        && Double.isFinite(matrix.getM12()) //
+        && Double.isFinite(matrix.getM13()) //
+        && Double.isFinite(matrix.getM20()) //
+        && Double.isFinite(matrix.getM21()) //
+        && Double.isFinite(matrix.getM22()) //
+        && Double.isFinite(matrix.getM23()) //
+        && Double.isFinite(matrix.getM30()) //
+        && Double.isFinite(matrix.getM31()) //
+        && Double.isFinite(matrix.getM32()) //
+        && Double.isFinite(matrix.getM33());
   }
 
   /**
@@ -2115,41 +2099,25 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   public int hashCode() {
     int result = 17;
 
-    long val = Double.doubleToLongBits(_m00);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m01);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m02);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m03);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m00);
+    result = HashUtil.hash(result, _m01);
+    result = HashUtil.hash(result, _m02);
+    result = HashUtil.hash(result, _m03);
 
-    val = Double.doubleToLongBits(_m10);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m11);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m12);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m13);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m10);
+    result = HashUtil.hash(result, _m11);
+    result = HashUtil.hash(result, _m12);
+    result = HashUtil.hash(result, _m13);
 
-    val = Double.doubleToLongBits(_m20);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m21);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m22);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m23);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m20);
+    result = HashUtil.hash(result, _m21);
+    result = HashUtil.hash(result, _m22);
+    result = HashUtil.hash(result, _m23);
 
-    val = Double.doubleToLongBits(_m30);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m31);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m32);
-    result += 31 * result + (int) (val ^ val >>> 32);
-    val = Double.doubleToLongBits(_m33);
-    result += 31 * result + (int) (val ^ val >>> 32);
+    result = HashUtil.hash(result, _m30);
+    result = HashUtil.hash(result, _m31);
+    result = HashUtil.hash(result, _m32);
+    result = HashUtil.hash(result, _m33);
 
     return result;
   }
@@ -2219,41 +2187,22 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
       return false;
     }
     final ReadOnlyMatrix4 comp = (ReadOnlyMatrix4) o;
-    if (getM00() != comp.getM00()) {
-      return false;
-    } else if (getM01() != comp.getM01()) {
-      return false;
-    } else if (getM02() != comp.getM02()) {
-      return false;
-    } else if (getM03() != comp.getM03()) {
-      return false;
-    } else if (getM10() != comp.getM10()) {
-      return false;
-    } else if (getM11() != comp.getM11()) {
-      return false;
-    } else if (getM12() != comp.getM12()) {
-      return false;
-    } else if (getM13() != comp.getM13()) {
-      return false;
-    } else if (getM20() != comp.getM20()) {
-      return false;
-    } else if (getM21() != comp.getM21()) {
-      return false;
-    } else if (getM22() != comp.getM22()) {
-      return false;
-    } else if (getM23() != comp.getM23()) {
-      return false;
-    } else if (getM30() != comp.getM30()) {
-      return false;
-    } else if (getM31() != comp.getM31()) {
-      return false;
-    } else if (getM32() != comp.getM32()) {
-      return false;
-    } else if (getM33() != comp.getM33()) {
-      return false;
-    }
-
-    return true;
+    return EqualsUtil.areEqual(getM00(), comp.getM00()) //
+        && EqualsUtil.areEqual(getM01(), comp.getM01()) //
+        && EqualsUtil.areEqual(getM02(), comp.getM02()) //
+        && EqualsUtil.areEqual(getM03(), comp.getM03()) //
+        && EqualsUtil.areEqual(getM10(), comp.getM10()) //
+        && EqualsUtil.areEqual(getM11(), comp.getM11()) //
+        && EqualsUtil.areEqual(getM12(), comp.getM12()) //
+        && EqualsUtil.areEqual(getM13(), comp.getM13()) //
+        && EqualsUtil.areEqual(getM20(), comp.getM20()) //
+        && EqualsUtil.areEqual(getM21(), comp.getM21()) //
+        && EqualsUtil.areEqual(getM22(), comp.getM22()) //
+        && EqualsUtil.areEqual(getM23(), comp.getM23()) //
+        && EqualsUtil.areEqual(getM30(), comp.getM30()) //
+        && EqualsUtil.areEqual(getM31(), comp.getM31()) //
+        && EqualsUtil.areEqual(getM32(), comp.getM32()) //
+        && EqualsUtil.areEqual(getM33(), comp.getM33());
   }
 
   // /////////////////

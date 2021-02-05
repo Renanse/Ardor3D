@@ -13,8 +13,8 @@ package com.ardor3d.input.gesture.event;
 import java.text.MessageFormat;
 
 import com.ardor3d.annotation.Immutable;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
+import com.ardor3d.math.util.MathUtils;
 
 @Immutable
 public class RotateGestureEvent extends AbstractGestureEvent {

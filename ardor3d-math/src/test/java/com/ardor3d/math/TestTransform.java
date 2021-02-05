@@ -17,6 +17,8 @@ import java.nio.FloatBuffer;
 
 import org.junit.Test;
 
+import com.ardor3d.math.util.MathUtils;
+
 public class TestTransform {
 
   @Test
@@ -292,25 +294,25 @@ public class TestTransform {
   }
 
   @Test
-  public void testValid() {
+  public void testFinite() {
     final Transform trans = new Transform();
-    assertTrue(Transform.isValid(trans));
+    assertTrue(Transform.isFinite(trans));
     trans.setIdentity();
     trans.setRotation(new Matrix3(Double.NaN, 0, 0, 0, 0, 0, 0, 0, 0));
-    assertFalse(Transform.isValid(trans));
+    assertFalse(Transform.isFinite(trans));
     trans.setIdentity();
     trans.setScale(Double.NaN, 0, 0);
-    assertFalse(Transform.isValid(trans));
+    assertFalse(Transform.isFinite(trans));
     trans.setScale(Double.NaN);
-    assertFalse(Transform.isValid(trans));
+    assertFalse(Transform.isFinite(trans));
     trans.setIdentity();
     trans.setTranslation(Double.NaN, 0, 0);
-    assertFalse(Transform.isValid(trans));
+    assertFalse(Transform.isFinite(trans));
 
     trans.setIdentity();
-    assertTrue(Transform.isValid(trans));
+    assertTrue(Transform.isFinite(trans));
 
-    assertFalse(Transform.isValid(null));
+    assertFalse(Transform.isFinite(null));
 
     // couple of equals validity tests
     assertEquals(trans, trans);

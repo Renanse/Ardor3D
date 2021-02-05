@@ -21,7 +21,7 @@ import javax.swing.JComboBox;
 
 import com.ardor3d.extension.effect.particle.SimpleParticleInfluenceFactory;
 import com.ardor3d.math.Line3;
-import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.tool.editor.swing.widget.SphericalUnitVectorPanel;
 import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 

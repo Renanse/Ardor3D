@@ -13,8 +13,8 @@ package com.ardor3d.scenegraph.shape;
 import java.io.IOException;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;

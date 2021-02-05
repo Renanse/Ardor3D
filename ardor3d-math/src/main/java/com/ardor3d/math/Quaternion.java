@@ -18,6 +18,9 @@ import java.io.ObjectOutput;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
+import com.ardor3d.math.util.HashUtil;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -222,14 +225,14 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    */
   public Quaternion fromEulerAngles(final double heading, final double attitude, final double bank) {
     double angle = heading * 0.5;
-    final double sinHeading = MathUtils.sin(angle);
-    final double cosHeading = MathUtils.cos(angle);
+    final double sinHeading = Math.sin(angle);
+    final double cosHeading = Math.cos(angle);
     angle = attitude * 0.5;
-    final double sinAttitude = MathUtils.sin(angle);
-    final double cosAttitude = MathUtils.cos(angle);
+    final double sinAttitude = Math.sin(angle);
+    final double cosAttitude = Math.cos(angle);
     angle = bank * 0.5;
-    final double sinBank = MathUtils.sin(angle);
-    final double cosBank = MathUtils.cos(angle);
+    final double sinBank = Math.sin(angle);
+    final double cosBank = Math.cos(angle);
 
     // variables used to reduce multiplication calls.
     final double cosHeadingXcosAttitude = cosHeading * cosAttitude;
@@ -549,8 +552,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     final double halfAngle = 0.5 * angle;
-    final double sin = MathUtils.sin(halfAngle);
-    final double w = MathUtils.cos(halfAngle);
+    final double sin = Math.sin(halfAngle);
+    final double w = Math.cos(halfAngle);
     final double x = sin * axis.getX();
     final double y = sin * axis.getY();
     final double z = sin * axis.getZ();
@@ -943,8 +946,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     final double halfAngle = 0.5 * angle;
-    final double sin = MathUtils.sin(halfAngle);
-    final double qw = MathUtils.cos(halfAngle);
+    final double sin = Math.sin(halfAngle);
+    final double qw = Math.cos(halfAngle);
     final double qx = sin * x;
     final double qy = sin * y;
     final double qz = sin * z;
@@ -966,8 +969,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    */
   public Quaternion applyRotationX(final double angle) {
     final double halfAngle = 0.5 * angle;
-    final double sin = MathUtils.sin(halfAngle);
-    final double cos = MathUtils.cos(halfAngle);
+    final double sin = Math.sin(halfAngle);
+    final double cos = Math.cos(halfAngle);
 
     final double newX = getX() * cos + getW() * sin;
     final double newY = getY() * cos + getZ() * sin;
@@ -986,8 +989,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    */
   public Quaternion applyRotationY(final double angle) {
     final double halfAngle = 0.5 * angle;
-    final double sin = MathUtils.sin(halfAngle);
-    final double cos = MathUtils.cos(halfAngle);
+    final double sin = Math.sin(halfAngle);
+    final double cos = Math.cos(halfAngle);
 
     final double newX = getX() * cos - getZ() * sin;
     final double newY = getY() * cos + getW() * sin;
@@ -1006,8 +1009,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    */
   public Quaternion applyRotationZ(final double angle) {
     final double halfAngle = 0.5 * angle;
-    final double sin = MathUtils.sin(halfAngle);
-    final double cos = MathUtils.cos(halfAngle);
+    final double sin = Math.sin(halfAngle);
+    final double cos = Math.cos(halfAngle);
 
     final double newX = getX() * cos + getY() * sin;
     final double newY = -getX() * sin + getY() * cos;
@@ -1168,12 +1171,12 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     if (1 - dotP > 0.1) {// Get the angle between the 2 quaternions,
       // and then store the sin() of that angle
       final double theta = Math.acos(dotP);
-      final double invSinTheta = 1f / MathUtils.sin(theta);
+      final double invSinTheta = 1f / Math.sin(theta);
 
       // Calculate the scale for q1 and q2, according to the angle and
       // it's sine value
-      scale0 = MathUtils.sin((1 - changeAmnt) * theta) * invSinTheta;
-      scale1 = MathUtils.sin(changeAmnt * theta) * invSinTheta;
+      scale0 = Math.sin((1 - changeAmnt) * theta) * invSinTheta;
+      scale1 = Math.sin(changeAmnt * theta) * invSinTheta;
     }
 
     // Calculate the x, y, z and w values for the quaternion by using a
@@ -1232,13 +1235,13 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     // warrant such calculations
     if (1 - result > 0.1) {// Get the angle between the 2 quaternions,
       // and then store the sin() of that angle
-      final double theta = MathUtils.acos(result);
-      final double invSinTheta = 1f / MathUtils.sin(theta);
+      final double theta = Math.acos(result);
+      final double invSinTheta = 1f / Math.sin(theta);
 
       // Calculate the scale for q1 and q2, according to the angle and
       // it's sine value
-      scale0 = MathUtils.sin((1 - changeAmnt) * theta) * invSinTheta;
-      scale1 = MathUtils.sin(changeAmnt * theta) * invSinTheta;
+      scale0 = Math.sin((1 - changeAmnt) * theta) * invSinTheta;
+      scale1 = Math.sin(changeAmnt * theta) * invSinTheta;
     }
 
     // Calculate the x, y, z and w values for the quaternion by using a
@@ -1317,7 +1320,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
       return 1.0;
     }
 
-    return MathUtils.sqrt(magnitudeSQ);
+    return Math.sqrt(magnitudeSQ);
   }
 
   /**
@@ -1364,23 +1367,15 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    *          the quaternion to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyQuaternion quat) {
+  public static boolean isFinite(final ReadOnlyQuaternion quat) {
     if (quat == null) {
       return false;
     }
-    if (Double.isNaN(quat.getX()) || Double.isInfinite(quat.getX())) {
-      return false;
-    }
-    if (Double.isNaN(quat.getY()) || Double.isInfinite(quat.getY())) {
-      return false;
-    }
-    if (Double.isNaN(quat.getZ()) || Double.isInfinite(quat.getZ())) {
-      return false;
-    }
-    if (Double.isNaN(quat.getW()) || Double.isInfinite(quat.getW())) {
-      return false;
-    }
-    return true;
+
+    return Double.isFinite(quat.getX()) //
+        && Double.isFinite(quat.getY()) //
+        && Double.isFinite(quat.getZ()) //
+        && Double.isFinite(quat.getW());
   }
 
   /**
@@ -1399,17 +1394,10 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
   public int hashCode() {
     int result = 17;
 
-    final long x = Double.doubleToLongBits(getX());
-    result += 31 * result + (int) (x ^ x >>> 32);
-
-    final long y = Double.doubleToLongBits(getY());
-    result += 31 * result + (int) (y ^ y >>> 32);
-
-    final long z = Double.doubleToLongBits(getZ());
-    result += 31 * result + (int) (z ^ z >>> 32);
-
-    final long w = Double.doubleToLongBits(getW());
-    result += 31 * result + (int) (w ^ w >>> 32);
+    result = HashUtil.hash(result, getX());
+    result = HashUtil.hash(result, getY());
+    result = HashUtil.hash(result, getZ());
+    result = HashUtil.hash(result, getW());
 
     return result;
   }
@@ -1449,7 +1437,10 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
       return false;
     }
     final ReadOnlyQuaternion comp = (ReadOnlyQuaternion) o;
-    return getX() == comp.getX() && getY() == comp.getY() && getZ() == comp.getZ() && getW() == comp.getW();
+    return EqualsUtil.areEqual(getX(), comp.getX()) //
+        && EqualsUtil.areEqual(getY(), comp.getY()) //
+        && EqualsUtil.areEqual(getW(), comp.getZ()) //
+        && EqualsUtil.areEqual(getZ(), comp.getW());
   }
 
   // /////////////////

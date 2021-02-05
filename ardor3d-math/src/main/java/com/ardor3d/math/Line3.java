@@ -12,6 +12,7 @@ package com.ardor3d.math;
 
 import com.ardor3d.math.type.ReadOnlyLine3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.util.EqualsUtil;
 
 public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
@@ -99,12 +100,13 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
    *          the line to check
    * @return true or false as stated above.
    */
-  public static boolean isValid(final ReadOnlyLine3 line) {
+  public static boolean isFinite(final ReadOnlyLine3 line) {
     if (line == null) {
       return false;
     }
 
-    return Vector3.isValid(line.getDirection()) && Vector3.isValid(line.getOrigin());
+    return Vector3.isFinite(line.getDirection()) //
+        && Vector3.isFinite(line.getOrigin());
   }
 
   /**
@@ -118,7 +120,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
   /**
    * @param o
    *          the object to compare for equality
-   * @return true if this line and the provided line have the same constant and normal values.
+   * @return true if this line and the provided line have the same origin and direction values.
    */
   @Override
   public boolean equals(final Object o) {
@@ -129,7 +131,8 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
       return false;
     }
     final ReadOnlyLine3 comp = (ReadOnlyLine3) o;
-    return _origin.equals(comp.getOrigin()) && _direction.equals(comp.getDirection());
+    return EqualsUtil.areEqual(getOrigin(), comp.getOrigin()) //
+        && EqualsUtil.areEqual(getDirection(), comp.getDirection());
   }
 
   // /////////////////
@@ -152,7 +155,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
    */
   public final static Line3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
-      return LINE3_POOL.fetch();
+      return Line3.LINE3_POOL.fetch();
     } else {
       return new Line3();
     }
@@ -167,7 +170,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
    */
   public final static void releaseTempInstance(final Line3 line) {
     if (MathConstants.useMathPools) {
-      LINE3_POOL.release(line);
+      Line3.LINE3_POOL.release(line);
     }
   }
 }

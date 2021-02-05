@@ -15,7 +15,6 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
@@ -87,7 +86,7 @@ public class SimpleTexturedPbrExample extends ExampleBase {
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -10 : 10) + MathUtils.sin(timer.getTimeInSeconds() * 2) * 5,
+      _lights[i].setLocation(((i % 2 == 1) ? -10 : 10) + Math.sin(timer.getTimeInSeconds() * 2) * 5,
           ((i / 2) % 2 == 1) ? -10 : 10, 10f);
     }
   }
