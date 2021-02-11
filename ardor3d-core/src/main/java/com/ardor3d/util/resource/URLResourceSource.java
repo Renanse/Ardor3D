@@ -123,8 +123,8 @@ public class URLResourceSource implements ResourceSource {
   @Override
   public InputStream openStream() throws IOException {
     final URLConnection connection = _url.openConnection();
-    connection.connect();
     UrlUtils.injectAuthenticator(connection);
+    connection.connect();
     _lastModifiedValue = connection.getLastModified();
     return connection.getInputStream();
   }

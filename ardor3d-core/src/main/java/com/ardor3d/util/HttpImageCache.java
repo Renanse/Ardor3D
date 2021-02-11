@@ -232,8 +232,8 @@ public enum HttpImageCache {
         final URLConnection connection = uri.toURL().openConnection();
         if (connection instanceof HttpURLConnection) {
           connection.setIfModifiedSince(cacheItem.lastModified.toEpochMilli());
-          connection.connect();
           UrlUtils.injectAuthenticator(connection);
+          connection.connect();
           final HttpURLConnection httpConnection = (HttpURLConnection) connection;
           final int responseCode = httpConnection.getResponseCode();
           if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
