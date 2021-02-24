@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Ray3;
@@ -310,8 +311,8 @@ public class Camera implements Savable, Externalizable {
 
     _planeQuantity = 6;
 
-    _worldPlane = new Plane[MAX_WORLD_PLANES];
-    for (int i = 0; i < MAX_WORLD_PLANES; i++) {
+    _worldPlane = new Plane[Camera.MAX_WORLD_PLANES];
+    for (int i = 0; i < Camera.MAX_WORLD_PLANES; i++) {
       _worldPlane[i] = new Plane();
     }
 
@@ -319,7 +320,7 @@ public class Camera implements Savable, Externalizable {
     onViewPortChange();
     onFrameChange();
 
-    _logger.fine("Camera created. W: " + width + "  H: " + height);
+    Camera._logger.fine("Camera created. W: " + width + "  H: " + height);
   }
 
   /**
@@ -334,14 +335,14 @@ public class Camera implements Savable, Externalizable {
     _coeffBottom = new double[2];
     _coeffTop = new double[2];
 
-    _worldPlane = new Plane[MAX_WORLD_PLANES];
-    for (int i = 0; i < MAX_WORLD_PLANES; i++) {
+    _worldPlane = new Plane[Camera.MAX_WORLD_PLANES];
+    for (int i = 0; i < Camera.MAX_WORLD_PLANES; i++) {
       _worldPlane[i] = new Plane();
     }
 
     set(source);
 
-    _logger.fine("Camera created. W: " + getWidth() + "  H: " + getHeight());
+    Camera._logger.fine("Camera created. W: " + getWidth() + "  H: " + getHeight());
   }
 
   /**
@@ -583,6 +584,16 @@ public class Camera implements Savable, Externalizable {
     onFrameChange();
   }
 
+  public Matrix3 getAxes(final Matrix3 store) {
+    final var rVal = store != null ? store : new Matrix3();
+
+    rVal.setColumn(0, _left);
+    rVal.setColumn(1, _up);
+    rVal.setColumn(2, _direction);
+
+    return rVal;
+  }
+
   /**
    * Sets our left, up and direction values from the given rotation matrix.
    *
@@ -659,7 +670,7 @@ public class Camera implements Savable, Externalizable {
   public void setFrustumPerspective(final double fovY, final double aspect, final double near, final double far) {
     if (Double.isNaN(aspect) || Double.isInfinite(aspect)) {
       // ignore.
-      _logger.warning("Invalid aspect given to setFrustumPerspective: " + aspect);
+      Camera._logger.warning("Invalid aspect given to setFrustumPerspective: " + aspect);
       return;
     }
 
@@ -931,11 +942,11 @@ public class Camera implements Savable, Externalizable {
     int mask;
     FrustumIntersect rVal = FrustumIntersect.Inside;
 
-    for (int planeCounter = FRUSTUM_PLANES; planeCounter >= 0; planeCounter--) {
+    for (int planeCounter = Camera.FRUSTUM_PLANES; planeCounter >= 0; planeCounter--) {
       if (planeCounter == bound.getCheckPlane()) {
         continue; // we have already checked this plane at first iteration
       }
-      final int planeId = (planeCounter == FRUSTUM_PLANES) ? bound.getCheckPlane() : planeCounter;
+      final int planeId = (planeCounter == Camera.FRUSTUM_PLANES) ? bound.getCheckPlane() : planeCounter;
 
       mask = 1 << (planeId);
       if ((_planeState & mask) == 0) {
@@ -1058,8 +1069,8 @@ public class Camera implements Savable, Externalizable {
     planeNormal.setZ(_left.getZ() * _coeffLeft[0]);
     planeNormal.addLocal(_direction.getX() * _coeffLeft[1], _direction.getY() * _coeffLeft[1],
         _direction.getZ() * _coeffLeft[1]);
-    _worldPlane[LEFT_PLANE].setNormal(planeNormal);
-    _worldPlane[LEFT_PLANE].setConstant(_location.dot(planeNormal));
+    _worldPlane[Camera.LEFT_PLANE].setNormal(planeNormal);
+    _worldPlane[Camera.LEFT_PLANE].setConstant(_location.dot(planeNormal));
 
     // right plane
     planeNormal.setX(_left.getX() * _coeffRight[0]);
@@ -1067,8 +1078,8 @@ public class Camera implements Savable, Externalizable {
     planeNormal.setZ(_left.getZ() * _coeffRight[0]);
     planeNormal.addLocal(_direction.getX() * _coeffRight[1], _direction.getY() * _coeffRight[1],
         _direction.getZ() * _coeffRight[1]);
-    _worldPlane[RIGHT_PLANE].setNormal(planeNormal);
-    _worldPlane[RIGHT_PLANE].setConstant(_location.dot(planeNormal));
+    _worldPlane[Camera.RIGHT_PLANE].setNormal(planeNormal);
+    _worldPlane[Camera.RIGHT_PLANE].setConstant(_location.dot(planeNormal));
 
     // bottom plane
     planeNormal.setX(_up.getX() * _coeffBottom[0]);
@@ -1076,8 +1087,8 @@ public class Camera implements Savable, Externalizable {
     planeNormal.setZ(_up.getZ() * _coeffBottom[0]);
     planeNormal.addLocal(_direction.getX() * _coeffBottom[1], _direction.getY() * _coeffBottom[1],
         _direction.getZ() * _coeffBottom[1]);
-    _worldPlane[BOTTOM_PLANE].setNormal(planeNormal);
-    _worldPlane[BOTTOM_PLANE].setConstant(_location.dot(planeNormal));
+    _worldPlane[Camera.BOTTOM_PLANE].setNormal(planeNormal);
+    _worldPlane[Camera.BOTTOM_PLANE].setConstant(_location.dot(planeNormal));
 
     // top plane
     planeNormal.setX(_up.getX() * _coeffTop[0]);
@@ -1085,35 +1096,35 @@ public class Camera implements Savable, Externalizable {
     planeNormal.setZ(_up.getZ() * _coeffTop[0]);
     planeNormal.addLocal(_direction.getX() * _coeffTop[1], _direction.getY() * _coeffTop[1],
         _direction.getZ() * _coeffTop[1]);
-    _worldPlane[TOP_PLANE].setNormal(planeNormal);
-    _worldPlane[TOP_PLANE].setConstant(_location.dot(planeNormal));
+    _worldPlane[Camera.TOP_PLANE].setNormal(planeNormal);
+    _worldPlane[Camera.TOP_PLANE].setConstant(_location.dot(planeNormal));
 
     if (getProjectionMode() == ProjectionMode.Orthographic) {
       if (_frustumRight > _frustumLeft) {
-        _worldPlane[LEFT_PLANE].setConstant(_worldPlane[LEFT_PLANE].getConstant() + _frustumLeft);
-        _worldPlane[RIGHT_PLANE].setConstant(_worldPlane[RIGHT_PLANE].getConstant() - _frustumRight);
+        _worldPlane[Camera.LEFT_PLANE].setConstant(_worldPlane[Camera.LEFT_PLANE].getConstant() + _frustumLeft);
+        _worldPlane[Camera.RIGHT_PLANE].setConstant(_worldPlane[Camera.RIGHT_PLANE].getConstant() - _frustumRight);
       } else {
-        _worldPlane[LEFT_PLANE].setConstant(_worldPlane[LEFT_PLANE].getConstant() - _frustumLeft);
-        _worldPlane[RIGHT_PLANE].setConstant(_worldPlane[RIGHT_PLANE].getConstant() + _frustumRight);
+        _worldPlane[Camera.LEFT_PLANE].setConstant(_worldPlane[Camera.LEFT_PLANE].getConstant() - _frustumLeft);
+        _worldPlane[Camera.RIGHT_PLANE].setConstant(_worldPlane[Camera.RIGHT_PLANE].getConstant() + _frustumRight);
       }
 
       if (_frustumBottom > _frustumTop) {
-        _worldPlane[TOP_PLANE].setConstant(_worldPlane[TOP_PLANE].getConstant() + _frustumTop);
-        _worldPlane[BOTTOM_PLANE].setConstant(_worldPlane[BOTTOM_PLANE].getConstant() - _frustumBottom);
+        _worldPlane[Camera.TOP_PLANE].setConstant(_worldPlane[Camera.TOP_PLANE].getConstant() + _frustumTop);
+        _worldPlane[Camera.BOTTOM_PLANE].setConstant(_worldPlane[Camera.BOTTOM_PLANE].getConstant() - _frustumBottom);
       } else {
-        _worldPlane[TOP_PLANE].setConstant(_worldPlane[TOP_PLANE].getConstant() - _frustumTop);
-        _worldPlane[BOTTOM_PLANE].setConstant(_worldPlane[BOTTOM_PLANE].getConstant() + _frustumBottom);
+        _worldPlane[Camera.TOP_PLANE].setConstant(_worldPlane[Camera.TOP_PLANE].getConstant() - _frustumTop);
+        _worldPlane[Camera.BOTTOM_PLANE].setConstant(_worldPlane[Camera.BOTTOM_PLANE].getConstant() + _frustumBottom);
       }
     }
 
     // far plane
     planeNormal.set(_direction).negateLocal();
-    _worldPlane[FAR_PLANE].setNormal(planeNormal);
-    _worldPlane[FAR_PLANE].setConstant(-(dirDotLocation + _frustumFar));
+    _worldPlane[Camera.FAR_PLANE].setNormal(planeNormal);
+    _worldPlane[Camera.FAR_PLANE].setConstant(-(dirDotLocation + _frustumFar));
 
     // near plane
-    _worldPlane[NEAR_PLANE].setNormal(_direction);
-    _worldPlane[NEAR_PLANE].setConstant(dirDotLocation + _frustumNear);
+    _worldPlane[Camera.NEAR_PLANE].setNormal(_direction);
+    _worldPlane[Camera.NEAR_PLANE].setConstant(dirDotLocation + _frustumNear);
 
     Vector3.releaseTempInstance(planeNormal);
 

@@ -1074,19 +1074,23 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
   /**
    * @param store
-   *          the Matrix to store our 3x3 portion to
+   *          the Matrix to store our 3x3 portion. If null, a new one is created.
    */
   @Override
-  public void toMatrix3(final Matrix3 store) {
-    store._m00 = _m00;
-    store._m01 = _m01;
-    store._m02 = _m02;
-    store._m10 = _m10;
-    store._m11 = _m11;
-    store._m12 = _m12;
-    store._m20 = _m20;
-    store._m21 = _m21;
-    store._m22 = _m22;
+  public Matrix3 toMatrix3(final Matrix3 store) {
+    final var rVal = store != null ? store : new Matrix3();
+
+    rVal._m00 = _m00;
+    rVal._m01 = _m01;
+    rVal._m02 = _m02;
+    rVal._m10 = _m10;
+    rVal._m11 = _m11;
+    rVal._m12 = _m12;
+    rVal._m20 = _m20;
+    rVal._m21 = _m21;
+    rVal._m22 = _m22;
+
+    return rVal;
   }
 
   /**

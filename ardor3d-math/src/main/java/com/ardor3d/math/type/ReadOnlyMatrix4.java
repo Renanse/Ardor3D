@@ -104,5 +104,5 @@ public interface ReadOnlyMatrix4 {
 
   double getM33();
 
-  void toMatrix3(final Matrix3 store);
+  Matrix3 toMatrix3(final Matrix3 store);
 }
