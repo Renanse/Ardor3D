@@ -216,6 +216,6 @@ public class LightState extends RenderState {
 
   @Override
   public StateRecord createStateRecord(final ContextCapabilities caps) {
-    return new LightStateRecord();
+    return null;
   }
 }
