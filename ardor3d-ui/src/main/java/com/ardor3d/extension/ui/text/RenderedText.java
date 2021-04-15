@@ -17,9 +17,9 @@ import java.util.List;
 
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.type.ReadOnlyTransform;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.event.DirtyType;
 

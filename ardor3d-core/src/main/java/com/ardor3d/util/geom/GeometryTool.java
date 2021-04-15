@@ -16,12 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;

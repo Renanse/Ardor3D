@@ -8,7 +8,7 @@ techniques:
           - key: color
           
         uniforms: 
-          - builtIn: [model, view, projection, normalMat, cameraLoc, lights4, colorSurface, fogParams, alphaTest]
+          - builtIn: [model, view, projection, normalMat, cameraLoc, lights, colorSurface, fogParams, alphaTest]
             
         shaders: 
           Vertex: 

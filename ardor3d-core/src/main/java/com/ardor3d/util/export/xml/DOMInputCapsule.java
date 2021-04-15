@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.ardor3d.annotation.SavableFactory;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
@@ -39,7 +40,6 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.export.binary.BinaryClassField;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Part of the ardor3d XML IO system

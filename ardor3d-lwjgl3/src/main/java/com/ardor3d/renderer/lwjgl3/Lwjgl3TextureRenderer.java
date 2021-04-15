@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL14C;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL30C;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
 import com.ardor3d.image.TextureCubeMap;
@@ -30,6 +31,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.RendererRecord;
@@ -38,11 +40,9 @@ import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <p>

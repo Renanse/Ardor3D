@@ -91,15 +91,15 @@ import com.ardor3d.input.mouse.GrabbedState;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.Ardor3dException;
 
@@ -183,10 +183,10 @@ public class NuklearHud extends Spatial implements Renderable {
     _canvas = canvas;
 
     setRenderMaterial("ui/textured/vertex_color.yaml");
+    LightProperties.setLightReceiver(this, false);
 
     getSceneHints().setCullHint(CullHint.Never);
     getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
 
     setupLogicalLayer();

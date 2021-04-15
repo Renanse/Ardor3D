@@ -15,9 +15,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.material.uniform.UniformRef;
-import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 

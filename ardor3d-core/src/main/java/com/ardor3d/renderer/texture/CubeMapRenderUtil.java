@@ -15,8 +15,8 @@ import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 
 public class CubeMapRenderUtil {

@@ -17,11 +17,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Loads image files in the Targa format. Handles RLE Targa files. Does not handle Targa files in

@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector2;
@@ -32,12 +34,10 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.ExtendedCamera;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.Debugger;
 
 /**

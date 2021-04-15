@@ -19,6 +19,7 @@ import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Quaternion;
@@ -34,7 +35,6 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Pyramid;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -53,7 +53,7 @@ public class SkeletalDebugger {
   protected static final BasicText jointText = BasicText.createDefaultTextLabel("", "");
   static {
     // No lighting, replace texturing
-    SkeletalDebugger.jointText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(SkeletalDebugger.jointText, false);
     SkeletalDebugger.jointText.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     // Do not queue... draw right away.
     SkeletalDebugger.jointText.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
@@ -209,7 +209,7 @@ public class SkeletalDebugger {
     SkeletalDebugger.bone.getMeshData().setNormalBuffer(null);
 
     // No lighting or texturing
-    SkeletalDebugger.bone.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(SkeletalDebugger.bone, false);
     SkeletalDebugger.bone.getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
     // Do not queue... draw right away.
     SkeletalDebugger.bone.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
@@ -311,7 +311,7 @@ public class SkeletalDebugger {
     SkeletalDebugger.joint.getMeshData().setNormalBuffer(null);
 
     // No lighting or texturing
-    SkeletalDebugger.joint.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(SkeletalDebugger.joint, false);
     SkeletalDebugger.joint.getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
     // Do not queue... draw right away.
     SkeletalDebugger.joint.getSceneHints().setRenderBucketType(RenderBucketType.Skip);

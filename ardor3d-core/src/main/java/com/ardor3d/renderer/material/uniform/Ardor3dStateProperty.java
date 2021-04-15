@@ -31,8 +31,13 @@ public enum Ardor3dStateProperty {
   CurrentViewportOffsetPixels,
 
   /**
-   * Properties of the light in the current LightState. The light index comes from the extra field of
-   * the uniform, which must be of type Integer.
+   * Properties of the light in the current LightManager. The light index comes from the extra field
+   * of the uniform, which must be of type Integer.
    */
-  Light
+  Light,
+
+  /**
+   * Current global ambient set on the current LightManager (from current SceneIndexer).
+   */
+  GlobalAmbientLight
 }

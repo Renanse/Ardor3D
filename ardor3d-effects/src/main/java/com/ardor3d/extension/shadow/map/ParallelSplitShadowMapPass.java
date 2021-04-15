@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.shadow.map;
 
-import java.lang.ref.WeakReference;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.DepthTextureCompareFunc;
 import com.ardor3d.image.Texture.DepthTextureCompareMode;
@@ -27,6 +27,7 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.light.Light;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
@@ -46,7 +47,6 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState;
@@ -59,9 +59,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A pass providing a parallel split shadow mapping (PSSM) layer across the top of an existing
@@ -100,9 +98,6 @@ public class ParallelSplitShadowMapPass extends Pass {
 
   /** Turn off textures when rendering shadow maps. */
   private final TextureState _noTexture;
-
-  /** Turn off lighting when rendering shadow maps. */
-  private final LightState _noLights;
 
   // Important pieces for rendering shadow maps
   /** Turn off colors when rendering shadow maps. */
@@ -214,8 +209,6 @@ public class ParallelSplitShadowMapPass extends Pass {
 
   private Filter filter = Filter.None;
 
-  private ShadowRenderCallback shadowRenderCallback;
-
   /**
    * Create a pssm shadow map pass casting shadows from a light with the direction given.
    *
@@ -237,8 +230,6 @@ public class ParallelSplitShadowMapPass extends Pass {
     _cullFrontFace = new CullState();
     _cullFrontFace.setEnabled(true);
     _cullFrontFace.setCullFace(CullState.Face.Front);
-    _noLights = new LightState();
-    _noLights.setEnabled(false);
 
     _shadowOffsetState = new OffsetState();
     _shadowOffsetState.setEnabled(true);
@@ -349,7 +340,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     } else {
       _shadowMapRenderer.clearEnforcedState(StateType.Cull);
     }
-    _shadowMapRenderer.enforceState(_noLights);
+    // _shadowMapRenderer.enforceState(_noLights);
     // _shadowMapRenderer.enforceState(_flat);
     _shadowMapRenderer.enforceState(_shadowOffsetState);
     if (!_useSceneTexturing) {
@@ -428,7 +419,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     // camera and pack frustum.
     if (_updateMainCamera) {
       // Copy our active camera to our working pssm camera.
-      final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+      final Camera cam = Camera.getCurrentCamera();
       _pssmCam.set(cam);
 
       // Calculate the closest fitting near and far planes.
@@ -553,7 +544,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     Vector3 direction = new Vector3();
     final DirectionalLight dl = (DirectionalLight) _light;
-    direction = direction.set(dl.getDirection());
+    direction = direction.set(dl.getWorldDirection());
     final double distance = Math.max(radius, _minimumLightDistance);
 
     final Vector3 tmpVec = Vector3.fetchTempInstance();
@@ -618,7 +609,7 @@ public class ParallelSplitShadowMapPass extends Pass {
     // Update shadow camera from light
     final PointLight pl = (PointLight) _light;
 
-    shadowCam.setLocation(pl.getLocation());
+    shadowCam.setLocation(pl.getTranslation());
 
     // Point light at split center
     shadowCam.lookAt(center, Vector3.UNIT_Y);
@@ -770,22 +761,17 @@ public class ParallelSplitShadowMapPass extends Pass {
    *          shadow map texture index to update
    */
   private void updateShadowMap(final int index, final Renderer r) {
-
-    if (shadowRenderCallback != null) {
-      shadowRenderCallback.onRender(index, r, this, _shadowMapRenderer.getCamera());
-    }
-
     // r.setRenderLogic(logic);
     if (!_useSceneTexturing) {
       Mesh.RENDER_VERTEX_ONLY = true;
     }
     _occluderNodes.clear();
-    for (final WeakReference<Spatial> ref : ShadowCasterManager.INSTANCE.getSpatialRefs()) {
-      final Spatial spat = ref.get();
-      if (spat != null) {
-        _occluderNodes.add(spat);
-      }
-    }
+    // for (final WeakReference<Spatial> ref : ShadowCasterManager.INSTANCE.getSpatialRefs()) {
+    // final Spatial spat = ref.get();
+    // if (spat != null) {
+    // _occluderNodes.add(spat);
+    // }
+    // }
     _shadowMapRenderer.renderSpatials(_occluderNodes, _shadowMapTexture[index], Renderer.BUFFER_COLOR_AND_DEPTH);
     if (!_useSceneTexturing) {
       Mesh.RENDER_VERTEX_ONLY = false;
@@ -801,7 +787,7 @@ public class ParallelSplitShadowMapPass extends Pass {
    */
   private void updateTextureMatrix(final int index) {
     // Create a matrix going from light to camera space
-    final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+    final Camera cam = Camera.getCurrentCamera();
     _shadowMatrix.set(cam.getViewMatrix()).invertLocal();
     _shadowMatrix.multiplyLocal(_shadowMapRenderer.getCamera().getModelViewProjectionMatrix())
         .multiplyLocal(SCALE_BIAS_MATRIX);
@@ -1008,10 +994,6 @@ public class ParallelSplitShadowMapPass extends Pass {
     _shadowColor.set(shadowColor);
   }
 
-  public ShadowRenderCallback getShadowRenderCallback() { return shadowRenderCallback; }
-
-  public void setShadowRenderCallback(final ShadowRenderCallback callback) { shadowRenderCallback = callback; }
-
   /**
    * Clean up.
    *
@@ -1216,7 +1198,7 @@ public class ParallelSplitShadowMapPass extends Pass {
       lineFrustum.getMeshData()
           .setIndexModes(new IndexMode[] {IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines});
       lineFrustum.getMeshData().setIndexLengths(new int[] {4, 4, 8, 8});
-      lineFrustum.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+      LightProperties.setLightReceiver(lineFrustum, false);
 
       final BlendState lineBlendState = new BlendState();
       lineBlendState.setEnabled(true);

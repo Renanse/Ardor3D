@@ -28,6 +28,7 @@ import com.ardor3d.image.util.awt.AWTImageUtil;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
@@ -35,7 +36,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
@@ -91,7 +91,7 @@ public class AtlasExample extends ExampleBase {
     // Setup text labels for presenting example info.
     final Node textNodes = new Node("Text");
     _orthoRoot.attachChild(textNodes);
-    textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(textNodes, false);
 
     final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() - 20;
     for (int i = 0; i < _exampleInfo.length; i++) {

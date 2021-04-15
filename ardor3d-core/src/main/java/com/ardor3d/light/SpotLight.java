@@ -13,8 +13,9 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
@@ -33,50 +34,66 @@ public class SpotLight extends PointLight {
   private static final long serialVersionUID = 1L;
 
   private float _angle, _innerAngle;
-  private final Vector3 _direction = new Vector3(Vector3.UNIT_Z);
+
+  // Locally cached direction vector for our light.
+  private final Vector3 _worldDirection = new Vector3(Vector3.UNIT_Z);
 
   /**
    * Constructor instantiates a new <code>SpotLight</code> object. The initial position of the light
-   * is (0,0,0) with angle 0, and colors white.
-   *
+   * is (0,0,0) with angle 0, and colors white. The direction the light travels is along the positive
+   * z axis (0,0,1). The direction and position will update based on the World Transform of the light.
    */
   public SpotLight() {
     super();
-    setAmbient(new ColorRGBA(0, 0, 0, 1));
 
     cachedUniforms
         .add(new UniformRef("angle", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getAngle));
     cachedUniforms.add(new UniformRef("innerAngle", UniformType.Float1, UniformSource.Supplier,
         (Supplier<Float>) this::getInnerAngle));
     cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
-        (Supplier<ReadOnlyVector3>) this::getDirection));
+        (Supplier<ReadOnlyVector3>) this::getWorldDirection));
   }
 
   /**
-   * @return the direction the spot light is pointing.
+   * @return the calculated world direction the spot light is pointing. It starts out traveling down
+   *         the positive Z Axis, and is then rotated by our world transform.
    */
-  public ReadOnlyVector3 getDirection() { return _direction; }
+  public ReadOnlyVector3 getWorldDirection() { return _worldDirection; }
 
   /**
    * @param direction
-   *          the direction the spot light is pointing.
+   *          the world direction we want the light to be traveling in.
    */
-  public void setDirection(final ReadOnlyVector3 direction) {
-    _direction.set(direction);
+  public void setWorldDirection(final ReadOnlyVector3 direction) {
+    setWorldDirection(direction.getX(), direction.getY(), direction.getZ());
   }
 
   /**
-   * <code>setDirection</code> sets the direction the spot light is pointing.
-   *
    * @param x
-   *          the x value of the direction vector.
+   *          the direction the light is traveling in on the x axis.
    * @param y
-   *          the y value of the direction vector.
+   *          the direction the light is traveling in on the y axis.
    * @param z
-   *          the z value of the direction vector.
+   *          the direction the light is traveling in on the z axis.
    */
-  public void setDirection(final double x, final double y, final double z) {
-    _direction.set(x, y, z);
+  public void setWorldDirection(final double x, final double y, final double z) {
+    _worldDirection.set(x, y, z);
+    final Vector3 from = Vector3.fetchTempInstance();
+    final Quaternion q = Quaternion.fetchTempInstance();
+    try {
+      from.set(Vector3.UNIT_Z);
+
+      if (_parent != null) {
+        final ReadOnlyTransform parentTransform = _parent.getWorldTransform();
+        parentTransform.applyForwardVector(from);
+      }
+
+      q.fromVectorToVector(from, _worldDirection);
+      setRotation(q);
+    } finally {
+      Quaternion.releaseTempInstance(q);
+      Vector3.releaseTempInstance(from);
+    }
   }
 
   /**
@@ -125,7 +142,6 @@ public class SpotLight extends PointLight {
   @Override
   public void write(final OutputCapsule capsule) throws IOException {
     super.write(capsule);
-    capsule.write(_direction, "direction", new Vector3(Vector3.UNIT_Z));
     capsule.write(_angle, "angle", 0);
     capsule.write(_innerAngle, "innerAngle", 0);
 
@@ -134,7 +150,6 @@ public class SpotLight extends PointLight {
   @Override
   public void read(final InputCapsule capsule) throws IOException {
     super.read(capsule);
-    _direction.set(capsule.readSavable("direction", (Vector3) Vector3.UNIT_Z));
     _angle = capsule.readFloat("angle", 0);
     _innerAngle = capsule.readFloat("innerAngle", 0);
   }

@@ -16,13 +16,13 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
@@ -114,7 +114,7 @@ public class RenderTextureSideBySideExample extends ExampleBase {
 
     if (textureRenderer == null) {
       final BasicText t = BasicText.createDefaultTextLabel("Text", "RTT not supported on this computer.");
-      t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+      LightProperties.setLightReceiver(t, false);
       t.setTranslation(new Vector3(0, 20, 0));
       _orthoRoot.attachChild(t);
     } else {
@@ -141,7 +141,7 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     quad = new Quad("Quad", 15, 13f);
     quad.setTranslation(new Vector3(10, 0, 0));
     quad.setModelBound(new BoundingBox());
-    quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(quad, false);
     _root.attachChild(quad);
 
     final TextureState ts = new TextureState();

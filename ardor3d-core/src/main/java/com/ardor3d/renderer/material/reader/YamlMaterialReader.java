@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
@@ -48,7 +49,6 @@ import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.surface.PbrSurface;
 import com.ardor3d.surface.PbrTexturedSurface;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
@@ -516,17 +516,8 @@ public class YamlMaterialReader {
             new UniformRef(FogParams.DefaultPropertyKey, UniformType.UniformSupplier, UniformSource.SpatialProperty,
                 FogParams.DefaultPropertyKey, "com.ardor3d.renderer.material.fog.FogParams", null));
         return;
-      case "lights1":
-        pass.addLightInfoUniforms(1);
-        return;
-      case "lights2":
-        pass.addLightInfoUniforms(2);
-        return;
-      case "lights3":
-        pass.addLightInfoUniforms(3);
-        return;
-      case "lights4":
-        pass.addLightInfoUniforms(4);
+      case "lights":
+        pass.addLightInfoUniforms(8);
         return;
       case "textureMatrix0":
         pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix0, UniformType.Matrix4x4, UniformSource.SpatialProperty,

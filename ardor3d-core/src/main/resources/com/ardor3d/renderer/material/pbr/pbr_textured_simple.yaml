@@ -8,7 +8,7 @@ techniques:
           - key: normal
           - key: uv0
         uniforms: 
-          - builtIn: [model, view, projection, cameraLoc, pbrTexturedSurface, lights4]
+          - builtIn: [model, view, projection, cameraLoc, pbrTexturedSurface, lights]
         shaders: 
           Vertex: 
             source: pbr/pbr.vert

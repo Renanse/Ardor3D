@@ -192,9 +192,6 @@ public class Node extends Spatial {
     if (child != null) {
       child.setParent(null);
       markDirty(child, DirtyType.Detached);
-      if (child.getListener() != null) {
-        child.setListener(null);
-      }
       if (Node.logger.isLoggable(Level.INFO)) {
         Node.logger.fine("Child removed.");
       }
@@ -425,16 +422,6 @@ public class Node extends Spatial {
 
     if (!preexecute) {
       visitor.visit(this);
-    }
-  }
-
-  @Override
-  public void sortLights() {
-    for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
-      final Spatial pkChild = getChild(i);
-      if (pkChild != null) {
-        pkChild.sortLights();
-      }
     }
   }
 

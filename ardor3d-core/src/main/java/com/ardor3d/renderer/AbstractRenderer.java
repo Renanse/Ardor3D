@@ -16,6 +16,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageUtils;
@@ -29,9 +31,7 @@ import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 

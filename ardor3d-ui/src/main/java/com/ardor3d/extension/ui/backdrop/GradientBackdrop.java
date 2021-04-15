@@ -10,6 +10,8 @@
 
 package com.ardor3d.extension.ui.backdrop;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.math.ColorRGBA;
@@ -21,10 +23,8 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A gradient four color backdrop. Each corner can be a different color and it will be blended

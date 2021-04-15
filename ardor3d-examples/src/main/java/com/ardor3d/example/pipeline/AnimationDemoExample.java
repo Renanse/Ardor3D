@@ -103,14 +103,6 @@ public class AnimationDemoExample extends ExampleBase {
     // speed up wasd control a little
     _controlHandle.setMoveSpeed(200);
 
-    _lightState.detachAll();
-    final DirectionalLight light = new DirectionalLight();
-    light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-    light.setAmbient(new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
-    light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    light.setEnabled(true);
-    _lightState.attach(light);
-
     final SkinnedMesh skeleton = loadMainSkeleton();
 
     // Load collada model
@@ -124,6 +116,15 @@ public class AnimationDemoExample extends ExampleBase {
       animInfo.add(new AnimationInfo());
       poseToMesh.put(copy.getCurrentPose(), copy);
     }
+  }
+
+  @Override
+  protected void setupLight() {
+    final DirectionalLight light = new DirectionalLight();
+    light.setColor(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+    light.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    light.setEnabled(true);
+    _root.attachChild(light);
   }
 
   private SkinnedMesh loadMainSkeleton() {

@@ -12,12 +12,12 @@ package com.ardor3d.scenegraph.shape;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * GeoSphere - generate a polygon mesh approximating a sphere by recursive subdivision. First

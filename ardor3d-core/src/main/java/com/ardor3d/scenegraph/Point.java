@@ -13,6 +13,9 @@ package com.ardor3d.scenegraph;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.FloatBufferDataUtil;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -20,7 +23,6 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <code>Point</code> defines a collection of vertices that are rendered as single points or

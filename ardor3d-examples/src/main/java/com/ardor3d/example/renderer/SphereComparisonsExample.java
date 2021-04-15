@@ -77,7 +77,6 @@ public class SphereComparisonsExample extends ExampleBase {
 
     _root.attachChild(globesNode);
     _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 0, 10));
-    _lightState.setEnabled(false);
   }
 
 }

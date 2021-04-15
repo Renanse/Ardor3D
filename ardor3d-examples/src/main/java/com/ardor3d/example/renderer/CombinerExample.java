@@ -23,7 +23,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.StripBox;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -103,7 +102,6 @@ public class CombinerExample extends ExampleBase {
     // make some text labels...
     for (int i = 0; i < text.length; i++) {
       text[i] = BasicText.createDefaultTextLabel("Text" + i, "", 16);
-      text[i].getSceneHints().setLightCombineMode(LightCombineMode.Off);
       text[i].setTranslation(new Vector3(10, 10 + i * 25, 0));
       _orthoRoot.attachChild(text[i]);
     }

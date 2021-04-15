@@ -14,14 +14,14 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * An extrusion of a 2D object ({@link Line}) along a path (List of Vector3). Either a convenience

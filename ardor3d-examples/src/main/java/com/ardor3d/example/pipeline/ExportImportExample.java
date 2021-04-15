@@ -16,6 +16,8 @@ import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
@@ -25,7 +27,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
@@ -40,7 +41,6 @@ import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.export.xml.XMLExporter;
 import com.ardor3d.util.export.xml.XMLImporter;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node

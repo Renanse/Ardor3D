@@ -24,7 +24,6 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.ui.text.BasicText;
@@ -87,7 +86,6 @@ public class ManyCollisionsExample extends ExampleBase {
     _canvas.setTitle("ManyCollisionsExample");
 
     t = BasicText.createDefaultTextLabel("Text", "");
-    t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t.setTranslation(new Vector3(0, 20, 0));
     _orthoRoot.attachChild(t);
 

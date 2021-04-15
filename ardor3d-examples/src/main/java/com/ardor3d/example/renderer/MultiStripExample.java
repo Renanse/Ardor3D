@@ -12,16 +12,16 @@ package com.ardor3d.example.renderer;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Illustrates mesh with several primitives (i.e. strip, quad, triangle).

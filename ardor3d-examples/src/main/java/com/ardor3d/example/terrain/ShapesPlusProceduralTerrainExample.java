@@ -34,6 +34,7 @@ import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Transform;
@@ -48,7 +49,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.GameTaskQueue;
@@ -209,7 +209,7 @@ public class ShapesPlusProceduralTerrainExample extends ExampleBase {
     final Node textNodes = new Node("Text");
     _orthoRoot.attachChild(textNodes);
     textNodes.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(textNodes, false);
 
     final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
     for (int i = 0; i < _exampleInfo.length; i++) {
@@ -323,16 +323,6 @@ public class ShapesPlusProceduralTerrainExample extends ExampleBase {
   }
 
   private void setupDefaultStates() {
-    _lightState.detachAll();
-    final DirectionalLight dLight = new DirectionalLight();
-    dLight.setEnabled(true);
-    dLight.setAmbient(new ColorRGBA(0.4f, 0.4f, 0.5f, 1));
-    dLight.setDiffuse(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    dLight.setSpecular(new ColorRGBA(0.3f, 0.3f, 0.2f, 1));
-    dLight.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    _lightState.attach(dLight);
-    _lightState.setEnabled(true);
-
     final CullState cs = new CullState();
     cs.setEnabled(true);
     cs.setCullFace(CullState.Face.Back);
@@ -344,6 +334,15 @@ public class ShapesPlusProceduralTerrainExample extends ExampleBase {
     // fs.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
     // fs.setDensityFunction(DensityFunction.Linear);
     // _root.setRenderState(fs);
+  }
+
+  @Override
+  protected void setupLight() {
+    final DirectionalLight dLight = new DirectionalLight();
+    dLight.setEnabled(true);
+    dLight.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
+    dLight.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    _root.attachChild(dLight);
   }
 
   /**

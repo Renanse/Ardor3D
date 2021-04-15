@@ -20,5 +20,5 @@ techniques:
             source: skinned_mesh.vert
 
           Fragment:
-            source: unlit/unlit.frag
+            source: unlit/unlit_modulate.frag
             define: UV_COUNT 1

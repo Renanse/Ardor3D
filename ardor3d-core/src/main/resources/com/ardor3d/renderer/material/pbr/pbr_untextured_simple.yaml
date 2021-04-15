@@ -9,7 +9,7 @@ techniques:
           - key: uv0
           
         uniforms: 
-          - builtIn: [model, view, projection, cameraLoc, pbrSurface, lights4]
+          - builtIn: [model, view, projection, cameraLoc, pbrSurface, lights]
 
         shaders: 
           Vertex: 

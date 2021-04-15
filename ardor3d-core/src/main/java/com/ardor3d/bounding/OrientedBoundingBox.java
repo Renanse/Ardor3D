@@ -13,6 +13,7 @@ package com.ardor3d.bounding;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
@@ -26,7 +27,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class OrientedBoundingBox extends BoundingVolume {
 

@@ -15,6 +15,7 @@ import java.nio.FloatBuffer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.intersection.CollisionData;
@@ -33,7 +34,6 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.PQTorus;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A demonstration of finding and retrieving collisions between two nodes.
@@ -58,9 +58,12 @@ public class CollisionTreeExample extends ExampleBase {
   }
 
   @Override
-  protected void initExample() {
-    _lightState.setEnabled(false);
+  protected void setupLight() {
+    // no lights
+  }
 
+  @Override
+  protected void initExample() {
     CollisionTreeManager.getInstance().setTreeType(CollisionTree.Type.AABB);
     CollisionTreeManager.getInstance().setDoSort(true);
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.LevelData;
 import com.ardor3d.extension.terrain.util.Region;
@@ -37,7 +38,6 @@ import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.TextureKey;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * An implementation of texture clipmapping

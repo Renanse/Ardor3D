@@ -12,11 +12,11 @@ package com.ardor3d.util.screen;
 
 import java.nio.ByteBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class ScreenExporter {
 

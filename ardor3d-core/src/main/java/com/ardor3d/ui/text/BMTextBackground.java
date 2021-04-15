@@ -13,8 +13,11 @@ package com.ardor3d.ui.text;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -25,15 +28,12 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A 9-slice capable background, suitable for sitting behind BMText to increase readability.
@@ -92,7 +92,7 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
     setDefaultColor(_tintColor);
     setModelBound(null);
 
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     getSceneHints().setCullHint(CullHint.Never);
   }

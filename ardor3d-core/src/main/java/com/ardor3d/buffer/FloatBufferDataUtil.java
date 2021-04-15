@@ -8,11 +8,10 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.scenegraph;
+package com.ardor3d.buffer;
 
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class FloatBufferDataUtil {
   public static FloatBufferData makeNew(final ReadOnlyVector2[] coords) {

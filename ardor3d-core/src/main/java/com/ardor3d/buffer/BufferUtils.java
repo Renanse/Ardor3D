@@ -8,7 +8,7 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.util.geom;
+package com.ardor3d.buffer;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -29,11 +29,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyVector4;
-import com.ardor3d.scenegraph.ByteBufferData;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.IntBufferData;
-import com.ardor3d.scenegraph.ShortBufferData;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.google.common.collect.MapMaker;

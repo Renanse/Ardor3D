@@ -19,11 +19,12 @@ import java.util.EnumMap;
 import java.util.List;
 
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;

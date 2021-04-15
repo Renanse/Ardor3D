@@ -17,7 +17,6 @@ import java.util.List;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
@@ -88,7 +87,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
     // If instructed, check to see if our last frustum check passed
     if (isUpdateOnlyInView()) {
-      final Camera cam = _viewCamera != null ? _viewCamera : ContextManager.getCurrentContext().getCurrentCamera();
+      final Camera cam = _viewCamera != null ? _viewCamera : Camera.getCurrentCamera();
       if (cam != null) {
         final int state = cam.getPlaneState();
         final boolean out = cam.contains(particles.getWorldBound()).equals(FrustumIntersect.Outside);
@@ -247,9 +246,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
       // If we have any live particles and are offscreen, update it
       if (anyAlive) {
         boolean updateMB = true;
-        final Camera cam = _viewCamera != null ? _viewCamera
-            : (ContextManager.getCurrentContext() != null ? ContextManager.getCurrentContext().getCurrentCamera()
-                : null);
+        final Camera cam = _viewCamera != null ? _viewCamera : Camera.getCurrentCamera();
         if (cam != null) {
           final int state = cam.getPlaneState();
           updateMB = cam.contains(particles.getWorldBound()).equals(FrustumIntersect.Outside);

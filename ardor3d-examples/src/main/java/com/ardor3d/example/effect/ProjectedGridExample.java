@@ -19,12 +19,12 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -124,8 +124,8 @@ public class ProjectedGridExample extends ExampleBase {
 
     // Setup textfields for presenting example info.
     final Node textNodes = new Node("Text");
+    LightProperties.setLightReceiver(textNodes, false);
     _orthoRoot.attachChild(textNodes);
-    textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
     final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
     for (int i = 0; i < _exampleInfo.length; i++) {

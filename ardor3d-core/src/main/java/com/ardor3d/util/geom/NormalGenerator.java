@@ -18,13 +18,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
+import com.ardor3d.buffer.IntBufferData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
 
 /**

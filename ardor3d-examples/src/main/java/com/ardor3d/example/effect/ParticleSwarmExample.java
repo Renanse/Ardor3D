@@ -68,11 +68,15 @@ public class ParticleSwarmExample extends ExampleBase {
   }
 
   @Override
+  protected void setupLight() {
+    // no lights
+  }
+
+  @Override
   protected void initExample() {
     EffectUtils.addDefaultResourceLocators();
 
     _canvas.setTitle("Particle System - Swarming Influence");
-    _lightState.setEnabled(false);
 
     sphere = new Sphere("sp", 12, 12, 3);
     sphere.setModelBound(new BoundingBox());

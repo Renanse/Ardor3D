@@ -20,9 +20,9 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
+import com.ardor3d.extension.shadow.ShadowCastMode;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass.Filter;
-import com.ardor3d.extension.shadow.map.ShadowCasterManager;
 import com.ardor3d.extension.terrain.client.Terrain;
 import com.ardor3d.extension.terrain.client.TerrainBuilder;
 import com.ardor3d.extension.terrain.heightmap.ImageHeightMap;
@@ -47,6 +47,7 @@ import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -60,7 +61,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.GameTaskQueue;
@@ -193,7 +193,7 @@ public class MountainShadowTerrainExample extends ExampleBase {
 
     if (moveLight) {
       lightTime += timer.getTimePerFrame();
-      light.setDirection(new Vector3(Math.sin(lightTime), -.8, Math.cos(lightTime)).normalizeLocal());
+      light.setWorldDirection(new Vector3(Math.sin(lightTime), -.8, Math.cos(lightTime)).normalizeLocal());
     }
   }
 
@@ -248,9 +248,9 @@ public class MountainShadowTerrainExample extends ExampleBase {
     // Add objects that will get shadowed through overlay render
     _pssmPass.add(_root);
 
-    // Add our occluders that will produce shadows
-    ShadowCasterManager.INSTANCE.addSpatial(terrainNode);
-    ShadowCasterManager.INSTANCE.addSpatial(_root);
+    // Setup elements that will produce shadows
+    terrainNode.setProperty(ShadowCastMode.SpatialKey, ShadowCastMode.OneSidedUntextured);
+    _root.setProperty(ShadowCastMode.SpatialKey, ShadowCastMode.OneSidedUntextured);
 
     final int quadSize = _canvas.getCanvasRenderer().getCamera().getWidth() / 10;
     _orthoQuad = new Quad[ParallelSplitShadowMapPass._MAX_SPLITS];
@@ -258,8 +258,8 @@ public class MountainShadowTerrainExample extends ExampleBase {
       _orthoQuad[i] = new Quad("OrthoQuad", quadSize, quadSize);
       _orthoQuad[i].setTranslation(new Vector3(quadSize / 2 + 5 + (quadSize + 5) * i, quadSize / 2 + 5, 1));
       _orthoQuad[i].setScale(1, -1, 1);
+      LightProperties.setLightReceiver(_orthoQuad[i], false);
       _orthoQuad[i].getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-      _orthoQuad[i].getSceneHints().setLightCombineMode(LightCombineMode.Off);
       _orthoQuad[i].getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
       _orthoQuad[i].getSceneHints().setCullHint(CullHint.Never);
       hud.attachChild(_orthoQuad[i]);
@@ -348,19 +348,9 @@ public class MountainShadowTerrainExample extends ExampleBase {
   }
 
   private void setupDefaultStates() {
-    terrainNode.setRenderState(_lightState);
+    // terrainNode.setRenderState(_lightState);
     terrainNode.setRenderState(_wireframeState);
     terrainNode.setRenderState(new ZBufferState());
-
-    _lightState.detachAll();
-    light = new DirectionalLight();
-    light.setEnabled(true);
-    light.setAmbient(new ColorRGBA(0.4f, 0.4f, 0.5f, 1));
-    light.setDiffuse(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    light.setSpecular(new ColorRGBA(0.3f, 0.3f, 0.2f, 1));
-    light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    _lightState.attach(light);
-    _lightState.setEnabled(true);
 
     // final FogState fs = new FogState();
     // fs.setStart(farPlane / 2.0f);
@@ -368,6 +358,15 @@ public class MountainShadowTerrainExample extends ExampleBase {
     // fs.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
     // fs.setDensityFunction(DensityFunction.Linear);
     // terrainNode.setRenderState(fs);
+  }
+
+  @Override
+  protected void setupLight() {
+    light = new DirectionalLight();
+    light.setEnabled(true);
+    light.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
+    light.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    _root.attachChild(light);
   }
 
   /**

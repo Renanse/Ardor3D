@@ -16,9 +16,11 @@ import java.nio.FloatBuffer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -31,13 +33,11 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * QuadImposterNode
@@ -112,7 +112,7 @@ public class QuadImposterNode extends Node {
     _imposterQuad.resize(1, 1);
     _imposterQuad.setModelBound(new BoundingBox());
     _imposterQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-    _imposterQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(_imposterQuad, false);
     super.attachChild(_imposterQuad);
 
     getSceneHints().setRenderBucketType(RenderBucketType.Transparent);

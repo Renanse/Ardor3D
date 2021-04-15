@@ -20,14 +20,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.extension.model.util.KeyframeController;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.util.TextureKey;
 
@@ -181,7 +181,7 @@ public class ObjExporter {
         } else {
           currentMtl.textureName = customTextureName;
         }
-        if (mesh.getSceneHints().getLightCombineMode() == LightCombineMode.Off) {
+        if (!LightProperties.isLightReceiver(mesh)) {
           // Color on and Ambient off
           currentMtl.illumType = 0;
         } else {
@@ -300,8 +300,8 @@ public class ObjExporter {
           case TriangleFan:
           case Triangles:
           case TriangleStrip:
-            for (int primIndex = 0, primCount =
-                meshData.getPrimitiveCount(sectionIndex); primIndex < primCount; primIndex++) {
+            for (int primIndex = 0,
+                primCount = meshData.getPrimitiveCount(sectionIndex); primIndex < primCount; primIndex++) {
               meshData.getPrimitiveIndices(primIndex, sectionIndex, indices);
               objPw.print("f");
               for (int vertexIndex = 0; vertexIndex < indices.length; vertexIndex++) {

@@ -18,10 +18,12 @@ import java.util.function.Supplier;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.IUniformSupplier;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -29,8 +31,7 @@ import com.ardor3d.util.export.Savable;
 /**
  * <code>Light</code> defines the attributes of a light element. This class is abstract and intended
  * to be sub-classed by specific lighting types. A light will illuminate portions of the scene by
- * assigning its properties to the objects in the scene. This will affect the objects color values,
- * depending on the color of the ambient, diffuse and specular light components.
+ * assigning its properties to the objects in the scene. This will affect the objects color value.
  *
  * Ambient light defines the general light of the scene, that is the intensity and color of lighting
  * if no particular lights are affecting it.
@@ -39,39 +40,29 @@ import com.ardor3d.util.export.Savable;
  *
  * Specular lighting defines the reflection of light on shiny surfaces.
  */
-public abstract class Light implements Serializable, Savable, IUniformSupplier {
+public abstract class Light extends Spatial implements Serializable, Savable, IUniformSupplier {
 
   private static final long serialVersionUID = 1L;
 
   protected final List<UniformRef> cachedUniforms = new ArrayList<>();
 
   /**
-   * dark grey (.4, .4, .4, 1)
-   */
-  public static final ReadOnlyColorRGBA DEFAULT_AMBIENT = new ColorRGBA(0.4f, 0.4f, 0.4f, 1.0f);
-
-  /**
    * white (1, 1, 1, 1)
    */
-  public static final ReadOnlyColorRGBA DEFAULT_DIFFUSE = new ColorRGBA(1, 1, 1, 1);
+  public static final ReadOnlyColorRGBA DEFAULT_COLOR = new ColorRGBA(1, 1, 1, 1);
 
-  /**
-   * white (1, 1, 1, 1)
-   */
-  public static final ReadOnlyColorRGBA DEFAULT_SPECULAR = new ColorRGBA(1, 1, 1, 1);
+  public static final float DEFAULT_INTENSITY = 1f;
 
   public enum Type {
     Directional, Point, Spot
   }
 
   // light attributes.
-  private final ColorRGBA _ambient = new ColorRGBA(DEFAULT_AMBIENT);
-  private final ColorRGBA _diffuse = new ColorRGBA(DEFAULT_DIFFUSE);
-  private final ColorRGBA _specular = new ColorRGBA(DEFAULT_SPECULAR);
+  private final ColorRGBA _color = new ColorRGBA(Light.DEFAULT_COLOR);
 
-  private boolean _enabled;
+  private float _intensity = Light.DEFAULT_INTENSITY;
 
-  private String _name;
+  private boolean _enabled = true;
 
   /** when true, indicates the lights in this lightState will cast shadows. */
   protected boolean _shadowCaster;
@@ -84,12 +75,12 @@ public abstract class Light implements Serializable, Savable, IUniformSupplier {
   public Light() {
     cachedUniforms
         .add(new UniformRef("type", UniformType.Int1, UniformSource.Supplier, (Supplier<Type>) this::getType));
-    cachedUniforms.add(new UniformRef("ambient", UniformType.Float3, UniformSource.Supplier,
-        (Supplier<ReadOnlyColorRGBA>) this::getAmbient));
-    cachedUniforms.add(new UniformRef("diffuse", UniformType.Float3, UniformSource.Supplier,
-        (Supplier<ReadOnlyColorRGBA>) this::getDiffuse));
-    cachedUniforms.add(new UniformRef("specular", UniformType.Float3, UniformSource.Supplier,
-        (Supplier<ReadOnlyColorRGBA>) this::getSpecular));
+    cachedUniforms.add(new UniformRef("color", UniformType.Float3, UniformSource.Supplier,
+        (Supplier<ReadOnlyColorRGBA>) this::getColor));
+    cachedUniforms.add(
+        new UniformRef("intensity", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getIntensity));
+    cachedUniforms
+        .add(new UniformRef("enabled", UniformType.Int1, UniformSource.Supplier, (Supplier<Integer>) () -> 1));
   }
 
   /**
@@ -118,55 +109,25 @@ public abstract class Light implements Serializable, Savable, IUniformSupplier {
   public void setEnabled(final boolean value) { _enabled = value; }
 
   /**
-   * <code>getSpecular</code> returns the specular color value for this light.
+   * <code>getColor</code> returns the color value for this light.
    *
-   * @return the specular color value of the light.
+   * @return the color value for this light.
    */
-  public ReadOnlyColorRGBA getSpecular() { return _specular; }
+  public ReadOnlyColorRGBA getColor() { return _color; }
 
   /**
-   * <code>setSpecular</code> sets the specular color value for this light.
+   * <code>setDiffuse</code> sets the color value for this light.
    *
-   * @param specular
-   *          the specular color value of the light.
+   * @param color
+   *          the color value for this light.
    */
-  public void setSpecular(final ReadOnlyColorRGBA specular) {
-    _specular.set(specular);
+  public void setColor(final ReadOnlyColorRGBA color) {
+    _color.set(color);
   }
 
-  /**
-   * <code>getDiffuse</code> returns the diffuse color value for this light.
-   *
-   * @return the diffuse color value for this light.
-   */
-  public ReadOnlyColorRGBA getDiffuse() { return _diffuse; }
+  public float getIntensity() { return _intensity; }
 
-  /**
-   * <code>setDiffuse</code> sets the diffuse color value for this light.
-   *
-   * @param diffuse
-   *          the diffuse color value for this light.
-   */
-  public void setDiffuse(final ReadOnlyColorRGBA diffuse) {
-    _diffuse.set(diffuse);
-  }
-
-  /**
-   * <code>getAmbient</code> returns the ambient color value for this light.
-   *
-   * @return the ambient color value for this light.
-   */
-  public ReadOnlyColorRGBA getAmbient() { return _ambient; }
-
-  /**
-   * <code>setAmbient</code> sets the ambient color value for this light.
-   *
-   * @param ambient
-   *          the ambient color value for this light.
-   */
-  public void setAmbient(final ReadOnlyColorRGBA ambient) {
-    _ambient.set(ambient);
-  }
+  public void setIntensity(final float intensity) { _intensity = intensity; }
 
   /**
    * @return Returns whether this light is able to cast shadows.
@@ -175,36 +136,40 @@ public abstract class Light implements Serializable, Savable, IUniformSupplier {
 
   /**
    * @param mayCastShadows
-   *          true if this light can be used to derive shadows (when used in conjunction with a shadow
-   *          pass.)
+   *          true if this light can be used to derive shadows (when used in conjunction with an
+   *          appropriate RenderMaterial.)
    */
   public void setShadowCaster(final boolean mayCastShadows) { _shadowCaster = mayCastShadows; }
-
-  public String getName() { return _name; }
-
-  public void setName(final String name) { _name = name; }
 
   @Override
   public List<UniformRef> getUniforms() { return cachedUniforms; }
 
   @Override
+  public void draw(final Renderer renderer) {
+    // ignore
+  }
+
+  @Override
+  public void updateWorldBound(final boolean recurse) {
+    // ignore - maybe useful later for calculating contribution?
+  }
+
+  @Override
   public void write(final OutputCapsule capsule) throws IOException {
-    capsule.write(_ambient, "ambient", (ColorRGBA) DEFAULT_AMBIENT);
-    capsule.write(_diffuse, "diffuse", (ColorRGBA) DEFAULT_DIFFUSE);
-    capsule.write(_specular, "specular", (ColorRGBA) DEFAULT_SPECULAR);
+    super.write(capsule);
+    capsule.write(_color, "diffuse", (ColorRGBA) Light.DEFAULT_COLOR);
+    capsule.write(_intensity, "intensity", Light.DEFAULT_INTENSITY);
     capsule.write(_enabled, "enabled", false);
     capsule.write(_shadowCaster, "shadowCaster", false);
-    capsule.write(_name, "name", null);
   }
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    _ambient.set(capsule.readSavable("ambient", (ColorRGBA) DEFAULT_AMBIENT));
-    _diffuse.set(capsule.readSavable("diffuse", (ColorRGBA) DEFAULT_DIFFUSE));
-    _specular.set(capsule.readSavable("specular", (ColorRGBA) DEFAULT_SPECULAR));
+    super.read(capsule);
+    _color.set(capsule.readSavable("diffuse", (ColorRGBA) Light.DEFAULT_COLOR));
+    _intensity = capsule.readFloat("intensity", Light.DEFAULT_INTENSITY);
     _enabled = capsule.readBoolean("enabled", false);
     _shadowCaster = capsule.readBoolean("shadowCaster", false);
-    _name = capsule.readString("name", null);
   }
 
   @Override

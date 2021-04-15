@@ -20,9 +20,13 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitiveKey;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -30,19 +34,17 @@ import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderMatrixType;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.MaterialTechnique;
 import com.ardor3d.renderer.material.TechniquePass;
-import com.ardor3d.renderer.state.LightState;
-import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
@@ -65,9 +67,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
    * with updateRenderStates()
    */
   protected final EnumMap<RenderState.StateType, RenderState> _states = new EnumMap<>(RenderState.StateType.class);
-
-  /** The compiled lightState for this mesh */
-  protected transient LightState _lightState;
 
   /** Visibility setting that can be used after the scenegraph hierarchical culling */
   protected boolean _isVisible = true;
@@ -259,7 +258,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
   }
 
   protected boolean render(final Renderer renderer, final MeshData meshData) {
-
     // Grab our proper RenderTechnique
     final MaterialTechnique technique = MaterialManager.INSTANCE.chooseTechnique(this);
 
@@ -271,6 +269,9 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     // Set our model matrix
     renderer.setMatrix(RenderMatrixType.Model, getWorldTransform());
     renderer.computeNormalMatrix(getWorldTransform().isUniformScale());
+    if (LightProperties.isLightReceiver(this)) {
+      SceneIndexer.getCurrent().getLightManager().sortLightsFor(this);
+    }
 
     // Walk through the passes of the technique and draw this mesh for each
     for (final TechniquePass pass : technique.getPasses()) {
@@ -369,20 +370,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     r.draw((Renderable) this);
   }
-
-  /**
-   * Sorts the lights based on distance to mesh bounding volume
-   */
-  @Override
-  public void sortLights() {
-    if (_lightState != null && _lightState.getLightList().size() > LightState.MAX_LIGHTS_ALLOWED) {
-      LightUtil.sort(this, _lightState.getLightList());
-    }
-  }
-
-  public LightState getLightState() { return _lightState; }
-
-  public void setLightState(final LightState lightState) { _lightState = lightState; }
 
   /**
    * @param type

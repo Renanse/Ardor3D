@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.terrain.client.TextureConfiguration;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
@@ -26,7 +27,6 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class ImageTextureSource implements TextureSource {
   private final int tileSize;

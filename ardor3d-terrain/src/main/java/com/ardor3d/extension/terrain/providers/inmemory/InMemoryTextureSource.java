@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.terrain.client.TextureConfiguration;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.providers.inmemory.data.InMemoryTerrainData;
@@ -24,7 +25,6 @@ import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class InMemoryTextureSource implements TextureSource {
   private final int tileSize;

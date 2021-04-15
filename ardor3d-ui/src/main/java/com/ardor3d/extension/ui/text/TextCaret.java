@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.ui.text;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
@@ -19,7 +20,6 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class TextCaret {
 

@@ -8,7 +8,7 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.scenegraph;
+package com.ardor3d.buffer;
 
 import java.nio.Buffer;
 import java.nio.IntBuffer;

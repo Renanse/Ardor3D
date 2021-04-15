@@ -12,6 +12,7 @@ package com.ardor3d.example.basic;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
@@ -67,7 +68,6 @@ import com.ardor3d.ui.text.BMTextBackground;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A display of intrinsic shapes (e.g. Box, Cone, Torus).

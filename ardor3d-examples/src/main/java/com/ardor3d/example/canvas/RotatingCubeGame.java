@@ -31,7 +31,6 @@ import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
@@ -95,16 +94,12 @@ public class RotatingCubeGame implements Updater {
     final float b = random.nextFloat();
     final float a = random.nextFloat();
 
-    light.setDiffuse(new ColorRGBA(r, g, b, a));
-    light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-    light.setLocation(new Vector3(4, 4, 4));
+    light.setColor(new ColorRGBA(r, g, b, a));
+    light.setTranslation(4, 4, 4);
     light.setEnabled(true);
 
     /** Attach the light to a lightState and the lightState to rootNode. */
-    final LightState lightState = new LightState();
-    lightState.setEnabled(true);
-    lightState.attach(light);
-    scene.getRoot().setRenderState(lightState);
+    scene.getRoot().attachChild(light);
 
     scene.getRoot().attachChild(box);
 

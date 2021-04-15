@@ -13,6 +13,7 @@ package com.ardor3d.extension.interact.widget;
 import java.nio.FloatBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -37,7 +38,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.MaterialUtil;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class MoveMultiPlanarWidget extends AbstractInteractWidget {
 

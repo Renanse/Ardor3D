@@ -21,6 +21,7 @@ import com.ardor3d.extension.ui.util.UIQuad;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
@@ -40,7 +41,6 @@ import com.ardor3d.renderer.texture.TextureRenderer;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -468,7 +468,7 @@ public abstract class UIContainer extends UIComponent {
     // no frustum culling checks
     _standin.getSceneHints().setCullHint(CullHint.Never);
     // no lighting
-    _standin.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(_standin, false);
     // a single texture
     _standin.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     // immediate mode

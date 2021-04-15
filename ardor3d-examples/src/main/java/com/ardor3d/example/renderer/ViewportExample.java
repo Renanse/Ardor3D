@@ -16,6 +16,7 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -24,7 +25,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.GameTaskQueue;
@@ -89,10 +89,9 @@ public class ViewportExample extends ExampleBase {
 
     // A text to check aspect ratio of 2D objects
     quad = new Quad("test quad", 100, 20);
-    quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(quad, false);
     // if we don't explicitly update model bounds, quad will keep its default infinite bounding sphere,
-    // so it will
-    // always display (and it will prevent rootnode from culling)
+    // so it will always display (and it will prevent rootnode from culling)
 
     // Attach children
     _root.attachChild(box1);

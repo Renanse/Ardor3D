@@ -13,6 +13,7 @@ package com.ardor3d.renderer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -24,8 +25,6 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.texture.ITextureUtils;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 

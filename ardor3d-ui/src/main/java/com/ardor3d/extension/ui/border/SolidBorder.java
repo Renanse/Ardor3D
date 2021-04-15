@@ -10,6 +10,9 @@
 
 package com.ardor3d.extension.ui.border;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.math.ColorRGBA;
@@ -21,11 +24,8 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * This border draws solid colored edges around a UI component. Each edge may be a different

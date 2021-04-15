@@ -40,7 +40,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.GameTaskQueue;
@@ -178,14 +177,6 @@ public class ColladaManualAnimationExample extends ExampleBase {
   protected void initExample() {
     _canvas.setTitle("Ardor3D - Collada Import - Manual Animation");
 
-    _lightState.detachAll();
-    final DirectionalLight light = new DirectionalLight();
-    light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-    light.setAmbient(new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
-    light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    light.setEnabled(true);
-    _lightState.attach(light);
-
     // Load collada model
     try {
       final long time = System.currentTimeMillis();
@@ -218,14 +209,12 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
     final BasicText t1 = BasicText.createDefaultTextLabel("Text1", "[K] Show Skeleton.");
     t1.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    t1.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t1.setTranslation(new Vector3(5, 0 * (t1.getHeight() + 5) + 10, 0));
     _orthoRoot.attachChild(t1);
     _orthoRoot.getSceneHints().setCullHint(CullHint.Never);
 
     final BasicText t2 = BasicText.createDefaultTextLabel("Text2", "[M] Hide Mesh.");
     t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t2.setTranslation(new Vector3(5, 1 * (t1.getHeight() + 5) + 10, 0));
     _orthoRoot.attachChild(t2);
 
@@ -257,6 +246,15 @@ public class ColladaManualAnimationExample extends ExampleBase {
     frameRateLabel.setTextColor(ColorRGBA.WHITE);
     frameRateLabel.getSceneHints().setOrthoOrder(-1);
     _root.attachChild(frameRateLabel);
+  }
+
+  @Override
+  protected void setupLight() {
+    final DirectionalLight light = new DirectionalLight();
+    light.setColor(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+    light.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    light.setEnabled(true);
+    _root.attachChild(light);
   }
 
   private void positionCamera() {

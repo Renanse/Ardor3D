@@ -10,12 +10,12 @@
 
 package com.ardor3d.extension.ui.util;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.util.MathUtils;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class UIDisk extends Mesh {
 

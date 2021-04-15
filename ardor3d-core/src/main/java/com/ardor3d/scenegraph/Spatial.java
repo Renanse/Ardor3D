@@ -84,8 +84,8 @@ public abstract class Spatial implements Savable, Hintable {
   /** The local render states of this spatial. */
   protected EnumMap<RenderState.StateType, RenderState> _renderStateList = new EnumMap<>(RenderState.StateType.class);
 
-  /** Listener for dirty events. */
-  protected DirtyEventListener _listener;
+  /** Listeners for dirty events. */
+  protected List<DirtyEventListener> _listeners;
 
   /** Field for accumulating dirty marks. */
   protected EnumSet<DirtyType> _dirtyMark = EnumSet.of(DirtyType.Bounding, DirtyType.RenderState, DirtyType.Transform);
@@ -247,19 +247,31 @@ public abstract class Spatial implements Savable, Hintable {
   public SceneHints getSceneHints() { return _sceneHints; }
 
   /**
-   * Returns the listener for dirty events on this node, if set.
+   * Add the listener for dirty events on this node.
    *
-   * @return the listener
+   * @param listener
+   *          listener to add.
    */
-  public DirtyEventListener getListener() { return _listener; }
+  public void addListener(final DirtyEventListener listener) {
+    if (_listeners == null) {
+      _listeners = new ArrayList<>();
+    }
+    _listeners.add(listener);
+  }
 
   /**
-   * Sets the listener for dirty events on this node.
+   * Removes the listener for dirty events on this node.
    *
    * @param listener
    *          listener to use.
+   * @return true if the given listener was found
    */
-  public void setListener(final DirtyEventListener listener) { _listener = listener; }
+  public boolean removeListener(final DirtyEventListener listener) {
+    if (_listeners == null) {
+      return false;
+    }
+    return _listeners.remove(listener);
+  }
 
   /**
    * Mark this node as dirty. Can be marked as Transform, Bounding, Attached, Detached, Destroyed or
@@ -375,27 +387,27 @@ public abstract class Spatial implements Savable, Hintable {
   }
 
   /**
-   * Propagate the dirty event up the hierarchy. If a listener is found on the spatial the event is
-   * fired and the propagation is stopped.
+   * Propagate the dirty event up the hierarchy to any registered listeners
    *
    * @param spatial
    *          the spatial
    * @param dirtyType
    *          the dirty type
    * @param dirty
-   *          if true, propogate a dirty event, else propogate a clean event
+   *          true if this is a dirty event, false if clean
    */
   protected void propageEventUp(final Spatial spatial, final DirtyType dirtyType, final boolean dirty) {
-    boolean consumed = false;
-    if (_listener != null) {
-      if (dirty) {
-        consumed = _listener.spatialDirty(spatial, dirtyType);
-      } else {
-        consumed = _listener.spatialClean(spatial, dirtyType);
+    boolean consumed;
+    if (_listeners != null) {
+      for (final var listener : _listeners) {
+        consumed = dirty ? listener.spatialDirty(spatial, dirtyType) : listener.spatialClean(spatial, dirtyType);
+        if (consumed) {
+          return;
+        }
       }
     }
 
-    if (!consumed && _parent != null) {
+    if (_parent != null) {
       _parent.propageEventUp(spatial, dirtyType, dirty);
     }
   }
@@ -958,11 +970,6 @@ public abstract class Spatial implements Savable, Hintable {
   protected void applyWorldRenderStates(final boolean recurse, final RenderState.StateStack stack) {}
 
   /**
-   * Sort the ligts on this spatial.
-   */
-  public void sortLights() {}
-
-  /**
    * Retrieves the complete renderstate list.
    *
    * @return the list of renderstates
@@ -1052,29 +1059,6 @@ public abstract class Spatial implements Savable, Hintable {
       _parent.updateWorldBound(false);
       _parent.propagateBoundToRoot();
     }
-  }
-
-  /**
-   * Gets the Spatial specific user data. Note that this is mapped to getLocalProperty(KEY_UserData)
-   * to maintain the "local only" behavior of the older API.
-   *
-   * @return the user data
-   * @deprecated Use {@link #getProperty(String)} instead.
-   */
-  @Deprecated
-  public Object getUserData() { return getLocalProperty(Spatial.KEY_UserData, null); }
-
-  /**
-   * Sets the Spatial specific user data.
-   *
-   * @param userData
-   *          Some Spatial specific user data. Note: If this object is not explicitly of type Savable,
-   *          it will be ignored during read/write.
-   * @deprecated Use {@link #setProperty(String, Object)} instead.
-   */
-  @Deprecated
-  public void setUserData(final Object userData) {
-    setProperty(Spatial.KEY_UserData, userData);
   }
 
   /**

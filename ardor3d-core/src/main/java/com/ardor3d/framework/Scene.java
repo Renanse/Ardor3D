@@ -12,7 +12,7 @@ package com.ardor3d.framework;
 
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.scenegraph.Renderable;
+import com.ardor3d.renderer.Renderable;
 
 /**
  * Owns all the data that is related to the scene. This class should not really know anything about

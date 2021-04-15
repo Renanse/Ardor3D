@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -21,7 +22,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.stat.StatCollector;
@@ -143,8 +143,8 @@ public abstract class GraphFactory {
    */
   private static void setupGraphQuad(final Quad quad, final Texture2D graphTexture, final float maxU,
       final float maxV) {
+    LightProperties.setLightReceiver(quad, false);
     quad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-    quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     quad.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
     quad.getSceneHints().setOrthoOrder(-1);
 

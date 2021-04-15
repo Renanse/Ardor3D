@@ -51,6 +51,8 @@ import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.system.MemoryStack;
 
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.TextureStoreFormat;
@@ -63,8 +65,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
@@ -372,7 +372,7 @@ public class AssimpModelImporter {
     }
 
     final IndexBufferData<?> rVal =
-        com.ardor3d.util.geom.BufferUtils.createIndexBufferData(count * tupleCount, vertexCount);
+        com.ardor3d.buffer.BufferUtils.createIndexBufferData(count * tupleCount, vertexCount);
     for (int i = 0; i < count; ++i) {
       final AIFace face = buffer.get();
       rVal.put(face.mIndices());

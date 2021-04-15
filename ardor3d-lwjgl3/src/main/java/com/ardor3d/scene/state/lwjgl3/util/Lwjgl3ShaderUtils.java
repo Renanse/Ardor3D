@@ -34,6 +34,9 @@ import org.lwjgl.opengl.GL33C;
 import org.lwjgl.opengl.GL40C;
 import org.lwjgl.system.MemoryStack;
 
+import com.ardor3d.buffer.AbstractBufferData;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.light.LightManager;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Quaternion;
@@ -55,10 +58,9 @@ import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.renderer.state.record.RendererRecord;
-import com.ardor3d.scenegraph.AbstractBufferData;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
@@ -627,6 +629,22 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
       case Light: {
         throw new Ardor3dException("Uniform of source Ardor3dStateProperty+Light must be of type 'UniformSupplier'.");
+      }
+
+      case GlobalAmbientLight: {
+        final SceneIndexer indexer = SceneIndexer.getCurrent();
+        final LightManager lm = indexer != null ? indexer.getLightManager() : null;
+
+        final ReadOnlyColorRGBA color = lm != null ? lm.getGlobalAmbient() : LightManager.DEFAULT_GLOBAL_AMBIENT;
+        if (color != null) {
+          final FloatBuffer buffer = stack.mallocFloat(3);
+          buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
+          buffer.rewind();
+          return buffer;
+        } else if (defaultValue != null) {
+          return getBuffer(UniformType.Float3, defaultValue, stack);
+        }
+        break;
       }
 
       default:

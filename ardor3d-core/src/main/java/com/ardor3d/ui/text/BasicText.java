@@ -13,6 +13,7 @@ package com.ardor3d.ui.text;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
@@ -22,7 +23,6 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.URLResourceSource;
@@ -37,11 +37,11 @@ public class BasicText extends BMText {
 
   static {
     try {
-      DEFAULT_FONT = new BMFont(new URLResourceSource(
+      BasicText.DEFAULT_FONT = new BMFont(new URLResourceSource(
           ResourceLocatorTool.getClassPathResource(BasicText.class, "com/ardor3d/ui/text/arial-24-bold-regular.fnt")),
           true);
     } catch (final Exception ex) {
-      logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
+      BasicText.logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
     }
   }
 
@@ -80,10 +80,10 @@ public class BasicText extends BMText {
 
     setProperty(AlphaTestConsts.KEY_AlphaTestType, AlphaTestConsts.TestFunction.GreaterThan);
     setProperty(AlphaTestConsts.KEY_AlphaReference, 0f);
+    LightProperties.setLightReceiver(this, false);
 
     getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
     getSceneHints().setCullHint(CullHint.Never);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     setLayer(Spatial.LAYER_UI);
 
@@ -91,11 +91,11 @@ public class BasicText extends BMText {
   }
 
   public static BasicText createDefaultTextLabel(final String name, final String text, final double fontSize) {
-    return new BasicText(name, text, DEFAULT_FONT, fontSize);
+    return new BasicText(name, text, BasicText.DEFAULT_FONT, fontSize);
   }
 
   public static BasicText createDefaultTextLabel(final String name, final String text) {
-    return new BasicText(name, text, DEFAULT_FONT, DEFAULT_FONT_SIZE);
+    return new BasicText(name, text, BasicText.DEFAULT_FONT, BasicText.DEFAULT_FONT_SIZE);
   }
 
 }

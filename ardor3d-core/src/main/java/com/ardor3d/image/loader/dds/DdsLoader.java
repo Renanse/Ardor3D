@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.util.LittleEndianDataInput;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <p>

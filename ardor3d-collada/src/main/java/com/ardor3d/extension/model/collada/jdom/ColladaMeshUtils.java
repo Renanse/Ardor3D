@@ -17,17 +17,17 @@ import java.util.logging.Logger;
 
 import org.jdom2.Element;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.Type;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.MeshVertPairs;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.GeometryTool;
 import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 import com.ardor3d.util.geom.VertMap;

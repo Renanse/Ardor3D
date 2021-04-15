@@ -12,11 +12,11 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -53,7 +53,7 @@ public class AxisRods extends Node {
     this.length = length;
     this.width = width;
     this.rightHanded = rightHanded;
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
 
     buildAxis();
@@ -61,18 +61,18 @@ public class AxisRods extends Node {
 
   protected void buildAxis() {
     xAxis = new Arrow("_xAxis", length, width);
-    xAxis.setDefaultColor(xAxisColor);
+    xAxis.setDefaultColor(AxisRods.xAxisColor);
     xAxis.setRotation(new Matrix3().fromAngles(0, 0, -90 * MathUtils.DEG_TO_RAD));
     xAxis.setTranslation(length * .5, 0, 0);
     attachChild(xAxis);
 
     yAxis = new Arrow("yAxis", length, width);
-    yAxis.setDefaultColor(yAxisColor);
+    yAxis.setDefaultColor(AxisRods.yAxisColor);
     yAxis.setTranslation(0, length * .5, 0);
     attachChild(yAxis);
 
     zAxis = new Arrow("zAxis", length, width);
-    zAxis.setDefaultColor(zAxisColor);
+    zAxis.setDefaultColor(AxisRods.zAxisColor);
     if (rightHanded) {
       zAxis.setRotation(new Matrix3().fromAngles(90 * MathUtils.DEG_TO_RAD, 0, 0));
       zAxis.setTranslation(0, 0, length * .5);

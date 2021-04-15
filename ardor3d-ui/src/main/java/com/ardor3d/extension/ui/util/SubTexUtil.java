@@ -10,6 +10,9 @@
 
 package com.ardor3d.extension.ui.util;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
@@ -22,11 +25,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * SubTexUtil is a utility for drawing SubTex objects to a renderer.

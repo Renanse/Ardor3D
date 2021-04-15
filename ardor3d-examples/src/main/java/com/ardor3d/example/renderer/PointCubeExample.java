@@ -12,6 +12,7 @@ package com.ardor3d.example.renderer;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
@@ -39,7 +40,6 @@ import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A more complex example of using geometry shaders. Requires support for geometry shaders

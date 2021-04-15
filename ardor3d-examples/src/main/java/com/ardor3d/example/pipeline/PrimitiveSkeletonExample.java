@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.pipeline;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.Joint;
@@ -29,11 +30,9 @@ import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.RenderMaterial;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A demonstration of combining the skeletal animation classes with OpenGL Shading Language.
@@ -63,7 +62,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
     _canvas.setTitle("Simple example of skinned mesh");
     _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 1.0f));
 
-    _lightState.get(0).setDiffuse(new ColorRGBA(300, 300, 300, 1));
+    light.setColor(new ColorRGBA(300, 300, 300, 1));
 
     SkinnedMesh.addDefaultResourceLocators();
 
@@ -154,19 +153,16 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
     t1 = BasicText.createDefaultTextLabel("Text1", "[SPACE] Pause joint animation.");
     t1.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    t1.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t1.setTranslation(new Vector3(5, 2 * (t1.getHeight() + 5) + 10, 0));
     _orthoRoot.attachChild(t1);
 
     t2 = BasicText.createDefaultTextLabel("Text2", "[G] GPU Skinning is " + (useGPU ? "ON." : "OFF."));
     t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t2.setTranslation(new Vector3(5, 1 * (t1.getHeight() + 5) + 10, 0));
     _orthoRoot.attachChild(t2);
 
     t3 = BasicText.createDefaultTextLabel("Text3", "[K] Show Skeleton.");
     t3.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    t3.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t3.setTranslation(new Vector3(5, 0 * (t1.getHeight() + 5) + 10, 0));
     _orthoRoot.attachChild(t3);
     _orthoRoot.getSceneHints().setCullHint(CullHint.Never);

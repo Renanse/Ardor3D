@@ -27,10 +27,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class BinaryInputCapsule implements InputCapsule {
   private static final Logger logger = Logger.getLogger(BinaryInputCapsule.class.getName());

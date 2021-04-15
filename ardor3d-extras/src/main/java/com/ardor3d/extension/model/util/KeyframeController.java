@@ -15,10 +15,11 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
@@ -26,7 +27,6 @@ import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * TODO: Revisit for better Ardor3D integration.

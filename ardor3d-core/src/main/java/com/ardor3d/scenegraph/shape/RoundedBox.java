@@ -13,12 +13,12 @@ package com.ardor3d.scenegraph.shape;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class RoundedBox extends Mesh implements Cloneable {
 

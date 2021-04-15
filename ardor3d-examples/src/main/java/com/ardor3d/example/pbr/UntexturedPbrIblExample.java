@@ -23,13 +23,13 @@ import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.texture.CubeMapRenderUtil;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Teapot;
@@ -84,13 +84,6 @@ public class UntexturedPbrIblExample extends ExampleBase {
       }
     }
 
-    _lightState.detachAll();
-    for (int i = 0; i < _lightCount; i++) {
-      _lights[i] = new PointLight();
-      _lights[i].setDiffuse(new ColorRGBA(900, 900, 900, 1));
-      _lightState.attach(_lights[i]);
-    }
-
     final TextureState ts = new TextureState();
     ts.setTexture(irradianceTex, 0);
     ts.setTexture(prefilterTex, 1);
@@ -98,6 +91,15 @@ public class UntexturedPbrIblExample extends ExampleBase {
     _root.setRenderState(ts);
 
     _root.setRenderMaterial("pbr/pbr_untextured_ibl.yaml");
+  }
+
+  @Override
+  protected void setupLight() {
+    for (int i = 0; i < _lightCount; i++) {
+      _lights[i] = new PointLight();
+      _lights[i].setColor(new ColorRGBA(900, 900, 900, 1));
+      _root.attachChild(_lights[i]);
+    }
   }
 
   private void buildTextures() {
@@ -199,8 +201,9 @@ public class UntexturedPbrIblExample extends ExampleBase {
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
+      _lights[i].setTranslation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
           ((i / 2) % 2 == 1) ? -30 : 30, 30f);
+      _lights[i].updateWorldTransform(false);
     }
   }
 }

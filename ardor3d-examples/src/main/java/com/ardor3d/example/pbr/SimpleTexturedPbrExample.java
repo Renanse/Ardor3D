@@ -32,7 +32,7 @@ import com.ardor3d.util.TextureManager;
     maxHeapMemory = 64)
 public class SimpleTexturedPbrExample extends ExampleBase {
 
-  int _lightCount = 1;
+  int _lightCount = 4;
   PointLight _lights[] = new PointLight[_lightCount];
 
   public static void main(final String[] args) {
@@ -73,20 +73,22 @@ public class SimpleTexturedPbrExample extends ExampleBase {
       }
     }
 
-    _lightState.detachAll();
+    _root.setRenderMaterial("pbr/pbr_textured_simple.yaml");
+  }
+
+  @Override
+  protected void setupLight() {
     for (int i = 0; i < _lightCount; i++) {
       _lights[i] = new PointLight();
-      _lights[i].setDiffuse(new ColorRGBA(150, 150, 150, 1));
-      _lightState.attach(_lights[i]);
+      _lights[i].setColor(new ColorRGBA(150, 150, 150, 1));
+      _root.attachChild(_lights[i]);
     }
-
-    _root.setRenderMaterial("pbr/pbr_textured_simple.yaml");
   }
 
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -10 : 10) + Math.sin(timer.getTimeInSeconds() * 2) * 5,
+      _lights[i].setTranslation(((i % 2 == 1) ? -10 : 10) + Math.sin(timer.getTimeInSeconds() * 2) * 5,
           ((i / 2) % 2 == 1) ? -10 : 10, 10f);
     }
   }

@@ -221,17 +221,6 @@ public class CompoundTerrainExample extends ExampleBase {
   }
 
   private void setupDefaultStates() {
-    _lightState.detachAll();
-    final DirectionalLight dLight = new DirectionalLight();
-    dLight.setEnabled(true);
-    dLight.setAmbient(new ColorRGBA(0.4f, 0.4f, 0.5f, 1));
-    dLight.setDiffuse(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    dLight.setSpecular(new ColorRGBA(0.3f, 0.3f, 0.2f, 1));
-    dLight.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    _root.setProperty("lightDir", dLight.getDirection());
-    _lightState.attach(dLight);
-    _lightState.setEnabled(true);
-
     final CullState cs = new CullState();
     cs.setEnabled(true);
     cs.setCullFace(CullState.Face.Back);
@@ -243,6 +232,16 @@ public class CompoundTerrainExample extends ExampleBase {
     fog.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
     fog.setFunction(DensityFunction.Linear);
     _root.setProperty(FogParams.DefaultPropertyKey, fog);
+  }
+
+  @Override
+  protected void setupLight() {
+    final DirectionalLight dLight = new DirectionalLight();
+    dLight.setEnabled(true);
+    dLight.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
+    dLight.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    _root.setProperty("lightDir", dLight.getWorldDirection());
+    _root.attachChild(dLight);
   }
 
   public static class ExampleEntry extends Entry {

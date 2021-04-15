@@ -10,10 +10,10 @@
 
 package com.ardor3d.extension.ui.text;
 
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 
 /**
@@ -24,7 +24,7 @@ public class TextMesh extends Mesh {
   public TextMesh() {
     super("text");
     getMeshData().setIndexMode(IndexMode.Triangles);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
     // -- never cull

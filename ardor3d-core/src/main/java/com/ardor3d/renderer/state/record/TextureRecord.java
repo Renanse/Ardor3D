@@ -12,8 +12,8 @@ package com.ardor3d.renderer.state.record;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class TextureRecord extends StateRecord {
 

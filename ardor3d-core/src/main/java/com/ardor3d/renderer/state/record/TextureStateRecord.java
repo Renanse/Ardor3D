@@ -14,9 +14,9 @@ import java.nio.DoubleBuffer;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class TextureStateRecord extends StateRecord {
 

@@ -13,8 +13,8 @@ package com.ardor3d.scenegraph.visitor;
 import java.nio.Buffer;
 import java.util.Map.Entry;
 
+import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.renderer.material.IShaderUtils;
-import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;

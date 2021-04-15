@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
 import com.ardor3d.extension.ui.text.font.BMFontProvider;
 import com.ardor3d.extension.ui.text.font.FontProvider;
@@ -33,7 +34,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.MeshData;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

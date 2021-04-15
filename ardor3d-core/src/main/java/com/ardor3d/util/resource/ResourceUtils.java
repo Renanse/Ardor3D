@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.buffer.BufferUtils;
 
 public final class ResourceUtils {
 

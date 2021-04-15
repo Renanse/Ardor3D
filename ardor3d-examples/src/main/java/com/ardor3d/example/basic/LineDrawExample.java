@@ -12,6 +12,7 @@ package com.ardor3d.example.basic;
 
 import java.util.LinkedList;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Image;
@@ -43,7 +44,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.TextureKey;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.GeometryTool;
 
 @Purpose(

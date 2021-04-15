@@ -12,16 +12,16 @@ package com.ardor3d.extension.ui.util;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.IndexBufferData;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.image.Image;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
-import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class UIArc extends Mesh {
 

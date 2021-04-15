@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.extension.model.util.KeyframeController;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.MinificationFilter;
@@ -23,8 +25,6 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.Ardor3dException;

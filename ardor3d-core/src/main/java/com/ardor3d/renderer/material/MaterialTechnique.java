@@ -13,7 +13,7 @@ package com.ardor3d.renderer.material;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.scenegraph.Renderable;
+import com.ardor3d.renderer.Renderable;
 
 public class MaterialTechnique {
 

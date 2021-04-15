@@ -62,20 +62,22 @@ public class SimplePbrExample extends ExampleBase {
       }
     }
 
-    _lightState.detachAll();
+    _root.setRenderMaterial("pbr/pbr_untextured_simple.yaml");
+  }
+
+  @Override
+  protected void setupLight() {
     for (int i = 0; i < _lightCount; i++) {
       _lights[i] = new PointLight();
-      _lights[i].setDiffuse(new ColorRGBA(900, 900, 900, 1));
-      _lightState.attach(_lights[i]);
+      _lights[i].setColor(new ColorRGBA(900, 900, 900, 1));
+      _root.attachChild(_lights[i]);
     }
-
-    _root.setRenderMaterial("pbr/pbr_untextured_simple.yaml");
   }
 
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
+      _lights[i].setTranslation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
           ((i / 2) % 2 == 1) ? -30 : 30, 30f);
     }
   }

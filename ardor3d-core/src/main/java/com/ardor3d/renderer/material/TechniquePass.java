@@ -22,6 +22,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ardor3d.buffer.AbstractBufferData;
+import com.ardor3d.light.LightManager;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -29,11 +31,10 @@ import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.gc.ContextValueReference;
@@ -129,9 +130,11 @@ public class TechniquePass {
 
   public void addLightInfoUniforms(final int maxLights) {
     for (int i = 0; i < maxLights; i++) {
-      addUniform(new UniformRef("light[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
+      addUniform(new UniformRef("lightProps.lights[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
           Ardor3dStateProperty.Light, i, null));
     }
+    addUniform(new UniformRef("lightProps.globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
+        Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
   }
 
   public void setupForDraw(final Renderer renderer, final Mesh mesh, final MeshData data) {
@@ -274,13 +277,12 @@ public class TechniquePass {
       case Ardor3dState:
         final Ardor3dStateProperty prop = Ardor3dStateProperty.valueOf(uniform.getValue().toString());
         if (prop == Ardor3dStateProperty.Light) {
-          // grab the appropriate light
           final int index = (!(uniform.getExtra() instanceof Integer)) ? 0 : ((Integer) uniform.getExtra()).intValue();
-          final RenderContext context = ContextManager.getCurrentContext();
-          final LightState ls = (LightState) context.getCurrentState(StateType.Light);
-          if (ls.count() > index) {
-            supplier = ls.get(index);
-          }
+          // grab the appropriate light from the current SceneIndexer's LightManager
+          final SceneIndexer si = SceneIndexer.getCurrent();
+          final LightManager lm = si != null ? si.getLightManager() : null;
+          supplier = lm != null ? lm.getBestLight(mesh, index) : null;
+          // defaults to point light if we don't get a supplier
           clazzName = "com.ardor3d.light.PointLight";
         } else {
           throw new Ardor3dException("Uniform type 'UniformSupplier' can not be used with Ardor3dState." + prop);

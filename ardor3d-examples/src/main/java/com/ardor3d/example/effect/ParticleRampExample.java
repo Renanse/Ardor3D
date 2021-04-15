@@ -47,7 +47,6 @@ public class ParticleRampExample extends ExampleBase {
     EffectUtils.addDefaultResourceLocators();
 
     _canvas.setTitle("Particle System - Example");
-    _lightState.setEnabled(false);
 
     final ParticleSystem particles = ParticleFactory.buildParticles("particles", 1);
     particles.setEmissionDirection(new Vector3(0, 1, 0));

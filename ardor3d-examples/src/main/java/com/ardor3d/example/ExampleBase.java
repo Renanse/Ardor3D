@@ -71,10 +71,10 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.util.Constants;
@@ -109,8 +109,6 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
   protected final Node _orthoRoot = new Node();
 
   protected Camera _orthoCam;
-
-  protected LightState _lightState;
 
   protected WireframeState _wireframeState;
 
@@ -193,19 +191,11 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
     buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
     _root.setRenderState(buf);
 
-    // ---- LIGHTS
-    /** Set up a basic, default light. */
-    light = new PointLight();
-    light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-    light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-    light.setLocation(new Vector3(100, 100, 100));
-    light.setEnabled(true);
+    SceneIndexer.getCurrent().addSceneRoot(_root);
+    SceneIndexer.getCurrent().addSceneRoot(_orthoRoot);
 
-    /** Attach the light to a lightState and the lightState to rootNode. */
-    _lightState = new LightState();
-    _lightState.setEnabled(true);
-    _lightState.attach(light);
-    _root.setRenderState(_lightState);
+    /** Set up a basic, default light. */
+    setupLight();
 
     _wireframeState = new WireframeState();
     _wireframeState.setEnabled(false);
@@ -217,6 +207,15 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
     initExample();
 
     _root.updateGeometricState(0);
+  }
+
+  protected void setupLight() {
+    light = new PointLight();
+    light.setColor(ColorRGBA.WHITE);
+    light.setIntensity(.75f);
+    light.setTranslation(100, 100, 100);
+    light.setEnabled(true);
+    _root.attachChild(light);
   }
 
   protected abstract void initExample();
@@ -272,6 +271,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
 
     /** Draw the rootNode and all its children. */
     if (!_canvas.isClosing()) {
+      /** Ask the current SceneIndexer to do anything Renderer related - like shadows. */
+      SceneIndexer.getCurrent().onRender(renderer);
+
       /** Call renderExample in any derived classes. */
       renderExample(renderer);
       renderDebug(renderer);
@@ -481,10 +483,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
         .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), (source, inputState, tpf) -> exit()));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.L), (source, inputState, tpf) -> {
-      _lightState.setEnabled(!_lightState.isEnabled());
-      // Either an update or a markDirty is needed here since we did not touch the affected spatial
-      // directly.
-      _root.markDirty(DirtyType.RenderState);
+      if (light != null) {
+        light.setEnabled(!light.isEnabled());
+      }
     }));
 
     _logicalLayer.registerTrigger(

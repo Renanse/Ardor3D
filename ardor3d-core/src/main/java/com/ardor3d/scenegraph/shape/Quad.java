@@ -13,13 +13,13 @@ package com.ardor3d.scenegraph.shape;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <code>Quad</code> defines a four sided, two dimensional shape. The local height of the
@@ -119,10 +119,10 @@ public class Quad extends Mesh {
 
   public static Quad newFullScreenQuad() {
     final Quad quad = new Quad("fsq", 2, 2);
+    LightProperties.setLightReceiver(quad, false);
     final SceneHints sceneHints = quad.getSceneHints();
     sceneHints.setCullHint(CullHint.Never);
     sceneHints.setRenderBucketType(RenderBucketType.OrthoOrder);
-    sceneHints.setLightCombineMode(LightCombineMode.Off);
     sceneHints.setTextureCombineMode(TextureCombineMode.Replace);
     return quad;
   }

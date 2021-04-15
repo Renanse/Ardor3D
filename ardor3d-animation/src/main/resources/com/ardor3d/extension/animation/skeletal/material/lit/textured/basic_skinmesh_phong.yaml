@@ -10,7 +10,7 @@ techniques:
           - key: uv0
 
         uniforms: 
-          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights4, colorSurface, alphaTest]
+          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights, colorSurface, alphaTest]
           - 
             shaderKey: jointPalette
             type: Matrix4x4

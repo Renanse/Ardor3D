@@ -12,13 +12,13 @@ package com.ardor3d.image.util;
 
 import java.nio.ByteBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  *

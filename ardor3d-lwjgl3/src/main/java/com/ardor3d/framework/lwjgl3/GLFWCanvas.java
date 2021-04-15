@@ -29,6 +29,7 @@ import org.lwjgl.opengl.GL11C;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
@@ -40,7 +41,6 @@ import com.ardor3d.input.focus.FocusWrapper;
 import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class GLFWCanvas implements NativeCanvas, FocusWrapper {
   private static final Logger logger = Logger.getLogger(GLFWCanvas.class.getName());

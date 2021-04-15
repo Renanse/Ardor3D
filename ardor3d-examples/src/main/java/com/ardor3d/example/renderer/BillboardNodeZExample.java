@@ -25,7 +25,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.AxisRods;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
@@ -85,7 +84,6 @@ public class BillboardNodeZExample extends ExampleBase {
     _canvas.setTitle("BillboardNodeZ - Example");
 
     text = BasicText.createDefaultTextLabel("Text", "[SPACE] " + StartingAlignment);
-    text.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     text.setTranslation(new Vector3(5, 20, 0));
     _orthoRoot.attachChild(text);
 

@@ -11,7 +11,7 @@ techniques:
             span: 4
           
         uniforms: 
-          - builtIn: [model, view, projection, cameraLoc, lights4, colorSurface, alphaTest]
+          - builtIn: [model, view, projection, cameraLoc, lights, colorSurface, alphaTest]
             
         shaders: 
           Vertex: 

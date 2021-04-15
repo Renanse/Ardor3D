@@ -13,6 +13,7 @@ package com.ardor3d.extension.effect.particle;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.effect.particle.ParticleSystem.ParticleType;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
@@ -23,7 +24,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <code>Particle</code> defines a single Particle of a Particle system. Generally, you would not

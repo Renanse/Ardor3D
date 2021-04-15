@@ -15,6 +15,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
 import com.ardor3d.extension.effect.particle.emitter.SavableParticleEmitter;
 import com.ardor3d.math.ColorRGBA;
@@ -37,7 +38,6 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * ParticleSystem is an abstract class representing a particle system. A ParticleController must be

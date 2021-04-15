@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
 import com.ardor3d.math.ColorRGBA;
@@ -25,7 +26,6 @@ import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class TextSelection {
 

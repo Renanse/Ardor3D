@@ -16,8 +16,11 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -33,14 +36,12 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.scenegraph.shape.AxisRods;
 import com.ardor3d.scenegraph.shape.Box;
@@ -635,7 +636,7 @@ public final class Debugger {
       line.getMeshData()
           .setIndexModes(new IndexMode[] {IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines});
       line.getMeshData().setIndexLengths(new int[] {4, 4, 8, 8});
-      line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+      LightProperties.setLightReceiver(line, false);
 
       final BlendState lineBlendState = new BlendState();
       lineBlendState.setEnabled(true);

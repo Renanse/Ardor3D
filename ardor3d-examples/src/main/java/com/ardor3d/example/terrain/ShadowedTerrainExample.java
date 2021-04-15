@@ -17,9 +17,9 @@ import java.util.logging.Logger;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.shadow.ShadowCastMode;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass.Filter;
-import com.ardor3d.extension.shadow.map.ShadowCasterManager;
 import com.ardor3d.extension.terrain.client.Terrain;
 import com.ardor3d.extension.terrain.client.TerrainBuilder;
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
@@ -32,6 +32,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
@@ -42,7 +43,6 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
@@ -218,13 +218,13 @@ public class ShadowedTerrainExample extends ExampleBase {
     // Add terrain in as bounds receiver as well, since it's not in the overlay list
     _pssmPass.addBoundsReceiver(terrain);
 
-    // Add our occluders that will produce shadows
-    ShadowCasterManager.INSTANCE.addSpatial(occluders);
+    // Set our occluders to produce shadows
+    occluders.setProperty(ShadowCastMode.SpatialKey, ShadowCastMode.OneSidedUntextured);
 
     // Setup labels for presenting example info.
     final Node textNodes = new Node("Text");
     _orthoRoot.attachChild(textNodes);
-    textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(textNodes, false);
 
     final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
     for (int i = 0; i < _exampleInfo.length; i++) {
@@ -316,16 +316,6 @@ public class ShadowedTerrainExample extends ExampleBase {
   }
 
   private void setupDefaultStates() {
-    _lightState.detachAll();
-    light = new DirectionalLight();
-    light.setEnabled(true);
-    light.setAmbient(new ColorRGBA(0.4f, 0.4f, 0.5f, 1));
-    light.setDiffuse(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    light.setSpecular(new ColorRGBA(0.3f, 0.3f, 0.2f, 1));
-    light.setDirection(lightPosition.normalize(null).negateLocal());
-    _lightState.attach(light);
-    _lightState.setEnabled(true);
-
     final CullState cs = new CullState();
     cs.setEnabled(true);
     cs.setCullFace(CullState.Face.Back);
@@ -337,6 +327,15 @@ public class ShadowedTerrainExample extends ExampleBase {
     // fs.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
     // fs.setDensityFunction(DensityFunction.Linear);
     // _root.setRenderState(fs);
+  }
+
+  @Override
+  protected void setupLight() {
+    light = new DirectionalLight();
+    light.setEnabled(true);
+    light.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
+    light.setWorldDirection(lightPosition.normalize(null).negateLocal());
+    _root.attachChild(light);
   }
 
   /**

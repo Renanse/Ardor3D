@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
@@ -23,16 +22,14 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
 /**
- * <code>PointLight</code> defines a light that has a location in space and emits light in all
- * directions evenly. This would be something similar to a light bulb. Typically this light's values
- * are attenuated based on the distance of the point light and the object it illuminates.
+ * <code>PointLight</code> defines a light that emits light in all directions evenly. This would be
+ * something similar to a light bulb. Typically this light's values are attenuated based on the
+ * distance of the point light and the object it illuminates. The light's position is read from its
+ * WorldTransform.
  */
 public class PointLight extends Light {
 
   private static final long serialVersionUID = 1L;
-
-  // Position of the light.
-  private Vector3 _location;
 
   private float _constant = 1;
   private float _linear;
@@ -45,47 +42,15 @@ public class PointLight extends Light {
    */
   public PointLight() {
     super();
-    _location = new Vector3();
 
     cachedUniforms.add(new UniformRef("position", UniformType.Float3, UniformSource.Supplier,
-        (Supplier<ReadOnlyVector3>) this::getLocation));
+        (Supplier<ReadOnlyVector3>) this::getWorldTranslation));
     cachedUniforms.add(
         new UniformRef("constant", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getConstant));
     cachedUniforms
         .add(new UniformRef("linear", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getLinear));
     cachedUniforms.add(
         new UniformRef("quadratic", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getQuadratic));
-  }
-
-  /**
-   * <code>getLocation</code> returns the position of this light.
-   *
-   * @return the position of the light.
-   */
-  public ReadOnlyVector3 getLocation() { return _location; }
-
-  /**
-   * <code>setLocation</code> sets the position of the light.
-   *
-   * @param location
-   *          the position of the light.
-   */
-  public void setLocation(final ReadOnlyVector3 location) {
-    _location.set(location);
-  }
-
-  /**
-   * <code>setLocation</code> sets the position of the light.
-   *
-   * @param x
-   *          the x position of the light.
-   * @param y
-   *          the y position of the light.
-   * @param z
-   *          the z position of the light.
-   */
-  public void setLocation(final double x, final double y, final double z) {
-    _location.set(x, y, z);
   }
 
   /**
@@ -135,9 +100,8 @@ public class PointLight extends Light {
 
   @Override
   public void applyDefaultUniformValues() {
-    setAmbient(ColorRGBA.BLACK_NO_ALPHA);
-    setDiffuse(ColorRGBA.BLACK_NO_ALPHA);
-    setSpecular(ColorRGBA.BLACK_NO_ALPHA);
+    setColor(ColorRGBA.BLACK_NO_ALPHA);
+    setIntensity(1f);
     setConstant(1);
     setQuadratic(0);
     setLinear(0);
@@ -154,7 +118,6 @@ public class PointLight extends Light {
   @Override
   public void write(final OutputCapsule capsule) throws IOException {
     super.write(capsule);
-    capsule.write(_location, "location", new Vector3(Vector3.ZERO));
     capsule.write(_constant, "constant", 1);
     capsule.write(_linear, "linear", 0);
     capsule.write(_quadratic, "quadratic", 0);
@@ -163,7 +126,6 @@ public class PointLight extends Light {
   @Override
   public void read(final InputCapsule capsule) throws IOException {
     super.read(capsule);
-    _location = capsule.readSavable("location", (Vector3) Vector3.ZERO);
     _constant = capsule.readFloat("constant", 1);
     _linear = capsule.readFloat("linear", 0);
     _quadratic = capsule.readFloat("quadratic", 0);

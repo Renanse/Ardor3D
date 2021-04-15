@@ -10,8 +10,8 @@
 
 package com.ardor3d.scenegraph.shape;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Teapot is the classical teapot model ready for you to use in ardor3d! If you plan to texture this

@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL31C;
 import org.lwjgl.opengl.GL32C;
 import org.lwjgl.opengl.GLUtil;
 
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -30,6 +31,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -53,8 +55,6 @@ import com.ardor3d.scene.state.lwjgl3.Lwjgl3ZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3ScissorUtils;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3ShaderUtils;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
-import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -351,13 +351,6 @@ public class Lwjgl3Renderer extends AbstractRenderer {
       case ZBuffer:
         Lwjgl3ZBufferStateUtil.apply((ZBufferState) state);
         return;
-
-      // The following are not core compatible states - we'll need to do them in shader.
-      case Light: {
-        final RenderContext context = ContextManager.getCurrentContext();
-        context.setCurrentState(state.getType(), state);
-        return;
-      }
     }
     throw new IllegalArgumentException("Unknown state: " + state);
   }

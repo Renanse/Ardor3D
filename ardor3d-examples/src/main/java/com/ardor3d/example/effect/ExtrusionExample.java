@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.math.Vector3;
@@ -27,7 +28,6 @@ import com.ardor3d.scenegraph.shape.Extrusion;
 import com.ardor3d.spline.CatmullRomSpline;
 import com.ardor3d.spline.Curve;
 import com.ardor3d.util.MaterialUtil;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A demonstration of the Extrusion class - showing how a set of point can be converted into a 3d

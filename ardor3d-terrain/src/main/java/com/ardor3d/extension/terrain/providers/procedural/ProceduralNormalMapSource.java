@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.terrain.client.TextureConfiguration;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
@@ -24,7 +25,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class ProceduralNormalMapSource implements TextureSource {
   private final Function3D function;

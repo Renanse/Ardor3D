@@ -41,11 +41,6 @@ public class SceneHints implements Savable {
   protected PropertyMode _propertyMode = PropertyMode.Inherit;
 
   /**
-   * Flag signaling how lights are combined for this node. By default set to INHERIT.
-   */
-  protected LightCombineMode _lightCombineMode = LightCombineMode.Inherit;
-
-  /**
    * Flag signaling how textures are combined for this node. By default set to INHERIT.
    */
   protected TextureCombineMode _textureCombineMode = TextureCombineMode.Inherit;
@@ -76,11 +71,6 @@ public class SceneHints implements Savable {
    */
   private TransparencyType _transpType = TransparencyType.Inherit;
 
-  /**
-   * Hint for shadow implementations
-   */
-  protected boolean _castsShadows = true;
-
   public SceneHints(final Hintable source) {
     _source = source;
   }
@@ -89,13 +79,11 @@ public class SceneHints implements Savable {
     _normalsMode = sceneHints._normalsMode;
     _cullHint = sceneHints._cullHint;
     _propertyMode = sceneHints._propertyMode;
-    _lightCombineMode = sceneHints._lightCombineMode;
     _textureCombineMode = sceneHints._textureCombineMode;
     _renderBucketType = sceneHints._renderBucketType;
     _orthoOrder = sceneHints._orthoOrder;
     _pickingHints.clear();
     _pickingHints.addAll(sceneHints._pickingHints);
-    _castsShadows = sceneHints._castsShadows;
     _transpType = sceneHints._transpType;
   }
 
@@ -204,45 +192,6 @@ public class SceneHints implements Savable {
   }
 
   /**
-   * Returns this spatial's light combine mode. If the mode is set to inherit, then the spatial gets
-   * its combine mode from its parent.
-   *
-   * @return The spatial's light current combine mode.
-   */
-  public LightCombineMode getLightCombineMode() {
-    if (_lightCombineMode != LightCombineMode.Inherit) {
-      return _lightCombineMode;
-    }
-
-    final Hintable parent = _source.getParentHintable();
-    if (parent != null) {
-      return parent.getSceneHints().getLightCombineMode();
-    }
-
-    return LightCombineMode.CombineFirst;
-  }
-
-  /**
-   * @return the lightCombineMode set on this Spatial
-   */
-  public LightCombineMode getLocalLightCombineMode() { return _lightCombineMode; }
-
-  /**
-   * Sets how lights from parents should be combined for this spatial.
-   *
-   * @param mode
-   *          The light combine mode for this spatial
-   * @throws IllegalArgumentException
-   *           if mode is null
-   */
-  public void setLightCombineMode(final LightCombineMode mode) {
-    if (mode == null) {
-      throw new IllegalArgumentException("mode can not be null.");
-    }
-    _lightCombineMode = mode;
-  }
-
-  /**
    * Returns this spatial's property mode. If the mode is set to inherit, then the spatial gets its
    * property mode from its parent.
    *
@@ -328,9 +277,7 @@ public class SceneHints implements Savable {
    *          the render bucket type to use for this spatial.
    * @see com.ardor3d.renderer.queue.RenderBucketType
    */
-  public void setRenderBucketType(final RenderBucketType renderBucketType) {
-    _renderBucketType = renderBucketType;
-  }
+  public void setRenderBucketType(final RenderBucketType renderBucketType) { _renderBucketType = renderBucketType; }
 
   /**
    * Returns whether a certain pick hint is set on this spatial.
@@ -416,17 +363,6 @@ public class SceneHints implements Savable {
    */
   public void setTransparencyType(final TransparencyType type) { _transpType = type; }
 
-  /**
-   * @return true if this object should cast shadows
-   */
-  public boolean isCastsShadows() { return _castsShadows; }
-
-  /**
-   * @param castsShadows
-   *          set if this object should cast shadows
-   */
-  public void setCastsShadows(final boolean castsShadows) { _castsShadows = castsShadows; }
-
   // /////////////////
   // Methods for Savable
   // /////////////////
@@ -441,11 +377,9 @@ public class SceneHints implements Savable {
     final String bucketTypeName = capsule.readString("renderBucketType", RenderBucketType.Inherit.name());
     _renderBucketType = RenderBucketType.getRenderBucketType(bucketTypeName);
     _propertyMode = capsule.readEnum("propertyMode", PropertyMode.class, PropertyMode.Inherit);
-    _lightCombineMode = capsule.readEnum("lightCombineMode", LightCombineMode.class, LightCombineMode.Inherit);
     _textureCombineMode = capsule.readEnum("textureCombineMode", TextureCombineMode.class, TextureCombineMode.Inherit);
     _normalsMode = capsule.readEnum("normalsMode", NormalsMode.class, NormalsMode.Inherit);
     _transpType = capsule.readEnum("transpType", TransparencyType.class, TransparencyType.Inherit);
-    _castsShadows = capsule.readBoolean("castsShadows", true);
     final PickingHint[] pickHints = capsule.readEnumArray("pickingHints", PickingHint.class, null);
     _pickingHints.clear();
     if (pickHints != null) {
@@ -466,11 +400,9 @@ public class SceneHints implements Savable {
     capsule.write(_cullHint, "cullMode", CullHint.Inherit);
     capsule.write(_renderBucketType.name(), "renderBucketType", RenderBucketType.Inherit.name());
     capsule.write(_propertyMode, "propertyMode", PropertyMode.Inherit);
-    capsule.write(_lightCombineMode, "lightCombineMode", LightCombineMode.Inherit);
     capsule.write(_textureCombineMode, "textureCombineMode", TextureCombineMode.Inherit);
     capsule.write(_normalsMode, "normalsMode", NormalsMode.Inherit);
     capsule.write(_pickingHints.toArray(new PickingHint[] {}), "pickingHints");
     capsule.write(_transpType, "transpType", TransparencyType.Inherit);
-    capsule.write(_castsShadows, "castsShadows", true);
   }
 }

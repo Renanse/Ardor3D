@@ -1,0 +1,176 @@
+/**
+ * Copyright (c) 2008-2021 Bird Dog Games, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <https://git.io/fjRmv>.
+ */
+
+package com.ardor3d.light;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Plane;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Renderer;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.Ardor3dException;
+
+public class LightManager {
+
+  public static ReadOnlyColorRGBA DEFAULT_GLOBAL_AMBIENT = new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f);
+
+  protected LightComparator lightComparator = new LightComparator();
+  protected List<WeakReference<Light>> _lightRefs = new ArrayList<>();
+
+  protected ColorRGBA _globalAmbient = new ColorRGBA(LightManager.DEFAULT_GLOBAL_AMBIENT);
+
+  public Light getBestLight(final Mesh mesh, final int index) {
+    if (_lightRefs.size() <= index) {
+      return null;
+    }
+    final var light = _lightRefs.get(index).get();
+    if (light == null || !light.isEnabled()) {
+      return null;
+    }
+    return light;
+  }
+
+  public void addLights(final Spatial spat) {
+    if (spat instanceof Light) {
+      _lightRefs.add(new WeakReference<>((Light) spat));
+    } else if (spat instanceof Node) {
+      final var node = (Node) spat;
+      final var children = node.getChildren();
+      for (int i = 0, maxI = children.size(); i < maxI; i++) {
+        addLights(children.get(i));
+      }
+    }
+  }
+
+  public void removeLights(final Spatial spat) {
+    if (spat instanceof Light) {
+      for (int i = _lightRefs.size(); --i >= 0;) {
+        final var ref = _lightRefs.get(i);
+        final var light = ref.get();
+        if (light == spat) {
+          _lightRefs.remove(i);
+          return;
+        }
+      }
+    } else if (spat instanceof Node) {
+      final var children = ((Node) spat).getChildren();
+      for (int i = 0, maxI = children.size(); i < maxI; i++) {
+        removeLights(children.get(i));
+      }
+    }
+  }
+
+  public void cleanLights() {
+    for (int i = _lightRefs.size(); --i >= 0;) {
+      final var ref = _lightRefs.get(i);
+      if (ref.get() == null) {
+        _lightRefs.remove(i);
+      }
+    }
+  }
+
+  public void sortLightsFor(final Mesh mesh) {
+    lightComparator.setBoundingVolume(mesh.getWorldBound());
+    Collections.sort(_lightRefs, lightComparator);
+  }
+
+  protected static class LightComparator implements Comparator<WeakReference<Light>> {
+    private BoundingVolume _bv;
+
+    public void setBoundingVolume(final BoundingVolume bv) { _bv = bv; }
+
+    @Override
+    public int compare(final WeakReference<Light> l1, final WeakReference<Light> l2) {
+      final double v1 = getValueFor(l1, _bv);
+      final double v2 = getValueFor(l2, _bv);
+      final double cmp = v1 - v2;
+      if (0 > cmp) {
+        return 1;
+      } else if (0 < cmp) {
+        return -1;
+      }
+      return 0;
+    }
+  }
+
+  protected static double getValueFor(final WeakReference<Light> lref, final BoundingVolume val) {
+    final Light l = lref.get();
+    if (l == null || !l.isEnabled()) {
+      return 0;
+    } else if (l.getType() == Light.Type.Directional) {
+      return getColorValue(l);
+    } else if (l.getType() == Light.Type.Point) {
+      return getValueFor((PointLight) l, val);
+    } else if (l.getType() == Light.Type.Spot) {
+      return getValueFor((SpotLight) l, val);
+    }
+    // If a new type of light was added and this was not updated throw exception.
+    throw new Ardor3dException("Unhandled light type: " + l.getType());
+  }
+
+  protected static double getValueFor(final PointLight l, final BoundingVolume val) {
+    if (val == null) {
+      return 0;
+    }
+
+    final ReadOnlyVector3 location = l.getWorldTranslation();
+    final double dist = val.distanceTo(location);
+
+    final double color = getColorValue(l);
+    final double amlat = l.getConstant() + l.getLinear() * dist + l.getQuadratic() * dist * dist;
+
+    return color / amlat;
+  }
+
+  protected static double getValueFor(final SpotLight l, final BoundingVolume val) {
+    if (val == null) {
+      return 0;
+    }
+    final ReadOnlyVector3 direction = l.getWorldDirection();
+    final ReadOnlyVector3 location = l.getWorldTranslation();
+    // direction is copied into Plane, not reused.
+    final Plane p = new Plane(direction, direction.dot(location));
+    if (val.whichSide(p) != Plane.Side.Inside) {
+      return getValueFor((PointLight) l, val);
+    }
+
+    return 0;
+  }
+
+  protected static double getColorValue(final Light l) {
+    return l.getIntensity() * strength(l.getColor());
+  }
+
+  protected static double strength(final ReadOnlyColorRGBA color) {
+    return Math.sqrt(
+        color.getRed() * color.getRed() + color.getGreen() * color.getGreen() + color.getBlue() * color.getBlue());
+  }
+
+  public void renderShadowMaps(final Renderer renderer) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public ReadOnlyColorRGBA getGlobalAmbient() { return _globalAmbient; }
+
+  public void setGlobalAmbient(final ReadOnlyColorRGBA color) {
+    _globalAmbient.set(color);
+  }
+}

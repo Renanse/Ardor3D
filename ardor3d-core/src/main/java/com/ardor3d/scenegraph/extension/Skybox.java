@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
@@ -24,7 +25,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.export.CapsuleUtils;
@@ -172,7 +172,7 @@ public class Skybox extends Node {
     _skyboxQuads[Face.Down.ordinal()].setTranslation(new Vector3(0, -_yExtent, 0));
 
     // We don't want the light to effect our skybox
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(this, false);
 
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
@@ -188,7 +188,7 @@ public class Skybox extends Node {
       _skyboxQuads[i].getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
       // Make sure no lighting on the skybox
-      _skyboxQuads[i].getSceneHints().setLightCombineMode(LightCombineMode.Off);
+      LightProperties.setLightReceiver(_skyboxQuads[i], false);
 
       // Make sure the quad is viewable
       _skyboxQuads[i].getSceneHints().setCullHint(CullHint.Never);

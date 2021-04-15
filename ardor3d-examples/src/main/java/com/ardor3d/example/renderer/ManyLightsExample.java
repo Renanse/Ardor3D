@@ -15,6 +15,7 @@ import java.util.Random;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -22,9 +23,7 @@ import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.util.ReadOnlyTimer;
 
 /**
  * A demonstration of randomly placed spheres being illuminated by numerious PointLight sources.
@@ -43,8 +42,8 @@ public class ManyLightsExample extends ExampleBase {
   }
 
   @Override
-  protected void updateExample(final ReadOnlyTimer timer) {
-    _root.sortLights();
+  protected void setupLight() {
+    // nothing default
   }
 
   /**
@@ -60,7 +59,7 @@ public class ManyLightsExample extends ExampleBase {
     // Create a sphere to show where the light is in the demo.
     final Sphere lightSphere = new Sphere("lightSphere" + i, 9, 9, .1f);
     lightSphere.setModelBound(new BoundingSphere());
-    lightSphere.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(lightSphere, false);
     lightSphere.setDefaultColor(lightColor);
 
     // Create a new point light and fill out the properties
@@ -69,10 +68,8 @@ public class ManyLightsExample extends ExampleBase {
     pointLight.setLinear(.001f);
     pointLight.setQuadratic(.1f);
     pointLight.setEnabled(true);
-    pointLight.setDiffuse(lightColor);
-    pointLight.setAmbient(new ColorRGBA(.1f, .1f, .1f, .1f));
-
-    _lightState.attach(pointLight);
+    pointLight.setColor(lightColor);
+    _root.attachChild(pointLight);
 
     lightSphere.addController(new SpatialController<>() {
 
@@ -92,7 +89,7 @@ public class ManyLightsExample extends ExampleBase {
         final double zPos = Math.sin(timeZ * 0.6) * worldsize;
 
         caller.setTranslation(xPos, yPos, zPos);
-        pointLight.setLocation(xPos, yPos, zPos);
+        pointLight.setTranslation(xPos, yPos, zPos);
       }
     });
 
@@ -118,8 +115,6 @@ public class ManyLightsExample extends ExampleBase {
 
   @Override
   protected void initExample() {
-    _lightState.detachAll();
-
     rand.setSeed(1337);
 
     // Now add all the lights.

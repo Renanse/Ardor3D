@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.terrain.client.TextureConfiguration;
 import com.ardor3d.extension.terrain.client.TextureSource;
 import com.ardor3d.extension.terrain.util.Tile;
@@ -33,7 +34,6 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.math.util.MathUtils;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class AwtTextureSource implements TextureSource, ElementUpdateListener {
   private static final int tileSize = 128;

@@ -21,7 +21,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.extension.SwitchNode;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
@@ -44,7 +43,6 @@ public class SwitchNodeExample extends ExampleBase {
     _canvas.setTitle("SwitchNode - Example");
 
     final BasicText t = BasicText.createDefaultTextLabel("Text", "[SPACE] Switch to next child");
-    t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t.setTranslation(new Vector3(0, 20, 0));
     _orthoRoot.attachChild(t);
 

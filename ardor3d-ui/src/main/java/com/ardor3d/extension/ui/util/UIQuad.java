@@ -12,12 +12,12 @@ package com.ardor3d.extension.ui.util;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Defines a four sided quad with its origin at the lower left corner. By default, this mesh only

@@ -8,10 +8,9 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.scenegraph;
+package com.ardor3d.renderer;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.renderer.Renderer;
 
 /**
  * Renderable is the interface for things that can be rendered.

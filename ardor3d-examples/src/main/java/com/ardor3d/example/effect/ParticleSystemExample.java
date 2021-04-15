@@ -80,11 +80,15 @@ public class ParticleSystemExample extends ExampleBase {
   }
 
   @Override
+  protected void setupLight() {
+    // no lights
+  }
+
+  @Override
   protected void initExample() {
     EffectUtils.addDefaultResourceLocators();
 
     _canvas.setTitle("Particle System - Example");
-    _lightState.setEnabled(false);
 
     // test particles + VBO
     // _root.getSceneHints().setDataMode(DataMode.VBO);

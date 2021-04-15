@@ -13,6 +13,7 @@ package com.ardor3d.example.renderer;
 import java.util.Random;
 
 import com.ardor3d.bounding.BoundingSphere;
+import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.input.keyboard.Key;
@@ -25,11 +26,9 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -76,7 +75,6 @@ public class GeometryInstancingExample extends ExampleBase {
 
     final BasicText t2 = BasicText.createDefaultTextLabel("Text", "[I] Instancing On");
     t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
-    t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t2.setTranslation(new Vector3(0, 50, 0));
     _orthoRoot.attachChild(t2);
 

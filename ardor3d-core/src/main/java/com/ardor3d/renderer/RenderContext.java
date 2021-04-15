@@ -21,6 +21,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
+import com.ardor3d.scenegraph.SceneIndexer;
 
 /**
  * Represents the state of an individual context in OpenGL.
@@ -33,8 +34,7 @@ public class RenderContext {
   protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates =
       new EnumMap<>(RenderState.StateType.class);
 
-  protected final Stack<EnumMap<StateType, RenderState>> _enforcedBackStack =
-      new Stack<>();
+  protected final Stack<EnumMap<StateType, RenderState>> _enforcedBackStack = new Stack<>();
 
   protected final Stack<AbstractFBOTextureRenderer> _textureRenderers = new Stack<>();
 
@@ -64,6 +64,8 @@ public class RenderContext {
   protected Camera _currentCamera = null;
 
   protected CanvasRenderer _currentCanvasRenderer = null;
+
+  protected SceneIndexer _sceneIndexer = new SceneIndexer();
 
   public RenderContext(final Object key, final ContextCapabilities caps) {
     this(key, caps, null);
@@ -188,6 +190,10 @@ public class RenderContext {
   public CanvasRenderer getCurrentCanvasRenderer() { return _currentCanvasRenderer; }
 
   public void setCurrentCanvasRenderer(final CanvasRenderer renderer) { _currentCanvasRenderer = renderer; }
+
+  public SceneIndexer getSceneIndexer() { return _sceneIndexer; }
+
+  public void setSceneIndexer(final SceneIndexer indexer) { _sceneIndexer = indexer; }
 
   public RenderContextRef getSharableContextRef() { return _sharableContextRef; }
 

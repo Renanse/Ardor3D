@@ -28,11 +28,11 @@ import com.ardor3d.framework.ICanvasListener;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.input.mouse.MouseManager;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.TextureRenderer;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ContextGarbageCollector;
@@ -121,10 +121,11 @@ public class SwtFboCanvas extends GLCanvas implements com.ardor3d.framework.Canv
     getParent().layout();
 
     _quad = new Quad("fsq", 2, 2);
+
     _quad.setRenderMaterial("unlit/textured/fsq.yaml");
 
     _quad.setModelBound(new BoundingBox());
-    _quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(_quad, false);
     _quad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     _quad.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
 

@@ -24,6 +24,7 @@ import org.lwjgl.opengl.GL13C;
 import org.lwjgl.opengl.GL14C;
 import org.lwjgl.opengl.GL30C;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
@@ -42,7 +43,6 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.texture.ITextureUtils;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class Lwjgl3TextureUtils implements ITextureUtils {
 

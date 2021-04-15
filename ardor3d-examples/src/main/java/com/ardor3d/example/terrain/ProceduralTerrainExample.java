@@ -24,6 +24,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
@@ -39,7 +40,6 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.extension.Skybox;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.GameTaskQueue;
@@ -169,7 +169,7 @@ public class ProceduralTerrainExample extends ExampleBase {
     // Setup labels for presenting example info.
     final Node textNodes = new Node("Text");
     _orthoRoot.attachChild(textNodes);
-    textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(textNodes, false);
 
     final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
     for (int i = 0; i < _exampleInfo.length; i++) {
@@ -257,17 +257,6 @@ public class ProceduralTerrainExample extends ExampleBase {
   final DirectionalLight dLight = new DirectionalLight();
 
   private void setupDefaultStates() {
-    _lightState.detachAll();
-    dLight.setEnabled(true);
-    dLight.setAmbient(new ColorRGBA(0.4f, 0.4f, 0.5f, 1));
-    dLight.setDiffuse(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    dLight.setSpecular(new ColorRGBA(0.3f, 0.3f, 0.2f, 1));
-    dLight.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    _lightState.attach(dLight);
-    _lightState.setEnabled(true);
-
-    _root.setProperty("lightDir", dLight.getDirection());
-
     final CullState cs = new CullState();
     cs.setEnabled(true);
     cs.setCullFace(CullState.Face.Back);
@@ -279,6 +268,16 @@ public class ProceduralTerrainExample extends ExampleBase {
     fog.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
     fog.setFunction(DensityFunction.Linear);
     _root.setProperty(FogParams.DefaultPropertyKey, fog);
+  }
+
+  @Override
+  protected void setupLight() {
+    dLight.setEnabled(true);
+    dLight.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
+    dLight.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    _root.attachChild(dLight);
+
+    _root.setProperty("lightDir", dLight.getWorldDirection());
   }
 
   /**

@@ -12,6 +12,8 @@ package com.ardor3d.example.renderer;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
@@ -23,15 +25,12 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Illustrates two techniques for creating a triangle strip (i.e. series of connected triangles).
@@ -73,7 +72,6 @@ public class DegenerateTrianglesExample extends ExampleBase {
     _canvas.setTitle("Degenerate vs MultiStrip Example");
 
     t = BasicText.createDefaultTextLabel("Text", "[SPACE] MultiStrip Mesh");
-    t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     t.setTranslation(new Vector3(0, 20, 0));
     _orthoRoot.attachChild(t);
 

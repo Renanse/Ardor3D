@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -28,7 +29,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.MultiStatSample;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;

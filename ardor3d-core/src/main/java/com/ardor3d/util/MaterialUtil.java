@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.material.fog.FogParams;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -118,8 +118,7 @@ public abstract class MaterialUtil {
   private static String calcMeshMaterial(final Mesh mesh) {
     final StringBuilder material = new StringBuilder();
     // First, check if we are lit or not
-    final LightState ls = mesh.getWorldRenderState(StateType.Light);
-    final boolean lit = (ls != null && ls.isEnabled() && ls.count() > 0);
+    final boolean lit = LightProperties.isLightReceiver(mesh);
     material.append(lit ? "lit/" : "unlit/");
 
     // Now check if we are textured
@@ -138,7 +137,7 @@ public abstract class MaterialUtil {
 
     material.append(".yaml");
 
-    logger.fine(() -> "Mesh material: " + material + " - " + mesh.getName());
+    MaterialUtil.logger.fine(() -> "Mesh material: " + material + " - " + mesh.getName());
 
     return material.toString();
   }
@@ -165,7 +164,7 @@ public abstract class MaterialUtil {
 
     material.append(".yaml");
 
-    logger.fine(() -> "Line material: " + material + " - " + line.getName());
+    MaterialUtil.logger.fine(() -> "Line material: " + material + " - " + line.getName());
 
     return material.toString();
   }

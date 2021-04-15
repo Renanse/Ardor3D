@@ -8,7 +8,7 @@ techniques:
           - key: normal
           - key: uv0
         uniforms: 
-          - builtIn: [model, view, projection, cameraLoc, pbrSurface, lights4]
+          - builtIn: [model, view, projection, cameraLoc, pbrSurface, lights]
           - 
             shaderKey: irradianceMap
             type: Int1

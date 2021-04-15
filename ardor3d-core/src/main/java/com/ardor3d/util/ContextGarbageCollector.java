@@ -10,8 +10,8 @@
 
 package com.ardor3d.util;
 
+import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.MeshData;
 
 public class ContextGarbageCollector {

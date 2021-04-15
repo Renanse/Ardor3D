@@ -12,9 +12,10 @@ package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.MeshData;
 
 public class TangentUtil {

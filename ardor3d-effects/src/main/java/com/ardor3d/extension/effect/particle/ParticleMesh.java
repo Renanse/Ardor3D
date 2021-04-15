@@ -12,7 +12,9 @@ package com.ardor3d.extension.effect.particle;
 
 import java.io.IOException;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -22,11 +24,9 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * ParticleMesh is a particle system that uses Mesh as its underlying geometric data.
@@ -40,15 +40,15 @@ public class ParticleMesh extends ParticleSystem {
 
   public ParticleMesh(final String name, final int numParticles) {
     super(name, numParticles);
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
   }
 
   public ParticleMesh(final String name, final int numParticles, final ParticleSystem.ParticleType type) {
     super(name, numParticles, type);
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
   }
 
@@ -56,8 +56,8 @@ public class ParticleMesh extends ParticleSystem {
     super(name, 0, ParticleSystem.ParticleType.GeomMesh);
     _numParticles = sourceMesh.getMeshData().getTotalPrimitiveCount();
     setParticleEmitter(new MeshEmitter(sourceMesh, false));
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     initializeParticles(_numParticles);
   }
@@ -135,7 +135,6 @@ public class ParticleMesh extends ParticleSystem {
     }
     Vector2.releaseTempInstance(temp);
     updateWorldRenderStates(true);
-    _particleMesh.getSceneHints().setCastsShadows(false);
   }
 
   @Override

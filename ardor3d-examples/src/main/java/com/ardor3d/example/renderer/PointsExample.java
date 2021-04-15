@@ -12,12 +12,12 @@ package com.ardor3d.example.renderer;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Point;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A simple demonstration of displaying numerous Point in three-dimensions.
@@ -34,13 +34,16 @@ public class PointsExample extends ExampleBase {
     start(PointsExample.class);
   }
 
+  @Override
+  protected void setupLight() {
+    // no light
+  }
+
   /**
    * Set up some points...
    */
   @Override
   protected void initExample() {
-    _lightState.setEnabled(false);
-
     final FloatBuffer pointData = BufferUtils.createFloatBuffer(POINTS * 3);
     for (int i = 0; i < POINTS; i++) {
       pointData.put((MathUtils.nextRandomFloat() * 12) - 6); // x

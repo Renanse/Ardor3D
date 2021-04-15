@@ -23,6 +23,7 @@ import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickResults;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
@@ -32,7 +33,6 @@ import com.ardor3d.math.functions.MandelbrotFunction3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.TextureKey;
 
@@ -65,7 +65,7 @@ public class MandelbrotExplorerExample extends ExampleBase {
     final Camera cam = _canvas.getCanvasRenderer().getCamera();
     display.resize(cam.getWidth(), cam.getHeight());
     display.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
-    display.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    LightProperties.setLightReceiver(display, false);
     _orthoRoot.attachChild(display);
 
     // set up our color map

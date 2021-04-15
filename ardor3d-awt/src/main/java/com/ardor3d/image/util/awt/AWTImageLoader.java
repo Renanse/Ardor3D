@@ -25,13 +25,13 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.image.loader.ImageLoaderUtil;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Image loader that makes use of AWT's ImageIO to load image file data.

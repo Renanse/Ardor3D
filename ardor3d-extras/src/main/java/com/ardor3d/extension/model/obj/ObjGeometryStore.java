@@ -18,17 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.geom.GeometryTool;
 import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 import com.ardor3d.util.geom.VertGroupData;
@@ -332,9 +332,7 @@ public class ObjGeometryStore {
 
     _currentMaterial.applyBlendAndAlpha(target);
 
-    if (_currentMaterial.illumType == 0) {
-      target.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-    }
+    LightProperties.setLightReceiver(target, _currentMaterial.illumType != 0);
 
     _materialMap.put(target, _currentMaterial.getName());
   }

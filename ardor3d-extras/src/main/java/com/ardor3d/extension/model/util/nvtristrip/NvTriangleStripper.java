@@ -15,14 +15,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.IndexBufferData;
+import com.ardor3d.buffer.IntBufferData;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.IndexBufferData;
-import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Ported from <a href="http://developer.nvidia.com/object/nvtristrip_library.html">NVIDIA's

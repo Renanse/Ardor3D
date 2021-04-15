@@ -39,9 +39,13 @@ public class LineExample extends ExampleBase {
   }
 
   @Override
+  protected void setupLight() {
+    // no lights
+  }
+
+  @Override
   protected void initExample() {
     _canvas.setTitle("Lines");
-    _lightState.setEnabled(false);
 
     // Create a line with our example "makeLine" method. See method below.
     final Line regular = makeLine(new Grapher() {

@@ -10,17 +10,16 @@
 
 package com.ardor3d.light;
 
-import java.io.IOException;
 import java.util.function.Supplier;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
-import com.ardor3d.util.export.InputCapsule;
-import com.ardor3d.util.export.OutputCapsule;
 
 /**
  * <code>DirectionalLight</code> defines a light that is assumed to be infinitely far away
@@ -31,31 +30,34 @@ import com.ardor3d.util.export.OutputCapsule;
 public class DirectionalLight extends Light {
   private static final long serialVersionUID = 1L;
 
-  private final Vector3 _direction = new Vector3(Vector3.UNIT_Z);
+  // Locally cached direction vector for our light.
+  private final Vector3 _worldDirection = new Vector3(Vector3.UNIT_Z);
 
   /**
    * Constructor instantiates a new <code>DirectionalLight</code> object. The initial light colors are
-   * white and the direction the light travels is along the positive z axis (0,0,1).
+   * white and the direction the light travels is along the positive z axis (0,0,1). The direction
+   * alters based on the World Transform of the light.
    *
    */
   public DirectionalLight() {
     super();
 
     cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
-        (Supplier<ReadOnlyVector3>) this::getDirection));
+        (Supplier<ReadOnlyVector3>) this::getWorldDirection));
   }
 
   /**
-   * @return the direction the light traveling in.
+   * @return the calculated world direction the light traveling in. It starts out traveling down the
+   *         positive Z Axis, and is then rotated by our world transform.
    */
-  public ReadOnlyVector3 getDirection() { return _direction; }
+  public ReadOnlyVector3 getWorldDirection() { return _worldDirection; }
 
   /**
    * @param direction
-   *          the direction the light is traveling in.
+   *          the world direction we want the light to be traveling in.
    */
-  public void setDirection(final ReadOnlyVector3 direction) {
-    _direction.set(direction);
+  public void setWorldDirection(final ReadOnlyVector3 direction) {
+    setWorldDirection(direction.getX(), direction.getY(), direction.getZ());
   }
 
   /**
@@ -66,15 +68,30 @@ public class DirectionalLight extends Light {
    * @param z
    *          the direction the light is traveling in on the z axis.
    */
-  public void setDirection(final double x, final double y, final double z) {
-    _direction.set(x, y, z);
+  public void setWorldDirection(final double x, final double y, final double z) {
+    _worldDirection.set(x, y, z);
+    final Vector3 from = Vector3.fetchTempInstance();
+    final Quaternion q = Quaternion.fetchTempInstance();
+    try {
+      from.set(Vector3.UNIT_Z);
+
+      if (_parent != null) {
+        final ReadOnlyTransform parentTransform = _parent.getWorldTransform();
+        parentTransform.applyForwardVector(from);
+      }
+
+      q.fromVectorToVector(from, _worldDirection);
+      setRotation(q);
+    } finally {
+      Quaternion.releaseTempInstance(q);
+      Vector3.releaseTempInstance(from);
+    }
   }
 
   @Override
   public void applyDefaultUniformValues() {
-    setAmbient(ColorRGBA.BLACK_NO_ALPHA);
-    setDiffuse(ColorRGBA.BLACK_NO_ALPHA);
-    setSpecular(ColorRGBA.BLACK_NO_ALPHA);
+    setColor(ColorRGBA.BLACK_NO_ALPHA);
+    setIntensity(1f);
   }
 
   /**
@@ -86,15 +103,9 @@ public class DirectionalLight extends Light {
   public Type getType() { return Type.Directional; }
 
   @Override
-  public void write(final OutputCapsule capsule) throws IOException {
-    super.write(capsule);
-    capsule.write(_direction, "direction", new Vector3(Vector3.UNIT_Z));
+  public void updateWorldTransform(final boolean recurse) {
+    super.updateWorldTransform(recurse);
+    _worldDirection.set(0, 0, 1);
+    getWorldTransform().applyForwardVector(_worldDirection);
   }
-
-  @Override
-  public void read(final InputCapsule capsule) throws IOException {
-    super.read(capsule);
-    _direction.set(capsule.readSavable("direction", (Vector3) Vector3.UNIT_Z));
-  }
-
 }

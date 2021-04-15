@@ -13,10 +13,10 @@ package com.ardor3d.input.mouse;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.ardor3d.annotation.Immutable;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * An immutable representation of a mouse cursor. A mouse cursor consists of an image and a hotspot

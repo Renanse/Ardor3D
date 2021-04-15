@@ -10,6 +10,8 @@
 
 package com.ardor3d.extension.effect.particle;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -17,9 +19,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Point;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * ParticlePoints is a particle system that uses Point as its underlying geometric data.
@@ -64,8 +64,8 @@ public class ParticlePoints extends ParticleSystem {
     };
     _particleMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles), 0);
     attachChild(_particleMesh);
+    LightProperties.setLightReceiver(this, false);
     getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
     for (int k = 0; k < numParticles; k++) {
@@ -81,7 +81,6 @@ public class ParticlePoints extends ParticleSystem {
 
     }
     updateWorldRenderStates(true);
-    _particleMesh.getSceneHints().setCastsShadows(false);
   }
 
   @Override

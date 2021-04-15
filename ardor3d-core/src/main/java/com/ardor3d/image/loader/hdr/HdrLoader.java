@@ -17,11 +17,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.loader.ImageLoader;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class HdrLoader implements ImageLoader {
   @Override

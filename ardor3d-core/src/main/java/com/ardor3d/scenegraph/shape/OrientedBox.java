@@ -12,13 +12,13 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * This primitive represents a box that has options to orient it according to its X/Y/Z axis. It is

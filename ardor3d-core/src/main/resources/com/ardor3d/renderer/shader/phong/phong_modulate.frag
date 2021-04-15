@@ -13,10 +13,6 @@
 #define NR_LIGHTS 4
 #endif
 
-#ifndef USE_BLINN_PHONG
-#define USE_BLINN_PHONG true
-#endif
-
 out vec4 FragColor;
 
 in vec3 WorldPos;
@@ -48,7 +44,7 @@ in vec4 DiffuseColor;
 	#endif
 #endif
 
-uniform Light light[NR_LIGHTS];
+uniform LightProperties lightProps;
 uniform vec3 cameraLoc;
 uniform ColorSurface surface;
 
@@ -72,11 +68,14 @@ void main()
 #endif
 
     vec3 V = normalize(cameraLoc - WorldPos);
-    vec3 lighting = vec3(0);
-    for(int i = 0; i < NR_LIGHTS; i++)
-    	lighting += calcLighting(light[i], WorldPos, Normal, V, surface, USE_BLINN_PHONG);
-
-    color = clamp(color * vec4(surface.emissive + lighting, surface.opacity), 0.0, 1.0);
+    LightingResult lit = calcLighting(lightProps, WorldPos, Normal, V, surface);
+    
+    vec3 emissive = surface.emissive;
+    vec3 ambient = surface.ambient * lightProps.globalAmbient;
+    vec3 diffuse = surface.diffuse * lit.diffuse;
+    vec3 specular = surface.specular * lit.specular;
+    
+    color = clamp(color * vec4(emissive + ambient + diffuse + specular, surface.opacity), 0.0, 1.0);
 
     if (!applyAlphaTest(color)) discard;
 

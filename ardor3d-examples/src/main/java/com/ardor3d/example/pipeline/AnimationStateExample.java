@@ -114,19 +114,20 @@ public class AnimationStateExample extends ExampleBase {
     // speed up wasd control a little
     _controlHandle.setMoveSpeed(200);
 
-    _lightState.detachAll();
-    final DirectionalLight light = new DirectionalLight();
-    light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-    light.setAmbient(new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
-    light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
-    light.setEnabled(true);
-    _lightState.attach(light);
-
     // Load collada model
     createCharacter();
 
     // Create our options frame and fps label
     createHUD();
+  }
+
+  @Override
+  protected void setupLight() {
+    final DirectionalLight light = new DirectionalLight();
+    light.setColor(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+    light.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    light.setEnabled(true);
+    _root.attachChild(light);
   }
 
   private void createHUD() {

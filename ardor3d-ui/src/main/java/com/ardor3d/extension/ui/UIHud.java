@@ -36,6 +36,7 @@ import com.ardor3d.input.mouse.GrabbedState;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -43,7 +44,6 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 
 /**
@@ -143,8 +143,8 @@ public class UIHud extends Node {
 
     getSceneHints().setCullHint(CullHint.Never);
     getSceneHints().setRenderBucketType(RenderBucketType.Skip);
-    getSceneHints().setLightCombineMode(LightCombineMode.Off);
     getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+    LightProperties.setLightReceiver(this, false);
     setLayer(Spatial.LAYER_UI);
 
     final ZBufferState zstate = new ZBufferState();

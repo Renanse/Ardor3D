@@ -26,6 +26,7 @@ import org.lwjgl.opengl.GL44C;
 import org.lwjgl.opengl.GL46C;
 import org.lwjgl.system.MemoryStack;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
@@ -48,7 +49,6 @@ import com.ardor3d.renderer.state.record.TextureUnitRecord;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 

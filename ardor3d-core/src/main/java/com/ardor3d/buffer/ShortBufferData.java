@@ -8,7 +8,7 @@
  * LICENSE file or at <https://git.io/fjRmv>.
  */
 
-package com.ardor3d.scenegraph;
+package com.ardor3d.buffer;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -17,7 +17,6 @@ import java.nio.ShortBuffer;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Simple data class storing a buffer of shorts

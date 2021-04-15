@@ -34,7 +34,7 @@ import com.ardor3d.util.export.Savable;
 public abstract class RenderState implements Savable {
 
   public enum StateType {
-    Blend, Light, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Offset;
+    Blend, Texture, Wireframe, ZBuffer, Cull, Stencil, ColorMask, Offset;
 
     // cached
     public static StateType[] values = values();
@@ -73,11 +73,11 @@ public abstract class RenderState implements Savable {
    */
   public static final EnumSet<StateType> _quickCompare = EnumSet.noneOf(StateType.class);
   static {
-    _quickCompare.add(StateType.Blend);
-    _quickCompare.add(StateType.ZBuffer);
-    _quickCompare.add(StateType.Cull);
-    _quickCompare.add(StateType.ColorMask);
-    _quickCompare.add(StateType.Offset);
+    RenderState._quickCompare.add(StateType.Blend);
+    RenderState._quickCompare.add(StateType.ZBuffer);
+    RenderState._quickCompare.add(StateType.Cull);
+    RenderState._quickCompare.add(StateType.ColorMask);
+    RenderState._quickCompare.add(StateType.Offset);
   }
 
   private static final ObjectPool<StateStack> STATESTACKS_POOL =
@@ -92,7 +92,7 @@ public abstract class RenderState implements Savable {
 
     public final static StateStack fetchTempInstance() {
       if (Constants.useStatePools) {
-        final StateStack s = STATESTACKS_POOL.fetch();
+        final StateStack s = RenderState.STATESTACKS_POOL.fetch();
         // re-use already allocated stacks
         for (final Stack<RenderState> stack : s.stacks.values()) {
           stack.clear();
@@ -105,7 +105,7 @@ public abstract class RenderState implements Savable {
 
     public final static void releaseTempInstance(final StateStack s) {
       if (Constants.useStatePools) {
-        STATESTACKS_POOL.release(s);
+        RenderState.STATESTACKS_POOL.release(s);
       }
     }
 
@@ -220,9 +220,9 @@ public abstract class RenderState implements Savable {
    * @param enabled
    */
   public static void setQuickCompares(final boolean enabled) {
-    _quickCompare.clear();
+    RenderState._quickCompare.clear();
     if (enabled) {
-      _quickCompare.addAll(EnumSet.allOf(StateType.class));
+      RenderState._quickCompare.addAll(EnumSet.allOf(StateType.class));
     }
   }
 
@@ -234,8 +234,6 @@ public abstract class RenderState implements Savable {
         return new ColorMaskState();
       case Cull:
         return new CullState();
-      case Light:
-        return new LightState();
       case Offset:
         return new OffsetState();
       case Stencil:

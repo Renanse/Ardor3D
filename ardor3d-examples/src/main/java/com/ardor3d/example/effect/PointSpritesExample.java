@@ -12,11 +12,13 @@ package com.ardor3d.example.effect;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
@@ -28,12 +30,10 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Point;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * A demonstration of texturing Points.
@@ -80,8 +80,10 @@ public class PointSpritesExample extends ExampleBase {
 
   private void buildPointSprites() {
     _points = new Point();
-    _points.getSceneHints().setLightCombineMode(LightCombineMode.Off);
     _points.setPointSize(20);
+
+    LightProperties.setLightReceiver(_points, false);
+
     final TextureState ts = new TextureState();
     ts.setTexture(TextureManager.load("images/flare.png", Texture.MinificationFilter.NearestNeighborNoMipMaps,
         TextureStoreFormat.GuessCompressedFormat, true));

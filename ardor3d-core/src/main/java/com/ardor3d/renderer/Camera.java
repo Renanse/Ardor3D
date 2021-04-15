@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
@@ -37,7 +38,6 @@ import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * This class represents a view into a 3d scene and how that view should map to a 2D rendering
@@ -1689,10 +1689,11 @@ public class Camera implements Savable, Externalizable {
    * @return the Camera on the current RenderContext.
    */
   public static Camera getCurrentCamera() {
-    if (ContextManager.getCurrentContext() == null) {
+    RenderContext context = ContextManager.getCurrentContext();
+    if (context == null) {
       return null;
     }
-    return ContextManager.getCurrentContext().getCurrentCamera();
+    return context.getCurrentCamera();
   }
 
   public boolean isFrameDirty() { return _frameDirty; }

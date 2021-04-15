@@ -21,13 +21,13 @@ import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.texture.CubeMapRenderUtil;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.surface.PbrSurface;
@@ -78,14 +78,16 @@ public class SimplePbrWithSkyboxExample extends ExampleBase {
       }
     }
 
-    _lightState.detachAll();
+    _root.setRenderMaterial("pbr/pbr_untextured_simple.yaml");
+  }
+
+  @Override
+  protected void setupLight() {
     for (int i = 0; i < _lightCount; i++) {
       _lights[i] = new PointLight();
-      _lights[i].setDiffuse(new ColorRGBA(900, 900, 900, 1));
-      _lightState.attach(_lights[i]);
+      _lights[i].setColor(new ColorRGBA(900, 900, 900, 1));
+      _root.attachChild(_lights[i]);
     }
-
-    _root.setRenderMaterial("pbr/pbr_untextured_simple.yaml");
   }
 
   private void buildSkybox() {
@@ -122,7 +124,7 @@ public class SimplePbrWithSkyboxExample extends ExampleBase {
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
     for (int i = 0; i < _lightCount; i++) {
-      _lights[i].setLocation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
+      _lights[i].setTranslation(((i % 2 == 1) ? -30 : 30) + Math.sin(timer.getTimeInSeconds() * 2) * 15,
           ((i / 2) % 2 == 1) ? -30 : 30, 30f);
     }
   }

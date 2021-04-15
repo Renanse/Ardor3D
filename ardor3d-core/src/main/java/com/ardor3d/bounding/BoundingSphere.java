@@ -15,6 +15,7 @@ import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
@@ -27,7 +28,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <code>BoundingSphere</code> defines a sphere that defines a container for a group of vertices of

@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 
 import org.jdom2.Element;
 
+import com.ardor3d.buffer.BufferUtils;
+import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * The purpose of this class is to tie a <source> and accessor together to pull out data.
