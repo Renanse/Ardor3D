@@ -262,82 +262,83 @@ public final class Debugger {
         }
       }
 
-      final FloatBuffer norms = mesh.getMeshData().getNormalBuffer();
-      final FloatBuffer verts = mesh.getMeshData().getVertexBuffer();
-      if (norms != null && verts != null && norms.limit() == verts.limit()) {
-        final MeshData normMD = Debugger.normalLines.getMeshData();
-        FloatBuffer lineVerts = normMD.getVertexBuffer();
-        if (lineVerts.capacity() < (3 * (2 * mesh.getMeshData().getVertexCount()))) {
-          normMD.setVertexBuffer(null);
-          lineVerts = BufferUtils.createVector3Buffer(mesh.getMeshData().getVertexCount() * 2);
-          normMD.setVertexBuffer(lineVerts);
-        } else {
-          lineVerts.clear();
-          lineVerts.limit(3 * 2 * mesh.getMeshData().getVertexCount());
-          normMD.setVertexBuffer(lineVerts);
-        }
-
-        FloatBuffer lineColors = normMD.getColorBuffer();
-        if (lineColors.capacity() < (4 * (2 * mesh.getMeshData().getVertexCount()))) {
-          normMD.setColorBuffer(null);
-          lineColors = BufferUtils.createColorBuffer(mesh.getMeshData().getVertexCount() * 2);
-          normMD.setColorBuffer(lineColors);
-        } else {
-          lineColors.clear();
-        }
-
-        IndexBufferData<?> lineInds = normMD.getIndices();
-        if (lineInds == null || lineInds.getBufferCapacity() < (normMD.getVertexCount())) {
-          normMD.setIndices(null);
-          lineInds =
-              BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2, normMD.getVertexCount() - 1);
-          normMD.setIndices(lineInds);
-        } else {
-          lineInds.getBuffer().clear();
-          lineInds.getBuffer().limit(normMD.getVertexCount());
-        }
-
-        verts.rewind();
-        norms.rewind();
-        lineVerts.rewind();
-        lineInds.getBuffer().rewind();
-
-        for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
-          Debugger._normalVect.set(verts.get(), verts.get(), verts.get());
-          mesh.getWorldTransform().applyForward(Debugger._normalVect);
-          lineVerts.put(Debugger._normalVect.getXf());
-          lineVerts.put(Debugger._normalVect.getYf());
-          lineVerts.put(Debugger._normalVect.getZf());
-
-          lineColors.put(Debugger.NORMAL_COLOR_BASE.getRed());
-          lineColors.put(Debugger.NORMAL_COLOR_BASE.getGreen());
-          lineColors.put(Debugger.NORMAL_COLOR_BASE.getBlue());
-          lineColors.put(Debugger.NORMAL_COLOR_BASE.getAlpha());
-
-          lineInds.put(x * 2);
-
-          Debugger._normalVect2.set(norms.get(), norms.get(), norms.get());
-          mesh.getWorldTransform().applyForwardVector(Debugger._normalVect2).normalizeLocal().multiplyLocal(rSize);
-          Debugger._normalVect.addLocal(Debugger._normalVect2);
-          lineVerts.put(Debugger._normalVect.getXf());
-          lineVerts.put(Debugger._normalVect.getYf());
-          lineVerts.put(Debugger._normalVect.getZf());
-
-          lineColors.put(Debugger.NORMAL_COLOR_TIP.getRed());
-          lineColors.put(Debugger.NORMAL_COLOR_TIP.getGreen());
-          lineColors.put(Debugger.NORMAL_COLOR_TIP.getBlue());
-          lineColors.put(Debugger.NORMAL_COLOR_TIP.getAlpha());
-
-          lineInds.put((x * 2) + 1);
-        }
-
-        normMD.markBufferDirty(MeshData.KEY_VertexCoords);
-        normMD.markBufferDirty(MeshData.KEY_ColorCoords);
-        normMD.markBuffersDirty();
-        normMD.markIndicesDirty();
-        Debugger.normalLines.onDraw(r);
+      final MeshData meshData = mesh.getMeshData();
+      final FloatBuffer norms = meshData.getNormalBuffer();
+      final FloatBuffer verts = meshData.getVertexBuffer();
+      if (norms == null || verts == null || norms.limit() != verts.limit()) {
+        return;
       }
 
+      final MeshData normMD = Debugger.normalLines.getMeshData();
+      FloatBuffer lineVerts = normMD.getVertexBuffer();
+      if (lineVerts.capacity() < (3 * (2 * meshData.getVertexCount()))) {
+        normMD.setVertexBuffer(null);
+        lineVerts = BufferUtils.createVector3Buffer(meshData.getVertexCount() * 2);
+        normMD.setVertexBuffer(lineVerts);
+      } else {
+        lineVerts.clear();
+        lineVerts.limit(3 * 2 * meshData.getVertexCount());
+        normMD.updateVertexCount();
+      }
+
+      FloatBuffer lineColors = normMD.getColorBuffer();
+      if (lineColors.capacity() < (4 * (2 * meshData.getVertexCount()))) {
+        normMD.setColorBuffer(null);
+        lineColors = BufferUtils.createColorBuffer(meshData.getVertexCount() * 2);
+        normMD.setColorBuffer(lineColors);
+      } else {
+        lineColors.clear();
+      }
+
+      IndexBufferData<?> lineInds = normMD.getIndices();
+      if (lineInds == null || lineInds.getBufferCapacity() < (normMD.getVertexCount())) {
+        normMD.setIndices(null);
+        lineInds = BufferUtils.createIndexBufferData(meshData.getVertexCount() * 2, normMD.getVertexCount() - 1);
+        normMD.setIndices(lineInds);
+      } else {
+        lineInds.getBuffer().clear();
+        lineInds.getBuffer().limit(normMD.getVertexCount());
+      }
+
+      verts.rewind();
+      norms.rewind();
+      lineVerts.rewind();
+      lineInds.getBuffer().rewind();
+
+      for (int x = 0; x < meshData.getVertexCount(); x++) {
+        Debugger._normalVect.set(verts.get(), verts.get(), verts.get());
+        mesh.getWorldTransform().applyForward(Debugger._normalVect);
+        lineVerts.put(Debugger._normalVect.getXf());
+        lineVerts.put(Debugger._normalVect.getYf());
+        lineVerts.put(Debugger._normalVect.getZf());
+
+        lineColors.put(Debugger.NORMAL_COLOR_BASE.getRed());
+        lineColors.put(Debugger.NORMAL_COLOR_BASE.getGreen());
+        lineColors.put(Debugger.NORMAL_COLOR_BASE.getBlue());
+        lineColors.put(Debugger.NORMAL_COLOR_BASE.getAlpha());
+
+        lineInds.put(x * 2);
+
+        Debugger._normalVect2.set(norms.get(), norms.get(), norms.get());
+        mesh.getWorldTransform().applyForwardVector(Debugger._normalVect2).normalizeLocal().multiplyLocal(rSize);
+        Debugger._normalVect.addLocal(Debugger._normalVect2);
+        lineVerts.put(Debugger._normalVect.getXf());
+        lineVerts.put(Debugger._normalVect.getYf());
+        lineVerts.put(Debugger._normalVect.getZf());
+
+        lineColors.put(Debugger.NORMAL_COLOR_TIP.getRed());
+        lineColors.put(Debugger.NORMAL_COLOR_TIP.getGreen());
+        lineColors.put(Debugger.NORMAL_COLOR_TIP.getBlue());
+        lineColors.put(Debugger.NORMAL_COLOR_TIP.getAlpha());
+
+        lineInds.put((x * 2) + 1);
+      }
+
+      normMD.markBufferDirty(MeshData.KEY_VertexCoords);
+      normMD.markBufferDirty(MeshData.KEY_ColorCoords);
+      normMD.markBuffersDirty();
+      normMD.markIndicesDirty();
+      Debugger.normalLines.onDraw(r);
     }
 
     if (doChildren && element instanceof Node) {

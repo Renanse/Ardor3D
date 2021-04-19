@@ -799,21 +799,27 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
   @Override
   public void deleteBuffers(final Collection<Integer> ids) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("deleting buffers");
+    }
+
     try (MemoryStack stack = MemoryStack.stackPush()) {
-      final IntBuffer idBuffer = stack.callocInt(ids.size());
-      idBuffer.clear();
+      final IntBuffer idBuffer = stack.mallocInt(1024);
       for (final Integer i : ids) {
         if (i != null && i != 0) {
           idBuffer.put(i);
         }
+        if (idBuffer.remaining() == 0) {
+          idBuffer.flip();
+          GL15C.glDeleteBuffers(idBuffer);
+          idBuffer.clear();
+        }
       }
-      idBuffer.flip();
-      if (idBuffer.remaining() > 0) {
+
+      if (idBuffer.position() > 0) {
+        idBuffer.flip();
         GL15C.glDeleteBuffers(idBuffer);
       }
-    }
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("deleting buffers");
     }
   }
 
