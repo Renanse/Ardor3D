@@ -9,10 +9,6 @@
 @import include/fog.glsl
 #endif
 
-#ifndef NR_LIGHTS
-#define NR_LIGHTS 4
-#endif
-
 out vec4 FragColor;
 
 in vec3 WorldPos;

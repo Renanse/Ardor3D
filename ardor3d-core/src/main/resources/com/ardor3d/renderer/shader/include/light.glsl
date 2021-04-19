@@ -2,7 +2,7 @@
 #define LIGHT_INC
 
 #ifndef MAX_LIGHTS
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 8
 #endif
 
 

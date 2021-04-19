@@ -82,7 +82,7 @@ LightingResult calcSpotLight(Light light, const vec3 worldPos, const vec3 worldN
 LightingResult calcLighting(LightProperties lightProps,  const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
     LightingResult totalResult;
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < MAX_LIGHTS; i++)
     {
         Light light = lightProps.lights[i];
         if (!light.enabled) continue;
