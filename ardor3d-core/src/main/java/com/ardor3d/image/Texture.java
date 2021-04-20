@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2020 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2021 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -41,11 +41,11 @@ public abstract class Texture implements Savable {
     /**
      * One dimensional texture. (basically a line)
      */
-    OneDimensional,
+    OneDimensional, OneDimensionalArray,
     /**
      * Two dimensional texture (default). A rectangle.
      */
-    TwoDimensional,
+    TwoDimensional, TwoDimensionalArray,
     /**
      * Three dimensional texture. (A cube)
      */
@@ -53,7 +53,7 @@ public abstract class Texture implements Savable {
     /**
      * A set of 6 TwoDimensional textures arranged as faces of a cube facing inwards.
      */
-    CubeMap
+    CubeMap, CubeMapArray
   }
 
   public enum MinificationFilter {
@@ -108,7 +108,7 @@ public abstract class Texture implements Savable {
 
     private boolean _usesMipMapLevels;
 
-    private MinificationFilter(final boolean usesMipMapLevels) {
+    MinificationFilter(final boolean usesMipMapLevels) {
       _usesMipMapLevels = usesMipMapLevels;
     }
 
@@ -217,7 +217,7 @@ public abstract class Texture implements Savable {
   private TextureKey _key = null;
   private TextureStoreFormat _storeFormat = TextureStoreFormat.RGBA8;
   private PixelDataType _rttPixelDataType = PixelDataType.UnsignedByte;
-  private transient boolean _storeImage = DEFAULT_STORE_IMAGE;
+  private transient boolean _storeImage = Texture.DEFAULT_STORE_IMAGE;
 
   private DepthTextureCompareMode _depthCompareMode = DepthTextureCompareMode.None;
   private DepthTextureCompareFunc _depthCompareFunc = DepthTextureCompareFunc.GreaterThanEqual;
@@ -229,29 +229,33 @@ public abstract class Texture implements Savable {
 
   public final static String KEY_TextureMatrixPrefix = "textureMatrix";
 
+  private WrapMode _wrapS = WrapMode.Repeat;
+  private WrapMode _wrapT = WrapMode.Repeat;
+  private WrapMode _wrapR = WrapMode.Repeat;
+
   /**
    * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 0. See
    * {@link MeshData#KEY_TextureCoords0}
    */
-  public final static String KEY_TextureMatrix0 = KEY_TextureMatrixPrefix + 0;
+  public final static String KEY_TextureMatrix0 = Texture.KEY_TextureMatrixPrefix + 0;
 
   /**
    * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 1. See
    * {@link MeshData#KEY_TextureCoords1}
    */
-  public final static String KEY_TextureMatrix1 = KEY_TextureMatrixPrefix + 1;
+  public final static String KEY_TextureMatrix1 = Texture.KEY_TextureMatrixPrefix + 1;
 
   /**
    * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 2. See
    * {@link MeshData#KEY_TextureCoords2}
    */
-  public final static String KEY_TextureMatrix2 = KEY_TextureMatrixPrefix + 2;
+  public final static String KEY_TextureMatrix2 = Texture.KEY_TextureMatrixPrefix + 2;
 
   /**
    * Spatial key for a 4x4 matrix available to materials for use transforming uv channel 3. See
    * {@link MeshData#KEY_TextureCoords3}
    */
-  public final static String KEY_TextureMatrix3 = KEY_TextureMatrixPrefix + 3;
+  public final static String KEY_TextureMatrix3 = Texture.KEY_TextureMatrixPrefix + 3;
 
   /**
    * Constructor instantiates a new <code>Texture</code> object with default attributes.
@@ -334,7 +338,7 @@ public abstract class Texture implements Savable {
    *         given context, 0 is returned.
    */
   public int getTextureIdForContext(final RenderContext context) {
-    return _key.getTextureIdForContext(context);
+    return _key != null ? _key.getTextureIdForContext(context) : 0;
   }
 
   /**
@@ -344,7 +348,7 @@ public abstract class Texture implements Savable {
    *         is not found in the given context, a 0 integer is returned.
    */
   public Integer getTextureIdForContextAsInteger(final RenderContext context) {
-    return _key.getTextureIdForContext(context);
+    return _key != null ? _key.getTextureIdForContext(context) : 0;
   }
 
   /**
@@ -400,17 +404,41 @@ public abstract class Texture implements Savable {
    * @throws IllegalArgumentException
    *           if axis or mode are null or invalid for this type of texture
    */
-  public abstract void setWrap(WrapAxis axis, WrapMode mode);
+  public final void setWrap(final WrapAxis axis, final WrapMode mode) {
+    if (mode == null) {
+      throw new IllegalArgumentException("mode can not be null.");
+    } else if (axis == null) {
+      throw new IllegalArgumentException("axis can not be null.");
+    }
+    switch (axis) {
+      case S:
+        _wrapS = mode;
+        break;
+      case T:
+        _wrapT = mode;
+        break;
+      case R:
+        _wrapR = mode;
+        break;
+    }
+  }
 
   /**
-   * Sets the wrap mode of this texture for all axis.
+   * Sets the wrap mode of this texture for all axes.
    *
    * @param mode
-   *          the wrap mode for the given axis of the texture.
+   *          the wrap mode to use for all axes of the texture.
    * @throws IllegalArgumentException
    *           if mode is null or invalid for this type of texture
    */
-  public abstract void setWrap(WrapMode mode);
+  public final void setWrap(final WrapMode mode) {
+    if (mode == null) {
+      throw new IllegalArgumentException("mode can not be null.");
+    }
+    _wrapS = mode;
+    _wrapT = mode;
+    _wrapR = mode;
+  }
 
   /**
    * @param axis
@@ -419,7 +447,17 @@ public abstract class Texture implements Savable {
    * @throws IllegalArgumentException
    *           if axis is null or invalid for this type of texture
    */
-  public abstract WrapMode getWrap(WrapAxis axis);
+  public final WrapMode getWrap(final WrapAxis axis) {
+    switch (axis) {
+      case S:
+        return _wrapS;
+      case T:
+        return _wrapT;
+      case R:
+        return _wrapR;
+    }
+    throw new IllegalArgumentException("invalid WrapAxis: " + axis);
+  }
 
   /**
    * @return the {@link Type} enum value of this Texture object.
@@ -560,10 +598,18 @@ public abstract class Texture implements Savable {
     if (getMinificationFilter() != that.getMinificationFilter()) {
       return false;
     }
-    if (!_borderColor.equals(that._borderColor)) {
+    if (!getBorderColor().equals(that._borderColor)) {
       return false;
     }
-
+    if (getWrap(WrapAxis.S) != that.getWrap(WrapAxis.S)) {
+      return false;
+    }
+    if (getWrap(WrapAxis.T) != that.getWrap(WrapAxis.T)) {
+      return false;
+    }
+    if (getWrap(WrapAxis.R) != that.getWrap(WrapAxis.R)) {
+      return false;
+    }
     return true;
   }
 
@@ -590,6 +636,9 @@ public abstract class Texture implements Savable {
     if (getTextureKey() != null) {
       rVal.setTextureKey(getTextureKey());
     }
+    rVal.setWrap(WrapAxis.S, _wrapS);
+    rVal.setWrap(WrapAxis.T, _wrapT);
+    rVal.setWrap(WrapAxis.R, _wrapR);
     return rVal;
   }
 
@@ -607,6 +656,9 @@ public abstract class Texture implements Savable {
     capsule.write(_storeFormat, "storeFormat", TextureStoreFormat.RGBA8);
     capsule.write(_rttPixelDataType, "rttPixelDataType", PixelDataType.UnsignedByte);
     capsule.write(_key, "textureKey", null);
+    capsule.write(_wrapS, "wrapS", WrapMode.Repeat);
+    capsule.write(_wrapT, "wrapT", WrapMode.Repeat);
+    capsule.write(_wrapR, "wrapR", WrapMode.Repeat);
   }
 
   @Override
@@ -638,6 +690,9 @@ public abstract class Texture implements Savable {
         capsule.readEnum("magnificationFilter", MagnificationFilter.class, MagnificationFilter.Bilinear);
     _storeFormat = capsule.readEnum("storeFormat", TextureStoreFormat.class, TextureStoreFormat.RGBA8);
     _rttPixelDataType = capsule.readEnum("rttPixelDataType", PixelDataType.class, PixelDataType.UnsignedByte);
+    _wrapS = capsule.readEnum("wrapS", WrapMode.class, WrapMode.Repeat);
+    _wrapT = capsule.readEnum("wrapT", WrapMode.class, WrapMode.Repeat);
+    _wrapR = capsule.readEnum("wrapR", WrapMode.class, WrapMode.Repeat);
   }
 
   @Override

@@ -10,19 +10,25 @@
 
 package com.ardor3d.image;
 
-public class Texture1D extends Texture {
+public class Texture1DArray extends TextureArray {
 
-  @Override
-  public Texture createSimpleClone() {
-    return createSimpleClone(new Texture1D());
+  public static Texture1DArray from(final Texture1D... textures) {
+    final var rVal = new Texture1DArray();
+    copyTextureDataInto(rVal, textures);
+    return rVal;
   }
 
   @Override
-  public Type getType() { return Type.OneDimensional; }
+  public Texture createSimpleClone() {
+    return createSimpleClone(new Texture1DArray());
+  }
+
+  @Override
+  public Type getType() { return Type.OneDimensionalArray; }
 
   @Override
   public boolean equals(final Object other) {
-    if (!(other instanceof Texture1D)) {
+    if (!(other instanceof Texture1DArray)) {
       return false;
     }
     return super.equals(other);

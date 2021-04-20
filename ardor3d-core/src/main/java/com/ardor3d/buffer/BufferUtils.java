@@ -1080,7 +1080,7 @@ public final class BufferUtils {
     final DoubleBuffer buf = ByteBuffer.allocateDirect(8 * size).order(ByteOrder.nativeOrder()).asDoubleBuffer();
     buf.clear();
     if (Constants.trackDirectMemory) {
-      trackingHash.put(buf, ref);
+      BufferUtils.trackingHash.put(buf, BufferUtils.ref);
     }
     return buf;
   }
@@ -1144,7 +1144,7 @@ public final class BufferUtils {
     final FloatBuffer buf = ByteBuffer.allocateDirect(4 * size).order(ByteOrder.nativeOrder()).asFloatBuffer();
     buf.clear();
     if (Constants.trackDirectMemory) {
-      trackingHash.put(buf, ref);
+      BufferUtils.trackingHash.put(buf, BufferUtils.ref);
     }
     return buf;
   }
@@ -1308,7 +1308,7 @@ public final class BufferUtils {
     final IntBuffer buf = ByteBuffer.allocateDirect(4 * size).order(ByteOrder.nativeOrder()).asIntBuffer();
     buf.clear();
     if (Constants.trackDirectMemory) {
-      trackingHash.put(buf, ref);
+      BufferUtils.trackingHash.put(buf, BufferUtils.ref);
     }
     return buf;
   }
@@ -1371,7 +1371,7 @@ public final class BufferUtils {
   public static ByteBuffer createByteBuffer(final int size) {
     final ByteBuffer buf = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
     if (Constants.trackDirectMemory) {
-      trackingHash.put(buf, ref);
+      BufferUtils.trackingHash.put(buf, BufferUtils.ref);
     }
     return buf;
   }
@@ -1448,7 +1448,7 @@ public final class BufferUtils {
     final ShortBuffer buf = ByteBuffer.allocateDirect(2 * size).order(ByteOrder.nativeOrder()).asShortBuffer();
     buf.clear();
     if (Constants.trackDirectMemory) {
-      trackingHash.put(buf, ref);
+      BufferUtils.trackingHash.put(buf, BufferUtils.ref);
     }
     return buf;
   }
@@ -1696,7 +1696,7 @@ public final class BufferUtils {
   public static void printCurrentDirectMemory(StringBuilder store) {
     long totalHeld = 0;
     // make a new set to hold the keys to prevent concurrency issues.
-    final List<Buffer> bufs = new ArrayList<>(trackingHash.keySet());
+    final List<Buffer> bufs = new ArrayList<>(BufferUtils.trackingHash.keySet());
     int fBufs = 0, bBufs = 0, iBufs = 0, sBufs = 0, dBufs = 0;
     int fBufsM = 0, bBufsM = 0, iBufsM = 0, sBufsM = 0, dBufsM = 0;
     for (final Buffer b : bufs) {
@@ -1737,4 +1737,45 @@ public final class BufferUtils {
       System.out.println(store.toString());
     }
   }
+
+  /**
+   * Concatenates all byte buffers in the given list to a single new ByteBuffer. If there is only one
+   * ByteBuffer in the list, it is returned instead of creating a new one.
+   *
+   * @param data
+   *          the list of ByteBuffers to concatenate.
+   * @return the resulting buffer
+   */
+  public static ByteBuffer concat(final List<ByteBuffer> data) {
+    int dSize = 0;
+    int count = 0;
+    ByteBuffer rVal = null;
+    for (int x = 0, maxX = data.size(); x < maxX; x++) {
+      final var buffer = data.get(x);
+      if (buffer == null) {
+        continue;
+      }
+
+      rVal = buffer;
+      dSize += rVal.limit();
+      count++;
+    }
+
+    // reuse buffer if we can.
+    if (count == 1) {
+      return rVal;
+    }
+
+    rVal = BufferUtils.createByteBuffer(dSize);
+    for (int x = 0, maxX = data.size(); x < maxX; x++) {
+      final var buffer = data.get(x);
+      if (buffer != null) {
+        rVal.put(buffer);
+      }
+    }
+
+    // ensure the buffer is ready for reading
+    return rVal.flip();
+  }
+
 }

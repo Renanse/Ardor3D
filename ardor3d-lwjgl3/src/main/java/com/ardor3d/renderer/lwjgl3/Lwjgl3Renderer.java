@@ -55,6 +55,7 @@ import com.ardor3d.scene.state.lwjgl3.Lwjgl3ZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3ScissorUtils;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3ShaderUtils;
 import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
+import com.ardor3d.scene.state.lwjgl3.util.TextureConstants;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -204,8 +205,8 @@ public class Lwjgl3Renderer extends AbstractRenderer {
   @Override
   public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final PixelDataType type,
       final int x, final int y, final int w, final int h) {
-    final int pixFormat = Lwjgl3TextureUtils.getGLPixelFormat(format);
-    final int pixDataType = Lwjgl3TextureUtils.getGLPixelDataType(type);
+    final int pixFormat = TextureConstants.getGLPixelFormat(format);
+    final int pixDataType = TextureConstants.getGLPixelDataType(type);
     GL11C.glReadPixels(x, y, w, h, pixFormat, pixDataType, store);
   }
 

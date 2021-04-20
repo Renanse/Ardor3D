@@ -10,19 +10,15 @@
 
 package com.ardor3d.scene.state.lwjgl3;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import org.lwjgl.opengl.ARBShadow;
-import org.lwjgl.opengl.ARBTextureCompression;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL12C;
 import org.lwjgl.opengl.GL13C;
 import org.lwjgl.opengl.GL14C;
 import org.lwjgl.opengl.GL30C;
-import org.lwjgl.opengl.GL44C;
 import org.lwjgl.opengl.GL46C;
 import org.lwjgl.system.MemoryStack;
 
@@ -31,7 +27,6 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
 import com.ardor3d.image.Texture.WrapAxis;
-import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
@@ -46,7 +41,8 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.state.record.TextureUnitRecord;
-import com.ardor3d.scene.state.lwjgl3.util.Lwjgl3TextureUtils;
+import com.ardor3d.scene.state.lwjgl3.util.TextureConstants;
+import com.ardor3d.scene.state.lwjgl3.util.TextureToCard;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.stat.StatCollector;
@@ -104,335 +100,70 @@ public abstract class Lwjgl3TextureStateUtil {
     final RenderContext context = ContextManager.getCurrentContext();
     final ContextCapabilities caps = context.getCapabilities();
 
+    // optimistically mark us clean for the current context
     texture.getTextureKey().markClean(context);
 
-    // our texture type:
+    // our texture type
     final Texture.Type type = texture.getType();
 
     // bind our texture id to this unit.
     doTextureBind(texture, unit, false);
 
-    // pass image data to OpenGL
+    // grab our texture image data for sending to the card
     final Image image = texture.getImage();
-    final boolean hasBorder = texture.hasBorder();
     if (image == null) {
       logger.warning("Image data for texture is null.");
+      return;
     }
 
-    // set alignment to support images with width % 4 != 0, as images are
-    // not aligned
+    // ensure our image data is not bigger than our max supported texture size.
+    final int maxSize = caps.getMaxTextureSize();
+    final int imageWidth = image.getWidth();
+    final int imageHeight = image.getHeight();
+    final int imageDepth = image.getDepth();
+    if (imageWidth > maxSize || imageHeight > maxSize || imageDepth > maxSize) {
+      logger.warning("(card unsupported) Attempted to apply texture with size bigger than max texture size [" + maxSize
+          + "]: " + imageWidth + " x " + imageHeight + " x " + imageDepth);
+      return;
+    }
+
+    // We expect image data to be tightly packed.
     GL11C.glPixelStorei(GL11C.GL_UNPACK_ALIGNMENT, 1);
 
-    // Get texture image data. Not all textures have image data.
-    // For example, ApplyMode.Combine modes can use primary colors,
-    // texture output, and constants to modify fragments via the
-    // texture units.
-    if (image != null) {
-      final int maxSize = caps.getMaxTextureSize();
-      final int actualWidth = image.getWidth();
-      final int actualHeight = image.getHeight();
+    // Time to push our image data to the card...
 
-      if (actualWidth > maxSize || actualHeight > maxSize) {
-        if (actualWidth > maxSize || actualHeight > maxSize) {
-          logger.warning("(card unsupported) Attempted to apply texture with size bigger than max texture size ["
-              + maxSize + "]: " + image.getWidth() + " x " + image.getHeight());
-          return;
-        }
-      }
+    // Handle textures either don't need mipmaps, or we want the card to generate them.
+    if (!texture.getMinificationFilter().usesMipMapLevels() || !image.hasMipmaps()) {
+      TextureToCard.sendBaseTexture(texture);
 
-      if (!texture.getMinificationFilter().usesMipMapLevels() && !texture.getTextureStoreFormat().isCompressed()) {
-
-        // Load textures which do not need mipmap auto-generating and
-        // which aren't using compressed images.
-
-        switch (texture.getType()) {
-          case TwoDimensional:
-            // ensure the buffer is ready for reading
-            image.getData(0).rewind();
-            // send top level to card
-            GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0,
-                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                image.getHeight(), hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
-            break;
-          case OneDimensional:
-            // ensure the buffer is ready for reading
-            image.getData(0).rewind();
-            // send top level to card
-            GL11C.glTexImage1D(GL11C.GL_TEXTURE_1D, 0,
-                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
-            break;
-          case ThreeDimensional:
-            // concat data into single buffer:
-            int dSize = 0;
-            int count = 0;
-            ByteBuffer data = null;
-            for (int x = 0; x < image.getData().size(); x++) {
-              if (image.getData(x) != null) {
-                data = image.getData(x);
-                dSize += data.limit();
-                count++;
-              }
-            }
-            // reuse buffer if we can.
-            if (count != 1) {
-              data = BufferUtils.createByteBuffer(dSize);
-              for (int x = 0; x < image.getData().size(); x++) {
-                if (image.getData(x) != null) {
-                  data.put(image.getData(x));
-                }
-              }
-              // ensure the buffer is ready for reading
-              data.flip();
-            }
-            // send top level to card
-            GL12C.glTexImage3D(GL12C.GL_TEXTURE_3D, 0,
-                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                image.getHeight(), image.getDepth(), hasBorder ? 1 : 0,
-                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
-            break;
-          case CubeMap:
-            // NOTE: Cubemaps MUST be square, so height is ignored on purpose.
-            for (final TextureCubeMap.Face face : TextureCubeMap.Face.values()) {
-              // ensure the buffer is ready for reading
-              image.getData(face.ordinal()).rewind();
-              // send top level to card
-              GL11C.glTexImage2D(getGLCubeMapFace(face), 0,
-                  Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                  image.getWidth(), hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                  Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(face.ordinal()));
-            }
-            break;
-        }
-      } else if (texture.getMinificationFilter().usesMipMapLevels() && !image.hasMipmaps()
-          && !texture.getTextureStoreFormat().isCompressed()) {
-
-        // For textures which need mipmaps auto-generating and which
-        // aren't using compressed images, generate the mipmaps.
-        // A new mipmap builder may be needed to build mipmaps for
-        // compressed textures.
-
-        switch (type) {
-          case TwoDimensional:
-            // ensure the buffer is ready for reading
-            image.getData(0).rewind();
-            // send top level to card
-            GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0,
-                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                image.getHeight(), hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
-            break;
-          case OneDimensional:
-            // ensure the buffer is ready for reading
-            image.getData(0).rewind();
-            // send top level to card
-            GL11C.glTexImage1D(GL11C.GL_TEXTURE_1D, 0,
-                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(0));
-            break;
-          case ThreeDimensional:
-            // concat data into single buffer:
-            int dSize = 0;
-            int count = 0;
-            ByteBuffer data = null;
-            for (int x = 0; x < image.getData().size(); x++) {
-              if (image.getData(x) != null) {
-                data = image.getData(x);
-                dSize += data.limit();
-                count++;
-              }
-            }
-            // reuse buffer if we can.
-            if (count != 1) {
-              data = BufferUtils.createByteBuffer(dSize);
-              for (int x = 0; x < image.getData().size(); x++) {
-                if (image.getData(x) != null) {
-                  data.put(image.getData(x));
-                }
-              }
-              // ensure the buffer is ready for reading
-              data.flip();
-            }
-            // send top level to card
-            GL12C.glTexImage3D(GL12C.GL_TEXTURE_3D, 0,
-                Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                image.getHeight(), image.getDepth(), hasBorder ? 1 : 0,
-                Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
-            break;
-          case CubeMap:
-            // NOTE: Cubemaps MUST be square, so height is ignored on purpose.
-            for (final TextureCubeMap.Face face : TextureCubeMap.Face.values()) {
-              // ensure the buffer is ready for reading
-              image.getData(face.ordinal()).rewind();
-              // send top level to card
-              GL11C.glTexImage2D(getGLCubeMapFace(face), 0,
-                  Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), image.getWidth(),
-                  image.getWidth(), hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                  Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), image.getData(face.ordinal()));
-            }
-            break;
-        }
-
+      // generate mipmaps, if we are uncompressed and our filter makes use of them.
+      if (!texture.getTextureStoreFormat().isCompressed() && texture.getMinificationFilter().usesMipMapLevels()) {
         // Ask the card to generate mipmaps
-        GL30C.glGenerateMipmap(getGLType(type));
+        GL30C.glGenerateMipmap(TextureConstants.getGLType(type));
 
+        // Override the max mipmap level, if we have that set.
         if (texture.getTextureMaxLevel() >= 0) {
-          GL11C.glTexParameteri(GL11C.GL_TEXTURE_2D, GL12C.GL_TEXTURE_MAX_LEVEL, texture.getTextureMaxLevel());
-        }
-      } else {
-        // Here we handle textures that are either compressed or have predefined mipmaps.
-        // Get mipmap data sizes and amount of mipmaps to send to opengl. Then loop through all mipmaps and
-        // send
-        // them.
-        int[] mipSizes = image.getMipMapByteSizes();
-        ByteBuffer data = null;
-
-        if (type == Type.CubeMap) {
-          for (final TextureCubeMap.Face face : TextureCubeMap.Face.values()) {
-            data = image.getData(face.ordinal());
-            int pos = 0;
-            int max = 1;
-
-            if (mipSizes == null) {
-              mipSizes = new int[] {data.capacity()};
-            } else if (texture.getMinificationFilter().usesMipMapLevels()) {
-              max = mipSizes.length;
-            }
-
-            // set max mip level
-            GL11C.glTexParameteri(getGLCubeMapFace(face), GL12C.GL_TEXTURE_MAX_LEVEL, max - 1);
-
-            for (int m = 0; m < max; m++) {
-              final int width = Math.max(1, image.getWidth() >> m);
-              final int height = Math.max(1, image.getHeight() >> m);
-
-              data.position(pos);
-              data.limit(pos + mipSizes[m]);
-
-              if (texture.getTextureStoreFormat().isCompressed()) {
-                ARBTextureCompression.glCompressedTexImage2DARB(getGLCubeMapFace(face), m,
-                    Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, height, data);
-              } else {
-                GL11C.glTexImage2D(getGLCubeMapFace(face), m,
-                    Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, height,
-                    hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                    Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
-              }
-              pos += mipSizes[m];
-            }
-          }
-        } else {
-          data = image.getData(0);
-          int pos = 0;
-          int max = 1;
-
-          if (mipSizes == null) {
-            mipSizes = new int[] {data.capacity()};
-          } else if (texture.getMinificationFilter().usesMipMapLevels()) {
-            max = mipSizes.length;
-          }
-
-          // Set max mip level
-          switch (type) {
-            case TwoDimensional:
-              GL11C.glTexParameteri(GL11C.GL_TEXTURE_2D, GL12C.GL_TEXTURE_MAX_LEVEL, max - 1);
-              break;
-            case ThreeDimensional:
-              GL11C.glTexParameteri(GL12C.GL_TEXTURE_3D, GL12C.GL_TEXTURE_MAX_LEVEL, max - 1);
-              break;
-            case OneDimensional:
-              GL11C.glTexParameteri(GL11C.GL_TEXTURE_1D, GL12C.GL_TEXTURE_MAX_LEVEL, max - 1);
-              break;
-            case CubeMap:
-              // handled above
-              break;
-          }
-
-          if (type == Type.ThreeDimensional) {
-            // concat data into single buffer:
-            int dSize = 0;
-            int count = 0;
-            for (int x = 0; x < image.getData().size(); x++) {
-              if (image.getData(x) != null) {
-                data = image.getData(x);
-                dSize += data.limit();
-                count++;
-              }
-            }
-            // reuse buffer if we can.
-            if (count != 1) {
-              data = BufferUtils.createByteBuffer(dSize);
-              for (int x = 0; x < image.getData().size(); x++) {
-                if (image.getData(x) != null) {
-                  data.put(image.getData(x));
-                }
-              }
-              // ensure the buffer is ready for reading
-              data.flip();
-            }
-          }
-
-          for (int m = 0; m < max; m++) {
-            final int width = Math.max(1, image.getWidth() >> m);
-            final int height = Math.max(1, image.getHeight() >> m);
-
-            data.position(pos);
-            data.limit(pos + mipSizes[m]);
-
-            switch (type) {
-              case TwoDimensional:
-                if (texture.getTextureStoreFormat().isCompressed()) {
-                  ARBTextureCompression.glCompressedTexImage2DARB(GL11C.GL_TEXTURE_2D, m,
-                      Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, height, data);
-                } else {
-                  GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, m,
-                      Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, height,
-                      hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                      Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
-                }
-                break;
-              case OneDimensional:
-                if (texture.getTextureStoreFormat().isCompressed()) {
-                  ARBTextureCompression.glCompressedTexImage1DARB(GL11C.GL_TEXTURE_1D, m,
-                      Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, data);
-                } else {
-                  GL11C.glTexImage1D(GL11C.GL_TEXTURE_1D, m,
-                      Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, hasBorder ? 1 : 0,
-                      Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                      Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
-                }
-                break;
-              case ThreeDimensional:
-                final int depth = Math.max(1, image.getDepth() >> m);
-                // already checked for support above...
-                if (texture.getTextureStoreFormat().isCompressed()) {
-                  ARBTextureCompression.glCompressedTexImage3DARB(GL12C.GL_TEXTURE_3D, m,
-                      Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, height, depth,
-                      data);
-                } else {
-                  GL12C.glTexImage3D(GL12C.GL_TEXTURE_3D, m,
-                      Lwjgl3TextureUtils.getGLInternalFormat(texture.getTextureStoreFormat()), width, height, depth,
-                      hasBorder ? 1 : 0, Lwjgl3TextureUtils.getGLPixelFormat(image.getDataFormat()),
-                      Lwjgl3TextureUtils.getGLPixelDataType(image.getDataType()), data);
-                }
-                break;
-              case CubeMap:
-                // handled above
-                break;
-            }
-            pos += mipSizes[m];
-          }
-        }
-        if (data != null) {
-          data.clear();
+          GL11C.glTexParameteri(TextureConstants.getGLType(type), GL12C.GL_TEXTURE_MAX_LEVEL,
+              texture.getTextureMaxLevel());
         }
       }
+      return;
     }
+
+    // Handle textures that have embeded mipmaps
+    // Special case - handle cubemap faces
+    if (type == Type.CubeMap) {
+      // walk through each face...
+      for (final TextureCubeMap.Face face : TextureCubeMap.Face.values()) {
+        final var data = image.getData(face.ordinal());
+        TextureToCard.sendMipMaps(texture, face, image, data);
+      }
+      return;
+    }
+
+    // all other types
+    final var data = type == Type.ThreeDimensional ? BufferUtils.concat(image.getData()) : image.getData(0);
+    TextureToCard.sendMipMaps(texture, null, image, data);
   }
 
   public static void apply(final TextureState state) {
@@ -486,7 +217,7 @@ public abstract class Lwjgl3TextureStateUtil {
           // texture already exists in OpenGL, just bind it if needed
           if (!unitRecord.isValid() || unitRecord.boundTexture != textureId) {
             checkAndSetUnit(i, record, caps);
-            GL11C.glBindTexture(getGLType(type), textureId);
+            GL11C.glBindTexture(TextureConstants.getGLType(type), textureId);
             if (Constants.stats) {
               StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
             }
@@ -541,7 +272,7 @@ public abstract class Lwjgl3TextureStateUtil {
     final float bias = texture.getLodBias() < caps.getMaxLodBias() ? texture.getLodBias() : caps.getMaxLodBias();
     if (!unitRecord.isValid() || unitRecord.lodBias != bias) {
       checkAndSetUnit(unit, record, caps);
-      GL11C.glTexParameterf(getGLType(texture.getType()), GL14C.GL_TEXTURE_LOD_BIAS, bias);
+      GL11C.glTexParameterf(TextureConstants.getGLType(texture.getType()), GL14C.GL_TEXTURE_LOD_BIAS, bias);
       unitRecord.lodBias = bias;
     }
   }
@@ -554,7 +285,8 @@ public abstract class Lwjgl3TextureStateUtil {
       TextureRecord.colorBuffer.put(texBorder.getRed()).put(texBorder.getGreen()).put(texBorder.getBlue())
           .put(texBorder.getAlpha());
       TextureRecord.colorBuffer.rewind();
-      GL11C.glTexParameterfv(getGLType(texture.getType()), GL11C.GL_TEXTURE_BORDER_COLOR, TextureRecord.colorBuffer);
+      GL11C.glTexParameterfv(TextureConstants.getGLType(texture.getType()), GL11C.GL_TEXTURE_BORDER_COLOR,
+          TextureRecord.colorBuffer);
       texRecord.borderColor.set(texBorder);
     }
   }
@@ -586,19 +318,19 @@ public abstract class Lwjgl3TextureStateUtil {
       final TextureStateRecord record, final ContextCapabilities caps) {
     final Type type = texture.getType();
 
-    final int depthCompareMode = Lwjgl3TextureUtils.getGLDepthTextureCompareMode(texture.getDepthCompareMode());
+    final int depthCompareMode = TextureConstants.getGLDepthTextureCompareMode(texture.getDepthCompareMode());
     // set up magnification filter
     if (!texRecord.isValid() || texRecord.depthTextureCompareMode != depthCompareMode) {
       checkAndSetUnit(unit, record, caps);
-      GL11C.glTexParameteri(getGLType(type), ARBShadow.GL_TEXTURE_COMPARE_MODE_ARB, depthCompareMode);
+      GL11C.glTexParameteri(TextureConstants.getGLType(type), GL14C.GL_TEXTURE_COMPARE_MODE, depthCompareMode);
       texRecord.depthTextureCompareMode = depthCompareMode;
     }
 
-    final int depthCompareFunc = Lwjgl3TextureUtils.getGLDepthTextureCompareFunc(texture.getDepthCompareFunc());
+    final int depthCompareFunc = TextureConstants.getGLDepthTextureCompareFunc(texture.getDepthCompareFunc());
     // set up magnification filter
     if (!texRecord.isValid() || texRecord.depthTextureCompareFunc != depthCompareFunc) {
       checkAndSetUnit(unit, record, caps);
-      GL11C.glTexParameteri(getGLType(type), ARBShadow.GL_TEXTURE_COMPARE_FUNC_ARB, depthCompareFunc);
+      GL11C.glTexParameteri(TextureConstants.getGLType(type), GL14C.GL_TEXTURE_COMPARE_FUNC, depthCompareFunc);
       texRecord.depthTextureCompareFunc = depthCompareFunc;
     }
   }
@@ -616,19 +348,19 @@ public abstract class Lwjgl3TextureStateUtil {
       final TextureStateRecord record, final ContextCapabilities caps) {
     final Type type = texture.getType();
 
-    final int magFilter = Lwjgl3TextureUtils.getGLMagFilter(texture.getMagnificationFilter());
+    final int magFilter = TextureConstants.getGLMagFilter(texture.getMagnificationFilter());
     // set up magnification filter
     if (!texRecord.isValid() || texRecord.magFilter != magFilter) {
       checkAndSetUnit(unit, record, caps);
-      GL11C.glTexParameteri(getGLType(type), GL11C.GL_TEXTURE_MAG_FILTER, magFilter);
+      GL11C.glTexParameteri(TextureConstants.getGLType(type), GL11C.GL_TEXTURE_MAG_FILTER, magFilter);
       texRecord.magFilter = magFilter;
     }
 
-    final int minFilter = Lwjgl3TextureUtils.getGLMinFilter(texture.getMinificationFilter());
+    final int minFilter = TextureConstants.getGLMinFilter(texture.getMinificationFilter());
     // set up mipmap filter
     if (!texRecord.isValid() || texRecord.minFilter != minFilter) {
       checkAndSetUnit(unit, record, caps);
-      GL11C.glTexParameteri(getGLType(type), GL11C.GL_TEXTURE_MIN_FILTER, minFilter);
+      GL11C.glTexParameteri(TextureConstants.getGLType(type), GL11C.GL_TEXTURE_MIN_FILTER, minFilter);
       texRecord.minFilter = minFilter;
     }
 
@@ -638,7 +370,7 @@ public abstract class Lwjgl3TextureStateUtil {
       aniso += 1.0f;
       if (!texRecord.isValid() || texRecord.anisoLevel - aniso > MathUtils.ZERO_TOLERANCE) {
         checkAndSetUnit(unit, record, caps);
-        GL11C.glTexParameterf(getGLType(type), GL46C.GL_TEXTURE_MAX_ANISOTROPY, aniso);
+        GL11C.glTexParameterf(TextureConstants.getGLType(type), GL46C.GL_TEXTURE_MAX_ANISOTROPY, aniso);
         texRecord.anisoLevel = aniso;
       }
     }
@@ -655,9 +387,9 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final Texture3D texture, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = getGLWrap(texture.getWrap(WrapAxis.S), caps);
-    final int wrapT = getGLWrap(texture.getWrap(WrapAxis.T), caps);
-    final int wrapR = getGLWrap(texture.getWrap(WrapAxis.R), caps);
+    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S), caps);
+    final int wrapT = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.T), caps);
+    final int wrapR = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.R), caps);
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -688,7 +420,7 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final Texture1D texture, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = getGLWrap(texture.getWrap(WrapAxis.S), caps);
+    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S), caps);
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -730,8 +462,8 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final Texture2D texture, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = getGLWrap(texture.getWrap(WrapAxis.S), caps);
-    final int wrapT = getGLWrap(texture.getWrap(WrapAxis.T), caps);
+    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S), caps);
+    final int wrapT = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.T), caps);
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -757,9 +489,9 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final TextureCubeMap cubeMap, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = getGLWrap(cubeMap.getWrap(WrapAxis.S), caps);
-    final int wrapT = getGLWrap(cubeMap.getWrap(WrapAxis.T), caps);
-    final int wrapR = getGLWrap(cubeMap.getWrap(WrapAxis.R), caps);
+    final int wrapS = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.S), caps);
+    final int wrapT = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.T), caps);
+    final int wrapR = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.R), caps);
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -829,58 +561,10 @@ public abstract class Lwjgl3TextureStateUtil {
     checkAndSetUnit(unit, record, caps);
 
     final int id = texture.getTextureIdForContext(context);
-    GL11C.glBindTexture(getGLType(texture.getType()), id);
+    GL11C.glBindTexture(TextureConstants.getGLType(texture.getType()), id);
     if (Constants.stats) {
       StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
     }
     record.units[unit].boundTexture = id;
-  }
-
-  public static int getGLType(final Type type) {
-    switch (type) {
-      case TwoDimensional:
-        return GL11C.GL_TEXTURE_2D;
-      case OneDimensional:
-        return GL11C.GL_TEXTURE_1D;
-      case ThreeDimensional:
-        return GL12C.GL_TEXTURE_3D;
-      case CubeMap:
-        return GL13C.GL_TEXTURE_CUBE_MAP;
-    }
-    throw new IllegalArgumentException("invalid texture type: " + type);
-  }
-
-  public static int getGLCubeMapFace(final TextureCubeMap.Face face) {
-    switch (face) {
-      case PositiveX:
-        return GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-      case NegativeX:
-        return GL13C.GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
-      case PositiveY:
-        return GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
-      case NegativeY:
-        return GL13C.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
-      case PositiveZ:
-        return GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
-      case NegativeZ:
-        return GL13C.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
-    }
-    throw new IllegalArgumentException("invalid cubemap face: " + face);
-  }
-
-  public static int getGLWrap(final WrapMode wrap, final ContextCapabilities caps) {
-    switch (wrap) {
-      case Repeat:
-        return GL11C.GL_REPEAT;
-      case MirroredRepeat:
-        return GL14C.GL_MIRRORED_REPEAT;
-      case BorderClamp:
-        return GL13C.GL_CLAMP_TO_BORDER;
-      case MirrorEdgeClamp:
-        return GL44C.GL_MIRROR_CLAMP_TO_EDGE;
-      case EdgeClamp:
-        return GL12C.GL_CLAMP_TO_EDGE;
-    }
-    throw new IllegalArgumentException("invalid WrapMode type: " + wrap);
   }
 }
