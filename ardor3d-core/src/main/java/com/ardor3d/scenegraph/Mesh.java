@@ -32,8 +32,11 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.RenderMatrixType;
+import com.ardor3d.renderer.RenderPhase;
 import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.MaterialManager;
@@ -258,8 +261,15 @@ public class Mesh extends Spatial implements Renderable, Pickable {
   }
 
   protected boolean render(final Renderer renderer, final MeshData meshData) {
+    final RenderContext context = ContextManager.getCurrentContext();
+    final RenderPhase phase = context.getRenderPhase();
+
+    if (phase == RenderPhase.ShadowTexture && !LightProperties.isShadowCaster(this)) {
+      return false;
+    }
+
     // Grab our proper RenderTechnique
-    final MaterialTechnique technique = MaterialManager.INSTANCE.chooseTechnique(this);
+    final MaterialTechnique technique = MaterialManager.INSTANCE.chooseTechnique(this, phase);
 
     // No technique? Can't render.
     if (technique == null) {
@@ -269,7 +279,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     // Set our model matrix
     renderer.setMatrix(RenderMatrixType.Model, getWorldTransform());
     renderer.computeNormalMatrix(getWorldTransform().isUniformScale());
-    if (LightProperties.isLightReceiver(this)) {
+    if (phase == RenderPhase.Scene && LightProperties.isLightReceiver(this)) {
       SceneIndexer.getCurrent().getLightManager().sortLightsFor(this);
     }
 
@@ -317,7 +327,6 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
     // final InstancingManager instancing = glsl != null ? meshData.getInstancingManager() : null;
 
-    // final RenderContext context = ContextManager.getCurrentContext();
     // final ContextCapabilities caps = context.getCapabilities();
 
     // if (instancing == null) {
@@ -527,6 +536,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     mesh.setModelBound(_modelBound != null ? _modelBound.clone(null) : null);
     mesh.setVisible(_isVisible);
     mesh.setRenderMaterial(_material);
+    mesh.setOccluderMaterial(_occluderMaterial);
     mesh._properties.putAll(_properties);
 
     // return

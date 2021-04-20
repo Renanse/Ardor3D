@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.RenderPhase;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.Constants;
@@ -40,11 +41,16 @@ public enum MaterialManager {
   private static final Logger logger = Logger.getLogger(MaterialManager.class.getName());
 
   private RenderMaterial _defaultMaterial = null;
+  private RenderMaterial _defaultOccluderMaterial = null;
   private final Map<ResourceSource, RenderMaterial> _materialCache = new HashMap<>();
 
   public void setDefaultMaterial(final RenderMaterial material) { _defaultMaterial = material; }
 
   public RenderMaterial getDefaultMaterial() { return _defaultMaterial; }
+
+  public void setDefaultOccluderMaterial(final RenderMaterial material) { _defaultOccluderMaterial = material; }
+
+  public RenderMaterial getDefaultOccluderMaterial() { return _defaultOccluderMaterial; }
 
   public RenderMaterial findMaterial(final String materialUrl) {
     final ResourceSource key = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, materialUrl);
@@ -63,16 +69,27 @@ public enum MaterialManager {
     return mat;
   }
 
-  public MaterialTechnique chooseTechnique(final Mesh mesh) {
+  public MaterialTechnique chooseTechnique(final Mesh mesh, final RenderPhase phase) {
 
     // find the local or inherited material for the given mesh
     final RenderContext context = ContextManager.getCurrentContext();
-    final RenderMaterial enforced = context.getEnforcedMaterial();
-    RenderMaterial material = enforced != null ? enforced : mesh.getWorldRenderMaterial();
+    RenderMaterial material = context.getEnforcedMaterial();
+    if (material == null) {
+      if (phase == RenderPhase.Scene) {
+        material = mesh.getWorldRenderMaterial();
+      } else if (phase == RenderPhase.ShadowTexture) {
+        material = mesh.getWorldOccluderMaterial();
+        if (material == null) {
+          material = _defaultOccluderMaterial;
+
+          return chooseTechnique(mesh, material);
+        }
+      }
+    }
 
     // if we have no material and we enable guessing materials, try that first.
     if (material == null && !Constants.ignoreMissingMaterials) {
-      logger.warning(() -> "Mesh " + mesh + " missing material.  Auto-guessing.");
+      MaterialManager.logger.warning(() -> "Mesh " + mesh + " missing material.  Auto-guessing.");
       MaterialUtil.autoMaterials(mesh);
       material = mesh.getWorldRenderMaterial();
     }
@@ -127,11 +144,11 @@ public enum MaterialManager {
       String line;
       while ((line = in.readLine()) != null) {
         line = line.trim();
-        if (line.startsWith(ImportMarker)) {
-          if (logger.isLoggable(Level.FINE)) {
-            logger.fine("found import: " + line);
+        if (line.startsWith(MaterialManager.ImportMarker)) {
+          if (MaterialManager.logger.isLoggable(Level.FINE)) {
+            MaterialManager.logger.fine("found import: " + line);
           }
-          final String sourceUrl = line.substring(ImportMarker.length()).trim();
+          final String sourceUrl = line.substring(MaterialManager.ImportMarker.length()).trim();
           final String text = getShaderText(sourceUrl, true, history);
           if (text != null) {
             builder.append(text);
@@ -154,8 +171,8 @@ public enum MaterialManager {
   protected static String getShaderText(final String sourceUrl, final boolean processImports,
       final Stack<String> history) {
     if (history.contains(sourceUrl)) {
-      if (logger.isLoggable(Level.FINE)) {
-        logger.fine("already seen: " + sourceUrl);
+      if (MaterialManager.logger.isLoggable(Level.FINE)) {
+        MaterialManager.logger.fine("already seen: " + sourceUrl);
       }
       return null;
     }
@@ -165,8 +182,8 @@ public enum MaterialManager {
       return null;
     }
 
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("loaded shader: " + sourceUrl);
+    if (MaterialManager.logger.isLoggable(Level.FINE)) {
+      MaterialManager.logger.fine("loaded shader: " + sourceUrl);
     }
 
     final CharBuffer buf = CharBuffer.allocate(2048);
@@ -180,7 +197,7 @@ public enum MaterialManager {
       }
       text = build.toString();
     } catch (final IOException ex) {
-      logger.logp(Level.SEVERE, MaterialManager.class.getName(), "getShaderText(String, boolean)",
+      MaterialManager.logger.logp(Level.SEVERE, MaterialManager.class.getName(), "getShaderText(String, boolean)",
           "Failed to read a shader source: " + sourceUrl + " Error: " + ex.getMessage());
       ex.printStackTrace();
     }

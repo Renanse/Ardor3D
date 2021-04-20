@@ -67,6 +67,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderPhase;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
@@ -274,12 +275,15 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
       /** Ask the current SceneIndexer to do anything Renderer related - like shadows. */
       SceneIndexer.getCurrent().onRender(renderer);
 
+      /** Set that we are back to rendering the scene now. */
+      ContextManager.getCurrentContext().setRenderPhase(RenderPhase.Scene);
+
       /** Call renderExample in any derived classes. */
       renderExample(renderer);
       renderDebug(renderer);
 
       if (_doShot) {
-        // force any waiting scene elements to be renderer.
+        // force any waiting scene elements to be rendered.
         renderer.renderBuckets();
         ScreenExporter.exportCurrentScreen(renderer, _screenShotExp);
         _doShot = false;
@@ -566,6 +570,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
           ResourceLocatorTool.getClassPathResource(ExampleBase.class, "com/ardor3d/example/media/shaders/")));
       MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
           .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
+      MaterialManager.INSTANCE.setDefaultOccluderMaterial(YamlMaterialReader
+          .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_occluder.yaml")));
     } catch (final URISyntaxException ex) {
       ex.printStackTrace();
     }

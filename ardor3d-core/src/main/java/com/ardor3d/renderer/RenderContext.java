@@ -67,6 +67,8 @@ public class RenderContext {
 
   protected SceneIndexer _sceneIndexer = new SceneIndexer();
 
+  protected RenderPhase _renderPhase = RenderPhase.Scene;
+
   public RenderContext(final Object key, final ContextCapabilities caps) {
     this(key, caps, null);
   }
@@ -199,6 +201,10 @@ public class RenderContext {
 
   public RenderContextRef getUniqueContextRef() { return _uniqueContextRef; }
 
+  public RenderPhase getRenderPhase() { return _renderPhase; }
+
+  public void setRenderPhase(final RenderPhase renderPhase) { _renderPhase = renderPhase; }
+
   /**
    * Saves the currently set states to a stack. Does not changes the currently enforced states.
    */
@@ -258,4 +264,5 @@ public class RenderContext {
       _currentCamera.update();
     }
   }
+
 }

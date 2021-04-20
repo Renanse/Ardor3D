@@ -102,6 +102,12 @@ public abstract class Spatial implements Savable, Hintable {
   /** The local RenderMaterial used by this spatial. Inherited by children if they have none set. */
   protected RenderMaterial _material;
 
+  /**
+   * The local RenderMaterial used by this spatial for light occluder rendering. Inherited by children
+   * if they have none set.
+   */
+  protected RenderMaterial _occluderMaterial;
+
   /** This spatial's layer; defaults to {@link #LAYER_DEFAULT}. */
   protected int _layer = Spatial.LAYER_INHERIT;
 
@@ -914,6 +920,29 @@ public abstract class Spatial implements Savable, Hintable {
    */
   public RenderMaterial getWorldRenderMaterial() {
     return _material != null ? _material : _parent != null ? _parent.getWorldRenderMaterial() : null;
+  }
+
+  /**
+   * Sets the local render material used when rendering this spatial as a light occluder.
+   *
+   * @param material
+   *          the new material
+   */
+  public void setOccluderMaterial(final RenderMaterial material) { _occluderMaterial = material; }
+
+  /**
+   * Gets the locally set render material used when rendering this spatial as a light occluder.
+   *
+   * @return the material, or null if none set.
+   */
+  public RenderMaterial getOccluderMaterial() { return _occluderMaterial; }
+
+  /**
+   * @return our locally set RenderMaterial used when rendering this spatial as a light occluder, or
+   *         the closest locally set occluder material on a scene graph ancestor.
+   */
+  public RenderMaterial getWorldOccluderMaterial() {
+    return _occluderMaterial != null ? _occluderMaterial : _parent != null ? _parent.getWorldOccluderMaterial() : null;
   }
 
   /**

@@ -1,0 +1,29 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+        uniforms: 
+          - builtIn: [model, view, projection]
+        shaders: 
+          Vertex: 
+            program: |
+                #version 330 core
+                
+                in vec3 vertex;
+                
+                uniform mat4 model, view, projection;
+                
+                void main()
+                {
+                    gl_Position = projection * view * model * vec4(vertex, 1.0);
+                }
+          Fragment:
+            program: |
+                #version 330 core
+
+                void main()
+                {
+                   // we're grabbing depth, so nothing to do here.
+                }
