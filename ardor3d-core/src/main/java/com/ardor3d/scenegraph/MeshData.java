@@ -12,7 +12,6 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -21,7 +20,6 @@ import java.nio.ShortBuffer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -101,20 +99,8 @@ public class MeshData implements Savable {
 
   protected transient ContextValueReference<MeshData, Integer> _vaoIdCache;
 
-  /**
-   * list of OpenGL contexts we believe have up to date values from all buffers and indices. For use
-   * in multi-context mode.
-   */
-  protected transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
-
-  /** if true, we believe we are fully uploaded to OpenGL. For use in single-context mode. */
-  protected transient boolean _uploaded;
-
   public MeshData() {
     MeshData._identityCache.put(this, MeshData.STATIC_REF);
-    if (Constants.useMultipleContexts) {
-      _uploadedContexts = new HashSet<>();
-    }
   }
 
   /**
@@ -159,22 +145,6 @@ public class MeshData implements Savable {
    */
   public int removeVAOID(final RenderContext context) {
     final Integer id = _vaoIdCache.removeValue(context.getUniqueContextRef());
-    if (Constants.useMultipleContexts) {
-      synchronized (_uploadedContexts) {
-        WeakReference<RenderContextRef> ref;
-        RenderContextRef check;
-        for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
-          ref = it.next();
-          check = ref.get();
-          if (check == null || check.equals(context.getUniqueContextRef())) {
-            it.remove();
-            continue;
-          }
-        }
-      }
-    } else {
-      _uploaded = false;
-    }
     return id != null ? id.intValue() : 0;
   }
 
@@ -214,7 +184,6 @@ public class MeshData implements Savable {
     }
 
     data.markDirty();
-    markBuffersDirty();
   }
 
   /**
@@ -230,76 +199,6 @@ public class MeshData implements Savable {
     }
 
     data.markDirty();
-    markBuffersDirty();
-  }
-
-  /**
-   * @param context
-   *          the RenderContext to check our state for.
-   * @return false if the MeshData has at least one dirty buffer for the given context or we don't
-   *         have the given a record of it in memory.
-   */
-  public boolean isBuffersClean(final RenderContext context) {
-    if (Constants.useMultipleContexts) {
-      synchronized (_uploadedContexts) {
-        // check if we are empty...
-        if (_uploadedContexts.isEmpty()) {
-          return false;
-        }
-
-        WeakReference<RenderContextRef> ref;
-        RenderContextRef check;
-        // look for a matching reference and clean out all weak references that have expired
-        boolean uploaded = false;
-        for (final Iterator<WeakReference<RenderContextRef>> it = _uploadedContexts.iterator(); it.hasNext();) {
-          ref = it.next();
-          check = ref.get();
-          if (check == null) {
-            // found empty, clean up
-            it.remove();
-            continue;
-          }
-
-          if (!uploaded && check.equals(context.getSharableContextRef())) {
-            // found match, return false
-            uploaded = true;
-          }
-        }
-        return uploaded;
-      }
-    } else {
-      return _uploaded;
-    }
-  }
-
-  /**
-   * Mark this MeshData as having at least one dirty Buffer. The buffer(s) itself should also be
-   * marked dirty separately via {@link AbstractBufferData#markDirty()}
-   */
-  public void markBuffersDirty() {
-    if (Constants.useMultipleContexts) {
-      synchronized (_uploadedContexts) {
-        _uploadedContexts.clear();
-      }
-    } else {
-      _uploaded = false;
-    }
-  }
-
-  /**
-   * Mark this MeshData as having sent all of its buffers to the given context.
-   *
-   * @param context
-   *          the OpenGL context our buffers belong to.
-   */
-  public void markBuffersClean(final RenderContext context) {
-    if (Constants.useMultipleContexts) {
-      synchronized (_uploadedContexts) {
-        _uploadedContexts.add(new WeakReference<>(context.getSharableContextRef()));
-      }
-    } else {
-      _uploaded = true;
-    }
   }
 
   /**

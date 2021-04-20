@@ -336,7 +336,6 @@ public final class Debugger {
 
       normMD.markBufferDirty(MeshData.KEY_VertexCoords);
       normMD.markBufferDirty(MeshData.KEY_ColorCoords);
-      normMD.markBuffersDirty();
       normMD.markIndicesDirty();
       Debugger.normalLines.onDraw(r);
     }

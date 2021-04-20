@@ -174,13 +174,8 @@ public class TechniquePass {
     if (vaoID <= 0) {
       vaoID = shaderUtils.createVertexArrayObject(context);
       data.setVAOID(context, vaoID);
-      shaderUtils.setBoundVAO(vaoID, context);
-    } else {
-      shaderUtils.setBoundVAO(vaoID, context);
-      if (data.isBuffersClean(context)) {
-        return;
-      }
     }
+    shaderUtils.setBoundVAO(vaoID, context);
 
     // send our mesh data to the card, binding them to the VAO
     final int programId = getProgramId(context);
@@ -223,8 +218,6 @@ public class TechniquePass {
     if (data.getIndexBuffer() != null) {
       shaderUtils.setupBufferObject(data.getIndices(), true, context);
     }
-
-    data.markBuffersClean(context);
   }
 
   protected void setupUniforms(final Renderer renderer, final Mesh mesh) {

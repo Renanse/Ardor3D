@@ -171,8 +171,6 @@ public class Sphere extends Mesh {
       texData.markDirty();
     }
 
-    _meshData.markBuffersDirty();
-
     // generate geometry
     final double fInvRS = 1.0 / _radialSamples;
     final double fZFactor = 2.0 / (_zSamples - 1);
