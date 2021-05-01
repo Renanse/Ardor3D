@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2020 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2021 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -14,18 +14,18 @@ public class Cone extends Cylinder {
 
   public Cone() {}
 
-  public Cone(final String name, final int axisSamples, final int radialSamples, final float radius,
-    final float height) {
+  public Cone(final String name, final int axisSamples, final int radialSamples, final double radius,
+    final double height) {
     this(name, axisSamples, radialSamples, radius, height, true);
   }
 
-  public Cone(final String name, final int axisSamples, final int radialSamples, final float radius, final float height,
-    final boolean closed) {
+  public Cone(final String name, final int axisSamples, final int radialSamples, final double radius,
+    final double height, final boolean closed) {
     super(name, axisSamples, radialSamples, radius, height, closed);
     setRadius2(0);
   }
 
-  public void setHalfAngle(final float radians) {
+  public void setHalfAngle(final double radians) {
     setRadius1(Math.tan(radians));
   }
 }

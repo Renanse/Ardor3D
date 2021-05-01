@@ -84,7 +84,7 @@ public class ColorSurface implements IUniformSupplier, Savable {
 
   public float getShininess() { return _shininess; }
 
-  public void setOpacity(final float value) { _shininess = value; }
+  public void setOpacity(final float value) { _opacity = value; }
 
   public float getOpacity() { return _opacity; }
 

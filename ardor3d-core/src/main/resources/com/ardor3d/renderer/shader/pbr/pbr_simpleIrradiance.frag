@@ -17,7 +17,7 @@ uniform PbrSurface surface;
 uniform samplerCube irradianceMap;
 
 // lights
-uniform Light light[4];
+uniform LightProperties lightProps;
 
 uniform vec3 cameraLoc;
 
@@ -36,12 +36,13 @@ void main()
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < 4; ++i) 
     {
+        Light light = lightProps.lights[i];
         // calculate per-light radiance
-        vec3 L = normalize(light[i].position - WorldPos);
+        vec3 L = normalize(light.position - WorldPos);
         vec3 H = normalize(V + L);
-        float distance = length(light[i].position - WorldPos);
+        float distance = length(light.position - WorldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = light[i].color * light[i].intensity * attenuation;
+        vec3 radiance = light.color * light.intensity * attenuation;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, surface.roughness);   
