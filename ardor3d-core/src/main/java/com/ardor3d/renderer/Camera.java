@@ -230,16 +230,16 @@ public class Camera implements Savable, Externalizable {
    */
   private ProjectionMode _projectionMode = ProjectionMode.Perspective;
 
-  private boolean _updateMVMatrix = true;
-  private boolean _updatePMatrix = true;
-  private boolean _updateMVPMatrix = true;
-  private boolean _updateInverseMVPMatrix = true;
+  private boolean _updateViewMatrix = true;
+  private boolean _updateProjectionMatrix = true;
+  private boolean _updateViewProjectionMatrix = true;
+  private boolean _updateInverseViewProjectionMatrix = true;
 
   // NB: These matrices are column-major.
   protected final Matrix4 _view = new Matrix4();
   protected final Matrix4 _projection = new Matrix4();
-  private final Matrix4 _modelViewProjection = new Matrix4();
-  private final Matrix4 _modelViewProjectionInverse = new Matrix4();
+  private final Matrix4 _viewProjection = new Matrix4();
+  private final Matrix4 _viewProjectionInverse = new Matrix4();
 
   protected boolean _depthRangeDirty;
   protected boolean _frustumDirty;
@@ -1044,9 +1044,9 @@ public class Camera implements Savable, Externalizable {
       }
     }
 
-    _updatePMatrix = true;
-    _updateMVPMatrix = true;
-    _updateInverseMVPMatrix = true;
+    _updateProjectionMatrix = true;
+    _updateViewProjectionMatrix = true;
+    _updateInverseViewProjectionMatrix = true;
 
     markFrustumDirty();
   }
@@ -1128,9 +1128,9 @@ public class Camera implements Savable, Externalizable {
 
     Vector3.releaseTempInstance(planeNormal);
 
-    _updateMVMatrix = true;
-    _updateMVPMatrix = true;
-    _updateInverseMVPMatrix = true;
+    _updateViewMatrix = true;
+    _updateViewProjectionMatrix = true;
+    _updateInverseViewProjectionMatrix = true;
 
     markFrameDirty();
   }
@@ -1144,26 +1144,42 @@ public class Camera implements Savable, Externalizable {
    */
   protected void updateProjectionMatrix() {
     if (getProjectionMode() == ProjectionMode.Orthographic) {
-      _projection.setIdentity();
       _projection.setM00(2.0 / (_frustumRight - _frustumLeft));
+      _projection.setM01(0.0);
+      _projection.setM02(0.0);
+      _projection.setM03(-(_frustumRight + _frustumLeft) / (_frustumRight - _frustumLeft));
+      _projection.setM10(0.0);
       _projection.setM11(2.0 / (_frustumTop - _frustumBottom));
+      _projection.setM12(0.0);
+      _projection.setM13(-(_frustumTop + _frustumBottom) / (_frustumTop - _frustumBottom));
+      _projection.setM20(0.0);
+      _projection.setM21(0.0);
       _projection.setM22(-2.0 / (_frustumFar - _frustumNear));
-      _projection.setM30(-(_frustumRight + _frustumLeft) / (_frustumRight - _frustumLeft));
-      _projection.setM31(-(_frustumTop + _frustumBottom) / (_frustumTop - _frustumBottom));
-      _projection.setM32(-(_frustumFar + _frustumNear) / (_frustumFar - _frustumNear));
+      _projection.setM23(-(_frustumFar + _frustumNear) / (_frustumFar - _frustumNear));
+      _projection.setM30(0.0);
+      _projection.setM31(0.0);
+      _projection.setM32(0.0);
+      _projection.setM33(1.0);
     } else if (getProjectionMode() == ProjectionMode.Perspective) {
-      _projection.setIdentity();
       _projection.setM00((2.0 * _frustumNear) / (_frustumRight - _frustumLeft));
+      _projection.setM01(0.0);
+      _projection.setM02((_frustumRight + _frustumLeft) / (_frustumRight - _frustumLeft));
+      _projection.setM03(0.0);
+      _projection.setM10(0.0);
       _projection.setM11((2.0 * _frustumNear) / (_frustumTop - _frustumBottom));
-      _projection.setM20((_frustumRight + _frustumLeft) / (_frustumRight - _frustumLeft));
-      _projection.setM21((_frustumTop + _frustumBottom) / (_frustumTop - _frustumBottom));
+      _projection.setM12((_frustumTop + _frustumBottom) / (_frustumTop - _frustumBottom));
+      _projection.setM13(0.0);
+      _projection.setM20(0.0);
+      _projection.setM21(0.0);
       _projection.setM22(-(_frustumFar + _frustumNear) / (_frustumFar - _frustumNear));
-      _projection.setM23(-1.0);
-      _projection.setM32(-(2.0 * _frustumFar * _frustumNear) / (_frustumFar - _frustumNear));
+      _projection.setM23(-(2.0 * _frustumFar * _frustumNear) / (_frustumFar - _frustumNear));
+      _projection.setM30(0.0);
+      _projection.setM31(0.0);
+      _projection.setM32(-1.0);
       _projection.setM33(-0.0);
     }
 
-    _updatePMatrix = false;
+    _updateProjectionMatrix = false;
   }
 
   public void setProjectionMatrix(final ReadOnlyMatrix4 projection) {
@@ -1175,7 +1191,7 @@ public class Camera implements Savable, Externalizable {
    * @return this camera's 4x4 projection matrix.
    */
   public ReadOnlyMatrix4 getProjectionMatrix() {
-    checkProjection();
+    checkProjectionMatrix();
 
     return _projection;
   }
@@ -1184,49 +1200,52 @@ public class Camera implements Savable, Externalizable {
    * Updates the value of our view matrix.
    */
   protected void updateViewMatrix() {
-    _view.setIdentity();
     _view.setM00(-_left.getX());
-    _view.setM10(-_left.getY());
-    _view.setM20(-_left.getZ());
+    _view.setM01(-_left.getY());
+    _view.setM02(-_left.getZ());
+    _view.setM03(_left.dot(_location));
 
-    _view.setM01(_up.getX());
+    _view.setM10(_up.getX());
     _view.setM11(_up.getY());
-    _view.setM21(_up.getZ());
+    _view.setM12(_up.getZ());
+    _view.setM13(-_up.dot(_location));
 
-    _view.setM02(-_direction.getX());
-    _view.setM12(-_direction.getY());
+    _view.setM20(-_direction.getX());
+    _view.setM21(-_direction.getY());
     _view.setM22(-_direction.getZ());
+    _view.setM23(_direction.dot(_location));
 
-    _view.setM30(_left.dot(_location));
-    _view.setM31(-_up.dot(_location));
-    _view.setM32(_direction.dot(_location));
+    _view.setM30(0.0);
+    _view.setM31(0.0);
+    _view.setM32(0.0);
+    _view.setM33(1.0);
   }
 
   /**
    * @return this camera's 4x4 view matrix.
    */
   public ReadOnlyMatrix4 getViewMatrix() {
-    checkModelView();
+    checkViewMatrix();
 
     return _view;
   }
 
   /**
-   * @return this camera's 4x4 model view X projection matrix.
+   * @return this camera's 4x4 view X projection matrix.
    */
-  public ReadOnlyMatrix4 getModelViewProjectionMatrix() {
-    checkModelViewProjection();
+  public ReadOnlyMatrix4 getViewProjectionMatrix() {
+    checkViewProjectionMatrix();
 
-    return _modelViewProjection;
+    return _viewProjection;
   }
 
   /**
-   * @return the inverse of this camera's 4x4 model view X projection matrix.
+   * @return the inverse of this camera's 4x4 view X projection matrix.
    */
-  public ReadOnlyMatrix4 getModelViewProjectionInverseMatrix() {
-    checkInverseModelViewProjection();
+  public ReadOnlyMatrix4 getViewProjectionInverseMatrix() {
+    checkInverseViewProjectionMatrix();
 
-    return _modelViewProjectionInverse;
+    return _viewProjectionInverse;
   }
 
   /**
@@ -1297,12 +1316,12 @@ public class Camera implements Savable, Externalizable {
     if (store == null) {
       store = new Vector3();
     }
-    checkInverseModelViewProjection();
+    checkInverseViewProjectionMatrix();
     final Vector4 position = Vector4.fetchTempInstance();
     position.set((screenPosition.getX() / getWidth() - _viewPortLeft) / (_viewPortRight - _viewPortLeft) * 2 - 1,
         (screenPosition.getY() / getHeight() - _viewPortBottom) / (_viewPortTop - _viewPortBottom) * 2 - 1,
         zDepth * 2 - 1, 1);
-    _modelViewProjectionInverse.applyPre(position, position);
+    _viewProjectionInverse.applyPost(position, position);
     position.multiplyLocal(1.0 / position.getW());
     store.setX(position.getX());
     store.setY(position.getY());
@@ -1388,10 +1407,10 @@ public class Camera implements Savable, Externalizable {
     if (store == null) {
       store = new Vector3();
     }
-    checkModelViewProjection();
+    checkViewProjectionMatrix();
     final Vector4 position = Vector4.fetchTempInstance();
     position.set(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), 1);
-    _modelViewProjection.applyPre(position, position);
+    _viewProjection.applyPost(position, position);
     position.multiplyLocal(1.0 / position.getW());
     store.setX(position.getX());
     store.setY(position.getY());
@@ -1402,43 +1421,43 @@ public class Camera implements Savable, Externalizable {
   }
 
   /**
-   * update modelView if necessary.
+   * update camera's copy of its view matrix, if necessary.
    */
-  private void checkModelView() {
-    if (_updateMVMatrix) {
+  private void checkViewMatrix() {
+    if (_updateViewMatrix) {
       updateViewMatrix();
-      _updateMVMatrix = false;
+      _updateViewMatrix = false;
     }
   }
 
   /**
-   * update projection if necessary.
+   * update camera's copy of its projection matrix, if necessary.
    */
-  private void checkProjection() {
-    if (_updatePMatrix) {
+  private void checkProjectionMatrix() {
+    if (_updateProjectionMatrix) {
       updateProjectionMatrix();
-      _updatePMatrix = false;
+      _updateProjectionMatrix = false;
     }
   }
 
   /**
-   * update modelViewProjection if necessary.
+   * update camera's copy of its view*projection matrix, if necessary.
    */
-  private void checkModelViewProjection() {
-    if (_updateMVPMatrix) {
-      _modelViewProjection.set(getViewMatrix()).multiplyLocal(getProjectionMatrix());
-      _updateMVPMatrix = false;
+  private void checkViewProjectionMatrix() {
+    if (_updateViewProjectionMatrix) {
+      _viewProjection.set(getProjectionMatrix()).multiplyLocal(getViewMatrix());
+      _updateViewProjectionMatrix = false;
     }
   }
 
   /**
-   * update inverse modelViewProjection if necessary.
+   * update camera's copy of its inverse view*projection matrix, if necessary.
    */
-  private void checkInverseModelViewProjection() {
-    if (_updateInverseMVPMatrix) {
-      checkModelViewProjection();
-      _modelViewProjection.invert(_modelViewProjectionInverse);
-      _updateInverseMVPMatrix = false;
+  private void checkInverseViewProjectionMatrix() {
+    if (_updateInverseViewProjectionMatrix) {
+      checkViewProjectionMatrix();
+      _viewProjection.invert(_viewProjectionInverse);
+      _updateInverseViewProjectionMatrix = false;
     }
   }
 
@@ -1505,7 +1524,7 @@ public class Camera implements Savable, Externalizable {
    */
   protected void applyProjectionMatrix(final Renderer renderer) {
     _matrixBuffer.rewind();
-    getProjectionMatrix().toFloatBuffer(_matrixBuffer);
+    getProjectionMatrix().toFloatBuffer(_matrixBuffer, false);
     _matrixBuffer.rewind();
     renderer.setMatrix(RenderMatrixType.Projection, _matrixBuffer);
   }
@@ -1540,7 +1559,7 @@ public class Camera implements Savable, Externalizable {
    */
   protected void applyViewMatrix(final Renderer renderer) {
     _matrixBuffer.rewind();
-    getViewMatrix().toFloatBuffer(_matrixBuffer);
+    getViewMatrix().toFloatBuffer(_matrixBuffer, false);
     _matrixBuffer.rewind();
     renderer.setMatrix(RenderMatrixType.View, _matrixBuffer);
   }
@@ -1689,7 +1708,7 @@ public class Camera implements Savable, Externalizable {
    * @return the Camera on the current RenderContext.
    */
   public static Camera getCurrentCamera() {
-    RenderContext context = ContextManager.getCurrentContext();
+    final RenderContext context = ContextManager.getCurrentContext();
     if (context == null) {
       return null;
     }

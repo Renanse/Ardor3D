@@ -280,7 +280,7 @@ public abstract class AbstractRenderer implements Renderer {
           // silently ignore for now - non invertable
         }
       }
-      normal.toFloatBuffer(dst);
+      normal.toFloatBuffer(dst, false);
     } finally {
       Matrix3.releaseTempInstance(normal);
       Matrix4.releaseTempInstance(model);

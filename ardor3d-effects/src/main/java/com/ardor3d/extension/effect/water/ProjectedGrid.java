@@ -217,7 +217,7 @@ public class ProjectedGrid extends Mesh {
 
     // find the plane intersection point
     source.set(0.5, 0.5);
-    getWorldIntersection(0.0, source, projectorCamera.getModelViewProjectionInverseMatrix(), planeIntersection);
+    getWorldIntersection(0.0, source, projectorCamera.getViewProjectionInverseMatrix(), planeIntersection);
 
     // force the projector to be a certain distance above the plane
     final ReadOnlyVector3 cameraLocation = projectorCamera.getLocation();
@@ -253,7 +253,7 @@ public class ProjectedGrid extends Mesh {
     projectorCamera.lookAt(planeIntersection, Vector3.UNIT_Y);
 
     // transform points to projector space
-    final ReadOnlyMatrix4 modelViewProjectionMatrix = projectorCamera.getModelViewProjectionMatrix();
+    final ReadOnlyMatrix4 modelViewProjectionMatrix = projectorCamera.getViewProjectionMatrix();
     final Vector4 spaceTransformation = new Vector4();
     for (int i = 0; i < nrPoints; i++) {
       spaceTransformation.set(intersections[i].getX(), 0.0, intersections[i].getZ(), 1.0);
@@ -289,7 +289,7 @@ public class ProjectedGrid extends Mesh {
     rangeMatrix.setM30(minX);
     rangeMatrix.setM31(minY);
 
-    final ReadOnlyMatrix4 modelViewProjectionInverseMatrix = projectorCamera.getModelViewProjectionInverseMatrix();
+    final ReadOnlyMatrix4 modelViewProjectionInverseMatrix = projectorCamera.getViewProjectionInverseMatrix();
     rangeMatrix.multiplyLocal(modelViewProjectionInverseMatrix);
 
     // convert screen coords to homogenous world coords with new range matrix

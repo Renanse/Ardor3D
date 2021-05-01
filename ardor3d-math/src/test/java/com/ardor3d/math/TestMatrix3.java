@@ -278,7 +278,7 @@ public class TestMatrix3 {
     final Matrix3 mat3A = new Matrix3().fromArray(values);
 
     // row major
-    final FloatBuffer fb = mat3A.toFloatBuffer(FloatBuffer.allocate(9));
+    final FloatBuffer fb = mat3A.toFloatBuffer(FloatBuffer.allocate(9), true);
     fb.flip();
     for (int i = 0; i < 9; i++) {
       assertTrue(values[i] == fb.get());
@@ -293,7 +293,7 @@ public class TestMatrix3 {
     }
 
     // row major
-    final DoubleBuffer db = mat3A.toDoubleBuffer(DoubleBuffer.allocate(9));
+    final DoubleBuffer db = mat3A.toDoubleBuffer(DoubleBuffer.allocate(9), true);
     db.flip();
     for (int i = 0; i < 9; i++) {
       assertTrue(values[i] == db.get());

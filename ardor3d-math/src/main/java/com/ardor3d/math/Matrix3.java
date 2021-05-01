@@ -356,7 +356,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    * @return this matrix for chaining.
    */
   public Matrix3 fromDoubleBuffer(final DoubleBuffer source) {
-    return fromDoubleBuffer(source, true);
+    return fromDoubleBuffer(source, false);
   }
 
   /**
@@ -400,7 +400,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    * @return this matrix for chaining.
    */
   public Matrix3 fromFloatBuffer(final FloatBuffer source) {
-    return fromFloatBuffer(source, true);
+    return fromFloatBuffer(source, false);
   }
 
   /**
@@ -873,7 +873,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   @Override
   public DoubleBuffer toDoubleBuffer(final DoubleBuffer store) {
-    return toDoubleBuffer(store, true);
+    return toDoubleBuffer(store, false);
   }
 
   /**
@@ -931,7 +931,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   @Override
   public FloatBuffer toFloatBuffer(final FloatBuffer store) {
-    return toFloatBuffer(store, true);
+    return toFloatBuffer(store, false);
   }
 
   /**

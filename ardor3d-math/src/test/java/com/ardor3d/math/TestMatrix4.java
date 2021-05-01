@@ -376,7 +376,7 @@ public class TestMatrix4 {
     }
 
     // row major
-    final DoubleBuffer db = mat4A.toDoubleBuffer(DoubleBuffer.allocate(16));
+    final DoubleBuffer db = mat4A.toDoubleBuffer(DoubleBuffer.allocate(16), true);
     db.flip();
     for (int i = 0; i < 16; i++) {
       assertTrue(values[i] == db.get());
