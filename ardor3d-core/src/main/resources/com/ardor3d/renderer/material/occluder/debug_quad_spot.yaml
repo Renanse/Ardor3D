@@ -1,0 +1,30 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor, textureMatrix0, alphaTest]
+            
+        shaders: 
+          Vertex: 
+            source: unlit/unlit.vert
+            define: UV_COUNT 1
+                        
+          Fragment:
+            program: |
+               #version 330 core
+               out vec4 FragColor;
+                 
+               in vec2 TexCoords0;
+               
+               uniform sampler2DArray depthMap;
+               
+               void main()
+               {             
+                   float depthValue = texture(depthMap, vec3(TexCoords0,0)).r;
+                   FragColor = vec4(vec3(depthValue), 1.0);
+               }      

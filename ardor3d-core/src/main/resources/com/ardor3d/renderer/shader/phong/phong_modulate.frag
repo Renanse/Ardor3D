@@ -40,7 +40,6 @@ in vec4 DiffuseColor;
 	#endif
 #endif
 
-uniform LightProperties lightProps;
 uniform vec3 cameraLoc;
 uniform ColorSurface surface;
 
@@ -64,7 +63,7 @@ void main()
 #endif
 
     vec3 V = normalize(cameraLoc - WorldPos);
-    LightingResult lit = calcLighting(lightProps, WorldPos, Normal, V, surface);
+    LightingResult lit = calcLighting(WorldPos, Normal, V, surface);
     
     vec3 emissive = surface.emissive;
     vec3 ambient = surface.ambient * lightProps.globalAmbient;

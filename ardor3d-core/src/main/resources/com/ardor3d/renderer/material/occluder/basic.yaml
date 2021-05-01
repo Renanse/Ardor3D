@@ -5,7 +5,7 @@ techniques:
         attributes:
           - key: vertex
         uniforms: 
-          - builtIn: [model, view, projection]
+          - builtIn: modelViewProj
         shaders: 
           Vertex: 
             program: |
@@ -13,11 +13,11 @@ techniques:
                 
                 in vec3 vertex;
                 
-                uniform mat4 model, view, projection;
+                uniform mat4 modelViewProj;
                 
                 void main()
                 {
-                    gl_Position = projection * view * model * vec4(vertex, 1.0);
+                    gl_Position = modelViewProj * vec4(vertex, 1.0);
                 }
           Fragment:
             program: |

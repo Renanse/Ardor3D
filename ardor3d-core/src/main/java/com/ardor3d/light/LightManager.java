@@ -17,17 +17,23 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderPhase;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
 public class LightManager {
+
+  public static int FIRST_SHADOW_INDEX = 8;
 
   public static ReadOnlyColorRGBA DEFAULT_GLOBAL_AMBIENT = new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f);
 
@@ -50,6 +56,11 @@ public class LightManager {
       return null;
     }
     return light;
+  }
+
+  public Texture getCurrentShadowTexture(final int index) {
+    final var light = getCurrentLight(index);
+    return light != null ? light.getShadowData().getTexture() : null;
   }
 
   public void addLights(final Spatial spat) {
@@ -131,6 +142,7 @@ public class LightManager {
     }
 
     final ReadOnlyVector3 location = l.getWorldTranslation();
+    // TODO: filter out lights that would not affect this BV
     final double dist = val.distanceTo(location);
 
     final double color = getColorValue(l);
@@ -145,6 +157,7 @@ public class LightManager {
     }
     final ReadOnlyVector3 direction = l.getWorldDirection();
     final ReadOnlyVector3 location = l.getWorldTranslation();
+    // TODO: filter out lights that would not affect this BV
     // direction is copied into Plane, not reused.
     final Plane p = new Plane(direction, direction.dot(location));
     if (val.whichSide(p) != Plane.Side.Inside) {
@@ -163,14 +176,32 @@ public class LightManager {
         color.getRed() * color.getRed() + color.getGreen() * color.getGreen() + color.getBlue() * color.getBlue());
   }
 
-  public void renderShadowMaps(final Renderer renderer) {
-    // TODO Auto-generated method stub
-
-  }
-
   public ReadOnlyColorRGBA getGlobalAmbient() { return _globalAmbient; }
 
   public void setGlobalAmbient(final ReadOnlyColorRGBA color) {
     _globalAmbient.set(color);
   }
+
+  public void renderShadowMaps(final Renderer renderer, final SceneIndexer indexer) {
+    // For each of our lights
+    final var context = ContextManager.getCurrentContext();
+    final var oldPhase = context.getRenderPhase();
+    try {
+      context.setRenderPhase(RenderPhase.ShadowTexture);
+      for (int i = _lightRefs.size(); --i >= 0;) {
+        final var lref = _lightRefs.get(i);
+        final var light = lref.get();
+
+        // if light has expired or is not a caster, ignore
+        if (light == null || !light.isShadowCaster()) {
+          continue;
+        }
+
+        light.getShadowData().updateShadows(renderer, indexer);
+      }
+    } finally {
+      context.setRenderPhase(oldPhase);
+    }
+  }
+
 }

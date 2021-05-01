@@ -26,7 +26,7 @@ public final class LightProperties {
    */
   public static final String KEY_CastsShadows = "_castsShadows";
 
-  public static boolean DefaultCastsShadows = false;
+  public static boolean DefaultCastsShadows = true;
 
   private LightProperties() {}
 

@@ -567,7 +567,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
       MaterialManager.INSTANCE.setDefaultMaterial(YamlMaterialReader
           .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_white.yaml")));
       MaterialManager.INSTANCE.setDefaultOccluderMaterial(YamlMaterialReader
-          .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "basic_occluder.yaml")));
+          .load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "occluder/basic.yaml")));
     } catch (final URISyntaxException ex) {
       ex.printStackTrace();
     }

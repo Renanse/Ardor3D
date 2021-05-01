@@ -58,6 +58,7 @@ import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.renderer.state.record.RendererRecord;
+import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.SceneIndexer;
@@ -242,7 +243,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         case Ardor3dState:
           // use default in getValue
           value = getValue(mesh, (Ardor3dStateProperty) uniform.getValue(), uniform.getExtra(),
-              uniform.getDefaultValue(), stack);
+              uniform.getDefaultValue(), stack, _renderer);
           break;
         case Function:
           // send default to function
@@ -580,7 +581,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
   }
 
   private static Buffer getValue(final Mesh mesh, final Ardor3dStateProperty propertyType, final Object extra,
-      final Object defaultValue, final MemoryStack stack) {
+      final Object defaultValue, final MemoryStack stack, final Lwjgl3Renderer renderer) {
     switch (propertyType) {
       case MeshDefaultColorRGB:
       case MeshDefaultColorRGBA: {
@@ -629,6 +630,19 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
       case Light: {
         throw new Ardor3dException("Uniform of source Ardor3dStateProperty+Light must be of type 'UniformSupplier'.");
+      }
+
+      case ShadowTexture: {
+        final int index = ((Number) extra).intValue();
+        final var lm = SceneIndexer.getCurrent().getLightManager();
+        final var tex = lm.getCurrentShadowTexture(index);
+        // figure out our next shadow unit
+        final var unit = LightManager.FIRST_SHADOW_INDEX + index;
+        // bind to texture unit
+        if (tex != null) {
+          Lwjgl3TextureStateUtil.doTextureBind(tex, unit, false);
+        }
+        return stack.mallocInt(1).put(unit).flip();
       }
 
       case GlobalAmbientLight: {

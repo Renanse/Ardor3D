@@ -13,6 +13,7 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import com.ardor3d.light.shadow.SpotShadowData;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
@@ -50,6 +51,11 @@ public class SpotLight extends PointLight {
         (Supplier<Float>) this::getInnerAngle));
     cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldDirection));
+  }
+
+  @Override
+  protected void setShadowData() {
+    _shadowData = new SpotShadowData(this);
   }
 
   /**

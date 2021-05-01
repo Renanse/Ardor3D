@@ -8,7 +8,7 @@ techniques:
           - key: uv0
 
         uniforms: 
-          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights, colorSurface, textureMatrix0, alphaTest]
+          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights, shadows, colorSurface, textureMatrix0, alphaTest]
             
         shaders: 
           Vertex: 

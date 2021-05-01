@@ -37,6 +37,11 @@ public enum Ardor3dStateProperty {
   Light,
 
   /**
+   * Bind a shadow texture to a given unit and return the unit to the shader.
+   */
+  ShadowTexture,
+
+  /**
    * Current global ambient set on the current LightManager (from current SceneIndexer).
    */
   GlobalAmbientLight

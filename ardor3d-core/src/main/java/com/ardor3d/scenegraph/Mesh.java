@@ -57,8 +57,6 @@ import com.ardor3d.util.stat.StatType;
  */
 public class Mesh extends Spatial implements Renderable, Pickable {
 
-  public static boolean RENDER_VERTEX_ONLY = false;
-
   /** Actual buffer representation of the mesh */
   protected MeshData _meshData = new MeshData();
 

@@ -36,7 +36,8 @@ float calcAttenuation(Light light, float distance)
     return 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 }
 
-LightingResult calcDirectionalLight(Light light, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+LightingResult calcDirectionalLight(Light light, const vec3 worldNormal, 
+const vec3 viewDir, const ColorSurface surface, const int index)
 {
     vec3 lightDir = normalize(-light.direction);
 
@@ -46,7 +47,8 @@ LightingResult calcDirectionalLight(Light light, const vec3 worldNormal, const v
     return result;
 }
 
-LightingResult calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+LightingResult calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, 
+const vec3 viewDir, const ColorSurface surface, const int index)
 {
     LightingResult result;
     result.diffuse = vec3(0.0);
@@ -60,17 +62,25 @@ LightingResult calcPointLight(Light light, const vec3 worldPos, const vec3 world
     
     float attenuation = calcAttenuation(light, distance);
 
-    LightingResult result;
     result.diffuse = calcDiffuse(light, lightDir, worldNormal) * attenuation;
     result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * attenuation;
     return result;
 }
 
-LightingResult calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+LightingResult calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, 
+const vec3 viewDir, const ColorSurface surface, const int index)
 {
     LightingResult result;
     result.diffuse = vec3(0.0);
     result.specular = vec3(0.0);
+    
+    float shadowFactor = 1.0;
+    if (light.castsShadows) {
+    	vec4 lightSpacePos = light.shadowMatrix * vec4(worldPos, 1.0);
+    	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
+        shadowFactor = texture(lightProps.shadowMaps[index], vec4(projCoords.xy, 0, projCoords.z - 0.001));
+        if (shadowFactor <= 0.0) return result;
+    }
     vec3 lightDir = (light.position - worldPos);
     float distance = length(lightDir);
     if (distance > light.range) return result;
@@ -84,12 +94,12 @@ LightingResult calcSpotLight(Light light, const vec3 worldPos, const vec3 worldN
     float epsilon = cos(light.innerAngle) - cos(light.angle);
     float intensity = clamp((theta - cos(light.angle)) / epsilon, 0.0, 1.0);
     
-    result.diffuse = calcDiffuse(light, lightDir, worldNormal) * attenuation * intensity;
-    result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * attenuation * intensity;
+    result.diffuse = calcDiffuse(light, lightDir, worldNormal) * attenuation * intensity * shadowFactor;
+    result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * attenuation * intensity * shadowFactor;
     return result;
 }
 
-LightingResult calcLighting(LightProperties lightProps,  const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+LightingResult calcLighting(const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
     LightingResult totalResult;
     for (int i = 0; i < MAX_LIGHTS; i++)
@@ -101,13 +111,13 @@ LightingResult calcLighting(LightProperties lightProps,  const vec3 worldPos, co
         switch (light.type)
         {
             case LIGHT_DIRECTIONAL:
-                result = calcDirectionalLight(light, worldNormal, viewDir, surface);
+                result = calcDirectionalLight(light, worldNormal, viewDir, surface, i);
                 break;
             case LIGHT_POINT:
-                result = calcPointLight(light, worldPos, worldNormal, viewDir, surface);
+                result = calcPointLight(light, worldPos, worldNormal, viewDir, surface, i);
                 break;
             case LIGHT_SPOT:
-                result = calcSpotLight(light, worldPos, worldNormal, viewDir, surface);
+                result = calcSpotLight(light, worldPos, worldNormal, viewDir, surface, i);
                 break;
         }
         totalResult.diffuse += result.diffuse;

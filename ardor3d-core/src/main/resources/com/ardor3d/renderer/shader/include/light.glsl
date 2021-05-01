@@ -5,6 +5,9 @@
 #define MAX_LIGHTS 8
 #endif
 
+#ifndef MAX_SHADOWS
+#define MAX_SHADOWS 8
+#endif
 
 #define LIGHT_DIRECTIONAL 0
 #define LIGHT_POINT 1
@@ -15,6 +18,10 @@
 struct Light {
 	int type;
 	bool enabled;
+	
+	// shadow info
+	bool castsShadows;
+	mat4 shadowMatrix;
 	
 	// Point and Spot
     vec3 position;
@@ -37,14 +44,15 @@ struct Light {
     float innerAngle;
 };
 
-struct LightProperties {
-	vec3 globalAmbient;
-	Light lights[MAX_LIGHTS];
-};
-
 struct LightingResult {
     vec3 diffuse;
     vec3 specular;
 };
+
+uniform struct LightProperties {
+	vec3 globalAmbient;
+	Light lights[MAX_LIGHTS];
+	sampler2DArrayShadow shadowMaps[MAX_SHADOWS];
+} lightProps;
 
 #endif

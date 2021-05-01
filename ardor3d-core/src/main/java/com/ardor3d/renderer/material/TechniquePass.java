@@ -137,6 +137,13 @@ public class TechniquePass {
         Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
   }
 
+  public void addShadowUniforms(final int maxShadows) {
+    for (int i = 0; i < maxShadows; i++) {
+      addUniform(new UniformRef("lightProps.shadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
+          Ardor3dStateProperty.ShadowTexture, i, null));
+    }
+  }
+
   public void setupForDraw(final Renderer renderer, final Mesh mesh, final MeshData data) {
     // Apply our states - modulated by any enforced by the pass
     applyRenderStates(renderer, mesh);
@@ -274,7 +281,7 @@ public class TechniquePass {
           // grab the appropriate light from the current SceneIndexer's LightManager
           final SceneIndexer si = SceneIndexer.getCurrent();
           final LightManager lm = si != null ? si.getLightManager() : null;
-          supplier = lm != null ? lm.getBestLight(mesh, index) : null;
+          supplier = lm != null ? lm.getCurrentLight(index) : null;
           // defaults to point light if we don't get a supplier
           clazzName = "com.ardor3d.light.PointLight";
         } else {

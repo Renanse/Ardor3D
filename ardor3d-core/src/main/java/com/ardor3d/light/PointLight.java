@@ -13,6 +13,7 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import com.ardor3d.light.shadow.PointShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
@@ -43,6 +44,7 @@ public class PointLight extends Light {
    */
   public PointLight() {
     super();
+    setShadowData();
 
     cachedUniforms.add(new UniformRef("position", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldTranslation));
@@ -54,6 +56,10 @@ public class PointLight extends Light {
         new UniformRef("quadratic", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getQuadratic));
     cachedUniforms
         .add(new UniformRef("range", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getRange));
+  }
+
+  protected void setShadowData() {
+    _shadowData = new PointShadowData(this);
   }
 
   /**

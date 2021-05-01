@@ -12,6 +12,7 @@ package com.ardor3d.light;
 
 import java.util.function.Supplier;
 
+import com.ardor3d.light.shadow.DirectionalShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -39,9 +40,14 @@ public class DirectionalLight extends Light {
    */
   public DirectionalLight() {
     super();
+    setShadowData();
 
     cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldDirection));
+  }
+
+  protected void setShadowData() {
+    _shadowData = new DirectionalShadowData(this);
   }
 
   /**

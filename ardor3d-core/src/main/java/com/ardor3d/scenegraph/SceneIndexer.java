@@ -10,15 +10,21 @@
 
 package com.ardor3d.scenegraph;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.light.LightManager;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderable;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.event.DirtyEventListener;
 import com.ardor3d.scenegraph.event.DirtyType;
 
-public class SceneIndexer implements DirtyEventListener {
+public class SceneIndexer implements DirtyEventListener, Renderable {
 
+  protected List<Spatial> _rootIndex = new ArrayList<>();
   protected LightManager _lightManager = new LightManager();
 
   public static SceneIndexer getCurrent() {
@@ -36,28 +42,30 @@ public class SceneIndexer implements DirtyEventListener {
   public void onRender(final Renderer renderer) {
     if (_lightManager != null) {
       _lightManager.cleanLights();
-      _lightManager.renderShadowMaps(renderer);
+      _lightManager.renderShadowMaps(renderer, this);
     }
 
   }
 
   public void addSceneRoot(final Spatial spat) {
     spat.addListener(this);
-    addToIndex(spat);
+    _rootIndex.add(spat);
+    onSpatialAttached(spat);
   }
 
   public void removeSceneRoot(final Spatial spat) {
     spat.removeListener(this);
-    removeFromIndex(spat);
+    _rootIndex.remove(spat);
+    onSpatialRemoved(spat);
   }
 
-  protected void addToIndex(final Spatial spat) {
+  protected void onSpatialAttached(final Spatial spat) {
     if (_lightManager != null) {
       _lightManager.addLights(spat);
     }
   }
 
-  protected void removeFromIndex(final Spatial spat) {
+  protected void onSpatialRemoved(final Spatial spat) {
     if (_lightManager != null) {
       _lightManager.removeLights(spat);
     }
@@ -72,11 +80,25 @@ public class SceneIndexer implements DirtyEventListener {
   @Override
   public boolean spatialDirty(final Spatial caller, final DirtyType dirtyType) {
     if (dirtyType == DirtyType.Attached) {
-      addToIndex(caller);
+      onSpatialAttached(caller);
     } else if (dirtyType == DirtyType.Detached) {
-      removeFromIndex(caller);
+      onSpatialRemoved(caller);
     }
     return false;
   }
 
+  @Override
+  public boolean render(final Renderer renderer) {
+    for (int i = _rootIndex.size(); --i >= 0;) {
+      final var root = _rootIndex.get(i);
+      root.draw(renderer);
+    }
+
+    return !_rootIndex.isEmpty();
+  }
+
+  public BoundingVolume getRootBounds() {
+    // FIXME - Need to generate a valid world bound here - ideally it would only include shadow casters
+    return null;
+  }
 }
