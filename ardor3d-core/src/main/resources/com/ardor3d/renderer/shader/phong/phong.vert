@@ -53,12 +53,11 @@ out vec4 DiffuseColor;
 void main()
 {
 
-    WorldPos = vec3( 
-		model *
+    WorldPos = (model *
 #ifdef INSTANCED
     	instanceMatrix *
 #endif
-	    vec4(vertex, 1.0));
+	    vec4(vertex, 1.0)).xyz;
     ViewPos = view * vec4(WorldPos, 1.0);
 #ifdef INSTANCED
     // expensive perhaps.  Could provide this as another instance attribute.

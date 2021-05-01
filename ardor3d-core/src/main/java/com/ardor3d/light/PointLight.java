@@ -34,6 +34,7 @@ public class PointLight extends Light {
   private float _constant = 1;
   private float _linear;
   private float _quadratic;
+  private float _range = 100;
 
   /**
    * Constructor instantiates a new <code>PointLight</code> object. The initial position of the light
@@ -51,6 +52,8 @@ public class PointLight extends Light {
         .add(new UniformRef("linear", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getLinear));
     cachedUniforms.add(
         new UniformRef("quadratic", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getQuadratic));
+    cachedUniforms
+        .add(new UniformRef("range", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getRange));
   }
 
   /**
@@ -98,6 +101,17 @@ public class PointLight extends Light {
    */
   public void setQuadratic(final float quadratic) { _quadratic = quadratic; }
 
+  /**
+   * @return the maximum world distance at which this light will affect geometry. Default is 100.
+   */
+  public float getRange() { return _range; }
+
+  /**
+   * @param range
+   *          the maximum world distance at which this light will affect geometry
+   */
+  public void setRange(final float range) { _range = range; }
+
   @Override
   public void applyDefaultUniformValues() {
     setColor(ColorRGBA.BLACK_NO_ALPHA);
@@ -105,6 +119,7 @@ public class PointLight extends Light {
     setConstant(1);
     setQuadratic(0);
     setLinear(0);
+    setEnabled(false);
   }
 
   /**
@@ -121,6 +136,7 @@ public class PointLight extends Light {
     capsule.write(_constant, "constant", 1);
     capsule.write(_linear, "linear", 0);
     capsule.write(_quadratic, "quadratic", 0);
+    capsule.write(_range, "range", 100);
   }
 
   @Override
@@ -129,6 +145,7 @@ public class PointLight extends Light {
     _constant = capsule.readFloat("constant", 1);
     _linear = capsule.readFloat("linear", 0);
     _quadratic = capsule.readFloat("quadratic", 0);
+    _range = capsule.readFloat("range", 100);
   }
 
 }

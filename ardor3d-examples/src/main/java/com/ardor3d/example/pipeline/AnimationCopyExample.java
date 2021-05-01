@@ -123,7 +123,7 @@ public class AnimationCopyExample extends ExampleBase {
   protected void setupLight() {
     final DirectionalLight light = new DirectionalLight();
     light.setColor(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-    light.setWorldDirection(-1, 0, 0);
+    light.lookAt(-1, 0, 0);
     light.setEnabled(true);
     _root.attachChild(light);
   }

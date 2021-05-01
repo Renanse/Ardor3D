@@ -16,19 +16,19 @@ vec3 calcDiffuse(Light light, const vec3 lightDir, const vec3 worldNormal)
 
 vec3 calcSpecular(Light light, const ColorSurface surface, const vec3 viewDir, const vec3 lightDir, const vec3 worldNormal)
 {
-    if (USE_BLINN_PHONG) {
+#if USE_BLINN_PHONG
 	    // blinn phong
         vec3 halfwayDir = normalize(lightDir + viewDir);
         float NdotH = max(0.0, dot(worldNormal, halfwayDir));
         
         return light.color * light.intensity * pow(NdotH, surface.shininess);
-    } else {
+#else
 	    // phong
         vec3 reflectDir = normalize(reflect(-lightDir, worldNormal));
         float RdotV = max(0.0, dot(reflectDir, viewDir));
         
         return light.color * light.intensity * pow(RdotV, surface.shininess);
-    }
+#endif
 }
 
 float calcAttenuation(Light light, float distance)
@@ -48,8 +48,14 @@ LightingResult calcDirectionalLight(Light light, const vec3 worldNormal, const v
 
 LightingResult calcPointLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
+    LightingResult result;
+    result.diffuse = vec3(0.0);
+    result.specular = vec3(0.0);
+    
     vec3 lightDir = (light.position - worldPos);
-    float distance = length(light.position - worldPos);
+    float distance = length(lightDir);
+    if (distance > light.range) return result;
+    
     lightDir /= distance;
     
     float attenuation = calcAttenuation(light, distance);
@@ -62,8 +68,13 @@ LightingResult calcPointLight(Light light, const vec3 worldPos, const vec3 world
 
 LightingResult calcSpotLight(Light light, const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
+    LightingResult result;
+    result.diffuse = vec3(0.0);
+    result.specular = vec3(0.0);
     vec3 lightDir = (light.position - worldPos);
-    float distance = length(light.position - worldPos);
+    float distance = length(lightDir);
+    if (distance > light.range) return result;
+    
     lightDir /= distance;
     
     float attenuation = calcAttenuation(light, distance);
@@ -73,7 +84,6 @@ LightingResult calcSpotLight(Light light, const vec3 worldPos, const vec3 worldN
     float epsilon = cos(light.innerAngle) - cos(light.angle);
     float intensity = clamp((theta - cos(light.angle)) / epsilon, 0.0, 1.0);
     
-    LightingResult result;
     result.diffuse = calcDiffuse(light, lightDir, worldNormal) * attenuation * intensity;
     result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * attenuation * intensity;
     return result;

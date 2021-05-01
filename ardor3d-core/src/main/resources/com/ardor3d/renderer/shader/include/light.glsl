@@ -25,7 +25,8 @@ struct Light {
     // attenuation - Point and Spot
     float constant;
     float linear;
-    float quadratic;  
+    float quadratic;
+    float range;
     
     // All types
     vec3 color;

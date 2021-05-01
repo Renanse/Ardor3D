@@ -116,7 +116,7 @@ public class ColladaExample extends ExampleBase {
   protected void setupLight() {
     final DirectionalLight light = new DirectionalLight();
     light.setColor(new ColorRGBA(1, 1, 1, 1));
-    light.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    light.lookAt(-1, -1, -1);
     light.setEnabled(true);
     _root.attachChild(light);
   }

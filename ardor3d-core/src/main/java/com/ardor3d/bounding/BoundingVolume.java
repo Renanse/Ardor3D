@@ -261,4 +261,6 @@ public abstract class BoundingVolume implements Serializable, Savable {
   public abstract void computeFromPrimitives(MeshData data, int section, final int[] indices, int start, int end);
 
   public abstract double getVolume();
+
+  public boolean isValid() { return Vector3.isFinite(getCenter()) && Double.isFinite(getRadius()); }
 }

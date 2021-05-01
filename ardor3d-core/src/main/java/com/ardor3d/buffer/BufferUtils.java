@@ -1763,6 +1763,7 @@ public final class BufferUtils {
 
     // reuse buffer if we can.
     if (count == 1) {
+      rVal.rewind();
       return rVal;
     }
 

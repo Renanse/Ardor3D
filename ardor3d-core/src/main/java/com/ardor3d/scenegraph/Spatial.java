@@ -661,6 +661,27 @@ public abstract class Spatial implements Savable, Hintable {
     markDirty(DirtyType.Transform);
   }
 
+  public void lookAt(final double x, final double y, final double z) {
+    lookAt(x, y, z, Vector3.UNIT_Y);
+  }
+
+  public void lookAt(final double x, final double y, final double z, final ReadOnlyVector3 worldUp) {
+    final var lookDir = Vector3.fetchTempInstance();
+    final var rot = Matrix3.fetchTempInstance();
+    try {
+      // create vector to look at point
+      lookDir.set(x, y, z).subtractLocal(getWorldTranslation());
+
+      // create and apply rotational matrix
+      rot.lookAt(lookDir, worldUp);
+      setRotation(rot);
+    } finally {
+      Vector3.releaseTempInstance(lookDir);
+      Matrix3.releaseTempInstance(rot);
+    }
+    markDirty(DirtyType.Transform);
+  }
+
   /**
    * Gets the world rotation matrix.
    *

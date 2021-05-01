@@ -36,7 +36,12 @@ public class LightManager {
 
   protected ColorRGBA _globalAmbient = new ColorRGBA(LightManager.DEFAULT_GLOBAL_AMBIENT);
 
-  public Light getBestLight(final Mesh mesh, final int index) {
+  public void sortLightsFor(final Mesh mesh) {
+    lightComparator.setBoundingVolume(mesh.getWorldBound());
+    Collections.sort(_lightRefs, lightComparator);
+  }
+
+  public Light getCurrentLight(final int index) {
     if (_lightRefs.size() <= index) {
       return null;
     }
@@ -84,11 +89,6 @@ public class LightManager {
         _lightRefs.remove(i);
       }
     }
-  }
-
-  public void sortLightsFor(final Mesh mesh) {
-    lightComparator.setBoundingVolume(mesh.getWorldBound());
-    Collections.sort(_lightRefs, lightComparator);
   }
 
   protected static class LightComparator implements Comparator<WeakReference<Light>> {

@@ -13,9 +13,7 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
@@ -60,40 +58,11 @@ public class SpotLight extends PointLight {
    */
   public ReadOnlyVector3 getWorldDirection() { return _worldDirection; }
 
-  /**
-   * @param direction
-   *          the world direction we want the light to be traveling in.
-   */
-  public void setWorldDirection(final ReadOnlyVector3 direction) {
-    setWorldDirection(direction.getX(), direction.getY(), direction.getZ());
-  }
-
-  /**
-   * @param x
-   *          the direction the light is traveling in on the x axis.
-   * @param y
-   *          the direction the light is traveling in on the y axis.
-   * @param z
-   *          the direction the light is traveling in on the z axis.
-   */
-  public void setWorldDirection(final double x, final double y, final double z) {
-    _worldDirection.set(x, y, z);
-    final Vector3 from = Vector3.fetchTempInstance();
-    final Quaternion q = Quaternion.fetchTempInstance();
-    try {
-      from.set(Vector3.UNIT_Z);
-
-      if (_parent != null) {
-        final ReadOnlyTransform parentTransform = _parent.getWorldTransform();
-        parentTransform.applyForwardVector(from);
-      }
-
-      q.fromVectorToVector(from, _worldDirection);
-      setRotation(q);
-    } finally {
-      Quaternion.releaseTempInstance(q);
-      Vector3.releaseTempInstance(from);
-    }
+  @Override
+  public void updateWorldTransform(final boolean recurse) {
+    super.updateWorldTransform(recurse);
+    _worldDirection.set(Vector3.UNIT_Z);
+    getWorldTransform().applyForwardVector(_worldDirection);
   }
 
   /**

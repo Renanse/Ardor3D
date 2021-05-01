@@ -274,7 +274,7 @@ public class ProceduralTerrainExample extends ExampleBase {
   protected void setupLight() {
     dLight.setEnabled(true);
     dLight.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    dLight.setWorldDirection(new Vector3(-1, -1, -1).normalizeLocal());
+    dLight.lookAt(-1, -1, -1);
     _root.attachChild(dLight);
 
     _root.setProperty("lightDir", dLight.getWorldDirection());

@@ -67,7 +67,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
-import com.ardor3d.renderer.RenderPhase;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.renderer.material.reader.YamlMaterialReader;
@@ -214,7 +213,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
     light = new PointLight();
     light.setColor(ColorRGBA.WHITE);
     light.setIntensity(.75f);
-    light.setTranslation(100, 100, 100);
+    light.setTranslation(10, 10, 10);
     light.setEnabled(true);
     _root.attachChild(light);
   }
@@ -274,9 +273,6 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, ICanvasLi
     if (!_canvas.isClosing()) {
       /** Ask the current SceneIndexer to do anything Renderer related - like shadows. */
       SceneIndexer.getCurrent().onRender(renderer);
-
-      /** Set that we are back to rendering the scene now. */
-      ContextManager.getCurrentContext().setRenderPhase(RenderPhase.Scene);
 
       /** Call renderExample in any derived classes. */
       renderExample(renderer);
