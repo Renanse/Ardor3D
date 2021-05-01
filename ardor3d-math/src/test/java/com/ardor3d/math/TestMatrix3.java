@@ -214,7 +214,7 @@ public class TestMatrix3 {
     fb.put(new float[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
     fb.flip();
     // row major
-    final Matrix3 mat3A = new Matrix3().fromFloatBuffer(fb);
+    final Matrix3 mat3A = new Matrix3().fromFloatBuffer(fb, true);
     assertTrue(0 == mat3A.getM00());
     assertTrue(1 == mat3A.getM01());
     assertTrue(2 == mat3A.getM02());
@@ -244,7 +244,7 @@ public class TestMatrix3 {
     db.flip();
     // row major
     mat3A.setIdentity();
-    mat3A.fromDoubleBuffer(db);
+    mat3A.fromDoubleBuffer(db, true);
     assertTrue(0 == mat3A.getM00());
     assertTrue(1 == mat3A.getM01());
     assertTrue(2 == mat3A.getM02());

@@ -269,7 +269,7 @@ public class TestMatrix4 {
     fb.put(new float[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
     fb.flip();
     // row major
-    final Matrix4 mat4A = new Matrix4().fromFloatBuffer(fb);
+    final Matrix4 mat4A = new Matrix4().fromFloatBuffer(fb, true);
     assertTrue(0 == mat4A.getM00());
     assertTrue(1 == mat4A.getM01());
     assertTrue(2 == mat4A.getM02());
@@ -313,7 +313,7 @@ public class TestMatrix4 {
     db.flip();
     // row major
     mat4A.setIdentity();
-    mat4A.fromDoubleBuffer(db);
+    mat4A.fromDoubleBuffer(db, true);
     assertTrue(0 == mat4A.getM00());
     assertTrue(1 == mat4A.getM01());
     assertTrue(2 == mat4A.getM02());
@@ -361,7 +361,7 @@ public class TestMatrix4 {
     final Matrix4 mat4A = new Matrix4().fromArray(values);
 
     // row major
-    final FloatBuffer fb = mat4A.toFloatBuffer(FloatBuffer.allocate(16));
+    final FloatBuffer fb = mat4A.toFloatBuffer(FloatBuffer.allocate(16), true);
     fb.flip();
     for (int i = 0; i < 16; i++) {
       assertTrue(values[i] == fb.get());
