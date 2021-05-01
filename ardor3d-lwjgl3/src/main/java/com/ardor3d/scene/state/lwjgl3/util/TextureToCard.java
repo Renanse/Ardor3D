@@ -24,10 +24,22 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.util.Ardor3dException;
 
 public abstract class TextureToCard {
 
-  public static void sendBaseTexture(final Texture texture) {
+  /**
+   * Convenience method for sending a texture to the graphics card where the available data is only
+   * the base level of the texture. Data is read from the Texture's Image and sent to level 0 of the
+   * Texture.
+   *
+   * For CubeMaps, the first 6 items in the Image's Data list are sent. For Texture3D, all data
+   * buffers in the Image are concatenated and sent as the base level.
+   *
+   * @param texture
+   *          the Texture to send.
+   */
+  public static void sendNonMipMappedTexture(final Texture texture) {
     final var image = texture.getImage();
     final var hasBorder = texture.hasBorder();
     final var imageWidth = image.getWidth();
@@ -60,6 +72,52 @@ public abstract class TextureToCard {
     sendTexture(type, null, 0, storeFormat, imageWidth, imageHeight, imageDepth, hasBorder, dataFormat, dataType, data);
   }
 
+  public static void sendMipMappedTexture(final Texture texture) {
+    final Texture.Type type = texture.getType();
+    final Image image = texture.getImage();
+    if (type == Type.CubeMap) {
+      // walk through each face...
+      for (final TextureCubeMap.Face face : TextureCubeMap.Face.values()) {
+        final var data = image.getData(face.ordinal());
+        TextureToCard.sendMipMaps(texture, face, image, data);
+      }
+      return;
+    }
+
+    // all other types
+    final var data = type == Type.ThreeDimensional ? BufferUtils.concat(image.getData()) : image.getData(0);
+    TextureToCard.sendMipMaps(texture, null, image, data);
+  }
+
+  protected static void sendMipMaps(final Texture texture, final TextureCubeMap.Face face, final Image image,
+      final ByteBuffer data) {
+    final Texture.Type type = texture.getType();
+
+    // send each mipmap for the current face
+    final int[] mipSizes = image.getMipMapByteSizes();
+
+    // figure out and set our max mip level
+    int maxMipLevel = mipSizes.length - 1;
+    if (texture.getTextureMaxLevel() >= 0) {
+      maxMipLevel = Math.min(maxMipLevel, texture.getTextureMaxLevel());
+    }
+    GL11C.glTexParameteri(TextureConstants.getGLType(type), GL12C.GL_TEXTURE_MAX_LEVEL, maxMipLevel);
+
+    for (int m = 0, pos = 0; m <= maxMipLevel; m++) {
+      final int width = Math.max(1, image.getWidth() >> m);
+      final int height = Math.max(1, image.getHeight() >> m);
+      final int depth = Math.max(1, image.getDepth() >> m);
+
+      data.position(pos);
+      data.limit(pos + mipSizes[m]);
+
+      TextureToCard.sendTexture(type, face, m, texture.getTextureStoreFormat(), width, height, depth,
+          texture.hasBorder(), image.getDataFormat(), image.getDataType(), data);
+
+      pos += mipSizes[m];
+    }
+  }
+
   public static void sendTexture(final Texture.Type type, final TextureCubeMap.Face face, final int level,
       final TextureStoreFormat storeFormat, final int width, final int height, final int depth, final boolean hasBorder,
       final ImageDataFormat dataFormat, final PixelDataType dataType, final ByteBuffer data) {
@@ -72,9 +130,9 @@ public abstract class TextureToCard {
     }
   }
 
-  public static void sendUncompressedTexture(final Texture.Type type, final TextureCubeMap.Face face, final int level,
-      final TextureStoreFormat storeFormat, final int width, final int height, final int depth, final boolean hasBorder,
-      final ImageDataFormat dataFormat, final PixelDataType dataType, final ByteBuffer data) {
+  protected static void sendUncompressedTexture(final Texture.Type type, final TextureCubeMap.Face face,
+      final int level, final TextureStoreFormat storeFormat, final int width, final int height, final int depth,
+      final boolean hasBorder, final ImageDataFormat dataFormat, final PixelDataType dataType, final ByteBuffer data) {
 
     final var glType = TextureConstants.getGLType(type);
     final var glStoreFormat = TextureConstants.getGLInternalFormat(storeFormat);
@@ -103,10 +161,13 @@ public abstract class TextureToCard {
             glDataType, data);
         break;
       }
+
+      default:
+        throw new Ardor3dException("Unsupported texture type: " + type);
     }
   }
 
-  public static void sendCompressedTexture(final Texture.Type type, final TextureCubeMap.Face face, final int level,
+  protected static void sendCompressedTexture(final Texture.Type type, final TextureCubeMap.Face face, final int level,
       final TextureStoreFormat storeFormat, final int width, final int height, final int depth, final boolean hasBorder,
       final ImageDataFormat dataFormat, final PixelDataType dataType, final ByteBuffer data) {
 
@@ -133,35 +194,9 @@ public abstract class TextureToCard {
         GL13C.glCompressedTexImage3D(glType, level, glStoreFormat, width, height, depth, hasBorder ? 1 : 0, data);
         break;
       }
-    }
-  }
 
-  public static void sendMipMaps(final Texture texture, final TextureCubeMap.Face face, final Image image,
-      final ByteBuffer data) {
-    final Texture.Type type = texture.getType();
-
-    // send each mipmap for the current face
-    final int[] mipSizes = image.getMipMapByteSizes();
-
-    // figure out and set our max mip level
-    int maxMipLevel = mipSizes.length - 1;
-    if (texture.getTextureMaxLevel() >= 0) {
-      maxMipLevel = Math.min(maxMipLevel, texture.getTextureMaxLevel());
-    }
-    GL11C.glTexParameteri(TextureConstants.getGLType(type), GL12C.GL_TEXTURE_MAX_LEVEL, maxMipLevel);
-
-    for (int m = 0, pos = 0; m <= maxMipLevel; m++) {
-      final int width = Math.max(1, image.getWidth() >> m);
-      final int height = Math.max(1, image.getHeight() >> m);
-      final int depth = Math.max(1, image.getDepth() >> m);
-
-      data.position(pos);
-      data.limit(pos + mipSizes[m]);
-
-      TextureToCard.sendTexture(type, face, m, texture.getTextureStoreFormat(), width, height, depth,
-          texture.hasBorder(), image.getDataFormat(), image.getDataType(), data);
-
-      pos += mipSizes[m];
+      default:
+        throw new Ardor3dException("Unsupported texture type: " + type);
     }
   }
 

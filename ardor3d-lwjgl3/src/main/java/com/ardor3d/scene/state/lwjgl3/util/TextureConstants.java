@@ -287,6 +287,72 @@ public class TextureConstants {
     throw new IllegalArgumentException("Incorrect format set: " + format);
   }
 
+  public static ImageDataFormat getImageDataFormatFromStoreFormat(final TextureStoreFormat format) {
+    switch (format) {
+      case RGBA2:
+      case RGBA4:
+      case RGBA8:
+      case RGB5A1:
+      case RGB10A2:
+      case RGBA12:
+      case RGBA16:
+      case CompressedRGBA:
+      case NativeDXT1A:
+      case NativeDXT3:
+      case NativeDXT5:
+      case RGBA16F:
+      case RGBA32F:
+        return ImageDataFormat.RGBA;
+      case R3G3B2:
+      case RGB4:
+      case RGB5:
+      case RGB8:
+      case RGB10:
+      case RGB12:
+      case RGB16:
+      case CompressedRGB:
+      case NativeDXT1:
+      case RGB16F:
+      case RGB32F:
+        return ImageDataFormat.RGB;
+      case Depth:
+      case Depth16:
+      case Depth24:
+      case Depth32:
+      case Depth32F:
+        return ImageDataFormat.Depth;
+      case R8:
+      case R16:
+      case R16F:
+      case R32F:
+      case R8I:
+      case R8UI:
+      case R16I:
+      case R16UI:
+      case R32I:
+      case R32UI:
+      case CompressedRed:
+      case NativeLATC_L:
+        return ImageDataFormat.Red;
+      case RG8:
+      case RG16:
+      case RG16F:
+      case RG32F:
+      case RG8I:
+      case RG8UI:
+      case RG16I:
+      case RG16UI:
+      case RG32I:
+      case RG32UI:
+      case CompressedRG:
+      case NativeLATC_LA:
+        return ImageDataFormat.RG;
+      default:
+        break;
+    }
+    throw new IllegalArgumentException("Incorrect format set: " + format);
+  }
+
   public static int getGLPixelFormatFromStoreFormat(final TextureStoreFormat format) {
     switch (format) {
       case RGBA2:

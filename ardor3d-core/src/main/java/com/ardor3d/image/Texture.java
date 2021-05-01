@@ -226,6 +226,7 @@ public abstract class Texture implements Savable {
   private int _textureMaxLevel = -1;
 
   private transient int _rttMipLevel = 0;
+  private transient int _rttLayer = 0;
 
   public final static String KEY_TextureMatrixPrefix = "textureMatrix";
 
@@ -562,6 +563,21 @@ public abstract class Texture implements Savable {
    *         TextureRenderer.) Defaults to 0.
    */
   public int getTexRenderMipLevel() { return _rttMipLevel; }
+
+  /**
+   * Set the layer to write into for the next Render To Texture operation (when used with
+   * TextureRenderer.) NB: This field is transient - not saved by Savable.
+   *
+   * @param layer
+   *          the layer to use. Defaults to 0.
+   */
+  public void setTexRenderLayer(final int layer) { _rttLayer = layer; }
+
+  /**
+   * @return the layer to write into for the next Render To Texture operation (when used with
+   *         TextureRenderer.) Defaults to 0.
+   */
+  public int getTexRenderLayer() { return _rttLayer; }
 
   public void setDirty() {
     if (_key != null) {

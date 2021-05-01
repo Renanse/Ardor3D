@@ -451,9 +451,9 @@ public class Lwjgl3Renderer extends AbstractRenderer {
   public Lwjgl3ScissorUtils getScissorUtils() { return _scissorUtils; }
 
   @Override
-  public Lwjgl3TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits,
-      final int samples) {
-    return new Lwjgl3TextureRenderer(width, height, depthBits, samples, this,
+  public Lwjgl3TextureRenderer createTextureRenderer(final int width, final int height, final int layers,
+      final int depthBits, final int samples) {
+    return new Lwjgl3TextureRenderer(width, height, layers, depthBits, samples, this,
         ContextManager.getCurrentContext().getCapabilities());
   }
 }

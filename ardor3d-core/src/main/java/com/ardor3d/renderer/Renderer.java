@@ -312,6 +312,22 @@ public interface Renderer {
    * @param samples
    * @return the texture renderer
    */
-  TextureRenderer createTextureRenderer(int width, int height, int depthBits, int samples);
+  default TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits,
+      final int samples) {
+    return createTextureRenderer(width, height, 0, depthBits, samples);
+  }
+
+  /**
+   * Creates a TextureRenderer backed by this Renderer. Must have a current context set (see
+   * {@link ContextManager#getCurrentContext()}) so the renderer can query hardware capabilities.
+   *
+   * @param width
+   * @param height
+   * @param layers
+   * @param depthBits
+   * @param samples
+   * @return the texture renderer
+   */
+  TextureRenderer createTextureRenderer(int width, int height, int layers, int depthBits, int samples);
 
 }

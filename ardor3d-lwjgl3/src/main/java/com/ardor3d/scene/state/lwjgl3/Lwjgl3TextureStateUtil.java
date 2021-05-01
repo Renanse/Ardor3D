@@ -12,6 +12,7 @@ package com.ardor3d.scene.state.lwjgl3;
 
 import java.nio.IntBuffer;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
@@ -22,7 +23,6 @@ import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL46C;
 import org.lwjgl.system.MemoryStack;
 
-import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture.Type;
@@ -112,7 +112,9 @@ public abstract class Lwjgl3TextureStateUtil {
     // grab our texture image data for sending to the card
     final Image image = texture.getImage();
     if (image == null) {
-      logger.warning("Image data for texture is null.");
+      if (logger.isLoggable(Level.FINE)) {
+        logger.fine("Image data for texture is null.");
+      }
       return;
     }
 
@@ -131,10 +133,9 @@ public abstract class Lwjgl3TextureStateUtil {
     GL11C.glPixelStorei(GL11C.GL_UNPACK_ALIGNMENT, 1);
 
     // Time to push our image data to the card...
-
-    // Handle textures either don't need mipmaps, or we want the card to generate them.
-    if (!texture.getMinificationFilter().usesMipMapLevels() || !image.hasMipmaps()) {
-      TextureToCard.sendBaseTexture(texture);
+    // ...handle textures that don't contain mipmaps:
+    if (!image.hasMipmaps()) {
+      TextureToCard.sendNonMipMappedTexture(texture);
 
       // generate mipmaps, if we are uncompressed and our filter makes use of them.
       if (!texture.getTextureStoreFormat().isCompressed() && texture.getMinificationFilter().usesMipMapLevels()) {
@@ -150,20 +151,8 @@ public abstract class Lwjgl3TextureStateUtil {
       return;
     }
 
-    // Handle textures that have embeded mipmaps
-    // Special case - handle cubemap faces
-    if (type == Type.CubeMap) {
-      // walk through each face...
-      for (final TextureCubeMap.Face face : TextureCubeMap.Face.values()) {
-        final var data = image.getData(face.ordinal());
-        TextureToCard.sendMipMaps(texture, face, image, data);
-      }
-      return;
-    }
-
-    // all other types
-    final var data = type == Type.ThreeDimensional ? BufferUtils.concat(image.getData()) : image.getData(0);
-    TextureToCard.sendMipMaps(texture, null, image, data);
+    // ...handle textures that have embedded mipmaps:
+    TextureToCard.sendMipMappedTexture(texture);
   }
 
   public static void apply(final TextureState state) {

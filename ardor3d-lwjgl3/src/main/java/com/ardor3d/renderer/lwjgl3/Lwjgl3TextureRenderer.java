@@ -10,7 +10,6 @@
 
 package com.ardor3d.renderer.lwjgl3;
 
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,6 +39,7 @@ import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.texture.AbstractFBOTextureRenderer;
 import com.ardor3d.scene.state.lwjgl3.Lwjgl3TextureStateUtil;
 import com.ardor3d.scene.state.lwjgl3.util.TextureConstants;
+import com.ardor3d.scene.state.lwjgl3.util.TextureToCard;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
@@ -62,9 +62,9 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
   private final Consumer<List<? extends Spatial>> drawSpatListConsumer =
       (final List<? extends Spatial> list) -> doDrawSpatials(list);
 
-  public Lwjgl3TextureRenderer(final int width, final int height, final int depthBits, final int samples,
-    final Renderer parentRenderer, final ContextCapabilities caps) {
-    super(width, height, depthBits, samples, parentRenderer, caps);
+  public Lwjgl3TextureRenderer(final int width, final int height, final int layers, final int depthBits,
+    final int samples, final Renderer parentRenderer, final ContextCapabilities caps) {
+    super(width, height, layers, depthBits, samples, parentRenderer, caps);
 
     if (caps.getMaxFBOColorAttachments() > 1) {
       _attachBuffer = BufferUtils.createIntBuffer(caps.getMaxFBOColorAttachments());
@@ -81,10 +81,6 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
    */
   @Override
   public void setupTexture(final Texture tex) {
-    if (tex.getType() != Type.TwoDimensional && tex.getType() != Type.CubeMap) {
-      throw new IllegalArgumentException("Texture type not supported: " + tex.getType());
-    }
-
     final RenderContext context = ContextManager.getCurrentContext();
     final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
@@ -102,28 +98,29 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     Lwjgl3TextureStateUtil.doTextureBind(tex, 0, true);
 
     // Initialize our texture with some default data.
-    final int internalFormat = TextureConstants.getGLInternalFormat(tex.getTextureStoreFormat());
-    final int dataFormat = TextureConstants.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
-    final int pixelDataType = TextureConstants.getGLPixelDataType(tex.getRenderedTexturePixelDataType());
+    final var storeFormat = tex.getTextureStoreFormat();
+    final var dataFormat = TextureConstants.getImageDataFormatFromStoreFormat(storeFormat);
+    final var dataType = tex.getRenderedTexturePixelDataType();
+    final var type = tex.getType();
 
-    if (tex.getType() == Type.TwoDimensional) {
-      GL11C.glTexImage2D(GL11C.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, pixelDataType,
-          (ByteBuffer) null);
-    } else {
+    if (type == Type.CubeMap) {
       for (final Face face : Face.values()) {
-        GL11C.glTexImage2D(TextureConstants.getGLCubeMapFace(face), 0, internalFormat, _width, _height, 0, dataFormat,
-            pixelDataType, (ByteBuffer) null);
+        TextureToCard.sendTexture(type, face, 0, storeFormat, _width, _height, _layers, tex.hasBorder(), dataFormat,
+            dataType, null);
       }
+    } else {
+      TextureToCard.sendTexture(type, null, 0, storeFormat, _width, _height, _layers, tex.hasBorder(), dataFormat,
+          dataType, null);
     }
 
     // Initialize mipmapping for this texture, if requested
     // We do this regardless of the EnableMipGeneration flag, to init storage.
     if (tex.getMinificationFilter().usesMipMapLevels()) {
-      GL30C.glGenerateMipmap(TextureConstants.getGLType(tex.getType()));
+      GL30C.glGenerateMipmap(TextureConstants.getGLType(type));
     }
 
     // Setup filtering and wrap
-    final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
+    final TextureRecord texRecord = record.getTextureRecord(textureId, type);
     Lwjgl3TextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
     Lwjgl3TextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
 
@@ -154,14 +151,14 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
 
   protected <T> void render(final T toRender, final Consumer<T> consumer, final List<Texture> texs, final int clear) {
 
-    final int maxDrawBuffers = ContextManager.getCurrentContext().getCapabilities().getMaxFBOColorAttachments();
+    final RenderContext context = ContextManager.getCurrentContext();
+    final int maxDrawBuffers = context.getCapabilities().getMaxFBOColorAttachments();
 
     // if we only support 1 draw buffer at a time anyway, we'll have to render to each texture
     // individually...
     if (maxDrawBuffers == 1 || texs.size() == 1) {
+      context.pushFBOTextureRenderer(this);
       try {
-        ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
-
         for (int i = 0; i < texs.size(); i++) {
           final Texture tex = texs.get(i);
 
@@ -184,12 +181,12 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
           takedownForSingleTexDraw(tex);
         }
       } finally {
-        ContextManager.getCurrentContext().popFBOTextureRenderer();
+        context.popFBOTextureRenderer();
       }
       return;
     }
     try {
-      ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
+      context.pushFBOTextureRenderer(this);
 
       // Otherwise, we can streamline this by rendering to multiple textures at once.
       // first determine how many groups we need
@@ -206,39 +203,20 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
       // we can only render to 1 depth texture at a time, so # groups is at minimum == numDepth
       final int groups = Math.max(depths.size(), (int) Math.ceil(colors.size() / (float) maxDrawBuffers));
 
-      final RenderContext context = ContextManager.getCurrentContext();
       for (int i = 0; i < groups; i++) {
         // First handle colors
         int colorsAdded = 0;
+        Texture tex;
         while (colorsAdded < maxDrawBuffers && !colors.isEmpty()) {
-          final Texture tex = colors.removeFirst();
-          if (tex.getType() == Type.TwoDimensional) {
-            GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
-                GL11C.GL_TEXTURE_2D, tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
-          } else if (tex.getType() == Type.CubeMap) {
-            GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded,
-                TextureConstants.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
-                tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
-          } else {
-            throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
-          }
+          tex = colors.removeFirst();
+          attachTextureToFramebuffer(tex, GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0 + colorsAdded);
           colorsAdded++;
         }
 
         // Now take care of depth.
         if (!depths.isEmpty()) {
-          final Texture tex = depths.removeFirst();
-          // Set up our depth texture
-          if (tex.getType() == Type.TwoDimensional) {
-            GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL11C.GL_TEXTURE_2D,
-                tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
-          } else if (tex.getType() == Type.CubeMap) {
-            GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
-                TextureConstants.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()),
-                tex.getTextureIdForContext(context), tex.getTexRenderMipLevel());
-          } else {
-            throw new IllegalArgumentException("Invalid texture type: " + tex.getType());
-          }
+          tex = depths.removeFirst();
+          attachTextureToFramebuffer(tex, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT);
           _usingDepthRB = false;
         } else if (!_usingDepthRB && _depthRBID != 0) {
           // setup our default depth render buffer if not already set
@@ -278,47 +256,65 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
       }
 
     } finally {
-      ContextManager.getCurrentContext().popFBOTextureRenderer();
+      context.popFBOTextureRenderer();
+    }
+  }
+
+  private void attachTextureToFramebuffer(final Texture tex, final int target, final int attachment) {
+    final RenderContext context = ContextManager.getCurrentContext();
+    final Texture.Type type = tex.getType();
+    final var glType = TextureConstants.getGLType(type);
+    switch (type) {
+      case OneDimensional: {
+        GL30C.glFramebufferTexture1D(target, attachment, glType, tex.getTextureIdForContext(context),
+            tex.getTexRenderMipLevel());
+        break;
+      }
+
+      case TwoDimensional:
+      case OneDimensionalArray:
+      case CubeMap: {
+        final int target2D =
+            type == Type.CubeMap ? TextureConstants.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace())
+                : glType;
+        GL30C.glFramebufferTexture2D(target, attachment, target2D, tex.getTextureIdForContext(context),
+            tex.getTexRenderMipLevel());
+        break;
+      }
+
+      case ThreeDimensional: {
+        GL30C.glFramebufferTexture3D(target, attachment, glType, tex.getTextureIdForContext(context),
+            tex.getTexRenderMipLevel(), tex.getTexRenderLayer());
+        break;
+      }
+
+      case TwoDimensionalArray:
+      case CubeMapArray: {
+        GL30C.glFramebufferTextureLayer(target, attachment, tex.getTextureIdForContext(context),
+            tex.getTexRenderMipLevel(), tex.getTexRenderLayer());
+        break;
+      }
+
+      default:
+        throw new Ardor3dException("Unsupported texture type: " + type);
     }
   }
 
   @Override
   protected void setupForSingleTexDraw(final Texture tex) {
-    final RenderContext context = ContextManager.getCurrentContext();
-    final int textureId = tex.getTextureIdForContext(context);
 
     if (tex.getTextureStoreFormat().isDepthFormat()) {
       // No color buffer
       GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0, GL30C.GL_RENDERBUFFER, 0);
-
-      // Setup depth texture into FBO
-      if (tex.getType() == Type.TwoDimensional) {
-        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL11C.GL_TEXTURE_2D, textureId,
-            tex.getTexRenderMipLevel());
-      } else if (tex.getType() == Type.CubeMap) {
-        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT,
-            TextureConstants.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
-            tex.getTexRenderMipLevel());
-      } else {
-        throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
-      }
+      // Attach depth texture to FBO
+      attachTextureToFramebuffer(tex, GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT);
 
       setDrawBuffer(GL11C.GL_NONE);
       setReadBuffer(GL11C.GL_NONE);
     } else {
-      // Set color texture into FBO
-      if (tex.getType() == Type.TwoDimensional) {
-        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0, GL11C.GL_TEXTURE_2D, textureId,
-            tex.getTexRenderMipLevel());
-      } else if (tex.getType() == Type.CubeMap) {
-        GL30C.glFramebufferTexture2D(GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0,
-            TextureConstants.getGLCubeMapFace(((TextureCubeMap) tex).getCurrentRTTFace()), textureId,
-            tex.getTexRenderMipLevel());
-      } else {
-        throw new IllegalArgumentException("Can not render to texture of type: " + tex.getType());
-      }
-
-      // setup depth RB
+      // Attach color texture to FBO
+      attachTextureToFramebuffer(tex, GL30C.GL_FRAMEBUFFER, GL30C.GL_COLOR_ATTACHMENT0);
+      // Setup depth RB
       if (_depthRBID != 0) {
         GL30C.glFramebufferRenderbuffer(GL30C.GL_FRAMEBUFFER, GL30C.GL_DEPTH_ATTACHMENT, GL30C.GL_RENDERBUFFER,
             _depthRBID);

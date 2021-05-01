@@ -16,13 +16,12 @@ import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL12C;
-import org.lwjgl.opengl.GL30C;
-import org.lwjgl.opengl.GL40C;
 
 import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture.Type;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
@@ -164,39 +163,36 @@ public class Lwjgl3TextureUtils implements ITextureUtils {
       GL11C.glPixelStorei(GL12C.GL_UNPACK_SKIP_IMAGES, srcOffsetZ);
     }
 
+    final var type = destination.getType();
+    final var glType = TextureConstants.getGLType(type);
+
     // Upload the image region into the texture.
     try {
-      switch (destination.getType()) {
+      switch (type) {
+        case OneDimensional: {
+          GL11C.glTexSubImage1D(glType, 0, dstOffsetX, dstWidth, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
+          break;
+        }
+
         case TwoDimensional:
-          GL11C.glTexSubImage2D(GL11C.GL_TEXTURE_2D, 0, dstOffsetX, dstOffsetY, dstWidth, dstHeight, pixelFormat,
+        case OneDimensionalArray:
+        case CubeMap: {
+          final int target2D = type == Type.CubeMap ? TextureConstants.getGLCubeMapFace(dstFace) : glType;
+          GL11C.glTexSubImage2D(target2D, 0, dstOffsetX, dstOffsetY, dstWidth, dstHeight, pixelFormat,
               GL11C.GL_UNSIGNED_BYTE, source);
           break;
-        case OneDimensional:
-          GL11C.glTexSubImage1D(GL11C.GL_TEXTURE_1D, 0, dstOffsetX, dstWidth, pixelFormat, GL11C.GL_UNSIGNED_BYTE,
-              source);
-          break;
+        }
+
         case ThreeDimensional:
+        case TwoDimensionalArray:
+        case CubeMapArray: {
           GL12C.glTexSubImage3D(GL12C.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight,
               dstDepth, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
           break;
-        case CubeMap:
-          GL11C.glTexSubImage2D(TextureConstants.getGLCubeMapFace(dstFace), 0, dstOffsetX, dstOffsetY, dstWidth,
-              dstHeight, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
-          break;
-        case OneDimensionalArray:
-          GL11C.glTexSubImage2D(GL30C.GL_TEXTURE_1D_ARRAY, 0, dstOffsetX, dstOffsetY, dstWidth, dstHeight, pixelFormat,
-              GL11C.GL_UNSIGNED_BYTE, source);
-          break;
-        case TwoDimensionalArray:
-          GL12C.glTexSubImage3D(GL30C.GL_TEXTURE_2D_ARRAY, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight,
-              dstDepth, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
-          break;
-        case CubeMapArray:
-          GL12C.glTexSubImage3D(GL40C.GL_TEXTURE_CUBE_MAP_ARRAY, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth,
-              dstHeight, dstDepth, pixelFormat, GL11C.GL_UNSIGNED_BYTE, source);
-          break;
+        }
+
         default:
-          throw new Ardor3dException("Unsupported type for updateTextureSubImage: " + destination.getType());
+          throw new Ardor3dException("Unsupported texture type: " + type);
       }
     } finally {
       // Restore the texture configuration (when necessary)...

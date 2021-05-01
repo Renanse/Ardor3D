@@ -215,6 +215,8 @@ public interface TextureRenderer {
 
   int getHeight();
 
+  int getLayers();
+
   /**
    * @param enable
    *          true (the default) if we should automatically generate mipmaps for textures that have

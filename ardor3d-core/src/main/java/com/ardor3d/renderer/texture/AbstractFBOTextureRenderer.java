@@ -47,7 +47,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
   protected int _fboID = 0, _depthRBID = 0;
   protected int _msfboID = 0, _msdepthRBID = 0, _mscolorRBID = 0;
-  protected int _width = 0, _height = 0, _samples = 0, _depthBits = 0;
+  protected int _width = 0, _height = 0, _layers = 0, _samples = 0, _depthBits = 0;
 
   protected IntBuffer _attachBuffer = null;
   protected boolean _usingDepthRB = false;
@@ -56,20 +56,21 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
   protected final Renderer _parentRenderer;
 
-  public AbstractFBOTextureRenderer(final int width, final int height, final int depthBits, final int samples,
-    final Renderer parentRenderer, final ContextCapabilities caps) {
+  public AbstractFBOTextureRenderer(final int width, final int height, final int layers, final int depthBits,
+    final int samples, final Renderer parentRenderer, final ContextCapabilities caps) {
 
-    if (logger.isLoggable(Level.FINE)) {
-      logger.fine("Creating FBOTextureRenderer sized: " + _width + " x " + _height);
+    _width = width;
+    _height = height;
+    _layers = layers;
+
+    if (AbstractFBOTextureRenderer.logger.isLoggable(Level.FINE)) {
+      AbstractFBOTextureRenderer.logger.fine("Creating FBOTextureRenderer sized: " + _width + " x " + _height);
     }
 
     _parentRenderer = parentRenderer;
     _samples = Math.min(samples, caps.getMaxFBOSamples());
     _depthBits = depthBits;
     _supportsMultisample = caps.getMaxFBOSamples() != 0;
-
-    _width = width;
-    _height = height;
 
     _camera.resize(_width, _height);
     _camera.setFrustum(1.0f, 1000.0f, -0.50f, 0.50f, 0.50f, -0.50f);
@@ -119,7 +120,8 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
       ContextManager.getCurrentContext().popFBOTextureRenderer();
     } catch (final Exception e) {
-      logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception", e);
+      AbstractFBOTextureRenderer.logger.logp(Level.SEVERE, this.getClass().toString(),
+          "render(Spatial, Texture, boolean)", "Exception", e);
     }
   }
 
@@ -146,7 +148,8 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
       ContextManager.getCurrentContext().popFBOTextureRenderer();
     } catch (final Exception e) {
-      logger.logp(Level.SEVERE, this.getClass().toString(), "render(List<Spatial>, Texture, boolean)", "Exception", e);
+      AbstractFBOTextureRenderer.logger.logp(Level.SEVERE, this.getClass().toString(),
+          "render(List<Spatial>, Texture, boolean)", "Exception", e);
     }
   }
 
@@ -173,7 +176,8 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
       ContextManager.getCurrentContext().popFBOTextureRenderer();
     } catch (final Exception e) {
-      logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception", e);
+      AbstractFBOTextureRenderer.logger.logp(Level.SEVERE, this.getClass().toString(),
+          "render(Spatial, Texture, boolean)", "Exception", e);
     }
   }
 
@@ -200,7 +204,8 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
       ContextManager.getCurrentContext().popFBOTextureRenderer();
     } catch (final Exception e) {
-      logger.logp(Level.SEVERE, this.getClass().toString(), "render(List<Spatial>, Texture, boolean)", "Exception", e);
+      AbstractFBOTextureRenderer.logger.logp(Level.SEVERE, this.getClass().toString(),
+          "render(List<Spatial>, Texture, boolean)", "Exception", e);
     }
   }
 
@@ -278,6 +283,9 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
   @Override
   public int getHeight() { return _height; }
+
+  @Override
+  public int getLayers() { return _layers; }
 
   @Override
   public int getDepthBits() { return _depthBits; }
