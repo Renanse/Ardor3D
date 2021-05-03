@@ -30,11 +30,7 @@ public interface ReadOnlyMatrix4 {
 
   Vector4 getRow(int index, Vector4 store);
 
-  DoubleBuffer toDoubleBuffer(DoubleBuffer store);
-
   DoubleBuffer toDoubleBuffer(DoubleBuffer store, boolean rowMajor);
-
-  FloatBuffer toFloatBuffer(FloatBuffer store);
 
   FloatBuffer toFloatBuffer(FloatBuffer store, boolean rowMajor);
 

@@ -30,8 +30,8 @@ import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 
-import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
@@ -238,7 +238,7 @@ public class ColladaAnimUtils {
             source.rewind();
             source.put(floatData, i, 16);
             source.flip();
-            final Matrix4 mat = new Matrix4().fromFloatBuffer(source);
+            final Matrix4 mat = new Matrix4().fromFloatBuffer(source, true);
             bindMatrices.add(new Transform().fromHomogeneousMatrix(mat));
           }
         }

@@ -499,15 +499,6 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * @param source
    *          the buffer to read our matrix data from.
-   * @return this matrix for chaining.
-   */
-  public Matrix4 fromDoubleBuffer(final DoubleBuffer source) {
-    return fromDoubleBuffer(source, false);
-  }
-
-  /**
-   * @param source
-   *          the buffer to read our matrix data from.
    * @param rowMajor
    *          if true, data is stored row by row. Otherwise it is stored column by column.
    * @return this matrix for chaining.
@@ -550,17 +541,6 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     return this;
-  }
-
-  /**
-   * Note: data is cast to floats.
-   *
-   * @param store
-   *          the buffer to read our matrix data from.
-   * @return this matrix for chaining.
-   */
-  public Matrix4 fromFloatBuffer(final FloatBuffer source) {
-    return fromFloatBuffer(source, false);
   }
 
   /**
@@ -1096,22 +1076,6 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   /**
    * @param store
    *          the buffer to store our matrix data in. Must not be null. Data is entered starting at
-   *          current buffer
-   * @return matrix data as a DoubleBuffer in row major order. The position is at the end of the
-   *         inserted data.
-   * @throws NullPointerException
-   *           if store is null.
-   * @throws BufferOverflowException
-   *           if there is not enough room left in the buffer to write all 16 values.
-   */
-  @Override
-  public DoubleBuffer toDoubleBuffer(final DoubleBuffer store) {
-    return toDoubleBuffer(store, false);
-  }
-
-  /**
-   * @param store
-   *          the buffer to store our matrix data in. Must not be null. Data is entered starting at
    *          current buffer position.
    * @param rowMajor
    *          if true, data is stored row by row. Otherwise it is stored column by column.
@@ -1161,24 +1125,6 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     return store;
-  }
-
-  /**
-   * Note: data is cast to floats.
-   *
-   * @param store
-   *          the buffer to store our matrix data in. Must not be null. Data is entered starting at
-   *          current buffer
-   * @return matrix data as a FloatBuffer in row major order. The position is at the end of the
-   *         inserted data.
-   * @throws NullPointerException
-   *           if store is null.
-   * @throws BufferOverflowException
-   *           if there is not enough room left in the buffer to write all 16 values.
-   */
-  @Override
-  public FloatBuffer toFloatBuffer(final FloatBuffer store) {
-    return toFloatBuffer(store, false);
   }
 
   /**
