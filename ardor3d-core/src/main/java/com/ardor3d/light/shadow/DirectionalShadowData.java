@@ -23,6 +23,8 @@ import com.ardor3d.scenegraph.SceneIndexer;
 
 public class DirectionalShadowData extends AbstractShadowData {
 
+  public static final String KEY_DebugSplit = "_debugSplit";
+
   /**
    * The lambda value used in split distance calculations. Should be in the range [0.0, 1.0] and
    * handles blending between logarithmic and uniform split calculations.
