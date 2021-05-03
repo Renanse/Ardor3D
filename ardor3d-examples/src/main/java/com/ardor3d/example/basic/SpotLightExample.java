@@ -34,16 +34,16 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * A simple example showing a textured and lit box spinning.
+ * Shows off two spot lights casting shadows on a simple, rotating scene.
  */
 @Purpose(
-    htmlDescriptionKey = "com.ardor3d.example.basic.RotatingSceneExample", //
-    thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_RotatingSceneExample.jpg", //
+    htmlDescriptionKey = "com.ardor3d.example.basic.SpotLightExample", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_SpotLightExample.jpg", //
     maxHeapMemory = 64)
-public class RotatingSceneExample extends ExampleBase {
+public class SpotLightExample extends ExampleBase {
 
   public static void main(final String[] args) {
-    start(RotatingSceneExample.class);
+    start(SpotLightExample.class);
   }
 
   double rotAngle = 0.0;
@@ -51,7 +51,7 @@ public class RotatingSceneExample extends ExampleBase {
 
   @Override
   protected void initExample() {
-    _canvas.setTitle("Rotating Scene Example");
+    _canvas.setTitle("Spot Light Example");
     _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.BLACK);
     _root.setRenderMaterial("lit/untextured/basic_phong.yaml");
 

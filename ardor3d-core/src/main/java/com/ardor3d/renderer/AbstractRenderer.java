@@ -266,7 +266,7 @@ public abstract class AbstractRenderer implements Renderer {
     try {
       final FloatBuffer modelBuff = _matrixStore.get(RenderMatrixType.Model);
       modelBuff.clear();
-      model.fromFloatBuffer(modelBuff);
+      model.fromFloatBuffer(modelBuff, false);
 
       if (modelIsUniformScale) {
         // normal matrix is just the 3x3 of the model matrix
