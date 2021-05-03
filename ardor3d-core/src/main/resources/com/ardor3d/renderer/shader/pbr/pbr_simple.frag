@@ -13,9 +13,6 @@ in vec2 TexCoords;
 // material parameters
 uniform PbrSurface surface;
 
-// lights
-uniform LightProperties lightProps;
-
 uniform vec3 cameraLoc;
 
 void main()

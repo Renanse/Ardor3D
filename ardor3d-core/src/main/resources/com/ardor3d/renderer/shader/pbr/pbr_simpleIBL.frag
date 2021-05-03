@@ -18,9 +18,6 @@ uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
-// lights
-uniform LightProperties lightProps;
-
 uniform vec3 cameraLoc;
 
 void main()

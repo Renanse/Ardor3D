@@ -16,9 +16,6 @@ uniform PbrSurface surface;
 // IBL
 uniform samplerCube irradianceMap;
 
-// lights
-uniform LightProperties lightProps;
-
 uniform vec3 cameraLoc;
 
 void main()
