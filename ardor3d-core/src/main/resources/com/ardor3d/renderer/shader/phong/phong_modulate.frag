@@ -62,8 +62,8 @@ void main()
 	#endif
 #endif
 
-    vec3 V = normalize(cameraLoc - WorldPos);
-    LightingResult lit = calcLighting(WorldPos, Normal, V, surface);
+    vec3 viewDir = normalize(cameraLoc - WorldPos);
+    LightingResult lit = calcLighting(WorldPos, Normal, ViewPos.xyz, viewDir, surface);
     
     vec3 emissive = surface.emissive;
     vec3 ambient = surface.ambient * lightProps.globalAmbient;

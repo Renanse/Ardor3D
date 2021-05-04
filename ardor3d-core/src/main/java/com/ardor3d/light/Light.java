@@ -18,9 +18,7 @@ import java.util.function.Supplier;
 
 import com.ardor3d.light.shadow.AbstractShadowData;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.IUniformSupplier;
 import com.ardor3d.renderer.material.uniform.UniformRef;
@@ -74,7 +72,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
   /** when true, indicates the lights in this lightState will cast shadows. */
   protected boolean _shadowCaster;
 
-  protected transient AbstractShadowData _shadowData;
   protected int _shadowSize = Light.DEFAULT_SHADOW_SIZE;
   protected int _shadowDepthBits = Light.DEFAULT_SHADOW_DEPTH_BITS;
 
@@ -96,8 +93,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
     cachedUniforms.add(new UniformRef("castsShadows", UniformType.Int1, UniformSource.Supplier,
         (Supplier<Integer>) () -> isShadowCaster() ? 1 : 0));
-    cachedUniforms.add(new UniformRef("shadowMatrix", UniformType.Matrix4x4, UniformSource.Supplier,
-        (Supplier<ReadOnlyMatrix4>) this::getShadowMatrix));
   }
 
   /**
@@ -150,7 +145,7 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
   public void setShadowSize(final int pixels) {
     if (pixels != _shadowSize) {
-      _shadowData.cleanUp();
+      getShadowData().cleanUp();
     }
     _shadowSize = pixels;
   }
@@ -184,11 +179,7 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
     // ignore - maybe useful later for calculating contribution?
   }
 
-  public AbstractShadowData getShadowData() { return _shadowData; }
-
-  public ReadOnlyMatrix4 getShadowMatrix() {
-    return _shadowData != null ? _shadowData.getShadowMatrix() : Matrix4.IDENTITY;
-  }
+  public abstract AbstractShadowData getShadowData();
 
   @Override
   public void write(final OutputCapsule capsule) throws IOException {

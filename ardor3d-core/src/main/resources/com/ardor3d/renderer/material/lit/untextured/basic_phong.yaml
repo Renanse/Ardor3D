@@ -7,7 +7,7 @@ techniques:
           - key: normal
 
         uniforms: 
-          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights, shadows, colorSurface, alphaTest]
+          - builtIn: [model, view, projection, normalMat, cameraLoc, defaultColor, lights, colorSurface, alphaTest]
             
         shaders: 
           Vertex: 

@@ -15,7 +15,7 @@ import com.ardor3d.renderer.material.IUniformSupplier;
 public class UniformRef {
 
   protected String _shaderVariableName;
-  protected int _location = -1;
+  protected int _location = Integer.MIN_VALUE;
   protected UniformType _type = UniformType.Float1;
   protected UniformSource _source = UniformSource.Value;
   protected Object _value = null;

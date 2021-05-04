@@ -13,17 +13,22 @@ package com.ardor3d.light.shadow;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.SceneIndexer;
 
 public class DirectionalShadowData extends AbstractShadowData {
 
   public static final String KEY_DebugSplit = "_debugSplit";
+
+  public static int MAX_SPLITS = 6;
 
   /**
    * The lambda value used in split distance calculations. Should be in the range [0.0, 1.0] and
@@ -37,8 +42,9 @@ public class DirectionalShadowData extends AbstractShadowData {
   // Represents the view frustum, for use in calculations
   protected final Frustum _frustum = new Frustum();
 
-  // Our split distances
-  protected double[] _splitDistances = new double[2];
+  // Our split distances and matrices
+  protected double[] _splitDistances = new double[0];
+  protected transient Matrix4[] _matrices = new Matrix4[0];
 
   protected final BoundingSphere _frustumBoundingSphere = new BoundingSphere();
 
@@ -46,8 +52,11 @@ public class DirectionalShadowData extends AbstractShadowData {
 
   protected int _cascades = 4;
 
+  private double _minimumCameraDistance = 1.0;
+
   public DirectionalShadowData(final DirectionalLight light) {
     super();
+
     _light = light;
   }
 
@@ -78,6 +87,13 @@ public class DirectionalShadowData extends AbstractShadowData {
    */
   public void setCascades(final int cascades) { _cascades = cascades; }
 
+  public double getMinimumCameraDistance() { return _minimumCameraDistance; }
+
+  public void setMinimumCameraDistance(final double distance) { _minimumCameraDistance = distance; }
+
+  @Override
+  protected ProjectionMode getProjectionMode() { return ProjectionMode.Orthographic; }
+
   @Override
   public void updateShadows(final Renderer renderer, final SceneIndexer indexer) {
     final Camera viewCam = Camera.getCurrentCamera();
@@ -85,7 +101,7 @@ public class DirectionalShadowData extends AbstractShadowData {
 
     // Render our splits
     final var shadowRenderer = getShadowRenderer(_light, getCascades(), renderer);
-    for (int i = 0, maxI = getCascades(); i < maxI; i++) {
+    for (int i = getCascades(); i-- > 0;) {
       // set up current split
       applySplitToLightCamera(i, viewCam, shadowRenderer.getCamera());
       _texture.setTexRenderLayer(i);
@@ -118,6 +134,10 @@ public class DirectionalShadowData extends AbstractShadowData {
     // ensure correct size.
     if (_splitDistances.length != splitCount + 1) {
       _splitDistances = new double[splitCount + 1];
+      _matrices = new Matrix4[splitCount];
+      for (int i = 0; i < _matrices.length; i++) {
+        _matrices[i] = new Matrix4();
+      }
     }
 
     final double nearPlane = _frustum.getNear();
@@ -147,7 +167,7 @@ public class DirectionalShadowData extends AbstractShadowData {
       final double fNear = _splitDistances[split];
       final double fFar = _splitDistances[split + 1];
 
-      // Calculate the frustum corners for the current split
+      // calculate the frustum corners for the current split
       _frustum.calculateCorners(fNear, fFar, viewCamera);
 
       // calculate a bounding sphere to encompass the calculated split corners
@@ -158,7 +178,7 @@ public class DirectionalShadowData extends AbstractShadowData {
 
       Vector3 direction = new Vector3();
       direction = direction.set(_light.getWorldDirection());
-      final double distance = Math.max(radius, 100);
+      final double distance = Math.max(radius, _minimumCameraDistance);
 
       tmpVec.set(direction);
       tmpVec.negateLocal();
@@ -196,13 +216,23 @@ public class DirectionalShadowData extends AbstractShadowData {
       final double farZ = tmpVec.subtractLocal(center).length() + radius;
 
       // set frustum, then location
+      lightCamera.setProjectionMode(ProjectionMode.Orthographic);
       lightCamera.setFrustum(1, farZ, -radius, radius, radius, -radius);
       lightCamera.setLocation(x, y, z);
+      _matrices[split].set(lightCamera.getViewProjectionMatrix());
     } finally {
       Vector3.releaseTempInstance(tmpVec);
       Vector3.releaseTempInstance(lightSpace);
       Quaternion.releaseTempInstance(axesQuat);
       Quaternion.releaseTempInstance(axesQuatInvert);
     }
+  }
+
+  public ReadOnlyMatrix4 getShadowMatrix(final int split) {
+    return split >= 0 && split < _matrices.length ? _matrices[split] : Matrix4.IDENTITY;
+  }
+
+  public double getSplit(final int split) {
+    return split >= 0 && split < _splitDistances.length ? _splitDistances[split] : Double.MAX_VALUE;
   }
 }

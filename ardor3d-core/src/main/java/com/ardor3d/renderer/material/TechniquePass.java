@@ -132,16 +132,12 @@ public class TechniquePass {
     for (int i = 0; i < maxLights; i++) {
       addUniform(new UniformRef("lightProps.lights[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
           Ardor3dStateProperty.Light, i, null));
-    }
-    addUniform(new UniformRef("lightProps.globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
-        Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
-  }
-
-  public void addShadowUniforms(final int maxShadows) {
-    for (int i = 0; i < maxShadows; i++) {
       addUniform(new UniformRef("lightProps.shadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
           Ardor3dStateProperty.ShadowTexture, i, null));
     }
+
+    addUniform(new UniformRef("lightProps.globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
+        Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
   }
 
   public void setupForDraw(final Renderer renderer, final Mesh mesh, final MeshData data) {
@@ -253,7 +249,7 @@ public class TechniquePass {
 
     // Set up non-bundle uniform
     int location = _cachedLocations.containsKey(uniform) ? _cachedLocations.get(uniform) : uniform.getLocation();
-    if (location < 0) {
+    if (location == Integer.MIN_VALUE) {
       // Use the name to find our location
       location = shaderUtils.findUniformLocation(programId, namePrepend + uniform.getShaderVariableName());
       if (location < 0) {

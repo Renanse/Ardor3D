@@ -5,8 +5,8 @@
 #define MAX_LIGHTS 8
 #endif
 
-#ifndef MAX_SHADOWS
-#define MAX_SHADOWS 8
+#ifndef MAX_SPLITS
+#define MAX_SPLITS 6
 #endif
 
 #define LIGHT_DIRECTIONAL 0
@@ -21,7 +21,8 @@ struct Light {
 	
 	// shadow info
 	bool castsShadows;
-	mat4 shadowMatrix;
+	mat4 shadowMatrix[MAX_SPLITS];
+	float splitDistances[MAX_SPLITS];
 	
 	// Point and Spot
     vec3 position;
@@ -52,7 +53,7 @@ struct LightingResult {
 uniform struct LightProperties {
 	vec3 globalAmbient;
 	Light lights[MAX_LIGHTS];
-	sampler2DArrayShadow shadowMaps[MAX_SHADOWS];
+	sampler2DArrayShadow shadowMaps[MAX_LIGHTS];
 } lightProps;
 
 #endif

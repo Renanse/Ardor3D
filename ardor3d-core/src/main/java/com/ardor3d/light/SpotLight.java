@@ -13,8 +13,11 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import com.ardor3d.light.shadow.AbstractShadowData;
 import com.ardor3d.light.shadow.SpotShadowData;
+import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformSource;
@@ -37,6 +40,8 @@ public class SpotLight extends PointLight {
   // Locally cached direction vector for our light.
   private final Vector3 _worldDirection = new Vector3(Vector3.UNIT_Z);
 
+  private SpotShadowData _shadowData;
+
   /**
    * Constructor instantiates a new <code>SpotLight</code> object. The initial position of the light
    * is (0,0,0) with angle 0, and colors white. The direction the light travels is along the positive
@@ -51,6 +56,8 @@ public class SpotLight extends PointLight {
         (Supplier<Float>) this::getInnerAngle));
     cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldDirection));
+    cachedUniforms.add(new UniformRef("shadowMatrix[0]", UniformType.Matrix4x4, UniformSource.Supplier,
+        (Supplier<ReadOnlyMatrix4>) this::getShadowMatrix));
   }
 
   @Override
@@ -70,6 +77,11 @@ public class SpotLight extends PointLight {
     _worldDirection.set(Vector3.UNIT_Z);
     getWorldTransform().applyForwardVector(_worldDirection);
   }
+
+  @Override
+  public AbstractShadowData getShadowData() { return _shadowData; }
+
+  ReadOnlyMatrix4 getShadowMatrix() { return _shadowData != null ? _shadowData.getShadowMatrix() : Matrix4.IDENTITY; }
 
   /**
    * <code>getAngle</code> returns the angle of the spot light.

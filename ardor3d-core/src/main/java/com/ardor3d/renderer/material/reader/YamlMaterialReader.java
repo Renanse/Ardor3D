@@ -519,9 +519,6 @@ public class YamlMaterialReader {
       case "lights":
         pass.addLightInfoUniforms(8);
         return;
-      case "shadows":
-        pass.addShadowUniforms(8);
-        return;
       case "textureMatrix0":
         pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix0, UniformType.Matrix4x4, UniformSource.SpatialProperty,
             Texture.KEY_TextureMatrix0, null, Matrix4.IDENTITY));

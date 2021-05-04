@@ -13,6 +13,7 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import com.ardor3d.light.shadow.AbstractShadowData;
 import com.ardor3d.light.shadow.PointShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -36,6 +37,8 @@ public class PointLight extends Light {
   private float _linear;
   private float _quadratic;
   private float _range = 100;
+
+  private PointShadowData _shadowData;
 
   /**
    * Constructor instantiates a new <code>PointLight</code> object. The initial position of the light
@@ -117,6 +120,9 @@ public class PointLight extends Light {
    *          the maximum world distance at which this light will affect geometry
    */
   public void setRange(final float range) { _range = range; }
+
+  @Override
+  public AbstractShadowData getShadowData() { return _shadowData; }
 
   @Override
   public void applyDefaultUniformValues() {

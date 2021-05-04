@@ -31,17 +31,39 @@ vec3 calcSpecular(Light light, const ColorSurface surface, const vec3 viewDir, c
 #endif
 }
 
-float calcAttenuation(Light light, float distance)
+float calcAttenuation(const Light light, const float distance)
 {
     return 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 }
 
-LightingResult calcDirectionalLight(Light light, const vec3 worldNormal, 
-const vec3 viewDir, const ColorSurface surface, const int index)
+int calcSplit(const Light light, const vec3 viewPos)
 {
+    for (int i=0; i<MAX_SPLITS; i++) {
+        if (abs(viewPos.z) < light.splitDistances[i]) {
+            return i-1;
+        }
+    }
+    return MAX_SPLITS - 1;
+}
+
+LightingResult calcDirectionalLight(Light light, const vec3 worldPos, const vec3 worldNormal, 
+const vec3 viewPos, const vec3 viewDir, const ColorSurface surface, const int index)
+{
+    LightingResult result;
+    result.diffuse = vec3(0.0);
+    result.specular = vec3(0.0);
+    
+    float shadowFactor = 1.0;
+    if (light.castsShadows) {
+        int split = calcSplit(light, viewPos);
+    	vec4 lightSpacePos = light.shadowMatrix[split] * vec4(worldPos, 1.0);
+    	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
+        shadowFactor = texture(lightProps.shadowMaps[index], vec4(projCoords.xy, split, projCoords.z - 0.01));
+        if (shadowFactor <= 0.0) return result;
+    }
+    
     vec3 lightDir = normalize(-light.direction);
 
-    LightingResult result;    
     result.diffuse = calcDiffuse(light, lightDir, worldNormal);
     result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal);
     return result;
@@ -76,7 +98,7 @@ const vec3 viewDir, const ColorSurface surface, const int index)
     
     float shadowFactor = 1.0;
     if (light.castsShadows) {
-    	vec4 lightSpacePos = light.shadowMatrix * vec4(worldPos, 1.0);
+    	vec4 lightSpacePos = light.shadowMatrix[0] * vec4(worldPos, 1.0);
     	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
         shadowFactor = texture(lightProps.shadowMaps[index], vec4(projCoords.xy, 0, projCoords.z - 0.001));
         if (shadowFactor <= 0.0) return result;
@@ -99,7 +121,8 @@ const vec3 viewDir, const ColorSurface surface, const int index)
     return result;
 }
 
-LightingResult calcLighting(const vec3 worldPos, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
+LightingResult calcLighting(const vec3 worldPos, const vec3 worldNormal, 
+const vec3 viewPos, const vec3 viewDir, const ColorSurface surface)
 {
     LightingResult totalResult;
     for (int i = 0; i < MAX_LIGHTS; i++)
@@ -111,7 +134,7 @@ LightingResult calcLighting(const vec3 worldPos, const vec3 worldNormal, const v
         switch (light.type)
         {
             case LIGHT_DIRECTIONAL:
-                result = calcDirectionalLight(light, worldNormal, viewDir, surface, i);
+                result = calcDirectionalLight(light, worldPos, worldNormal, viewPos, viewDir, surface, i);
                 break;
             case LIGHT_POINT:
                 result = calcPointLight(light, worldPos, worldNormal, viewDir, surface, i);

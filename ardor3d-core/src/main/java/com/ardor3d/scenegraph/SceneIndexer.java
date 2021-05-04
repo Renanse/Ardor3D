@@ -44,7 +44,6 @@ public class SceneIndexer implements DirtyEventListener, Renderable {
       _lightManager.cleanLights();
       _lightManager.renderShadowMaps(renderer, this);
     }
-
   }
 
   public void addSceneRoot(final Spatial spat) {
