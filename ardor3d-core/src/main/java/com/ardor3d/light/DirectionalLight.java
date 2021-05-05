@@ -46,6 +46,7 @@ public class DirectionalLight extends Light {
 
     cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldDirection));
+
     for (int i = 0; i < DirectionalShadowData.MAX_SPLITS; i++) {
       final int index = i;
       cachedUniforms.add(new UniformRef("shadowMatrix[" + i + "]", UniformType.Matrix4x4, UniformSource.Supplier,

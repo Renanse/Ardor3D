@@ -24,8 +24,20 @@ import com.ardor3d.scenegraph.SceneIndexer;
 
 public abstract class AbstractShadowData {
 
+  public final static int FILTER_MODE_PCF = 0;
+  public final static int FILTER_MODE_PCF_3x3 = 1;
+
+  public static final int DEFAULT_SHADOW_SIZE = 1024;
+  public static final int DEFAULT_SHADOW_DEPTH_BITS = 16;
+
   protected transient TextureRenderer _shadowRenderer;
+
   protected transient Texture _texture;
+  protected int _textureSize = AbstractShadowData.DEFAULT_SHADOW_SIZE;
+  protected int _textureDepthBits = AbstractShadowData.DEFAULT_SHADOW_DEPTH_BITS;
+
+  protected float _bias;
+  protected int _filterMode = 0;
 
   public AbstractShadowData() {
     _texture = new Texture2DArray();
@@ -36,7 +48,7 @@ public abstract class AbstractShadowData {
 
   public void cleanUp() {
     // TODO: properly delete from card
-    // _shadowTexture.markForDelete();
+    // _texture.markForDelete();
     _texture = null;
     if (_shadowRenderer != null) {
       _shadowRenderer.cleanup();
@@ -46,12 +58,33 @@ public abstract class AbstractShadowData {
 
   public Texture getTexture() { return _texture; }
 
+  public float getBias() { return _bias; }
+
+  public void setBias(final float bias) { _bias = bias; }
+
+  public int getFilterMode() { return _filterMode; }
+
+  public void setFilterMode(final int filterMode) { _filterMode = filterMode; }
+
+  public int getTextureSize() { return _textureSize; }
+
+  public void setTextureSize(final int pixels) {
+    if (pixels != _textureSize) {
+      cleanUp();
+    }
+    _textureSize = pixels;
+  }
+
+  public int getTextureDepthBits() { return _textureDepthBits; }
+
+  public void setTextureDepthBits(final int bits) { _textureDepthBits = bits; }
+
   public abstract void updateShadows(Renderer renderer, SceneIndexer indexer);
 
   protected TextureRenderer getShadowRenderer(final Light light, final int layers, final Renderer renderer) {
     if (_shadowRenderer == null || (layers != 0 && _shadowRenderer.getLayers() != layers)) {
-      final int pixelSize = light.getShadowSize();
-      final int depthBits = light.getShadowDepthBits();
+      final int pixelSize = getTextureSize();
+      final int depthBits = getTextureDepthBits();
       _shadowRenderer = renderer.createTextureRenderer(pixelSize, pixelSize, layers, depthBits, 0);
       _shadowRenderer.getCamera().setProjectionMode(getProjectionMode());
       _shadowRenderer.setBackgroundColor(ColorRGBA.BLACK_NO_ALPHA);

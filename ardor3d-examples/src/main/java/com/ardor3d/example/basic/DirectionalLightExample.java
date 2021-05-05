@@ -16,6 +16,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.light.Light;
 import com.ardor3d.light.LightProperties;
+import com.ardor3d.light.shadow.AbstractShadowData;
 import com.ardor3d.light.shadow.DirectionalShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
@@ -130,8 +131,10 @@ public class DirectionalLightExample extends ExampleBase {
     dl.setIntensity(1.0f);
     dl.setColor(ColorRGBA.WHITE);
     dl.setShadowCaster(true);
-    dl.getShadowData().setMaxDistance(100);
-    dl.getShadowData().setCascades(6);
+    dl.getShadowData().setFilterMode(AbstractShadowData.FILTER_MODE_PCF);
+    dl.getShadowData().setMaxDistance(200);
+    dl.getShadowData().setMinimumCameraDistance(50);
+    dl.getShadowData().setCascades(SPLITS);
     arrow.setDefaultColor(dl.getColor());
     light.attachChild(dl);
 
@@ -146,7 +149,7 @@ public class DirectionalLightExample extends ExampleBase {
     quad.setProperty(DirectionalShadowData.KEY_DebugSplit, i);
     LightProperties.setLightReceiver(quad, false);
     LightProperties.setShadowCaster(quad, false);
-    
+
     quad.setRenderMaterial("occluder/debug_quad_directional.yaml");
     final SceneHints sceneHints = quad.getSceneHints();
     sceneHints.setCullHint(CullHint.Never);

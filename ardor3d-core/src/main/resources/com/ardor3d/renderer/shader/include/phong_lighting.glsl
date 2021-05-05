@@ -38,12 +38,31 @@ float calcAttenuation(const Light light, const float distance)
 
 int calcSplit(const Light light, const vec3 viewPos)
 {
-    for (int i=0; i<MAX_SPLITS; i++) {
+    for (int i=1; i<MAX_SPLITS; i++) {
         if (abs(viewPos.z) < light.splitDistances[i]) {
             return i-1;
         }
     }
     return MAX_SPLITS - 1;
+}
+
+float calcShadowFactor(const sampler2DArrayShadow shadowTex, const int layer, 
+const int mode, const vec3 projCoords, const float compare)
+{
+    // 3x3 sampling
+    if (mode == 1) {
+        float shadowFactor = 0.0;
+        float inc = 1.0 / textureSize(shadowTex, 0).x;
+		for(int row = -1; row <= 1; row++) {
+		    for(int col = -1; col <= 1; col++) {
+		        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(row, col) * inc, layer, compare)); 
+		    }    
+		}
+        return shadowFactor / 9.0;
+    }
+    
+    // all other modes, including 0 - technically 2x2 sampling since it is a Shadow texture sample.
+    else return texture(shadowTex, vec4(projCoords.xy, layer, compare));
 }
 
 LightingResult calcDirectionalLight(Light light, const vec3 worldPos, const vec3 worldNormal, 
@@ -58,14 +77,14 @@ const vec3 viewPos, const vec3 viewDir, const ColorSurface surface, const int in
         int split = calcSplit(light, viewPos);
     	vec4 lightSpacePos = light.shadowMatrix[split] * vec4(worldPos, 1.0);
     	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
-        shadowFactor = texture(lightProps.shadowMaps[index], vec4(projCoords.xy, split, projCoords.z - 0.01));
+    	shadowFactor = calcShadowFactor(lightProps.shadowMaps[index], split, light.filterMode, projCoords, projCoords.z - light.bias);
         if (shadowFactor <= 0.0) return result;
     }
     
     vec3 lightDir = normalize(-light.direction);
 
-    result.diffuse = calcDiffuse(light, lightDir, worldNormal);
-    result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal);
+    result.diffuse = calcDiffuse(light, lightDir, worldNormal) * shadowFactor;
+    result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * shadowFactor;
     return result;
 }
 
@@ -100,7 +119,7 @@ const vec3 viewDir, const ColorSurface surface, const int index)
     if (light.castsShadows) {
     	vec4 lightSpacePos = light.shadowMatrix[0] * vec4(worldPos, 1.0);
     	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
-        shadowFactor = texture(lightProps.shadowMaps[index], vec4(projCoords.xy, 0, projCoords.z - 0.001));
+    	shadowFactor = calcShadowFactor(lightProps.shadowMaps[index], 0, light.filterMode, projCoords, projCoords.z - light.bias);
         if (shadowFactor <= 0.0) return result;
     }
     vec3 lightDir = (light.position - worldPos);

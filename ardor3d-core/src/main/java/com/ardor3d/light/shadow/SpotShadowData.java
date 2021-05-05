@@ -27,6 +27,7 @@ public class SpotShadowData extends AbstractShadowData {
 
   public SpotShadowData(final SpotLight light) {
     _light = light;
+    _bias = 0.001f;
   }
 
   @Override

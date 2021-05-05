@@ -23,6 +23,8 @@ struct Light {
 	bool castsShadows;
 	mat4 shadowMatrix[MAX_SPLITS];
 	float splitDistances[MAX_SPLITS];
+	float bias;
+	int filterMode;
 	
 	// Point and Spot
     vec3 position;

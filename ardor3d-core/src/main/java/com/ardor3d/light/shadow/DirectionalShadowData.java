@@ -58,6 +58,7 @@ public class DirectionalShadowData extends AbstractShadowData {
     super();
 
     _light = light;
+    _bias = 0.01f;
   }
 
   /**
@@ -192,7 +193,7 @@ public class DirectionalShadowData extends AbstractShadowData {
 
       {
         // determine
-        final int texSize = _light.getShadowSize();
+        final int texSize = getTextureSize();
         final double texelSize = (2.0 * radius) / texSize;
 
         // build a Quaternion from camera axes to move

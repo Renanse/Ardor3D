@@ -54,10 +54,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
   public static final float DEFAULT_INTENSITY = 1f;
 
-  public static final int DEFAULT_SHADOW_SIZE = 1024;
-
-  public static final int DEFAULT_SHADOW_DEPTH_BITS = 16;
-
   public enum Type {
     Directional, Point, Spot
   }
@@ -71,9 +67,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
   /** when true, indicates the lights in this lightState will cast shadows. */
   protected boolean _shadowCaster;
-
-  protected int _shadowSize = Light.DEFAULT_SHADOW_SIZE;
-  protected int _shadowDepthBits = Light.DEFAULT_SHADOW_DEPTH_BITS;
 
   /**
    * Constructor instantiates a new <code>Light</code> object. All light color values are set to
@@ -93,6 +86,10 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
     cachedUniforms.add(new UniformRef("castsShadows", UniformType.Int1, UniformSource.Supplier,
         (Supplier<Integer>) () -> isShadowCaster() ? 1 : 0));
+    cachedUniforms.add(new UniformRef("bias", UniformType.Float1, UniformSource.Supplier,
+        (Supplier<Float>) () -> getShadowData().getBias()));
+    cachedUniforms.add(new UniformRef("filterMode", UniformType.Int1, UniformSource.Supplier,
+        (Supplier<Integer>) () -> getShadowData().getFilterMode()));
   }
 
   /**
@@ -141,19 +138,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
   public void setIntensity(final float intensity) { _intensity = intensity; }
 
-  public int getShadowSize() { return _shadowSize; }
-
-  public void setShadowSize(final int pixels) {
-    if (pixels != _shadowSize) {
-      getShadowData().cleanUp();
-    }
-    _shadowSize = pixels;
-  }
-
-  public int getShadowDepthBits() { return _shadowDepthBits; }
-
-  public void setShadowDepthBits(final int shadowDepthBits) { _shadowDepthBits = shadowDepthBits; }
-
   /**
    * @return Returns whether this light is able to cast shadows.
    */
@@ -186,8 +170,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
     super.write(capsule);
     capsule.write(_color, "diffuse", (ColorRGBA) Light.DEFAULT_COLOR);
     capsule.write(_intensity, "intensity", Light.DEFAULT_INTENSITY);
-    capsule.write(_shadowSize, "shadowSize", Light.DEFAULT_SHADOW_SIZE);
-    capsule.write(_shadowDepthBits, "shadowDepthBits", Light.DEFAULT_SHADOW_DEPTH_BITS);
     capsule.write(_enabled, "enabled", false);
     capsule.write(_shadowCaster, "shadowCaster", false);
   }
@@ -197,8 +179,6 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
     super.read(capsule);
     _color.set(capsule.readSavable("diffuse", (ColorRGBA) Light.DEFAULT_COLOR));
     _intensity = capsule.readFloat("intensity", Light.DEFAULT_INTENSITY);
-    _shadowSize = capsule.readInt("shadowSize", Light.DEFAULT_SHADOW_SIZE);
-    _shadowDepthBits = capsule.readInt("shadowDepthBits", Light.DEFAULT_SHADOW_DEPTH_BITS);
     _enabled = capsule.readBoolean("enabled", false);
     _shadowCaster = capsule.readBoolean("shadowCaster", false);
   }
