@@ -81,7 +81,9 @@ public class SpotLight extends PointLight {
   @Override
   public AbstractShadowData getShadowData() { return _shadowData; }
 
-  ReadOnlyMatrix4 getShadowMatrix() { return _shadowData != null ? _shadowData.getShadowMatrix() : Matrix4.IDENTITY; }
+  protected ReadOnlyMatrix4 getShadowMatrix() {
+    return _shadowData != null ? _shadowData.getShadowMatrix() : Matrix4.IDENTITY;
+  }
 
   /**
    * <code>getAngle</code> returns the angle of the spot light.

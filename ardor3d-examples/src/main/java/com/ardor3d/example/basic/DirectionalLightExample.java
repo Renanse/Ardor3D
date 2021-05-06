@@ -45,12 +45,19 @@ import com.ardor3d.util.TextureManager;
     maxHeapMemory = 64)
 public class DirectionalLightExample extends ExampleBase {
 
+  private double _rotAngle = 0.0;
+  private final Quaternion _rot = new Quaternion();
+
+  /** Quads used for debug showing shadowmaps. */
+  private final static int SPLITS = 4;
+  private final static int QUAD_SIZE = 128;
+  private final Quad _orthoQuad[] = new Quad[SPLITS];
+
+  private Node light;
+
   public static void main(final String[] args) {
     start(DirectionalLightExample.class);
   }
-
-  double rotAngle = 0.0;
-  Quaternion rot = new Quaternion();
 
   @Override
   protected void initExample() {
@@ -67,9 +74,9 @@ public class DirectionalLightExample extends ExampleBase {
 
     final var rotNode = new Node("rotate");
     rotNode.addController((time, caller) -> {
-      rotAngle += time * 0.25;
-      rot.fromAngleAxis(rotAngle, Vector3.NEG_UNIT_Y);
-      caller.setRotation(rot);
+      _rotAngle += time * 0.25;
+      _rot.fromAngleAxis(_rotAngle, Vector3.NEG_UNIT_Y);
+      caller.setRotation(_rot);
     });
     _root.attachChild(rotNode);
 
@@ -96,13 +103,6 @@ public class DirectionalLightExample extends ExampleBase {
     cam.setLocation(-16, 29, 19);
     cam.lookAt(0, 2, 0, Vector3.UNIT_Y);
   }
-
-  /** Quads used for debug showing shadowmaps. */
-  final static int SPLITS = 4;
-  final static int QUAD_SIZE = 128;
-  private final Quad _orthoQuad[] = new Quad[SPLITS];
-
-  Node light;
 
   @Override
   protected void updateExample(final ReadOnlyTimer timer) {
