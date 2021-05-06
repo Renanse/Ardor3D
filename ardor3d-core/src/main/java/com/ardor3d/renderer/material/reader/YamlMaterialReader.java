@@ -734,21 +734,12 @@ public class YamlMaterialReader {
     return doc != null ? doc.toString() : null;
   }
 
-  @SuppressWarnings("unchecked")
   private static DoubleBuffer getDoubleBuffer(final Object doc, final int sizeM, final int sizeN) {
     if (doc == null) {
       return null;
     }
 
-    if (!(doc instanceof ArrayList<?>)) {
-      throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + sizeM + ".  Got: "
-          + doc.getClass().getName() + " value: " + doc);
-    }
-    final List<Object> vals = (ArrayList<Object>) doc;
-    if (vals.size() != sizeM) {
-      throw new Ardor3dException("Incorrect size.  Expected: " + sizeM + " value: " + doc);
-    }
-
+    final List<Object> vals = getListOfSize(doc, sizeM);
     final DoubleBuffer buff = BufferUtils.createDoubleBuffer(sizeM * sizeN);
     for (final Object val : vals) {
       buff.put(getDoubleBuffer(val, sizeN));
@@ -768,15 +759,7 @@ public class YamlMaterialReader {
       buff = BufferUtils.createDoubleBuffer(1);
       buff.put(getDouble(doc));
     } else {
-      if (!(doc instanceof ArrayList<?>)) {
-        throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + size + ".  Got: "
-            + doc.getClass().getName() + " value: " + doc);
-      }
-      final List<Object> vals = (ArrayList<Object>) doc;
-      if (vals.size() != size) {
-        throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
-      }
-
+      final List<Object> vals = getListOfSize(doc, size);
       buff = BufferUtils.createDoubleBuffer(size);
       for (final Object val : vals) {
         buff.put(getDouble(val));
@@ -793,15 +776,7 @@ public class YamlMaterialReader {
       return null;
     }
 
-    if (!(doc instanceof ArrayList<?>)) {
-      throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + sizeM + ".  Got: "
-          + doc.getClass().getName() + " value: " + doc);
-    }
-    final List<Object> vals = (ArrayList<Object>) doc;
-    if (vals.size() != sizeM) {
-      throw new Ardor3dException("Incorrect size.  Expected: " + sizeM + " value: " + doc);
-    }
-
+    final List<Object> vals = getListOfSize(doc, sizeM);
     final FloatBuffer buff = BufferUtils.createFloatBuffer(sizeM * sizeN);
     for (final Object val : vals) {
       buff.put(getFloatBuffer(val, sizeN));
@@ -821,15 +796,7 @@ public class YamlMaterialReader {
       buff = BufferUtils.createFloatBuffer(1);
       buff.put(getFloat(doc));
     } else {
-      if (!(doc instanceof ArrayList<?>)) {
-        throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + size + ".  Got: "
-            + doc.getClass().getName() + " value: " + doc);
-      }
-      final List<Object> vals = (ArrayList<Object>) doc;
-      if (vals.size() != size) {
-        throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
-      }
-
+      final List<Object> vals = getListOfSize(doc, size);
       buff = BufferUtils.createFloatBuffer(size);
       for (final Object val : vals) {
         buff.put(getFloat(val));
@@ -850,15 +817,7 @@ public class YamlMaterialReader {
       buff = BufferUtils.createIntBuffer(1);
       buff.put(getInt(doc));
     } else {
-      if (!(doc instanceof ArrayList<?>)) {
-        throw new Ardor3dException("Incorrect type.  Expected ArrayList of size " + size + ".  Got: "
-            + doc.getClass().getName() + " value: " + doc);
-      }
-      final List<Object> vals = (ArrayList<Object>) doc;
-      if (vals.size() != size) {
-        throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
-      }
-
+      final List<Object> vals = getListOfSize(doc, size);
       buff = BufferUtils.createIntBuffer(size);
       for (final Object val : vals) {
         buff.put(getInt(val));
@@ -893,5 +852,13 @@ public class YamlMaterialReader {
     }
 
     return (List<Object>) doc;
+  }
+
+  private static List<Object> getListOfSize(final Object doc, final int size) {
+    final List<Object> vals = getList(doc, true);
+    if (vals.size() != size) {
+      throw new Ardor3dException("Incorrect size.  Expected: " + size + " value: " + doc);
+    }
+    return vals;
   }
 }

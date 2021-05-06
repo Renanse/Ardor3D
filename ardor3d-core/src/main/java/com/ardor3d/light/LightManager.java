@@ -257,7 +257,9 @@ public class LightManager implements IUniformSupplier {
   }
 
   @Override
-  public void applyDefaultUniformValues() {}
+  public void applyDefaultUniformValues() {
+    // Nothing to do here
+  }
 
   @Override
   public List<UniformRef> getUniforms() { return _cachedUniforms; }
