@@ -1,8 +1,6 @@
 #version 330 core
 
 @import include/alpha_test.glsl
-
-@import include/surface.glsl
 @import include/phong_lighting.glsl
 
 #ifdef USE_FOG
@@ -63,7 +61,7 @@ void main()
 #endif
 
     vec3 viewDir = normalize(cameraLoc - WorldPos);
-    LightingResult lit = calcLighting(WorldPos, Normal, ViewPos.xyz, viewDir, surface);
+    LightingResult lit = calcLighting(WorldPos, Normal, ViewPos.xyz/ViewPos.w, viewDir, surface);
     
     vec3 emissive = surface.emissive;
     vec3 ambient = surface.ambient * lightProps.globalAmbient;

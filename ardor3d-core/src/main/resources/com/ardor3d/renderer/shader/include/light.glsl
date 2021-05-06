@@ -6,7 +6,7 @@
 #endif
 
 #ifndef MAX_SPLITS
-#define MAX_SPLITS 6
+#define MAX_SPLITS 4
 #endif
 
 #define LIGHT_DIRECTIONAL 0

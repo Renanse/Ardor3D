@@ -2,6 +2,7 @@
 #define PHONG_LIGHTING_INC
 
 @import include/light.glsl
+@import include/surface.glsl
 
 // default us to use blinn-phong over phong.
 #ifndef USE_BLINN_PHONG
