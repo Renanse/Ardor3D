@@ -15,9 +15,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.image.Texture;
+import com.ardor3d.light.Light.Type;
+import com.ardor3d.light.shadow.DirectionalShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -25,15 +28,23 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderPhase;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.IUniformSupplier;
+import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
+import com.ardor3d.renderer.material.uniform.UniformRef;
+import com.ardor3d.renderer.material.uniform.UniformSource;
+import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
-public class LightManager {
+public class LightManager implements IUniformSupplier {
+
+  public static final String DefaultPropertyKey = "lightProps";
 
   public static int FIRST_SHADOW_INDEX = 8;
+  public static int MAX_LIGHTS = 8;
 
   public static ReadOnlyColorRGBA DEFAULT_GLOBAL_AMBIENT = new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f);
 
@@ -42,16 +53,57 @@ public class LightManager {
 
   protected ColorRGBA _globalAmbient = new ColorRGBA(LightManager.DEFAULT_GLOBAL_AMBIENT);
 
+  protected final List<UniformRef> _cachedUniforms = new ArrayList<>();
+
+  public LightManager() {
+    for (int i = 0; i < LightManager.MAX_LIGHTS; i++) {
+      _cachedUniforms.add(new UniformRef("lights[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
+          Ardor3dStateProperty.Light, i, null));
+      _cachedUniforms.add(new UniformRef("shadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
+          Ardor3dStateProperty.ShadowTexture, i, null));
+    }
+
+    _cachedUniforms.add(new UniformRef("globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
+        Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
+
+    _cachedUniforms.add(new UniformRef("dirShadowLight", UniformType.UniformSupplier, UniformSource.Ardor3dState,
+        Ardor3dStateProperty.Light, -1, null));
+    _cachedUniforms.add(new UniformRef("dirShadowMap", UniformType.Int1, UniformSource.Ardor3dState,
+        Ardor3dStateProperty.ShadowTexture, -1, null));
+    for (int i = 0; i < DirectionalShadowData.MAX_SPLITS; i++) {
+      final int index = i;
+      _cachedUniforms.add(new UniformRef("splitDistances[" + i + "]", UniformType.Float1, UniformSource.Supplier,
+          (Supplier<Float>) () -> getDirectionalCSMSplit(index)));
+    }
+  }
+
+  protected float getDirectionalCSMSplit(final int index) {
+    final Light light = getCurrentLight(-1);
+    if (light == null || light.getType() != Type.Directional) {
+      return Float.MAX_VALUE;
+    }
+
+    final double distance = ((DirectionalLight) light).getShadowData().getSplit(index);
+    return distance == Double.MAX_VALUE ? Float.MAX_VALUE : (float) distance;
+  }
+
   public void sortLightsFor(final Mesh mesh) {
     lightComparator.setBoundingVolume(mesh.getWorldBound());
     Collections.sort(_lightRefs, lightComparator);
   }
 
   public Light getCurrentLight(final int index) {
-    if (_lightRefs.size() <= index) {
+    final Light light0 = _lightRefs.isEmpty() ? null : _lightRefs.get(0).get();
+    final boolean hasDSM = light0 != null && light0.isShadowCaster() && light0.getType() == Type.Directional;
+    if (index == -1) {
+      return hasDSM ? light0 : null;
+    }
+
+    final int newIndex = (hasDSM ? index + 1 : index);
+    if (_lightRefs.size() <= newIndex) {
       return null;
     }
-    final var light = _lightRefs.get(index).get();
+    final var light = _lightRefs.get(newIndex).get();
     if (light == null || !light.isEnabled()) {
       return null;
     }
@@ -126,7 +178,7 @@ public class LightManager {
     if (l == null || !l.isEnabled()) {
       return 0;
     } else if (l.getType() == Light.Type.Directional) {
-      return getColorValue(l);
+      return getColorValue(l) - (l.isShadowCaster() ? 99999.0 : 0.0);
     } else if (l.getType() == Light.Type.Point) {
       return getValueFor((PointLight) l, val);
     } else if (l.getType() == Light.Type.Spot) {
@@ -192,8 +244,8 @@ public class LightManager {
         final var lref = _lightRefs.get(i);
         final var light = lref.get();
 
-        // if light has expired or is not a caster, ignore
-        if (light == null || !light.isShadowCaster()) {
+        // if light has expired, is disabled or is not a caster, ignore
+        if (light == null || !light.isEnabled() || !light.isShadowCaster()) {
           continue;
         }
 
@@ -204,4 +256,9 @@ public class LightManager {
     }
   }
 
+  @Override
+  public void applyDefaultUniformValues() {}
+
+  @Override
+  public List<UniformRef> getUniforms() { return _cachedUniforms; }
 }

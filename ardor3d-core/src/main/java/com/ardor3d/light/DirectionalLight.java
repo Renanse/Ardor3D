@@ -44,18 +44,13 @@ public class DirectionalLight extends Light {
     super();
     setShadowData();
 
-    cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldDirection));
 
     for (int i = 0; i < DirectionalShadowData.MAX_SPLITS; i++) {
       final int index = i;
-      cachedUniforms.add(new UniformRef("shadowMatrix[" + i + "]", UniformType.Matrix4x4, UniformSource.Supplier,
+      _cachedUniforms.add(new UniformRef("shadowMatrix[" + i + "]", UniformType.Matrix4x4, UniformSource.Supplier,
           (Supplier<ReadOnlyMatrix4>) () -> _shadowData.getShadowMatrix(index)));
-      cachedUniforms.add(new UniformRef("splitDistances[" + i + "]", UniformType.Float1, UniformSource.Supplier,
-          (Supplier<Float>) () -> {
-            final double distance = _shadowData.getSplit(index);
-            return distance == Double.MAX_VALUE ? Float.MAX_VALUE : (float) distance;
-          }));
     }
   }
 

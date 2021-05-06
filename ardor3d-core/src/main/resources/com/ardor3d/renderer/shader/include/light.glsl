@@ -22,7 +22,6 @@ struct Light {
 	// shadow info
 	bool castsShadows;
 	mat4 shadowMatrix[MAX_SPLITS];
-	float splitDistances[MAX_SPLITS];
 	float bias;
 	int filterMode;
 	
@@ -56,6 +55,11 @@ uniform struct LightProperties {
 	vec3 globalAmbient;
 	Light lights[MAX_LIGHTS];
 	sampler2DArrayShadow shadowMaps[MAX_LIGHTS];
+
+	// for performance reasons, we only support one directional light with shadows here
+	Light dirShadowLight;
+	sampler2DArrayShadow dirShadowMap;
+	float splitDistances[MAX_SPLITS];
 } lightProps;
 
 #endif

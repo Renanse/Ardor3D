@@ -50,13 +50,13 @@ public class SpotLight extends PointLight {
   public SpotLight() {
     super();
 
-    cachedUniforms
+    _cachedUniforms
         .add(new UniformRef("angle", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getAngle));
-    cachedUniforms.add(new UniformRef("innerAngle", UniformType.Float1, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("innerAngle", UniformType.Float1, UniformSource.Supplier,
         (Supplier<Float>) this::getInnerAngle));
-    cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("direction", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldDirection));
-    cachedUniforms.add(new UniformRef("shadowMatrix[0]", UniformType.Matrix4x4, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("shadowMatrix[0]", UniformType.Matrix4x4, UniformSource.Supplier,
         (Supplier<ReadOnlyMatrix4>) this::getShadowMatrix));
   }
 

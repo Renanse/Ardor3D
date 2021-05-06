@@ -29,7 +29,6 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
-import com.ardor3d.renderer.material.uniform.UniformSource;
 import com.ardor3d.renderer.material.uniform.UniformType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
@@ -126,18 +125,6 @@ public class TechniquePass {
         u.setValue(value);
       }
     });
-  }
-
-  public void addLightInfoUniforms(final int maxLights) {
-    for (int i = 0; i < maxLights; i++) {
-      addUniform(new UniformRef("lightProps.lights[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
-          Ardor3dStateProperty.Light, i, null));
-      addUniform(new UniformRef("lightProps.shadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
-          Ardor3dStateProperty.ShadowTexture, i, null));
-    }
-
-    addUniform(new UniformRef("lightProps.globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
-        Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
   }
 
   public void setupForDraw(final Renderer renderer, final Mesh mesh, final MeshData data) {
@@ -272,11 +259,14 @@ public class TechniquePass {
         break;
       case Ardor3dState:
         final Ardor3dStateProperty prop = Ardor3dStateProperty.valueOf(uniform.getValue().toString());
-        if (prop == Ardor3dStateProperty.Light) {
+        final SceneIndexer si = SceneIndexer.getCurrent();
+        final LightManager lm = si != null ? si.getLightManager() : null;
+        if (prop == Ardor3dStateProperty.LightProperties) {
+          supplier = lm;
+          clazzName = null;
+        } else if (prop == Ardor3dStateProperty.Light) {
           final int index = (!(uniform.getExtra() instanceof Integer)) ? 0 : ((Integer) uniform.getExtra()).intValue();
           // grab the appropriate light from the current SceneIndexer's LightManager
-          final SceneIndexer si = SceneIndexer.getCurrent();
-          final LightManager lm = si != null ? si.getLightManager() : null;
           supplier = lm != null ? lm.getCurrentLight(index) : null;
           // defaults to point light if we don't get a supplier
           clazzName = "com.ardor3d.light.PointLight";

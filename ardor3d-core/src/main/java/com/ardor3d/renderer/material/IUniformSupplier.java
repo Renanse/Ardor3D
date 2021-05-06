@@ -30,7 +30,7 @@ public interface IUniformSupplier {
   Set<String> nullProviders = new HashSet<>();
 
   static IUniformSupplier getDefaultProvider(final String className) {
-    if (nullProviders.contains(className)) {
+    if (IUniformSupplier.nullProviders.contains(className)) {
       return null;
     }
 
@@ -48,7 +48,7 @@ public interface IUniformSupplier {
       ex.printStackTrace();
     }
 
-    nullProviders.add(className);
+    IUniformSupplier.nullProviders.add(className);
     return null;
   }
 }

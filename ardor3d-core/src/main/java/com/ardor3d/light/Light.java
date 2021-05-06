@@ -45,7 +45,7 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
 
   private static final long serialVersionUID = 1L;
 
-  protected final List<UniformRef> cachedUniforms = new ArrayList<>();
+  protected final List<UniformRef> _cachedUniforms = new ArrayList<>();
 
   /**
    * white (1, 1, 1, 1)
@@ -74,21 +74,21 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
    *
    */
   public Light() {
-    cachedUniforms
+    _cachedUniforms
         .add(new UniformRef("type", UniformType.Int1, UniformSource.Supplier, (Supplier<Type>) this::getType));
-    cachedUniforms.add(new UniformRef("enabled", UniformType.Int1, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("enabled", UniformType.Int1, UniformSource.Supplier,
         (Supplier<Integer>) () -> isEnabled() ? 1 : 0));
 
-    cachedUniforms.add(new UniformRef("color", UniformType.Float3, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("color", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyColorRGBA>) this::getColor));
-    cachedUniforms.add(
+    _cachedUniforms.add(
         new UniformRef("intensity", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getIntensity));
 
-    cachedUniforms.add(new UniformRef("castsShadows", UniformType.Int1, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("castsShadows", UniformType.Int1, UniformSource.Supplier,
         (Supplier<Integer>) () -> isShadowCaster() ? 1 : 0));
-    cachedUniforms.add(new UniformRef("bias", UniformType.Float1, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("bias", UniformType.Float1, UniformSource.Supplier,
         (Supplier<Float>) () -> getShadowData().getBias()));
-    cachedUniforms.add(new UniformRef("filterMode", UniformType.Int1, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("filterMode", UniformType.Int1, UniformSource.Supplier,
         (Supplier<Integer>) () -> getShadowData().getFilterMode()));
   }
 
@@ -151,7 +151,7 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
   public void setShadowCaster(final boolean mayCastShadows) { _shadowCaster = mayCastShadows; }
 
   @Override
-  public List<UniformRef> getUniforms() { return cachedUniforms; }
+  public List<UniformRef> getUniforms() { return _cachedUniforms; }
 
   @Override
   public void draw(final Renderer renderer) {

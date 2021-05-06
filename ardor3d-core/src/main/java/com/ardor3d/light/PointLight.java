@@ -49,15 +49,15 @@ public class PointLight extends Light {
     super();
     setShadowData();
 
-    cachedUniforms.add(new UniformRef("position", UniformType.Float3, UniformSource.Supplier,
+    _cachedUniforms.add(new UniformRef("position", UniformType.Float3, UniformSource.Supplier,
         (Supplier<ReadOnlyVector3>) this::getWorldTranslation));
-    cachedUniforms.add(
+    _cachedUniforms.add(
         new UniformRef("constant", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getConstant));
-    cachedUniforms
+    _cachedUniforms
         .add(new UniformRef("linear", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getLinear));
-    cachedUniforms.add(
+    _cachedUniforms.add(
         new UniformRef("quadratic", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getQuadratic));
-    cachedUniforms
+    _cachedUniforms
         .add(new UniformRef("range", UniformType.Float1, UniformSource.Supplier, (Supplier<Float>) this::getRange));
   }
 

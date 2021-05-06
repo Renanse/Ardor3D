@@ -628,6 +628,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         return buffer;
       }
 
+      case LightProperties: {
+        throw new Ardor3dException(
+            "Uniform of source Ardor3dStateProperty+LightProperties must be of type 'UniformSupplier'.");
+      }
+
       case Light: {
         throw new Ardor3dException("Uniform of source Ardor3dStateProperty+Light must be of type 'UniformSupplier'.");
       }

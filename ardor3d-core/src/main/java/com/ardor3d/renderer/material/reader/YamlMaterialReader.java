@@ -30,6 +30,7 @@ import org.yaml.snakeyaml.reader.UnicodeReader;
 
 import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture;
+import com.ardor3d.light.LightManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.RenderMatrixType;
@@ -517,7 +518,8 @@ public class YamlMaterialReader {
                 FogParams.DefaultPropertyKey, "com.ardor3d.renderer.material.fog.FogParams", null));
         return;
       case "lights":
-        pass.addLightInfoUniforms(8);
+        pass.addUniform(new UniformRef(LightManager.DefaultPropertyKey, UniformType.UniformSupplier,
+            UniformSource.Ardor3dState, Ardor3dStateProperty.LightProperties, null, null));
         return;
       case "textureMatrix0":
         pass.addUniform(new UniformRef(Texture.KEY_TextureMatrix0, UniformType.Matrix4x4, UniformSource.SpatialProperty,

@@ -31,6 +31,12 @@ public enum Ardor3dStateProperty {
   CurrentViewportOffsetPixels,
 
   /**
+   * The current LightManager. The extra indicates the total number of lights to send through to the
+   * shader.
+   */
+  LightProperties,
+
+  /**
    * Properties of the light in the current LightManager. The light index comes from the extra field
    * of the uniform, which must be of type Integer.
    */
