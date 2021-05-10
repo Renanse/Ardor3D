@@ -9,13 +9,21 @@
 #define USE_BLINN_PHONG true
 #endif
 
-const vec3 CubeFaceDirections[6] = vec3[6](
-    vec3(1, 0, 0),
-    vec3(-1, 0, 0),
-    vec3(0, 1, 0),
-    vec3(0, -1, 0),
-    vec3(0, 0, 1),
-    vec3(0, 0, -1)
+const vec3 pointSampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
+
+const vec2 sampleOffsetDirections[8] = vec2[]
+(
+   vec2( 1,  1), vec2( -1,  1),
+   vec2( 1,  -1), vec2( -1,  -1),
+   vec2( 1,  0), vec2( -1,  0),
+   vec2( 0,  1), vec2( 0,  -1)
 );
 
 vec3 calcDiffuse(const Light light, const vec3 lightDir, const vec3 worldNormal)
@@ -56,27 +64,56 @@ int calcSplit(const float absViewZ)
     return MAX_SPLITS - 1;
 }
 
-float calcShadowFactor(const sampler2DArrayShadow shadowTex, const int layer, 
+float calcDirShadowFactor(const sampler2DArrayShadow shadowTex, const int layer, 
 const int mode, const vec3 projCoords, const float compare)
 {
     // 3x3 sampling
     if (mode == 1) {
         float shadowFactor = 0.0;
-        float inc = 1.0 / textureSize(shadowTex, 0).x;
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(-1, -1) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(-1, 0) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(-1, 1) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(0, -1) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(0, 0) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(0, 1) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(1, -1) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(1, 0) * inc, layer, compare)); 
-        shadowFactor += texture(shadowTex, vec4(projCoords.xy + vec2(1, 1) * inc, layer, compare)); 
-        return shadowFactor / 9.0;
+        const float inc = 1.0 / textureSize(shadowTex, 0).x;
+        const float samples = sampleOffsetDirections.length;
+        for (int i = 0; i < samples; i++) {
+            shadowFactor += texture(shadowTex, vec4(projCoords.xy + sampleOffsetDirections[i] * inc, layer, compare)); 
+        }
+        return shadowFactor / samples;
     }
     
     // all other modes, including 0 - technically 2x2 sampling since it is a Shadow texture sample.
     else return texture(shadowTex, vec4(projCoords.xy, layer, compare));
+}
+
+float calcSpotShadowFactor(const sampler2DShadow shadowTex, const int mode, const vec3 projCoords, const float compare)
+{
+    // 3x3 sampling
+    if (mode == 1) {
+        float shadowFactor = 0.0;
+        const float inc = 1.0 / textureSize(shadowTex, 0).x;
+        const float samples = sampleOffsetDirections.length;
+        for (int i = 0; i < samples; i++) {
+            shadowFactor += texture(shadowTex, vec3(projCoords.xy + sampleOffsetDirections[i] * inc, compare)); 
+        }
+        return shadowFactor / samples;
+    }
+    
+    // all other modes, including 0 - technically 2x2 sampling since it is a Shadow texture sample.
+    else return texture(shadowTex, vec3(projCoords.xy, compare));
+}
+
+float calcPointShadowFactor(const samplerCubeShadow shadowTex, const int mode, const vec3 fragToLight, const float compare)
+{
+    // 3x3x3 sampling
+    if (mode == 1) {
+        float shadowFactor = 0.0;
+        const float inc = 0.05;
+        const float samples = pointSampleOffsetDirections.length;
+        for (int i = 0; i < samples; i++) {
+            shadowFactor += texture(shadowTex, vec4(fragToLight.xyz + pointSampleOffsetDirections[i] * inc, compare)); 
+        }
+        return shadowFactor / samples;
+    }
+    
+    // all other modes, including 0 - technically 2x2 sampling since it is a Shadow texture sample.
+    else return texture(shadowTex, vec4(fragToLight, compare));
 }
 
 LightingResult calcDirectionalLight(const Light light, const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
@@ -99,7 +136,7 @@ const vec3 viewPos, const vec3 viewDir, const ColorSurface surface)
     int split = calcSplit(abs(viewPos.z));
 	vec4 lightSpacePos = light.shadowMatrix[split] * vec4(worldPos, 1.0);
 	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
-	shadowFactor = calcShadowFactor(lightProps.dirShadowMap, split, light.filterMode, projCoords, projCoords.z - light.bias);
+	shadowFactor = calcDirShadowFactor(lightProps.dirShadowMap, split, light.filterMode, projCoords, projCoords.z - light.bias);
 	shadowFactor = clamp(shadowFactor, 0.0, 1.0);
 
     result.diffuse *= shadowFactor;
@@ -107,22 +144,15 @@ const vec3 viewPos, const vec3 viewDir, const ColorSurface surface)
     return result;
 }
 
-int calcCubeFace(const vec3 toFrag)
+float vectToDepth(const vec3 vec, const mat4 proj)
 {
-    float max = -1;
-    int face = 0;
-    for (int i=0; i<6; i++) {
-        vec3 fwd = CubeFaceDirections[i];
-        float dp = dot(toFrag, fwd);
-        if (dp > max) {
-            max = dp;
-            face = i;
-        }
-    }
-    return face;
+    vec3 absVec = abs(vec);
+    float maxAxis = max(max(absVec.x, absVec.y), absVec.z);
+    float rVal = -proj[2][2] + proj[3][2] / maxAxis;
+    return (rVal + 1.0) * 0.5;
 }
 
-LightingResult calcPointLight(const Light light, const sampler2DArrayShadow shadowTexture, const vec3 worldPos, 
+LightingResult calcPointLight(const Light light, const samplerCubeShadow shadowTexture, const vec3 worldPos, 
 const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
     LightingResult result;
@@ -136,10 +166,9 @@ const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
     
     float shadowFactor = 1.0;
     if (light.castsShadows) {
-        int face = calcCubeFace(-lightDir);
-    	vec4 lightSpacePos = light.shadowMatrix[face] * vec4(worldPos, 1.0);
-    	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
-    	shadowFactor = calcShadowFactor(shadowTexture, face, light.filterMode, projCoords, projCoords.z - light.bias);
+        vec3 fragToLight = worldPos - light.position;
+        float eval = vectToDepth(fragToLight, light.shadowMatrix[0]) - light.bias;
+        shadowFactor = calcPointShadowFactor(shadowTexture, light.filterMode, fragToLight, eval);
         if (shadowFactor <= 0.0) return result;
     }
     
@@ -150,7 +179,7 @@ const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
     return result;
 }
 
-LightingResult calcSpotLight(const Light light, const sampler2DArrayShadow shadowTexture, const vec3 worldPos, 
+LightingResult calcSpotLight(const Light light, const sampler2DShadow shadowTexture, const vec3 worldPos, 
 const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
     LightingResult result;
@@ -161,7 +190,7 @@ const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
     if (light.castsShadows) {
     	vec4 lightSpacePos = light.shadowMatrix[0] * vec4(worldPos, 1.0);
     	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
-    	shadowFactor = calcShadowFactor(shadowTexture, 0, light.filterMode, projCoords, projCoords.z - light.bias);
+    	shadowFactor = calcSpotShadowFactor(shadowTexture, light.filterMode, projCoords, projCoords.z - light.bias);
         if (shadowFactor <= 0.0) return result;
     }
     vec3 lightDir = (light.position - worldPos);
@@ -200,10 +229,10 @@ const vec3 viewPos, const vec3 viewDir, const ColorSurface surface)
                 result = calcDirectionalLight(light, worldNormal, viewDir, surface);
                 break;
             case LIGHT_POINT:
-                result = calcPointLight(light, lightProps.shadowMaps[i], worldPos, worldNormal, viewDir, surface);
+                result = calcPointLight(light, lightProps.pointShadowMaps[i], worldPos, worldNormal, viewDir, surface);
                 break;
             case LIGHT_SPOT:
-                result = calcSpotLight(light, lightProps.shadowMaps[i], worldPos, worldNormal, viewDir, surface);
+                result = calcSpotLight(light, lightProps.spotShadowMaps[i], worldPos, worldNormal, viewDir, surface);
                 break;
         }
         totalResult.diffuse += result.diffuse;

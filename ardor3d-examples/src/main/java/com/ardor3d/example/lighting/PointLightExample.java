@@ -16,7 +16,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.light.Light;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.light.PointLight;
-import com.ardor3d.light.shadow.DirectionalShadowData;
+import com.ardor3d.light.shadow.PointShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -72,6 +72,9 @@ public class PointLightExample extends ExampleBase {
 
     for (int i = -30; i <= 30; i += 15) {
       for (int j = -30; j <= 30; j += 10) {
+        if (i == 0 && j == 0) {
+          continue;
+        }
         newBox(2, 10, new Vector3(i, 0, j));
       }
     }
@@ -127,11 +130,11 @@ public class PointLightExample extends ExampleBase {
 
   private Quad makeDebugQuad(final Light light, final int i) {
     final Quad quad = new Quad("fsq", QUAD_SIZE, QUAD_SIZE);
-    quad.setProperty(DirectionalShadowData.KEY_DebugSplit, i);
+    quad.setProperty(PointShadowData.KEY_DebugFace, i);
     LightProperties.setLightReceiver(quad, false);
     LightProperties.setShadowCaster(quad, false);
 
-    quad.setRenderMaterial("occluder/debug_quad_directional.yaml");
+    quad.setRenderMaterial("occluder/debug_quad_cube.yaml");
     final SceneHints sceneHints = quad.getSceneHints();
     sceneHints.setCullHint(CullHint.Never);
     sceneHints.setRenderBucketType(RenderBucketType.OrthoOrder);

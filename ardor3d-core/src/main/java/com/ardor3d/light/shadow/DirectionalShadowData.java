@@ -12,6 +12,10 @@ package com.ardor3d.light.shadow;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.image.Texture.DepthTextureCompareFunc;
+import com.ardor3d.image.Texture.DepthTextureCompareMode;
+import com.ardor3d.image.Texture2DArray;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Quaternion;
@@ -28,7 +32,7 @@ public class DirectionalShadowData extends AbstractShadowData {
 
   public static final String KEY_DebugSplit = "_debugSplit";
 
-  public static int MAX_SPLITS = 6;
+  public static int MAX_SPLITS = 4;
 
   /**
    * The lambda value used in split distance calculations. Should be in the range [0.0, 1.0] and
@@ -55,7 +59,10 @@ public class DirectionalShadowData extends AbstractShadowData {
   private double _minimumCameraDistance = 1.0;
 
   public DirectionalShadowData(final DirectionalLight light) {
-    super();
+    _texture = new Texture2DArray();
+    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
+    _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
+    _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
 
     _light = light;
     _bias = 0.01f;

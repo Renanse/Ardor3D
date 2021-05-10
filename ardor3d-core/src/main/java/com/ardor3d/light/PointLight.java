@@ -13,7 +13,6 @@ package com.ardor3d.light;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.light.shadow.AbstractShadowData;
 import com.ardor3d.light.shadow.PointShadowData;
 import com.ardor3d.math.ColorRGBA;
@@ -66,10 +65,8 @@ public class PointLight extends Light {
   protected void setShadowData() {
     _shadowData = new PointShadowData(this);
 
-    for (final var face : TextureCubeMap.Face.values()) {
-      _cachedUniforms.add(new UniformRef("shadowMatrix[" + face.ordinal() + "]", UniformType.Matrix4x4,
-          UniformSource.Supplier, (Supplier<ReadOnlyMatrix4>) () -> _shadowData.getShadowMatrix(face)));
-    }
+    _cachedUniforms.add(new UniformRef("shadowMatrix[0]", UniformType.Matrix4x4, UniformSource.Supplier,
+        (Supplier<ReadOnlyMatrix4>) () -> _shadowData.getShadowMatrix()));
   }
 
   /**

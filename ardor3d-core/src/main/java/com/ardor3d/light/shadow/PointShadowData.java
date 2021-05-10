@@ -10,8 +10,11 @@
 
 package com.ardor3d.light.shadow;
 
+import com.ardor3d.image.Texture.DepthTextureCompareFunc;
+import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
@@ -24,18 +27,21 @@ import com.ardor3d.scenegraph.SceneIndexer;
 
 public class PointShadowData extends AbstractShadowData {
 
+  public static final String KEY_DebugFace = "_debugFace";
+
   // Tracked light
   protected final PointLight _light;
 
-  protected transient Matrix4[] _matrices = new Matrix4[TextureCubeMap.Face.values().length];
+  protected transient Matrix4 _matrix = new Matrix4();
 
   public PointShadowData(final PointLight pointLight) {
-    super();
+    _texture = new TextureCubeMap();
+    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
+    _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
+    _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
+
     _light = pointLight;
     _bias = 0.001f;
-    for (final var face : TextureCubeMap.Face.values()) {
-      _matrices[face.ordinal()] = new Matrix4();
-    }
   }
 
   @Override
@@ -44,19 +50,19 @@ public class PointShadowData extends AbstractShadowData {
   @Override
   public void updateShadows(final Renderer renderer, final SceneIndexer indexer) {
     final Camera viewCam = Camera.getCurrentCamera();
-    final var shadowRenderer = getShadowRenderer(_light, 6, renderer);
+    final var shadowRenderer = getShadowRenderer(_light, 0, renderer);
+
     final Camera shadowCam = shadowRenderer.getCamera();
-    // TODO: Fix near/far using light attenuation properties.
-    shadowCam.setFrustumPerspective(90.0, 1.0, viewCam.getFrustumNear(), viewCam.getFrustumFar());
+    shadowCam.setFrustumPerspective(90.0, 1.0, viewCam.getFrustumNear(),
+        Math.min(viewCam.getFrustumFar(), _light.getRange()));
+    _matrix.set(shadowCam.getProjectionMatrix());
 
     for (final var face : TextureCubeMap.Face.values()) {
       // set up our texture camera to look out of the cube in the correct direction
       updateCameraForFace(shadowRenderer.getCamera(), face, _light.getWorldTranslation());
-      // TODO: probably could be cached?
-      _matrices[face.ordinal()].set(shadowCam.getViewProjectionMatrix());
 
       // render to the corresponding layer
-      _texture.setTexRenderLayer(face.ordinal());
+      ((TextureCubeMap) _texture).setCurrentRTTFace(face);
       shadowRenderer.render(indexer, _texture, Renderer.BUFFER_DEPTH);
     }
   }
@@ -66,7 +72,5 @@ public class PointShadowData extends AbstractShadowData {
     CubeMapRenderUtil.pointAtFace(face, cam);
   }
 
-  public ReadOnlyMatrix4 getShadowMatrix(final Face face) {
-    return _matrices[face.ordinal()];
-  }
+  public ReadOnlyMatrix4 getShadowMatrix() { return _matrix; }
 }

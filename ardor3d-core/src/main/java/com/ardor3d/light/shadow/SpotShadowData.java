@@ -10,6 +10,10 @@
 
 package com.ardor3d.light.shadow;
 
+import com.ardor3d.image.Texture.DepthTextureCompareFunc;
+import com.ardor3d.image.Texture.DepthTextureCompareMode;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.SpotLight;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
@@ -26,6 +30,11 @@ public class SpotShadowData extends AbstractShadowData {
   protected transient Matrix4 _matrix = new Matrix4();
 
   public SpotShadowData(final SpotLight light) {
+    _texture = new Texture2D();
+    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
+    _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
+    _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
+
     _light = light;
     _bias = 0.001f;
   }

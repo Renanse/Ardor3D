@@ -11,10 +11,6 @@
 package com.ardor3d.light.shadow;
 
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.DepthTextureCompareFunc;
-import com.ardor3d.image.Texture.DepthTextureCompareMode;
-import com.ardor3d.image.Texture2DArray;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.light.Light;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Camera.ProjectionMode;
@@ -38,13 +34,6 @@ public abstract class AbstractShadowData {
 
   protected float _bias;
   protected int _filterMode = 0;
-
-  public AbstractShadowData() {
-    _texture = new Texture2DArray();
-    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
-    _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
-    _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
-  }
 
   public void cleanUp() {
     // TODO: properly delete from card

@@ -6,7 +6,7 @@
 #endif
 
 #ifndef MAX_SPLITS
-#define MAX_SPLITS 6
+#define MAX_SPLITS 4
 #endif
 
 #define LIGHT_DIRECTIONAL 0
@@ -54,7 +54,8 @@ struct LightingResult {
 uniform struct LightProperties {
 	vec3 globalAmbient;
 	Light lights[MAX_LIGHTS];
-	sampler2DArrayShadow shadowMaps[MAX_LIGHTS];
+	sampler2DShadow spotShadowMaps[MAX_LIGHTS];
+	samplerCubeShadow pointShadowMaps[MAX_LIGHTS];
 
 	// for performance reasons, we only support one directional light with shadows here
 	Light dirShadowLight;

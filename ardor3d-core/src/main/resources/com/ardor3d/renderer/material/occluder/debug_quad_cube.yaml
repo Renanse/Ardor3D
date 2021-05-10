@@ -1,0 +1,56 @@
+---
+techniques: 
+  passes: 
+      - 
+        attributes:
+          - key: vertex
+          - key: uv0
+
+        uniforms: 
+          - builtIn: [model, view, projection, defaultColor, textureMatrix0, alphaTest]
+          - 
+            shaderKey: _debugFace
+            type: Int1
+            source: SpatialProperty
+
+        shaders: 
+          Vertex: 
+            source: unlit/unlit.vert
+            define: UV_COUNT 1
+                        
+          Fragment:
+            program: |
+               #version 330 core
+               out vec4 FragColor;
+                 
+               in vec2 TexCoords0;
+               
+               uniform samplerCube depthMap;
+               uniform int _debugFace;
+               
+               void main()
+               {
+                   float depthValue = 0;
+                   switch (_debugFace)
+                   {
+                       case 0:
+                           depthValue = texture(depthMap, vec3(1.0, TexCoords0.yx)).r;
+                           break;
+                       case 1:
+                           depthValue = texture(depthMap, vec3(-1.0, TexCoords0.yx)).r;
+                           break;
+                       case 2:
+                           depthValue = texture(depthMap, vec3(TexCoords0.x, 1.0, TexCoords0.y)).r;
+                           break;
+                       case 3:
+                           depthValue = texture(depthMap, vec3(TexCoords0.x, -1.0, TexCoords0.y)).r;
+                           break;
+                       case 4:
+                           depthValue = texture(depthMap, vec3(TexCoords0.xy, 1.0)).r;
+                           break;
+                       case 5:
+                           depthValue = texture(depthMap, vec3(TexCoords0.xy, -1.0)).r;
+                           break;
+                   }
+                   FragColor = vec4(vec3(depthValue), 1.0);
+               }      

@@ -59,7 +59,9 @@ public class LightManager implements IUniformSupplier {
     for (int i = 0; i < LightManager.MAX_LIGHTS; i++) {
       _cachedUniforms.add(new UniformRef("lights[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
           Ardor3dStateProperty.Light, i, null));
-      _cachedUniforms.add(new UniformRef("shadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
+      _cachedUniforms.add(new UniformRef("spotShadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
+          Ardor3dStateProperty.ShadowTexture, i, null));
+      _cachedUniforms.add(new UniformRef("pointShadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
           Ardor3dStateProperty.ShadowTexture, i, null));
     }
 
