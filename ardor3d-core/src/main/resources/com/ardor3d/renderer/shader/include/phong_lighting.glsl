@@ -9,6 +9,15 @@
 #define USE_BLINN_PHONG true
 #endif
 
+const vec3 CubeFaceDirections[6] = vec3[6](
+    vec3(1, 0, 0),
+    vec3(-1, 0, 0),
+    vec3(0, 1, 0),
+    vec3(0, -1, 0),
+    vec3(0, 0, 1),
+    vec3(0, 0, -1)
+);
+
 vec3 calcDiffuse(const Light light, const vec3 lightDir, const vec3 worldNormal)
 {
     float NdotL = max(dot(worldNormal, lightDir), 0.0);
@@ -98,6 +107,21 @@ const vec3 viewPos, const vec3 viewDir, const ColorSurface surface)
     return result;
 }
 
+int calcCubeFace(const vec3 toFrag)
+{
+    float max = -1;
+    int face = 0;
+    for (int i=0; i<6; i++) {
+        vec3 fwd = CubeFaceDirections[i];
+        float dp = dot(toFrag, fwd);
+        if (dp > max) {
+            max = dp;
+            face = i;
+        }
+    }
+    return face;
+}
+
 LightingResult calcPointLight(const Light light, const sampler2DArrayShadow shadowTexture, const vec3 worldPos, 
 const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
 {
@@ -108,13 +132,21 @@ const vec3 worldNormal, const vec3 viewDir, const ColorSurface surface)
     vec3 lightDir = (light.position - worldPos);
     float distance = length(lightDir);
     if (distance > light.range) return result;
-    
     lightDir /= distance;
+    
+    float shadowFactor = 1.0;
+    if (light.castsShadows) {
+        int face = calcCubeFace(-lightDir);
+    	vec4 lightSpacePos = light.shadowMatrix[face] * vec4(worldPos, 1.0);
+    	vec3 projCoords = (lightSpacePos.xyz / lightSpacePos.w) * 0.5 + 0.5;
+    	shadowFactor = calcShadowFactor(shadowTexture, face, light.filterMode, projCoords, projCoords.z - light.bias);
+        if (shadowFactor <= 0.0) return result;
+    }
     
     float attenuation = calcAttenuation(light, distance);
 
-    result.diffuse = calcDiffuse(light, lightDir, worldNormal) * attenuation;
-    result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * attenuation;
+    result.diffuse = calcDiffuse(light, lightDir, worldNormal) * attenuation * shadowFactor;
+    result.specular = calcSpecular(light, surface, viewDir, lightDir, worldNormal) * attenuation * shadowFactor;
     return result;
 }
 

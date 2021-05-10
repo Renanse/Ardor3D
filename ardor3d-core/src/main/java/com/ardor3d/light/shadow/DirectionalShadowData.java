@@ -186,10 +186,9 @@ public class DirectionalShadowData extends AbstractShadowData {
       tmpVec.multiplyLocal(distance);
       tmpVec.addLocal(center);
 
-      // temporary location
-      // FIXME: has a singularity if light comes directly from Y.
+      // temporary location before we attempt to stabilize
       lightCamera.setLocation(tmpVec);
-      lightCamera.lookAt(center, Vector3.UNIT_Y);
+      lightCamera.lookAt(center, viewCamera.getUp());
 
       {
         // determine

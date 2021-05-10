@@ -749,7 +749,6 @@ public class YamlMaterialReader {
     return buff;
   }
 
-  @SuppressWarnings("unchecked")
   private static DoubleBuffer getDoubleBuffer(final Object doc, final int size) {
     if (doc == null) {
       return null;
@@ -770,7 +769,6 @@ public class YamlMaterialReader {
     return buff;
   }
 
-  @SuppressWarnings("unchecked")
   private static FloatBuffer getFloatBuffer(final Object doc, final int sizeM, final int sizeN) {
     if (doc == null) {
       return null;
@@ -786,7 +784,6 @@ public class YamlMaterialReader {
     return buff;
   }
 
-  @SuppressWarnings("unchecked")
   private static FloatBuffer getFloatBuffer(final Object doc, final int size) {
     if (doc == null) {
       return null;
@@ -807,7 +804,6 @@ public class YamlMaterialReader {
     return buff;
   }
 
-  @SuppressWarnings("unchecked")
   private static IntBuffer getIntBuffer(final Object doc, final int size) {
     if (doc == null) {
       return null;

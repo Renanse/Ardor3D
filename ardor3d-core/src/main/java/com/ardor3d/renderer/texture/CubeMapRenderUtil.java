@@ -89,7 +89,7 @@ public class CubeMapRenderUtil {
     }
   }
 
-  private void pointAtFace(final Face face, final Camera cam) {
+  public static void pointAtFace(final Face face, final Camera cam) {
     switch (face) {
       case NegativeX:
         cam.setAxes(Vector3.NEG_UNIT_Z, Vector3.NEG_UNIT_Y, Vector3.NEG_UNIT_X);
