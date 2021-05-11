@@ -2,8 +2,9 @@
 
 in vec4 vertex;
  
-out vec2 vVertex;             // our vertex position relative to our eye.
-out vec3 eyeSpacePosition;
+out vec2 vVertex;             // our terrain grid position relative to our eye.
+out vec3 WorldPos;
+out vec4 ViewPos;
  
 uniform mat4 model;
 uniform mat4 view;
@@ -34,13 +35,12 @@ void main()
     vVertex = (vertex.xz - eyePosition.xz) * textureDensity;
 
 	// Apply terrain height blending    
-    // assign vertex to position so we can use in in/out param 
+    // assign vertex to position so we can use with in/out param 
     vec4 position = vertex;
     applyTerrainBlending(position);
     
-    // Used for fog calculations
-    mat4 modelViewMatrix = view * model;
-    eyeSpacePosition = (modelViewMatrix * position).xyz;
+    WorldPos = (model * position).xyz;
+    ViewPos = view * vec4(WorldPos, 1.0);
     
-    gl_Position = projection * modelViewMatrix * position;
+    gl_Position = projection * ViewPos;
 }

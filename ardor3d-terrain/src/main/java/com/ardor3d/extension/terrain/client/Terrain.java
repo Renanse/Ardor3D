@@ -26,6 +26,8 @@ import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.Pickable;
+import com.ardor3d.light.LightProperties;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
@@ -38,6 +40,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.surface.ColorSurface;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
@@ -114,7 +117,16 @@ public class Terrain extends Node implements Pickable, Runnable {
 
     setRenderState(clipTextureState);
 
-    // getSceneHints().setLightCombineMode(LightCombineMode.Off);
+    // default color surface
+    final ColorSurface surface = new ColorSurface();
+    surface.setShininess(0f);
+    surface.setSpecular(ColorRGBA.BLACK);
+    surface.setDiffuse(ColorRGBA.WHITE);
+    surface.setAmbient(ColorRGBA.WHITE);
+    surface.setEmissive(ColorRGBA.BLACK);
+    setProperty(ColorSurface.DefaultPropertyKey, surface);
+
+    LightProperties.setShadowCaster(this, false);
 
     try {
       _clips = new ArrayList<>();

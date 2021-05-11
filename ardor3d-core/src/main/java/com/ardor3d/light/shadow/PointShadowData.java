@@ -36,7 +36,7 @@ public class PointShadowData extends AbstractShadowData {
 
   public PointShadowData(final PointLight pointLight) {
     _texture = new TextureCubeMap();
-    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
+    _texture.setTextureStoreFormat(TextureStoreFormat.Depth32);
     _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
     _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
 

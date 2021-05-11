@@ -17,7 +17,6 @@ import com.ardor3d.extension.terrain.client.TerrainBuilder;
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
 import com.ardor3d.extension.terrain.heightmap.MidPointHeightMapGenerator;
 import com.ardor3d.extension.terrain.providers.array.ArrayTerrainDataProvider;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
@@ -32,8 +31,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.Node;
@@ -41,8 +38,6 @@ import com.ardor3d.scenegraph.extension.Skybox;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
-import com.ardor3d.util.GameTaskQueue;
-import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
@@ -125,21 +120,14 @@ public class ZupTerrainExample extends ExampleBase {
   protected void initExample() {
     Terrain.addDefaultResourceLocators();
 
-    // Setup main camera.
     _canvas.setTitle("Z-up Terrain Example");
-    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 0, 300));
-    _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(1, -1, 300), Vector3.UNIT_Z);
-    _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(70.0,
-        (float) _canvas.getCanvasRenderer().getCamera().getWidth()
-            / _canvas.getCanvasRenderer().getCamera().getHeight(),
-        1.0f, farPlane);
-    final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
-    final RenderContext renderContext = canvasRenderer.getRenderContext();
-    final Renderer renderer = canvasRenderer.getRenderer();
-    GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(() -> {
-      renderer.setBackgroundColor(ColorRGBA.GRAY);
-      return null;
-    });
+    _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
+
+    // Setup main camera.
+    final var cam = _canvas.getCanvasRenderer().getCamera();
+    cam.setLocation(new Vector3(0, 0, 300));
+    cam.lookAt(new Vector3(1, -1, 300), Vector3.UNIT_Z);
+    cam.setFrustumPerspective(70.0, (float) cam.getWidth() / cam.getHeight(), 1.0f, farPlane);
     _controlHandle.setUpAxis(Vector3.UNIT_Z);
     _controlHandle.setMoveSpeed(200);
 
@@ -151,19 +139,19 @@ public class ZupTerrainExample extends ExampleBase {
 
     try {
       // Keep a separate camera to be able to freeze terrain update
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       terrainCamera = new Camera(camera);
 
       final int SIZE = 2048;
 
-      final MidPointHeightMapGenerator raw = new MidPointHeightMapGenerator(SIZE, 0.5f);
+      final MidPointHeightMapGenerator raw = new MidPointHeightMapGenerator(SIZE, 0.95f);
       raw.setHeightRange(0.2f);
       final float[] heightMap = raw.getHeightData();
 
       final TerrainDataProvider terrainDataProvider =
           new ArrayTerrainDataProvider(heightMap, SIZE, new Vector3(1, 300, 1));
 
-      terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
+      terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).build();
       terrain.setRenderMaterial("clipmap/terrain_textured.yaml");
 
       terrain.setRotation(new Quaternion().fromAngleAxis(MathUtils.HALF_PI, Vector3.UNIT_X));
@@ -184,7 +172,7 @@ public class ZupTerrainExample extends ExampleBase {
     textNodes.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
     LightProperties.setLightReceiver(textNodes, false);
 
-    final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
+    final double infoStartY = cam.getHeight() / 2;
     for (int i = 0; i < _exampleInfo.length; i++) {
       _exampleInfo[i] = BasicText.createDefaultTextLabel("Text", "", 16);
       _exampleInfo[i].setTranslation(new Vector3(10, infoStartY - i * 20, 0));
@@ -242,32 +230,34 @@ public class ZupTerrainExample extends ExampleBase {
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SEVEN), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX() + 500.0, camera.getLocation().getY(), camera.getLocation().getZ());
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.EIGHT), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX() - 500.0, camera.getLocation().getY(), camera.getLocation().getZ());
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NINE), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX(), camera.getLocation().getY(), camera.getLocation().getZ() + 500.0);
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX(), camera.getLocation().getY(), camera.getLocation().getZ() - 500.0);
     }));
   }
 
   @Override
   protected void setupLight() {
-    final DirectionalLight dLight = new DirectionalLight();
-    dLight.setEnabled(true);
-    dLight.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
-    dLight.lookAt(-1, -1, -1);
-    _root.attachChild(dLight);
+    final DirectionalLight dl = new DirectionalLight();
+    dl.setEnabled(true);
+    dl.setColor(ColorRGBA.WHITE);
+    dl.setIntensity(1.0f);
+    dl.lookAt(-1, -1, -1);
+    dl.setShadowCaster(false);
+    _root.attachChild(dl);
   }
 
   private void setupDefaultStates() {
@@ -276,12 +266,12 @@ public class ZupTerrainExample extends ExampleBase {
     cs.setCullFace(CullState.Face.Back);
     _root.setRenderState(cs);
 
-    // final FogState fs = new FogState();
-    // fs.setStart(farPlane / 2.0f);
-    // fs.setEnd(farPlane);
-    // fs.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
-    // fs.setDensityFunction(DensityFunction.Linear);
-    // _root.setRenderState(fs);
+    // final FogParams fog = new FogParams();
+    // fog.setStart(farPlane / 2.0f);
+    // fog.setEnd(farPlane);
+    // fog.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+    // fog.setFunction(DensityFunction.Linear);
+    // _root.setProperty(FogParams.DefaultPropertyKey, fog);
   }
 
   /**

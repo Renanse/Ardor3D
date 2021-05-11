@@ -17,7 +17,6 @@ import com.ardor3d.extension.terrain.client.TerrainBuilder;
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
 import com.ardor3d.extension.terrain.heightmap.MidPointHeightMapGenerator;
 import com.ardor3d.extension.terrain.providers.array.ArrayTerrainDataProvider;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -30,8 +29,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.fog.FogParams;
 import com.ardor3d.renderer.material.fog.FogParams.DensityFunction;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -42,8 +39,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
-import com.ardor3d.util.GameTaskQueue;
-import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
@@ -133,19 +128,12 @@ public class ArrayTerrainExample extends ExampleBase {
 
     // Setup main camera.
     _canvas.setTitle("Terrain Example");
-    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 300, 0));
-    _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(1, 300, 1), Vector3.UNIT_Y);
-    _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(70.0,
-        (float) _canvas.getCanvasRenderer().getCamera().getWidth()
-            / _canvas.getCanvasRenderer().getCamera().getHeight(),
-        1.0f, farPlane);
-    final CanvasRenderer canvasRenderer = _canvas.getCanvasRenderer();
-    final RenderContext renderContext = canvasRenderer.getRenderContext();
-    final Renderer renderer = canvasRenderer.getRenderer();
-    GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(() -> {
-      renderer.setBackgroundColor(ColorRGBA.GRAY);
-      return null;
-    });
+    _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
+
+    final Camera cam = _canvas.getCanvasRenderer().getCamera();
+    cam.setLocation(new Vector3(0, 300, 0));
+    cam.lookAt(new Vector3(1, 300, 1), Vector3.UNIT_Y);
+    cam.setFrustumPerspective(70.0, (float) cam.getWidth() / cam.getHeight(), 1.0f, farPlane);
     _controlHandle.setMoveSpeed(200);
 
     setupDefaultStates();
@@ -160,19 +148,18 @@ public class ArrayTerrainExample extends ExampleBase {
 
     try {
       // Keep a separate camera to be able to freeze terrain update
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
-      terrainCamera = new Camera(camera);
+      terrainCamera = new Camera(cam);
 
       final int SIZE = 2048;
 
-      final MidPointHeightMapGenerator raw = new MidPointHeightMapGenerator(SIZE, 0.6f);
+      final MidPointHeightMapGenerator raw = new MidPointHeightMapGenerator(SIZE, .95f);
       raw.setHeightRange(0.2f);
       final float[] heightMap = raw.getHeightData();
 
       final TerrainDataProvider terrainDataProvider =
           new ArrayTerrainDataProvider(heightMap, SIZE, new Vector3(1, 300, 1), true);
 
-      terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).withShowDebugPanels(true).build();
+      terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).build();
       terrain.setRenderMaterial("clipmap/terrain_textured_normal_map.yaml");
 
       _root.attachChild(terrain);
@@ -187,7 +174,7 @@ public class ArrayTerrainExample extends ExampleBase {
     textNodes.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
     LightProperties.setLightReceiver(textNodes, false);
 
-    final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
+    final double infoStartY = cam.getHeight() / 2;
     for (int i = 0; i < _exampleInfo.length; i++) {
       _exampleInfo[i] = BasicText.createDefaultTextLabel("Text", "", 16);
       _exampleInfo[i].setTranslation(new Vector3(10, infoStartY - i * 20, 0));
@@ -247,22 +234,22 @@ public class ArrayTerrainExample extends ExampleBase {
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SEVEN), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX() + 500.0, camera.getLocation().getY(), camera.getLocation().getZ());
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.EIGHT), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX() - 500.0, camera.getLocation().getY(), camera.getLocation().getZ());
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NINE), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX(), camera.getLocation().getY(),
           camera.getLocation().getZ() + 1500.0);
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), (source, inputStates, tpf) -> {
-      final Camera camera = _canvas.getCanvasRenderer().getCamera();
+      final Camera camera = cam;
       camera.setLocation(camera.getLocation().getX(), camera.getLocation().getY(),
           camera.getLocation().getZ() - 1500.0);
     }));
@@ -286,9 +273,8 @@ public class ArrayTerrainExample extends ExampleBase {
   protected void setupLight() {
     final DirectionalLight dLight = new DirectionalLight();
     dLight.setEnabled(true);
-    dLight.setColor(new ColorRGBA(0.6f, 0.6f, 0.5f, 1));
+    dLight.setColor(ColorRGBA.WHITE);
     dLight.lookAt(-1, -1, -1);
-    _root.setProperty("lightDir", dLight.getWorldDirection());
     _root.attachChild(dLight);
   }
 

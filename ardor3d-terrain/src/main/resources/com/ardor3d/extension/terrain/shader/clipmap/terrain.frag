@@ -1,5 +1,6 @@
 #version 330 core
 
+@import include/phong_lighting.glsl
 @import include/alpha_test.glsl
 
 #ifdef USE_FOG
@@ -7,7 +8,8 @@
 #endif
 
 in vec2 vVertex;
-in vec3 eyeSpacePosition;
+in vec3 WorldPos;
+in vec4 ViewPos;
 
 out vec4 FragColor;
 
@@ -19,6 +21,14 @@ uniform int minLevel;
 uniform int validLevels;
 uniform int showDebug; 
 uniform vec2 sliceOffset[16];
+
+uniform vec3 cameraLoc;
+uniform ColorSurface surface;
+
+#ifdef USE_NORMAL_MAP
+uniform sampler3D normalMap;
+#endif
+uniform mat3 normalMat;
 
 @import clipmap/terrain_frag_inc.glsl
 
@@ -39,15 +49,33 @@ void main()
   
 	// lookup clip colors
     vec4 texCol = clipTexColor(diffuseMap, texCoord1, texCoord2, fadeCoord, textureSize, texelSize, showDebug);
+	vec4 color = tint * texCol;
 
-    if (!applyAlphaTest(texCol)) discard;
+#ifdef USE_NORMAL_MAP
+    vec4 normCol = clipTexColor(normalMap, texCoord1, texCoord2, fadeCoord, textureSize, texelSize, 0) * vec4(2.0) - vec4(1.0);
+    vec3 Normal = normalize(normalMat * normCol.xyz);
+#else
+    vec3 Normal = normalize(normalMat * vec3(0,1,0));
+#endif
+
+	vec3 viewDir = normalize(cameraLoc - WorldPos);
+    LightingResult lit = calcLighting(WorldPos, Normal, ViewPos.xyz/ViewPos.w, viewDir, surface);
+    
+    vec3 emissive = surface.emissive;
+    vec3 ambient = surface.ambient * lightProps.globalAmbient;
+    vec3 diffuse = surface.diffuse * lit.diffuse;
+    vec3 specular = surface.specular * lit.specular;
+    
+    color = clamp(color * vec4(emissive + ambient + diffuse + specular, surface.opacity), 0.0, 1.0);
+
+    if (!applyAlphaTest(color)) discard;
 
 #ifdef USE_FOG
-	// Calculate any fog contribution using vertex distance in eye space.
-    float dist = length(eyeSpacePosition);
+    // Calculate any fog contribution using vertex distance in eye space.
+    float dist = length(ViewPos.xyz/ViewPos.w);
     float fogAmount = calcFogAmount(abs(dist));
-    FragColor = mix(tint * texCol, fogParams.color, fogAmount);
-#else
-    FragColor = tint * texCol;
+    color = mix(color, fogParams.color, fogAmount);
 #endif
+
+    FragColor = color;
 }

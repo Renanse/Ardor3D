@@ -52,15 +52,15 @@ public class DirectionalShadowData extends AbstractShadowData {
 
   protected final BoundingSphere _frustumBoundingSphere = new BoundingSphere();
 
-  protected double _maxDistance = 100;
+  protected double _maxDistance = 200;
 
   protected int _cascades = 4;
 
-  private double _minimumCameraDistance = 1.0;
+  private double _minimumCameraDistance = 25.0;
 
   public DirectionalShadowData(final DirectionalLight light) {
     _texture = new Texture2DArray();
-    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
+    _texture.setTextureStoreFormat(TextureStoreFormat.Depth32);
     _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
     _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
 

@@ -31,7 +31,7 @@ public class SpotShadowData extends AbstractShadowData {
 
   public SpotShadowData(final SpotLight light) {
     _texture = new Texture2D();
-    _texture.setTextureStoreFormat(TextureStoreFormat.Depth);
+    _texture.setTextureStoreFormat(TextureStoreFormat.Depth32);
     _texture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
     _texture.setDepthCompareFunc(DepthTextureCompareFunc.LessThanEqual);
 

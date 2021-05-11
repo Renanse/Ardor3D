@@ -24,7 +24,7 @@ public abstract class AbstractShadowData {
   public final static int FILTER_MODE_PCF_3x3 = 1;
 
   public static final int DEFAULT_SHADOW_SIZE = 1024;
-  public static final int DEFAULT_SHADOW_DEPTH_BITS = 16;
+  public static final int DEFAULT_SHADOW_DEPTH_BITS = 32;
 
   protected transient TextureRenderer _shadowRenderer;
 
@@ -36,6 +36,9 @@ public abstract class AbstractShadowData {
   protected int _filterMode = 0;
 
   public void cleanUp() {
+    if (_texture == null || _texture.getTextureKey() == null) {
+      return;
+    }
     // TODO: properly delete from card
     // _texture.markForDelete();
     _texture = null;
@@ -78,7 +81,7 @@ public abstract class AbstractShadowData {
       _shadowRenderer.getCamera().setProjectionMode(getProjectionMode());
       _shadowRenderer.setBackgroundColor(ColorRGBA.BLACK_NO_ALPHA);
 
-      if (_texture.getTextureKey() == null) {
+      if (_texture != null && _texture.getTextureKey() == null) {
         _shadowRenderer.setupTexture(_texture);
       }
     }

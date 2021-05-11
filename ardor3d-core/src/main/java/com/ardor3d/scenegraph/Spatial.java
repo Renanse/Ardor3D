@@ -669,6 +669,9 @@ public abstract class Spatial implements Savable, Hintable {
     final var lookDir = Vector3.fetchTempInstance();
     final var rot = Matrix3.fetchTempInstance();
     try {
+      // make sure our transform is up to date
+      updateWorldTransform(false);
+
       // create vector to look at point
       lookDir.set(x, y, z).subtractLocal(getWorldTranslation());
 
