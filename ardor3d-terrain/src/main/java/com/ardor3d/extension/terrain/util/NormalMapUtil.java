@@ -41,7 +41,6 @@ public class NormalMapUtil {
       final double xGridSpacing, final double zGridSpacing) {
     int x, z;
     final Vector3 n = new Vector3();
-    final Vector3 n2 = new Vector3();
     final ByteBuffer data = ByteBuffer.allocateDirect(side * side * 3);
     final Image normalMap = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, side, side, data, null);
     for (z = 0; z < side; ++z) {

@@ -180,7 +180,7 @@ public class LightManager implements IUniformSupplier {
     if (l == null || !l.isEnabled()) {
       return 0;
     } else if (l.getType() == Light.Type.Directional) {
-      return getColorValue(l) - (l.isShadowCaster() ? 99999.0 : 0.0);
+      return getColorValue(l) + (l.isShadowCaster() ? 99999.0 : 0.0);
     } else if (l.getType() == Light.Type.Point) {
       return getValueFor((PointLight) l, val);
     } else if (l.getType() == Light.Type.Spot) {

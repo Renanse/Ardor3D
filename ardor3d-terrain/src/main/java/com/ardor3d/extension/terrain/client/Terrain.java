@@ -127,6 +127,7 @@ public class Terrain extends Node implements Pickable, Runnable {
     setProperty(ColorSurface.DefaultPropertyKey, surface);
 
     LightProperties.setShadowCaster(this, false);
+    LightProperties.setLightReceiver(this, true);
 
     try {
       _clips = new ArrayList<>();
