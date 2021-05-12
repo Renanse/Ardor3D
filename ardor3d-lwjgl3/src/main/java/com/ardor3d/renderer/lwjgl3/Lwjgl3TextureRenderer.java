@@ -123,6 +123,8 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
     final TextureRecord texRecord = record.getTextureRecord(textureId, type);
     Lwjgl3TextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
     Lwjgl3TextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
+    Lwjgl3TextureStateUtil.applyShadow(tex, texRecord, 0, record, context.getCapabilities());
+    Lwjgl3TextureStateUtil.applyBorderColor(tex, texRecord, 0, record);
 
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);

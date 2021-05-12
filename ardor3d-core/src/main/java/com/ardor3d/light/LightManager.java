@@ -178,7 +178,7 @@ public class LightManager implements IUniformSupplier {
   protected static double getValueFor(final WeakReference<Light> lref, final BoundingVolume val) {
     final Light l = lref.get();
     if (l == null || !l.isEnabled()) {
-      return 0;
+      return Double.NEGATIVE_INFINITY;
     } else if (l.getType() == Light.Type.Directional) {
       return getColorValue(l) + (l.isShadowCaster() ? 99999.0 : 0.0);
     } else if (l.getType() == Light.Type.Point) {
