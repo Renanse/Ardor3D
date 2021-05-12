@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.terrain;
 
+import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +18,8 @@ import java.util.logging.Logger;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
+import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.terrain.client.Terrain;
 import com.ardor3d.extension.terrain.client.TerrainBuilder;
 import com.ardor3d.extension.terrain.client.TerrainDataProvider;
@@ -30,10 +33,13 @@ import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.light.Light;
 import com.ardor3d.light.LightProperties;
+import com.ardor3d.light.SpotLight;
 import com.ardor3d.light.shadow.DirectionalShadowData;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.material.fog.FogParams;
 import com.ardor3d.renderer.material.fog.FogParams.DensityFunction;
@@ -41,10 +47,12 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Cone;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
@@ -61,25 +69,28 @@ public class ShadowedTerrainExample extends ExampleBase {
   /** The Constant logger. */
   private static final Logger logger = Logger.getLogger(ShadowedTerrainExample.class.getName());
 
-  private boolean updateTerrain = true;
-  private final float farPlane = 2500.0f;
+  private boolean _updateTerrain = true;
+  private final float _farPlane = 2500.0f;
 
-  private Terrain terrain;
+  private Terrain _terrain;
 
-  private final Sphere sphere = new Sphere("sp", 16, 16, 1);
-  private final Ray3 pickRay = new Ray3();
+  private final Sphere _sphere = new Sphere("sp", 16, 16, 1);
+  private final Ray3 _pickRay = new Ray3();
 
-  private boolean groundCamera = false;
-  private Camera terrainCamera;
+  private boolean _groundCamera = true;
+  private Camera _terrainCamera;
 
   /** Text fields used to present info about the example. */
   private final BasicText _exampleInfo[] = new BasicText[5];
 
-  private DirectionalLight dl;
-
   private final static int SPLITS = 6;
   private final static int QUAD_SIZE = 128;
-  private final Quad _orthoQuad[] = new Quad[SPLITS];
+  protected final Quad _orthoQuad[] = new Quad[SPLITS];
+
+  private Node _light1;
+  private Node _rover;
+
+  private final Vector3 roverLoc = new Vector3(433, 30, 575);
 
   public static void main(final String[] args) {
     ExampleBase._minDepthBits = 24;
@@ -91,28 +102,28 @@ public class ShadowedTerrainExample extends ExampleBase {
     final Camera camera = _canvas.getCanvasRenderer().getCamera();
 
     // Make sure camera is above terrain
-    final double height = terrain.getHeightAt(camera.getLocation().getX(), camera.getLocation().getZ());
-    if (height > -Float.MAX_VALUE && (groundCamera || camera.getLocation().getY() < height + 3)) {
+    final double height = _terrain.getHeightAt(camera.getLocation().getX(), camera.getLocation().getZ());
+    if (height > -Float.MAX_VALUE && (_groundCamera || camera.getLocation().getY() < height + 3)) {
       camera.setLocation(new Vector3(camera.getLocation().getX(), height + 3, camera.getLocation().getZ()));
     }
 
-    if (updateTerrain) {
-      terrainCamera.set(camera);
+    if (_updateTerrain) {
+      _terrainCamera.set(camera);
     }
 
     // if we're picking...
-    if (sphere.getSceneHints().getCullHint() == CullHint.Dynamic) {
+    if (_sphere.getSceneHints().getCullHint() == CullHint.Dynamic) {
       // Set up our pick ray
-      pickRay.setOrigin(camera.getLocation());
-      pickRay.setDirection(camera.getDirection());
+      _pickRay.setOrigin(camera.getLocation());
+      _pickRay.setDirection(camera.getDirection());
 
       // do pick and move the sphere
       final PrimitivePickResults pickResults = new PrimitivePickResults();
       pickResults.setCheckDistance(true);
-      PickingUtil.findPick(_root, pickRay, pickResults);
+      PickingUtil.findPick(_root, _pickRay, pickResults);
       if (pickResults.getNumber() != 0) {
         final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-        sphere.setTranslation(intersectionPoint);
+        _sphere.setTranslation(intersectionPoint);
         // XXX: maybe change the color of the ball for valid vs. invalid?
       }
     }
@@ -126,20 +137,20 @@ public class ShadowedTerrainExample extends ExampleBase {
     _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
 
     final Camera cam = _canvas.getCanvasRenderer().getCamera();
-    cam.setLocation(new Vector3(440, 215, 275));
-    cam.lookAt(new Vector3(450, 140, 360), Vector3.UNIT_Y);
-    cam.setFrustumPerspective(70.0, (float) cam.getWidth() / cam.getHeight(), 1.0f, farPlane);
-    _controlHandle.setMoveSpeed(200);
+    cam.setLocation(new Vector3(425, 34, 584));
+    cam.lookAt(new Vector3(roverLoc), cam.getUp());
+    cam.setFrustumPerspective(70.0, (float) cam.getWidth() / cam.getHeight(), 1.0f, _farPlane);
+    _controlHandle.setMoveSpeed(10);
 
     setupDefaultStates();
 
-    sphere.getSceneHints().setAllPickingHints(false);
-    sphere.getSceneHints().setCullHint(CullHint.Always);
-    _root.attachChild(sphere);
+    _sphere.getSceneHints().setAllPickingHints(false);
+    _sphere.getSceneHints().setCullHint(CullHint.Always);
+    _root.attachChild(_sphere);
 
     try {
       // Keep a separate camera to be able to freeze terrain update
-      terrainCamera = new Camera(cam);
+      _terrainCamera = new Camera(cam);
 
       final int SIZE = 2048;
 
@@ -150,10 +161,10 @@ public class ShadowedTerrainExample extends ExampleBase {
       final TerrainDataProvider terrainDataProvider =
           new ArrayTerrainDataProvider(heightMap, SIZE, new Vector3(1, 300, 1), true);
 
-      terrain = new TerrainBuilder(terrainDataProvider, terrainCamera).build();
-      terrain.setRenderMaterial("clipmap/terrain_textured_normal_map.yaml");
+      _terrain = new TerrainBuilder(terrainDataProvider, _terrainCamera).build();
+      _terrain.setRenderMaterial("clipmap/terrain_textured_normal_map.yaml");
 
-      _root.attachChild(terrain);
+      _root.attachChild(_terrain);
     } catch (final Exception e) {
       logger.log(Level.SEVERE, "Problem setting up terrain...", e);
       System.exit(1);
@@ -161,6 +172,8 @@ public class ShadowedTerrainExample extends ExampleBase {
 
     final Node occluders = setupOccluders();
     _root.attachChild(occluders);
+
+    addRover();
 
     // Setup labels for presenting example info.
     final Node textNodes = new Node("Text");
@@ -178,7 +191,7 @@ public class ShadowedTerrainExample extends ExampleBase {
     updateText();
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.U), (source, inputStates, tpf) -> {
-      updateTerrain = !updateTerrain;
+      _updateTerrain = !_updateTerrain;
       updateText();
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE), (source, inputStates, tpf) -> {
@@ -199,28 +212,28 @@ public class ShadowedTerrainExample extends ExampleBase {
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), (source, inputStates, tpf) -> {
-      groundCamera = !groundCamera;
+      _groundCamera = !_groundCamera;
       updateText();
     }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.P), (source, inputStates, tpf) -> {
-      if (sphere.getSceneHints().getCullHint() == CullHint.Dynamic) {
-        sphere.getSceneHints().setCullHint(CullHint.Always);
-      } else if (sphere.getSceneHints().getCullHint() == CullHint.Always) {
-        sphere.getSceneHints().setCullHint(CullHint.Dynamic);
+      if (_sphere.getSceneHints().getCullHint() == CullHint.Dynamic) {
+        _sphere.getSceneHints().setCullHint(CullHint.Always);
+      } else if (_sphere.getSceneHints().getCullHint() == CullHint.Always) {
+        _sphere.getSceneHints().setCullHint(CullHint.Dynamic);
       }
       updateText();
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), (source, inputStates, tpf) -> {
-      terrain.getTextureClipmap().setShowDebug(!terrain.getTextureClipmap().isShowDebug());
+      _terrain.getTextureClipmap().setShowDebug(!_terrain.getTextureClipmap().isShowDebug());
       updateText();
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.FIVE), (source, inputStates, tpf) -> {
-      terrain.getTextureClipmap().setPixelDensity(terrain.getTextureClipmap().getPixelDensity() / 2);
+      _terrain.getTextureClipmap().setPixelDensity(_terrain.getTextureClipmap().getPixelDensity() / 2);
       updateText();
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SIX), (source, inputStates, tpf) -> {
-      terrain.getTextureClipmap().setPixelDensity(terrain.getTextureClipmap().getPixelDensity() * 2);
+      _terrain.getTextureClipmap().setPixelDensity(_terrain.getTextureClipmap().getPixelDensity() * 2);
       updateText();
     }));
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), (source, inputStates, tpf) -> {
@@ -260,36 +273,85 @@ public class ShadowedTerrainExample extends ExampleBase {
     _root.setRenderState(cs);
 
     final FogParams fog = new FogParams();
-    fog.setStart(farPlane / 2.0f);
-    fog.setEnd(farPlane);
+    fog.setStart(_farPlane / 2.0f);
+    fog.setEnd(_farPlane);
     fog.setColor(new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
     fog.setFunction(DensityFunction.Linear);
     _root.setProperty(FogParams.DefaultPropertyKey, fog);
   }
 
+  private Spatial addRover() {
+    try {
+      final ColladaStorage storage = new ColladaImporter().load("collada/sketchup/NASA Mars Rover.dae");
+      _rover = storage.getScene();
+      _rover.setScale(1);
+      _rover.setRotation(new Quaternion().fromAngleAxis(-MathUtils.HALF_PI, Vector3.UNIT_X));
+
+      final Node roverRoot = new Node("rover_root");
+      roverRoot.setTranslation(roverLoc);
+      roverRoot.addController((time, caller) -> {
+        final var roverWLoc = caller.getWorldTranslation();
+        final var roverLoc = caller.getTranslation();
+        final double height = _terrain.getHeightAt(roverWLoc.getX(), roverWLoc.getZ());
+        caller.setTranslation(roverLoc.getX(), height, roverLoc.getZ());
+      });
+      roverRoot.attachChild(_rover);
+      _root.attachChild(roverRoot);
+
+      _light1 = new Node("light1");
+      roverRoot.attachChild(_light1);
+      _light1.setTranslation(-1.9, 3.3, 5);
+      _root.updateWorldTransform(true);
+      _light1.lookAt(430, -20, 20);
+
+      final Cone c1 = new Cone("c1", 4, 16, .125, .25);
+      LightProperties.setLightReceiver(c1, false);
+      c1.setRenderMaterial("unlit/untextured/basic.yaml");
+      _light1.attachChild(c1);
+
+      final SpotLight spot1 = new SpotLight();
+      spot1.setIntensity(1.0f);
+      spot1.setAngle((float) (30f * MathUtils.DEG_TO_RAD));
+      spot1.setInnerAngle((float) (27f * MathUtils.DEG_TO_RAD));
+      spot1.setColor(ColorRGBA.WHITE);
+      spot1.setShadowCaster(true);
+      spot1.setRange(400);
+      c1.setDefaultColor(spot1.getColor());
+      _light1.attachChild(spot1);
+
+    } catch (final IOException ex) {
+      ex.printStackTrace();
+    }
+
+    return _rover;
+  }
+
   @Override
   protected void setupLight() {
-    dl = new DirectionalLight();
+    final var dl = new DirectionalLight();
     dl.setEnabled(true);
     dl.setColor(ColorRGBA.WHITE);
     dl.setIntensity(1.0f);
     dl.setTranslation(280, 118, 544);
-    dl.lookAt(305, 100, 545);
+    dl.lookAt(305, 100, 610);
     _root.attachChild(dl);
 
     // shadow params - have to play around a bit to get it looking nice for your scene
     dl.setShadowCaster(true);
-    dl.getShadowData().setBias(0.01f);
     dl.getShadowData().setCascades(SPLITS);
+
+    dl.getShadowData().setBias(0.004f);
+    dl.getShadowData().setLambda(.6f);
+    dl.getShadowData().setMinimumCameraDistance(200);
+    dl.getShadowData().setMaxDistance(400);
+
     dl.getShadowData().setTextureSize(1024);
     dl.getShadowData().setTextureDepthBits(32);
-    dl.getShadowData().setMinimumCameraDistance(500);
-    dl.getShadowData().setMaxDistance(farPlane);
 
-    for (int i = 0; i < SPLITS; i++) {
-      _orthoQuad[i] = makeDebugQuad(dl, i);
-      _orthoQuad[i].setTranslation(i * 10 + (i * 2 + 1) * QUAD_SIZE / 2, 10 + QUAD_SIZE / 2, 0);
-    }
+    // for (int i = 0; i < SPLITS; i++) {
+    // _orthoQuad[i] = makeDebugQuad(dl, i);
+    // _orthoQuad[i].setTranslation(i * 10 + (i * 2 + 1) * QUAD_SIZE / 2, 10 + QUAD_SIZE / 2, 0);
+    // }
   }
 
   private Quad makeDebugQuad(final Light light, final int i) {
@@ -317,8 +379,8 @@ public class ShadowedTerrainExample extends ExampleBase {
    */
   private void updateText() {
     _exampleInfo[0].setText("[1/2/3] Moving speed: " + _controlHandle.getMoveSpeed() * 3.6 + "km/h");
-    _exampleInfo[1].setText("[P] Do picking: " + (sphere.getSceneHints().getCullHint() == CullHint.Dynamic));
-    _exampleInfo[2].setText("[SPACE] Toggle fly/walk: " + (groundCamera ? "walk" : "fly"));
-    _exampleInfo[3].setText("[U] Freeze terrain(debug): " + !updateTerrain);
+    _exampleInfo[1].setText("[P] Do picking: " + (_sphere.getSceneHints().getCullHint() == CullHint.Dynamic));
+    _exampleInfo[2].setText("[SPACE] Toggle fly/walk: " + (_groundCamera ? "walk" : "fly"));
+    _exampleInfo[3].setText("[U] Freeze terrain(debug): " + !_updateTerrain);
   }
 }
