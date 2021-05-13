@@ -9,7 +9,8 @@
 #define USE_BLINN_PHONG true
 #endif
 
-const vec3 pointSampleOffsetDirections[20] = vec3[]
+#define POINT_SAMPLE_DIR_LENGTH 20
+const vec3 pointSampleOffsetDirections[POINT_SAMPLE_DIR_LENGTH] = vec3[]
 (
    vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
    vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
@@ -18,7 +19,8 @@ const vec3 pointSampleOffsetDirections[20] = vec3[]
    vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
 );
 
-const vec2 sampleOffsetDirections[8] = vec2[]
+#define SHADOW_SAMPLE_DIR_LENGTH 8
+const vec2 sampleOffsetDirections[SHADOW_SAMPLE_DIR_LENGTH] = vec2[]
 (
    vec2( 1,  1), vec2( -1,  1),
    vec2( 1,  -1), vec2( -1,  -1),
@@ -70,8 +72,8 @@ const int mode, const vec3 projCoords, const float compare)
     // 3x3 sampling
     if (mode == 1) {
         float shadowFactor = 0.0;
-        const float inc = 1.0 / textureSize(shadowTex, 0).x;
-        const float samples = sampleOffsetDirections.length;
+        float inc = 1.0 / textureSize(shadowTex, 0).x;
+        const float samples = SHADOW_SAMPLE_DIR_LENGTH;
         for (int i = 0; i < samples; i++) {
             shadowFactor += texture(shadowTex, vec4(projCoords.xy + sampleOffsetDirections[i] * inc, layer, compare)); 
         }
@@ -87,8 +89,8 @@ float calcSpotShadowFactor(const sampler2DShadow shadowTex, const int mode, cons
     // 3x3 sampling
     if (mode == 1) {
         float shadowFactor = 0.0;
-        const float inc = 1.0 / textureSize(shadowTex, 0).x;
-        const float samples = sampleOffsetDirections.length;
+        float inc = 1.0 / textureSize(shadowTex, 0).x;
+        const float samples = SHADOW_SAMPLE_DIR_LENGTH;
         for (int i = 0; i < samples; i++) {
             shadowFactor += texture(shadowTex, vec3(projCoords.xy + sampleOffsetDirections[i] * inc, compare)); 
         }
@@ -105,7 +107,7 @@ float calcPointShadowFactor(const samplerCubeShadow shadowTex, const int mode, c
     if (mode == 1) {
         float shadowFactor = 0.0;
         const float inc = 0.05;
-        const float samples = pointSampleOffsetDirections.length;
+        const float samples = POINT_SAMPLE_DIR_LENGTH;
         for (int i = 0; i < samples; i++) {
             shadowFactor += texture(shadowTex, vec4(fragToLight.xyz + pointSampleOffsetDirections[i] * inc, compare)); 
         }

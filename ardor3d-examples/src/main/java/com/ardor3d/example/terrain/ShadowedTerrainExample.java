@@ -354,6 +354,7 @@ public class ShadowedTerrainExample extends ExampleBase {
     // }
   }
 
+  @SuppressWarnings("unused")
   private Quad makeDebugQuad(final Light light, final int i) {
     final Quad quad = new Quad("fsq", QUAD_SIZE, QUAD_SIZE);
     quad.setProperty(DirectionalShadowData.KEY_DebugSplit, i);
