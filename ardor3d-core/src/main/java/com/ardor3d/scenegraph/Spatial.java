@@ -670,10 +670,15 @@ public abstract class Spatial implements Savable, Hintable {
     final var rot = Matrix3.fetchTempInstance();
     try {
       // make sure our transform is up to date
-      updateWorldTransform(false);
+      updateWorldTransformToRoot();
 
       // create vector to look at point
       lookDir.set(x, y, z).subtractLocal(getWorldTranslation());
+
+      // rotate our lookDir by the parent rotation, if any
+      if (_parent != null) {
+        _parent.getWorldTransform().applyForwardVector(lookDir);
+      }
 
       // create and apply rotational matrix
       rot.lookAt(lookDir, worldUp);
@@ -861,6 +866,18 @@ public abstract class Spatial implements Savable, Hintable {
       _worldTransform.set(_localTransform);
     }
     clearDirty(DirtyType.Transform);
+  }
+
+  /**
+   * Ensure our
+   */
+  protected void updateWorldTransformToRoot() {
+    if (_parent != null) {
+      _parent.updateWorldTransformToRoot();
+      _parent._worldTransform.multiply(_localTransform, _worldTransform);
+    } else {
+      _worldTransform.set(_localTransform);
+    }
   }
 
   /**

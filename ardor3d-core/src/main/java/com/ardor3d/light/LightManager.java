@@ -21,7 +21,6 @@ import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.image.Texture;
 import com.ardor3d.light.Light.Type;
 import com.ardor3d.light.shadow.DirectionalShadowData;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -46,12 +45,8 @@ public class LightManager implements IUniformSupplier {
   public static int FIRST_SHADOW_INDEX = 8;
   public static int MAX_LIGHTS = 8;
 
-  public static ReadOnlyColorRGBA DEFAULT_GLOBAL_AMBIENT = new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f);
-
   protected LightComparator lightComparator = new LightComparator();
   protected List<WeakReference<Light>> _lightRefs = new ArrayList<>();
-
-  protected ColorRGBA _globalAmbient = new ColorRGBA(LightManager.DEFAULT_GLOBAL_AMBIENT);
 
   protected final List<UniformRef> _cachedUniforms = new ArrayList<>();
 
@@ -66,7 +61,7 @@ public class LightManager implements IUniformSupplier {
     }
 
     _cachedUniforms.add(new UniformRef("globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
-        Ardor3dStateProperty.GlobalAmbientLight, null, LightManager.DEFAULT_GLOBAL_AMBIENT));
+        Ardor3dStateProperty.GlobalAmbientLight));
 
     _cachedUniforms.add(new UniformRef("dirShadowLight", UniformType.UniformSupplier, UniformSource.Ardor3dState,
         Ardor3dStateProperty.Light, -1, null));
@@ -228,12 +223,6 @@ public class LightManager implements IUniformSupplier {
   protected static double strength(final ReadOnlyColorRGBA color) {
     return Math.sqrt(
         color.getRed() * color.getRed() + color.getGreen() * color.getGreen() + color.getBlue() * color.getBlue());
-  }
-
-  public ReadOnlyColorRGBA getGlobalAmbient() { return _globalAmbient; }
-
-  public void setGlobalAmbient(final ReadOnlyColorRGBA color) {
-    _globalAmbient.set(color);
   }
 
   public void renderShadowMaps(final Renderer renderer, final SceneIndexer indexer) {

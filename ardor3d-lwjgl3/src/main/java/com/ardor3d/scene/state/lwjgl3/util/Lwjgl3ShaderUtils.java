@@ -37,6 +37,7 @@ import org.lwjgl.system.MemoryStack;
 import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.light.LightManager;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Quaternion;
@@ -651,19 +652,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
       }
 
       case GlobalAmbientLight: {
-        final SceneIndexer indexer = SceneIndexer.getCurrent();
-        final LightManager lm = indexer != null ? indexer.getLightManager() : null;
-
-        final ReadOnlyColorRGBA color = lm != null ? lm.getGlobalAmbient() : LightManager.DEFAULT_GLOBAL_AMBIENT;
-        if (color != null) {
-          final FloatBuffer buffer = stack.mallocFloat(3);
-          buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
-          buffer.rewind();
-          return buffer;
-        } else if (defaultValue != null) {
-          return getBuffer(UniformType.Float3, defaultValue, stack);
-        }
-        break;
+        final ReadOnlyColorRGBA color = LightProperties.getAmbientLightColor(mesh);
+        final FloatBuffer buffer = stack.mallocFloat(3);
+        buffer.put(color.getRed()).put(color.getGreen()).put(color.getBlue());
+        buffer.rewind();
+        return buffer;
       }
 
       default:

@@ -10,6 +10,8 @@
 
 package com.ardor3d.light;
 
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Spatial;
 
 public final class LightProperties {
@@ -28,6 +30,14 @@ public final class LightProperties {
 
   public static boolean DefaultCastsShadows = true;
 
+  /**
+   * Spatial property indicating the ambient light color. Should be mapped to a ReadOnlyColorRGBA.
+   * Generally, this would be set at the root node and inherited by children.
+   */
+  public static final String KEY_AmbientLightColor = "_ambientLightColor";
+
+  public static ReadOnlyColorRGBA DefaultAmbientColor = new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f);
+
   private LightProperties() {}
 
   public static boolean isLightReceiver(final Spatial spat) {
@@ -44,5 +54,13 @@ public final class LightProperties {
 
   public static void setShadowCaster(final Spatial spat, final boolean castsShadow) {
     spat.setProperty(LightProperties.KEY_CastsShadows, castsShadow);
+  }
+
+  public static ReadOnlyColorRGBA getAmbientLightColor(final Spatial spat) {
+    return spat.getProperty(LightProperties.KEY_AmbientLightColor, LightProperties.DefaultAmbientColor);
+  }
+
+  public static void setAmbientLightColor(final Spatial spat, final ReadOnlyColorRGBA color) {
+    spat.setProperty(LightProperties.KEY_AmbientLightColor, color);
   }
 }

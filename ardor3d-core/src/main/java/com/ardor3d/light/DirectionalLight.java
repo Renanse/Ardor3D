@@ -64,8 +64,31 @@ public class DirectionalLight extends Light {
    */
   public ReadOnlyVector3 getWorldDirection() { return _worldDirection; }
 
-  @Override
-  public DirectionalShadowData getShadowData() { return _shadowData; }
+  /**
+   * Convenience method for setting this light's rotation such that the forward vector points at the
+   * given direction in world coordinate space. Assumes Y axis is up, which in most cases has no
+   * impact.
+   *
+   * @param direction
+   */
+  public void setWorldDirection(final ReadOnlyVector3 direction) {
+    setWorldDirection(direction.getX(), direction.getY(), direction.getZ());
+  }
+
+  /**
+   * Convenience method for setting this light's rotation such that the forward vector points at the
+   * given direction in world coordinate space. Assumes Y axis is up, which in most cases has no
+   * impact.
+   *
+   * @param x
+   * @param y
+   * @param z
+   */
+  public void setWorldDirection(final double x, final double y, final double z) {
+    updateWorldTransformToRoot();
+    _worldDirection.set(_worldTransform.getTranslation()).addLocal(x, y, z);
+    lookAt(_worldDirection.getX(), _worldDirection.getY(), _worldDirection.getZ());
+  }
 
   @Override
   public void updateWorldTransform(final boolean recurse) {
@@ -73,6 +96,9 @@ public class DirectionalLight extends Light {
     _worldDirection.set(Vector3.UNIT_Z);
     getWorldTransform().applyForwardVector(_worldDirection);
   }
+
+  @Override
+  public DirectionalShadowData getShadowData() { return _shadowData; }
 
   @Override
   public void applyDefaultUniformValues() {
