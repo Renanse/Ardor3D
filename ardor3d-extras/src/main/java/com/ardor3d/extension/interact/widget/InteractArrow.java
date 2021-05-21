@@ -12,6 +12,7 @@ package com.ardor3d.extension.interact.widget;
 
 import java.io.IOException;
 
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.shape.Arrow;
@@ -45,6 +46,7 @@ public class InteractArrow extends Arrow {
   public InteractArrow(final String name, final double length, final double width, final double lengthGap,
     final double tipGap) {
     super(name);
+    LightProperties.setLightReceiver(this, false);
     _length = length;
     _width = width;
     _lengthGap = lengthGap;

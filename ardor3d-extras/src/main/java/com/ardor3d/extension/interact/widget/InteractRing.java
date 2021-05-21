@@ -13,9 +13,10 @@ package com.ardor3d.extension.interact.widget;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
-import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
@@ -48,6 +49,7 @@ public class InteractRing extends Mesh {
     _tessSteps = tessSteps;
     _concaveValue = concaveValue;
     setRadius(radius, width);
+    LightProperties.setLightReceiver(this, false);
   }
 
   public void setRadius(final float radius, final float width) {

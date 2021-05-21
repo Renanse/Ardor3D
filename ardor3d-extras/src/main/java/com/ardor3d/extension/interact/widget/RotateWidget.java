@@ -18,6 +18,7 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
@@ -56,6 +57,7 @@ public class RotateWidget extends AbstractInteractWidget {
 
   public RotateWidget() {
     _handle = new Node("rotationHandle");
+    LightProperties.setLightReceiver(_handle, false);
 
     final ZBufferState zstate = new ZBufferState();
     zstate.setFunction(TestFunction.LessThanOrEqualTo);

@@ -21,6 +21,7 @@ import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PrimitiveKey;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
@@ -52,6 +53,7 @@ public class MoveMultiPlanarWidget extends AbstractInteractWidget {
 
   public MoveMultiPlanarWidget(final double extent) {
     _handle = new Node("moveHandle");
+    LightProperties.setLightReceiver(_handle, false);
 
     final BlendState blend = new BlendState();
     blend.setBlendEnabled(true);

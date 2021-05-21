@@ -17,6 +17,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.mouse.MouseState;
+import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Transform;
@@ -50,6 +51,7 @@ public class MovePlanarWidget extends AbstractInteractWidget {
 
   public MovePlanarWidget() {
     _handle = new Node("moveHandle");
+    LightProperties.setLightReceiver(_handle, false);
 
     final BlendState blend = new BlendState();
     blend.setBlendEnabled(true);
