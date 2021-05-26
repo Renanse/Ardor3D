@@ -34,7 +34,7 @@ vec3 calcDiffuse(const Light light, const vec3 lightDir, const vec3 worldNormal)
     return light.color * light.intensity * NdotL; 
 }
 
-vec3 calcSpecular(Light light, const ColorSurface surface, const vec3 viewDir, const vec3 lightDir, const vec3 worldNormal)
+vec3 calcSpecular(const Light light, const ColorSurface surface, const vec3 viewDir, const vec3 lightDir, const vec3 worldNormal)
 {
 #if USE_BLINN_PHONG
 	    // blinn phong

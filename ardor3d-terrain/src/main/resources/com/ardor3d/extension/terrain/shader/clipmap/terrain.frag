@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 @import include/phong_lighting.glsl
 @import include/alpha_test.glsl
