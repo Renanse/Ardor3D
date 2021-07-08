@@ -127,7 +127,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
   }
 
   @Override
-  public float getHeight(final int x, final int z) {
+  public float getHeight(final int x, final int z, final boolean tryParentCache) {
     int tileX = MathUtils.floor((float) x / tileSize);
     int tileY = MathUtils.floor((float) z / tileSize);
     final CacheData tileData;
@@ -148,11 +148,11 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     tileData = cache[tileX][tileY];
 
     if (tileData == null || !tileData.isValid) {
-      if (parentCache != null) {
+      if (tryParentCache && parentCache != null) {
         if (x % 2 == 0 && z % 2 == 0) {
-          return parentCache.getHeight(x / 2, z / 2);
+          return parentCache.getHeight(x / 2, z / 2, tryParentCache);
         } else {
-          return parentCache.getSubHeight(x / 2f, z / 2f);
+          return parentCache.getSubHeight(x / 2f, z / 2f, tryParentCache);
         }
       } else {
         return terrainConfiguration.getHeightRangeMin();
@@ -173,7 +173,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
   }
 
   @Override
-  public float getSubHeight(final float x, final float z) {
+  public float getSubHeight(final float x, final float z, final boolean tryParentCache) {
     int tileX = MathUtils.floor(x / tileSize);
     int tileY = MathUtils.floor(z / tileSize);
 
@@ -189,8 +189,8 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     }
 
     if (tileData == null || !tileData.isValid) {
-      if (parentCache != null) {
-        return parentCache.getSubHeight(x / 2f, z / 2f);
+      if (tryParentCache && parentCache != null) {
+        return parentCache.getSubHeight(x / 2f, z / 2f, tryParentCache);
       } else {
         return terrainConfiguration.getHeightRangeMin();
       }
@@ -204,10 +204,10 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
       final double col1 = col + 1;
       final double row1 = row + 1;
 
-      final double topLeft = getHeight((int) col, (int) row);
-      final double topRight = getHeight((int) col1, (int) row);
-      final double bottomLeft = getHeight((int) col, (int) row1);
-      final double bottomRight = getHeight((int) col1, (int) row1);
+      final double topLeft = getHeight((int) col, (int) row, tryParentCache);
+      final double topRight = getHeight((int) col1, (int) row, tryParentCache);
+      final double bottomLeft = getHeight((int) col, (int) row1, tryParentCache);
+      final double bottomRight = getHeight((int) col1, (int) row1, tryParentCache);
 
       return (float) MathUtils.lerp(intOnZ, MathUtils.lerp(intOnX, topLeft, topRight),
           MathUtils.lerp(intOnX, bottomLeft, bottomRight));
@@ -222,7 +222,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
       for (int x = 0; x < 2; x++) {
         final int currentX = sourceX + x;
 
-        final float cacheHeight = getHeight(currentX, currentZ);
+        final float cacheHeight = getHeight(currentX, currentZ, true);
 
         final int indexDest = z * 8 + x * 4;
         destinationData[indexDest + 0] = currentX * vertexDistance - eyePos.getXf(); // x
@@ -239,7 +239,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
           final boolean onGridZ = currentZ % 2 == 0;
 
           if (onGridX && onGridZ) {
-            final float coarseHeight = parentCache.getHeight(coarseX1, coarseZ1);
+            final float coarseHeight = parentCache.getHeight(coarseX1, coarseZ1, true);
             destinationData[indexDest + 3] = coarseHeight; // w
           } else {
             int coarseX2 = coarseX1;
@@ -253,8 +253,8 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
               coarseZ1++;
             }
 
-            final float coarser1 = parentCache.getHeight(coarseX1, coarseZ1);
-            final float coarser2 = parentCache.getHeight(coarseX2, coarseZ2);
+            final float coarser1 = parentCache.getHeight(coarseX1, coarseZ1, true);
+            final float coarser2 = parentCache.getHeight(coarseX2, coarseZ2, true);
 
             // Apply the median of the coarser heightvalues to the W
             // value
@@ -273,7 +273,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
       for (int x = 0; x < width; x++) {
         final int currentX = sourceX + x;
 
-        final float cacheHeight = getHeight(currentX, currentZ);
+        final float cacheHeight = getHeight(currentX, currentZ, true);
 
         final int destX = MathUtils.moduloPositive(currentX, destinationSize);
         final int destY = MathUtils.moduloPositive(currentZ, destinationSize);
@@ -293,7 +293,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
           final boolean onGridZ = currentZ % 2 == 0;
 
           if (onGridX && onGridZ) {
-            final float coarseHeight = parentCache.getHeight(coarseX1, coarseZ1);
+            final float coarseHeight = parentCache.getHeight(coarseX1, coarseZ1, true);
             destinationData.put(indexDest + 3, coarseHeight); // w
           } else {
             int coarseX2 = coarseX1;
@@ -307,8 +307,8 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
               coarseZ1++;
             }
 
-            final float coarser1 = parentCache.getHeight(coarseX1, coarseZ1);
-            final float coarser2 = parentCache.getHeight(coarseX2, coarseZ2);
+            final float coarser1 = parentCache.getHeight(coarseX1, coarseZ1, true);
+            final float coarser2 = parentCache.getHeight(coarseX2, coarseZ2, true);
 
             // Apply the median of the coarser heightvalues to the W
             // value

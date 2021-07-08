@@ -39,7 +39,7 @@ public interface TerrainCache {
    *          local z position to get height from
    * @return height at position
    */
-  float getHeight(int x, int z);
+  float getHeight(int x, int z, boolean tryParentCache);
 
   /**
    * Calculates, via LERP, the height at a given grid position. If the cache does not have a valid
@@ -49,10 +49,11 @@ public interface TerrainCache {
    *          local, fractional x position to interpolate data from.
    * @param z
    *          local, fractional z position to interpolate data from.
+   * @param tryParentCache
    * @return height at position, linearly interpolated from the surrounding 4 grid points as pulled by
    *         getHeight.
    */
-  float getSubHeight(float x, float z);
+  float getSubHeight(float x, float z, boolean tryParentCache);
 
   /**
    * Update destinationData from cache in specified region

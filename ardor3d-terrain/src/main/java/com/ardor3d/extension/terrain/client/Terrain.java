@@ -606,9 +606,28 @@ public class Terrain extends Node implements Pickable, Runnable {
    * @return the height, in world coordinate
    */
   public float getHeightAt(final double x, final double z) {
+    return getHeightAt(x, z, 0, true);
+  }
+
+  /**
+   * Get height of the terrain at the given world coordinates from the given clip level.
+   *
+   * @param x
+   *          world x-coordinate
+   * @param z
+   *          world z-coordinate
+   * @param clipLevel
+   *          clip level to start our check at
+   * @param tryParentCache
+   *          if true and the requested clip level is not available, we will ask the next coarser
+   *          level
+   * @return the height, in world coordinate
+   */
+  public float getHeightAt(final double x, final double z, final int clipLevel, final boolean tryParentCache) {
     final Vector3 heightCalc = new Vector3(x, 0, z);
     worldToLocal(heightCalc, heightCalc);
-    final float height = getClipmaps().get(0).getCache().getSubHeight(heightCalc.getXf(), heightCalc.getZf());
+    final float height =
+        getClipmaps().get(clipLevel).getCache().getSubHeight(heightCalc.getXf(), heightCalc.getZf(), tryParentCache);
     heightCalc.set(x, height, z);
     localToWorld(heightCalc, heightCalc);
     return heightCalc.getYf();
