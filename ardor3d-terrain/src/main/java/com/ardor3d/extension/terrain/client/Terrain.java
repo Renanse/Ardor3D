@@ -625,11 +625,23 @@ public class Terrain extends Node implements Pickable, Runnable {
    */
   public float getHeightAt(final double x, final double z, final int clipLevel, final boolean tryParentCache) {
     final Vector3 heightCalc = new Vector3(x, 0, z);
-    worldToLocal(heightCalc, heightCalc);
+
+    // don't use worldToLocal because we don't want rotations to have any affect on things
+    // - assumes scale is not part of matrix
+    // worldToLocal(heightCalc, heightCalc);
+    heightCalc.subtractLocal(getWorldTranslation());
+    heightCalc.divideLocal(getWorldScale());
+
     final float height =
         getClipmaps().get(clipLevel).getCache().getSubHeight(heightCalc.getXf(), heightCalc.getZf(), tryParentCache);
     heightCalc.set(x, height, z);
-    localToWorld(heightCalc, heightCalc);
+
+    // don't use localToWorld because we don't want rotations to have any affect on things
+    // - assumes scale is not part of matrix
+    // localToWorld(heightCalc, heightCalc);
+    heightCalc.multiplyLocal(getWorldScale());
+    heightCalc.addLocal(getWorldTranslation());
+
     return heightCalc.getYf();
   }
 
