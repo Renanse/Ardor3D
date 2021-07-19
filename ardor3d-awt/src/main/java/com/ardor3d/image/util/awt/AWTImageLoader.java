@@ -11,17 +11,15 @@
 package com.ardor3d.image.util.awt;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.RenderableImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferFloat;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferShort;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -31,14 +29,12 @@ import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.loader.ImageLoader;
 import com.ardor3d.image.loader.ImageLoaderUtil;
-import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.util.Ardor3dException;
 
 /**
  * Image loader that makes use of AWT's ImageIO to load image file data.
  */
 public class AWTImageLoader implements ImageLoader {
-  private static final Logger logger = Logger.getLogger(AWTImageLoader.class.getName());
-
   private static boolean createOnHeap = false;
 
   private static String[] supportedFormats;
@@ -74,77 +70,180 @@ public class AWTImageLoader implements ImageLoader {
       return null;
     }
 
-    final boolean hasAlpha = image.getColorModel().hasAlpha();
-    final boolean grayscale = image.getColorModel().getNumComponents() == 1;
-    BufferedImage tex;
+    final var dataBuffer = image.getRaster().getDataBuffer();
 
-    if (flipImage || ((image).getType() != BufferedImage.TYPE_BYTE_GRAY
-        && (hasAlpha ? (image).getType() != BufferedImage.TYPE_4BYTE_ABGR
-            : (image).getType() != BufferedImage.TYPE_3BYTE_BGR))) {
-      // Obtain the image data.
-      try {
-        tex = new BufferedImage(image.getWidth(null), image.getHeight(null), grayscale ? BufferedImage.TYPE_BYTE_GRAY
-            : hasAlpha ? BufferedImage.TYPE_4BYTE_ABGR : BufferedImage.TYPE_3BYTE_BGR);
-      } catch (final IllegalArgumentException e) {
-        logger.warning("Problem creating buffered Image: " + e.getMessage());
-        return TextureState.getDefaultTextureImage();
-      }
-
-      final int imageWidth = image.getWidth(null);
-      final int imageHeight = image.getHeight(null);
-      final int[] tmpData = new int[imageWidth];
-      int row = 0;
-      for (int y = imageHeight - 1; y >= 0; y--) {
-        image.getRGB(0, (flipImage ? row++ : y), imageWidth, 1, tmpData, 0, imageWidth);
-        tex.setRGB(0, y, imageWidth, 1, tmpData, 0, imageWidth);
-      }
-
-    } else {
-      tex = image;
+    if (dataBuffer instanceof DataBufferByte) {
+      return convertDataBuffer((DataBufferByte) dataBuffer, image, flipImage);
     }
 
-    // Get a pointer to the image memory
-    final byte data[] = asByteArray(tex);
-    final ByteBuffer scratch =
-        createOnHeap ? BufferUtils.createByteBufferOnHeap(data.length) : BufferUtils.createByteBuffer(data.length);
-    scratch.clear();
-    scratch.put(data);
-    scratch.flip();
+    if (dataBuffer instanceof DataBufferShort) {
+      return convertDataBuffer((DataBufferShort) dataBuffer, image, flipImage);
+    }
+
+    if (dataBuffer instanceof DataBufferInt) {
+      return convertDataBuffer((DataBufferInt) dataBuffer, image, flipImage);
+    }
+
+    if (dataBuffer instanceof DataBufferFloat) {
+      return convertDataBuffer((DataBufferFloat) dataBuffer, image, flipImage);
+    }
+
+    throw new Ardor3dException(
+        "Unhandled buffered image - could not convert data buffer of type: " + dataBuffer.getClass().getName());
+  }
+
+  protected static Image convertDataBuffer(final DataBufferByte dataBuffer, final BufferedImage source,
+      final boolean flipImage) {
+    final var width = source.getWidth();
+    final var height = source.getHeight();
+    final var data = dataBuffer.getData();
+    final var colorModel = source.getColorModel();
+    final var bpp = colorModel.getPixelSize();
+    final var rowWidth = width * bpp >> 3;
+
+    if (flipImage) {
+      // flip data in place
+      final var tmp = new byte[rowWidth];
+      for (int y = 0, maxY = height / 2; y < maxY; y++) {
+        // read line A into tmp
+        System.arraycopy(data, y * rowWidth, tmp, 0, rowWidth);
+        // copy line B over line A
+        System.arraycopy(data, (height - y - 1) * rowWidth, data, y * rowWidth, rowWidth);
+        // copy saved line A over line B
+        System.arraycopy(tmp, 0, data, (height - y - 1) * rowWidth, rowWidth);
+      }
+    }
+
+    // create image byte buffer
+    final var byteBuffer = BufferUtils.createByteBuffer(data.length);
+    byteBuffer.put(data);
+    byteBuffer.flip();
+
     final Image ardorImage = new Image();
-    ardorImage.setDataFormat(grayscale ? ImageDataFormat.Red : hasAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB);
+    ardorImage.setWidth(width);
+    ardorImage.setHeight(height);
+    ardorImage.setData(byteBuffer);
     ardorImage.setDataType(PixelDataType.UnsignedByte);
-    ardorImage.setWidth(tex.getWidth());
-    ardorImage.setHeight(tex.getHeight());
-    ardorImage.setData(scratch);
+
+    // Figure out our type
+    if (colorModel.getNumColorComponents() == 3) {
+      ardorImage.setDataFormat(colorModel.hasAlpha() ? ImageDataFormat.RGBA : ImageDataFormat.RGB);
+    } else if (colorModel.getNumColorComponents() == 2) {
+      ardorImage.setDataFormat(ImageDataFormat.RG);
+    } else if (colorModel.getNumColorComponents() == 1) {
+      ardorImage.setDataFormat(ImageDataFormat.Red);
+    }
+
+    // return our new Ardor3d image
     return ardorImage;
   }
 
-  public static Image makeArdor3dImage(final RenderableImage image, final boolean flipImage) {
-    return makeArdor3dImage(image.createDefaultRendering(), flipImage);
-  }
+  protected static Image convertDataBuffer(final DataBufferShort dataBuffer, final BufferedImage source,
+      final boolean flipImage) {
+    final var width = source.getWidth();
+    final var height = source.getHeight();
+    final var data = dataBuffer.getData();
+    final var colorModel = source.getColorModel();
+    final var bpp = colorModel.getPixelSize();
+    final var rowWidth = width * bpp >> 4;
 
-  public static Image makeArdor3dImage(final RenderedImage image, final boolean flipImage) {
-    if (image == null) {
-      return null;
+    if (flipImage) {
+      // flip data in place
+      final var tmp = new short[rowWidth];
+      for (int y = 0, maxY = height / 2; y < maxY; y++) {
+        // read line A into tmp
+        System.arraycopy(data, y * rowWidth, tmp, 0, rowWidth);
+        // copy line B over line A
+        System.arraycopy(data, (height - y - 1) * rowWidth, data, y * rowWidth, rowWidth);
+        // copy saved line A over line B
+        System.arraycopy(tmp, 0, data, (height - y - 1) * rowWidth, rowWidth);
+      }
     }
 
-    final ColorModel colorModel = image.getColorModel();
-    final boolean hasAlpha = colorModel.hasAlpha();
-    final boolean grayscale = colorModel.getNumComponents() == 1;
+    // create image byte buffer
+    final var byteBuffer = BufferUtils.createByteBuffer(data.length * 2);
+    byteBuffer.asShortBuffer().put(data);
 
-    // Get a pointer to the image memory
-    final byte data[] = asByteArray(image, grayscale, hasAlpha);
-    final ByteBuffer scratch =
-        createOnHeap ? BufferUtils.createByteBufferOnHeap(data.length) : BufferUtils.createByteBuffer(data.length);
-    scratch.clear();
-    scratch.put(data);
-    scratch.flip();
     final Image ardorImage = new Image();
-    ardorImage.setDataFormat(grayscale ? ImageDataFormat.Red : hasAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB);
+    ardorImage.setWidth(width);
+    ardorImage.setHeight(height);
+    ardorImage.setData(byteBuffer);
+    ardorImage.setDataType(PixelDataType.UnsignedShort);
+    ardorImage.setDataFormat(ImageDataFormat.Red); // ??? Not sure here
+
+    // return our new Ardor3d image
+    return ardorImage;
+  }
+
+  protected static Image convertDataBuffer(final DataBufferInt dataBuffer, final BufferedImage source,
+      final boolean flipImage) {
+    final var width = source.getWidth();
+    final var height = source.getHeight();
+    final var data = dataBuffer.getData();
+    final var rowWidth = width;
+
+    if (flipImage) {
+      // flip data in place
+      final var tmp = new int[rowWidth];
+      for (int y = 0, maxY = height / 2; y < maxY; y++) {
+        // read line A into tmp
+        System.arraycopy(data, y * rowWidth, tmp, 0, rowWidth);
+        // copy line B over line A
+        System.arraycopy(data, (height - y - 1) * rowWidth, data, y * rowWidth, rowWidth);
+        // copy saved line A over line B
+        System.arraycopy(tmp, 0, data, (height - y - 1) * rowWidth, rowWidth);
+      }
+    }
+
+    // create image byte buffer
+    final var byteBuffer = BufferUtils.createByteBuffer(data.length * 4);
+    byteBuffer.asIntBuffer().put(data);
+
+    final Image ardorImage = new Image();
+    ardorImage.setWidth(width);
+    ardorImage.setHeight(height);
+    ardorImage.setData(byteBuffer);
     ardorImage.setDataType(PixelDataType.UnsignedByte);
-    ardorImage.setWidth(image.getWidth());
-    ardorImage.setHeight(image.getHeight());
-    ardorImage.setData(scratch);
+    ardorImage.setDataFormat(ImageDataFormat.RGBA);
+
+    // return our new Ardor3d image
+    return ardorImage;
+  }
+
+  protected static Image convertDataBuffer(final DataBufferFloat dataBuffer, final BufferedImage source,
+      final boolean flipImage) {
+    final var width = source.getWidth();
+    final var height = source.getHeight();
+    final var data = dataBuffer.getData();
+    final var colorModel = source.getColorModel();
+    final var bpp = colorModel.getPixelSize();
+    final var rowWidth = width;
+
+    if (flipImage) {
+      // flip data in place
+      final var tmp = new float[rowWidth];
+      for (int y = 0, maxY = height / 2; y < maxY; y++) {
+        // read line A into tmp
+        System.arraycopy(data, y * rowWidth, tmp, 0, rowWidth);
+        // copy line B over line A
+        System.arraycopy(data, (height - y - 1) * rowWidth, data, y * rowWidth, rowWidth);
+        // copy saved line A over line B
+        System.arraycopy(tmp, 0, data, (height - y - 1) * rowWidth, rowWidth);
+      }
+    }
+
+    // create image byte buffer
+    final var byteBuffer = BufferUtils.createByteBuffer(data.length * 4);
+    byteBuffer.asFloatBuffer().put(data);
+
+    final Image ardorImage = new Image();
+    ardorImage.setWidth(width);
+    ardorImage.setHeight(height);
+    ardorImage.setData(byteBuffer);
+    ardorImage.setDataType(bpp == 16 ? PixelDataType.HalfFloat : PixelDataType.Float);
+    ardorImage.setDataFormat(ImageDataFormat.Red);
+
+    // return our new Ardor3d image
     return ardorImage;
   }
 
@@ -178,81 +277,6 @@ public class AWTImageLoader implements ImageLoader {
       }
     }
     return rVal;
-  }
-
-  public static byte[] asByteArray(final RenderedImage image, final boolean isGreyscale, final boolean hasAlpha) {
-    final int imageWidth = image.getWidth();
-    final int imageHeight = image.getHeight();
-    final Raster raster = image.getData();
-
-    if (raster.getTransferType() == DataBuffer.TYPE_BYTE) {
-      return (byte[]) image.getData().getDataElements(0, 0, imageWidth, imageHeight, null);
-    }
-
-    final byte[] rVal = new byte[imageWidth * imageHeight * (isGreyscale ? 1 : (hasAlpha ? 4 : 3))];
-    final int[] tmpData = new int[imageWidth];
-    int index = 0;
-    for (int y = 0; y < imageHeight; y++) {
-      getRGB(raster, image.getColorModel(), 0, y, imageWidth, 1, tmpData, 0, imageWidth);
-      for (int i = 0; i < imageWidth; i++) {
-        final int argb = tmpData[i];
-        if (isGreyscale) {
-          rVal[index++] = (byte) (argb & 0xFF);
-        } else {
-          rVal[index++] = (byte) ((argb >> 16) & 0xFF);
-          rVal[index++] = (byte) ((argb >> 8) & 0xFF);
-          rVal[index++] = (byte) (argb & 0xFF);
-          if (hasAlpha) {
-            rVal[index++] = (byte) ((argb >> 24) & 0xFF);
-          }
-        }
-      }
-    }
-    return rVal;
-  }
-
-  /**
-   * Extract rgb values from raster using the colormodel.
-   */
-  private static int[] getRGB(final Raster raster, final ColorModel colorModel, final int startX, final int startY,
-      final int w, final int h, int[] rgbArray, final int offset, final int scansize) {
-    Object data;
-    final int nbands = raster.getNumBands();
-    final int dataType = raster.getDataBuffer().getDataType();
-    switch (dataType) {
-      case DataBuffer.TYPE_BYTE:
-        data = new byte[nbands];
-        break;
-      case DataBuffer.TYPE_USHORT:
-        data = new short[nbands];
-        break;
-      case DataBuffer.TYPE_INT:
-        data = new int[nbands];
-        break;
-      case DataBuffer.TYPE_FLOAT:
-        data = new float[nbands];
-        break;
-      case DataBuffer.TYPE_DOUBLE:
-        data = new double[nbands];
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown data buffer type: " + dataType);
-    }
-
-    if (rgbArray == null) {
-      rgbArray = new int[offset + h * scansize];
-    }
-
-    int yoff = offset;
-    int off;
-    for (int y = startY; y < startY + h; y++, yoff += scansize) {
-      off = yoff;
-      for (int x = startX; x < startX + w; x++) {
-        rgbArray[off++] = colorModel.getRGB(raster.getDataElements(x, y, data));
-      }
-    }
-
-    return rgbArray;
   }
 
   public static void setCreateOnHeap(final boolean createOnHeap) { AWTImageLoader.createOnHeap = createOnHeap; }

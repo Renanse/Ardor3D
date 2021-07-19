@@ -39,30 +39,22 @@ public abstract class ImageLoaderUtil {
 
   public static Image loadImage(final ResourceSource src, final boolean flipped) {
     if (src == null) {
-      logger.warning("loadImage(ResourceSource, boolean): file is null, defaultTexture used.");
+      ImageLoaderUtil.logger.warning("loadImage(ResourceSource, boolean): file is null, defaultTexture used.");
       return TextureState.getDefaultTextureImage();
     }
 
     final String type = src.getType();
     if (type == null) {
-      logger.warning("loadImage(ResourceSource, boolean): type is null, defaultTexture used.");
+      ImageLoaderUtil.logger.warning("loadImage(ResourceSource, boolean): type is null, defaultTexture used.");
       return TextureState.getDefaultTextureImage();
     }
 
-    InputStream is = null;
-    try {
-      is = src.openStream();
-      logger.log(Level.FINER, "loadImage(ResourceSource, boolean) opened stream: {0}", src);
+    try (InputStream is = src.openStream()) {
+      ImageLoaderUtil.logger.log(Level.FINER, "loadImage(ResourceSource, boolean) opened stream: {0}", src);
       return loadImage(type, is, flipped);
     } catch (final IOException e) {
-      logger.log(Level.WARNING, "loadImage(ResourceSource, boolean): defaultTexture used", e);
+      ImageLoaderUtil.logger.log(Level.WARNING, "loadImage(ResourceSource, boolean): defaultTexture used", e);
       return TextureState.getDefaultTextureImage();
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (final IOException ioe) {} // ignore
-      }
     }
   }
 
@@ -70,21 +62,22 @@ public abstract class ImageLoaderUtil {
 
     Image imageData = null;
     try {
-      ImageLoader loader = loaders.get(type.toLowerCase());
+      ImageLoader loader = ImageLoaderUtil.loaders.get(type.toLowerCase());
       if (loader == null) {
-        loader = defaultLoader;
+        loader = ImageLoaderUtil.defaultLoader;
       }
       if (loader != null) {
         imageData = loader.load(stream, flipped);
       } else {
-        logger.log(Level.WARNING, "Unable to read image of type: {0}", type);
+        ImageLoaderUtil.logger.log(Level.WARNING, "Unable to read image of type: {0}", type);
       }
       if (imageData == null) {
-        logger.warning("loadImage(String, InputStream, boolean): no imageData found.  defaultTexture used.");
+        ImageLoaderUtil.logger
+            .warning("loadImage(String, InputStream, boolean): no imageData found.  defaultTexture used.");
         imageData = TextureState.getDefaultTextureImage();
       }
     } catch (final IOException e) {
-      logger.log(Level.WARNING, "Could not load Image.", e);
+      ImageLoaderUtil.logger.log(Level.WARNING, "Could not load Image.", e);
       imageData = TextureState.getDefaultTextureImage();
     }
     return imageData;
@@ -102,17 +95,17 @@ public abstract class ImageLoaderUtil {
    */
   public static void registerHandler(final ImageLoader handler, final String... types) {
     for (final String type : types) {
-      loaders.put(type.toLowerCase(), handler);
+      ImageLoaderUtil.loaders.put(type.toLowerCase(), handler);
     }
   }
 
   public static void unregisterHandler(final String... types) {
     for (final String type : types) {
-      loaders.remove(type.toLowerCase());
+      ImageLoaderUtil.loaders.remove(type.toLowerCase());
     }
   }
 
   public static void registerDefaultHandler(final ImageLoader handler) {
-    defaultLoader = handler;
+    ImageLoaderUtil.defaultLoader = handler;
   }
 }
