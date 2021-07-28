@@ -10,6 +10,8 @@
 
 package com.ardor3d.image;
 
+import com.ardor3d.util.Ardor3dException;
+
 public enum TextureStoreFormat {
   /**
    * When used in texture loading, this indicates to convert the image's data properties to its
@@ -249,6 +251,72 @@ public enum TextureStoreFormat {
         return true;
       default:
         return false;
+    }
+  }
+
+  public int getComponents() {
+    switch (this) {
+      case RGBA2:
+      case RGBA4:
+      case RGB5A1:
+      case RGBA8:
+      case RGB10A2:
+      case RGBA12:
+      case RGBA16:
+      case RGBA16F:
+      case RGBA32F:
+      case CompressedRGBA:
+        return 4;
+      case RGB4:
+      case RGB5:
+      case RGB8:
+      case RGB10:
+      case RGB12:
+      case RGB16F:
+      case RGB16:
+      case RGB32F:
+      case CompressedRGB:
+        return 3;
+      case RG8:
+      case RG8I:
+      case RG8UI:
+      case RG16:
+      case RG16F:
+      case RG16I:
+      case RG16UI:
+      case RG32F:
+      case RG32I:
+      case RG32UI:
+      case R3G3B2:
+      case CompressedRG:
+        return 2;
+      case Depth:
+      case Depth16:
+      case Depth24:
+      case Depth32:
+      case Depth32F:
+      case R8:
+      case R8I:
+      case R8UI:
+      case R16:
+      case R16F:
+      case R16I:
+      case R16UI:
+      case R32F:
+      case R32I:
+      case R32UI:
+      case CompressedRed:
+        return 1;
+      case GuessCompressedFormat:
+      case GuessNoCompressedFormat:
+      case NativeDXT1:
+      case NativeDXT1A:
+      case NativeDXT3:
+      case NativeDXT5:
+      case NativeLATC_L:
+      case NativeLATC_LA:
+      default:
+        throw new Ardor3dException("Unhandled format: " + this);
     }
   }
 }
