@@ -24,6 +24,7 @@ uniform vec2 sliceOffset[16];
 
 uniform vec3 cameraLoc;
 uniform ColorSurface surface;
+uniform int grayscaleDiffuse;
 
 #ifdef USE_NORMAL_MAP
 uniform sampler3D normalMap;
@@ -49,6 +50,7 @@ void main()
   
 	// lookup clip colors
     vec4 texCol = clipTexColor(diffuseMap, texCoord1, texCoord2, fadeCoord, textureSize, texelSize, showDebug);
+    if (grayscaleDiffuse != 0) texCol = texCol.rrra;
 	vec4 color = tint * texCol;
 
 #ifdef USE_NORMAL_MAP

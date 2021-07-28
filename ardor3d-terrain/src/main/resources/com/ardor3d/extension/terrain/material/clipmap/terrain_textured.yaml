@@ -41,6 +41,11 @@ techniques:
             type: Int1
             source: SpatialProperty
           - 
+            shaderKey: grayscaleDiffuse
+            type: Int1
+            source: SpatialProperty
+            defaultValue: 0
+          - 
             shaderKey: sliceOffset
             type: Float2
             source: SpatialProperty

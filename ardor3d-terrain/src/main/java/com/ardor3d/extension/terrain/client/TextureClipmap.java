@@ -134,6 +134,7 @@ public class TextureClipmap {
     terrain.setProperty("levels", getTextureLevels());
     terrain.setProperty("validLevels", getValidLevels() - 1);
     terrain.setProperty("showDebug", isShowDebug() ? 1 : 0);
+    terrain.setProperty("grayscaleDiffuse", textureClipmap.getTextureStoreFormat().getComponents() == 1 ? 1 : 0);
   }
 
   public void update(final Renderer renderer, final ReadOnlyVector3 eyePos) {
@@ -163,7 +164,7 @@ public class TextureClipmap {
 
       final boolean valid = cache.isValid();
       if (!valid) {
-        // clip is not valid, so invalidate whatever we might have though was the lowest clip
+        // clip is not valid, so invalidate whatever we might have thought was the lowest clip
         currentShownLevels = -1;
         continue;
       }
