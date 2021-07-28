@@ -13,10 +13,10 @@ package com.ardor3d.extension.terrain.client;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.buffer.IndexBufferData;
-import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
@@ -244,8 +244,8 @@ public class ClipmapLevel extends Mesh {
       final int dz = clipRegion.getY() - oldClipZ;
 
       // Use our clip region to set the cache position - this is not the same thing as our camera
-      // position.
-      // We do this, even if the region has not changed, because it gives
+      // position. We do this, even if the region has not changed, because it gives the system a chance to
+      // refresh tiles
       cache.setCurrentPosition(clipRegion.getX() / vertexDistance, clipRegion.getY() / vertexDistance);
 
       // Apply our delta change to the vertex buffer.

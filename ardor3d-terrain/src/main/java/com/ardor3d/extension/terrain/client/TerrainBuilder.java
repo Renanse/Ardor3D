@@ -133,6 +133,7 @@ public class TerrainBuilder {
     final int tileSize = terrainConfiguration.getCacheGridSize();
 
     int cacheSize = (buildConfig.clipmapTerrainSize + 1) / tileSize + buildConfig.cacheBufferSize;
+    // make sure cacheSize is odd.
     cacheSize += cacheSize & 1 ^ 1;
 
     logger.fine("server clipmapLevels: " + clipmapLevels);
@@ -186,6 +187,7 @@ public class TerrainBuilder {
     final int tileSize = textureConfiguration.getCacheGridSize();
 
     int cacheSize = (buildConfig.clipmapTextureSize + 1) / tileSize + buildConfig.cacheBufferSize;
+    // make sure cacheSize is odd.
     cacheSize += cacheSize & 1 ^ 1;
 
     logger.fine("server clipmapLevels: " + clipmapLevels);
