@@ -77,6 +77,9 @@ public class GridCacheDebugPanel extends JPanel implements Runnable {
           case loading:
             g2.setColor(Color.blue);
             break;
+          case requeue:
+            g2.setColor(Color.white);
+            break;
           case init:
           default:
             g2.setColor(Color.lightGray);

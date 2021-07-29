@@ -24,7 +24,6 @@ import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.LevelData;
 import com.ardor3d.extension.terrain.util.Region;
-import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
@@ -181,18 +180,6 @@ public class TextureClipmap {
         updateLevel(renderer, levelData, offX, offY);
       }
 
-      // Check for individually updated tiles from our source
-      final Set<Tile> updatedTiles = cache.handleUpdateRequests();
-      if (updatedTiles != null) {
-        final int sX = offX - textureSize / 2;
-        final int sY = offY - textureSize / 2;
-
-        // XXX: Perhaps this could find out a subregion of the tile that had changed and update just that,
-        // but for now we will update the full level.
-        updateQuick(renderer, levelData, textureSize + 1, textureSize + 1, sX, sY, levelData.offsetX, levelData.offsetY,
-            textureSize, textureSize);
-      }
-
       // calculate values used to shift texcoords in shader
       final int shiftX = MathUtils.moduloPositive(levelData.x, 2);
       final int shiftY = MathUtils.moduloPositive(levelData.y, 2);
@@ -202,6 +189,10 @@ public class TextureClipmap {
 
       sliceDataBuffer.put(unit * 2, x);
       sliceDataBuffer.put(unit * 2 + 1, y);
+
+      // Ask the cache to look for any invalid data in the current region. These will be sent to the
+      // mailbox
+      cache.checkForInvalidatedRegions();
     }
 
     if (currentShownLevels == -1) {

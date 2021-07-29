@@ -18,9 +18,10 @@ import java.util.concurrent.Future;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.PriorityExecutors.PriorityRunnable;
-import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.extension.terrain.util.Tile;
+import com.ardor3d.math.util.MathUtils;
+import com.google.common.collect.Sets;
 
 public abstract class AbstractGridCache {
 
@@ -31,22 +32,24 @@ public abstract class AbstractGridCache {
   protected final CacheData[][] cache;
   protected final int destinationSize;
 
-  protected final Set<TileLoadingData> currentTiles = new HashSet<>();
-  protected Set<TileLoadingData> newThreadTiles = new HashSet<>();
-  protected Set<TileLoadingData> backThreadTiles = new HashSet<>();
+  protected final Set<TileLoadingData> currentTiles = Sets.newConcurrentHashSet();
+  protected Set<TileLoadingData> newThreadTiles = Sets.newConcurrentHashSet();
+  protected Set<TileLoadingData> backThreadTiles = Sets.newConcurrentHashSet();
 
   protected final int meshClipIndex;
   protected final int dataClipIndex;
   protected final int vertexDistance;
 
+  // Guards a
   protected final Object SWAP_LOCK = new Object();
+
   protected int backCurrentTileX = Integer.MAX_VALUE;
   protected int backCurrentTileY = Integer.MAX_VALUE;
   protected boolean updated = false;
 
   // Debug
   protected boolean enableDebug = true;
-  protected final Set<TileLoadingData> debugTiles = new HashSet<>();
+  protected final Set<TileLoadingData> debugTiles = Sets.newConcurrentHashSet();
 
   protected final ExecutorService tileThreadService;
 
@@ -56,6 +59,10 @@ public abstract class AbstractGridCache {
 
   protected final int locatorSize = 20;
   protected Tile locatorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+  public enum State {
+    init, loading, finished, cancelled, error, requeue
+  }
 
   protected AbstractGridCache(final int cacheSize, final int tileSize, final int destinationSize,
     final int meshClipIndex, final int dataClipIndex, final int vertexDistance,
@@ -92,63 +99,62 @@ public abstract class AbstractGridCache {
       return;
     }
 
-    synchronized (SWAP_LOCK) {
-      backCurrentTileX = tileX;
-      backCurrentTileY = tileY;
+    backCurrentTileX = tileX;
+    backCurrentTileY = tileY;
 
-      // Gather all of the tiles in range of our new position
-      final Set<TileLoadingData> newTiles = new HashSet<>();
-      for (int i = 0; i < cacheSize; i++) {
-        for (int j = 0; j < cacheSize; j++) {
-          final int sourceX = tileX + j - cacheSize / 2;
-          final int sourceY = tileY + i - cacheSize / 2;
+    // Gather all of the tiles in range of our new position
+    final Set<TileLoadingData> newTiles = new HashSet<>();
+    for (int i = 0; i < cacheSize; i++) {
+      for (int j = 0; j < cacheSize; j++) {
+        final int sourceX = tileX + j - cacheSize / 2;
+        final int sourceY = tileY + i - cacheSize / 2;
 
-          final int destX = MathUtils.moduloPositive(sourceX, cacheSize);
-          final int destY = MathUtils.moduloPositive(sourceY, cacheSize);
+        final int destX = MathUtils.moduloPositive(sourceX, cacheSize);
+        final int destY = MathUtils.moduloPositive(sourceY, cacheSize);
 
-          newTiles.add(new TileLoadingData(this, new Tile(sourceX, sourceY), new Tile(destX, destY), dataClipIndex));
-        }
+        newTiles.add(new TileLoadingData(this, new Tile(sourceX, sourceY), new Tile(destX, destY), dataClipIndex));
       }
-
-      // Walk through tiles we are currently tracking status of. We think these are valid currently.
-      final Iterator<TileLoadingData> tileIterator = currentTiles.iterator();
-      while (tileIterator.hasNext()) {
-        final TileLoadingData data = tileIterator.next();
-
-        // Is this tile NOT in the new data set?
-        if (!newTiles.contains(data)) {
-          // set that destination tile as invalid
-          cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
-
-          // try to cancel the tile's loading if possible
-          data.isCancelled = true;
-          final Future<?> future = data.future;
-          if (future != null && !future.isDone()) {
-            future.cancel(false);
-          }
-
-          // remove the tile from current
-          tileIterator.remove();
-
-          // remove the tile from the back accumulator list, since we don't need it anymore.
-          if (backThreadTiles.contains(data)) {
-            backThreadTiles.remove(data);
-          }
-        }
-
-        // If the tile IS in the new data set, we don't want to add it to current or backthread Tiles again
-        else {
-          newTiles.remove(data);
-        }
-      }
-
-      // add remaining tiles to backthread for next execution pass
-      backThreadTiles.addAll(newTiles);
-      updated = true;
-
-      // add remaining tiles to our currentTiles for tracking here.
-      currentTiles.addAll(newTiles);
     }
+
+    // Walk through tiles we are currently tracking status of. We think these are valid currently.
+    final Iterator<TileLoadingData> tileIterator = currentTiles.iterator();
+    while (tileIterator.hasNext()) {
+      final TileLoadingData data = tileIterator.next();
+
+      // Is this tile NOT in the new data set?
+      if (!newTiles.contains(data) || data.state == State.requeue) {
+        // set that destination tile as invalid
+        cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
+
+        // try to cancel the tile's loading if possible
+        data.isCancelled = true;
+        final Future<?> future = data.future;
+        if (future != null && !future.isDone()) {
+          future.cancel(false);
+        }
+
+        // remove the tile from current
+        tileIterator.remove();
+
+        // remove the tile from the back accumulator list, since we don't need it anymore.
+        if (backThreadTiles.contains(data)) {
+          backThreadTiles.remove(data);
+        }
+      }
+
+      // If the tile IS in the new data set and doesn't need retry,
+      // we don't want to add it to current or backthread Tiles again
+      else {
+        newTiles.remove(data);
+      }
+    }
+
+    // add remaining tiles to backthread for next execution pass
+    backThreadTiles.addAll(newTiles);
+    updated = true;
+
+    // add remaining tiles to our currentTiles for tracking here.
+    currentTiles.addAll(newTiles);
 
     // Sync our debug tiles if enabled
     if (enableDebug) {
@@ -160,12 +166,25 @@ public abstract class AbstractGridCache {
   }
 
   public void checkForUpdates() {
+    // check for stalled items and resubmit
+    var tileIterator = currentTiles.iterator();
+    while (tileIterator.hasNext()) {
+      final TileLoadingData data = tileIterator.next();
+      if (data.state == State.requeue) {
+        data.state = State.init;
+        data.future = null;
+        backThreadTiles.add(data);
+      }
+    }
+
     if (!updated) {
       return;
     }
 
     int tileX;
     int tileY;
+
+    final Set<TileLoadingData> toProcess = new HashSet<>();
     synchronized (SWAP_LOCK) {
       // Swap our tile sets so we work on data accumulated recently.
       final Set<TileLoadingData> tmp = newThreadTiles;
@@ -173,19 +192,21 @@ public abstract class AbstractGridCache {
       backThreadTiles = tmp;
       backThreadTiles.clear();
 
-      tileX = backCurrentTileX;
-      tileY = backCurrentTileY;
-
-      updated = false;
+      toProcess.addAll(newThreadTiles);
     }
 
-    if (isTileOutsideLocatorArea(tileX, tileY)) {
+    tileX = backCurrentTileX;
+    tileY = backCurrentTileY;
+
+    updated = false;
+
+    if (shouldMoveLocator(tileX, tileY)) {
       validTiles = getValidTilesFromSource(tileX - locatorSize / 2, tileY - locatorSize / 2, locatorSize, locatorSize);
       locatorTile = new Tile(tileX, tileY);
     }
 
     // walk through the accumulated tile data
-    final Iterator<TileLoadingData> tileIterator = newThreadTiles.iterator();
+    tileIterator = toProcess.iterator();
     while (tileIterator.hasNext()) {
       final TileLoadingData data = tileIterator.next();
 
@@ -205,7 +226,7 @@ public abstract class AbstractGridCache {
     }
   }
 
-  protected abstract boolean copyTileData(final Tile sourceTile, final int destX, final int destY);
+  protected abstract State copyTileData(final Tile sourceTile, final int destX, final int destY);
 
   protected abstract Set<Tile> getValidTilesFromSource(final int tileX, final int tileY, int numTilesX, int numTilesY);
 
@@ -214,14 +235,21 @@ public abstract class AbstractGridCache {
 
   protected abstract AbstractGridCache getParentCache();
 
-  protected boolean isTileOutsideLocatorArea(final int tileX, final int tileY) {
-    final int locX = tileX - locatorTile.getX();
-    final int locY = tileY - locatorTile.getY();
-    final int halfSize = locatorSize / 2;
-    return locX <= -halfSize + 1 || //
-        locX >= +halfSize - 2 || //
-        locY <= -halfSize + 1 || //
-        locY >= +halfSize - 2;
+  /**
+   * Check if a given tile coordinate is far enough away from the center of the locator area that we
+   * should re-center things.
+   *
+   * @param tileX
+   * @param tileY
+   * @return
+   */
+  protected boolean shouldMoveLocator(final int tileX, final int tileY) {
+    // is the given tile outside of our locator area?
+    // our destination includes padding of 4-5 units, so we check if we are away from our old center by
+    // that amount.
+    final int offsetX = Math.abs(tileX - locatorTile.getX());
+    final int offsetY = Math.abs(tileY - locatorTile.getY());
+    return offsetX > 2 || offsetY > 2;
   }
 
   public Set<TileLoadingData> getDebugTiles() {
@@ -251,11 +279,8 @@ public abstract class AbstractGridCache {
     public final int index;
 
     public boolean isCancelled = false;
+    public static long maxLoadingTime = 15 * 1000L;
     public Future<?> future;
-
-    public enum State {
-      init, loading, finished, cancelled, error
-    }
 
     public State state = State.init;
 
@@ -271,26 +296,41 @@ public abstract class AbstractGridCache {
     public void run() {
       state = State.loading;
 
+      // catch cancellation and bail immediately.
       if (isCancelled()) {
         state = State.cancelled;
         return;
       }
 
-      if (!sourceCache.copyTileData(sourceTile, destTile.getX(), destTile.getY())) {
-        state = State.error;
-        return;
+      // ask underlying system for data. We need to poll since the source may not be ready, or may need
+      // time to load.
+      final var copyState = sourceCache.copyTileData(sourceTile, destTile.getX(), destTile.getY());
+
+      switch (copyState) {
+        case init:
+        case loading:
+        case requeue:
+          // source is not ready. Reschedule.
+          state = State.requeue;
+          return;
+        case cancelled:
+          // source was asked to cancel.
+          state = State.cancelled;
+          return;
+        case error:
+          state = State.error;
+          return;
+        case finished:
+          state = State.finished;
+          final Region region = sourceCache.toRegion(sourceTile);
+          final DoubleBufferedList<Region> mailBox = sourceCache.mailBox;
+          if (mailBox != null) {
+            mailBox.add(region);
+          }
+          sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
+        default:
+          return;
       }
-
-      state = State.finished;
-      sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
-
-      final Region region = sourceCache.toRegion(sourceTile);
-      final DoubleBufferedList<Region> mailBox = sourceCache.mailBox;
-      if (mailBox != null) {
-        mailBox.add(region);
-      }
-
-      return;
     }
 
     protected boolean isCancelled() {

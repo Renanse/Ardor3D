@@ -11,11 +11,9 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.nio.ByteBuffer;
-import java.util.Set;
 
 import com.ardor3d.extension.terrain.util.DoubleBufferedList;
 import com.ardor3d.extension.terrain.util.Region;
-import com.ardor3d.extension.terrain.util.Tile;
 
 /**
  * Fetches data from a source to the texture clipmap destination data through updateRegion.
@@ -35,7 +33,11 @@ public interface TextureCache {
 
   void setMailBox(final DoubleBufferedList<Region> mailBox);
 
-  Set<Tile> handleUpdateRequests();
+  /**
+   * Ask our cache to check for tiles that have gone bad. These should get submitted to the mailbox as
+   * regions.
+   */
+  void checkForInvalidatedRegions();
 
   void checkForUpdates();
 }

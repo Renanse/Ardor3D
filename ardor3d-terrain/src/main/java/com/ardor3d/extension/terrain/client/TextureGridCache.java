@@ -39,7 +39,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
   private final byte[] data;
 
   private final boolean useAlpha;
-  private final int colorBits;
+  private final int colorWidthBytes;
 
   public TextureGridCache(final TextureCache parentCache, final int cacheSize, final TextureSource source,
     final int tileSize, final int destinationSize, final TextureConfiguration textureConfiguration,
@@ -49,56 +49,56 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
     this.source = source;
     this.textureConfiguration = textureConfiguration;
     useAlpha = textureConfiguration.isUseAlpha();
-    colorBits = useAlpha ? 4 : 3;
+    colorWidthBytes = useAlpha ? 4 : 3;
 
-    data = new byte[dataSize * dataSize * colorBits];
-    for (int i = 0; i < dataSize * dataSize * colorBits; i++) {
+    data = new byte[dataSize * dataSize * colorWidthBytes];
+    for (int i = 0; i < dataSize * dataSize * colorWidthBytes; i++) {
       data[i] = (byte) 1;
     }
   }
 
   @Override
-  public Set<Tile> handleUpdateRequests() {
-    final Set<Tile> updateTiles = getInvalidTilesFromSource(backCurrentTileX - cacheSize / 2,
+  public void checkForInvalidatedRegions() {
+    final Set<Tile> invalidTiles = getInvalidTilesFromSource(backCurrentTileX - cacheSize / 2,
         backCurrentTileY - cacheSize / 2, cacheSize, cacheSize);
-    if (updateTiles == null || updateTiles.isEmpty()) {
-      return null;
+    if (invalidTiles == null || invalidTiles.isEmpty()) {
+      return;
     }
 
-    final Set<Tile> rVal = new HashSet<>();
+    final Set<TileLoadingData> updates = new HashSet<>();
 
-    for (final Tile tile : updateTiles) {
+    for (final Tile tile : invalidTiles) {
       final int destX = MathUtils.moduloPositive(tile.getX(), cacheSize);
       final int destY = MathUtils.moduloPositive(tile.getY(), cacheSize);
-      if (copyTileData(tile, destX, destY)) {
-        rVal.add(tile);
-      }
+      updates.add(new TileLoadingData(this, new Tile(tile.getX(), tile.getY()), new Tile(destX, destY), dataClipIndex));
     }
 
-    return rVal;
+    backThreadTiles.addAll(updates);
+    updated = true;
   }
 
   @Override
-  protected boolean copyTileData(final Tile sourceTile, final int destX, final int destY) {
+  protected State copyTileData(final Tile sourceTile, final int destX, final int destY) {
     ByteBuffer sourceData = null;
     try {
       sourceData = source.getTile(dataClipIndex, sourceTile);
     } catch (final InterruptedException e) {
       // XXX: Loading can be interrupted
-      return false;
+      return State.cancelled;
     } catch (final Throwable t) {
       t.printStackTrace();
+      return State.error;
     }
 
     if (sourceData == null) {
-      return false;
+      return State.loading;
     }
 
     final TextureStoreFormat format =
         textureConfiguration.getTextureDataType(source.getContributorId(dataClipIndex, sourceTile));
     CacheFunctionUtil.applyFunction(useAlpha, function, sourceData, data, destX, destY, format, tileSize, dataSize);
 
-    return true;
+    return State.finished;
   }
 
   @Override
@@ -154,7 +154,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
     } else {
       final int dataX = MathUtils.moduloPositive(x, dataSize);
       final int dataY = MathUtils.moduloPositive(z, dataSize);
-      final int sourceIndex = (dataY * dataSize + dataX) * colorBits;
+      final int sourceIndex = (dataY * dataSize + dataX) * colorWidthBytes;
 
       int color = 0;
       if (useAlpha) {
@@ -163,18 +163,6 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
       } else {
         color = IntColorUtils.getColor(data[sourceIndex + 0], data[sourceIndex + 1], data[sourceIndex + 2], (byte) 0);
       }
-
-      // if (rgbStore.r == 0 && rgbStore.g == 0 && rgbStore.b == 0) {
-      // if (parentCache != null) {
-      // if (x % 2 == 0 && z % 2 == 0) {
-      // return parentCache.getRGB(x / 2, z / 2, rgbStore);
-      // } else {
-      // return parentCache.getSubRGB(x / 2f, z / 2f, rgbStore);
-      // }
-      // } else {
-      // return minRGB;
-      // }
-      // }
 
       return color;
     }
@@ -219,7 +207,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
   @Override
   public void updateRegion(final ByteBuffer destinationData, final int sourceX, final int sourceY, final int destX,
       final int destY, final int width, final int height) {
-    final byte[] rgbArray = new byte[width * colorBits];
+    final byte[] rgbArray = new byte[width * colorWidthBytes];
     for (int z = 0; z < height; z++) {
       final int currentSourceZ = sourceY + z;
       final int currentDestZ = destY + z;
@@ -229,7 +217,7 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
         final int currentSourceX = sourceX + x;
         final int color = getColor(currentSourceX, currentSourceZ);
 
-        final int index = x * colorBits;
+        final int index = x * colorWidthBytes;
         rgbArray[index + 0] = (byte) (color >> 24 & 0xFF);
         rgbArray[index + 1] = (byte) (color >> 16 & 0xFF);
         rgbArray[index + 2] = (byte) (color >> 8 & 0xFF);
@@ -240,16 +228,16 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
 
       final int dataX = MathUtils.moduloPositive(destX, destinationSize);
       if (dataX + width > destinationSize) {
-        final int destIndex = dataY * destinationSize * colorBits;
+        final int destIndex = dataY * destinationSize * colorWidthBytes;
 
-        destinationData.position(destIndex + dataX * colorBits);
-        destinationData.put(rgbArray, 0, (destinationSize - dataX) * colorBits);
+        destinationData.position(destIndex + dataX * colorWidthBytes);
+        destinationData.put(rgbArray, 0, (destinationSize - dataX) * colorWidthBytes);
 
         destinationData.position(destIndex);
-        destinationData.put(rgbArray, (destinationSize - dataX) * colorBits,
-            (dataX + width - destinationSize) * colorBits);
+        destinationData.put(rgbArray, (destinationSize - dataX) * colorWidthBytes,
+            (dataX + width - destinationSize) * colorWidthBytes);
       } else {
-        final int destIndex = (dataY * destinationSize + dataX) * colorBits;
+        final int destIndex = (dataY * destinationSize + dataX) * colorWidthBytes;
         destinationData.position(destIndex);
         destinationData.put(rgbArray);
       }

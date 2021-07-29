@@ -65,33 +65,32 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
       updates.add(new TileLoadingData(this, new Tile(tile.getX(), tile.getY()), new Tile(destX, destY), dataClipIndex));
     }
 
-    synchronized (SWAP_LOCK) {
-      backThreadTiles.addAll(updates);
-      updated = true;
-    }
+    backThreadTiles.addAll(updates);
+    updated = true;
   }
 
   @Override
-  protected boolean copyTileData(final Tile sourceTile, final int destX, final int destY) {
+  protected State copyTileData(final Tile sourceTile, final int destX, final int destY) {
     float[] sourceData = null;
     try {
       sourceData = source.getTile(dataClipIndex, sourceTile);
     } catch (final InterruptedException e) {
       // XXX: Loading can be interrupted
-      return false;
+      return State.cancelled;
     } catch (final Throwable t) {
       t.printStackTrace();
+      return State.error;
     }
 
     if (sourceData == null) {
-      return false;
+      return State.loading;
     }
 
     final int offset = destY * tileSize * dataSize + destX * tileSize;
     for (int y = 0; y < tileSize; y++) {
       System.arraycopy(sourceData, y * tileSize, data, offset + y * dataSize, tileSize);
     }
-    return true;
+    return State.finished;
   }
 
   @Override
@@ -130,24 +129,11 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
   public float getHeight(final int x, final int z, final boolean tryParentCache) {
     int tileX = MathUtils.floor((float) x / tileSize);
     int tileY = MathUtils.floor((float) z / tileSize);
-    final CacheData tileData;
-    // mallan - 2016-01-26: this conditional will ALWAYS fail once view has
-    // moved outside the origin cache bounds (tileX,tileY are source tile coordinates,
-    // cacheSize are destination tile coordinates). The moduloPositive does what we need,
-    // this conditional breaks the terrain.
-    // final int cacheMin = -cacheSize / 2, cacheMax = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
-    // if (tileX < cacheMin || tileX > cacheMax || tileY < cacheMin || tileY > cacheMax) {
-    // tileData = null;
-    // } else {
-    // tileX = MathUtils.moduloPositive(tileX, cacheSize);
-    // tileY = MathUtils.moduloPositive(tileY, cacheSize);
-    // tileData = cache[tileX][tileY];
-    // }
     tileX = MathUtils.moduloPositive(tileX, cacheSize);
     tileY = MathUtils.moduloPositive(tileY, cacheSize);
-    tileData = cache[tileX][tileY];
+    final var tileData = cache[tileX][tileY];
 
-    if (tileData == null || !tileData.isValid) {
+    if (!tileData.isValid) {
       if (tryParentCache && parentCache != null) {
         if (x % 2 == 0 && z % 2 == 0) {
           return parentCache.getHeight(x / 2, z / 2, tryParentCache);
@@ -176,19 +162,11 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
   public float getSubHeight(final float x, final float z, final boolean tryParentCache) {
     int tileX = MathUtils.floor(x / tileSize);
     int tileY = MathUtils.floor(z / tileSize);
+    tileX = MathUtils.moduloPositive(tileX, cacheSize);
+    tileY = MathUtils.moduloPositive(tileY, cacheSize);
+    final var tileData = cache[tileX][tileY];
 
-    final int min = -cacheSize / 2;
-    final int max = cacheSize / 2 - (cacheSize % 2 == 0 ? 1 : 0);
-    final CacheData tileData;
-    if (tileX < min || tileX > max || tileY < min || tileY > max) {
-      tileData = null;
-    } else {
-      tileX = MathUtils.moduloPositive(tileX, cacheSize);
-      tileY = MathUtils.moduloPositive(tileY, cacheSize);
-      tileData = cache[tileX][tileY];
-    }
-
-    if (tileData == null || !tileData.isValid) {
+    if (!tileData.isValid) {
       if (tryParentCache && parentCache != null) {
         return parentCache.getSubHeight(x / 2f, z / 2f, tryParentCache);
       } else {
@@ -197,7 +175,6 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
     } else {
       final double col = MathUtils.floor(x);
       final double row = MathUtils.floor(z);
-
       final double intOnX = x - col;
       final double intOnZ = z - row;
 
@@ -310,8 +287,7 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
             final float coarser1 = parentCache.getHeight(coarseX1, coarseZ1, true);
             final float coarser2 = parentCache.getHeight(coarseX2, coarseZ2, true);
 
-            // Apply the median of the coarser heightvalues to the W
-            // value
+            // Apply the median of the coarser heightvalues to the W value
             destinationData.put(indexDest + 3, (coarser1 + coarser2) * 0.5f); // w
           }
         }
