@@ -65,12 +65,9 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
       return;
     }
 
-    final Set<TileLoadingData> updates = new HashSet<>();
-
+    final var updates = new HashSet<TileLoadingData>();
     for (final Tile tile : invalidTiles) {
-      final int destX = MathUtils.moduloPositive(tile.getX(), cacheSize);
-      final int destY = MathUtils.moduloPositive(tile.getY(), cacheSize);
-      updates.add(new TileLoadingData(this, new Tile(tile.getX(), tile.getY()), new Tile(destX, destY), dataClipIndex));
+      updates.add(new TileLoadingData(this, tile.getX(), tile.getY(), cacheSize, dataClipIndex));
     }
 
     backThreadTiles.addAll(updates);

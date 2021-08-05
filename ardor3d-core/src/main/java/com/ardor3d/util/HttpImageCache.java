@@ -378,8 +378,7 @@ public enum HttpImageCache {
       md.reset();
 
       // the hash is good, but out of concern for the unlikely collision, I'm adding the hash of the url's
-      // reverse
-      // as well.
+      // reverse as well.
       final StringBuilder sb = new StringBuilder(key);
       md.update(sb.reverse().toString().getBytes());
       final String part2 = bytesToHex(md.digest());

@@ -11,7 +11,6 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -103,23 +102,20 @@ public abstract class AbstractGridCache {
     backCurrentTileY = tileY;
 
     // Gather all of the tiles in range of our new position
-    final Set<TileLoadingData> newTiles = new HashSet<>();
+    final var newTiles = new HashSet<TileLoadingData>();
     for (int i = 0; i < cacheSize; i++) {
       for (int j = 0; j < cacheSize; j++) {
         final int sourceX = tileX + j - cacheSize / 2;
         final int sourceY = tileY + i - cacheSize / 2;
 
-        final int destX = MathUtils.moduloPositive(sourceX, cacheSize);
-        final int destY = MathUtils.moduloPositive(sourceY, cacheSize);
-
-        newTiles.add(new TileLoadingData(this, new Tile(sourceX, sourceY), new Tile(destX, destY), dataClipIndex));
+        newTiles.add(new TileLoadingData(this, sourceX, sourceY, cacheSize, dataClipIndex));
       }
     }
 
     // Walk through tiles we are currently tracking status of. We think these are valid currently.
-    final Iterator<TileLoadingData> tileIterator = currentTiles.iterator();
+    final var tileIterator = currentTiles.iterator();
     while (tileIterator.hasNext()) {
-      final TileLoadingData data = tileIterator.next();
+      final var data = tileIterator.next();
 
       // Is this tile NOT in the new data set?
       if (!newTiles.contains(data) || data.state == State.requeue) {
@@ -284,11 +280,15 @@ public abstract class AbstractGridCache {
 
     public State state = State.init;
 
-    public TileLoadingData(final AbstractGridCache sourceCache, final Tile sourceTile, final Tile destTile,
-      final int index) {
+    public TileLoadingData(final AbstractGridCache sourceCache, final int sourceX, final int sourceY,
+      final int cacheSize, final int index) {
       this.sourceCache = sourceCache;
-      this.sourceTile = sourceTile;
-      this.destTile = destTile;
+      sourceTile = new Tile(sourceX, sourceY);
+
+      final int destX = MathUtils.moduloPositive(sourceX, cacheSize);
+      final int destY = MathUtils.moduloPositive(sourceY, cacheSize);
+      destTile = new Tile(destX, destY);
+
       this.index = index;
     }
 

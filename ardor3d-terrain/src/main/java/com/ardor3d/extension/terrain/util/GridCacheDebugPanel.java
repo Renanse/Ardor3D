@@ -21,8 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.ardor3d.extension.terrain.client.AbstractGridCache;
-import com.ardor3d.extension.terrain.client.AbstractGridCache.TileLoadingData;
-import com.ardor3d.math.util.MathUtils;
 
 public class GridCacheDebugPanel extends JPanel implements Runnable {
   private static final long serialVersionUID = 1L;
@@ -63,7 +61,7 @@ public class GridCacheDebugPanel extends JPanel implements Runnable {
 
     for (int i = 0; i < cacheList.size(); i++) {
       final var cache = cacheList.get(i);
-      for (final TileLoadingData data : cache.getDebugTiles()) {
+      for (final var data : cache.getDebugTiles()) {
         switch (data.state) {
           case cancelled:
             g2.setColor(Color.orange);
@@ -85,8 +83,9 @@ public class GridCacheDebugPanel extends JPanel implements Runnable {
             g2.setColor(Color.lightGray);
             break;
         }
-        final int x = MathUtils.moduloPositive(data.sourceTile.getX(), cacheSize);
-        final int y = MathUtils.moduloPositive(data.sourceTile.getY(), cacheSize);
+
+        final int x = data.destTile.getX();
+        final int y = data.destTile.getY();
         final int xPos = x * size + 20 + (cacheList.size() - i - 1) * (size * cacheSize + 5);
         final int yPos = y * size + 20;
         g2.fillRect(xPos, yPos, size, size);
