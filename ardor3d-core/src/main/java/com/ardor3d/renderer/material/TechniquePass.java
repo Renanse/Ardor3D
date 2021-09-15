@@ -182,6 +182,7 @@ public class TechniquePass {
       }
 
       // pull our related buffer
+      @SuppressWarnings("unchecked")
       final AbstractBufferData<? extends Buffer> buffer = data.getCoords(attribute.getMeshDataKey());
 
       // check we have a valid attribute location in the current program
