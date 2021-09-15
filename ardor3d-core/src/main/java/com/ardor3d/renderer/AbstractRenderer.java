@@ -13,11 +13,9 @@ package com.ardor3d.renderer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 import com.ardor3d.buffer.BufferUtils;
-import com.ardor3d.buffer.FloatBufferData;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageUtils;
@@ -30,7 +28,6 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
@@ -121,42 +118,6 @@ public abstract class AbstractRenderer implements Renderer {
         StatCollector.addStat(StatType.STAT_POINT_COUNT, primCount);
         break;
     }
-  }
-
-  protected int getTotalInterleavedSize(final RenderContext context, final FloatBufferData vertexCoords,
-      final FloatBufferData normalCoords, final FloatBufferData colorCoords,
-      final List<FloatBufferData> textureCoords) {
-
-    int bufferSizeBytes = 0;
-    if (normalCoords != null) {
-      bufferSizeBytes += normalCoords.getBufferLimit() * 4;
-    }
-    if (colorCoords != null) {
-      bufferSizeBytes += colorCoords.getBufferLimit() * 4;
-    }
-    if (textureCoords != null) {
-      final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-      if (ts != null) {
-        boolean exists;
-        for (int i = 0; i < TextureState.MAX_TEXTURES; i++) {
-          exists = i < textureCoords.size() && textureCoords.get(i) != null && i <= ts.getMaxTextureIndexUsed();
-
-          if (!exists) {
-            continue;
-          }
-
-          final FloatBufferData textureBufferData = textureCoords.get(i);
-          if (textureBufferData != null) {
-            bufferSizeBytes += textureBufferData.getBufferLimit() * 4;
-          }
-        }
-      }
-    }
-    if (vertexCoords != null) {
-      bufferSizeBytes += vertexCoords.getBufferLimit() * 4;
-    }
-
-    return bufferSizeBytes;
   }
 
   public int getStencilClearValue() { return _stencilClearValue; }
