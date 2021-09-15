@@ -91,7 +91,7 @@ public class BlendState extends RenderState {
 
     private boolean usesConstantColor;
 
-    private SourceFunction(final boolean usesConstantColor) {
+    SourceFunction(final boolean usesConstantColor) {
       this.usesConstantColor = usesConstantColor;
     }
 
@@ -158,7 +158,7 @@ public class BlendState extends RenderState {
 
     private boolean usesConstantColor;
 
-    private DestinationFunction(final boolean usesConstantColor) {
+    DestinationFunction(final boolean usesConstantColor) {
       this.usesConstantColor = usesConstantColor;
     }
 
@@ -390,6 +390,7 @@ public class BlendState extends RenderState {
       throw new IllegalArgumentException("blendEquation can not be null.");
     }
     _blendEquationRGB = blendEquation;
+    setNeedsRefresh(true);
   }
 
   public void setBlendEquationAlpha(final BlendEquation blendEquation) {
@@ -397,6 +398,7 @@ public class BlendState extends RenderState {
       throw new IllegalArgumentException("blendEquation can not be null.");
     }
     _blendEquationAlpha = blendEquation;
+    setNeedsRefresh(true);
   }
 
   public BlendEquation getBlendEquationRGB() { return _blendEquationRGB; }
@@ -410,24 +412,28 @@ public class BlendState extends RenderState {
 
   public void setConstantColor(final ReadOnlyColorRGBA constantColor) {
     _constantColor.set(constantColor);
+    setNeedsRefresh(true);
   }
 
   public boolean isSampleAlphaToCoverageEnabled() { return _sampleAlphaToCoverageEnabled; }
 
   public void setSampleAlphaToCoverageEnabled(final boolean sampleAlphaToCoverageEnabled) {
     _sampleAlphaToCoverageEnabled = sampleAlphaToCoverageEnabled;
+    setNeedsRefresh(true);
   }
 
   public boolean isSampleAlphaToOneEnabled() { return _sampleAlphaToOneEnabled; }
 
   public void setSampleAlphaToOneEnabled(final boolean sampleAlphaToOneEnabled) {
     _sampleAlphaToOneEnabled = sampleAlphaToOneEnabled;
+    setNeedsRefresh(true);
   }
 
   public boolean isSampleCoverageEnabled() { return _sampleCoverageEnabled; }
 
   public void setSampleCoverageEnabled(final boolean sampleCoverageEnabled) {
     _sampleCoverageEnabled = sampleCoverageEnabled;
+    setNeedsRefresh(true);
   }
 
   public float getSampleCoverage() { return _sampleCoverage; }
@@ -443,12 +449,14 @@ public class BlendState extends RenderState {
       throw new IllegalArgumentException("value must be in range [0f, 1f]");
     }
     _sampleCoverage = value;
+    setNeedsRefresh(true);
   }
 
   public boolean isSampleCoverageInverted() { return _sampleCoverageInverted; }
 
   public void setSampleCoverageInverted(final boolean sampleCoverageInverted) {
     _sampleCoverageInverted = sampleCoverageInverted;
+    setNeedsRefresh(true);
   }
 
   @Override
@@ -482,6 +490,11 @@ public class BlendState extends RenderState {
         DestinationFunction.OneMinusSourceAlpha);
     _blendEquationAlpha = capsule.readEnum("blendEquationAlpha", BlendEquation.class, BlendEquation.Add);
     _constantColor = capsule.readSavable("constantColor", null);
+    _sampleAlphaToCoverageEnabled = capsule.readBoolean("sampleAlphaToCoverageEnabled", false);
+    _sampleAlphaToOneEnabled = capsule.readBoolean("sampleAlphaToOneEnabled", false);
+    _sampleCoverageEnabled = capsule.readBoolean("sampleCoverageEnabled", false);
+    _sampleCoverageInverted = capsule.readBoolean("sampleCoverageInverted", false);
+    _sampleCoverage = capsule.readFloat("sampleCoverage", 1.0f);
   }
 
   @Override
