@@ -124,13 +124,9 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
 
   @Override
   public float getHeight(final int x, final int z, final boolean tryParentCache) {
-    int tileX = MathUtils.floor((float) x / tileSize);
-    int tileY = MathUtils.floor((float) z / tileSize);
-    tileX = MathUtils.moduloPositive(tileX, cacheSize);
-    tileY = MathUtils.moduloPositive(tileY, cacheSize);
-    final var tileData = cache[tileX][tileY];
+    final CacheData tileData = getTileFromCache(x, z);
 
-    if (!tileData.isValid) {
+    if (tileData == null || !tileData.isValid) {
       if (tryParentCache && parentCache != null) {
         if (x % 2 == 0 && z % 2 == 0) {
           return parentCache.getHeight(x / 2, z / 2, tryParentCache);
@@ -157,13 +153,9 @@ public class TerrainGridCache extends AbstractGridCache implements TerrainCache 
 
   @Override
   public float getSubHeight(final float x, final float z, final boolean tryParentCache) {
-    int tileX = MathUtils.floor(x / tileSize);
-    int tileY = MathUtils.floor(z / tileSize);
-    tileX = MathUtils.moduloPositive(tileX, cacheSize);
-    tileY = MathUtils.moduloPositive(tileY, cacheSize);
-    final var tileData = cache[tileX][tileY];
+    final CacheData tileData = getTileFromCache(x, z);
 
-    if (!tileData.isValid) {
+    if (tileData == null || !tileData.isValid) {
       if (tryParentCache && parentCache != null) {
         return parentCache.getSubHeight(x / 2f, z / 2f, tryParentCache);
       } else {

@@ -274,12 +274,38 @@ public abstract class AbstractGridCache {
   }
 
   public boolean isValid() {
+    // FIXME: is the whole grid *really* valid when we only have 1 tile valid?
     for (final TileLoadingData data : currentTiles) {
       if (cache[data.destTile.getX()][data.destTile.getY()].isValid) {
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * Get a CacheData object based on a given relative x, z location.
+   *
+   * @param x
+   *          clipmap relative X position
+   * @param z
+   *          clipmap relative Z position
+   * @return the CacheData object for the cache tile corresponding to the given coordinates, or null
+   *         if the tile is not valid or the position would fall outside of the cache.
+   */
+  protected CacheData getTileFromCache(final float x, final float z) {
+    // get our terrain relative tile
+    final int tileX = MathUtils.floor(x / tileSize);
+    final int tileY = MathUtils.floor(z / tileSize);
+
+    final int cacheX = MathUtils.moduloPositive(tileX, cacheSize);
+    final int cacheY = MathUtils.moduloPositive(tileY, cacheSize);
+    final var tileData = cache[cacheX][cacheY];
+
+    if (!tileData.isValid || tileData.validX != tileX || tileData.validY != tileY) {
+      return null;
+    }
+    return tileData;
   }
 
   public void setMailBox(final DoubleBufferedList<Region> mailBox) { this.mailBox = mailBox; }
@@ -344,7 +370,10 @@ public abstract class AbstractGridCache {
           if (mailBox != null) {
             mailBox.add(region);
           }
-          sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
+          final var cacheTile = sourceCache.cache[destTile.getX()][destTile.getY()];
+          cacheTile.isValid = true;
+          cacheTile.validX = sourceTile.getX();
+          cacheTile.validY = sourceTile.getY();
         default:
           return;
       }
@@ -406,6 +435,7 @@ public abstract class AbstractGridCache {
   }
 
   public static class CacheData {
+    public int validX, validY;
     public boolean isValid;
 
     public CacheData() {
