@@ -54,10 +54,21 @@ public abstract class AbstractGridCache {
 
   protected DoubleBufferedList<Region> mailBox;
 
-  protected Set<Tile> validTiles;
+  /**
+   * The center tile of our last validity check.
+   */
+  protected Tile validityAnchorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-  protected final int locatorSize = 20;
-  protected Tile locatorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
+  /**
+   * Manhattan distance of our validity check area from our anchor tile.
+   */
+  protected int validityCheckDistance;
+
+  /**
+   * Set of tiles in the validity check area that we were told are valid for querying from source. If
+   * null, we assume any tile is valid for querying.
+   */
+  protected Set<Tile> validTiles;
 
   public enum State {
     init, loading, finished, cancelled, error, requeue
@@ -67,6 +78,7 @@ public abstract class AbstractGridCache {
     final int meshClipIndex, final int dataClipIndex, final int vertexDistance,
     final ExecutorService tileThreadService) {
     this.cacheSize = cacheSize;
+    validityCheckDistance = cacheSize * 2;
     this.tileSize = tileSize;
     dataSize = tileSize * cacheSize;
     this.destinationSize = destinationSize;
@@ -196,9 +208,11 @@ public abstract class AbstractGridCache {
 
     updated = false;
 
-    if (shouldMoveLocator(tileX, tileY)) {
-      validTiles = getValidTilesFromSource(tileX - locatorSize / 2, tileY - locatorSize / 2, locatorSize, locatorSize);
-      locatorTile = new Tile(tileX, tileY);
+    if (shouldMoveValidityAnchor(tileX, tileY)) {
+      validityAnchorTile = new Tile(tileX, tileY);
+      final int edgeSize = 2 * validityCheckDistance + (validityCheckDistance % 2 == 0 ? 1 : 0);
+      validTiles =
+          getValidTilesFromSource(tileX - validityCheckDistance, tileY - validityCheckDistance, edgeSize, edgeSize);
     }
 
     // walk through the accumulated tile data
@@ -232,20 +246,23 @@ public abstract class AbstractGridCache {
   protected abstract AbstractGridCache getParentCache();
 
   /**
-   * Check if a given tile coordinate is far enough away from the center of the locator area that we
-   * should re-center things.
+   * Check if a given tile coordinate is close enough to the edge of the validity area that we should
+   * re-center things.
    *
    * @param tileX
+   *          The X index of the tile at the center of our cache area
    * @param tileY
-   * @return
+   *          The Y index of the tile at the center of our cache area
+   * @return true if our cache would border the edge or at least partially lie outside of the validity
+   *         area.
    */
-  protected boolean shouldMoveLocator(final int tileX, final int tileY) {
-    // is the given tile outside of our locator area?
-    // our destination includes padding of 4-5 units, so we check if we are away from our old center by
-    // that amount.
-    final int offsetX = Math.abs(tileX - locatorTile.getX());
-    final int offsetY = Math.abs(tileY - locatorTile.getY());
-    return offsetX > 2 || offsetY > 2;
+  protected boolean shouldMoveValidityAnchor(final int tileX, final int tileY) {
+    // find the max X and Y tile offsets for a cache centered at tileX, tileY.
+    final int offsetX = Math.abs(tileX - validityAnchorTile.getX()) + cacheSize / 2;
+    final int offsetY = Math.abs(tileY - validityAnchorTile.getY()) + cacheSize / 2;
+
+    // if the cache would be at or past the edge of the validity area, return true.
+    return offsetX >= validityCheckDistance || offsetY >= validityCheckDistance;
   }
 
   public Set<TileLoadingData> getDebugTiles() {
