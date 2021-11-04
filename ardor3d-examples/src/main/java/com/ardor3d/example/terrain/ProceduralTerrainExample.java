@@ -69,7 +69,10 @@ public class ProceduralTerrainExample extends ExampleBase {
   private Camera terrainCamera;
   private Skybox skybox;
 
-  private int octaves = 9;
+  private FbmFunction3D _fbmFunction;
+  private int _octaves = 9;
+
+  final DirectionalLight dLight = new DirectionalLight();
 
   /** Text fields used to present info about the example. */
   private final BasicText _exampleInfo[] = new BasicText[5];
@@ -149,7 +152,7 @@ public class ProceduralTerrainExample extends ExampleBase {
       terrainCamera = new Camera(camera);
 
       final double scale = 1.0 / 4000.0;
-      _fbmFunction = new FbmFunction3D(Functions.simplexNoise(), octaves, 0.5, 0.5, 3.14);
+      _fbmFunction = new FbmFunction3D(Functions.simplexNoise(), _octaves, 0.5, 0.5, 3.14);
       final var functionTmp = Functions.clamp(_fbmFunction, -1.2, 1.2);
       final Function3D function = Functions.scaleInput(functionTmp, scale, scale, 1);
 
@@ -186,16 +189,16 @@ public class ProceduralTerrainExample extends ExampleBase {
 
     _logicalLayer
         .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT_BRACKET), (source, inputStates, tpf) -> {
-          octaves = Math.max(1, octaves - 1);
-          _fbmFunction.setOctaves(octaves);
+          _octaves = Math.max(1, _octaves - 1);
+          _fbmFunction.setOctaves(_octaves);
           terrain.regenerate(true, true);
           updateText();
         }));
 
     _logicalLayer
         .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT_BRACKET), (source, inputStates, tpf) -> {
-          octaves = Math.min(12, octaves + 1);
-          _fbmFunction.setOctaves(octaves);
+          _octaves = Math.min(12, _octaves + 1);
+          _fbmFunction.setOctaves(_octaves);
           terrain.regenerate(true, true);
           updateText();
         }));
@@ -267,9 +270,6 @@ public class ProceduralTerrainExample extends ExampleBase {
     }));
   }
 
-  final DirectionalLight dLight = new DirectionalLight();
-  private FbmFunction3D _fbmFunction;
-
   private void setupDefaultStates() {
     final CullState cs = new CullState();
     cs.setEnabled(true);
@@ -326,7 +326,7 @@ public class ProceduralTerrainExample extends ExampleBase {
     _exampleInfo[0].setText("[1/2/3/4] Moving speed: " + _controlHandle.getMoveSpeed() * 3.6 + " km/h");
     _exampleInfo[1].setText("[P] Do picking: " + (sphere.getSceneHints().getCullHint() == CullHint.Dynamic));
     _exampleInfo[2].setText("[SPACE] Toggle fly/walk: " + (groundCamera ? "walk" : "fly"));
-    _exampleInfo[3].setText("[Left/Right Bracket] Octaves: " + octaves);
+    _exampleInfo[3].setText("[Left/Right Bracket] Octaves: " + _octaves);
     _exampleInfo[4].setText("[U] Freeze terrain(debug): " + !updateTerrain);
   }
 }
