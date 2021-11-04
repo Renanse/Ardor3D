@@ -60,6 +60,6 @@ subprojects {
 	
 	dependencies {
 		testImplementation group: 'junit', name: 'junit', version:'4.13.2'
-		testImplementation group: 'org.easymock', name: 'easymock', version: '4.2'
+		testImplementation group: 'org.easymock', name: 'easymock', version: '4.3'
 	}
 }
