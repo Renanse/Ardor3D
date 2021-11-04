@@ -329,25 +329,9 @@ public class TextureClipmap {
         textureSize);
   }
 
-  public void regenerate(final Renderer renderer) {
-    for (int unit = validLevels - 1; unit >= 0; unit--) {
-      float x = eyePosition.getXf();
-      float y = eyePosition.getZf();
-
-      final int exp2 = (int) Math.pow(2, unit);
-      x /= exp2;
-      y /= exp2;
-
-      final int offX = MathUtils.floor(x);
-      final int offY = MathUtils.floor(y);
-
-      final LevelData levelData = levelDataList.get(unit);
-
-      final int sX = offX - textureSize / 2;
-      final int sY = offY - textureSize / 2;
-
-      updateQuick(renderer, levelData, textureSize + 1, textureSize + 1, sX, sY, levelData.offsetX, levelData.offsetY,
-          textureSize, textureSize);
+  public void regenerate() {
+    for (final TextureCache textureCache : cacheList) {
+      textureCache.regenerate();
     }
   }
 

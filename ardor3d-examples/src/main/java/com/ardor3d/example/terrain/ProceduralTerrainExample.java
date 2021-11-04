@@ -69,6 +69,8 @@ public class ProceduralTerrainExample extends ExampleBase {
   private Camera terrainCamera;
   private Skybox skybox;
 
+  private int octaves = 9;
+
   /** Text fields used to present info about the example. */
   private final BasicText _exampleInfo[] = new BasicText[5];
 
@@ -104,6 +106,7 @@ public class ProceduralTerrainExample extends ExampleBase {
       PickingUtil.findPick(_root, pickRay, pickResults);
       if (pickResults.getNumber() != 0) {
         final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+        intersectionPoint.setY(terrain.getHeightAt(intersectionPoint.getX(), intersectionPoint.getZ()));
         sphere.setTranslation(intersectionPoint);
         // XXX: maybe change the color of the ball for valid vs. invalid?
       }
@@ -119,7 +122,7 @@ public class ProceduralTerrainExample extends ExampleBase {
 
     // Setup main camera.
     _canvas.setTitle("Procedural Terrain Example");
-    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 300, 0));
+    _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(10000, 300, -8000));
     _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(1, 300, 1), Vector3.UNIT_Y);
     _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(70.0,
         (float) _canvas.getCanvasRenderer().getCamera().getWidth()
@@ -146,8 +149,8 @@ public class ProceduralTerrainExample extends ExampleBase {
       terrainCamera = new Camera(camera);
 
       final double scale = 1.0 / 4000.0;
-      Function3D functionTmp = new FbmFunction3D(Functions.simplexNoise(), 9, 0.5, 0.5, 3.14);
-      functionTmp = Functions.clamp(functionTmp, -1.2, 1.2);
+      _fbmFunction = new FbmFunction3D(Functions.simplexNoise(), octaves, 0.5, 0.5, 3.14);
+      final var functionTmp = Functions.clamp(_fbmFunction, -1.2, 1.2);
       final Function3D function = Functions.scaleInput(functionTmp, scale, scale, 1);
 
       final TerrainDataProvider terrainDataProvider =
@@ -181,11 +184,21 @@ public class ProceduralTerrainExample extends ExampleBase {
     textNodes.updateGeometricState(0.0);
     updateText();
 
-    _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), (source, inputStates,
-        tpf) -> GameTaskQueueManager.getManager(renderContext).getQueue(GameTaskQueue.RENDER).enqueue(() -> {
-          terrain.regenerate(renderer);
-          return null;
-        })));
+    _logicalLayer
+        .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT_BRACKET), (source, inputStates, tpf) -> {
+          octaves = Math.max(1, octaves - 1);
+          _fbmFunction.setOctaves(octaves);
+          terrain.regenerate(true, true);
+          updateText();
+        }));
+
+    _logicalLayer
+        .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT_BRACKET), (source, inputStates, tpf) -> {
+          octaves = Math.min(12, octaves + 1);
+          _fbmFunction.setOctaves(octaves);
+          terrain.regenerate(true, true);
+          updateText();
+        }));
 
     _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.U), (source, inputStates, tpf) -> {
       updateTerrain = !updateTerrain;
@@ -255,6 +268,7 @@ public class ProceduralTerrainExample extends ExampleBase {
   }
 
   final DirectionalLight dLight = new DirectionalLight();
+  private FbmFunction3D _fbmFunction;
 
   private void setupDefaultStates() {
     final CullState cs = new CullState();
@@ -312,7 +326,7 @@ public class ProceduralTerrainExample extends ExampleBase {
     _exampleInfo[0].setText("[1/2/3/4] Moving speed: " + _controlHandle.getMoveSpeed() * 3.6 + " km/h");
     _exampleInfo[1].setText("[P] Do picking: " + (sphere.getSceneHints().getCullHint() == CullHint.Dynamic));
     _exampleInfo[2].setText("[SPACE] Toggle fly/walk: " + (groundCamera ? "walk" : "fly"));
-    _exampleInfo[3].setText("[J] Regenerate heightmap/texture");
+    _exampleInfo[3].setText("[Left/Right Bracket] Octaves: " + octaves);
     _exampleInfo[4].setText("[U] Freeze terrain(debug): " + !updateTerrain);
   }
 }

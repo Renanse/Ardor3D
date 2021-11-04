@@ -80,4 +80,6 @@ public interface TerrainCache {
 
   void checkForUpdates();
 
+  void regenerate();
+
 }

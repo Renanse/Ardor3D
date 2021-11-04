@@ -427,36 +427,40 @@ public class Terrain extends Node implements Pickable, Runnable {
     clearDirty(DirtyType.Bounding);
   }
 
-  public void regenerate(final Renderer renderer) {
-    for (int i = _clips.size() - 1; i >= 0; i--) {
-      if (!_clips.get(i).isReady()) {
-        _visibleLevels = i + 1;
-        break;
+  public void regenerate(final boolean geometry, final boolean textures) {
+    if (geometry) {
+      for (int i = _clips.size() - 1; i >= 0; i--) {
+        if (!_clips.get(i).isReady()) {
+          _visibleLevels = i + 1;
+          break;
+        }
+      }
+
+      // Update vertices.
+      for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+        _clips.get(i).regenerate();
+      }
+
+      // Update indices.
+      for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+        if (i == _visibleLevels) {
+          // Level 0 has no nested level, so pass null as parameter.
+          _clips.get(i).updateIndices(null);
+        } else {
+          // All other levels i have the level i-1 nested in.
+          _clips.get(i).updateIndices(_clips.get(i - 1));
+        }
       }
     }
 
-    // Update vertices.
-    for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
-      _clips.get(i).regenerate();
-    }
-
-    // Update indices.
-    for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
-      if (i == _visibleLevels) {
-        // Level 0 has no nested level, so pass null as parameter.
-        _clips.get(i).updateIndices(null);
-      } else {
-        // All other levels i have the level i-1 nested in.
-        _clips.get(i).updateIndices(_clips.get(i - 1));
+    if (textures) {
+      for (final TextureClipmap textureClipmap : _textureClipmaps) {
+        textureClipmap.regenerate();
       }
-    }
 
-    for (final TextureClipmap textureClipmap : _textureClipmaps) {
-      textureClipmap.regenerate(renderer);
-    }
-
-    if (_normalClipmap != null) {
-      _normalClipmap.regenerate(renderer);
+      if (_normalClipmap != null) {
+        _normalClipmap.regenerate();
+      }
     }
   }
 

@@ -101,6 +101,10 @@ public abstract class AbstractGridCache {
         sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
   }
 
+  public void regenerate() {
+    updateCurrentTiles(true);
+  }
+
   public void setCurrentPosition(final int x, final int y) {
     final int tileX = MathUtils.floor((float) x / tileSize);
     final int tileY = MathUtils.floor((float) y / tileSize);
@@ -113,12 +117,16 @@ public abstract class AbstractGridCache {
     backCurrentTileX = tileX;
     backCurrentTileY = tileY;
 
-    // Gather all of the tiles in range of our new position
+    updateCurrentTiles(false);
+  }
+
+  protected void updateCurrentTiles(final boolean forceRefresh) {
+    // Gather all of the tiles in range of our current position
     final var newTiles = new HashSet<TileLoadingData>();
     for (int i = 0; i < cacheSize; i++) {
       for (int j = 0; j < cacheSize; j++) {
-        final int sourceX = tileX + j - cacheSize / 2;
-        final int sourceY = tileY + i - cacheSize / 2;
+        final int sourceX = backCurrentTileX + j - cacheSize / 2;
+        final int sourceY = backCurrentTileY + i - cacheSize / 2;
 
         newTiles.add(new TileLoadingData(this, sourceX, sourceY, cacheSize, dataClipIndex));
       }
@@ -130,7 +138,7 @@ public abstract class AbstractGridCache {
       final var data = tileIterator.next();
 
       // Is this tile NOT in the new data set?
-      if (!newTiles.contains(data) || data.state == State.requeue) {
+      if (forceRefresh || !newTiles.contains(data) || data.state == State.requeue) {
         // set that destination tile as invalid
         cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
 
