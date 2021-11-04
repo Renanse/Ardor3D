@@ -15,7 +15,7 @@ import com.ardor3d.extension.terrain.providers.compound.function.ICombineFunctio
 
 public class Entry {
   protected final TerrainSource _source;
-  protected final ICombineFunction _combine;
+  protected ICombineFunction _combine;
 
   public Entry(final TerrainSource source, final ICombineFunction combine) {
     _source = source;
@@ -25,5 +25,7 @@ public class Entry {
   public TerrainSource getSource() { return _source; }
 
   public ICombineFunction getCombine() { return _combine; }
+
+  public void setCombine(final ICombineFunction combine) { _combine = combine; }
 
 }
