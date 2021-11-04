@@ -40,4 +40,6 @@ public interface TextureCache {
   void checkForInvalidatedRegions();
 
   void checkForUpdates();
+
+  void regenerate();
 }

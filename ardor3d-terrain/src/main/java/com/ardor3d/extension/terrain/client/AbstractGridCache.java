@@ -54,10 +54,21 @@ public abstract class AbstractGridCache {
 
   protected DoubleBufferedList<Region> mailBox;
 
-  protected Set<Tile> validTiles;
+  /**
+   * The center tile of our last validity check.
+   */
+  protected Tile validityAnchorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-  protected final int locatorSize = 20;
-  protected Tile locatorTile = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
+  /**
+   * Manhattan distance of our validity check area from our anchor tile.
+   */
+  protected int validityCheckDistance;
+
+  /**
+   * Set of tiles in the validity check area that we were told are valid for querying from source. If
+   * null, we assume any tile is valid for querying.
+   */
+  protected Set<Tile> validTiles;
 
   public enum State {
     init, loading, finished, cancelled, error, requeue
@@ -67,6 +78,7 @@ public abstract class AbstractGridCache {
     final int meshClipIndex, final int dataClipIndex, final int vertexDistance,
     final ExecutorService tileThreadService) {
     this.cacheSize = cacheSize;
+    validityCheckDistance = cacheSize * 2;
     this.tileSize = tileSize;
     dataSize = tileSize * cacheSize;
     this.destinationSize = destinationSize;
@@ -89,6 +101,10 @@ public abstract class AbstractGridCache {
         sourceTile.getY() * tileSize * vertexDistance, tileSize * vertexDistance, tileSize * vertexDistance);
   }
 
+  public void regenerate() {
+    updateCurrentTiles(true);
+  }
+
   public void setCurrentPosition(final int x, final int y) {
     final int tileX = MathUtils.floor((float) x / tileSize);
     final int tileY = MathUtils.floor((float) y / tileSize);
@@ -101,12 +117,16 @@ public abstract class AbstractGridCache {
     backCurrentTileX = tileX;
     backCurrentTileY = tileY;
 
-    // Gather all of the tiles in range of our new position
+    updateCurrentTiles(false);
+  }
+
+  protected void updateCurrentTiles(final boolean forceRefresh) {
+    // Gather all of the tiles in range of our current position
     final var newTiles = new HashSet<TileLoadingData>();
     for (int i = 0; i < cacheSize; i++) {
       for (int j = 0; j < cacheSize; j++) {
-        final int sourceX = tileX + j - cacheSize / 2;
-        final int sourceY = tileY + i - cacheSize / 2;
+        final int sourceX = backCurrentTileX + j - cacheSize / 2;
+        final int sourceY = backCurrentTileY + i - cacheSize / 2;
 
         newTiles.add(new TileLoadingData(this, sourceX, sourceY, cacheSize, dataClipIndex));
       }
@@ -118,7 +138,7 @@ public abstract class AbstractGridCache {
       final var data = tileIterator.next();
 
       // Is this tile NOT in the new data set?
-      if (!newTiles.contains(data) || data.state == State.requeue) {
+      if (forceRefresh || !newTiles.contains(data) || data.state == State.requeue) {
         // set that destination tile as invalid
         cache[data.destTile.getX()][data.destTile.getY()].isValid = false;
 
@@ -196,9 +216,11 @@ public abstract class AbstractGridCache {
 
     updated = false;
 
-    if (shouldMoveLocator(tileX, tileY)) {
-      validTiles = getValidTilesFromSource(tileX - locatorSize / 2, tileY - locatorSize / 2, locatorSize, locatorSize);
-      locatorTile = new Tile(tileX, tileY);
+    if (shouldMoveValidityAnchor(tileX, tileY)) {
+      validityAnchorTile = new Tile(tileX, tileY);
+      final int edgeSize = 2 * validityCheckDistance + (validityCheckDistance % 2 == 0 ? 1 : 0);
+      validTiles =
+          getValidTilesFromSource(tileX - validityCheckDistance, tileY - validityCheckDistance, edgeSize, edgeSize);
     }
 
     // walk through the accumulated tile data
@@ -232,20 +254,23 @@ public abstract class AbstractGridCache {
   protected abstract AbstractGridCache getParentCache();
 
   /**
-   * Check if a given tile coordinate is far enough away from the center of the locator area that we
-   * should re-center things.
+   * Check if a given tile coordinate is close enough to the edge of the validity area that we should
+   * re-center things.
    *
    * @param tileX
+   *          The X index of the tile at the center of our cache area
    * @param tileY
-   * @return
+   *          The Y index of the tile at the center of our cache area
+   * @return true if our cache would border the edge or at least partially lie outside of the validity
+   *         area.
    */
-  protected boolean shouldMoveLocator(final int tileX, final int tileY) {
-    // is the given tile outside of our locator area?
-    // our destination includes padding of 4-5 units, so we check if we are away from our old center by
-    // that amount.
-    final int offsetX = Math.abs(tileX - locatorTile.getX());
-    final int offsetY = Math.abs(tileY - locatorTile.getY());
-    return offsetX > 2 || offsetY > 2;
+  protected boolean shouldMoveValidityAnchor(final int tileX, final int tileY) {
+    // find the max X and Y tile offsets for a cache centered at tileX, tileY.
+    final int offsetX = Math.abs(tileX - validityAnchorTile.getX()) + cacheSize / 2;
+    final int offsetY = Math.abs(tileY - validityAnchorTile.getY()) + cacheSize / 2;
+
+    // if the cache would be at or past the edge of the validity area, return true.
+    return offsetX >= validityCheckDistance || offsetY >= validityCheckDistance;
   }
 
   public Set<TileLoadingData> getDebugTiles() {
@@ -257,12 +282,38 @@ public abstract class AbstractGridCache {
   }
 
   public boolean isValid() {
+    // FIXME: is the whole grid *really* valid when we only have 1 tile valid?
     for (final TileLoadingData data : currentTiles) {
       if (cache[data.destTile.getX()][data.destTile.getY()].isValid) {
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * Get a CacheData object based on a given relative x, z location.
+   *
+   * @param x
+   *          clipmap relative X position
+   * @param z
+   *          clipmap relative Z position
+   * @return the CacheData object for the cache tile corresponding to the given coordinates, or null
+   *         if the tile is not valid or the position would fall outside of the cache.
+   */
+  protected CacheData getTileFromCache(final float x, final float z) {
+    // get our terrain relative tile
+    final int tileX = MathUtils.floor(x / tileSize);
+    final int tileY = MathUtils.floor(z / tileSize);
+
+    final int cacheX = MathUtils.moduloPositive(tileX, cacheSize);
+    final int cacheY = MathUtils.moduloPositive(tileY, cacheSize);
+    final var tileData = cache[cacheX][cacheY];
+
+    if (!tileData.isValid || tileData.validX != tileX || tileData.validY != tileY) {
+      return null;
+    }
+    return tileData;
   }
 
   public void setMailBox(final DoubleBufferedList<Region> mailBox) { this.mailBox = mailBox; }
@@ -327,7 +378,10 @@ public abstract class AbstractGridCache {
           if (mailBox != null) {
             mailBox.add(region);
           }
-          sourceCache.cache[destTile.getX()][destTile.getY()].isValid = true;
+          final var cacheTile = sourceCache.cache[destTile.getX()][destTile.getY()];
+          cacheTile.isValid = true;
+          cacheTile.validX = sourceTile.getX();
+          cacheTile.validY = sourceTile.getY();
         default:
           return;
       }
@@ -389,6 +443,7 @@ public abstract class AbstractGridCache {
   }
 
   public static class CacheData {
+    public int validX, validY;
     public boolean isValid;
 
     public CacheData() {

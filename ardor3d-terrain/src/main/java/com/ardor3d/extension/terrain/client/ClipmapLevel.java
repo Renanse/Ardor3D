@@ -262,9 +262,7 @@ public class ClipmapLevel extends Mesh {
   }
 
   public void regenerate() {
-    updateVerticesForMovement(clipSideSize - 1, clipSideSize - 1);
-    getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
-    markDirty(DirtyType.Bounding);
+    cache.regenerate();
   }
 
   /**

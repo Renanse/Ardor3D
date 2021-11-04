@@ -132,13 +132,9 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
 
   @Override
   public int getColor(final int x, final int z) {
-    int tileX = MathUtils.floor((float) x / tileSize);
-    int tileY = MathUtils.floor((float) z / tileSize);
-    tileX = MathUtils.moduloPositive(tileX, cacheSize);
-    tileY = MathUtils.moduloPositive(tileY, cacheSize);
-    final CacheData tileData = cache[tileX][tileY];
+    final CacheData tileData = getTileFromCache(x, z);
 
-    if (!tileData.isValid) {
+    if (tileData == null || !tileData.isValid) {
       if (parentCache != null) {
         if (x % 2 == 0 && z % 2 == 0) {
           return parentCache.getColor(x / 2, z / 2);
@@ -167,13 +163,9 @@ public class TextureGridCache extends AbstractGridCache implements TextureCache 
 
   @Override
   public int getSubColor(final float x, final float z) {
-    int tileX = MathUtils.floor(x / tileSize);
-    int tileY = MathUtils.floor(z / tileSize);
-    tileX = MathUtils.moduloPositive(tileX, cacheSize);
-    tileY = MathUtils.moduloPositive(tileY, cacheSize);
-    final CacheData tileData = cache[tileX][tileY];
+    final CacheData tileData = getTileFromCache(x, z);
 
-    if (!tileData.isValid) {
+    if (tileData == null || !tileData.isValid) {
       if (parentCache != null) {
         return parentCache.getSubColor(x / 2f, z / 2f);
       } else {
