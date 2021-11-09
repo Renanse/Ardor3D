@@ -11,6 +11,7 @@
 package com.ardor3d.extension.terrain.providers.compound;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,7 @@ import com.ardor3d.extension.terrain.util.Tile;
 
 public class CompoundTerrainSource implements TerrainSource {
 
-  protected List<Entry> _sourceList = new ArrayList<>();
+  protected final List<Entry> _sourceList = Collections.synchronizedList(new ArrayList<>());
   protected TerrainConfiguration _terrainConfig;
 
   public CompoundTerrainSource(final TerrainConfiguration config) {
@@ -37,6 +38,11 @@ public class CompoundTerrainSource implements TerrainSource {
     _sourceList.add(entry);
   }
 
+  /**
+   * @return the list of entries used in this source. The List is created with
+   *         Collections.synchronizedList and thus, iterator operations and stream operations must be
+   *         synchronized with the list as the mutex.
+   */
   public List<Entry> getEntries() { return _sourceList; }
 
   public Entry getEntry(final int index) {
@@ -73,14 +79,16 @@ public class CompoundTerrainSource implements TerrainSource {
       final int numTilesY) throws Exception {
     Set<Tile> set;
     Set<Tile> rVal = null;
-    for (final Entry src : _sourceList) {
-      set = src.getSource() == null ? null
-          : src.getSource().getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
-      if (set != null) {
-        if (rVal == null) {
-          rVal = new HashSet<>(set);
-        } else {
-          rVal.addAll(set);
+    synchronized (_sourceList) {
+      for (final Entry src : _sourceList) {
+        set = src.getSource() == null ? null
+            : src.getSource().getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+        if (set != null) {
+          if (rVal == null) {
+            rVal = new HashSet<>(set);
+          } else {
+            rVal.addAll(set);
+          }
         }
       }
     }
@@ -91,13 +99,15 @@ public class CompoundTerrainSource implements TerrainSource {
   public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
     float[] data = null;
 
-    for (final Entry entry : _sourceList) {
-      if (entry.getSource() != null) {
-        final float[] srcData = entry.getSource().getTile(clipmapLevel, tile);
-        if (entry.getCombine() == null) {
-          data = srcData;
-        } else {
-          data = entry.getCombine().apply(data, srcData);
+    synchronized (_sourceList) {
+      for (final Entry entry : _sourceList) {
+        if (entry.getSource() != null) {
+          final float[] srcData = entry.getSource().getTile(clipmapLevel, tile);
+          if (entry.getCombine() == null) {
+            data = srcData;
+          } else {
+            data = entry.getCombine().apply(data, srcData);
+          }
         }
       }
     }

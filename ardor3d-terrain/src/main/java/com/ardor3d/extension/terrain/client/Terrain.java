@@ -65,7 +65,7 @@ public class Terrain extends Node implements Pickable, Runnable {
   protected final BlendState blendState;
 
   /** Reference to the texture clipmap */
-  protected final List<TextureClipmap> _textureClipmaps = new ArrayList<>();
+  protected final List<TextureClipmap> _textureClipmaps = Collections.synchronizedList(new ArrayList<>());
 
   /** Reference to normal map */
   protected TextureClipmap _normalClipmap;
@@ -249,14 +249,16 @@ public class Terrain extends Node implements Pickable, Runnable {
       }
 
       // check texture clips
-      for (int i = 0; i < _textureClipmaps.size(); i++) {
-        final TextureClipmap cm = _textureClipmaps.get(i);
-        if (!cm.isEnabled()) {
-          continue;
-        }
-        final List<TextureCache> list = cm.getCacheList();
-        for (int j = list.size(); --j >= 0;) {
-          list.get(j).checkForUpdates();
+      synchronized (_textureClipmaps) {
+        for (int i = 0; i < _textureClipmaps.size(); i++) {
+          final TextureClipmap cm = _textureClipmaps.get(i);
+          if (!cm.isEnabled()) {
+            continue;
+          }
+          final List<TextureCache> list = cm.getCacheList();
+          for (int j = list.size(); --j >= 0;) {
+            list.get(j).checkForUpdates();
+          }
         }
       }
 
@@ -283,50 +285,52 @@ public class Terrain extends Node implements Pickable, Runnable {
     }
 
     boolean firstDrawnClip = true;
-    // Walk through our clipmaps
-    for (int i = 0, maxI = _textureClipmaps.size(); i < maxI; i++) {
-      final TextureClipmap textureClipmap = _textureClipmaps.get(i);
+    synchronized (_textureClipmaps) {
+      // Walk through our clipmaps
+      for (int i = 0, maxI = _textureClipmaps.size(); i < maxI; i++) {
+        final TextureClipmap textureClipmap = _textureClipmaps.get(i);
 
-      // if this clipmap is disabled, ignore it
-      if (!textureClipmap.isEnabled()) {
-        continue;
-      }
-
-      // update clipmap contents
-      textureClipmap.update(r, transformedFrustumPos);
-
-      // prepare this clipmap for drawing
-      textureClipmap.prepareToDrawClips(this);
-
-      // grab the clipmap's texture for drawing
-      clipTextureState.setTexture(textureClipmap.getTexture());
-
-      // If we're the first clip to draw, we won't blend
-      blendState.setEnabled(!firstDrawnClip);
-      firstDrawnClip = false;
-
-      // If we plan to draw more than one clipmap, push our buckets so we can render just this level
-      // independent
-      // of anything else.
-      if (_textureClipmaps.size() > 1) {
-        r.getQueue().pushBuckets();
-      }
-
-      // draw levels from coarse to fine.
-      for (int j = _clips.size() - 1; j >= _visibleLevels; j--) {
-        final ClipmapLevel clip = _clips.get(j);
-
-        if (clip.getStripIndex() > 0) {
-          clip.draw(r);
+        // if this clipmap is disabled, ignore it
+        if (!textureClipmap.isEnabled()) {
+          continue;
         }
-      }
 
-      // Again, if we plan to draw more than one, we pushed our buckets, so render the current buckets and
-      // restore
-      // what was in them previously.
-      if (_textureClipmaps.size() > 1) {
-        r.renderBuckets();
-        r.getQueue().popBuckets();
+        // update clipmap contents
+        textureClipmap.update(r, transformedFrustumPos);
+
+        // prepare this clipmap for drawing
+        textureClipmap.prepareToDrawClips(this);
+
+        // grab the clipmap's texture for drawing
+        clipTextureState.setTexture(textureClipmap.getTexture());
+
+        // If we're the first clip to draw, we won't blend
+        blendState.setEnabled(!firstDrawnClip);
+        firstDrawnClip = false;
+
+        // If we plan to draw more than one clipmap, push our buckets so we can render just this level
+        // independent
+        // of anything else.
+        if (_textureClipmaps.size() > 1) {
+          r.getQueue().pushBuckets();
+        }
+
+        // draw levels from coarse to fine.
+        for (int j = _clips.size() - 1; j >= _visibleLevels; j--) {
+          final ClipmapLevel clip = _clips.get(j);
+
+          if (clip.getStripIndex() > 0) {
+            clip.draw(r);
+          }
+        }
+
+        // Again, if we plan to draw more than one, we pushed our buckets, so render the current buckets and
+        // restore
+        // what was in them previously.
+        if (_textureClipmaps.size() > 1) {
+          r.renderBuckets();
+          r.getQueue().popBuckets();
+        }
       }
     }
   }
@@ -454,8 +458,10 @@ public class Terrain extends Node implements Pickable, Runnable {
     }
 
     if (textures) {
-      for (final TextureClipmap textureClipmap : _textureClipmaps) {
-        textureClipmap.regenerate();
+      synchronized (_textureClipmaps) {
+        for (final TextureClipmap textureClipmap : _textureClipmaps) {
+          textureClipmap.regenerate();
+        }
       }
 
       if (_normalClipmap != null) {
@@ -500,9 +506,11 @@ public class Terrain extends Node implements Pickable, Runnable {
   public List<TextureClipmap> getTextureClipmaps() { return _textureClipmaps; }
 
   public TextureClipmap findTextureClipmap(final TextureSource source) {
-    for (final TextureClipmap cm : _textureClipmaps) {
-      if (cm.getSource() == source) {
-        return cm;
+    synchronized (_textureClipmaps) {
+      for (final TextureClipmap cm : _textureClipmaps) {
+        if (cm.getSource() == source) {
+          return cm;
+        }
       }
     }
 
@@ -551,6 +559,11 @@ public class Terrain extends Node implements Pickable, Runnable {
     return null;
   }
 
+  /**
+   * @return the list of entries used in this source. The List is created with
+   *         Collections.synchronizedList and thus, iterator operations and stream operations must be
+   *         synchronized with the list as the mutex.
+   */
   public List<ClipmapLevel> getClipmaps() { return _clips; }
 
   public void addTextureClipmap(final TextureClipmap textureClipmap) {
@@ -580,8 +593,10 @@ public class Terrain extends Node implements Pickable, Runnable {
    * TextureClipmaps and any NormalMap held by this terrain
    */
   public void setTextureMinVisibleLevel(final int level) {
-    for (final TextureClipmap tc : _textureClipmaps) {
-      tc.setMinVisibleLevel(level);
+    synchronized (_textureClipmaps) {
+      for (final TextureClipmap tc : _textureClipmaps) {
+        tc.setMinVisibleLevel(level);
+      }
     }
     if (_normalClipmap != null) {
       _normalClipmap.setMinVisibleLevel(level);
