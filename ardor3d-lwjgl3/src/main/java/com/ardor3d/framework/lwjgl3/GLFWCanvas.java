@@ -64,6 +64,8 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
   protected float _dpiScale = 1f;
   protected boolean _doSwap = true;
 
+  protected String _title = "Ardor3D";
+
   protected List<ICanvasListener> _listeners = new ArrayList<>();
 
   public GLFWCanvas(final DisplaySettings settings, final Lwjgl3CanvasRenderer canvasRenderer) {
@@ -89,9 +91,9 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
       if (_settings.isFullScreen()) {
         // TODO: allow choice of monitor
         final long primary = GLFW.glfwGetPrimaryMonitor();
-        _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", primary, 0);
+        _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), _title, primary, 0);
       } else {
-        _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), "Ardor3D", 0, 0);
+        _windowId = GLFW.glfwCreateWindow(_settings.getWidth(), _settings.getHeight(), _title, 0, 0);
       }
 
       if (_windowId == 0) {
@@ -222,6 +224,7 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
   @Override
   public void setTitle(final String title) {
+    _title = title;
     if (_windowId != 0) {
       GLFW.glfwSetWindowTitle(_windowId, title);
     }
