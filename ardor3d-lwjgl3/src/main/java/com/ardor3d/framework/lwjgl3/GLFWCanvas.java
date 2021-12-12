@@ -138,6 +138,10 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
     GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
     GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
     GLFW.glfwWindowHint(GLFW.GLFW_SCALE_TO_MONITOR, GLFW.GLFW_TRUE);
+    GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, _settings.getSamples());
+    GLFW.glfwWindowHint(GLFW.GLFW_ALPHA_BITS, _settings.getAlphaBits());
+    GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, _settings.getDepthBits());
+    GLFW.glfwWindowHint(GLFW.GLFW_STENCIL_BITS, _settings.getStencilBits());
 
     if (Platform.get() == Platform.MACOSX) {
       GLFW.glfwWindowHint(GLFW.GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW.GLFW_FALSE);
