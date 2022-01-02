@@ -159,9 +159,9 @@ final public class TextureKey implements Savable {
    * @return the new TextureKey
    */
   public static synchronized TextureKey getRTTKey(final MinificationFilter minFilter) {
-    int val = _uniqueTK.addAndGet(1);
+    int val = TextureKey._uniqueTK.addAndGet(1);
     if (val == Integer.MAX_VALUE) {
-      _uniqueTK.set(Integer.MIN_VALUE);
+      TextureKey._uniqueTK.set(Integer.MIN_VALUE);
       val = Integer.MIN_VALUE;
     }
     return getKey(null, false, TextureStoreFormat.GuessCompressedFormat, "RTT_" + val, minFilter);
@@ -186,7 +186,7 @@ final public class TextureKey implements Savable {
     {
       WeakReference<TextureKey> ref;
       TextureKey check;
-      for (final Iterator<WeakReference<TextureKey>> it = _keyCache.iterator(); it.hasNext();) {
+      for (final Iterator<WeakReference<TextureKey>> it = TextureKey._keyCache.iterator(); it.hasNext();) {
         ref = it.next();
         check = ref.get();
         if (check == null) {
@@ -203,14 +203,14 @@ final public class TextureKey implements Savable {
     }
 
     // not found
-    _keyCache.add(new WeakReference<>(key));
+    TextureKey._keyCache.add(new WeakReference<>(key));
     return key;
   }
 
   public static synchronized boolean clearKey(final TextureKey key) {
     WeakReference<TextureKey> ref;
     TextureKey check;
-    for (final Iterator<WeakReference<TextureKey>> it = _keyCache.iterator(); it.hasNext();) {
+    for (final Iterator<WeakReference<TextureKey>> it = TextureKey._keyCache.iterator(); it.hasNext();) {
       ref = it.next();
       check = ref.get();
       if (check != null && check.equals(key)) {
@@ -242,7 +242,7 @@ final public class TextureKey implements Savable {
     if (id != null) {
       return id;
     }
-    return ZERO;
+    return TextureKey.ZERO;
   }
 
   /**
