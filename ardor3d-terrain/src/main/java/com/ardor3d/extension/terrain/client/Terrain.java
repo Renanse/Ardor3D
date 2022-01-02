@@ -78,7 +78,7 @@ public class Terrain extends Node implements Pickable, Runnable {
   /** Timers for mailbox updates */
   protected long oldTime = 0;
   protected long updateTimer = 0;
-  protected final long updateThreashold = 300;
+  protected final long updateThreshold = 300;
 
   protected boolean runCacheThread = true;
   protected Thread cacheThread;
@@ -92,6 +92,9 @@ public class Terrain extends Node implements Pickable, Runnable {
 
   protected final Vector3 _boundsCenter = new Vector3();
   protected final Vector3 _boundsExtents = new Vector3();
+
+  /** Listeners for region events. */
+  protected List<IRegionUpdateListener> _listeners;
 
   public Terrain(final BuildConfiguration buildConfig, final List<TerrainCache> cacheList,
     final TerrainConfiguration terrainConfiguration) {
@@ -336,47 +339,26 @@ public class Terrain extends Node implements Pickable, Runnable {
   }
 
   protected void updateFromMailbox() {
-    if (updateTimer > updateThreashold) {
+    if (updateTimer > updateThreshold) {
       final List<Region> regionList = mailBox.switchAndGet();
       if (!regionList.isEmpty()) {
-        for (int i = regionList.size() - 1; i >= 0; i--) {
-          final Region region = regionList.get(i);
+        // trim our regions down based on our valid clipmaps
+        trimRegionsToClipmaps(regionList);
 
-          final ClipmapLevel clip = _clips.get(region.getLevel());
-          final Region clipRegion = clip.getIntersectionRegion();
-
-          if (clipRegion.intersects(region)) {
-            clipRegion.intersection(region);
-          } else {
-            regionList.remove(i);
-          }
-        }
-
-        Collections.sort(regionList, regionSorter);
-
+        // walk through the remaining regions backwards and recursively add new update regions on levels
+        // lower than them. This is important for getting a valid visual result when reconstructing
+        // vertices later.
         final int start = regionList.size() - 1;
         for (int i = start; i >= 0; i--) {
           final Region region = regionList.get(i);
-
           recursiveAddUpdates(regionList, region.getLevel(), region.getX(), region.getY(), region.getWidth(),
               region.getHeight());
         }
 
-        for (int i = regionList.size() - 1; i >= 0; i--) {
-          final Region region = regionList.get(i);
+        // trim our updated regions down again based on our valid clipmaps
+        trimRegionsToClipmaps(regionList);
 
-          final ClipmapLevel clip = _clips.get(region.getLevel());
-          final Region clipRegion = clip.getIntersectionRegion();
-
-          if (clipRegion.intersects(region)) {
-            clipRegion.intersection(region);
-          } else {
-            regionList.remove(i);
-          }
-        }
-
-        Collections.sort(regionList, regionSorter);
-
+        // Update the clipmap vertices for the affected regions
         for (int i = regionList.size() - 1; i >= 0; i--) {
           final Region region = regionList.get(i);
           final ClipmapLevel clip = _clips.get(region.getLevel());
@@ -390,12 +372,43 @@ public class Terrain extends Node implements Pickable, Runnable {
           meshData.markBufferDirty(MeshData.KEY_VertexCoords);
           clip.markDirty(DirtyType.Bounding);
         }
+
+        // Alert any terrain region listeners of the regions used to do updates.
+        alertRegionListeners(regionList);
       }
-      updateTimer %= updateThreashold;
+      updateTimer %= updateThreshold;
     }
     final long time = System.currentTimeMillis();
     updateTimer += time - oldTime;
     oldTime = time;
+  }
+
+  private void alertRegionListeners(final List<Region> regionList) {
+    if (_listeners == null || _listeners.isEmpty()) {
+      return;
+    }
+
+    for (final var listener : _listeners) {
+      listener.onRegionsUpdated(regionList, getWorldTransform());
+    }
+  }
+
+  private void trimRegionsToClipmaps(final List<Region> regionList) {
+    for (int i = regionList.size() - 1; i >= 0; i--) {
+      final Region region = regionList.get(i);
+
+      final ClipmapLevel clip = _clips.get(region.getLevel());
+      final Region clipRegion = clip.getIntersectionRegion();
+
+      if (clipRegion.intersects(region)) {
+        clipRegion.intersection(region);
+      } else {
+        regionList.remove(i);
+      }
+    }
+
+    // sort regions in order of their level.
+    Collections.sort(regionList, regionSorter);
   }
 
   protected void recursiveAddUpdates(final List<Region> regionList, final int level, final int x, final int y,
@@ -681,6 +694,20 @@ public class Terrain extends Node implements Pickable, Runnable {
   public void setNormalUnit(final int unit) {
     _normalUnit = unit;
     setProperty("normalMap", _normalUnit);
+  }
+
+  public void addListener(final IRegionUpdateListener listener) {
+    if (_listeners == null) {
+      _listeners = new ArrayList<>();
+    }
+    _listeners.add(listener);
+  }
+
+  public boolean removeListener(final IRegionUpdateListener listener) {
+    if (_listeners == null) {
+      return false;
+    }
+    return _listeners.remove(listener);
   }
 
   public static void addDefaultResourceLocators() {

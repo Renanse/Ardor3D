@@ -21,6 +21,10 @@ public class Region {
 
   private final int level;
 
+  public Region(final Region source) {
+    this(source.level, source.x, source.y, source.width, source.height);
+  }
+
   public Region(final int x, final int y, final int width, final int height) {
     this(0, x, y, width, height);
   }
