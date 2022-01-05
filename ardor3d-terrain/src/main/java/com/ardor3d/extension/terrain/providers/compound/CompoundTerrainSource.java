@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2021 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2022 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,15 +15,20 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.terrain.client.TerrainConfiguration;
 import com.ardor3d.extension.terrain.client.TerrainSource;
 import com.ardor3d.extension.terrain.util.Tile;
 
 public class CompoundTerrainSource implements TerrainSource {
 
-  protected final List<Entry> _sourceList = Collections.synchronizedList(new ArrayList<>());
+  protected final List<Entry> _sourceList = new ArrayList<>();
   protected TerrainConfiguration _terrainConfig;
+
+  protected ReadWriteLock _sourceLock = new ReentrantReadWriteLock();
 
   public CompoundTerrainSource(final TerrainConfiguration config) {
     _terrainConfig = config;
@@ -34,19 +39,62 @@ public class CompoundTerrainSource implements TerrainSource {
 
   public void setTerrainConfig(final TerrainConfiguration config) { _terrainConfig = config; }
 
+  @MainThread
   public void addEntry(final Entry entry) {
-    _sourceList.add(entry);
+    _sourceLock.writeLock().lock();
+    try {
+      _sourceList.add(entry);
+    } finally {
+      _sourceLock.writeLock().unlock();
+    }
+  }
+
+  @MainThread
+  public void addEntry(final int index, final Entry entry) {
+    _sourceLock.writeLock().lock();
+    try {
+      _sourceList.add(index, entry);
+    } finally {
+      _sourceLock.writeLock().unlock();
+    }
+  }
+
+  @MainThread
+  public void removeEntry(final Entry entry) {
+    _sourceLock.writeLock().lock();
+    try {
+      _sourceList.remove(entry);
+    } finally {
+      _sourceLock.writeLock().unlock();
+    }
+  }
+
+  @MainThread
+  public void removeEntry(final int index) {
+    _sourceLock.writeLock().lock();
+    try {
+      _sourceList.remove(index);
+    } finally {
+      _sourceLock.writeLock().unlock();
+    }
   }
 
   /**
-   * @return the list of entries used in this source. The List is created with
-   *         Collections.synchronizedList and thus, iterator operations and stream operations must be
-   *         synchronized with the list as the mutex.
+   * @return a non-modifiable list of entries used in this source.
    */
-  public List<Entry> getEntries() { return _sourceList; }
+  public List<Entry> getEntries() { return Collections.unmodifiableList(_sourceList); }
 
   public Entry getEntry(final int index) {
-    return _sourceList.get(index);
+
+    _sourceLock.readLock().lock();
+    try {
+      if (index >= _sourceList.size() || index < 0) {
+        return null;
+      }
+      return _sourceList.get(index);
+    } finally {
+      _sourceLock.readLock().unlock();
+    }
   }
 
   /**
@@ -57,16 +105,24 @@ public class CompoundTerrainSource implements TerrainSource {
       final int numTilesY) throws Exception {
     Set<Tile> set;
     Set<Tile> rVal = null;
-    for (final Entry src : _sourceList) {
-      set = src.getSource() == null ? null
-          : src.getSource().getValidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
-      if (set != null) {
+
+    _sourceLock.readLock().lock();
+    try {
+      for (final Entry src : _sourceList) {
+        set = src.getSource() == null ? null
+            : src.getSource().getValidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
+        if (set == null) {
+          continue;
+        }
+
         if (rVal == null) {
           rVal = new HashSet<>(set);
         } else {
           rVal.retainAll(set);
         }
       }
+    } finally {
+      _sourceLock.readLock().unlock();
     }
     return rVal;
   }
@@ -79,18 +135,23 @@ public class CompoundTerrainSource implements TerrainSource {
       final int numTilesY) throws Exception {
     Set<Tile> set;
     Set<Tile> rVal = null;
-    synchronized (_sourceList) {
+    _sourceLock.readLock().lock();
+    try {
       for (final Entry src : _sourceList) {
         set = src.getSource() == null ? null
             : src.getSource().getInvalidTiles(clipmapLevel, tileX, tileY, numTilesX, numTilesY);
-        if (set != null) {
-          if (rVal == null) {
-            rVal = new HashSet<>(set);
-          } else {
-            rVal.addAll(set);
-          }
+        if (set == null) {
+          continue;
+        }
+
+        if (rVal == null) {
+          rVal = new HashSet<>(set);
+        } else {
+          rVal.addAll(set);
         }
       }
+    } finally {
+      _sourceLock.readLock().unlock();
     }
     return rVal;
   }
@@ -99,17 +160,22 @@ public class CompoundTerrainSource implements TerrainSource {
   public float[] getTile(final int clipmapLevel, final Tile tile) throws Exception {
     float[] data = null;
 
-    synchronized (_sourceList) {
-      for (final Entry entry : _sourceList) {
-        if (entry.getSource() != null) {
-          final float[] srcData = entry.getSource().getTile(clipmapLevel, tile);
-          if (entry.getCombine() == null) {
-            data = srcData;
-          } else {
-            data = entry.getCombine().apply(data, srcData);
-          }
+    _sourceLock.readLock().lock();
+    try {
+      for (final Entry src : _sourceList) {
+        if (src.getSource() == null) {
+          continue;
+        }
+
+        final float[] srcData = src.getSource().getTile(clipmapLevel, tile);
+        if (src.getCombine() == null) {
+          data = srcData;
+        } else {
+          data = src.getCombine().apply(data, srcData);
         }
       }
+    } finally {
+      _sourceLock.readLock().unlock();
     }
 
     return data;
