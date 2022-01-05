@@ -1,6 +1,10 @@
 import org.gradle.internal.os.OperatingSystem
 
 allprojects  {
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
 	apply plugin: 'java-library'
 	group = 'com.ardor3d'
 	version = '1.6.0'
