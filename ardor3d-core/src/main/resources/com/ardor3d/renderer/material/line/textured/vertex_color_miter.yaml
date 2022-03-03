@@ -34,7 +34,7 @@ techniques:
         shaders: 
           Vertex: 
             source: line/line.vert
-            define: VERT_COLORS
+            defines: [VERT_COLORS, TEXTURED]
           Geometry:
             source: line/lines_miter.geom
           Fragment: 

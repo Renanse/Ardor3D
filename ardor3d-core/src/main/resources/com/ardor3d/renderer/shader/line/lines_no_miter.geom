@@ -10,11 +10,7 @@ uniform vec2	viewSize;
 uniform vec2	viewOffset;
 uniform float	featherWidth;
 
-#ifdef TEXTURED
 uniform mat4 textureMatrix0;
-#else
-const mat4 textureMatrix0 = mat4(1.0); // identity
-#endif
 
 layout(lines) in;
 layout(triangle_strip, max_vertices=8) out;
@@ -92,10 +88,10 @@ void main()
 	// generate the triangle strip using six triangles
 	emitVert(p1 + offsetFeather, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceB, texVBRight);
 	emitVert(p0 + offsetFeather, ndc0.z, vec4(VertexIn[0].color.xyz, 0.0), distanceA, texVARight);
-	emitVert(p1 + offset, ndc1.z, VertexIn[1].color, distanceB, vec2(1, 0));
-	emitVert(p0 + offset, ndc0.z, VertexIn[0].color, distanceA, vec2(1, 0));
-	emitVert(p1 - offset, ndc1.z, VertexIn[1].color, distanceB, vec2(0, 0));
-	emitVert(p0 - offset, ndc0.z, VertexIn[0].color, distanceA, vec2(0, 0));
+	emitVert(p1 + offset, ndc1.z, VertexIn[1].color, distanceB, texVBRight);
+	emitVert(p0 + offset, ndc0.z, VertexIn[0].color, distanceA, texVARight);
+	emitVert(p1 - offset, ndc1.z, VertexIn[1].color, distanceB, texVBLeft);
+	emitVert(p0 - offset, ndc0.z, VertexIn[0].color, distanceA, texVALeft);
 	emitVert(p1 - offsetFeather, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceB, texVBLeft);
 	emitVert(p0 - offsetFeather, ndc0.z, vec4(VertexIn[0].color.xyz, 0.0), distanceA, texVALeft);
 #endif

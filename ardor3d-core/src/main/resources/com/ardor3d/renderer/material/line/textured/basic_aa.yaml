@@ -32,6 +32,7 @@ techniques:
         shaders: 
           Vertex: 
             source: line/line.vert
+            define: TEXTURED
           Geometry:
             source: line/lines_no_miter.geom
             define: ANTIALIAS

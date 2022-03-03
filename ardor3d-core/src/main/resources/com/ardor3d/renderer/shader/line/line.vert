@@ -32,7 +32,7 @@ void main()
     VertexOut.color = color;
 #endif
 
-#ifdef TEXTURE2D
+#ifdef TEXTURED
 	VertexOut.texV = texV;
 #else
 	VertexOut.texV = 0.0;

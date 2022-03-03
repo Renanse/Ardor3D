@@ -11,11 +11,7 @@ uniform vec2	viewSize;
 uniform vec2	viewOffset;
 uniform float	featherWidth;
 
-#ifdef TEXTURED
 uniform mat4 textureMatrix0;
-#else
-const mat4 textureMatrix0 = mat4(1.0); // identity
-#endif
 
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 11) out;

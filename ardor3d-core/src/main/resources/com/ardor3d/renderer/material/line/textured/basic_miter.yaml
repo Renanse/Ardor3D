@@ -5,7 +5,7 @@ techniques:
       - 
         attributes:
           - key: vertex
-          - key: texVw
+          - key: texV
           
         uniforms: 
           - builtIn: [modelViewProj, defaultColor, viewSize, viewOffset, textureMatrix0, alphaTest]
@@ -33,6 +33,7 @@ techniques:
         shaders: 
           Vertex: 
             source: line/line.vert
+            define: TEXTURED
           Geometry:
             source: line/lines_miter.geom
           Fragment: 

@@ -32,6 +32,8 @@ public class Line extends Mesh {
 
   public final static String KEY_Distances = "distance";
 
+  public final static String KEY_TexV = "texV";
+
   private float _lineWidth;
   private float _miterLimit;
   private boolean _antialiased = false;
@@ -213,15 +215,15 @@ public class Line extends Mesh {
     final MeshData md = getMeshData();
     final FloatBuffer positions = md.getVertexBuffer();
     if (positions == null) {
-      logger.log(Level.WARNING, "Unable to generate line distances - vertices were null.");
+      Line.logger.log(Level.WARNING, "Unable to generate line distances - vertices were null.");
       return;
     }
 
     final int vCount = md.getVertexCount();
-    FloatBufferData dists = md.getCoords(KEY_Distances);
+    FloatBufferData dists = md.getCoords(Line.KEY_Distances);
     if (dists == null || dists.getBufferCapacity() != vCount) {
       dists = new FloatBufferData(vCount, 1);
-      md.setCoords(KEY_Distances, dists);
+      md.setCoords(Line.KEY_Distances, dists);
     }
 
     float d = 0f;
