@@ -5,9 +5,10 @@ techniques:
       - 
         attributes:
           - key: vertex
+          - key: texV
           
         uniforms: 
-          - builtIn: [modelViewProj, defaultColor, viewSize, viewOffset, alphaTest]
+          - builtIn: [modelViewProj, defaultColor, viewSize, viewOffset, textureMatrix0, alphaTest]
           - 
             shaderKey: lineWidth
             type: Float1

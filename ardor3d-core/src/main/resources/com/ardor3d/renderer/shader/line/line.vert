@@ -2,6 +2,10 @@
 
 in vec3 vertex;
 
+#ifdef TEXTURED
+in float texV;
+#endif
+
 uniform mat4 modelViewProj;
 
 #ifndef VERT_COLORS
@@ -16,6 +20,8 @@ out VertexData{
 	#else
 	vec4 color;
 	#endif
+	
+	float texV;
 } VertexOut;
 
 void main()
@@ -24,6 +30,12 @@ void main()
     VertexOut.color = defaultColor;
 #else
     VertexOut.color = color;
+#endif
+
+#ifdef TEXTURE2D
+	VertexOut.texV = texV;
+#else
+	VertexOut.texV = 0.0;
 #endif
 
     gl_Position = modelViewProj * vec4(vertex, 1.0);

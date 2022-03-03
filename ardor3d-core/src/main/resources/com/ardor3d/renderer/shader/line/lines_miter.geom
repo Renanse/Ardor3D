@@ -11,6 +11,12 @@ uniform vec2	viewSize;
 uniform vec2	viewOffset;
 uniform float	featherWidth;
 
+#ifdef TEXTURED
+uniform mat4 textureMatrix0;
+#else
+const mat4 textureMatrix0 = mat4(1.0); // identity
+#endif
+
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 11) out;
 
@@ -20,6 +26,8 @@ in VertexData{
 	#else
 	vec4 color;
 	#endif
+
+	float texV;
 } VertexIn[4];
 
 out VertexData{
@@ -77,6 +85,13 @@ void main()
 	float length_a = lineWidth * 0.5 / dot(miter_a, normCurr);
 	float length_b = lineWidth * 0.5 / dot(miter_b, normCurr);
 
+	// come up with our start and end uv coords
+	vec2 texVALeft = vec2(textureMatrix0 * vec4(0.0, VertexIn[1].texV, 1.0, 1.0));
+	vec2 texVAMid = vec2(textureMatrix0 * vec4(0.5, VertexIn[1].texV, 1.0, 1.0));
+	vec2 texVARight = vec2(textureMatrix0 * vec4(1.0, VertexIn[1].texV, 1.0, 1.0));
+	vec2 texVBLeft = vec2(textureMatrix0 * vec4(0.0, VertexIn[2].texV, 1.0, 1.0));
+	vec2 texVBRight = vec2(textureMatrix0 * vec4(1.0, VertexIn[2].texV, 1.0, 1.0));
+
 	// prevent excessively long miters at sharp corners
 	if(dot(dirPrev, dirCurr) < -miterLimit) {
 		miter_a = normCurr;
@@ -85,15 +100,15 @@ void main()
 		// close the gap
 		// XXX: we don't add anti-aliasing to the miter joint, but we could?
 		if(dot(dirPrev, normCurr) > 0) {
-			emitVert(p1 + lineWidth * 0.5 * normPrev, ndc1.z, VertexIn[1].color, 0, vec2(0, 0));
-			emitVert(p1 + lineWidth * 0.5 * normCurr, ndc1.z, VertexIn[1].color, 0, vec2(0, 0));
-			emitVert(p1, ndc1.z, VertexIn[1].color, 0, vec2(0.5, 0));
+			emitVert(p1 + lineWidth * 0.5 * normPrev, ndc1.z, VertexIn[1].color, 0, texVALeft);
+			emitVert(p1 + lineWidth * 0.5 * normCurr, ndc1.z, VertexIn[1].color, 0, texVALeft);
+			emitVert(p1, ndc1.z, VertexIn[1].color, 0, texVAMid);
 			EndPrimitive();
 		}
 		else {
-			emitVert(p1 - lineWidth * 0.5 * normCurr, ndc1.z, VertexIn[1].color, 0, vec2(1, 0));
-			emitVert(p1 - lineWidth * 0.5 * normPrev, ndc1.z, VertexIn[1].color, 0, vec2(1, 0));
-			emitVert(p1, ndc1.z, VertexIn[1].color, 0, vec2(0.5, 0));
+			emitVert(p1 - lineWidth * 0.5 * normCurr, ndc1.z, VertexIn[1].color, 0, texVARight);
+			emitVert(p1 - lineWidth * 0.5 * normPrev, ndc1.z, VertexIn[1].color, 0, texVARight);
+			emitVert(p1, ndc1.z, VertexIn[1].color, 0, texVAMid);
 			EndPrimitive();
 		}
 	}
@@ -111,23 +126,23 @@ void main()
 
 #ifndef ANTIALIAS
 	// generate the triangle strip using two triangles
-	emitVert(p1 + offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(1, 0));
-	emitVert(p1 - offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(0, 0));
-	emitVert(p2 + offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(1, 0));
-	emitVert(p2 - offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(0, 0));
+	emitVert(p1 + offsetA, ndc1.z, VertexIn[1].color, distanceA, texVARight);
+	emitVert(p1 - offsetA, ndc1.z, VertexIn[1].color, distanceA, texVALeft);
+	emitVert(p2 + offsetB, ndc2.z, VertexIn[2].color, distanceB, texVBRight);
+	emitVert(p2 - offsetB, ndc2.z, VertexIn[2].color, distanceB, texVBLeft);
 #else
 	vec2 offsetFeatherA = (featherWidth + (length_a)) * miter_a;
 	vec2 offsetFeatherB = (featherWidth + (length_b)) * miter_b;
 
 	// generate the triangle strip using six triangles
-	emitVert(p2 + offsetFeatherB, ndc2.z, vec4(VertexIn[2].color.xyz, 0.0), distanceB, vec2(1, 0));
-	emitVert(p1 + offsetFeatherA, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceA, vec2(1, 0));
-	emitVert(p2 + offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(1, 0));
-	emitVert(p1 + offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(1, 0));
-	emitVert(p2 - offsetB, ndc2.z, VertexIn[2].color, distanceB, vec2(0, 0));
-	emitVert(p1 - offsetA, ndc1.z, VertexIn[1].color, distanceA, vec2(0, 0));
-	emitVert(p2 - offsetFeatherB, ndc2.z, vec4(VertexIn[2].color.xyz, 0.0), distanceB, vec2(0, 0));
-	emitVert(p1 - offsetFeatherA, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceA, vec2(0, 0));
+	emitVert(p2 + offsetFeatherB, ndc2.z, vec4(VertexIn[2].color.xyz, 0.0), distanceB, texVBRight);
+	emitVert(p1 + offsetFeatherA, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceA, texVARight);
+	emitVert(p2 + offsetB, ndc2.z, VertexIn[2].color, distanceB, texVBRight);
+	emitVert(p1 + offsetA, ndc1.z, VertexIn[1].color, distanceA, texVARight);
+	emitVert(p2 - offsetB, ndc2.z, VertexIn[2].color, distanceB, texVBLeft);
+	emitVert(p1 - offsetA, ndc1.z, VertexIn[1].color, distanceA, texVALeft);
+	emitVert(p2 - offsetFeatherB, ndc2.z, vec4(VertexIn[2].color.xyz, 0.0), distanceB, texVBLeft);
+	emitVert(p1 - offsetFeatherA, ndc1.z, vec4(VertexIn[1].color.xyz, 0.0), distanceA, texVALeft);
 #endif
 	EndPrimitive();
 }
