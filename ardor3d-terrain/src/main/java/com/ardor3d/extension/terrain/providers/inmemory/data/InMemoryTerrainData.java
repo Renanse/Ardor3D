@@ -46,9 +46,19 @@ public class InMemoryTerrainData {
    * @param totalSide
    *          must be greater than 10.
    */
-  @SuppressWarnings("unchecked")
   public InMemoryTerrainData(final int totalSide, final int clipmapLevels, final int tileSize,
     final ReadOnlyVector3 scale) {
+    this(totalSide, clipmapLevels, tileSize, scale, new FbmFunction3D(Functions.simplexNoise(), 9, 0.5, 0.5, 3.14));
+  }
+
+  /**
+   *
+   * @param totalSide
+   *          must be greater than 10.
+   */
+  @SuppressWarnings("unchecked")
+  public InMemoryTerrainData(final int totalSide, final int clipmapLevels, final int tileSize,
+    final ReadOnlyVector3 scale, final FbmFunction3D sourceFunc) {
     if (totalSide < 10) {
       throw new IllegalArgumentException("totalSide must be at least 10.");
     }
@@ -67,8 +77,7 @@ public class InMemoryTerrainData {
     }
 
     final double procScale = 1.0 / 4000.0;
-    final Function3D functionTmp = new FbmFunction3D(Functions.simplexNoise(), 9, 0.5, 0.5, 3.14);
-    final Function3D function = Functions.scaleInput(functionTmp, procScale, procScale, 1);
+    final Function3D function = Functions.scaleInput(sourceFunc, procScale, procScale, 1);
 
     for (int y = 0; y < side; y++) {
       for (int x = 0; x < side; x++) {

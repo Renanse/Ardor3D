@@ -86,7 +86,7 @@ public class ArrayTextureSource implements TextureSource {
         final int heightX = tileX * tileSize + x;
         final int heightY = tileY * tileSize + y;
         final float height = getHeight(heightMap, heightMapSize, heightX, heightY);
-        final byte byteHeight = (byte) (height * 255 * 3);
+        final byte byteHeight = (byte) (height * 255 * 5);
         data.put(index, byteHeight);
       }
     }

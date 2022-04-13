@@ -50,7 +50,7 @@ public interface ReadOnlyTimer {
   double getFrameRate();
 
   /**
-   * @return Time in resolution specified by implementation
+   * @return Time between last two frames, in seconds.
    */
   double getTimePerFrame();
 
