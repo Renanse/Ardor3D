@@ -540,7 +540,7 @@ public class YamlMaterialReader {
       case "alphaTest":
         pass.addUniform(
             new UniformRef(AlphaTestConsts.KEY_AlphaTestType, UniformType.Int1, UniformSource.SpatialProperty,
-                AlphaTestConsts.KEY_AlphaTestType, null, AlphaTestConsts.TestFunction.Always));
+                AlphaTestConsts.KEY_AlphaTestType, null, AlphaTestConsts.TestFunction.GreaterThanOrEqualTo));
         pass.addUniform(new UniformRef(AlphaTestConsts.KEY_AlphaReference, UniformType.Float1,
             UniformSource.SpatialProperty, AlphaTestConsts.KEY_AlphaReference, null, 0f));
         return;

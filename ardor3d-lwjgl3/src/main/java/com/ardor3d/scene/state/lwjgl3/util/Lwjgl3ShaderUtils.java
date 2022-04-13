@@ -737,7 +737,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
       for (int i = 0; i < span; i++) {
         GL20C.glEnableVertexAttribArray(loc + i);
         GL20C.glVertexAttribPointer(loc + i, tupleSize, glDataType, normalized, matrixStride,
-            strideBytes + i * bytesPerTuple);
+            offsetBytes + i * (strideBytes + bytesPerTuple));
         GL33C.glVertexAttribDivisor(loc + i, divisor);
       }
     }
