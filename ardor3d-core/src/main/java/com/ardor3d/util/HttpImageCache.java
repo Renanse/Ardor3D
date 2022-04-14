@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2021 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2022 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -294,6 +294,21 @@ public enum HttpImageCache {
     // clear the file cache as well.
     if (cacheDir != null && cacheDir.exists()) {
       deleteDirectory(cacheDir);
+    }
+  }
+
+  public void removeFromCache(final URI uri, final String type, final boolean flipped) {
+    // Convert our name to a key to be used in our in memory hash and file system
+    final String key = convertUrlToFileName(uri.toString(), type, flipped);
+
+    // remove any existing memory entry for the key
+    MemoryCache.remove(key);
+
+    // remove any existing cache file
+    try {
+      new File(cacheDir, key).delete();
+    } catch (final Exception e) {
+      // ignore
     }
   }
 
