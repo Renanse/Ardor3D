@@ -42,12 +42,7 @@ public class UpdatingTerrainData extends InMemoryTerrainData {
 
     // queue up an update alert for the rectangle updated
     final Rectangle2 region = new Rectangle2(minX, minY, maxX - minX, maxY - minY);
-
-    // break up by clipmaplevel
-    // add to two queues since these updates are called in different threads potentially
-    for (int i = 0; i < clipmapLevels; i++) {
-      addTiles(region, updatedTerrainTiles[i]);
-    }
+    addTiles(region, updatedTerrainTiles);
   }
 
 }

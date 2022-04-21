@@ -117,15 +117,18 @@ public enum HttpImageCache {
    *          image contents from the URI.
    * @param flipped
    *          if true, flip the image vertically before returning.
+   * @param ignoreCache
+   *          if true, we will not check the memory or disk cache for the image, but we will save it
+   *          there upon fetching.
    * @param onSuccess
    *          Consumer callback called once we've downloaded the image. May be called with the
    *          argument <code>TextureState.getDefaultTextureImage()</code> if we are unable to load the
    *          image.
    */
   public void loadFromCacheOrDownloadAsync(final URI uri, final String type, final boolean flipped,
-      final Consumer<Image> onSuccess) {
+      final boolean ignoreCache, final Consumer<Image> onSuccess) {
     CompletableFuture.runAsync(() -> {
-      final Image img = Instance.loadFromCacheOrDownload(uri, type, flipped);
+      final Image img = Instance.loadFromCacheOrDownload(uri, type, flipped, ignoreCache);
       onSuccess.accept(img);
     });
   }
@@ -140,10 +143,14 @@ public enum HttpImageCache {
    *          image contents from the URI.
    * @param flipped
    *          if true, flip the image vertically before returning.
+   * @param ignoreCache
+   *          if true, we will not check the memory or disk cache for the image, but we will save it
+   *          there upon fetching.
    * @return The loaded Image, or <code>TextureState.getDefaultTextureImage()</code> if we are unable
    *         to load the image.
    */
-  public Image loadFromCacheOrDownload(final URI uri, final String type, final boolean flipped) {
+  public Image loadFromCacheOrDownload(final URI uri, final String type, final boolean flipped,
+      final boolean ignoreCache) {
     // Convert our name to a key to be used in our in memory hash and file system
     final String key = convertUrlToFileName(uri.toString(), type, flipped);
 
@@ -152,9 +159,9 @@ public enum HttpImageCache {
     try {
       lock.lock();
       // Check the memory cache
-      ImageCacheItem cacheItem = MemoryCache.get(key);
+      ImageCacheItem cacheItem = ignoreCache ? null : MemoryCache.get(key);
 
-      if (cacheItem == null && cacheDir != null) {
+      if (!ignoreCache && cacheItem == null && cacheDir != null) {
         // Check the file cache
         try {
           final File f = new File(cacheDir, key);
@@ -186,9 +193,7 @@ public enum HttpImageCache {
       }
 
       // if we have not asked about this item for a bit, fire off a check to see if there's an update. But
-      // send
-      // the
-      // cached copy back immediately.
+      // send the cached copy back immediately.
       if (checkModified && cacheItem.lastChecked.until(Instant.now(), ChronoUnit.SECONDS) > minModCheckSeconds) {
         final ImageCacheItem item = cacheItem;
         CompletableFuture.runAsync(() -> tryGetImage(item, uri));

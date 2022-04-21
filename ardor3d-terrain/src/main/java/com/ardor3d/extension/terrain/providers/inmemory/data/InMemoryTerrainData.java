@@ -138,10 +138,8 @@ public class InMemoryTerrainData {
 
           // break up by clipmaplevel
           // add to two queues since these updates are called in different threads potentially
-          for (int i = 0; i < clipmapLevels; i++) {
-            addTiles(region, updatedTerrainTiles[i]);
-            addTiles(region, updatedTextureTiles[i]);
-          }
+          addTiles(region, updatedTerrainTiles);
+          addTiles(region, updatedTextureTiles);
         }
       }
     };
@@ -149,8 +147,8 @@ public class InMemoryTerrainData {
     t.start();
   }
 
-  protected void addTiles(final Rectangle2 bounds, final Set<Tile> store) {
-    for (int i = 0; i <= clipmapLevels; i++) {
+  protected void addTiles(final Rectangle2 bounds, final Set<Tile>[] store) {
+    for (int i = 0; i < clipmapLevels; i++) {
       final double scale = 1.0 / (tileSize * MathUtils.pow2(i));
       final int minX = (int) MathUtils.floor(bounds.getX() * scale);
       final int minY = (int) MathUtils.floor(bounds.getY() * scale);
@@ -161,8 +159,8 @@ public class InMemoryTerrainData {
       for (int y = minY; y <= maxY; y++) {
         for (int x = minX; x <= maxX; x++) {
           tile = new Tile(x, y);
-          synchronized (store) {
-            store.add(tile);
+          synchronized (store[i]) {
+            store[i].add(tile);
           }
         }
       }
