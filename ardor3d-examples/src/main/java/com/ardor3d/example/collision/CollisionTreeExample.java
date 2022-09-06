@@ -58,27 +58,24 @@ public class CollisionTreeExample extends ExampleBase {
   }
 
   @Override
-  protected void setupLight() {
-    // no lights
-  }
-
-  @Override
   protected void initExample() {
     CollisionTreeManager.getInstance().setTreeType(CollisionTree.Type.AABB);
     CollisionTreeManager.getInstance().setDoSort(true);
 
     results = new PrimitiveCollisionResults();
-    sphere = new Sphere("sphere", 10, 10, 2);
+    sphere = new Sphere("sphere", 25, 25, 2);
+    sphere.setRenderMaterial("unlit/untextured/vertex_color.yaml");
 
     sphere.setSolidColor(ColorRGBA.WHITE);
     sphere.setModelBound(new BoundingBox());
 
     sphereNode = new Node("sphere node");
 
-    torus = new PQTorus("torus", 5, 4, 2f, .5f, 128, 16);
+    torus = new PQTorus("torus", 5, 4, 2f, .5f, 256, 64);
     torus.setTranslation(new Vector3(0, 0, 0));
     torus.setSolidColor(ColorRGBA.WHITE);
     torus.setModelBound(new BoundingBox());
+    torus.setRenderMaterial("unlit/untextured/vertex_color.yaml");
 
     torusNode = new Node("torus node");
 
@@ -126,8 +123,8 @@ public class CollisionTreeExample extends ExampleBase {
     final int[] indexBuffer = new int[3];
     final MeshData sphereMD = sphere.getMeshData();
     final MeshData torusMD = torus.getMeshData();
-    final FloatBuffer color1 = sphere.getMeshData().getColorBuffer();
-    final FloatBuffer color2 = torus.getMeshData().getColorBuffer();
+    final FloatBuffer color1 = sphereMD.getColorBuffer();
+    final FloatBuffer color2 = torusMD.getColorBuffer();
 
     if (oldData != null) {
       for (int j = 0; j < oldData.getSourcePrimitives().size(); j++) {
@@ -136,6 +133,7 @@ public class CollisionTreeExample extends ExampleBase {
         BufferUtils.setInBuffer(colorSpread[indexBuffer[0] % 3], color1, indexBuffer[0]);
         BufferUtils.setInBuffer(colorSpread[indexBuffer[1] % 3], color1, indexBuffer[1]);
         BufferUtils.setInBuffer(colorSpread[indexBuffer[2] % 3], color1, indexBuffer[2]);
+        sphereMD.markBufferDirty(MeshData.KEY_ColorCoords);
       }
 
       for (int j = 0; j < oldData.getTargetPrimitives().size(); j++) {
@@ -144,6 +142,7 @@ public class CollisionTreeExample extends ExampleBase {
         BufferUtils.setInBuffer(colorSpread[indexBuffer[0] % 3], color2, indexBuffer[0]);
         BufferUtils.setInBuffer(colorSpread[indexBuffer[1] % 3], color2, indexBuffer[1]);
         BufferUtils.setInBuffer(colorSpread[indexBuffer[2] % 3], color2, indexBuffer[2]);
+        torusMD.markBufferDirty(MeshData.KEY_ColorCoords);
       }
     }
 
@@ -158,6 +157,7 @@ public class CollisionTreeExample extends ExampleBase {
         BufferUtils.setInBuffer(ColorRGBA.RED, color1, indexBuffer[0]);
         BufferUtils.setInBuffer(ColorRGBA.RED, color1, indexBuffer[1]);
         BufferUtils.setInBuffer(ColorRGBA.RED, color1, indexBuffer[2]);
+        sphereMD.markBufferDirty(MeshData.KEY_ColorCoords);
       }
 
       for (int i = 0; i < oldData.getTargetPrimitives().size(); i++) {
@@ -166,6 +166,7 @@ public class CollisionTreeExample extends ExampleBase {
         BufferUtils.setInBuffer(ColorRGBA.BLUE, color2, indexBuffer[0]);
         BufferUtils.setInBuffer(ColorRGBA.BLUE, color2, indexBuffer[1]);
         BufferUtils.setInBuffer(ColorRGBA.BLUE, color2, indexBuffer[2]);
+        torusMD.markBufferDirty(MeshData.KEY_ColorCoords);
       }
     }
   }
