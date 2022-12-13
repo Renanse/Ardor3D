@@ -48,7 +48,7 @@ techniques:
               
               void main()
               {
-                FragColor = vec4(texture2D(diffuse, gl_PointCoord)) * DiffuseColor;
+                FragColor = vec4(texture(diffuse, gl_PointCoord)) * DiffuseColor;
               }
                     
               
