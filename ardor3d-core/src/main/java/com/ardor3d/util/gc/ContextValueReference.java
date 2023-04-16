@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2021 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2023 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -12,8 +12,7 @@ package com.ardor3d.util.gc;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +33,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
   /**
    * Keep a strong reference to these objects until their reference is cleared.
    */
-  private static final List<ContextValueReference<?, ?>> REFS = new LinkedList<>();
+  private static final Set<ContextValueReference<?, ?>> REFS = new HashSet<>();
 
   private final Map<RenderContextRef, U> _valueCache;
   private U _singleContextValue;
@@ -46,7 +45,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
     } else {
       _valueCache = null;
     }
-    REFS.add(this);
+    ContextValueReference.REFS.add(this);
   }
 
   public boolean containsKey(final RenderContextRef glContext) {
@@ -95,7 +94,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
   public void clear() {
     super.clear();
     _singleContextValue = null;
-    REFS.remove(this);
+    ContextValueReference.REFS.remove(this);
   }
 
   public static <T, U> ContextValueReference<T, U> newReference(final T reference,
