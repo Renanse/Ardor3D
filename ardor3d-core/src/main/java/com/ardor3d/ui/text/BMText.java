@@ -361,9 +361,8 @@ public class BMText extends Mesh {
     // for ortho mode cameras, that's just a constant defined by the top and bottom of the frustum.
     double heightAtZ = (cam.getFrustumTop() - cam.getFrustumBottom());
     if (cam.getProjectionMode().equals(ProjectionMode.Perspective)) {
-      // for perspective cameras, we take the size at the near frustum, normalize to a depth of 1, then
-      // use the field of view (y) to determine our size at the given depth.
-      heightAtZ = (heightAtZ / cam.getFrustumNear()) * Math.tan(cam.getFovY() * MathUtils.DEG_TO_RAD) * zDepth;
+      // for perspective cameras, divide by near frustum and multiply by depth
+      heightAtZ = (heightAtZ / cam.getFrustumNear()) * zDepth;
     }
 
     // Now determine a unit/pixel ratio using our camera's pixel height: screen height units per pixel.
