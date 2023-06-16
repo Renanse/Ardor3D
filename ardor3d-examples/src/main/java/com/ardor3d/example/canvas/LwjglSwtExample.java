@@ -189,6 +189,7 @@ public class LwjglSwtExample {
 
     final Lwjgl3SwtCanvas canvas1 = new Lwjgl3SwtCanvas(topLeft, SWT.NONE, data);
     final Lwjgl3CanvasRenderer lwjglCanvasRenderer1 = new Lwjgl3CanvasRenderer(scene);
+    lwjglCanvasRenderer1.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
     addCallback(canvas1, lwjglCanvasRenderer1);
     canvas1.setCanvasRenderer(lwjglCanvasRenderer1);
     frameWork.addCanvas(canvas1);
@@ -197,6 +198,7 @@ public class LwjglSwtExample {
 
     final Lwjgl3SwtCanvas canvas2 = new Lwjgl3SwtCanvas(bottomLeft, SWT.NONE, data);
     final Lwjgl3CanvasRenderer lwjglCanvasRenderer2 = new Lwjgl3CanvasRenderer(scene);
+    lwjglCanvasRenderer2.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
     addCallback(canvas2, lwjglCanvasRenderer2);
     canvas2.setCanvasRenderer(lwjglCanvasRenderer2);
     frameWork.addCanvas(canvas2);
@@ -204,6 +206,7 @@ public class LwjglSwtExample {
 
     final Lwjgl3SwtCanvas canvas3 = new Lwjgl3SwtCanvas(topRight, SWT.NONE, data);
     final Lwjgl3CanvasRenderer lwjglCanvasRenderer3 = new Lwjgl3CanvasRenderer(scene);
+    lwjglCanvasRenderer3.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
     addCallback(canvas3, lwjglCanvasRenderer3);
     canvas3.setCanvasRenderer(lwjglCanvasRenderer3);
     frameWork.addCanvas(canvas3);
@@ -211,6 +214,7 @@ public class LwjglSwtExample {
 
     final Lwjgl3SwtCanvas canvas4 = new Lwjgl3SwtCanvas(bottomRight, SWT.NONE, data);
     final Lwjgl3CanvasRenderer lwjglCanvasRenderer4 = new Lwjgl3CanvasRenderer(scene);
+    lwjglCanvasRenderer4.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
     addCallback(canvas4, lwjglCanvasRenderer4);
     canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
     frameWork.addCanvas(canvas4);

@@ -155,6 +155,8 @@ public class LwjglAwtExample {
 
     frame.add(theCanvas);
 
+    renderer.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
+
     _showCursor1.put(theCanvas, true);
 
     theCanvas.setSize(new Dimension(400, 300));

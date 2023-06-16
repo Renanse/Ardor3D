@@ -57,6 +57,7 @@ public class LwjglHeadlessExample {
 
     // set up the opengl canvas renderer to use
     final Lwjgl3CanvasRenderer renderer = new Lwjgl3CanvasRenderer(scene);
+    renderer.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
 
     // Create our headless canvas
     final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0);
@@ -66,28 +67,26 @@ public class LwjglHeadlessExample {
     frameWork.init();
 
     // game loop
-    while (!exit.get()) {
-      frameWork.updateFrame();
-      Thread.yield();
-      frameWork.updateFrame();
-      Thread.yield();
-      frameWork.updateFrame();
-      Thread.yield();
-      frameWork.updateFrame();
-      Thread.yield();
+    frameWork.updateFrame();
+    Thread.yield();
+    frameWork.updateFrame();
+    Thread.yield();
+    frameWork.updateFrame();
+    Thread.yield();
+    frameWork.updateFrame();
+    Thread.yield();
 
-      try {
-        Thread.sleep(100);
-        if (_doShot) {
-          // force any waiting scene elements to be renderer.
-          renderer.getRenderer().renderBuckets();
-          ScreenExporter.exportCurrentScreen(renderer.getRenderer(), _screenShotExp);
-          _doShot = false;
-        }
-      } catch (final InterruptedException ex) {
-        // TODO Auto-generated catch block
-        ex.printStackTrace();
+    try {
+      Thread.sleep(100);
+      if (_doShot) {
+        // force any waiting scene elements to be renderer.
+        renderer.getRenderer().renderBuckets();
+        ScreenExporter.exportCurrentScreen(renderer.getRenderer(), _screenShotExp);
+        _doShot = false;
       }
+    } catch (final InterruptedException ex) {
+      // TODO Auto-generated catch block
+      ex.printStackTrace();
     }
 
     // cleanup and exit

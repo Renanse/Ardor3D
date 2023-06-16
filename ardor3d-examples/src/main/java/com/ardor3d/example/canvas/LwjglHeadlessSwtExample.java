@@ -110,6 +110,8 @@ public class LwjglHeadlessSwtExample {
     frameWork.addCanvas(canvas);
     canvas.setFocus();
 
+    renderer.getRenderContext().getSceneIndexer().addSceneRoot(scene.getRoot());
+
     addCanvasCallback(canvas, renderer);
     canvas.addListener((final int w, final int h) -> {
       System.err.println(w);
