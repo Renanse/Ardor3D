@@ -41,11 +41,12 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
   // protected Object _context = new Object();
   protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
-  private RenderContext _currentContext;
+  private final RenderContext _renderContext;
   private Lwjgl3CanvasCallback _canvasCallback;
 
   public Lwjgl3CanvasRenderer(final Scene scene) {
     _scene = scene;
+    _renderContext = new RenderContext(this);
     _canvasCallback = new Lwjgl3CanvasAdapter();
   }
 
@@ -71,13 +72,14 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
     if (settings.getShareContext() != null) {
       sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext().getContextKey());
     }
+    _renderContext.setSharedContext(sharedContext);
 
     _canvasCallback.makeCurrent(true);
 
     final ContextCapabilities caps = createContextCapabilities();
-    _currentContext = new RenderContext(this, caps, sharedContext);
+    _renderContext.setCapabilities(caps);
 
-    ContextManager.addContext(this, _currentContext);
+    ContextManager.addContext(this, _renderContext);
     ContextManager.switchContext(this);
     ContextManager.getCurrentContext().setCurrentCanvasRenderer(this);
 
@@ -165,7 +167,7 @@ public class Lwjgl3CanvasRenderer implements CanvasRenderer {
   public void setCamera(final Camera camera) { _camera = camera; }
 
   @Override
-  public RenderContext getRenderContext() { return _currentContext; }
+  public RenderContext getRenderContext() { return _renderContext; }
 
   @Override
   public int getFrameClear() { return _frameClear; }

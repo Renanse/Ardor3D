@@ -50,16 +50,16 @@ public class RenderContext {
 
   protected final RendererRecord _rendererRecord = createRendererRecord();
 
-  /** Represents the sharable portion of a GL context... Textures, displayLists, etc. */
-  protected final RenderContextRef _sharableContextRef;
-
   /** Represents the non-sharable portion of a GL context... VAO, etc. */
   protected final RenderContextRef _uniqueContextRef = new RenderContextRef();
 
-  protected final ContextCapabilities _capabilities;
-
   /** The object tied to this RenderContext, such as the Canvas, etc. */
   protected final Object _contextKey;
+
+  /** Represents the sharable portion of a GL context... Textures, displayLists, etc. */
+  protected RenderContextRef _sharableContextRef;
+
+  protected ContextCapabilities _capabilities;
 
   protected Camera _currentCamera = null;
 
@@ -69,15 +69,22 @@ public class RenderContext {
 
   protected RenderPhase _renderPhase = RenderPhase.Scene;
 
-  public RenderContext(final Object key, final ContextCapabilities caps) {
-    this(key, caps, null);
+  public RenderContext(final Object key) {
+    this(key, null);
   }
 
-  public RenderContext(final Object key, final ContextCapabilities caps, final RenderContext shared) {
+  public RenderContext(final Object key, final RenderContext shared) {
     _contextKey = key;
+    setSharedContext(shared);
+  }
+
+  public void setSharedContext(final RenderContext shared) {
+    _sharableContextRef = (shared == null) ? new RenderContextRef() : shared._sharableContextRef;
+  }
+
+  public void setCapabilities(final ContextCapabilities caps) {
     _capabilities = caps;
     setupRecords();
-    _sharableContextRef = (shared == null) ? new RenderContextRef() : shared._sharableContextRef;
   }
 
   protected RendererRecord createRendererRecord() {
