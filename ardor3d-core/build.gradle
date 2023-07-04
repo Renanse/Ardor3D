@@ -1,7 +1,7 @@
 
 description = 'Ardor 3D Core'
 
-project.ext.guavaVersion = "30.1.1-jre"
+project.ext.guavaVersion = "32.1.1-jre"
 project.ext.snakeyamlVersion = "1.28"
 
 dependencies {
