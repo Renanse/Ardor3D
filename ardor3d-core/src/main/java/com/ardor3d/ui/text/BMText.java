@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
-import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
@@ -27,7 +27,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
-import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.IndexMode;

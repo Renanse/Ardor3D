@@ -622,8 +622,7 @@ public class ProjectedGrid extends Mesh {
     final String namePrefix;
 
     DeamonThreadFactory() {
-      final SecurityManager s = System.getSecurityManager();
-      group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+      group = Thread.currentThread().getThreadGroup();
       namePrefix = "ProjectedGrid Pool-" + poolNumber.getAndIncrement() + "-thread-";
     }
 

@@ -23,10 +23,9 @@ public class MathConstants {
   static {
     boolean hasPropertyAccess = true;
     try {
-      if (System.getSecurityManager() != null) {
-        System.getSecurityManager().checkPropertiesAccess();
-      }
+      System.getProperty("ardor3d.noMathPools");
     } catch (final SecurityException e) {
+      // It appears the user does not have permission to access System properties
       hasPropertyAccess = false;
     }
 

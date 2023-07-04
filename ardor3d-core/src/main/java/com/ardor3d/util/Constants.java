@@ -41,10 +41,9 @@ public class Constants {
   static {
     boolean hasPropertyAccess = true;
     try {
-      if (System.getSecurityManager() != null) {
-        System.getSecurityManager().checkPropertiesAccess();
-      }
+      System.getProperty("ardor3d.stats");
     } catch (final SecurityException e) {
+      // It appears the user does not have permission to access System properties
       hasPropertyAccess = false;
     }
 
