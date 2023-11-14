@@ -255,4 +255,28 @@ public enum MaterialManager {
     sb.append(program.substring(firstLF + 1));
     return sb.toString();
   }
+
+  /**
+   * Clear the contents of the material cache
+   */
+  public void clearMaterialCache() {
+    _materialCache.clear();
+  }
+
+  /**
+   * Remove a specific material from the cache.
+   * Useful for editing a material or shader and re-loading at runtime.
+   * @return true if the material was successfully removed from the cache.
+   */
+  public boolean clearMaterialCacheItem(final String materialUrl) {
+    final ResourceSource key = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, materialUrl);
+    if (key == null) {
+      return false;
+    }
+    if (!_materialCache.containsKey(key)) {
+      return false;
+    }
+    var value = _materialCache.get(key);
+    return _materialCache.remove(key, value);
+  }
 }
