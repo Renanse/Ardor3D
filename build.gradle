@@ -4,7 +4,7 @@ allprojects  {
 	apply plugin: 'java-library'
 	group = 'com.ardor3d'
 	version = '1.6.1'
-    project.ext.lwjglVersion = "3.2.3"
+    project.ext.lwjglVersion = "3.3.3"
     
 	switch ( OperatingSystem.current() ) {
 		case OperatingSystem.WINDOWS:

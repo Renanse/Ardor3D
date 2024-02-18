@@ -71,7 +71,7 @@ class CalculatorWindow extends NuklearWindow {
   @Override
   public void layout(final NkContext ctx) {
     try (MemoryStack stack = stackPush()) {
-      final NkRect rect = NkRect.mallocStack(stack);
+      final NkRect rect = NkRect.malloc(stack);
       if (nk_begin(ctx, "Calculator", nk_rect(getXOffset(), getYOffset(), 180, 250, rect),
           NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_MOVABLE)) {
         nk_layout_row_dynamic(ctx, 35, 1);

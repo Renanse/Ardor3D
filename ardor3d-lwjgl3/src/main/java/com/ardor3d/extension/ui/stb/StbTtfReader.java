@@ -71,7 +71,7 @@ public class StbTtfReader {
 
       final ByteBuffer bitmap = memAlloc(texWidth * texHeight);
 
-      final STBTTPackContext pc = STBTTPackContext.mallocStack(stack);
+      final STBTTPackContext pc = STBTTPackContext.malloc(stack);
       stbtt_PackBegin(pc, bitmap, texWidth, texHeight, 0, 1, NULL);
       stbtt_PackSetOversampling(pc, 4, 4);
       stbtt_PackFontRange(pc, font.ttf, 0, fontHeight, startUnicodeChar, font.charData);

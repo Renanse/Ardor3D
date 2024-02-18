@@ -321,7 +321,7 @@ public class NuklearHud extends Spatial implements Renderable {
         // Check for wheel change
         if (currentMState.getDwheel() != 0) {
           try (MemoryStack stack = stackPush()) {
-            final NkVec2 scroll = NkVec2.mallocStack(stack).y(currentMState.getDwheel());
+            final NkVec2 scroll = NkVec2.malloc(stack).y(currentMState.getDwheel());
             nk_input_scroll(_ctx, scroll);
           }
         }
@@ -525,11 +525,11 @@ public class NuklearHud extends Spatial implements Renderable {
           GL15C.glMapBuffer(GL15C.GL_ELEMENT_ARRAY_BUFFER, GL15C.GL_WRITE_ONLY, max_element_buffer, null));
       try (MemoryStack stack = stackPush()) {
         // fill convert configuration
-        final NkConvertConfig config = NkConvertConfig.callocStack(stack) //
+        final NkConvertConfig config = NkConvertConfig.calloc(stack) //
             .vertex_layout(VERTEX_LAYOUT) //
             .vertex_size(20) //
             .vertex_alignment(4) //
-            .null_texture(null_texture) //
+            .tex_null(null_texture) //
             .circle_segment_count(22) //
             .curve_segment_count(22) //
             .arc_segment_count(22) //
@@ -538,8 +538,8 @@ public class NuklearHud extends Spatial implements Renderable {
             .line_AA(AA);
 
         // setup buffers to load vertices and elements
-        final NkBuffer vbuf = NkBuffer.mallocStack(stack);
-        final NkBuffer ebuf = NkBuffer.mallocStack(stack);
+        final NkBuffer vbuf = NkBuffer.malloc(stack);
+        final NkBuffer ebuf = NkBuffer.malloc(stack);
 
         nk_buffer_init_fixed(vbuf, vertices/* , max_vertex_buffer */);
         nk_buffer_init_fixed(ebuf, elements/* , max_element_buffer */);
@@ -615,7 +615,7 @@ public class NuklearHud extends Spatial implements Renderable {
         final FloatBuffer x = stack.floats(0.0f);
         final FloatBuffer y = stack.floats(0.0f);
 
-        final STBTTAlignedQuad q = STBTTAlignedQuad.mallocStack(stack);
+        final STBTTAlignedQuad q = STBTTAlignedQuad.malloc(stack);
         final IntBuffer advance = stack.mallocInt(1);
 
         stbtt_GetPackedQuad(font.charData, texWidth, textHeight, codepoint - 32, x, y, q, false);
