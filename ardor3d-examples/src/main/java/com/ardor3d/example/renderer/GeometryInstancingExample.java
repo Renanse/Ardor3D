@@ -72,6 +72,7 @@ public class GeometryInstancingExample extends ExampleBase {
   @Override
   protected void initExample() {
     _canvas.setTitle("GeometryInstancingExample");
+    _canvas.setVSyncEnabled(false);
 
     final BasicText t2 = BasicText.createDefaultTextLabel("Text", "[I] Instancing On");
     t2.getSceneHints().setRenderBucketType(RenderBucketType.OrthoOrder);
