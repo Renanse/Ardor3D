@@ -71,7 +71,7 @@ public class DdsUtils {
    */
   static final int getInt(final byte[] bytes) {
     int rVal = 0;
-    rVal |= ((bytes[0] & 0xff) << 0);
+    rVal |= ((bytes[0] & 0xff));
     if (bytes.length > 1) {
       rVal |= ((bytes[1] & 0xff) << 8);
     }
@@ -180,7 +180,7 @@ public class DdsUtils {
   // DXT5 Alpha block flipping, inspired by code from Evan Hart (nVidia SDK)
   private static int getUInt24(final byte[] input, final int offset) {
     int result = 0;
-    result |= (input[offset + 0] & 0xff) << 0;
+    result |= (input[offset + 0] & 0xff);
     result |= (input[offset + 1] & 0xff) << 8;
     result |= (input[offset + 2] & 0xff) << 16;
     return result;
@@ -220,7 +220,7 @@ public class DdsUtils {
 
     // stuff 8x 3bits into 3 bytes
     int result = 0;
-    result = result | (threeBits[1][0] << 0);
+    result = result | (threeBits[1][0]);
     result = result | (threeBits[1][1] << 3);
     result = result | (threeBits[1][2] << 6);
     result = result | (threeBits[1][3] << 9);

@@ -358,7 +358,7 @@ public class TexturePacker {
       if (sourceAlpha) {
         dataAsFloatBuffer.put(targetIndex + 3, lightData.get(sourceIndex + 3));
       } else {
-        dataAsFloatBuffer.put(targetIndex + 3, (byte) (255 & 0xFF));
+        dataAsFloatBuffer.put(targetIndex + 3, (byte) 0xFF);
       }
     }
   }
