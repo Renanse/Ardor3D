@@ -313,7 +313,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
    *         forth. Multiple calls to the method should return instances of this class that are not
    *         currently in use.
    */
-  public final static LineSegment3 fetchTempInstance() {
+  public static LineSegment3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return LineSegment3.LINESEG3_POOL.fetch();
     } else {
@@ -329,7 +329,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
    * @param segment
    *          the LineSegment3 to release.
    */
-  public final static void releaseTempInstance(final LineSegment3 segment) {
+  public static void releaseTempInstance(final LineSegment3 segment) {
     if (MathConstants.useMathPools) {
       LineSegment3.LINESEG3_POOL.release(segment);
     }

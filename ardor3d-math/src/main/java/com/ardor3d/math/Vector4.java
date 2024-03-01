@@ -1079,7 +1079,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Vector4 fetchTempInstance() {
+  public static Vector4 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Vector4.VEC_POOL.fetch().zero();
     } else {
@@ -1094,7 +1094,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * @param vec
    *          the Vector4 to release.
    */
-  public final static void releaseTempInstance(final Vector4 vec) {
+  public static void releaseTempInstance(final Vector4 vec) {
     if (MathConstants.useMathPools) {
       Vector4.VEC_POOL.release(vec);
     }

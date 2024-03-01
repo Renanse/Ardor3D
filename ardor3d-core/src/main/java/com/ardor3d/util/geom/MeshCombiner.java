@@ -59,11 +59,11 @@ public class MeshCombiner {
    *          our source node
    * @return the combined Mesh.
    */
-  public final static Mesh combine(final Node source) {
+  public static Mesh combine(final Node source) {
     return combine(source, new MeshCombineLogic());
   }
 
-  public final static Mesh combine(final Spatial source, final MeshCombineLogic logic) {
+  public static Mesh combine(final Spatial source, final MeshCombineLogic logic) {
     final List<Mesh> sources = new ArrayList<>();
     source.acceptVisitor((final Spatial spatial) -> {
       if (spatial instanceof Mesh) {
@@ -83,7 +83,7 @@ public class MeshCombiner {
    *          our Mesh objects to combine.
    * @return the combined Mesh.
    */
-  public final static Mesh combine(final Mesh... sources) {
+  public static Mesh combine(final Mesh... sources) {
     return combine(Arrays.asList(sources));
   }
 
@@ -96,11 +96,11 @@ public class MeshCombiner {
    *          our collection of Mesh objects to combine.
    * @return the combined Mesh.
    */
-  public final static Mesh combine(final Collection<Mesh> sources) {
+  public static Mesh combine(final Collection<Mesh> sources) {
     return combine(sources, new MeshCombineLogic());
   }
 
-  public final static Mesh combine(final Collection<Mesh> sources, final MeshCombineLogic logic) {
+  public static Mesh combine(final Collection<Mesh> sources, final MeshCombineLogic logic) {
     if (sources == null || sources.isEmpty()) {
       return null;
     }

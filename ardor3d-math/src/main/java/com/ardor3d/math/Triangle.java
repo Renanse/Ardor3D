@@ -397,7 +397,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Triangle fetchTempInstance() {
+  public static Triangle fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Triangle.TRI_POOL.fetch();
     } else {
@@ -412,7 +412,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
    * @param tri
    *          the Triangle to release.
    */
-  public final static void releaseTempInstance(final Triangle tri) {
+  public static void releaseTempInstance(final Triangle tri) {
     if (MathConstants.useMathPools) {
       Triangle.TRI_POOL.release(tri);
     }

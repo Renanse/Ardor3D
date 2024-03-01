@@ -1131,7 +1131,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Vector3 fetchTempInstance() {
+  public static Vector3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Vector3.VEC_POOL.fetch().zero();
     } else {
@@ -1146,7 +1146,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * @param vec
    *          the Vector3 to release.
    */
-  public final static void releaseTempInstance(final Vector3 vec) {
+  public static void releaseTempInstance(final Vector3 vec) {
     if (MathConstants.useMathPools) {
       Vector3.VEC_POOL.release(vec);
     }

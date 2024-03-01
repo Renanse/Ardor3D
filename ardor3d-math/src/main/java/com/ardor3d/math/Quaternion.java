@@ -1519,7 +1519,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    *         forth. Multiple calls to the method should return instances of this class that are not
    *         currently in use.
    */
-  public final static Quaternion fetchTempInstance() {
+  public static Quaternion fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Quaternion.QUAT_POOL.fetch().setIdentity();
     } else {
@@ -1534,7 +1534,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    * @param mat
    *          the Quaternion to release.
    */
-  public final static void releaseTempInstance(final Quaternion mat) {
+  public static void releaseTempInstance(final Quaternion mat) {
     if (MathConstants.useMathPools) {
       Quaternion.QUAT_POOL.release(mat);
     }

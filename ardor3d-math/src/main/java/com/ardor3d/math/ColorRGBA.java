@@ -943,7 +943,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static ColorRGBA fetchTempInstance() {
+  public static ColorRGBA fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return ColorRGBA.COLOR_POOL.fetch();
     } else {
@@ -958,7 +958,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
    * @param color
    *          the ColorRGBA to release.
    */
-  public final static void releaseTempInstance(final ColorRGBA color) {
+  public static void releaseTempInstance(final ColorRGBA color) {
     if (MathConstants.useMathPools) {
       ColorRGBA.COLOR_POOL.release(color);
     }

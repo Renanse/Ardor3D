@@ -153,7 +153,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Line3 fetchTempInstance() {
+  public static Line3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Line3.LINE3_POOL.fetch();
     } else {
@@ -168,7 +168,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
    * @param line
    *          the Line3 to release.
    */
-  public final static void releaseTempInstance(final Line3 line) {
+  public static void releaseTempInstance(final Line3 line) {
     if (MathConstants.useMathPools) {
       Line3.LINE3_POOL.release(line);
     }

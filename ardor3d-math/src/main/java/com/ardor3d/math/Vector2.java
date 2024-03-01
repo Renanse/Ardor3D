@@ -1027,7 +1027,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Vector2 fetchTempInstance() {
+  public static Vector2 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Vector2.VEC_POOL.fetch().zero();
     } else {
@@ -1042,7 +1042,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    * @param vec
    *          the Vector2 to release.
    */
-  public final static void releaseTempInstance(final Vector2 vec) {
+  public static void releaseTempInstance(final Vector2 vec) {
     if (MathConstants.useMathPools) {
       Vector2.VEC_POOL.release(vec);
     }

@@ -1827,7 +1827,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Matrix3 fetchTempInstance() {
+  public static Matrix3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Matrix3.MAT_POOL.fetch().setIdentity();
     } else {
@@ -1842,7 +1842,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    * @param mat
    *          the Matrix3 to release.
    */
-  public final static void releaseTempInstance(final Matrix3 mat) {
+  public static void releaseTempInstance(final Matrix3 mat) {
     if (MathConstants.useMathPools) {
       Matrix3.MAT_POOL.release(mat);
     }

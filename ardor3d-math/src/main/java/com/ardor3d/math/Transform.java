@@ -1060,7 +1060,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Transform fetchTempInstance() {
+  public static Transform fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Transform.TRANS_POOL.fetch().setIdentity();
     } else {
@@ -1075,7 +1075,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    * @param trans
    *          the Transform to release.
    */
-  public final static void releaseTempInstance(final Transform trans) {
+  public static void releaseTempInstance(final Transform trans) {
     if (MathConstants.useMathPools) {
       Transform.TRANS_POOL.release(trans);
     }

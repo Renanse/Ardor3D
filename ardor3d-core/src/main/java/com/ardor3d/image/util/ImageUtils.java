@@ -23,11 +23,11 @@ import com.ardor3d.math.util.MathUtils;
 
 public abstract class ImageUtils {
 
-  public static final int getPixelByteSize(final ImageDataFormat format, final PixelDataType type) {
+  public static int getPixelByteSize(final ImageDataFormat format, final PixelDataType type) {
     return type.getBytesPerPixel(format.getComponents());
   }
 
-  public static final TextureStoreFormat getTextureStoreFormat(final TextureStoreFormat format, final Image image) {
+  public static TextureStoreFormat getTextureStoreFormat(final TextureStoreFormat format, final Image image) {
     if (format != TextureStoreFormat.GuessCompressedFormat && format != TextureStoreFormat.GuessNoCompressedFormat) {
       return format;
     }

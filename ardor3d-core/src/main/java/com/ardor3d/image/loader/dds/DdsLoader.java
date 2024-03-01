@@ -93,7 +93,7 @@ public class DdsLoader implements ImageLoader {
     return image;
   }
 
-  private static final void updateDepth(final Image image, final DdsImageInfo info) {
+  private static void updateDepth(final Image image, final DdsImageInfo info) {
     if (isSet(info.header.dwCaps2, DdsHeader.DDSCAPS2_CUBEMAP)) {
       int depth = 0;
       if (isSet(info.header.dwCaps2, DdsHeader.DDSCAPS2_CUBEMAP_POSITIVEX)) {
@@ -126,7 +126,7 @@ public class DdsLoader implements ImageLoader {
     }
   }
 
-  private static final void populateImage(final Image image, final DdsImageInfo info, final LittleEndianDataInput in)
+  private static void populateImage(final Image image, final DdsImageInfo info, final LittleEndianDataInput in)
       throws IOException {
     final int flags = info.header.ddpf.dwFlags;
 
@@ -271,8 +271,8 @@ public class DdsLoader implements ImageLoader {
     image.setData(imageData);
   }
 
-  static final ByteBuffer readDXT(final LittleEndianDataInput in, final int totalSize, final DdsImageInfo info,
-      final Image image) throws IOException {
+  static ByteBuffer readDXT(final LittleEndianDataInput in, final int totalSize, final DdsImageInfo info,
+                            final Image image) throws IOException {
     int mipWidth = info.header.dwWidth;
     int mipHeight = info.header.dwHeight;
 

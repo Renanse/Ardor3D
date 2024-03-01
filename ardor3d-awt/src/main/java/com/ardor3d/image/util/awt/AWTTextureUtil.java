@@ -33,8 +33,8 @@ public abstract class AWTTextureUtil {
    *          the specific format to use when storing this texture on the card.
    * @return our new Texture.
    */
-  public static final Texture loadTexture(final BufferedImage image, final Texture.MinificationFilter minFilter,
-      final TextureStoreFormat storeFormat, final boolean flipVertically) {
+  public static Texture loadTexture(final BufferedImage image, final Texture.MinificationFilter minFilter,
+                                    final TextureStoreFormat storeFormat, final boolean flipVertically) {
     final Image imageData = AWTImageLoader.makeArdor3dImage(image, flipVertically);
     final String fileType = (image != null) ? "" + image.hashCode() : null;
     final TextureKey tkey = TextureKey.getKey(null, flipVertically, storeFormat, fileType, minFilter);

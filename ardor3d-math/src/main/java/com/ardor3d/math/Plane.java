@@ -308,7 +308,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Plane fetchTempInstance() {
+  public static Plane fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Plane.PLANE_POOL.fetch();
     } else {
@@ -323,7 +323,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
    * @param plane
    *          the Plane to release.
    */
-  public final static void releaseTempInstance(final Plane plane) {
+  public static void releaseTempInstance(final Plane plane) {
     if (MathConstants.useMathPools) {
       Plane.PLANE_POOL.release(plane);
     }

@@ -353,7 +353,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
   public abstract AbstractBufferData<T> makeCopy();
 
   @SuppressWarnings("unchecked")
-  private static final Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
+  private static Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
     // Pull all expired vbos from ref queue and add to an id multimap.
     ContextValueReference<AbstractBufferData<?>, Integer> ref;
     while ((ref = (ContextValueReference<AbstractBufferData<?>, Integer>) _vboRefQueue.poll()) != null) {

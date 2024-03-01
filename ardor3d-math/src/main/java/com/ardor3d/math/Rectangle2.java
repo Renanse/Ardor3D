@@ -261,7 +261,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
    *         forth. Multiple calls to the method should return instances of this class that are not
    *         currently in use.
    */
-  public final static Rectangle2 fetchTempInstance() {
+  public static Rectangle2 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Rectangle2.RECTANGLE_POOL.fetch();
     } else {
@@ -276,7 +276,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
    * @param rectangle
    *          the Rectangle2 to release.
    */
-  public final static void releaseTempInstance(final Rectangle2 rectangle) {
+  public static void releaseTempInstance(final Rectangle2 rectangle) {
     if (MathConstants.useMathPools) {
       Rectangle2.RECTANGLE_POOL.release(rectangle);
     }

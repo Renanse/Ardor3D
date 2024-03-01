@@ -342,7 +342,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Ring fetchTempInstance() {
+  public static Ring fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Ring.RING_POOL.fetch();
     } else {
@@ -357,7 +357,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
    * @param ring
    *          the Ring to release.
    */
-  public final static void releaseTempInstance(final Ring ring) {
+  public static void releaseTempInstance(final Ring ring) {
     if (MathConstants.useMathPools) {
       Ring.RING_POOL.release(ring);
     }

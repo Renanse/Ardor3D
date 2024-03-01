@@ -21,7 +21,7 @@ public class DdsUtils {
    *          the bit mask to test
    * @return number of bits to shift to the right to align mask with 0.
    */
-  static final int shiftCount(int mask) {
+  static int shiftCount(int mask) {
     if (mask == 0) {
       return 0;
     }
@@ -47,7 +47,7 @@ public class DdsUtils {
    *          our mask
    * @return true if the mask passes
    */
-  static final boolean isSet(final int value, final int bitMask) {
+  static boolean isSet(final int value, final int bitMask) {
     return (value & bitMask) == bitMask;
   }
 
@@ -58,7 +58,7 @@ public class DdsUtils {
    *          our string... should only be 1-4 chars long.
    * @return the int value
    */
-  static final int getInt(final String string) {
+  static int getInt(final String string) {
     return getInt(string.getBytes());
   }
 
@@ -69,7 +69,7 @@ public class DdsUtils {
    *          our array... should only be 1-4 bytes long.
    * @return the int value
    */
-  static final int getInt(final byte[] bytes) {
+  static int getInt(final byte[] bytes) {
     int rVal = 0;
     rVal |= ((bytes[0] & 0xff));
     if (bytes.length > 1) {

@@ -1253,7 +1253,7 @@ public class MeshData implements Savable {
   }
 
   @SuppressWarnings("unchecked")
-  private static final Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
+  private static Multimap<RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContextRef, Integer> store) {
     // Pull all expired vaos from ref queue and add to an id multimap.
     ContextValueReference<MeshData, Integer> valRef;
     while ((valRef = (ContextValueReference<MeshData, Integer>) MeshData._vaoRefQueue.poll()) != null) {

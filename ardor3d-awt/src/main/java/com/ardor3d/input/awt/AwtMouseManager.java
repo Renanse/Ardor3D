@@ -144,7 +144,7 @@ public class AwtMouseManager implements MouseManager {
     }
   }
 
-  private static final Cursor getTransparentCursor() {
+  private static Cursor getTransparentCursor() {
     if (_transparentCursor == null) {
       final BufferedImage cursorImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
       cursorImage.setRGB(0, 0, 0);

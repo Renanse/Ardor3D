@@ -97,7 +97,7 @@ public class SwtMouseManager implements MouseManager {
     }
   }
 
-  private final Cursor getTransparentCursor() {
+  private Cursor getTransparentCursor() {
     if (_transparentCursor == null) {
       final Display display = _control.getDisplay();
       final Color white = display.getSystemColor(SWT.COLOR_WHITE);

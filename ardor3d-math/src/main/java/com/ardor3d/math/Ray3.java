@@ -375,7 +375,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
    *         Multiple calls to the method should return instances of this class that are not currently
    *         in use.
    */
-  public final static Ray3 fetchTempInstance() {
+  public static Ray3 fetchTempInstance() {
     if (MathConstants.useMathPools) {
       return Ray3.RAY_POOL.fetch();
     } else {
@@ -390,7 +390,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
    * @param ray
    *          the Ray to release.
    */
-  public final static void releaseTempInstance(final Ray3 ray) {
+  public static void releaseTempInstance(final Ray3 ray) {
     if (MathConstants.useMathPools) {
       Ray3.RAY_POOL.release(ray);
     }

@@ -90,7 +90,7 @@ public abstract class RenderState implements Savable {
 
     public StateStack() {}
 
-    public final static StateStack fetchTempInstance() {
+    public static StateStack fetchTempInstance() {
       if (Constants.useStatePools) {
         final StateStack s = RenderState.STATESTACKS_POOL.fetch();
         // re-use already allocated stacks
@@ -103,7 +103,7 @@ public abstract class RenderState implements Savable {
       }
     }
 
-    public final static void releaseTempInstance(final StateStack s) {
+    public static void releaseTempInstance(final StateStack s) {
       if (Constants.useStatePools) {
         RenderState.STATESTACKS_POOL.release(s);
       }
