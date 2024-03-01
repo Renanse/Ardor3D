@@ -207,7 +207,6 @@ public class MeshData implements Savable {
    * @return the buffer for the associated buffer data
    */
   public <T extends Buffer> T getBuffer(final String key) {
-    @SuppressWarnings("unchecked")
     final AbstractBufferData<T> coords = getCoords(key);
     if (coords == null) {
       return null;
