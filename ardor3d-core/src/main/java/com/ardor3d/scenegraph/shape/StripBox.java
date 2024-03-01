@@ -231,11 +231,11 @@ public class StripBox extends Mesh implements Cloneable {
    */
   public Vector3[] computeVertices() {
 
-    final Vector3 akEAxis[] = {Vector3.UNIT_X.multiply(_xExtent, Vector3.fetchTempInstance()),
+    final Vector3[] akEAxis = {Vector3.UNIT_X.multiply(_xExtent, Vector3.fetchTempInstance()),
         Vector3.UNIT_Y.multiply(_yExtent, Vector3.fetchTempInstance()),
         Vector3.UNIT_Z.multiply(_zExtent, Vector3.fetchTempInstance())};
 
-    final Vector3 rVal[] = new Vector3[8];
+    final Vector3[] rVal = new Vector3[8];
     rVal[0] = _center.subtract(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
     rVal[1] = _center.add(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
     rVal[2] = _center.add(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);

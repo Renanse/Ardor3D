@@ -63,7 +63,7 @@ public class UpdatingTerrainExample extends ExampleBase {
   private UpdatingTerrainData terrainData;
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[6];
+  private final BasicText[] _exampleInfo = new BasicText[6];
 
   public static void main(final String[] args) {
     ExampleBase.start(UpdatingTerrainExample.class);

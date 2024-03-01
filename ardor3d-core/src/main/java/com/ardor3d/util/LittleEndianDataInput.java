@@ -104,12 +104,12 @@ public class LittleEndianDataInput implements DataInput {
   }
 
   @Override
-  public final void readFully(final byte b[]) throws IOException {
+  public final void readFully(final byte[] b) throws IOException {
     readFully(b, 0, b.length);
   }
 
   @Override
-  public final void readFully(final byte b[], final int off, final int len) throws IOException {
+  public final void readFully(final byte[] b, final int off, final int len) throws IOException {
     // this may look over-complicated, but the problem is that the InputStream.read() methods are
     // not guaranteed to fill up the buffer you pass to it. So we need to loop until we have filled
     // up the buffer or until we reach the end of the file.

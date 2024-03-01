@@ -177,10 +177,10 @@ public class Camera implements Savable, Externalizable {
 
   // Temporary values computed in onFrustumChange that are needed if a
   // call is made to onFrameChange.
-  protected double _coeffLeft[];
-  protected double _coeffRight[];
-  protected double _coeffBottom[];
-  protected double _coeffTop[];
+  protected double[] _coeffLeft;
+  protected double[] _coeffRight;
+  protected double[] _coeffBottom;
+  protected double[] _coeffTop;
 
   /** Number of camera planes used by this camera. Default is 6. */
   protected int _planeQuantity;

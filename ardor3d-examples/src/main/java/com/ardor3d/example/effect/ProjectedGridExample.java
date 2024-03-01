@@ -45,7 +45,7 @@ public class ProjectedGridExample extends ExampleBase {
   private boolean animateExternalCamera = false;
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[4];
+  private final BasicText[] _exampleInfo = new BasicText[4];
 
   public static void main(final String[] args) {
     start(ProjectedGridExample.class);

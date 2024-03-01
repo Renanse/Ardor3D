@@ -162,7 +162,7 @@ public class NvTriangleStripper implements Visitor {
     return isSame;
   }
 
-  boolean testTriangle(final int v0, final int v1, final int v2, final List<NvFaceInfo> in_bins[], final int NUMBINS) {
+  boolean testTriangle(final int v0, final int v1, final int v2, final List<NvFaceInfo>[] in_bins, final int NUMBINS) {
     // hash this triangle
     boolean isLegit = false;
     int ctr = v0 % NUMBINS;
@@ -351,7 +351,7 @@ public class NvTriangleStripper implements Visitor {
     if (validate) {
       final int NUMBINS = 100;
 
-      final List<NvFaceInfo> in_bins[] = new List[NUMBINS];
+      final List<NvFaceInfo>[] in_bins = new List[NUMBINS];
       for (int i = 0; i < NUMBINS; i++) {
         in_bins[i] = new ArrayList<>();
       }

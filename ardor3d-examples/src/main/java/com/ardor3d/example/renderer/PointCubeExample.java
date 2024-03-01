@@ -51,7 +51,7 @@ import com.ardor3d.util.TextureManager;
     maxHeapMemory = 64)
 public class PointCubeExample extends ExampleBase {
   protected Node _textNode = new Node();
-  protected BasicText _exampleInfo[] = new BasicText[4];
+  protected BasicText[] _exampleInfo = new BasicText[4];
 
   private Point _pointCubes;
 

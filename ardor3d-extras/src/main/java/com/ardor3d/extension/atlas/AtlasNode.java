@@ -15,7 +15,7 @@ import com.ardor3d.math.Rectangle2;
 public class AtlasNode {
   private boolean isLeaf = true;
   private boolean isSet = false;
-  private final AtlasNode child[] = new AtlasNode[2];
+  private final AtlasNode[] child = new AtlasNode[2];
   private Rectangle2 localRectangle;
 
   private AtlasNode() {}

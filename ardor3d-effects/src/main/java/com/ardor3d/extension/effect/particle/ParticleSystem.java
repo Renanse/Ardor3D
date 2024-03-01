@@ -97,7 +97,7 @@ public abstract class ParticleSystem extends Node {
   protected final Vector3 _facingUpVector = new Vector3(Vector3.UNIT_Y);
   protected final Vector3 _facingLeftVector = new Vector3(-1, 0, 0);
 
-  protected Particle _particles[];
+  protected Particle[] _particles;
 
   // protected Vector3 particleSpeed;
   protected int _releaseRate; // particles per second
@@ -108,7 +108,7 @@ public abstract class ParticleSystem extends Node {
   protected ParticleController _controller;
 
   protected Vector3 _oldEmit = new Vector3(Float.NaN, Float.NaN, Float.NaN);
-  protected double _matData[] = new double[9];
+  protected double[] _matData = new double[9];
 
   public ParticleSystem() {}
 
@@ -200,8 +200,8 @@ public abstract class ParticleSystem extends Node {
       final double f4 = 2.0 / _abUpMinUp.dot(_abUpMinUp);
       final double f6 = 2.0 / _upXemit.dot(_upXemit);
       final double f8 = f4 * f6 * _abUpMinUp.dot(_upXemit);
-      final double af1[] = {_abUpMinUp.getX(), _abUpMinUp.getY(), _abUpMinUp.getZ()};
-      final double af2[] = {_upXemit.getX(), _upXemit.getY(), _upXemit.getZ()};
+      final double[] af1 = {_abUpMinUp.getX(), _abUpMinUp.getY(), _abUpMinUp.getZ()};
+      final double[] af2 = {_upXemit.getX(), _upXemit.getY(), _upXemit.getZ()};
       for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
           _matData[(i * 3) + j] = (-f4 * af1[i] * af1[j] - f6 * af2[i] * af2[j]) + f8 * af2[i] * af1[j];

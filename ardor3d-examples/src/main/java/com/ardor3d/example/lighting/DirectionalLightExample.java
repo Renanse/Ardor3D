@@ -51,7 +51,7 @@ public class DirectionalLightExample extends ExampleBase {
   /** Quads used for debug showing shadowmaps. */
   private final static int SPLITS = 4;
   private final static int QUAD_SIZE = 128;
-  private final Quad _orthoQuad[] = new Quad[SPLITS];
+  private final Quad[] _orthoQuad = new Quad[SPLITS];
 
   private Node light;
 

@@ -54,7 +54,7 @@ import com.ardor3d.util.geom.MeshCombiner;
 public class AtlasExample extends ExampleBase {
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[3];
+  private final BasicText[] _exampleInfo = new BasicText[3];
 
   private double counter = 0;
   private int frames = 0;

@@ -292,7 +292,7 @@ public class Box extends Mesh implements Cloneable {
    */
   public Vector3[] computeVertices() {
 
-    final Vector3 rVal[] = new Vector3[8];
+    final Vector3[] rVal = new Vector3[8];
     rVal[0] = _center.add(-_xExtent, -_yExtent, -_zExtent, null);
     rVal[1] = _center.add(_xExtent, -_yExtent, -_zExtent, null);
     rVal[2] = _center.add(_xExtent, _yExtent, -_zExtent, null);

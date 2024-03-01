@@ -498,7 +498,7 @@ public class WaterNode extends Node {
     return 0.0;
   }
 
-  private double projectionMatrix[] = new double[16];
+  private double[] projectionMatrix = new double[16];
   private final Vector4 cornerPoint = new Vector4();
   private final Matrix4 tmpMatrix = new Matrix4();
 

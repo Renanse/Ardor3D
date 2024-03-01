@@ -34,7 +34,7 @@ public class ParticlePoints extends ParticleSystem {
 
   @Override
   protected void initializeParticles(final int numParticles) {
-    Vector2 sharedTextureData[];
+    Vector2[] sharedTextureData;
 
     // setup texture coords
     sharedTextureData = new Vector2[] {new Vector2(0.0, 0.0)};

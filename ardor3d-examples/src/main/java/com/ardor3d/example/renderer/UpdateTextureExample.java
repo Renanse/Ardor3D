@@ -68,7 +68,7 @@ public class UpdateTextureExample extends ExampleBase {
   protected void renderExample(final Renderer renderer) {
     switch (mode) {
       case 0: {
-        final byte data[] = AWTImageLoader.asByteArray(img);
+        final byte[] data = AWTImageLoader.asByteArray(img);
         imageBuffer.put(data);
         imageBuffer.flip();
         final Texture prevTexture =
@@ -78,7 +78,7 @@ public class UpdateTextureExample extends ExampleBase {
         break;
       }
       case 1: {
-        final byte data[] = AWTImageLoader.asByteArray(img);
+        final byte[] data = AWTImageLoader.asByteArray(img);
         imageBuffer.put(data);
         imageBuffer.flip();
         final Texture prevTexture =
@@ -172,7 +172,7 @@ public class UpdateTextureExample extends ExampleBase {
       img = ImageIO.read(ResourceLocatorTool
           .locateResource(ResourceLocatorTool.TYPE_TEXTURE, "images/ardor3d_white_256.jpg").openStream());
       // FIXME: Check if this is a int[] or byte[]
-      final byte data[] = AWTImageLoader.asByteArray(img);
+      final byte[] data = AWTImageLoader.asByteArray(img);
       imageBuffer = BufferUtils.createByteBuffer(data.length);
 
       imgGraphics = img.getGraphics();

@@ -88,7 +88,7 @@ public class ParticleMesh extends ParticleSystem {
     if (numParticles == 0) {
       return;
     }
-    Vector2 sharedTextureData[];
+    Vector2[] sharedTextureData;
 
     // setup texture coords and index mode
     final MeshData meshData = mesh.getMeshData();

@@ -118,7 +118,7 @@ public class AWTImageLoader implements ImageLoader {
     }
 
     // Get image as a byte buffer - note this corrects order of Alpha component from ARGB to RGBA
-    final byte data[] = asByteArray(texToConvert);
+    final byte[] data = asByteArray(texToConvert);
     final ByteBuffer scratch =
         createOnHeap ? BufferUtils.createByteBufferOnHeap(data.length) : BufferUtils.createByteBuffer(data.length);
     scratch.clear();

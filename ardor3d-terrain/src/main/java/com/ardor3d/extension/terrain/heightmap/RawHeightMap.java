@@ -34,7 +34,7 @@ public class RawHeightMap {
 
   private int size;
   private InputStream stream;
-  private float heightData[];
+  private float[] heightData;
 
   private boolean swapXY;
   private boolean flipX;

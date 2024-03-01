@@ -59,7 +59,7 @@ public interface ReadOnlyQuaternion {
 
   Vector3 apply(ReadOnlyVector3 vec, Vector3 store);
 
-  Vector3[] toAxes(Vector3 axes[]);
+  Vector3[] toAxes(Vector3[] axes);
 
   Quaternion slerp(ReadOnlyQuaternion endQuat, double changeAmnt, Quaternion store);
 

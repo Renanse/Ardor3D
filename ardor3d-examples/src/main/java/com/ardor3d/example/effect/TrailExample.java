@@ -53,7 +53,7 @@ public class TrailExample extends ExampleBase {
   private final Vector3 tangent = new Vector3();
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[10];
+  private final BasicText[] _exampleInfo = new BasicText[10];
 
   public static void main(final String[] args) {
     start(TrailExample.class);

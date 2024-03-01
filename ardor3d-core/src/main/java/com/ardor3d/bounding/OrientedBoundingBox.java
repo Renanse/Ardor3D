@@ -583,7 +583,7 @@ public class OrientedBoundingBox extends BoundingVolume {
     int i;
 
     // convenience variables
-    final ReadOnlyVector3 akA[] = new ReadOnlyVector3[] {box0.getXAxis(), box0.getYAxis(), box0.getZAxis()};
+    final ReadOnlyVector3[] akA = new ReadOnlyVector3[] {box0.getXAxis(), box0.getYAxis(), box0.getZAxis()};
     final ReadOnlyVector3[] akB = new ReadOnlyVector3[] {box1.getXAxis(), box1.getYAxis(), box1.getZAxis()};
     final ReadOnlyVector3 afEA = box0._extent;
     final ReadOnlyVector3 afEB = box1._extent;
@@ -809,7 +809,7 @@ public class OrientedBoundingBox extends BoundingVolume {
     int i;
 
     // convenience variables
-    final Vector3 akA[] = new Vector3[] {_xAxis, _yAxis, _zAxis};
+    final Vector3[] akA = new Vector3[] {_xAxis, _yAxis, _zAxis};
     final Vector3[] akB =
         new Vector3[] {Vector3.fetchTempInstance(), Vector3.fetchTempInstance(), Vector3.fetchTempInstance()};
     final Vector3 afEA = _extent;
@@ -1016,7 +1016,7 @@ public class OrientedBoundingBox extends BoundingVolume {
     int i;
 
     // convenience variables
-    final Vector3 akA[] = new Vector3[] {_xAxis, _yAxis, _zAxis};
+    final Vector3[] akA = new Vector3[] {_xAxis, _yAxis, _zAxis};
     final Vector3[] akB = new Vector3[] {obb._xAxis, obb._yAxis, obb._zAxis};
     final Vector3 afEA = _extent;
     final Vector3 afEB = obb._extent;

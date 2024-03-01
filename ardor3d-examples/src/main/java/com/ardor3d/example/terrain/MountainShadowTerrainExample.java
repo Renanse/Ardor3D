@@ -83,13 +83,13 @@ public class MountainShadowTerrainExample extends ExampleBase {
   private Camera terrainCamera;
 
   /** Text fields used to present info about the example. */
-  private final UILabel _exampleInfo[] = new UILabel[2];
+  private final UILabel[] _exampleInfo = new UILabel[2];
 
   private DirectionalLight light;
 
   private final static int SPLITS = 6;
   private final static int QUAD_SIZE = 128;
-  private final Quad _orthoQuad[] = new Quad[SPLITS];
+  private final Quad[] _orthoQuad = new Quad[SPLITS];
 
   private double lightTime;
   private boolean moveLight = false;

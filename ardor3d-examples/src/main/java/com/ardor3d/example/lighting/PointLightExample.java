@@ -48,7 +48,7 @@ public class PointLightExample extends ExampleBase {
   private final double height = 6;
   private final double speed = .5;
   private final static int QUAD_SIZE = 128;
-  private final Quad _orthoQuad[] = new Quad[6];
+  private final Quad[] _orthoQuad = new Quad[6];
 
   public static void main(final String[] args) {
     start(PointLightExample.class);

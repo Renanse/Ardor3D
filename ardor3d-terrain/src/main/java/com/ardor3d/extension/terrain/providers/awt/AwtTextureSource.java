@@ -43,8 +43,8 @@ public class AwtTextureSource implements TextureSource, ElementUpdateListener {
   private final TextureStoreFormat format;
   private final boolean hasAlpha;
 
-  private final BufferedImage _image[];
-  private final Set<Tile> _updatedTiles[];
+  private final BufferedImage[] _image;
+  private final Set<Tile>[] _updatedTiles;
 
   private final ThreadLocal<byte[]> tileDataPool = new ThreadLocal<>() {
     @Override

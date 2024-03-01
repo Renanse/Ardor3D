@@ -81,11 +81,11 @@ public class ShadowedTerrainExample extends ExampleBase {
   private Camera _terrainCamera;
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[5];
+  private final BasicText[] _exampleInfo = new BasicText[5];
 
   private final static int SPLITS = 6;
   private final static int QUAD_SIZE = 128;
-  protected final Quad _orthoQuad[] = new Quad[SPLITS];
+  protected final Quad[] _orthoQuad = new Quad[SPLITS];
 
   private Node _light1;
   private Node _rover;

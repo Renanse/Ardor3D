@@ -93,7 +93,7 @@ public class TerrainWaterExample extends ExampleBase {
   private final Ray3 pickRay = new Ray3();
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[8];
+  private final BasicText[] _exampleInfo = new BasicText[8];
 
   /**
    * The main method.

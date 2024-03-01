@@ -33,7 +33,7 @@ import com.ardor3d.util.TextureManager;
 public class SimpleTexturedPbrExample extends ExampleBase {
 
   int _lightCount = 4;
-  PointLight _lights[] = new PointLight[_lightCount];
+  PointLight[] _lights = new PointLight[_lightCount];
 
   public static void main(final String[] args) {
     start(SimpleTexturedPbrExample.class);

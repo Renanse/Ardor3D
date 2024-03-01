@@ -69,7 +69,7 @@ public class InMemoryTerrainExample extends ExampleBase {
   private InMemoryTerrainData inMemoryTerrainData;
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[6];
+  private final BasicText[] _exampleInfo = new BasicText[6];
 
   public static void main(final String[] args) {
     ExampleBase.start(InMemoryTerrainExample.class);

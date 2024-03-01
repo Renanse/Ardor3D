@@ -119,12 +119,12 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
   }
 
   @Override
-  public final void readFully(final byte b[]) throws IOException {
+  public final void readFully(final byte[] b) throws IOException {
     readFully(b, 0, b.length);
   }
 
   @Override
-  public final void readFully(final byte b[], final int off, final int len) throws IOException {
+  public final void readFully(final byte[] b, final int off, final int len) throws IOException {
     if (len - off + _contents.position() > _contents.capacity()) {
       throw new EOFException("EOF reached");
     } else {

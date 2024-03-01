@@ -78,7 +78,7 @@ public class ShapesPlusProceduralTerrainExample extends ExampleBase {
   Transform ovalTrans = new Transform();
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[5];
+  private final BasicText[] _exampleInfo = new BasicText[5];
 
   public static void main(final String[] args) {
     ExampleBase.start(ShapesPlusProceduralTerrainExample.class);

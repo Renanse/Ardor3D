@@ -49,7 +49,7 @@ import com.ardor3d.util.TextureManager;
 public class FullPbrExample extends ExampleBase {
 
   int _lightCount = 4;
-  PointLight _lights[] = new PointLight[_lightCount];
+  PointLight[] _lights = new PointLight[_lightCount];
 
   TextureCubeMap skyboxTex, irradianceTex, prefilterTex;
   Texture2D brdfTex;

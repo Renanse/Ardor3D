@@ -264,8 +264,8 @@ public class Extrusion extends Mesh {
     if (closed) {
       np = np + 3;
     }
-    final double d[][] = new double[3][np]; // Newton form coefficients
-    final double x[] = new double[np]; // x-coordinates of nodes
+    final double[][] d = new double[3][np]; // Newton form coefficients
+    final double[] x = new double[np]; // x-coordinates of nodes
 
     final List<ReadOnlyVector3> path = new ArrayList<>();
 
@@ -290,14 +290,14 @@ public class Extrusion extends Mesh {
 
     if (np > 1) {
       final double[][] a = new double[3][np];
-      final double h[] = new double[np];
+      final double[] h = new double[np];
       for (int i = 1; i <= np - 1; i++) {
         h[i] = x[i] - x[i - 1];
       }
       if (np > 2) {
-        final double sub[] = new double[np - 1];
-        final double diag[] = new double[np - 1];
-        final double sup[] = new double[np - 1];
+        final double[] sub = new double[np - 1];
+        final double[] diag = new double[np - 1];
+        final double[] sup = new double[np - 1];
 
         for (int i = 1; i <= np - 2; i++) {
           diag[i] = (h[i] + h[i + 1]) / 3;
@@ -343,8 +343,8 @@ public class Extrusion extends Mesh {
    * (the values sub[1], sup[n] are ignored) right hand side vector b[1:n] is overwritten with
    * solution NOTE: 1...n is used in all arrays, 0 is unused
    */
-  private static void solveTridiag(final double sub[], final double diag[], final double sup[], final double b[],
-      final int n) {
+  private static void solveTridiag(final double[] sub, final double[] diag, final double[] sup, final double[] b,
+                                   final int n) {
     // factorization and forward substitution
     for (int i = 2; i <= n; i++) {
       sub[i] = sub[i] / diag[i - 1];

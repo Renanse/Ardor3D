@@ -64,7 +64,7 @@ public class ArrayTerrainExample extends ExampleBase {
   private Camera terrainCamera;
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[5];
+  private final BasicText[] _exampleInfo = new BasicText[5];
 
   private double counter = 0;
   private int frames = 0;

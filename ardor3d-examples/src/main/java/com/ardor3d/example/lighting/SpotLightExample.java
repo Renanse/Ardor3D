@@ -95,7 +95,7 @@ public class SpotLightExample extends ExampleBase {
   }
 
   /** Quads used for debug showing shadowmaps. */
-  private final Quad _orthoQuad[] = new Quad[2];
+  private final Quad[] _orthoQuad = new Quad[2];
 
   Node light1, light2;
 

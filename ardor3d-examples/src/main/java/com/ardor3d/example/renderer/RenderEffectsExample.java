@@ -51,7 +51,7 @@ public class RenderEffectsExample extends ExampleBase {
 
   private EffectManager effectManager;
   private final Node textNodes = new Node("Text");
-  private final BasicText exampleInfo[] = new BasicText[2];
+  private final BasicText[] exampleInfo = new BasicText[2];
 
   public static void main(final String[] args) {
     start(RenderEffectsExample.class);

@@ -280,7 +280,7 @@ public class TextureState extends RenderState {
     // accumulate the textures in the stack into a single TextureState object
     final TextureState newTState = new TextureState();
     boolean foundEnabled = false;
-    final Object states[] = stack.toArray();
+    final Object[] states = stack.toArray();
     switch (mode) {
       case CombineClosest:
       case CombineClosestEnabled:

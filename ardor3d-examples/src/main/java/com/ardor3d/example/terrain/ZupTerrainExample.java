@@ -65,7 +65,7 @@ public class ZupTerrainExample extends ExampleBase {
   private Skybox skybox;
 
   /** Text fields used to present info about the example. */
-  private final BasicText _exampleInfo[] = new BasicText[5];
+  private final BasicText[] _exampleInfo = new BasicText[5];
 
   public static void main(final String[] args) {
     ExampleBase.start(ZupTerrainExample.class);

@@ -360,7 +360,7 @@ public class DdsLoader implements ImageLoader {
     int bpp = 0;
     DdsHeader header;
     DdsHeaderDX10 headerDX10;
-    int mipmapByteSizes[];
+    int[] mipmapByteSizes;
 
     void calcMipmapSizes(final boolean compressed) {
       int width = header.dwWidth;

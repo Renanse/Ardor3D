@@ -72,7 +72,7 @@ public class InMemoryTextureSource implements TextureSource {
   @Override
   public Set<Tile> getInvalidTiles(final int clipmapLevel, final int tileX, final int tileY, final int numTilesX,
       final int numTilesY) throws Exception {
-    final Set<Tile> updatedTiles[] = inMemoryTerrainData.getUpdatedTextureTiles();
+    final Set<Tile>[] updatedTiles = inMemoryTerrainData.getUpdatedTextureTiles();
     if (updatedTiles == null) {
       return null;
     }
