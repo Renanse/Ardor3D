@@ -1,8 +1,8 @@
 
 description = 'Ardor 3D Collada Importer'
 
-project.ext.jdomVersion = "2.0.6"
-project.ext.jaxenVersion = "1.2.0"
+project.ext.jdomVersion = "2.0.6.1"
+project.ext.jaxenVersion = "2.0.0"
 
 dependencies {
 	api project(':ardor3d-core')
