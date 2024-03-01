@@ -43,9 +43,9 @@ import com.google.common.util.concurrent.Striped;
 public enum HttpImageCache {
   Instance;
 
-  Comparator<ImageCacheItem> DateCompare = (a, b) -> b.lastAccessed.compareTo(a.lastAccessed);
-  ConcurrentMap<String, ImageCacheItem> MemoryCache = new ConcurrentHashMap<>();
-  Striped<Lock> Locks = Striped.lazyWeakLock(10);
+  final Comparator<ImageCacheItem> DateCompare = (a, b) -> b.lastAccessed.compareTo(a.lastAccessed);
+  final ConcurrentMap<String, ImageCacheItem> MemoryCache = new ConcurrentHashMap<>();
+  final Striped<Lock> Locks = Striped.lazyWeakLock(10);
 
   boolean checkModified = false;
   long maxMemoryCacheSize = 8 * 1024 * 1024;
