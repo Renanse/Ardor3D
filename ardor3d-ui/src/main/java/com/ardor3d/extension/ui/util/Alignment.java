@@ -46,12 +46,12 @@ public enum Alignment {
   /**
    * How far from the left this alignment is as a percentage.
    */
-  private double along;
+  private final double _along;
 
   /**
    * How far from the bottom this alignment is as a percentage.
    */
-  private double up;
+  private final double _up;
 
   /**
    * @param along
@@ -60,22 +60,22 @@ public enum Alignment {
    *          How far from the bottom this alignment is as a percentage.
    */
   Alignment(final double along, final double up) {
-    this.along = along;
-    this.up = up;
+    this._along = along;
+    this._up = up;
   }
 
   /**
    * @return a value in [0, 1] describing how far from the bottom this alignment is.
    */
   public double fromLeft() {
-    return along;
+    return _along;
   }
 
   /**
    * @return a value in [0, 1] describing how far from the bottom this alignment is.
    */
   public double fromBottom() {
-    return up;
+    return _up;
   }
 
   /**

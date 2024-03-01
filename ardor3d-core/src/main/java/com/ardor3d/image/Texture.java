@@ -106,7 +106,7 @@ public abstract class Texture implements Savable {
      */
     Trilinear(true);
 
-    private boolean _usesMipMapLevels;
+    private final boolean _usesMipMapLevels;
 
     MinificationFilter(final boolean usesMipMapLevels) {
       _usesMipMapLevels = usesMipMapLevels;

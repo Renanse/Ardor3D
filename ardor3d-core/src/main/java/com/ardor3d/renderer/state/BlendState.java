@@ -89,7 +89,7 @@ public class BlendState extends RenderState {
      */
     OneMinusConstantAlpha(true);
 
-    private boolean usesConstantColor;
+    private final boolean usesConstantColor;
 
     SourceFunction(final boolean usesConstantColor) {
       this.usesConstantColor = usesConstantColor;
@@ -156,7 +156,7 @@ public class BlendState extends RenderState {
      */
     OneMinusConstantAlpha(true);
 
-    private boolean usesConstantColor;
+    private final boolean usesConstantColor;
 
     DestinationFunction(final boolean usesConstantColor) {
       this.usesConstantColor = usesConstantColor;

@@ -17,7 +17,7 @@ enum D3d10ResourceDimension {
   D3D10_RESOURCE_DIMENSION_TEXTURE2D(3), //
   D3D10_RESOURCE_DIMENSION_TEXTURE3D(4); //
 
-  int _value;
+  final int _value;
 
   D3d10ResourceDimension(final int value) {
     _value = value;

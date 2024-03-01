@@ -131,7 +131,7 @@ public enum MaterialManager {
 
   }
 
-  public static String ImportMarker = "@import";
+  public static final String IMPORT_MARKER = "@import";
 
   public static String inflateShaderImports(final String shaderText) {
     return inflateShaderImports(shaderText, new Stack<>());
@@ -144,11 +144,11 @@ public enum MaterialManager {
       String line;
       while ((line = in.readLine()) != null) {
         line = line.trim();
-        if (line.startsWith(MaterialManager.ImportMarker)) {
+        if (line.startsWith(MaterialManager.IMPORT_MARKER)) {
           if (MaterialManager.logger.isLoggable(Level.FINE)) {
             MaterialManager.logger.fine("found import: " + line);
           }
-          final String sourceUrl = line.substring(MaterialManager.ImportMarker.length()).trim();
+          final String sourceUrl = line.substring(MaterialManager.IMPORT_MARKER.length()).trim();
           final String text = getShaderText(sourceUrl, true, history);
           if (text != null) {
             builder.append(text);

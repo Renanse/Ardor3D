@@ -114,7 +114,7 @@ enum DxgiFormat {
   DXGI_FORMAT_BC7_UNORM_SRGB(99), //
   DXGI_FORMAT_FORCE_UINT(0xffffffff); //
 
-  int _value;
+  final int _value;
 
   DxgiFormat(final int value) {
     _value = value;
