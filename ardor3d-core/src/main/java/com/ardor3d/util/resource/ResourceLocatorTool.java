@@ -14,9 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -51,11 +53,7 @@ public class ResourceLocatorTool {
       return null;
     }
 
-    try {
-      resourceName = URLDecoder.decode(resourceName, "UTF-8");
-    } catch (final UnsupportedEncodingException ex) {
-      ex.printStackTrace();
-    }
+    resourceName = URLDecoder.decode(resourceName, StandardCharsets.UTF_8);
 
     synchronized (_locatorMap) {
       final List<ResourceLocator> bases = _locatorMap.get(resourceType);
@@ -89,12 +87,7 @@ public class ResourceLocatorTool {
       return;
     }
     synchronized (_locatorMap) {
-      List<ResourceLocator> bases = _locatorMap.get(resourceType);
-      if (bases == null) {
-        bases = new ArrayList<>();
-        _locatorMap.put(resourceType, bases);
-      }
-
+      List<ResourceLocator> bases = _locatorMap.computeIfAbsent(resourceType, k -> new ArrayList<>());
       if (!bases.contains(locator)) {
         bases.add(locator);
       }
@@ -194,31 +187,31 @@ public class ResourceLocatorTool {
    *          a class to use as a local reference.
    * @param name
    *          the name and path of the resource.
-   * @return a set containing the located URLs of the named resource.
+   * @return a set containing the located URIs of the named resource.
    */
-  public static Set<URL> getClassPathResources(final Class<?> clazz, final String name) {
-    final Set<URL> results = new HashSet<>();
+  public static Set<URI> getClassPathResources(final Class<?> clazz, final String name) {
+    final Set<URI> results = new HashSet<>();
     Enumeration<URL> urls = null;
     try {
       urls = Thread.currentThread().getContextClassLoader().getResources(name);
-      for (; urls.hasMoreElements();) {
-        results.add(urls.nextElement());
+      while (urls.hasMoreElements()) {
+        results.add(urls.nextElement().toURI());
       }
-    } catch (final IOException ioe) {}
-    if (!Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+    } catch (final URISyntaxException | IOException ignored) {}
+      if (!Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
       try {
         urls = ClassLoader.getSystemResources(name);
-        for (; urls.hasMoreElements();) {
-          results.add(urls.nextElement());
+        while (urls.hasMoreElements()) {
+          results.add(urls.nextElement().toURI());
         }
-      } catch (final IOException ioe) {}
+      } catch (final URISyntaxException | IOException ignored) {}
     }
     try {
       urls = clazz.getClassLoader().getResources(name);
-      for (; urls.hasMoreElements();) {
-        results.add(urls.nextElement());
+      while (urls.hasMoreElements()) {
+        results.add(urls.nextElement().toURI());
       }
-    } catch (final IOException ioe) {}
+    } catch (final URISyntaxException | IOException ignored) {}
     return results;
   }
 }
