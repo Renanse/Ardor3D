@@ -165,10 +165,9 @@ public class VoroniFunction3D implements Function3D {
       if (this == o) {
         return true;
       }
-      if (!(o instanceof Key)) {
+      if (!(o instanceof Key comp)) {
         return false;
       }
-      final Key comp = (Key) o;
       return x == comp.x && y == comp.y && z == comp.z;
     }
   }

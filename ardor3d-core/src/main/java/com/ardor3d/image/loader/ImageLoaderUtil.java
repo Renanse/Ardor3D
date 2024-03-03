@@ -28,7 +28,7 @@ public abstract class ImageLoaderUtil {
   private static final Logger logger = Logger.getLogger(ImageLoaderUtil.class.getName());
 
   private static ImageLoader defaultLoader;
-  private static Map<String, ImageLoader> loaders = Collections.synchronizedMap(new HashMap<String, ImageLoader>());
+  private static Map<String, ImageLoader> loaders = Collections.synchronizedMap(new HashMap<>());
 
   static {
     registerHandler(new DdsLoader(), ".DDS"); // dxt image

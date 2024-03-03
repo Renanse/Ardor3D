@@ -838,8 +838,7 @@ public class GenericSkin extends Skin {
         c.setMargin(new Insets(0, 0, 0, 0));
         c.setPadding(new Insets(0, 2, 0, 2));
         c.setForegroundColor(ColorRGBA.BLACK);
-        if (c instanceof UIButton) {
-          final UIButton button = (UIButton) c;
+        if (c instanceof UIButton button) {
           button.setAlignment(Alignment.LEFT);
           for (final UIState state : button.getStates()) {
             state.setBorder(null);

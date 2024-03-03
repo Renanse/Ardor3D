@@ -28,8 +28,7 @@ public class DeleteVBOsVisitor implements Visitor {
 
   @Override
   public void visit(final Spatial spatial) {
-    if (spatial instanceof Mesh) {
-      final Mesh mesh = (Mesh) spatial;
+    if (spatial instanceof Mesh mesh) {
       final MeshData meshData = mesh.getMeshData();
       for (final Entry<String, AbstractBufferData<? extends Buffer>> entry : meshData.listDataItems()) {
         _utils.deleteBuffer(entry.getValue());

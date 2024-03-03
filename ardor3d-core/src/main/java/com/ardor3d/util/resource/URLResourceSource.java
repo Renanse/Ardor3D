@@ -91,7 +91,7 @@ public class URLResourceSource implements ResourceSource {
         return new URLResourceSource(srcURL);
 
       }
-    } catch (final MalformedURLException ex) {} catch (final IOException ex) {}
+    } catch (final IOException ex) {}
     if (URLResourceSource.logger.isLoggable(Level.FINEST)) {
       URLResourceSource.logger.logp(Level.FINEST, getClass().getName(), "getRelativeSource(String)",
           "Unable to find relative file {0} from {1}.", new Object[] {name, _url});
@@ -154,10 +154,9 @@ public class URLResourceSource implements ResourceSource {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof URLResourceSource)) {
+    if (!(obj instanceof URLResourceSource other)) {
       return false;
     }
-    final URLResourceSource other = (URLResourceSource) obj;
     if (_type == null) {
       if (other._type != null) {
         return false;

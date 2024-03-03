@@ -186,15 +186,15 @@ public class RectLayoutUIExample extends ExampleBase {
     cPanel.add(makeCalcButton("7", 1, 1, 1));
     cPanel.add(makeCalcButton("8", 1, 2, 1));
     cPanel.add(makeCalcButton("9", 1, 3, 1));
-    cPanel.add(makeCalcButton("\u00F7", 1, 4, 1));
+    cPanel.add(makeCalcButton("÷", 1, 4, 1));
     cPanel.add(makeCalcButton("Sqrt", 1, 5, 1));
 
     cPanel.add(makeCalcButton("MR", 2, 0, 1));
     cPanel.add(makeCalcButton("4", 2, 1, 1));
     cPanel.add(makeCalcButton("5", 2, 2, 1));
     cPanel.add(makeCalcButton("6", 2, 3, 1));
-    cPanel.add(makeCalcButton("\u00D7", 2, 4, 1));
-    cPanel.add(makeCalcButton("x\u00B2", 2, 5, 1));
+    cPanel.add(makeCalcButton("×", 2, 4, 1));
+    cPanel.add(makeCalcButton("x²", 2, 5, 1));
 
     cPanel.add(makeCalcButton("MS", 3, 0, 1));
     cPanel.add(makeCalcButton("1", 3, 1, 1));
@@ -206,7 +206,7 @@ public class RectLayoutUIExample extends ExampleBase {
     cPanel.add(makeCalcButton("M+", 4, 0, 1));
     cPanel.add(makeCalcButton("0", 4, 1, 1));
     cPanel.add(makeCalcButton(".", 4, 2, 1));
-    cPanel.add(makeCalcButton("\u00B1", 4, 3, 1));
+    cPanel.add(makeCalcButton("±", 4, 3, 1));
     cPanel.add(makeCalcButton("+", 4, 4, 1));
     cPanel.add(makeCalcButton("=", 4, 5, 1));
 

@@ -40,10 +40,9 @@ public class StatType implements Comparable<StatType> {
 
   @Override
   public boolean equals(final Object obj) {
-    if (!(obj instanceof StatType)) {
+    if (!(obj instanceof StatType other)) {
       return false;
     }
-    final StatType other = (StatType) obj;
     if (!_statName.equals(other._statName)) {
       return false;
     }

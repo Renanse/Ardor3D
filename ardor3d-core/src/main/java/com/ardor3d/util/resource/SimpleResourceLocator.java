@@ -91,9 +91,7 @@ public class SimpleResourceLocator implements ResourceLocator {
       // open a stream to see if this is a valid resource
       rVal.openStream().close();
       return new URLResourceSource(rVal);
-    } catch (final IOException e) {
-      // URL wasn't valid in some way, so try up a path.
-    } catch (final IllegalArgumentException e) {
+    } catch (final IOException | IllegalArgumentException e) {
       // URL wasn't valid in some way, so try up a path.
     }
 
@@ -108,9 +106,7 @@ public class SimpleResourceLocator implements ResourceLocator {
       // XXX: Perhaps this is wasteful? Also, what info will determine validity?
       rVal.openStream().close();
       return new URLResourceSource(rVal);
-    } catch (final IOException e) {
-      // URL wasn't valid in some way, so try up a path.
-    } catch (final IllegalArgumentException e) {
+    } catch (final IOException | IllegalArgumentException e) {
       // URL wasn't valid in some way, so try up a path.
     }
 

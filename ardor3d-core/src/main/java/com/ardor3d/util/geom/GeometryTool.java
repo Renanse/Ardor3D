@@ -240,8 +240,7 @@ public final class GeometryTool {
   }
 
   public static void trimEmptyBranches(final Spatial spatial) {
-    if (spatial instanceof Node) {
-      final Node node = (Node) spatial;
+    if (spatial instanceof Node node) {
       for (int i = node.getNumberOfChildren(); --i >= 0;) {
         trimEmptyBranches(node.getChild(i));
       }

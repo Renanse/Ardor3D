@@ -105,7 +105,7 @@ public class AwtMouseManager implements MouseManager {
       } else {
         SwingUtilities.invokeAndWait(() -> setMousePosition(x, y));
       }
-    } catch (final InterruptedException ex) {} catch (final InvocationTargetException ex) {}
+    } catch (final InterruptedException | InvocationTargetException ex) {}
   }
 
   private void setMousePosition(final int ardorX, final int ardorY) {

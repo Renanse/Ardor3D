@@ -15,12 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -54,11 +49,7 @@ public class DOMOutputCapsule implements OutputCapsule {
   private Element appendElement(final String name) {
     Element ret = null;
     ret = _doc.createElement(name);
-    if (_currentElement == null) {
-      _doc.appendChild(ret);
-    } else {
-      _currentElement.appendChild(ret);
-    }
+    Objects.requireNonNullElse(_currentElement, _doc).appendChild(ret);
     _currentElement = ret;
     return ret;
   }
@@ -577,8 +568,7 @@ public class DOMOutputCapsule implements OutputCapsule {
     for (final Object o : array) {
       if (o == null) {
         continue;
-      } else if (o instanceof Savable) {
-        final Savable s = (Savable) o;
+      } else if (o instanceof Savable s) {
         write(s, s.getClassTag().getName(), null);
       } else {
         throw new ClassCastException("Not a Savable instance: " + o);
@@ -664,9 +654,7 @@ public class DOMOutputCapsule implements OutputCapsule {
     }
     final Element stringMap = appendElement(name);
 
-    final Iterator<? extends Savable> keyIterator = map.keySet().iterator();
-    while (keyIterator.hasNext()) {
-      final Savable key = keyIterator.next();
+    for (Savable key : map.keySet()) {
       appendElement(XMLExporter.ELEMENT_MAPENTRY);
       write(key, XMLExporter.ELEMENT_KEY, null);
       final Savable value = map.get(key);
@@ -688,9 +676,7 @@ public class DOMOutputCapsule implements OutputCapsule {
     }
     final Element stringMap = appendElement(name);
 
-    final Iterator<String> keyIterator = map.keySet().iterator();
-    while (keyIterator.hasNext()) {
-      final String key = keyIterator.next();
+    for (String key : map.keySet()) {
       final Element mapEntry = appendElement("MapEntry");
       mapEntry.setAttribute("key", key);
       final Savable s = map.get(key);
@@ -712,9 +698,7 @@ public class DOMOutputCapsule implements OutputCapsule {
     }
     final Element stringMap = appendElement(name);
 
-    final Iterator<String> keyIterator = map.keySet().iterator();
-    while (keyIterator.hasNext()) {
-      final String key = keyIterator.next();
+    for (String key : map.keySet()) {
       final Element mapEntry = appendElement("MapEntry");
       mapEntry.setAttribute("key", key);
       tryToWriteValue(map.get(key));
@@ -886,8 +870,7 @@ public class DOMOutputCapsule implements OutputCapsule {
       write((String[][]) value, "value", null);
       return;
     }
-    if (value instanceof List<?>) {
-      final List<?> list = (List<?>) value;
+    if (value instanceof List<?> list) {
       if (list.size() == 0) {
         write(BinaryClassField.UNHANDLED, "type", (byte) -1);
         return;

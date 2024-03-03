@@ -88,10 +88,9 @@ public class TextureParameter {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof TextureParameter)) {
+    if (!(obj instanceof TextureParameter other)) {
       return false;
     }
-    final TextureParameter other = (TextureParameter) obj;
     if (textureKey == null) {
       if (other.textureKey != null) {
         return false;

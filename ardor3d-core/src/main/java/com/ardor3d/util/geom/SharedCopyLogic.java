@@ -46,11 +46,7 @@ public class SharedCopyLogic implements CopyLogic {
     Mesh copy = null;
     try {
       copy = original.getClass().newInstance();
-    } catch (final InstantiationException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + original.getClass().getCanonicalName(),
-          e);
-      throw new RuntimeException(e);
-    } catch (final IllegalAccessException e) {
+    } catch (final InstantiationException | IllegalAccessException e) {
       logger.log(Level.SEVERE, "Could not access final constructor of class " + original.getClass().getCanonicalName(),
           e);
       throw new RuntimeException(e);
@@ -73,11 +69,7 @@ public class SharedCopyLogic implements CopyLogic {
     Node copy = null;
     try {
       copy = original.getClass().newInstance();
-    } catch (final InstantiationException e) {
-      logger.log(Level.SEVERE, "Could not access final constructor of class " + original.getClass().getCanonicalName(),
-          e);
-      throw new RuntimeException(e);
-    } catch (final IllegalAccessException e) {
+    } catch (final InstantiationException | IllegalAccessException e) {
       logger.log(Level.SEVERE, "Could not access final constructor of class " + original.getClass().getCanonicalName(),
           e);
       throw new RuntimeException(e);

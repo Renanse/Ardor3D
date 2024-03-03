@@ -234,7 +234,7 @@ public class TextureState extends RenderState {
   @Override
   public void read(final InputCapsule capsule) throws IOException {
     super.read(capsule);
-    _texture = capsule.readSavableList("texture", new ArrayList<Texture>(1));
+    _texture = capsule.readSavableList("texture", new ArrayList<>(1));
   }
 
   public static Image getDefaultTextureImage() { return _defaultTexture != null ? _defaultTexture.getImage() : null; }

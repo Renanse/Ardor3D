@@ -58,10 +58,9 @@ public class ObjExporter {
    * @throws IOException
    */
   public void save(final Mesh mesh, final File objFile, final File mtlFile) throws IOException {
-    if (mesh.getControllerCount() == 0 || !(mesh.getController(0) instanceof KeyframeController)) {
+    if (mesh.getControllerCount() == 0 || !(mesh.getController(0) instanceof KeyframeController<?> controller)) {
       save(mesh, objFile, mtlFile, false, 0, true, null, null);
     } else {
-      final KeyframeController<?> controller = (KeyframeController<?>) mesh.getController(0);
       final ArrayList<Mesh> meshList = new ArrayList<>();
       for (final KeyframeController.PointInTime pit : controller._keyframes) {
         if (pit != null && pit._newShape != null) {
@@ -93,12 +92,11 @@ public class ObjExporter {
       final List<ObjMaterial> materialList = new ArrayList<>();
       for (final Mesh mesh : meshList) {
         if (mesh != null) {
-          if (mesh.getControllerCount() == 0 || !(mesh.getController(0) instanceof KeyframeController)) {
+          if (mesh.getControllerCount() == 0 || !(mesh.getController(0) instanceof KeyframeController<?> controller)) {
             save(mesh, objFile, mtlFile, !firstFiles, firstVertexIndex, firstFiles, materialList, customTextureName);
             firstFiles = false;
             firstVertexIndex += mesh.getMeshData().getVertexCount();
           } else {
-            final KeyframeController<?> controller = (KeyframeController<?>) mesh.getController(0);
             final ArrayList<Mesh> subMeshList = new ArrayList<>();
             for (final KeyframeController.PointInTime pit : controller._keyframes) {
               if (pit != null && pit._newShape != null) {

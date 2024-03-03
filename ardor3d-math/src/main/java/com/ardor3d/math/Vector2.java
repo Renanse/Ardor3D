@@ -932,12 +932,11 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyVector2)) {
+    if (!(o instanceof ReadOnlyVector2 comp)) {
       return false;
     }
-    final ReadOnlyVector2 comp = (ReadOnlyVector2) o;
-    return EqualsUtil.areEqual(getX(), comp.getX()) //
-        && EqualsUtil.areEqual(getY(), comp.getY());
+    return EqualsUtil.equals(getX(), comp.getX()) //
+        && EqualsUtil.equals(getY(), comp.getY());
   }
 
   /**
@@ -953,8 +952,8 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (this == v) {
       return true;
     }
-    return EqualsUtil.areEqual(getX(), v.getX(), epsilon) //
-        && EqualsUtil.areEqual(getY(), v.getY(), epsilon);
+    return EqualsUtil.equals(getX(), v.getX(), epsilon) //
+        && EqualsUtil.equals(getY(), v.getY(), epsilon);
   }
 
   // /////////////////

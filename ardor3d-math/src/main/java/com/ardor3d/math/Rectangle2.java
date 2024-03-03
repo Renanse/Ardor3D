@@ -173,14 +173,13 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyRectangle2)) {
+    if (!(o instanceof ReadOnlyRectangle2 comp)) {
       return false;
     }
-    final ReadOnlyRectangle2 comp = (ReadOnlyRectangle2) o;
-    return EqualsUtil.areEqual(getX(), comp.getX()) //
-        && EqualsUtil.areEqual(getY(), comp.getY()) //
-        && EqualsUtil.areEqual(getWidth(), comp.getWidth()) //
-        && EqualsUtil.areEqual(getHeight(), comp.getHeight());
+    return EqualsUtil.equals(getX(), comp.getX()) //
+        && EqualsUtil.equals(getY(), comp.getY()) //
+        && EqualsUtil.equals(getWidth(), comp.getWidth()) //
+        && EqualsUtil.equals(getHeight(), comp.getHeight());
   }
 
   // /////////////////

@@ -37,8 +37,7 @@ public interface IUniformSupplier {
     try {
       final Class<?> clazz = Class.forName(className);
       final Object val = clazz.getDeclaredConstructor().newInstance();
-      if (val instanceof IUniformSupplier) {
-        final IUniformSupplier supplier = (IUniformSupplier) val;
+      if (val instanceof IUniformSupplier supplier) {
         supplier.applyDefaultUniformValues();
         return supplier;
       }

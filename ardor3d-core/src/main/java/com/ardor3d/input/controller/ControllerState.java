@@ -58,8 +58,7 @@ public class ControllerState {
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof ControllerState) {
-      final ControllerState other = (ControllerState) obj;
+    if (obj instanceof ControllerState other) {
       return other._controllerStates.equals(_controllerStates);
     }
 

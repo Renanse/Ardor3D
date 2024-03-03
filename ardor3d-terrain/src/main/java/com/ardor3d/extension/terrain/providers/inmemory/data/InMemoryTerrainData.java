@@ -102,47 +102,44 @@ public class InMemoryTerrainData {
     }
 
     running = true;
-    final Thread t = new Thread() {
-      @Override
-      public void run() {
-        while (running) {
-          // sleep some random amount of time (0 - 2 secs)
-          try {
-            Thread.sleep(MathUtils.nextRandomInt(0, 2000));
-          } catch (final InterruptedException e) {
-            running = false;
-            continue;
-          }
-
-          // pick a place to modify the terrain
-          final int x = MathUtils.nextRandomInt(0, side - 1);
-          final int y = MathUtils.nextRandomInt(0, side - 1);
-
-          // pick a color
-          final ColorRGBA paint = ColorRGBA.randomColor(null);
-
-          // pick a random radius 0 - tenth side
-          final int radius = MathUtils.nextRandomInt(0, side / 10);
-
-          // pick an offset amount
-          final float offset =
-              MathUtils.nextRandomFloat() * updateDelta * (MathUtils.nextRandomInt(0, 2) != 0 ? 1 : -1);
-
-          // modify the terrain!
-          updateTerrain(x, y, radius, paint, offset);
-
-          // queue up an update alert for the rectangle updated
-          final int minY = Math.max(0, y - radius), maxY = Math.min(y + radius, side - 1);
-          final int minX = Math.max(0, x - radius), maxX = Math.min(x + radius, side - 1);
-          final Rectangle2 region = new Rectangle2(minX, minY, maxX - minX, maxY - minY);
-
-          // break up by clipmaplevel
-          // add to two queues since these updates are called in different threads potentially
-          addTiles(region, updatedTerrainTiles);
-          addTiles(region, updatedTextureTiles);
+    final Thread t = new Thread(() -> {
+      while (running) {
+        // sleep some random amount of time (0 - 2 secs)
+        try {
+          Thread.sleep(MathUtils.nextRandomInt(0, 2000));
+        } catch (final InterruptedException e) {
+          running = false;
+          continue;
         }
+
+        // pick a place to modify the terrain
+        final int x = MathUtils.nextRandomInt(0, side - 1);
+        final int y = MathUtils.nextRandomInt(0, side - 1);
+
+        // pick a color
+        final ColorRGBA paint = ColorRGBA.randomColor(null);
+
+        // pick a random radius 0 - tenth side
+        final int radius = MathUtils.nextRandomInt(0, side / 10);
+
+        // pick an offset amount
+        final float offset =
+            MathUtils.nextRandomFloat() * updateDelta * (MathUtils.nextRandomInt(0, 2) != 0 ? 1 : -1);
+
+        // modify the terrain!
+        updateTerrain(x, y, radius, paint, offset);
+
+        // queue up an update alert for the rectangle updated
+        final int minY = Math.max(0, y - radius), maxY = Math.min(y + radius, side - 1);
+        final int minX = Math.max(0, x - radius), maxX = Math.min(x + radius, side - 1);
+        final Rectangle2 region = new Rectangle2(minX, minY, maxX - minX, maxY - minY);
+
+        // break up by clipmaplevel
+        // add to two queues since these updates are called in different threads potentially
+        addTiles(region, updatedTerrainTiles);
+        addTiles(region, updatedTextureTiles);
       }
-    };
+    });
     t.setDaemon(true);
     t.start();
   }

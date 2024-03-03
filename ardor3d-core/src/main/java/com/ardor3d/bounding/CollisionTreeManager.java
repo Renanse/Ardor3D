@@ -85,7 +85,7 @@ public enum CollisionTreeManager {
    */
   private CollisionTreeManager() {
     _cache = new MapMaker().weakKeys().makeMap();
-    _protectedList = Collections.synchronizedList(new ArrayList<Mesh>(1));
+    _protectedList = Collections.synchronizedList(new ArrayList<>(1));
     setCollisionTreeController(new UsageTreeController());
   }
 
@@ -245,8 +245,7 @@ public enum CollisionTreeManager {
    *          the spatial to remove all collision trees from.
    */
   public void removeCollisionTree(final Spatial object) {
-    if (object instanceof Node) {
-      final Node n = (Node) object;
+    if (object instanceof Node n) {
       for (int i = n.getNumberOfChildren() - 1; i >= 0; i--) {
         removeCollisionTree(n.getChild(i));
       }
@@ -277,8 +276,7 @@ public enum CollisionTreeManager {
    *          the object on which to update the tree.
    */
   public void updateCollisionTree(final Spatial object) {
-    if (object instanceof Node) {
-      final Node n = (Node) object;
+    if (object instanceof Node n) {
       for (int i = n.getNumberOfChildren() - 1; i >= 0; i--) {
         updateCollisionTree(n.getChild(i));
       }

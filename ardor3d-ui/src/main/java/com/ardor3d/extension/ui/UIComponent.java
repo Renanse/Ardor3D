@@ -1082,8 +1082,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
   protected void updateWorldTransform(final boolean recurse, final boolean self) {
     if (self) {
       if (_parent != null) {
-        if (_parent instanceof UIComponent) {
-          final UIComponent gPar = (UIComponent) _parent;
+        if (_parent instanceof UIComponent gPar) {
 
           // grab our parent's world transform
           final Transform t = Transform.fetchTempInstance();
@@ -1405,14 +1404,11 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
       cancelTooltipTimer();
       resetToolTipTime();
       _showTask = new FutureTask<>(show);
-      final Thread t = new Thread() {
-        @Override
-        public void run() {
-          if (_showTask != null && !_showTask.isDone()) {
-            _showTask.run();
-          }
+      final Thread t = new Thread(() -> {
+        if (_showTask != null && !_showTask.isDone()) {
+          _showTask.run();
         }
-      };
+      });
       t.setDaemon(true);
       t.start();
     }

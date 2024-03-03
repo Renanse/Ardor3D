@@ -11,6 +11,7 @@
 package com.ardor3d.math;
 
 import java.io.*;
+import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -230,12 +231,11 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyPlane)) {
+    if (!(o instanceof ReadOnlyPlane comp)) {
       return false;
     }
-    final ReadOnlyPlane comp = (ReadOnlyPlane) o;
-    return EqualsUtil.areEqual(getConstant(), comp.getConstant()) //
-        && EqualsUtil.areEqual(getNormal(), comp.getNormal());
+    return EqualsUtil.equals(getConstant(), comp.getConstant()) //
+        && Objects.equals(getNormal(), comp.getNormal());
   }
 
   // /////////////////

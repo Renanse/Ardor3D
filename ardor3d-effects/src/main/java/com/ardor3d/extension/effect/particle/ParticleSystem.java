@@ -561,8 +561,7 @@ public abstract class ParticleSystem extends Node {
 
   public void initParticleLocation(final int index) {
     final Particle p = _particles[index];
-    if (getParticleType() == ParticleType.GeomMesh && getParticleEmitter() instanceof MeshEmitter) {
-      final MeshEmitter emitter = (MeshEmitter) getParticleEmitter();
+    if (getParticleType() == ParticleType.GeomMesh && getParticleEmitter() instanceof MeshEmitter emitter) {
       final Mesh mesh = emitter.getSource();
 
       // Update the triangle model on each new particle creation.
@@ -592,8 +591,7 @@ public abstract class ParticleSystem extends Node {
       mesh.localToWorld(t.getCenter(), p.getPosition());
       p.getPosition().multiplyLocal(getInvScale());
 
-    } else if (getParticleEmitter() instanceof MeshEmitter) {
-      final MeshEmitter emitter = (MeshEmitter) getParticleEmitter();
+    } else if (getParticleEmitter() instanceof MeshEmitter emitter) {
       final Mesh mesh = emitter.getSource();
       mesh.getMeshData().randomPointOnPrimitives(p.getPosition());
       mesh.localToWorld(p.getPosition(), p.getPosition());

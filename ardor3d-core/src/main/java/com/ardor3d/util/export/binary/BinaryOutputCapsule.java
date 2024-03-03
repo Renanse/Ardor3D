@@ -17,10 +17,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import com.ardor3d.util.export.ByteUtils;
@@ -244,7 +241,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
 
   @Override
   public void write(final String value, final String name, final String defVal) throws IOException {
-    if (value == null ? defVal == null : value.equals(defVal)) {
+    if (Objects.equals(value, defVal)) {
       return;
     }
     writeAlias(name, BinaryClassField.STRING);
@@ -1022,8 +1019,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
       write((String[][]) value);
       return;
     }
-    if (value instanceof List<?>) {
-      final List<?> list = (List<?>) value;
+    if (value instanceof List<?> list) {
       if (list.size() == 0) {
         write(BinaryClassField.UNHANDLED);
         return;

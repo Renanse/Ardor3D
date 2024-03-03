@@ -196,8 +196,7 @@ public class MoveWidget extends AbstractInteractWidget {
     }
 
     // act on drag
-    if (_lastDragSpatial != null && _lastDragSpatial.getParent() instanceof InteractArrow) {
-      final InteractArrow arrow = (InteractArrow) _lastDragSpatial.getParent();
+    if (_lastDragSpatial != null && _lastDragSpatial.getParent() instanceof InteractArrow arrow) {
       _lastArrow = arrow;
       final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
       final Vector3 loc = getNewOffset(arrow, oldMouse, current, camera, manager);

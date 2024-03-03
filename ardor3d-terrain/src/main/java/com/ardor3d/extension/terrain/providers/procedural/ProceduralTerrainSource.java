@@ -31,12 +31,7 @@ public class ProceduralTerrainSource implements TerrainSource {
   private static final int availableClipmapLevels = 8;
 
   private final ReentrantLock terrainLock = new ReentrantLock();
-  private final ThreadLocal<float[]> tileDataPool = new ThreadLocal<>() {
-    @Override
-    protected float[] initialValue() {
-      return new float[tileSize * tileSize];
-    }
-  };
+  private final ThreadLocal<float[]> tileDataPool = ThreadLocal.withInitial(() -> new float[tileSize * tileSize]);
 
   public ProceduralTerrainSource(final Function3D function, final ReadOnlyVector3 scale, final float minHeight,
     final float maxHeight) {

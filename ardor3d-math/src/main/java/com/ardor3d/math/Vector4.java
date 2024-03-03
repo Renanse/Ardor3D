@@ -972,14 +972,13 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyVector4)) {
+    if (!(o instanceof ReadOnlyVector4 comp)) {
       return false;
     }
-    final ReadOnlyVector4 comp = (ReadOnlyVector4) o;
-    return EqualsUtil.areEqual(getX(), comp.getX()) //
-        && EqualsUtil.areEqual(getY(), comp.getY()) //
-        && EqualsUtil.areEqual(getZ(), comp.getZ()) //
-        && EqualsUtil.areEqual(getW(), comp.getW());
+    return EqualsUtil.equals(getX(), comp.getX()) //
+        && EqualsUtil.equals(getY(), comp.getY()) //
+        && EqualsUtil.equals(getZ(), comp.getZ()) //
+        && EqualsUtil.equals(getW(), comp.getW());
   }
 
   /**
@@ -995,10 +994,10 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (this == v) {
       return true;
     }
-    return EqualsUtil.areEqual(getX(), v.getX(), epsilon) //
-        && EqualsUtil.areEqual(getY(), v.getY(), epsilon) //
-        && EqualsUtil.areEqual(getZ(), v.getZ(), epsilon) //
-        && EqualsUtil.areEqual(getW(), v.getW(), epsilon);
+    return EqualsUtil.equals(getX(), v.getX(), epsilon) //
+        && EqualsUtil.equals(getY(), v.getY(), epsilon) //
+        && EqualsUtil.equals(getZ(), v.getZ(), epsilon) //
+        && EqualsUtil.equals(getW(), v.getW(), epsilon);
   }
 
   // /////////////////

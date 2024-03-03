@@ -125,8 +125,7 @@ public final class Debugger {
       }
       cam.setPlaneState(state);
     }
-    if (doChildren && se instanceof Node) {
-      final Node n = (Node) se;
+    if (doChildren && se instanceof Node n) {
       if (n.getNumberOfChildren() != 0) {
         for (int i = n.getNumberOfChildren(); --i >= 0;) {
           drawBounds(n.getChild(i), r, true);
@@ -239,8 +238,7 @@ public final class Debugger {
       return;
     }
     cam.setPlaneState(state);
-    if (element instanceof Mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
-      final Mesh mesh = (Mesh) element;
+    if (element instanceof Mesh mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
 
       double rSize = size;
       if (rSize == -1) {
@@ -340,8 +338,7 @@ public final class Debugger {
       Debugger.normalLines.onDraw(r);
     }
 
-    if (doChildren && element instanceof Node) {
-      final Node n = (Node) element;
+    if (doChildren && element instanceof Node n) {
       if (n.getNumberOfChildren() != 0) {
         for (int i = n.getNumberOfChildren(); --i >= 0;) {
           drawNormals(n.getChild(i), r, size, true);
@@ -363,8 +360,7 @@ public final class Debugger {
       return;
     }
     cam.setPlaneState(state);
-    if (element instanceof Mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
-      final Mesh mesh = (Mesh) element;
+    if (element instanceof Mesh mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
 
       double rSize = size;
       if (rSize == -1) {
@@ -455,8 +451,7 @@ public final class Debugger {
 
     }
 
-    if (doChildren && element instanceof Node) {
-      final Node n = (Node) element;
+    if (doChildren && element instanceof Node n) {
       if (n.getNumberOfChildren() != 0) {
         for (int i = n.getNumberOfChildren(); --i >= 0;) {
           drawTangents(n.getChild(i), r, size, true);
@@ -516,8 +511,7 @@ public final class Debugger {
       Debugger.rods.draw(r);
     }
 
-    if ((spat instanceof Node) && drawChildren) {
-      final Node n = (Node) spat;
+    if ((spat instanceof Node n) && drawChildren) {
       if (n.getNumberOfChildren() == 0) {
         return;
       }

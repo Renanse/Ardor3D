@@ -33,10 +33,9 @@ public class Tile implements Serializable {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof Tile)) {
+    if (!(obj instanceof Tile other)) {
       return false;
     }
-    final Tile other = (Tile) obj;
     return x == other.x && y == other.y;
   }
 

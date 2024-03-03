@@ -82,11 +82,9 @@ public class ExtendedCamera extends Camera {
       _corners[i].set(center);
     }
 
-    if (sceneBounds instanceof BoundingBox) {
-      final BoundingBox bbox = (BoundingBox) sceneBounds;
+    if (sceneBounds instanceof BoundingBox bbox) {
       bbox.getExtent(_extents);
-    } else if (sceneBounds instanceof BoundingSphere) {
-      final BoundingSphere bsphere = (BoundingSphere) sceneBounds;
+    } else if (sceneBounds instanceof BoundingSphere bsphere) {
       _extents.set(bsphere.getRadius(), bsphere.getRadius(), bsphere.getRadius());
     }
 

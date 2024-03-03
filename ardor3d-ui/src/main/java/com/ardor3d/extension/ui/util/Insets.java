@@ -94,8 +94,7 @@ public class Insets {
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof Insets) {
-      final Insets other = (Insets) obj;
+    if (obj instanceof Insets other) {
       return _top == other._top && _left == other._left && _bottom == other._bottom && _right == other._right;
     }
     return false;

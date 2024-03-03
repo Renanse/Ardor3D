@@ -77,8 +77,7 @@ public class UIComboBox extends UIPanel {
       public UIComponent getUIComponent(final int hudX, final int hudY) {
         final UIComponent component = super.getUIComponent(hudX, hudY);
         if (component != null) {
-          if (component instanceof UIButton) {
-            final UIButton over = (UIButton) component;
+          if (component instanceof UIButton over) {
             final UIState state = over.getCurrentState();
             if (state == over.getDefaultState() || state == over.getSelectedState()) {
               clearOver();
@@ -133,8 +132,7 @@ public class UIComboBox extends UIPanel {
     _openButton.switchState(_openButton.getDefaultState());
     for (int i = _valuesMenu.getNumberOfChildren(); --i >= 0;) {
       final Spatial item = _valuesMenu.getChild(i);
-      if (item instanceof UIButton) {
-        final UIButton over = (UIButton) item;
+      if (item instanceof UIButton over) {
         over.switchState(over.getDefaultState());
       }
     }

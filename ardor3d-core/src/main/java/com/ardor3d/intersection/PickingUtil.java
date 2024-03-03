@@ -57,8 +57,7 @@ public abstract class PickingUtil {
 
     if (spatial instanceof Pickable) {
       results.addPick(ray, (Pickable) spatial);
-    } else if (spatial instanceof Node) {
-      final Node node = (Node) spatial;
+    } else if (spatial instanceof Node node) {
       for (int i = node.getNumberOfChildren() - 1; i >= 0; i--) {
         findPick(node.getChild(i), ray, results, ignoreCulled);
       }
@@ -72,8 +71,7 @@ public abstract class PickingUtil {
       return;
     }
 
-    if (spatial instanceof Node) {
-      final Node node = (Node) spatial;
+    if (spatial instanceof Node node) {
 
       if (node.getWorldBound().intersects(scene.getWorldBound())) {
         // further checking needed.
@@ -81,12 +79,10 @@ public abstract class PickingUtil {
           PickingUtil.findCollisions(node.getChild(i), scene, results);
         }
       }
-    } else if (spatial instanceof Mesh) {
-      final Mesh mesh = (Mesh) spatial;
+    } else if (spatial instanceof Mesh mesh) {
 
       if (mesh.getWorldBound().intersects(scene.getWorldBound())) {
-        if (scene instanceof Node) {
-          final Node parent = (Node) scene;
+        if (scene instanceof Node parent) {
           for (int i = 0; i < parent.getNumberOfChildren(); i++) {
             PickingUtil.findCollisions(mesh, parent.getChild(i), results);
           }
@@ -160,8 +156,7 @@ public abstract class PickingUtil {
       return false;
     }
 
-    if (spatial instanceof Node) {
-      final Node node = (Node) spatial;
+    if (spatial instanceof Node node) {
 
       if (node.getWorldBound().intersects(scene.getWorldBound())) {
         if (node.getNumberOfChildren() == 0 && !checkPrimitives) {
@@ -174,12 +169,10 @@ public abstract class PickingUtil {
           }
         }
       }
-    } else if (spatial instanceof Mesh) {
-      final Mesh mesh = (Mesh) spatial;
+    } else if (spatial instanceof Mesh mesh) {
 
       if (mesh.getWorldBound().intersects(scene.getWorldBound())) {
-        if (scene instanceof Node) {
-          final Node parent = (Node) scene;
+        if (scene instanceof Node parent) {
           for (int i = 0; i < parent.getNumberOfChildren(); i++) {
             if (PickingUtil.hasCollision(mesh, parent.getChild(i), checkPrimitives)) {
               return true;

@@ -1411,10 +1411,9 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyQuaternion)) {
+    if (!(o instanceof ReadOnlyQuaternion comp)) {
       return false;
     }
-    final ReadOnlyQuaternion comp = (ReadOnlyQuaternion) o;
     return Math.abs(_x - comp.getX()) < Quaternion.ALLOWED_DEVIANCE
         && Math.abs(_y - comp.getY()) < Quaternion.ALLOWED_DEVIANCE
         && Math.abs(_z - comp.getZ()) < Quaternion.ALLOWED_DEVIANCE
@@ -1431,14 +1430,13 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyQuaternion)) {
+    if (!(o instanceof ReadOnlyQuaternion comp)) {
       return false;
     }
-    final ReadOnlyQuaternion comp = (ReadOnlyQuaternion) o;
-    return EqualsUtil.areEqual(getX(), comp.getX()) //
-        && EqualsUtil.areEqual(getY(), comp.getY()) //
-        && EqualsUtil.areEqual(getZ(), comp.getZ()) //
-        && EqualsUtil.areEqual(getW(), comp.getW());
+    return EqualsUtil.equals(getX(), comp.getX()) //
+        && EqualsUtil.equals(getY(), comp.getY()) //
+        && EqualsUtil.equals(getZ(), comp.getZ()) //
+        && EqualsUtil.equals(getW(), comp.getW());
   }
 
   // /////////////////

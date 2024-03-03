@@ -263,8 +263,7 @@ public abstract class UIContainer extends UIComponent {
 
     for (int i = 0; i < getNumberOfChildren(); i++) {
       final Spatial s = getChild(i);
-      if (s instanceof UIComponent) {
-        final UIComponent comp = (UIComponent) s;
+      if (s instanceof UIComponent comp) {
         ret = comp.getUIComponent(hudX, hudY);
 
         if (ret != null) {

@@ -38,11 +38,7 @@ public class XMLImporter implements Ardor3dImporter {
       final DOMInputCapsule _domIn =
           new DOMInputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is));
       return _domIn.readSavable(null, null);
-    } catch (final SAXException e) {
-      final IOException ex = new IOException();
-      ex.initCause(e);
-      throw ex;
-    } catch (final ParserConfigurationException e) {
+    } catch (final SAXException | ParserConfigurationException e) {
       final IOException ex = new IOException();
       ex.initCause(e);
       throw ex;

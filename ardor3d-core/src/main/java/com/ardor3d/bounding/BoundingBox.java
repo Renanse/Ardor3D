@@ -73,10 +73,9 @@ public class BoundingBox extends BoundingVolume {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof BoundingBox)) {
+    if (!(other instanceof BoundingBox b)) {
       return false;
     }
-    final BoundingBox b = (BoundingBox) other;
     return _center.equals(b._center) && _xExtent == b._xExtent && _yExtent == b._yExtent && _zExtent == b._zExtent;
   }
 

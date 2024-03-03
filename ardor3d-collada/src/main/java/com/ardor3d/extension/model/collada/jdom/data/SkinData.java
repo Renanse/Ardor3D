@@ -91,7 +91,7 @@ public class SkinData implements Savable {
     }
     _skinBaseNode = capsule.readSavable("baseNode", null);
     _skins.clear();
-    _skins.addAll(capsule.readSavableList("skins", new ArrayList<SkinnedMesh>()));
+    _skins.addAll(capsule.readSavableList("skins", new ArrayList<>()));
     _pose = capsule.readSavable("pose", null);
   }
 

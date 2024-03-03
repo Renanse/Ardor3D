@@ -38,8 +38,7 @@ public class LabelState extends UIState {
     super.setupAppearance(component);
 
     // Add some extra settings if this is a label component.
-    if (component instanceof AbstractLabelUIComponent) {
-      final AbstractLabelUIComponent labelComponent = (AbstractLabelUIComponent) component;
+    if (component instanceof AbstractLabelUIComponent labelComponent) {
       if (_text != null) {
         labelComponent.setText(_text);
       }

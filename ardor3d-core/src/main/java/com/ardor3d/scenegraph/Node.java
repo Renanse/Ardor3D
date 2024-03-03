@@ -44,7 +44,7 @@ public class Node extends Spatial {
    */
   public Node() {
     super();
-    _children = Collections.synchronizedList(new ArrayList<Spatial>(1));
+    _children = Collections.synchronizedList(new ArrayList<>(1));
   }
 
   /**
@@ -54,7 +54,7 @@ public class Node extends Spatial {
    *          the name of the node. This is required for identification purposes.
    */
   public Node(final String name) {
-    this(name, Collections.synchronizedList(new ArrayList<Spatial>(1)));
+    this(name, Collections.synchronizedList(new ArrayList<>(1)));
   }
 
   /**

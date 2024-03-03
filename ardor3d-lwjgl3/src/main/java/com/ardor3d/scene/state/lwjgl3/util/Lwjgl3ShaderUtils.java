@@ -385,20 +385,17 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
         return (DoubleBuffer) value;
       case Double2:
-        if (value instanceof Vector2) {
-          final Vector2 vec = (Vector2) value;
+        if (value instanceof Vector2 vec) {
           return stack.mallocDouble(2).put(vec.getX()).put(vec.getY()).flip();
         }
         return (DoubleBuffer) value;
       case Double3:
-        if (value instanceof Vector3) {
-          final Vector3 vec = (Vector3) value;
+        if (value instanceof Vector3 vec) {
           return stack.mallocDouble(3).put(vec.getX()).put(vec.getY()).put(vec.getZ()).flip();
         }
         return (DoubleBuffer) value;
       case Double4:
-        if (value instanceof Vector4) {
-          final Vector4 vec = (Vector4) value;
+        if (value instanceof Vector4 vec) {
           return stack.mallocDouble(4).put(vec.getX()).put(vec.getY()).put(vec.getZ()).put(vec.getW()).flip();
         }
         return (DoubleBuffer) value;
@@ -408,12 +405,10 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
         return (FloatBuffer) value;
       case Float2:
-        if (value instanceof Vector2) {
-          final Vector2 vec = (Vector2) value;
+        if (value instanceof Vector2 vec) {
           return stack.mallocFloat(2).put(vec.getXf()).put(vec.getYf()).flip();
         }
-        if (value instanceof Vector2[]) {
-          final Vector2[] vecs = (Vector2[]) value;
+        if (value instanceof Vector2[] vecs) {
           final FloatBuffer buff = stack.mallocFloat(2 * vecs.length);
           for (int i = 0; i < vecs.length; i++) {
             final Vector2 vec = vecs[i];
@@ -423,12 +418,10 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
         return (FloatBuffer) value;
       case Float3:
-        if (value instanceof Vector3) {
-          final Vector3 vec = (Vector3) value;
+        if (value instanceof Vector3 vec) {
           return stack.mallocFloat(3).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).flip();
         }
-        if (value instanceof Vector3[]) {
-          final Vector3[] vecs = (Vector3[]) value;
+        if (value instanceof Vector3[] vecs) {
           final FloatBuffer buff = stack.mallocFloat(3 * vecs.length);
           for (int i = 0; i < vecs.length; i++) {
             final Vector3 vec = vecs[i];
@@ -436,18 +429,15 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
           }
           return buff.flip();
         }
-        if (value instanceof ReadOnlyColorRGBA) {
-          final ReadOnlyColorRGBA vec = (ReadOnlyColorRGBA) value;
+        if (value instanceof ReadOnlyColorRGBA vec) {
           return stack.mallocFloat(3).put(vec.getRed()).put(vec.getGreen()).put(vec.getBlue()).flip();
         }
         return (FloatBuffer) value;
       case Float4:
-        if (value instanceof Vector4) {
-          final Vector4 vec = (Vector4) value;
+        if (value instanceof Vector4 vec) {
           return stack.mallocFloat(4).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf()).flip();
         }
-        if (value instanceof Vector4[]) {
-          final Vector4[] vecs = (Vector4[]) value;
+        if (value instanceof Vector4[] vecs) {
           final FloatBuffer buff = stack.mallocFloat(4 * vecs.length);
           for (int i = 0; i < vecs.length; i++) {
             final Vector4 vec = vecs[i];
@@ -455,12 +445,10 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
           }
           return buff.flip();
         }
-        if (value instanceof Quaternion) {
-          final Quaternion vec = (Quaternion) value;
+        if (value instanceof Quaternion vec) {
           return stack.mallocFloat(4).put(vec.getXf()).put(vec.getYf()).put(vec.getZf()).put(vec.getWf()).flip();
         }
-        if (value instanceof ReadOnlyColorRGBA) {
-          final ReadOnlyColorRGBA vec = (ReadOnlyColorRGBA) value;
+        if (value instanceof ReadOnlyColorRGBA vec) {
           return stack.mallocFloat(4).put(vec.getRed()).put(vec.getGreen()).put(vec.getBlue()).put(vec.getAlpha())
               .flip();
         }
@@ -500,14 +488,12 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
       case Matrix3x2D:
         return (DoubleBuffer) value;
       case Matrix3x3:
-        if (value instanceof Matrix3) {
-          final Matrix3 mat = (Matrix3) value;
+        if (value instanceof Matrix3 mat) {
           final FloatBuffer buff = stack.mallocFloat(9);
           mat.toFloatBuffer(buff, false);
           return buff.flip();
         }
-        if (value instanceof Matrix3[]) {
-          final Matrix3[] mats = (Matrix3[]) value;
+        if (value instanceof Matrix3[] mats) {
           final FloatBuffer buff = stack.mallocFloat(9 * mats.length);
           for (final Matrix3 mat : mats) {
             mat.toFloatBuffer(buff, false);
@@ -516,14 +502,12 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
         return (FloatBuffer) value;
       case Matrix3x3D:
-        if (value instanceof Matrix3) {
-          final Matrix3 mat = (Matrix3) value;
+        if (value instanceof Matrix3 mat) {
           final DoubleBuffer buff = stack.mallocDouble(9);
           mat.toDoubleBuffer(buff, false);
           return buff.flip();
         }
-        if (value instanceof Matrix3[]) {
-          final Matrix3[] mats = (Matrix3[]) value;
+        if (value instanceof Matrix3[] mats) {
           final DoubleBuffer buff = stack.mallocDouble(9 * mats.length);
           for (final Matrix3 mat : mats) {
             mat.toDoubleBuffer(buff, false);
@@ -544,14 +528,12 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
       case Matrix4x3D:
         return (DoubleBuffer) value;
       case Matrix4x4:
-        if (value instanceof Matrix4) {
-          final Matrix4 mat = (Matrix4) value;
+        if (value instanceof Matrix4 mat) {
           final FloatBuffer buff = stack.mallocFloat(16);
           mat.toFloatBuffer(buff, false);
           return buff.flip();
         }
-        if (value instanceof Matrix4[]) {
-          final Matrix4[] mats = (Matrix4[]) value;
+        if (value instanceof Matrix4[] mats) {
           final FloatBuffer buff = stack.mallocFloat(16 * mats.length);
           for (final Matrix4 mat : mats) {
             mat.toFloatBuffer(buff, false);
@@ -560,14 +542,12 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         }
         return (FloatBuffer) value;
       case Matrix4x4D:
-        if (value instanceof Matrix4) {
-          final Matrix4 mat = (Matrix4) value;
+        if (value instanceof Matrix4 mat) {
           final DoubleBuffer buff = stack.mallocDouble(16);
           mat.toDoubleBuffer(buff, false);
           return buff.flip();
         }
-        if (value instanceof Matrix4[]) {
-          final Matrix4[] mats = (Matrix4[]) value;
+        if (value instanceof Matrix4[] mats) {
           final DoubleBuffer buff = stack.mallocDouble(16 * mats.length);
           for (final Matrix4 mat : mats) {
             mat.toDoubleBuffer(buff, false);

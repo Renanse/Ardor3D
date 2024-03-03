@@ -44,10 +44,9 @@ public class PrimitiveKey {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PrimitiveKey)) {
+    if (!(o instanceof PrimitiveKey comp)) {
       return false;
     }
-    final PrimitiveKey comp = (PrimitiveKey) o;
     return _primitiveIndex == comp._primitiveIndex && _section == comp._section;
   }
 

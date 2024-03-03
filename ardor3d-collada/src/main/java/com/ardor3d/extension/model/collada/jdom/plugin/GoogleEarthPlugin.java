@@ -20,8 +20,7 @@ public class GoogleEarthPlugin implements ColladaExtraPlugin {
 
   @Override
   public boolean processExtra(final Element extra, final Object[] params) {
-    if (params.length > 0 && params[0] instanceof Mesh) {
-      final Mesh mesh = (Mesh) params[0];
+    if (params.length > 0 && params[0] instanceof Mesh mesh) {
       // should have a child: <technique profile="GOOGLEEARTH">
       final Element technique = extra.getChild("technique");
       if (technique != null) {

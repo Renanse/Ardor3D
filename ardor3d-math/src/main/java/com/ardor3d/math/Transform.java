@@ -20,7 +20,6 @@ import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.math.util.EqualsUtil;
 import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -637,8 +636,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     if (_rotationMatrix && transformBy.isRotationMatrix() && _uniformScale) {
       result._rotationMatrix = true;
-      final Matrix3 newRotation = result._matrix;
-      newRotation.set(_matrix).multiplyLocal(transformBy.getMatrix());
+      result._matrix.set(_matrix).multiplyLocal(transformBy.getMatrix());
 
       final Vector3 newTranslation = result._translation.set(transformBy.getTranslation());
       _matrix.applyPost(newTranslation, newTranslation);
@@ -702,7 +700,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
       _rotationMatrix = true;
       _uniformScale = true;
     } else {
-      _rotationMatrix = rotationMatrixGuaranteed ? true : _matrix.isOrthonormal();
+      _rotationMatrix = rotationMatrixGuaranteed || _matrix.isOrthonormal();
       _uniformScale = _rotationMatrix && _scale.getX() == _scale.getY() && _scale.getY() == _scale.getZ();
     }
   }
@@ -942,10 +940,9 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyTransform)) {
+    if (!(o instanceof ReadOnlyTransform comp)) {
       return false;
     }
-    final ReadOnlyTransform comp = (ReadOnlyTransform) o;
     return _matrix.equals(comp.getMatrix())
         && Math.abs(_translation.getX() - comp.getTranslation().getX()) < Transform.ALLOWED_DEVIANCE
         && Math.abs(_translation.getY() - comp.getTranslation().getY()) < Transform.ALLOWED_DEVIANCE
@@ -965,13 +962,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyTransform)) {
+    if (!(o instanceof ReadOnlyTransform comp)) {
       return false;
     }
-    final ReadOnlyTransform comp = (ReadOnlyTransform) o;
-    return EqualsUtil.areEqual(_matrix, comp.getMatrix()) //
-        && EqualsUtil.areEqual(_scale, comp.getScale()) //
-        && EqualsUtil.areEqual(_translation, comp.getTranslation());
+    return Objects.equals(_matrix, comp.getMatrix()) //
+        && Objects.equals(_scale, comp.getScale()) //
+        && Objects.equals(_translation, comp.getTranslation());
   }
 
   // /////////////////

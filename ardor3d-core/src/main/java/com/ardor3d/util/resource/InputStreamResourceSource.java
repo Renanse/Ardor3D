@@ -88,10 +88,9 @@ public class InputStreamResourceSource implements ResourceSource {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof InputStreamResourceSource)) {
+    if (!(obj instanceof InputStreamResourceSource other)) {
       return false;
     }
-    final InputStreamResourceSource other = (InputStreamResourceSource) obj;
     if (_type == null) {
       if (other._type != null) {
         return false;

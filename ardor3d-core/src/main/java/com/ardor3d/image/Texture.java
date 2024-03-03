@@ -594,11 +594,10 @@ public abstract class Texture implements Savable {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof Texture)) {
+    if (!(other instanceof Texture that)) {
       return false;
     }
 
-    final Texture that = (Texture) other;
     if (getImage() != null && !getImage().equals(that.getImage())) {
       return false;
     }

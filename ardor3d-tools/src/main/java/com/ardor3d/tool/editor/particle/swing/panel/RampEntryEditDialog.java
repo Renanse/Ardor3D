@@ -214,7 +214,7 @@ public class RampEntryEditDialog extends JDialog {
     if (entry.hasColorSet()) {
       _sColorPanel.setBackground(AwtColorUtil.makeColor(entry.getColor(), false));
       _colorHex.setText(convColorToHex(_sColorPanel.getBackground()));
-      _alphaSpinner.setValue(Integer.valueOf(AwtColorUtil.makeColor(entry.getColor(), true).getAlpha()));
+      _alphaSpinner.setValue(AwtColorUtil.makeColor(entry.getColor(), true).getAlpha());
     }
     add(colorPanel, new GridBagConstraints(1, 4, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
         GridBagConstraints.HORIZONTAL, new Insets(10, 5, 5, 5), 0, 0));

@@ -208,8 +208,7 @@ public class AnimationStateExample extends ExampleBase {
         .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, resetAnimCheck, Alignment.BOTTOM_LEFT, 0, -5));
     gpuSkinningCheck.setSelected(false);
     gpuSkinningCheck.addActionListener(event -> _root.acceptVisitor((final Spatial spatial) -> {
-      if (spatial instanceof SkinnedMesh) {
-        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+      if (spatial instanceof SkinnedMesh skinnedSpatial) {
         if (gpuSkinningCheck.isSelected()) {
           skinnedSpatial.setRenderMaterial(matGPU);
           skinnedSpatial.setUseGPU(true);
@@ -287,8 +286,7 @@ public class AnimationStateExample extends ExampleBase {
 
       // OPTIMIZATION: turn on the buffers in our skeleton so they can be shared. (reuse ids)
       primeModel.acceptVisitor((final Spatial spatial) -> {
-        if (spatial instanceof SkinnedMesh) {
-          final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+        if (spatial instanceof SkinnedMesh skinnedSpatial) {
           skinnedSpatial.recreateWeightAttributeBuffer();
           skinnedSpatial.recreateJointAttributeBuffer();
         }

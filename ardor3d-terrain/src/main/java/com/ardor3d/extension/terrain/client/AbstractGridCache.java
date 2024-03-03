@@ -415,10 +415,9 @@ public abstract class AbstractGridCache {
       if (obj == null) {
         return false;
       }
-      if (!(obj instanceof TileLoadingData)) {
+      if (!(obj instanceof TileLoadingData other)) {
         return false;
       }
-      final TileLoadingData other = (TileLoadingData) obj;
       if (destTile == null) {
         if (other.destTile != null) {
           return false;

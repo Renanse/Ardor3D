@@ -215,8 +215,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
    */
   private int getArdor3DX(final MouseEvent e) {
     final int x = e.getX();
-    if (_component instanceof Canvas) {
-      final Canvas canvas = (Canvas) _component;
+    if (_component instanceof Canvas canvas) {
       return (int) Math.round(canvas.scaleToScreenDpi(x));
     }
     return x;
@@ -237,8 +236,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
           : _component.getHeight();
       y = height - y;
     }
-    if (_component instanceof Canvas) {
-      final Canvas canvas = (Canvas) _component;
+    if (_component instanceof Canvas canvas) {
       y = (int) Math.round(canvas.scaleToScreenDpi(y));
     }
     return y;
@@ -317,8 +315,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     // clean out click states if we've moved the mouse or they've expired
     boolean clear = false;
     double comp = MouseState.CLICK_MAX_DELTA;
-    if (_component instanceof Canvas) {
-      final Canvas canvas = (Canvas) _component;
+    if (_component instanceof Canvas canvas) {
       comp = canvas.scaleToScreenDpi(comp);
     }
     if (_lastClickLocation.distanceSquared(x, y) > comp * comp) {

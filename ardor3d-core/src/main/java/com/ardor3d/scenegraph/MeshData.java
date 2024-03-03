@@ -1196,7 +1196,7 @@ public class MeshData implements Savable {
   public void read(final InputCapsule capsule) throws IOException {
     _vertexCount = capsule.readInt("vertexCount", 0);
     _vertexDataItems =
-        capsule.readStringSavableMap("vertexDataItems", new HashMap<String, AbstractBufferData<? extends Buffer>>());
+        capsule.readStringSavableMap("vertexDataItems", new HashMap<>());
     _indexBuffer = capsule.readSavable("indexBuffer", null);
     _indexLengths = capsule.readIntArray("indexLengths", null);
     _indexModes = capsule.readEnumArray("indexModes", IndexMode.class, new IndexMode[] {IndexMode.Triangles});

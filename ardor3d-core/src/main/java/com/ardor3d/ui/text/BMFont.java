@@ -877,7 +877,7 @@ public class BMFont implements Savable {
     _common = capsule.readSavable("common", _common);
     // Pages
     _pages.clear();
-    final List<Savable> pages = capsule.readSavableList("pages", new ArrayList<Savable>());
+    final List<Savable> pages = capsule.readSavableList("pages", new ArrayList<>());
     for (final Savable savable : pages) {
       _pages.add((Page) savable);
       if (_pages.size() > 1) {
@@ -886,7 +886,7 @@ public class BMFont implements Savable {
     }
     // Chars
     _charMap.clear();
-    final List<Savable> chars = capsule.readSavableList("charMap", new ArrayList<Savable>());
+    final List<Savable> chars = capsule.readSavableList("charMap", new ArrayList<>());
     for (final Savable savable : chars) {
       final Char c = (Char) savable;
       _charMap.put(c.id, c);
@@ -896,7 +896,7 @@ public class BMFont implements Savable {
     }
     // Kernings
     _kernMap.clear();
-    final List<Savable> kernings = capsule.readSavableList("kernings", new ArrayList<Savable>());
+    final List<Savable> kernings = capsule.readSavableList("kernings", new ArrayList<>());
     for (final Savable savable : kernings) {
       final Kerning k = (Kerning) savable;
       Map<Integer, Integer> amtHash;

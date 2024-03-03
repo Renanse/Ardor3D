@@ -480,8 +480,7 @@ public class NvTriangleStripper implements Visitor {
 
   @Override
   public void visit(final Spatial spatial) {
-    if (spatial instanceof Mesh) {
-      final Mesh mesh = (Mesh) spatial;
+    if (spatial instanceof Mesh mesh) {
       final MeshData md = mesh.getMeshData();
       if (md.getTotalPrimitiveCount() < 1 || md.getVertexCount() < 3) {
         return;

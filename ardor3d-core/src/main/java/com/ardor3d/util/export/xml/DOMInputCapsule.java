@@ -1106,8 +1106,7 @@ public class DOMInputCapsule implements InputCapsule {
     final NodeList nodes = tempEl.getChildNodes();
     for (int i = 0; i < nodes.getLength(); i++) {
       final Node n = nodes.item(i);
-      if (n instanceof Element && n.getNodeName().equals("MapEntry")) {
-        final Element elem = (Element) n;
+      if (n instanceof Element elem && n.getNodeName().equals("MapEntry")) {
         _currentElem = elem;
         final K key = (K) readSavable(XMLExporter.ELEMENT_KEY, null);
         final V val = (V) readSavable(XMLExporter.ELEMENT_VALUE, null);
@@ -1136,8 +1135,7 @@ public class DOMInputCapsule implements InputCapsule {
       final NodeList nodes = tempEl.getChildNodes();
       for (int i = 0; i < nodes.getLength(); i++) {
         final Node n = nodes.item(i);
-        if (n instanceof Element && n.getNodeName().equals("MapEntry")) {
-          final Element elem = (Element) n;
+        if (n instanceof Element elem && n.getNodeName().equals("MapEntry")) {
           _currentElem = elem;
           final String key = _currentElem.getAttribute("key");
           final V val = (V) readSavable("Savable", null);
@@ -1168,8 +1166,7 @@ public class DOMInputCapsule implements InputCapsule {
       final NodeList nodes = tempEl.getChildNodes();
       for (int i = 0; i < nodes.getLength(); i++) {
         final Node n = nodes.item(i);
-        if (n instanceof Element && n.getNodeName().equals("MapEntry")) {
-          final Element elem = (Element) n;
+        if (n instanceof Element elem && n.getNodeName().equals("MapEntry")) {
           _currentElem = elem;
           final String key = _currentElem.getAttribute("key");
           final Object val = tryToReadValue("value");
@@ -1425,7 +1422,7 @@ public class DOMInputCapsule implements InputCapsule {
       if (size > 0) {
         final String[] strings = tmpEl.getAttribute("data").split("\\s+");
         for (final String s : strings) {
-          tmp.put(Byte.valueOf(s));
+          tmp.put(Byte.parseByte(s));
         }
         tmp.flip();
       }
@@ -1452,7 +1449,7 @@ public class DOMInputCapsule implements InputCapsule {
       if (size > 0) {
         final String[] strings = tmpEl.getAttribute("data").split("\\s+");
         for (final String s : strings) {
-          tmp.put(Short.valueOf(s));
+          tmp.put(Short.parseShort(s));
         }
         tmp.flip();
       }

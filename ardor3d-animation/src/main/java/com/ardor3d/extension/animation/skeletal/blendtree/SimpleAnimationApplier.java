@@ -47,8 +47,7 @@ public class SimpleAnimationApplier implements AnimationApplier {
       for (final String key : data.keySet()) {
         final Object value = data.get(key);
         if (value instanceof JointData) { // ignore
-        } else if (value instanceof TransformData) {
-          final TransformData transformData = (TransformData) value;
+        } else if (value instanceof TransformData transformData) {
           final Spatial applyTo = findChild(root, key);
           if (applyTo != null) {
             transformData.applyTo(applyTo);
@@ -82,13 +81,11 @@ public class SimpleAnimationApplier implements AnimationApplier {
     // cycle through, pulling out and applying those we know about
     if (data != null) {
       for (final Object value : data.values()) {
-        if (value instanceof JointData) {
-          final JointData jointData = (JointData) value;
+        if (value instanceof JointData jointData) {
           if (jointData.getJointIndex() >= 0) {
             jointData.applyTo(applyToPose.getLocalJointTransforms()[jointData.getJointIndex()]);
           }
-        } else if (value instanceof TriggerData) {
-          final TriggerData trigger = (TriggerData) value;
+        } else if (value instanceof TriggerData trigger) {
           if (trigger.isArmed()) {
             try {
               // pull callback(s) for the current trigger key, if exists, and call.

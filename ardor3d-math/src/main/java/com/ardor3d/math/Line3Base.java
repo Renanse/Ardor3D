@@ -14,9 +14,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.math.util.EqualsUtil;
 import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -89,12 +89,11 @@ public abstract class Line3Base implements Savable, Externalizable, Cloneable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Line3Base)) {
+    if (!(o instanceof Line3Base comp)) {
       return false;
     }
-    final Line3Base comp = (Line3Base) o;
-    return EqualsUtil.areEqual(getOrigin(), comp.getOrigin()) //
-        && EqualsUtil.areEqual(getDirection(), comp.getDirection());
+    return Objects.equals(getOrigin(), comp.getOrigin()) //
+        && Objects.equals(getDirection(), comp.getDirection());
   }
 
   // /////////////////

@@ -1590,7 +1590,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   @Override
   public String toString() {
-    final StringBuffer result = new StringBuffer("com.ardor3d.math.Matrix3\n[\n");
+    final StringBuilder result = new StringBuilder("com.ardor3d.math.Matrix3\n[\n");
     result.append(' ');
     result.append(_m00);
     result.append(' ');
@@ -1653,10 +1653,9 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyMatrix3)) {
+    if (!(o instanceof ReadOnlyMatrix3 comp)) {
       return false;
     }
-    final ReadOnlyMatrix3 comp = (ReadOnlyMatrix3) o;
     if (Math.abs(getM00() - comp.getM00()) > Matrix3.ALLOWED_DEVIANCE) {
       return false;
     } else if (Math.abs(getM01() - comp.getM01()) > Matrix3.ALLOWED_DEVIANCE) {
@@ -1689,19 +1688,18 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyMatrix3)) {
+    if (!(o instanceof ReadOnlyMatrix3 comp)) {
       return false;
     }
-    final ReadOnlyMatrix3 comp = (ReadOnlyMatrix3) o;
-    return EqualsUtil.areEqual(getM00(), comp.getM00()) //
-        && EqualsUtil.areEqual(getM01(), comp.getM01()) //
-        && EqualsUtil.areEqual(getM02(), comp.getM02()) //
-        && EqualsUtil.areEqual(getM10(), comp.getM10()) //
-        && EqualsUtil.areEqual(getM11(), comp.getM11()) //
-        && EqualsUtil.areEqual(getM12(), comp.getM12()) //
-        && EqualsUtil.areEqual(getM20(), comp.getM20()) //
-        && EqualsUtil.areEqual(getM21(), comp.getM21()) //
-        && EqualsUtil.areEqual(getM22(), comp.getM22());
+    return EqualsUtil.equals(getM00(), comp.getM00()) //
+        && EqualsUtil.equals(getM01(), comp.getM01()) //
+        && EqualsUtil.equals(getM02(), comp.getM02()) //
+        && EqualsUtil.equals(getM10(), comp.getM10()) //
+        && EqualsUtil.equals(getM11(), comp.getM11()) //
+        && EqualsUtil.equals(getM12(), comp.getM12()) //
+        && EqualsUtil.equals(getM20(), comp.getM20()) //
+        && EqualsUtil.equals(getM21(), comp.getM21()) //
+        && EqualsUtil.equals(getM22(), comp.getM22());
   }
 
   // /////////////////

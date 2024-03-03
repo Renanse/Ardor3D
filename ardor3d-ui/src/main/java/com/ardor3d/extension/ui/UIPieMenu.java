@@ -180,8 +180,7 @@ public class UIPieMenu extends UIPopupMenu implements IPopOver {
     final Rectangle2 storeA = Rectangle2.fetchTempInstance();
     for (int i = 0; i < content.size(); i++) {
       final Spatial spat = content.get(i);
-      if (spat instanceof UIComponent) {
-        final UIComponent comp = (UIComponent) spat;
+      if (spat instanceof UIComponent comp) {
         final Rectangle2 minRect = comp.getRelativeMinComponentBounds(storeA);
         comp.fitComponentIn(minRect.getWidth(), minRect.getHeight());
         if (comp == _center) {

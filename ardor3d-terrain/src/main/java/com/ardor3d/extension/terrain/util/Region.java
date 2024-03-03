@@ -181,10 +181,9 @@ public class Region {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof Region)) {
+    if (!(obj instanceof Region other)) {
       return false;
     }
-    final Region other = (Region) obj;
     if (height != other.height) {
       return false;
     }

@@ -101,8 +101,7 @@ public class CompoundTerrainSourcePanel extends JPanel {
       final Object selected = tp.getLastPathComponent();
       if (selected instanceof ExampleEntry) {
         selectedEntry = (ExampleEntry) selected;
-        if (selectedEntry.getSource() instanceof ProceduralTerrainSource) {
-          final ProceduralTerrainSource src = (ProceduralTerrainSource) selectedEntry.getSource();
+        if (selectedEntry.getSource() instanceof ProceduralTerrainSource src) {
           if (src.getFunction() instanceof UIEditableFunction) {
             ((UIEditableFunction) src.getFunction()).setupFunctionEditPanel(_bottomPanel, src);
             return;
@@ -123,8 +122,7 @@ public class CompoundTerrainSourcePanel extends JPanel {
 
     @Override
     public Object getChild(final Object parent, final int index) {
-      if (parent instanceof CompoundTerrainSource) {
-        final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
+      if (parent instanceof CompoundTerrainSource parentSource) {
         return parentSource.getEntry(index);
       }
 
@@ -133,8 +131,7 @@ public class CompoundTerrainSourcePanel extends JPanel {
 
     @Override
     public int getChildCount(final Object parent) {
-      if (parent instanceof CompoundTerrainSource) {
-        final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
+      if (parent instanceof CompoundTerrainSource parentSource) {
         return parentSource.getEntries().size();
       }
       return 0;
@@ -142,8 +139,7 @@ public class CompoundTerrainSourcePanel extends JPanel {
 
     @Override
     public int getIndexOfChild(final Object parent, final Object child) {
-      if (parent instanceof CompoundTerrainSource) {
-        final CompoundTerrainSource parentSource = (CompoundTerrainSource) parent;
+      if (parent instanceof CompoundTerrainSource parentSource) {
         return parentSource.getEntries().indexOf(child);
       }
       return 0;

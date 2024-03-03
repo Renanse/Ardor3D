@@ -127,8 +127,7 @@ public class AnimationLayer implements StateOwner {
   public boolean doTransition(final String key) {
     final AbstractFiniteState state = getCurrentState();
     // see if current state has a transition
-    if (state instanceof SteadyState) {
-      final SteadyState steadyState = (SteadyState) state;
+    if (state instanceof SteadyState steadyState) {
       AbstractFiniteState nextState = steadyState.doTransition(key, this);
       if (nextState == null) {
         // no transition found, check if there is a global transition

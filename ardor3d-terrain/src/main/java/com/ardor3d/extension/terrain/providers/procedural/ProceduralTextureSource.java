@@ -35,12 +35,7 @@ public class ProceduralTextureSource implements TextureSource {
   private final ReadOnlyColorRGBA[] terrainColors;
 
   private final ReentrantLock textureLock = new ReentrantLock();
-  private final ThreadLocal<ByteBuffer> tileDataPool = new ThreadLocal<>() {
-    @Override
-    protected ByteBuffer initialValue() {
-      return BufferUtils.createByteBufferOnHeap(tileSize * tileSize * 3);
-    }
-  };
+  private final ThreadLocal<ByteBuffer> tileDataPool = ThreadLocal.withInitial(() -> BufferUtils.createByteBufferOnHeap(tileSize * tileSize * 3));
 
   public ProceduralTextureSource(final Function3D function) {
     this.function = function;

@@ -353,7 +353,7 @@ public class PropertiesGameSettings {
       return defaultFullscreen;
     }
 
-    return Boolean.valueOf(prop.getProperty("FULLSCREEN"));
+    return Boolean.parseBoolean(prop.getProperty("FULLSCREEN"));
   }
 
   /**

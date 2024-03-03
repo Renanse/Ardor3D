@@ -302,9 +302,7 @@ public class ColladaDOMUtil {
     rootElement.setNamespace(null);
 
     final List<Element> children = rootElement.getChildren();
-    final Iterator<Element> i = children.iterator();
-    while (i.hasNext()) {
-      final Element child = i.next();
+    for (Element child : children) {
       stripNamespace(child);
     }
   }

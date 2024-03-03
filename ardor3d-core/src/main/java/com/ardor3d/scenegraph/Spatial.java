@@ -1466,22 +1466,8 @@ public abstract class Spatial implements Savable, Hintable {
       } else {
         spat = (Spatial) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null, (Object[]) null);
       }
-    } catch (final InstantiationException e) {
-      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
-      throw new RuntimeException(e);
-    } catch (final IllegalAccessException e) {
-      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
-      throw new RuntimeException(e);
-    } catch (final NoSuchMethodException e) {
-      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
-      throw new RuntimeException(e);
-    } catch (final IllegalArgumentException e) {
-      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
-      throw new RuntimeException(e);
-    } catch (final SecurityException e) {
-      Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
-      throw new RuntimeException(e);
-    } catch (final InvocationTargetException e) {
+    } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException |
+                   SecurityException | InvocationTargetException e) {
       Spatial.logger.log(Level.SEVERE, "Could not access final constructor of class " + clazz.getCanonicalName(), e);
       throw new RuntimeException(e);
     }

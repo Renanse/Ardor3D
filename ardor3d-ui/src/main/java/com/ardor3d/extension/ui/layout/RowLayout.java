@@ -93,8 +93,7 @@ public class RowLayout extends UILayout {
     List<UIComponent> compsBack = new ArrayList<>();
     for (int i = 0; i < content.size(); i++) {
       final Spatial spat = content.get(i);
-      if (spat instanceof UIComponent) {
-        final UIComponent comp = (UIComponent) spat;
+      if (spat instanceof UIComponent comp) {
         final Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
         final Rectangle2 minRect = comp.getRelativeMinComponentBounds(storeB);
         if (_horizontal) {
@@ -168,10 +167,9 @@ public class RowLayout extends UILayout {
       for (int i = 0; i < content.size(); i++) {
         final Spatial spat = _horizontal ? content.get(i) : content.get(content.size() - i - 1);
 
-        if (!(spat instanceof UIComponent)) {
+        if (!(spat instanceof UIComponent comp)) {
           continue;
         }
-        final UIComponent comp = (UIComponent) spat;
         final Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
 
         if (_horizontal) {
@@ -201,10 +199,9 @@ public class RowLayout extends UILayout {
       final Rectangle2 store = new Rectangle2();
       int spaces = -1;
       for (final Spatial s : content) {
-        if (!(s instanceof UIComponent)) {
+        if (!(s instanceof UIComponent comp)) {
           continue;
         }
-        final UIComponent comp = (UIComponent) s;
         final Rectangle2 rect = comp.getRelativeMinComponentBounds(store);
         if (_horizontal) {
           minW += rect.getWidth();

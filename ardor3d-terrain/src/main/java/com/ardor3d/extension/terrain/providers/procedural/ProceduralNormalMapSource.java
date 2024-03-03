@@ -38,12 +38,7 @@ public class ProceduralNormalMapSource implements TextureSource {
   private final double[][] cache = new double[tileSize + 2][tileSize + 2];
 
   private final ReentrantLock textureLock = new ReentrantLock();
-  private final ThreadLocal<ByteBuffer> tileDataPool = new ThreadLocal<>() {
-    @Override
-    protected ByteBuffer initialValue() {
-      return BufferUtils.createByteBufferOnHeap(tileSize * tileSize * 3);
-    }
-  };
+  private final ThreadLocal<ByteBuffer> tileDataPool = ThreadLocal.withInitial(() -> BufferUtils.createByteBufferOnHeap(tileSize * tileSize * 3));
 
   public ProceduralNormalMapSource(final Function3D function, final double heightScale, final double xGridSpacing,
     final double zGridSpacing) {

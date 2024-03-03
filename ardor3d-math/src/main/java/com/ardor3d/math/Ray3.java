@@ -353,10 +353,9 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyRay3)) {
+    if (!(o instanceof ReadOnlyRay3 comp)) {
       return false;
     }
-    final ReadOnlyRay3 comp = (ReadOnlyRay3) o;
     return _origin.equals(comp.getOrigin()) && _direction.equals(comp.getDirection());
   }
 

@@ -122,7 +122,7 @@ public class ColladaStorage implements Savable {
   public void read(final InputCapsule capsule) throws IOException {
     _assetData = capsule.readSavable("assetData", null);
     _scene = capsule.readSavable("scene", null);
-    _skins.addAll(capsule.readSavableList("skins", new LinkedList<SkinData>()));
+    _skins.addAll(capsule.readSavableList("skins", new LinkedList<>()));
     _transformChannels.clear();
     _transformChannels.addAll(capsule.readSavableList("jointChannels", new LinkedList<TransformChannel>()));
   }

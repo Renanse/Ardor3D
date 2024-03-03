@@ -18,6 +18,8 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 
+import java.util.Objects;
+
 /**
  * An immutable representation of a mouse cursor. A mouse cursor consists of an image and a hotspot
  * where clicking is done.
@@ -90,11 +92,11 @@ public class MouseCursor {
     if (_hotspotY != that._hotspotY) {
       return false;
     }
-    if (_image != null ? !_image.equals(that._image) : that._image != null) {
+    if (!Objects.equals(_image, that._image)) {
       return false;
     }
     // noinspection RedundantIfStatement
-    if (_name != null ? !_name.equals(that._name) : that._name != null) {
+    if (!Objects.equals(_name, that._name)) {
       return false;
     }
 

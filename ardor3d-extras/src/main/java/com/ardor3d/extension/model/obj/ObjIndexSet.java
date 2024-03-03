@@ -69,10 +69,9 @@ public class ObjIndexSet {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ObjIndexSet)) {
+    if (!(o instanceof ObjIndexSet comp)) {
       return false;
     }
-    final ObjIndexSet comp = (ObjIndexSet) o;
     return _vIndex == comp._vIndex && _vnIndex == comp._vnIndex && _vtIndex == comp._vtIndex && _sGroup == comp._sGroup;
   }
 }

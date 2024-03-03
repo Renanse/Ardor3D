@@ -12,9 +12,9 @@ package com.ardor3d.math;
 
 import com.ardor3d.math.type.ReadOnlyLine3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.math.util.EqualsUtil;
 
 import java.io.Serial;
+import java.util.Objects;
 
 public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
@@ -130,12 +130,11 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyLine3)) {
+    if (!(o instanceof ReadOnlyLine3 comp)) {
       return false;
     }
-    final ReadOnlyLine3 comp = (ReadOnlyLine3) o;
-    return EqualsUtil.areEqual(getOrigin(), comp.getOrigin()) //
-        && EqualsUtil.areEqual(getDirection(), comp.getDirection());
+    return Objects.equals(getOrigin(), comp.getOrigin()) //
+        && Objects.equals(getDirection(), comp.getDirection());
   }
 
   // /////////////////

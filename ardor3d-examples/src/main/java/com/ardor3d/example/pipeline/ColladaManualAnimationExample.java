@@ -265,8 +265,7 @@ public class ColladaManualAnimationExample extends ExampleBase {
       double radius = 0;
       if (bounding instanceof BoundingSphere) {
         radius = ((BoundingSphere) bounding).getRadius();
-      } else if (bounding instanceof BoundingBox) {
-        final BoundingBox boundingBox = (BoundingBox) bounding;
+      } else if (bounding instanceof BoundingBox boundingBox) {
         radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox.getZExtent());
       }
 

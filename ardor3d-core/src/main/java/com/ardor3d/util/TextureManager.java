@@ -456,7 +456,7 @@ final public class TextureManager {
       // Otherwise, add a delete request to that context's render task queue.
       else {
         final Future<Void> future = GameTaskQueueManager
-            .getManager(ContextManager.getContextForSharableRef(sharableRef)).render(new RendererCallable<Void>() {
+            .getManager(ContextManager.getContextForSharableRef(sharableRef)).render(new RendererCallable<>() {
               @Override
               public Void call() throws Exception {
                 getRenderer().getTextureUtils().deleteTextureIds(idMap.get(sharableRef));

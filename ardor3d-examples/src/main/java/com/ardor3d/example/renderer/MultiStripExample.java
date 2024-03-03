@@ -45,8 +45,7 @@ public class MultiStripExample extends ExampleBase {
     if (pickResults.getNumber() > i) {
       final PickData pick = pickResults.getPickData(i);
       final int section = pick.getIntersectionRecord().getIntersectionPrimitive(0).getSection();
-      if (pick.getTarget() instanceof Mesh) {
-        final Mesh hit = (Mesh) pick.getTarget();
+      if (pick.getTarget() instanceof Mesh hit) {
         System.err
             .println("picked: " + hit + " section: " + section + " (type = " + hit.getMeshData().getIndexMode(section)
                 + ") primitive: " + pick.getIntersectionRecord().getIntersectionPrimitive(0).getPrimitiveIndex());

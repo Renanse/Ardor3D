@@ -62,7 +62,7 @@ public class AnimationItem implements Savable {
       e.printStackTrace();
     }
     _children.clear();
-    _children.addAll(capsule.readSavableList("children", new ArrayList<AnimationItem>()));
+    _children.addAll(capsule.readSavableList("children", new ArrayList<>()));
     _animationClip = capsule.readSavable("animationClip", null);
   }
 

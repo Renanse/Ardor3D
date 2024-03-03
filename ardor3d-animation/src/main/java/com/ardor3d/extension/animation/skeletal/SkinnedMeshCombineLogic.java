@@ -41,11 +41,10 @@ public class SkinnedMeshCombineLogic extends MeshCombineLogic {
 
   @Override
   public void addSource(final Mesh mesh) {
-    if (!(mesh instanceof SkinnedMesh)) {
+    if (!(mesh instanceof SkinnedMesh skMesh)) {
       return;
     }
 
-    final SkinnedMesh skMesh = (SkinnedMesh) mesh;
     if (first) {
       _mesh.setCurrentPose(skMesh.getCurrentPose());
     }

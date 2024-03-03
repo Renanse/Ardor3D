@@ -78,8 +78,7 @@ public class Lwjgl3SwtCanvas extends GLCanvas implements Canvas {
     final int h = getContentHeight();
 
     CanvasRenderer shareCanvasRenderer = null;
-    if (_passedGLData.shareContext != null && _passedGLData.shareContext instanceof com.ardor3d.framework.Canvas) {
-      final com.ardor3d.framework.Canvas canvas = (com.ardor3d.framework.Canvas) _passedGLData.shareContext;
+    if (_passedGLData.shareContext != null && _passedGLData.shareContext instanceof Canvas canvas) {
       shareCanvasRenderer = canvas.getCanvasRenderer();
     }
 

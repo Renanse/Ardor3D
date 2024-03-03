@@ -41,7 +41,7 @@ public abstract class StatCollector {
    */
   protected static final HashMap<StatType, StatValue> current = new HashMap<>();
 
-  protected static List<MultiStatSample> historical = Collections.synchronizedList(new LinkedList<MultiStatSample>());
+  protected static List<MultiStatSample> historical = Collections.synchronizedList(new LinkedList<>());
 
   /**
    * How long to gather stats as a single unit before pushing them onto the historical stack.

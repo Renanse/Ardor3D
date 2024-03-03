@@ -57,10 +57,9 @@ public final class TwoInputStates {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof TwoInputStates)) {
+    if (!(o instanceof TwoInputStates comp)) {
       return false;
     }
-    final TwoInputStates comp = (TwoInputStates) o;
     return _previous == comp._previous && _current == comp._current;
   }
 }

@@ -110,8 +110,7 @@ public class UITabbedPane extends UIPanel {
     if (_contents != null) {
       for (int x = 0, max = _contents.size(); x < max; x++) {
         final Spatial child = _contents.get(x);
-        if (child instanceof UIComponent) {
-          final UIComponent comp = (UIComponent) child;
+        if (child instanceof UIComponent comp) {
           comp.setLocalComponentSize(getViewedComponent().getLocalComponentWidth(),
               getViewedComponent().getLocalComponentHeight());
           comp.layout();

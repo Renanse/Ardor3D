@@ -663,10 +663,9 @@ public class SkinnedMesh extends Mesh implements PoseListener {
       if (this == o) {
         return true;
       }
-      if (!(o instanceof JointWeight)) {
+      if (!(o instanceof JointWeight comp)) {
         return false;
       }
-      final JointWeight comp = (JointWeight) o;
       // only care about joint
       return joint == comp.joint;
     }

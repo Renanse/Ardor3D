@@ -855,14 +855,13 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyColorRGBA)) {
+    if (!(o instanceof ReadOnlyColorRGBA comp)) {
       return false;
     }
-    final ReadOnlyColorRGBA comp = (ReadOnlyColorRGBA) o;
-    return EqualsUtil.areEqual(getRed(), comp.getRed()) //
-        && EqualsUtil.areEqual(getGreen(), comp.getGreen()) //
-        && EqualsUtil.areEqual(getBlue(), comp.getBlue()) //
-        && EqualsUtil.areEqual(getAlpha(), comp.getAlpha());
+    return EqualsUtil.equals(getRed(), comp.getRed()) //
+        && EqualsUtil.equals(getGreen(), comp.getGreen()) //
+        && EqualsUtil.equals(getBlue(), comp.getBlue()) //
+        && EqualsUtil.equals(getAlpha(), comp.getAlpha());
   }
 
   // /////////////////

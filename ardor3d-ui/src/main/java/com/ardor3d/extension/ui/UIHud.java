@@ -267,8 +267,7 @@ public class UIHud extends Node {
 
     for (int i = getNumberOfChildren(); --i >= 0;) {
       final Spatial s = getChild(i);
-      if (s instanceof UIComponent) {
-        final UIComponent comp = (UIComponent) s;
+      if (s instanceof UIComponent comp) {
         if (!comp.isVisible()) {
           continue;
         }

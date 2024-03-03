@@ -428,33 +428,29 @@ public class ExampleRunner extends JFrame {
     if (!(selected instanceof Class<?>)) {
       return;
     }
-    new Thread() {
+    new Thread(() -> {
+      try {
+        final Class<?> clazz = (Class<?>) selected;
 
-      @Override
-      public void run() {
-        try {
-          final Class<?> clazz = (Class<?>) selected;
-
-          final boolean isWindows = System.getProperty("os.name").contains("Windows");
-          final List<String> args = new ArrayList<>();
-          args.add(isWindows ? "javaw" : "java");
-          args.add("-Xmx" + maxHeapMemory + "M");
-          args.add("-cp");
-          args.add(System.getProperty("java.class.path"));
-          args.add("-Djava.library.path=" + System.getProperty("java.library.path"));
-          args.add(clazz.getCanonicalName());
-          logger.info("start " + args.toString());
-          final ProcessBuilder pb = new ProcessBuilder(args);
-          pb.redirectErrorStream(true);
-          final Process p = pb.start();
-          final InputStream in = p.getInputStream();
-          console.started(clazz.getCanonicalName(), p);
-          new ConsoleStreamer(in, console).start();
-        } catch (final Exception ex) {
-          JOptionPane.showMessageDialog(ExampleRunner.this, ex.toString());
-        }
+        final boolean isWindows = System.getProperty("os.name").contains("Windows");
+        final List<String> args = new ArrayList<>();
+        args.add(isWindows ? "javaw" : "java");
+        args.add("-Xmx" + maxHeapMemory + "M");
+        args.add("-cp");
+        args.add(System.getProperty("java.class.path"));
+        args.add("-Djava.library.path=" + System.getProperty("java.library.path"));
+        args.add(clazz.getCanonicalName());
+        logger.info("start " + args.toString());
+        final ProcessBuilder pb = new ProcessBuilder(args);
+        pb.redirectErrorStream(true);
+        final Process p = pb.start();
+        final InputStream in = p.getInputStream();
+        console.started(clazz.getCanonicalName(), p);
+        new ConsoleStreamer(in, console).start();
+      } catch (final Exception ex) {
+        JOptionPane.showMessageDialog(ExampleRunner.this, ex.toString());
       }
-    }.start();
+    }).start();
   }
 
   private void browseSelected() {
@@ -789,8 +785,7 @@ public class ExampleRunner extends JFrame {
           // be in the case of a package contained in a jar file.
           logger.info("Searching for Demo classes in \"" + url + "\".");
           final URLConnection urlConnection = url.openConnection();
-          if (urlConnection instanceof JarURLConnection) {
-            final JarURLConnection conn = (JarURLConnection) urlConnection;
+          if (urlConnection instanceof JarURLConnection conn) {
 
             final JarFile jfile = conn.getJarFile();
             final Enumeration<JarEntry> e = jfile.entries();
@@ -802,8 +797,6 @@ public class ExampleRunner extends JFrame {
               }
             }
           }
-        } catch (final IOException e) {
-          logger.logp(Level.SEVERE, this.getClass().toString(), "find(pckgname, recursive, classes)", "Exception", e);
         } catch (final Exception e) {
           logger.logp(Level.SEVERE, this.getClass().toString(), "find(pckgname, recursive, classes)", "Exception", e);
         }
@@ -836,8 +829,7 @@ public class ExampleRunner extends JFrame {
         classNameLabel.setText("Null"); // Throw an exception?
         classNameLabel.setFont(defaultFont);
       } else {
-        if ((value != null) && (value instanceof Class<?>)) {
-          final Class<?> clazz = (Class<?>) value;
+        if ((value != null) && (value instanceof Class<?> clazz)) {
           classNameLabel.setText(clazz.getSimpleName());
         } else if ((value != null) && value instanceof Package) {
           String name = ((Package) value).getName();
@@ -914,15 +906,11 @@ public class ExampleRunner extends JFrame {
 
     public void started(final String className, final Process process) {
       textArea.setText(className + ": started...");
-      new Thread() {
-
-        @Override
-        public void run() {
-          try {
-            process.waitFor();
-          } catch (final InterruptedException ex) {}
-        }
-      }.start();
+      new Thread(() -> {
+        try {
+          process.waitFor();
+        } catch (final InterruptedException ex) {}
+      }).start();
     }
 
     public void appendLine(final String line) {

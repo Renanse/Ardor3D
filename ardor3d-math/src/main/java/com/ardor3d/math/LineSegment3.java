@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serial;
+import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyLineSegment3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -229,13 +230,12 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyLineSegment3)) {
+    if (!(o instanceof ReadOnlyLineSegment3 comp)) {
       return false;
     }
-    final ReadOnlyLineSegment3 comp = (ReadOnlyLineSegment3) o;
-    return EqualsUtil.areEqual(getOrigin(), comp.getOrigin()) //
-        && EqualsUtil.areEqual(getDirection(), comp.getDirection()) //
-        && EqualsUtil.areEqual(getExtent(), comp.getExtent());
+    return Objects.equals(getOrigin(), comp.getOrigin()) //
+        && Objects.equals(getDirection(), comp.getDirection()) //
+        && EqualsUtil.equals(getExtent(), comp.getExtent());
   }
 
   /**

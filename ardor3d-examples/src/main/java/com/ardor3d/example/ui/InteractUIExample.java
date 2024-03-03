@@ -744,8 +744,7 @@ public class InteractUIExample extends ExampleBase {
         if (!tData.color.equals(data.color)) {
           tData.color.set(data.color);
           target.acceptVisitor((final Spatial spatial) -> {
-            if (spatial instanceof Mesh) {
-              final Mesh mesh = (Mesh) spatial;
+            if (spatial instanceof Mesh mesh) {
               mesh.setDefaultColor(tData.color);
               mesh.setSolidColor(tData.color);
             }

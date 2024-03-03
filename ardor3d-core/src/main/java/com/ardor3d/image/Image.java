@@ -316,10 +316,9 @@ public class Image implements Serializable, Savable {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof Image)) {
+    if (!(other instanceof Image that)) {
       return false;
     }
-    final Image that = (Image) other;
     if (getDataFormat() != that.getDataFormat()) {
       return false;
     }

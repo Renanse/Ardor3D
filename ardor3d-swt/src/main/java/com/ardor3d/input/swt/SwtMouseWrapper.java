@@ -143,8 +143,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
    */
   private int getArdor3DX(final MouseEvent e) {
     final int x = e.x;
-    if (_control instanceof Canvas) {
-      final Canvas canvas = (Canvas) _control;
+    if (_control instanceof Canvas canvas) {
       return (int) Math.round(canvas.scaleToScreenDpi(x));
     }
     return x;
@@ -160,8 +159,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
    */
   private int getArdor3DY(final MouseEvent e) {
     final int y = _control.getSize().y - e.y;
-    if (_control instanceof Canvas) {
-      final Canvas canvas = (Canvas) _control;
+    if (_control instanceof Canvas canvas) {
       return (int) Math.round(canvas.scaleToScreenDpi(y));
     }
     return y;
@@ -224,8 +222,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     // clean out click states if we've moved the mouse or they've expired
     boolean clear = false;
     double comp = MouseState.CLICK_MAX_DELTA;
-    if (_control instanceof Canvas) {
-      final Canvas canvas = (Canvas) _control;
+    if (_control instanceof Canvas canvas) {
       comp = canvas.scaleToScreenDpi(comp);
     }
     if (_lastClickLocation.distanceSquared(x, y) > comp * comp) {

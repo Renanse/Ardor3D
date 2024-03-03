@@ -579,8 +579,7 @@ public class ParticleEditorFrame extends JFrame {
     }
     try {
       final Spatial obj = (Spatial) new BinaryImporter().load(file);
-      if (obj instanceof Node && !(obj instanceof ParticleSystem)) {
-        final Node node = (Node) obj;
+      if (obj instanceof Node node && !(obj instanceof ParticleSystem)) {
         for (int ii = node.getNumberOfChildren() - 1; ii >= 0; ii--) {
           if (!(node.getChild(ii) instanceof ParticleSystem)) {
             node.detachChildAt(ii);
@@ -635,8 +634,7 @@ public class ParticleEditorFrame extends JFrame {
     try {
       final Spatial obj = (Spatial) new BinaryImporter().load(file);
       final int lidx = editScene.particleNode.getNumberOfChildren();
-      if (obj instanceof Node) {
-        final Node node = (Node) obj;
+      if (obj instanceof Node node) {
         final ArrayList<Spatial> meshes = new ArrayList<>();
         for (int ii = 0, nn = node.getNumberOfChildren(); ii < nn; ii++) {
           if (node.getChild(ii) instanceof ParticleSystem) {
@@ -1072,14 +1070,11 @@ public class ParticleEditorFrame extends JFrame {
 
     editScene.init();
 
-    final Thread t = new Thread() {
-      @Override
-      public void run() {
-        while (true) {
-          handler.updateFrame();
-        }
+    final Thread t = new Thread(() -> {
+      while (true) {
+        handler.updateFrame();
       }
-    };
+    });
     t.start();
 
     return theCanvas;

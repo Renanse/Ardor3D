@@ -11,10 +11,10 @@
 package com.ardor3d.math;
 
 import java.io.*;
+import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyRectangle3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.math.util.EqualsUtil;
 import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
@@ -200,13 +200,12 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyRectangle3)) {
+    if (!(o instanceof ReadOnlyRectangle3 comp)) {
       return false;
     }
-    final ReadOnlyRectangle3 comp = (ReadOnlyRectangle3) o;
-    return EqualsUtil.areEqual(getA(), comp.getA()) //
-        && EqualsUtil.areEqual(getB(), comp.getB()) //
-        && EqualsUtil.areEqual(getC(), comp.getC());
+    return Objects.equals(getA(), comp.getA()) //
+        && Objects.equals(getB(), comp.getB()) //
+        && Objects.equals(getC(), comp.getC());
   }
 
   // /////////////////

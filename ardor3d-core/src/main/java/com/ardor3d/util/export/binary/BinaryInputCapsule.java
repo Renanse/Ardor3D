@@ -83,7 +83,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Boolean) _fieldData.get(field._alias)).booleanValue();
+    return ((Boolean) _fieldData.get(field._alias));
   }
 
   @Override
@@ -110,7 +110,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Byte) _fieldData.get(field._alias)).byteValue();
+    return (Byte) _fieldData.get(field._alias);
   }
 
   @Override
@@ -156,7 +156,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Double) _fieldData.get(field._alias)).doubleValue();
+    return (Double) _fieldData.get(field._alias);
   }
 
   @Override
@@ -183,7 +183,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Float) _fieldData.get(field._alias)).floatValue();
+    return (Float) _fieldData.get(field._alias);
   }
 
   @Override
@@ -229,7 +229,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Integer) _fieldData.get(field._alias)).intValue();
+    return (Integer) _fieldData.get(field._alias);
   }
 
   @Override
@@ -265,7 +265,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Long) _fieldData.get(field._alias)).longValue();
+    return (Long) _fieldData.get(field._alias);
   }
 
   @Override
@@ -537,9 +537,8 @@ public class BinaryInputCapsule implements InputCapsule {
       return defVal;
     }
     Object value = _fieldData.get(field._alias);
-    if (value instanceof StringIDMap) {
+    if (value instanceof StringIDMap in) {
       // read Savable array and convert to Map values
-      final StringIDMap in = (StringIDMap) value;
       final Savable[] values = resolveIDs(in.values);
       value = stringSavableMapFromKV(in.keys, values);
       _fieldData.put(field._alias, value);
@@ -570,7 +569,7 @@ public class BinaryInputCapsule implements InputCapsule {
     if (field == null || !_fieldData.containsKey(field._alias)) {
       return defVal;
     }
-    return ((Short) _fieldData.get(field._alias)).shortValue();
+    return (Short) _fieldData.get(field._alias);
   }
 
   @Override

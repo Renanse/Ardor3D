@@ -73,8 +73,7 @@ public class Dimension {
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof Dimension) {
-      final Dimension d = (Dimension) obj;
+    if (obj instanceof Dimension d) {
       return getWidth() == d.getWidth() && getHeight() == d.getHeight();
     }
     return false;

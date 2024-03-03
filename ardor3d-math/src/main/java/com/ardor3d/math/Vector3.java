@@ -1030,13 +1030,12 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyVector3)) {
+    if (!(o instanceof ReadOnlyVector3 comp)) {
       return false;
     }
-    final ReadOnlyVector3 comp = (ReadOnlyVector3) o;
-    return EqualsUtil.areEqual(getX(), comp.getX()) //
-        && EqualsUtil.areEqual(getY(), comp.getY()) //
-        && EqualsUtil.areEqual(getZ(), comp.getZ());
+    return EqualsUtil.equals(getX(), comp.getX()) //
+        && EqualsUtil.equals(getY(), comp.getY()) //
+        && EqualsUtil.equals(getZ(), comp.getZ());
   }
 
   /**
@@ -1052,9 +1051,9 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     if (this == v) {
       return true;
     }
-    return EqualsUtil.areEqual(getX(), v.getX(), epsilon) //
-        && EqualsUtil.areEqual(getY(), v.getY(), epsilon) //
-        && EqualsUtil.areEqual(getZ(), v.getZ(), epsilon);
+    return EqualsUtil.equals(getX(), v.getX(), epsilon) //
+        && EqualsUtil.equals(getY(), v.getY(), epsilon) //
+        && EqualsUtil.equals(getZ(), v.getZ(), epsilon);
   }
 
   // /////////////////

@@ -81,8 +81,7 @@ public class UIPopupMenu extends UIContainer implements IPopOver {
 
     // clean up any state
     acceptVisitor((final Spatial spatial) -> {
-      if (spatial instanceof StateBasedUIComponent) {
-        final StateBasedUIComponent comp = (StateBasedUIComponent) spatial;
+      if (spatial instanceof StateBasedUIComponent comp) {
         comp.switchState(comp.getDefaultState());
       }
     }, true);

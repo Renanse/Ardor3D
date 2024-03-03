@@ -13,6 +13,7 @@ package com.ardor3d.ui.text;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
@@ -605,11 +606,7 @@ public class BMText extends Mesh {
       return;
     }
 
-    if (text == null) {
-      _textString = "";
-    } else {
-      _textString = text;
-    }
+    _textString = Objects.requireNonNullElse(text, "");
 
     checkBuffers(_textString);
     calculateSize(_textString);

@@ -222,11 +222,9 @@ public class QuadImposterNode extends Node {
       _corners[i].set(_center);
     }
 
-    if (worldBound instanceof BoundingBox) {
-      final BoundingBox bbox = (BoundingBox) worldBound;
+    if (worldBound instanceof BoundingBox bbox) {
       bbox.getExtent(_extents);
-    } else if (worldBound instanceof BoundingSphere) {
-      final BoundingSphere bsphere = (BoundingSphere) worldBound;
+    } else if (worldBound instanceof BoundingSphere bsphere) {
       _extents.set(bsphere.getRadius(), bsphere.getRadius(), bsphere.getRadius());
     }
 

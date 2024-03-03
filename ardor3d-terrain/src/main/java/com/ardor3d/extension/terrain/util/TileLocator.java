@@ -47,10 +47,9 @@ public class TileLocator implements Serializable {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof TileLocator)) {
+    if (!(obj instanceof TileLocator other)) {
       return false;
     }
-    final TileLocator other = (TileLocator) obj;
     if (clipmapLevel != other.clipmapLevel) {
       return false;
     }

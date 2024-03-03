@@ -81,7 +81,7 @@ public class RGBE {
 
     @Override
     public String toString() {
-      final StringBuffer buf = new StringBuffer();
+      final StringBuilder buf = new StringBuilder();
       if (isProgramTypeValid()) {
         buf.append(" Program type: ");
         buf.append(getProgramType());

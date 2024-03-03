@@ -70,14 +70,12 @@ public class RectLayout extends UILayout {
 
       // make sure child is UIComponent and has a RectLayoutData set
       final Spatial child = container.getChild(i);
-      if (!(child instanceof UIComponent)) {
+      if (!(child instanceof UIComponent childComp)) {
         continue;
       }
-      final UIComponent childComp = (UIComponent) child;
-      if (!(childComp.getLayoutData() instanceof RectLayoutData)) {
+      if (!(childComp.getLayoutData() instanceof RectLayoutData layData)) {
         continue;
       }
-      final RectLayoutData layData = (RectLayoutData) childComp.getLayoutData();
       final Vector2 rMin = layData.getRelativeMin(), rMax = layData.getRelativeMax();
       final Insets layInsets = layData.getPixelInsets();
 

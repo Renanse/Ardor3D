@@ -177,8 +177,7 @@ public class GridLayout extends UILayout {
     final List<Spatial> content = container.getChildren();
     grid = new LayoutGrid();
     for (final Spatial spatial : content) {
-      if (spatial instanceof UIComponent) {
-        final UIComponent c = (UIComponent) spatial;
+      if (spatial instanceof UIComponent c) {
         grid.add(c);
       }
     }
@@ -210,8 +209,7 @@ public class GridLayout extends UILayout {
       lc.firstRow = currentRow;
       lc.lastColumn = currentColumn;
       lc.lastRow = currentRow;
-      if (data != null && data instanceof GridLayoutData) {
-        final GridLayoutData gld = (GridLayoutData) data;
+      if (data != null && data instanceof GridLayoutData gld) {
         if (gld.getSpan() > 1) {
           if (!gld.isWrap()) {
             nextColumn += gld.getSpan();

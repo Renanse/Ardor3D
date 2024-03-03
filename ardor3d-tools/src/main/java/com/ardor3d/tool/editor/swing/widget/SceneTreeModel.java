@@ -32,8 +32,7 @@ public class SceneTreeModel implements TreeModel {
       return index == 0 ? ((UIFrame) parent).getContentPanel() : null;
     }
 
-    if (parent instanceof Node) {
-      final Node parentNode = (Node) parent;
+    if (parent instanceof Node parentNode) {
       return parentNode.getChild(index);
     }
 
@@ -46,8 +45,7 @@ public class SceneTreeModel implements TreeModel {
       return 1;
     }
 
-    if (parent instanceof Node) {
-      final Node parentNode = (Node) parent;
+    if (parent instanceof Node parentNode) {
       return parentNode.getNumberOfChildren();
     }
     return 0;
@@ -55,8 +53,7 @@ public class SceneTreeModel implements TreeModel {
 
   @Override
   public int getIndexOfChild(final Object parent, final Object child) {
-    if (parent instanceof Node && child instanceof Spatial) {
-      final Node parentNode = (Node) parent;
+    if (parent instanceof Node parentNode && child instanceof Spatial) {
       return parentNode.getChildIndex((Spatial) child);
     }
     return 0;

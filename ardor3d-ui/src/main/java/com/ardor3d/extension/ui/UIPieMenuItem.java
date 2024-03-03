@@ -52,8 +52,7 @@ public class UIPieMenuItem extends UIMenuItem {
     boolean setup = false;
     final Vector3 showAt = new Vector3(getWorldTranslation());
     final UIPieMenu subMenu = (UIPieMenu) _subMenu;
-    if (getParent() instanceof UIPieMenu) {
-      final UIPieMenu pie = (UIPieMenu) getParent();
+    if (getParent() instanceof UIPieMenu pie) {
       if (pie.getCenterItem() != this) {
         subMenu.setOuterRadius(pie.getOuterRadius() + _subMenuSize);
         subMenu.setInnerRadius(pie.getOuterRadius());

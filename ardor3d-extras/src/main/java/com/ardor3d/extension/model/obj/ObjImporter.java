@@ -163,22 +163,22 @@ public class ObjImporter {
           // final double w = argCount >= 4 ? Double.valueOf(tokens[4]) : 1.0;
 
           final Vector3 vertex =
-              new Vector3(Double.valueOf(tokens[1]), Double.valueOf(tokens[2]), Double.valueOf(tokens[3]));
+              new Vector3(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]), Double.parseDouble(tokens[3]));
           store.getDataStore().getVertices().add(vertex);
         }
 
         // if texture coords
         else if ("vt".equals(keyword)) {
-          final double v = argCount >= 2 ? Double.valueOf(tokens[2]) : 0;
-          final double w = argCount >= 3 ? Double.valueOf(tokens[3]) : 0;
-          final Vector3 coord = new Vector3(Double.valueOf(tokens[1]), v, w);
+          final double v = argCount >= 2 ? Double.parseDouble(tokens[2]) : 0;
+          final double w = argCount >= 3 ? Double.parseDouble(tokens[3]) : 0;
+          final Vector3 coord = new Vector3(Double.parseDouble(tokens[1]), v, w);
           store.getDataStore().getUvs().add(coord);
         }
 
         // if normal vector
         else if ("vn".equals(keyword)) {
           final Vector3 normal =
-              new Vector3(Double.valueOf(tokens[1]), Double.valueOf(tokens[2]), Double.valueOf(tokens[3]));
+              new Vector3(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]), Double.parseDouble(tokens[3]));
           store.getDataStore().getNormals().add(normal);
         }
 

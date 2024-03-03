@@ -11,6 +11,7 @@
 package com.ardor3d.math;
 
 import java.io.*;
+import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyRing;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -254,14 +255,13 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyRing)) {
+    if (!(o instanceof ReadOnlyRing comp)) {
       return false;
     }
-    final ReadOnlyRing comp = (ReadOnlyRing) o;
-    return EqualsUtil.areEqual(getInnerRadius(), comp.getInnerRadius()) //
-        && EqualsUtil.areEqual(getOuterRadius(), comp.getOuterRadius()) //
-        && EqualsUtil.areEqual(getUp(), comp.getUp()) //
-        && EqualsUtil.areEqual(getCenter(), comp.getCenter());
+    return EqualsUtil.equals(getInnerRadius(), comp.getInnerRadius()) //
+        && EqualsUtil.equals(getOuterRadius(), comp.getOuterRadius()) //
+        && Objects.equals(getUp(), comp.getUp()) //
+        && Objects.equals(getCenter(), comp.getCenter());
   }
 
   // /////////////////

@@ -105,7 +105,7 @@ public class SkeletalDebugger {
    */
   public static void drawSkeletons(final Spatial scene, final Renderer renderer, final boolean allowSkeletonRedraw,
       final boolean showLabels) {
-    SkeletalDebugger.drawSkeletons(scene, renderer, allowSkeletonRedraw, showLabels, new HashSet<Skeleton>());
+    SkeletalDebugger.drawSkeletons(scene, renderer, allowSkeletonRedraw, showLabels, new HashSet<>());
   }
 
   private static void drawSkeletons(final Spatial scene, final Renderer renderer, final boolean allowSkeletonRedraw,
@@ -131,8 +131,7 @@ public class SkeletalDebugger {
     }
 
     // Recurse down the scene if we're a Node and we were not flagged to ignore children.
-    if (doChildren && scene instanceof Node) {
-      final Node n = (Node) scene;
+    if (doChildren && scene instanceof Node n) {
       if (n.getNumberOfChildren() != 0) {
         for (int i = n.getNumberOfChildren(); --i >= 0;) {
           SkeletalDebugger.drawSkeletons(n.getChild(i), renderer, allowSkeletonRedraw, showLabels, alreadyDrawn);

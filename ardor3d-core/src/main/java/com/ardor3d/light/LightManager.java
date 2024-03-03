@@ -115,8 +115,7 @@ public class LightManager implements IUniformSupplier {
   public void addLights(final Spatial spat) {
     if (spat instanceof Light) {
       _lightRefs.add(new WeakReference<>((Light) spat));
-    } else if (spat instanceof Node) {
-      final var node = (Node) spat;
+    } else if (spat instanceof Node node) {
       final var children = node.getChildren();
       for (int i = 0, maxI = children.size(); i < maxI; i++) {
         addLights(children.get(i));

@@ -87,8 +87,7 @@ public class SolidArcBackdrop extends UIBackdrop {
     v.set(margin.getLeft() + border.getLeft(), margin.getBottom() + border.getBottom(), 0);
 
     final Transform t = Transform.fetchTempInstance();
-    if (comp instanceof UIPieMenuItem && comp.getParent() instanceof UIPieMenu) {
-      final UIPieMenu pie = (UIPieMenu) comp.getParent();
+    if (comp instanceof UIPieMenuItem && comp.getParent() instanceof UIPieMenu pie) {
       t.set(pie.getWorldTransform());
     } else {
       t.set(comp.getWorldTransform());
@@ -102,15 +101,12 @@ public class SolidArcBackdrop extends UIBackdrop {
 
     double size = 0, inner = 0, angle = 0, length = MathUtils.TWO_PI;
     boolean ignoreArcEdges = true;
-    if (comp instanceof UIPieMenu) {
-      final UIPieMenu pie = (UIPieMenu) comp;
+    if (comp instanceof UIPieMenu pie) {
       size = pie.getOuterRadius() - 2;
       length = pie.getTotalArcLength();
       inner = pie.getInnerRadius();
       angle = pie.getStartAngle();
-    } else if (comp instanceof UIPieMenuItem && comp.getParent() instanceof UIPieMenu) {
-      final UIPieMenuItem item = (UIPieMenuItem) comp;
-      final UIPieMenu pie = (UIPieMenu) comp.getParent();
+    } else if (comp instanceof UIPieMenuItem item && comp.getParent() instanceof UIPieMenu pie) {
       if (pie.getCenterItem() == item) {
         size = pie.getInnerRadius();
       } else {

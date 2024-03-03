@@ -54,16 +54,14 @@ public class ValuePanel extends JPanel {
     _slabel.setEnabled(enabled);
   }
 
-  public void setValue(final double value) {
-    _spinner.setValue(Double.valueOf(value));
-  }
+  public void setValue(final double value) { _spinner.setValue(value); }
 
   public void setValue(final float value) {
-    _spinner.setValue(Float.valueOf(value));
+    _spinner.setValue(value);
   }
 
   public void setValue(final int value) {
-    _spinner.setValue(Integer.valueOf(value));
+    _spinner.setValue(value);
   }
 
   public double getDoubleValue() { return ((Number) _spinner.getValue()).floatValue(); }

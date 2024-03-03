@@ -11,6 +11,7 @@
 package com.ardor3d.math;
 
 import java.io.*;
+import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -309,14 +310,13 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ReadOnlyTriangle)) {
+    if (!(o instanceof ReadOnlyTriangle comp)) {
       return false;
     }
-    final ReadOnlyTriangle comp = (ReadOnlyTriangle) o;
-    return EqualsUtil.areEqual(_index, comp.getIndex()) //
-        && EqualsUtil.areEqual(_pointA, comp.getA()) //
-        && EqualsUtil.areEqual(_pointB, comp.getB()) //
-        && EqualsUtil.areEqual(_pointC, comp.getC());
+    return _index == comp.getIndex() //
+        && Objects.equals(_pointA, comp.getA()) //
+        && Objects.equals(_pointB, comp.getB()) //
+        && Objects.equals(_pointC, comp.getC());
   }
 
   // /////////////////

@@ -10,6 +10,8 @@
 
 package com.ardor3d.framework;
 
+import java.util.Objects;
+
 public class DisplaySettings {
   private final int _width;
   private final int _height;
@@ -213,8 +215,7 @@ public class DisplaySettings {
     return _colorDepth == that._colorDepth && _frequency == that._frequency && _fullScreen != that._fullScreen
         && _height != that._height && _width != that._width && _alphaBits != that._alphaBits
         && _depthBits != that._depthBits && _stencilBits != that._stencilBits && _samples != that._samples
-        && _stereo != that._stereo && ((_shareContext == that._shareContext)
-            || (_shareContext != null && _shareContext.equals(that._shareContext)));
+        && _stereo != that._stereo && (Objects.equals(_shareContext, that._shareContext));
   }
 
   @Override

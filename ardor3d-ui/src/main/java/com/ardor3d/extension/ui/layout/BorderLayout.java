@@ -41,10 +41,9 @@ public class BorderLayout extends UILayout {
     // Go through each component in the given container and determine the width and height of our edges.
     final Rectangle2 store = new Rectangle2();
     for (final Spatial s : content) {
-      if (!(s instanceof UIComponent)) {
+      if (!(s instanceof UIComponent comp)) {
         continue;
       }
-      final UIComponent comp = (UIComponent) s;
       comp.getRelativeMinComponentBounds(store);
 
       final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
@@ -72,10 +71,9 @@ public class BorderLayout extends UILayout {
     // Using the information from the last pass, set the position and size of each component in the
     // container.
     for (final Spatial s : content) {
-      if (!(s instanceof UIComponent)) {
+      if (!(s instanceof UIComponent comp)) {
         continue;
       }
-      final UIComponent comp = (UIComponent) s;
       comp.getRelativeMinComponentBounds(store);
 
       final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
@@ -125,10 +123,9 @@ public class BorderLayout extends UILayout {
     if (content != null) {
       final Rectangle2 store = new Rectangle2();
       for (final Spatial s : content) {
-        if (!(s instanceof UIComponent)) {
+        if (!(s instanceof UIComponent comp)) {
           continue;
         }
-        final UIComponent comp = (UIComponent) s;
         comp.getRelativeMinComponentBounds(store);
         final BorderLayoutData bld = (BorderLayoutData) comp.getLayoutData();
         if (bld == null) {
@@ -154,10 +151,9 @@ public class BorderLayout extends UILayout {
     if (content != null) {
       final Rectangle2 store = new Rectangle2();
       for (final Spatial s : content) {
-        if (!(s instanceof UIComponent)) {
+        if (!(s instanceof UIComponent comp)) {
           continue;
         }
-        final UIComponent comp = (UIComponent) s;
         comp.getRelativeMinComponentBounds(store);
         final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
         if (data == BorderLayoutData.EAST || data == BorderLayoutData.WEST || data == BorderLayoutData.CENTER
