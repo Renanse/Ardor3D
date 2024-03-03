@@ -217,8 +217,8 @@ public class BMTextBackground extends Mesh implements BMTextChangeListener {
     final BMText.Align align = text.getAlign();
     float x = size.getXf() * align.horizontal;
     float y = size.getYf() * align.vertical;
-    x += fixedOffset.getX();
-    y += fixedOffset.getY();
+    x += fixedOffset.getXf();
+    y += fixedOffset.getYf();
     float xs = x + size.getXf();
     float ys = y + size.getYf();
 

@@ -95,7 +95,7 @@ public class ColladaNodeUtils {
       for (final JointNode jointChildNode : _dataCache.getRootJointNode().getChildren()) {
         final List<Joint> jointList = new ArrayList<>();
         buildJointLists(jointChildNode, jointList);
-        final Joint[] joints = jointList.toArray(new Joint[jointList.size()]);
+        final Joint[] joints = jointList.toArray(new Joint[0]);
         final Skeleton skeleton = new Skeleton(joints[0].getName() + "_skeleton", joints);
         if (logger.isLoggable(Level.FINE)) {
           logger.fine("skeleton created: " + skeleton.getName());

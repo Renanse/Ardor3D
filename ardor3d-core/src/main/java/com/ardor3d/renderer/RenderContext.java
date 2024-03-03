@@ -28,7 +28,7 @@ import com.ardor3d.scenegraph.SceneIndexer;
  */
 public class RenderContext {
 
-  public class RenderContextRef extends Object {}
+  public static class RenderContextRef {}
 
   /** List of states that override any set states on a spatial if not null. */
   protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates =
@@ -88,8 +88,7 @@ public class RenderContext {
   }
 
   protected RendererRecord createRendererRecord() {
-    final RendererRecord rendererRecord = new RendererRecord();
-    return rendererRecord;
+    return new RendererRecord();
   }
 
   protected void setupRecords() {
@@ -240,7 +239,7 @@ public class RenderContext {
   }
 
   public void pushFBOTextureRenderer(final AbstractFBOTextureRenderer top) {
-    if (_textureRenderers.size() > 0) {
+    if (!_textureRenderers.isEmpty()) {
       _textureRenderers.peek().deactivate();
     }
     _textureRenderers.push(top);
@@ -250,7 +249,7 @@ public class RenderContext {
   public void popFBOTextureRenderer() {
     AbstractFBOTextureRenderer top = _textureRenderers.pop();
     top.deactivate();
-    if (_textureRenderers.size() > 0) {
+    if (!_textureRenderers.isEmpty()) {
       top = _textureRenderers.peek();
       top.activate();
     }

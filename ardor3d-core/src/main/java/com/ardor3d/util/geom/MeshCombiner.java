@@ -443,6 +443,6 @@ class IndexCombiner {
     }
 
     data.setIndexLengths(sectionCounts);
-    data.setIndexModes(modes.toArray(new IndexMode[modes.size()]));
+    data.setIndexModes(modes.toArray(new IndexMode[0]));
   }
 }

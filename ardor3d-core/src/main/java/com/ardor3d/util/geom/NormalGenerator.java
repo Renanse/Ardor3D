@@ -11,11 +11,7 @@
 package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.logging.Logger;
 
 import com.ardor3d.buffer.BufferUtils;
@@ -145,14 +141,14 @@ public class NormalGenerator {
 
     // Set up the arrays for reconstructing the mesh: Vertices,
     // texture coordinates, colors, normals and indices
-    _splitVerts = _destVerts.toArray(new Vector3[_destVerts.size()]);
+    _splitVerts = _destVerts.toArray(new Vector3[0]);
     if (_destColors != null) {
-      _splitColors = _destColors.toArray(new ColorRGBA[_destColors.size()]);
+      _splitColors = _destColors.toArray(new ColorRGBA[0]);
     } else {
       _splitColors = null;
     }
     if (_destTexCoords != null) {
-      _splitTexCoords = _destTexCoords.toArray(new Vector2[_destTexCoords.size()]);
+      _splitTexCoords = _destTexCoords.toArray(new Vector2[0]);
     } else {
       _splitTexCoords = null;
     }
@@ -252,22 +248,16 @@ public class NormalGenerator {
   private void initialize() {
     // Copy the source vertices as a base for the normal generation
     _destVerts = new ArrayList<>(_sourceVerts.length);
-    for (int i = 0; i < _sourceVerts.length; i++) {
-      _destVerts.add(_sourceVerts[i]);
-    }
+    _destVerts.addAll(Arrays.asList(_sourceVerts));
     if (_sourceColors != null) {
       _destColors = new ArrayList<>(_sourceColors.length);
-      for (int i = 0; i < _sourceColors.length; i++) {
-        _destColors.add(_sourceColors[i]);
-      }
+      Collections.addAll(_destColors, _sourceColors);
     } else {
       _destColors = null;
     }
     if (_sourceTexCoords != null) {
       _destTexCoords = new ArrayList<>(_sourceTexCoords.length);
-      for (int i = 0; i < _sourceTexCoords.length; i++) {
-        _destTexCoords.add(_sourceTexCoords[i]);
-      }
+      Collections.addAll(_destTexCoords, _sourceTexCoords);
     } else {
       _destTexCoords = null;
     }

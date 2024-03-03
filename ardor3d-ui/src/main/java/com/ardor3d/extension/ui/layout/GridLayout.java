@@ -209,7 +209,7 @@ public class GridLayout extends UILayout {
       lc.firstRow = currentRow;
       lc.lastColumn = currentColumn;
       lc.lastRow = currentRow;
-      if (data != null && data instanceof GridLayoutData gld) {
+      if (data instanceof GridLayoutData gld) {
         if (gld.getSpan() > 1) {
           if (!gld.isWrap()) {
             nextColumn += gld.getSpan();

@@ -241,9 +241,9 @@ public class TransformChannel extends AbstractAnimationChannel {
       timesArray[i++] = time;
     }
     // return
-    return newChannel(name, timesArray, rotations.toArray(new ReadOnlyQuaternion[rotations.size()]),
-        translations.toArray(new ReadOnlyVector3[translations.size()]),
-        scales.toArray(new ReadOnlyVector3[scales.size()]));
+    return newChannel(name, timesArray, rotations.toArray(new ReadOnlyQuaternion[0]),
+        translations.toArray(new ReadOnlyVector3[0]),
+        scales.toArray(new ReadOnlyVector3[0]));
   }
 
   public ImmutableList<ReadOnlyVector3> getTranslations() { return ImmutableList.copyOf(_translations); }

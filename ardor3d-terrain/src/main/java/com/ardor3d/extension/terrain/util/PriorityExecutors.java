@@ -74,7 +74,7 @@ public class PriorityExecutors {
           : PriorityRunnable.of(runnable, DEFAULT_PRIORITY);
     }
 
-    private class ComparableFutureTask<T> extends FutureTask<T> implements ComparableTask {
+    private static class ComparableFutureTask<T> extends FutureTask<T> implements ComparableTask {
       private final Long sequentialOrder = instanceCounter.getAndIncrement();
       private final HasPriority hasPriority;
 

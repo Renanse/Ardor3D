@@ -18,11 +18,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -388,9 +384,7 @@ public class BinaryInputCapsule implements InputCapsule {
       return null;
     }
     final List<Savable> list = new ArrayList<>(savables.length);
-    for (int x = 0; x < savables.length; x++) {
-      list.add(savables[x]);
-    }
+    Collections.addAll(list, savables);
     return list;
   }
 
@@ -1141,169 +1135,50 @@ public class BinaryInputCapsule implements InputCapsule {
 
   protected boolean readContentOfType(final byte[] content, final byte type, final AtomicReference<Object> reference)
       throws IOException {
-    switch (type) {
-      case BinaryClassField.BITSET: {
-        reference.set(readBitSet(content));
-        return true;
-      }
-      case BinaryClassField.BOOLEAN: {
-        reference.set(readBoolean(content));
-        return true;
-      }
-      case BinaryClassField.BOOLEAN_1D: {
-        reference.set(readBooleanArray(content));
-        return true;
-      }
-      case BinaryClassField.BOOLEAN_2D: {
-        reference.set(readBooleanArray2D(content));
-        return true;
-      }
-      case BinaryClassField.BYTE: {
-        reference.set(readByte(content));
-        return true;
-      }
-      case BinaryClassField.BYTE_1D: {
-        reference.set(readByteArray(content));
-        return true;
-      }
-      case BinaryClassField.BYTE_2D: {
-        reference.set(readByteArray2D(content));
-        return true;
-      }
-      case BinaryClassField.BYTEBUFFER: {
-        reference.set(readByteBuffer(content));
-        return true;
-      }
-      case BinaryClassField.DOUBLE: {
-        reference.set(readDouble(content));
-        return true;
-      }
-      case BinaryClassField.DOUBLE_1D: {
-        reference.set(readDoubleArray(content));
-        return true;
-      }
-      case BinaryClassField.DOUBLE_2D: {
-        reference.set(readDoubleArray2D(content));
-        return true;
-      }
-      case BinaryClassField.FLOAT: {
-        reference.set(readFloat(content));
-        return true;
-      }
-      case BinaryClassField.FLOAT_1D: {
-        reference.set(readFloatArray(content));
-        return true;
-      }
-      case BinaryClassField.FLOAT_2D: {
-        reference.set(readFloatArray2D(content));
-        return true;
-      }
-      case BinaryClassField.FLOATBUFFER: {
-        reference.set(readFloatBuffer(content));
-        return true;
-      }
-      case BinaryClassField.FLOATBUFFER_ARRAYLIST: {
-        reference.set(readFloatBufferArrayList(content));
-        return true;
-      }
-      case BinaryClassField.BYTEBUFFER_ARRAYLIST: {
-        reference.set(readByteBufferArrayList(content));
-        return true;
-      }
-      case BinaryClassField.INT: {
-        reference.set(readInt(content));
-        return true;
-      }
-      case BinaryClassField.INT_1D: {
-        reference.set(readIntArray(content));
-        return true;
-      }
-      case BinaryClassField.INT_2D: {
-        reference.set(readIntArray2D(content));
-        return true;
-      }
-      case BinaryClassField.INTBUFFER: {
-        reference.set(readIntBuffer(content));
-        return true;
-      }
-      case BinaryClassField.LONG: {
-        reference.set(readLong(content));
-        return true;
-      }
-      case BinaryClassField.LONG_1D: {
-        reference.set(readLongArray(content));
-        return true;
-      }
-      case BinaryClassField.LONG_2D: {
-        reference.set(readLongArray2D(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE: {
-        reference.set(readSavable(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE_1D: {
-        reference.set(readSavableArray(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE_2D: {
-        reference.set(readSavableArray2D(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE_ARRAYLIST: {
-        reference.set(readSavableArray(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE_ARRAYLIST_1D: {
-        reference.set(readSavableArray2D(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE_ARRAYLIST_2D: {
-        reference.set(readSavableArray3D(content));
-        return true;
-      }
-      case BinaryClassField.SAVABLE_MAP: {
-        reference.set(readSavableMap(content));
-        return true;
-      }
-      case BinaryClassField.STRING_SAVABLE_MAP: {
-        reference.set(readStringSavableMap(content));
-        return true;
-      }
-      case BinaryClassField.STRING_OBJECT_MAP: {
-        reference.set(readStringObjectMap(content));
-        return true;
-      }
-      case BinaryClassField.SHORT: {
-        reference.set(readShort(content));
-        return true;
-      }
-      case BinaryClassField.SHORT_1D: {
-        reference.set(readShortArray(content));
-        return true;
-      }
-      case BinaryClassField.SHORT_2D: {
-        reference.set(readShortArray2D(content));
-        return true;
-      }
-      case BinaryClassField.SHORTBUFFER: {
-        reference.set(readShortBuffer(content));
-        return true;
-      }
-      case BinaryClassField.STRING: {
-        reference.set(readString(content));
-        return true;
-      }
-      case BinaryClassField.STRING_1D: {
-        reference.set(readStringArray(content));
-        return true;
-      }
-      case BinaryClassField.STRING_2D: {
-        reference.set(readStringArray2D(content));
-        return true;
-      }
-    }
-    return false;
+    return switch (type) {
+      case BinaryClassField.BITSET -> { reference.set(readBitSet(content)); yield true; }
+      case BinaryClassField.BOOLEAN -> { reference.set(readBoolean(content)); yield true; }
+      case BinaryClassField.BOOLEAN_1D -> { reference.set(readBooleanArray(content)); yield true; }
+      case BinaryClassField.BOOLEAN_2D -> { reference.set(readBooleanArray2D(content)); yield true; }
+      case BinaryClassField.BYTE -> { reference.set(readByte(content)); yield true; }
+      case BinaryClassField.BYTE_1D -> { reference.set(readByteArray(content)); yield true; }
+      case BinaryClassField.BYTE_2D -> { reference.set(readByteArray2D(content)); yield true; }
+      case BinaryClassField.BYTEBUFFER -> { reference.set(readByteBuffer(content)); yield true; }
+      case BinaryClassField.DOUBLE -> { reference.set(readDouble(content)); yield true; }
+      case BinaryClassField.DOUBLE_1D -> { reference.set(readDoubleArray(content)); yield true; }
+      case BinaryClassField.DOUBLE_2D -> { reference.set(readDoubleArray2D(content)); yield true; }
+      case BinaryClassField.FLOAT -> { reference.set(readFloat(content)); yield true; }
+      case BinaryClassField.FLOAT_1D -> { reference.set(readFloatArray(content)); yield true; }
+      case BinaryClassField.FLOAT_2D -> { reference.set(readFloatArray2D(content)); yield true; }
+      case BinaryClassField.FLOATBUFFER -> { reference.set(readFloatBuffer(content)); yield true; }
+      case BinaryClassField.FLOATBUFFER_ARRAYLIST -> { reference.set(readFloatBufferArrayList(content)); yield true; }
+      case BinaryClassField.BYTEBUFFER_ARRAYLIST -> { reference.set(readByteBufferArrayList(content)); yield true; }
+      case BinaryClassField.INT -> { reference.set(readInt(content)); yield true; }
+      case BinaryClassField.INT_1D -> { reference.set(readIntArray(content)); yield true; }
+      case BinaryClassField.INT_2D -> { reference.set(readIntArray2D(content)); yield true; }
+      case BinaryClassField.INTBUFFER -> { reference.set(readIntBuffer(content)); yield true; }
+      case BinaryClassField.LONG -> { reference.set(readLong(content)); yield true; }
+      case BinaryClassField.LONG_1D -> { reference.set(readLongArray(content)); yield true; }
+      case BinaryClassField.LONG_2D -> { reference.set(readLongArray2D(content)); yield true; }
+      case BinaryClassField.SAVABLE -> { reference.set(readSavable(content)); yield true; }
+      case BinaryClassField.SAVABLE_1D -> { reference.set(readSavableArray(content)); yield true; }
+      case BinaryClassField.SAVABLE_2D -> { reference.set(readSavableArray2D(content)); yield true; }
+      case BinaryClassField.SAVABLE_ARRAYLIST -> { reference.set(readSavableArray(content)); yield true; }
+      case BinaryClassField.SAVABLE_ARRAYLIST_1D -> { reference.set(readSavableArray2D(content)); yield true; }
+      case BinaryClassField.SAVABLE_ARRAYLIST_2D -> { reference.set(readSavableArray3D(content)); yield true; }
+      case BinaryClassField.SAVABLE_MAP -> { reference.set(readSavableMap(content)); yield true; }
+      case BinaryClassField.STRING_SAVABLE_MAP -> { reference.set(readStringSavableMap(content)); yield true; }
+      case BinaryClassField.STRING_OBJECT_MAP -> { reference.set(readStringObjectMap(content)); yield true; }
+      case BinaryClassField.SHORT -> { reference.set(readShort(content)); yield true; }
+      case BinaryClassField.SHORT_1D -> { reference.set(readShortArray(content)); yield true; }
+      case BinaryClassField.SHORT_2D -> { reference.set(readShortArray2D(content)); yield true; }
+      case BinaryClassField.SHORTBUFFER -> { reference.set(readShortBuffer(content)); yield true; }
+      case BinaryClassField.STRING -> { reference.set(readString(content)); yield true; }
+      case BinaryClassField.STRING_1D -> { reference.set(readStringArray(content)); yield true; }
+      case BinaryClassField.STRING_2D -> { reference.set(readStringArray2D(content)); yield true; }
+      default -> false;
+    };
+
   }
 
   // ArrayList<FloatBuffer>

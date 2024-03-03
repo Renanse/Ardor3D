@@ -362,14 +362,8 @@ public enum HttpImageCache {
   }
 
   List<ImageCacheItem> createSortedList() {
-    final List<ImageCacheItem> returnList = new ArrayList<>();
-
-    for (final ImageCacheItem value : MemoryCache.values()) {
-      returnList.add(value);
-    }
-
+    final List<ImageCacheItem> returnList = new ArrayList<>(MemoryCache.values());
     returnList.sort(DateCompare);
-
     return returnList;
   }
 
@@ -414,7 +408,7 @@ public enum HttpImageCache {
     }
   }
 
-  private class ImageCacheItem {
+  private static class ImageCacheItem {
     private final String id;
     private final String type;
     private final boolean flipped;

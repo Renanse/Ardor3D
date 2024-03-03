@@ -52,6 +52,7 @@ public final class ControllerComponentCondition implements Predicate<TwoInputSta
       for (final ControllerEvent event : events) {
         if (event.getControllerName().equals(controllerName) && event.getComponentName().equals(componentName)) {
           apply = true;
+          break;
         }
       }
     }

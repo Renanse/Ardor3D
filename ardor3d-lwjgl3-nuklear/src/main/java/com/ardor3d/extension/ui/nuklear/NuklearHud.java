@@ -561,7 +561,7 @@ public class NuklearHud extends Spatial implements Renderable {
             (int) cmd.clip_rect().w(), //
             (int) cmd.clip_rect().h());
         GL11C.glDrawElements(GL11C.GL_TRIANGLES, cmd.elem_count(), GL11C.GL_UNSIGNED_SHORT, offset);
-        offset += cmd.elem_count() * 2;
+        offset += cmd.elem_count() * 2L;
       }
       nk_clear(_ctx);
     }

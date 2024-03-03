@@ -739,10 +739,7 @@ final class NvStripifier {
         // we're not just doing a tempStrips.add(allBigStrips.get(i)) because
         // this way we can delete allBigStrips later to free the memory
         currentStrip = new NvStripInfo(startInfo, 0, -1);
-
-        for (int j = 0; j < allStripI._faces.size(); j++) {
-          currentStrip._faces.add(allStripI._faces.get(j));
-        }
+        currentStrip._faces.addAll(allStripI._faces);
 
         tempStrips.add(currentStrip);
       }
@@ -877,9 +874,7 @@ final class NvStripifier {
       final NvStripInfo allStripI = allStrips.get(i);
       if (allStripI._faces.size() < _minStripLength) {
         // strip is too small, add faces to faceList
-        for (int j = 0; j < allStripI._faces.size(); j++) {
-          tempFaceList.add(allStripI._faces.get(j));
-        }
+        tempFaceList.addAll(allStripI._faces);
       } else {
         allBigStrips.add(allStripI);
       }

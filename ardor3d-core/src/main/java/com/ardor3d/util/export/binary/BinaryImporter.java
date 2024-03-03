@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -191,16 +192,13 @@ public class BinaryImporter implements Ardor3dImporter {
   protected String readString(final InputStream is, final int length) throws IOException {
     final byte[] data = new byte[length];
     is.read(data, 0, length);
-    return new String(data);
+    return new String(data, StandardCharsets.UTF_8);
   }
 
   protected String readString(final int length, final int offset) throws IOException {
     final byte[] data = new byte[length];
-    for (int j = 0; j < length; j++) {
-      data[j] = _dataArray[j + offset];
-    }
-
-    return new String(data);
+    System.arraycopy(_dataArray, offset, data, 0, length);
+    return new String(data, StandardCharsets.UTF_8);
   }
 
   public Savable readObject(final int id) {

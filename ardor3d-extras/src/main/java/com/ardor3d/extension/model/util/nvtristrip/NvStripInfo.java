@@ -249,10 +249,7 @@ final class NvStripInfo {
 
     // tempAllFaces is going to be forwardFaces + backwardFaces
     // it's used for Unique()
-    final List<NvFaceInfo> tempAllFaces = new ArrayList<>();
-    for (int i = 0; i < forwardFaces.size(); i++) {
-      tempAllFaces.add(forwardFaces.get(i));
-    }
+    final List<NvFaceInfo> tempAllFaces = new ArrayList<>(forwardFaces);
 
     //
     // reset the indices for building the strip backwards and do so

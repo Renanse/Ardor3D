@@ -562,19 +562,11 @@ public class BMText extends Mesh {
   }
 
   protected float getJustificationXOffset(final int lineIndex) {
-    float cursorX = 0;
-    switch (_justify) {
-      case Left:
-        cursorX = 0;
-        break;
-      case Center:
-        cursorX = 0.5f * (_size.getXf() - _lineWidths[lineIndex]);
-        break;
-      case Right:
-        cursorX = _size.getXf() - _lineWidths[lineIndex];
-        break;
-    }
-    return cursorX;
+    return switch (_justify) {
+      case Left -> 0;
+      case Center -> 0.5f * (_size.getXf() - _lineWidths[lineIndex]);
+      case Right -> _size.getXf() - _lineWidths[lineIndex];
+    };
   }
 
   public BMFont getFont() { return _font; }
@@ -629,8 +621,8 @@ public class BMText extends Mesh {
     float alignY = _size.getYf() * _align.vertical;
     alignX = Math.round(alignX);
     alignY = Math.round(alignY);
-    alignX += _fixedOffset.getX();
-    alignY += _fixedOffset.getY();
+    alignX += _fixedOffset.getXf();
+    alignY += _fixedOffset.getYf();
 
     final int strLen = _textString.length();
     for (int i = 0; i < strLen; i++) {

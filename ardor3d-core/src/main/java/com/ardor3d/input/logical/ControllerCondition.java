@@ -43,6 +43,7 @@ public final class ControllerCondition implements Predicate<TwoInputStates> {
       for (final ControllerEvent event : events) {
         if (event.getControllerName().equals(controllerName)) {
           apply = true;
+          break;
         }
       }
     }

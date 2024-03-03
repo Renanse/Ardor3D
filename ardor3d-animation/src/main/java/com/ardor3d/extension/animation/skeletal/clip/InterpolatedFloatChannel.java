@@ -145,7 +145,7 @@ public class InterpolatedFloatChannel extends AbstractAnimationChannel {
     super.read(capsule);
     final float[] values = capsule.readFloatArray("values", null);
     try {
-      final Field field1 = TriggerChannel.class.getDeclaredField("_values");
+      final Field field1 = InterpolatedFloatChannel.class.getDeclaredField("_values");
       field1.setAccessible(true);
       field1.set(this, values);
     } catch (final Exception e) {

@@ -770,7 +770,7 @@ public class ColladaAnimUtils {
     for (int i = 0; i < finalTimeList.size(); i++) {
       time[i] = finalTimeList.get(i);
     }
-    final Transform[] transforms = finalTransformList.toArray(new Transform[finalTransformList.size()]);
+    final Transform[] transforms = finalTransformList.toArray(new Transform[0]);
 
     AnimationClip animationClip = animationItemRoot.getAnimationClip();
     if (animationClip == null) {

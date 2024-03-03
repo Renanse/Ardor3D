@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.ardor3d.util.export.InputCapsule;
@@ -99,7 +100,7 @@ public class Image implements Serializable, Savable {
    */
   public Image(final ImageDataFormat format, final PixelDataType type, final int width, final int height,
     final ByteBuffer data, final int[] mipMapSizes) {
-    this(format, type, width, height, Arrays.asList(data), mipMapSizes);
+    this(format, type, width, height, Collections.singletonList(data), mipMapSizes);
   }
 
   /**
@@ -123,7 +124,7 @@ public class Image implements Serializable, Savable {
    * @param data
    *          the data that contains the image information.
    */
-  public void setData(final ByteBuffer data) { _data = Arrays.asList(data); }
+  public void setData(final ByteBuffer data) { _data = Collections.singletonList(data); }
 
   /**
    * Adds the given buffer onto the current list of image data

@@ -55,7 +55,7 @@ public class GuaranteedTriggerChannel extends TriggerChannel {
           triggers.add(_keys[i]);
         }
       }
-      triggerData.arm(newIndex, triggers.toArray(new String[triggers.size()]));
+      triggerData.arm(newIndex, triggers.toArray(new String[0]));
     }
   }
 
@@ -116,7 +116,7 @@ public class GuaranteedTriggerChannel extends TriggerChannel {
       timesArray[i++] = time;
     }
     // return
-    return new GuaranteedTriggerChannel(name, timesArray, keys.toArray(new String[keys.size()]));
+    return new GuaranteedTriggerChannel(name, timesArray, keys.toArray(new String[0]));
   }
 
   // /////////////////

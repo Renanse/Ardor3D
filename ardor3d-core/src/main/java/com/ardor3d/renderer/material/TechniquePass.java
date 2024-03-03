@@ -62,7 +62,7 @@ public class TechniquePass {
     if (_shaderIdCache != null) {
       final Integer id = _shaderIdCache.getValue(context.getSharableContextRef());
       if (id != null) {
-        return id.intValue();
+        return id;
       }
     }
     return 0;
@@ -250,8 +250,8 @@ public class TechniquePass {
   }
 
   private List<UniformRef> getUniformsFromSupplier(final UniformRef uniform, final Mesh mesh) {
-    Object supplier = null;
-    String clazzName = null;
+    Object supplier;
+    String clazzName;
     switch (uniform.getSource()) {
       case SpatialProperty:
         supplier = mesh.getProperty(uniform.getValue().toString(), uniform.getDefaultValue());
@@ -265,7 +265,7 @@ public class TechniquePass {
           supplier = lm;
           clazzName = null;
         } else if (prop == Ardor3dStateProperty.Light) {
-          final int index = (!(uniform.getExtra() instanceof Integer)) ? 0 : ((Integer) uniform.getExtra()).intValue();
+          final int index = (!(uniform.getExtra() instanceof Integer)) ? 0 : (Integer) uniform.getExtra();
           // grab the appropriate light from the current SceneIndexer's LightManager
           supplier = lm != null ? lm.getCurrentLight(index) : null;
           // defaults to point light if we don't get a supplier

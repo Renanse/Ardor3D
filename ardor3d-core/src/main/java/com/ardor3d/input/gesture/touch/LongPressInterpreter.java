@@ -74,6 +74,7 @@ public class LongPressInterpreter extends AbstractTouchInterpreter {
             for (final String id : _lastArmedIds) {
               if (t.id.equals(id)) {
                 found = true;
+                break;
               }
             }
             if (!found) {

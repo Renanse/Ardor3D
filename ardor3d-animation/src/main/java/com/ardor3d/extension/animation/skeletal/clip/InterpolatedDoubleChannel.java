@@ -146,7 +146,7 @@ public class InterpolatedDoubleChannel extends AbstractAnimationChannel {
     super.read(capsule);
     final double[] values = capsule.readDoubleArray("values", null);
     try {
-      final Field field1 = TriggerChannel.class.getDeclaredField("_values");
+      final Field field1 = InterpolatedDoubleChannel.class.getDeclaredField("_values");
       field1.setAccessible(true);
       field1.set(this, values);
     } catch (final Exception e) {

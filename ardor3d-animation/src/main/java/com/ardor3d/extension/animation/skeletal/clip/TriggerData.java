@@ -11,6 +11,7 @@
 package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,9 +58,7 @@ public class TriggerData {
       _armed = false;
     } else if (index != _currentIndex) {
       _currentTriggers.clear();
-      for (final String t : triggers) {
-        _currentTriggers.add(t);
-      }
+      _currentTriggers.addAll(Arrays.asList(triggers));
       _armed = true;
     }
     _currentIndex = index;

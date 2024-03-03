@@ -12,14 +12,7 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.jdom2.Attribute;
@@ -142,9 +135,7 @@ public class ColladaImporter {
 
   public void setOptimizeSettings(final MatchCondition... optimizeSettings) {
     _optimizeSettings.clear();
-    for (final MatchCondition cond : optimizeSettings) {
-      _optimizeSettings.add(cond);
-    }
+    _optimizeSettings.addAll(Arrays.asList(optimizeSettings));
   }
 
   /**

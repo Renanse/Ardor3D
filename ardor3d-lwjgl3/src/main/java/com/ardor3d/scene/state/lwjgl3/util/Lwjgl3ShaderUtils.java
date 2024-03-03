@@ -150,20 +150,14 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
   }
 
   public static int getGLShaderType(final ShaderType type) {
-    switch (type) {
-      case Fragment:
-        return GL20C.GL_FRAGMENT_SHADER;
-      case Geometry:
-        return GL32C.GL_GEOMETRY_SHADER;
-      case TessellationControl:
-        return GL40C.GL_TESS_CONTROL_SHADER;
-      case TessellationEvaluation:
-        return GL40C.GL_TESS_EVALUATION_SHADER;
-      case Vertex:
-        return GL20C.GL_VERTEX_SHADER;
-      default:
-        throw new Ardor3dException("Unhandled shader type: " + type);
-    }
+    return switch (type) {
+      case Fragment -> GL20C.GL_FRAGMENT_SHADER;
+      case Geometry -> GL32C.GL_GEOMETRY_SHADER;
+      case TessellationControl -> GL40C.GL_TESS_CONTROL_SHADER;
+      case TessellationEvaluation -> GL40C.GL_TESS_EVALUATION_SHADER;
+      case Vertex -> GL20C.GL_VERTEX_SHADER;
+      default -> throw new Ardor3dException("Unhandled shader type: " + type);
+    };
   }
 
   private static int prepareShader(final List<String> info, final ShaderType type) {
@@ -175,11 +169,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     final int shaderId = GL20C.glCreateShader(Lwjgl3ShaderUtils.getGLShaderType(type));
 
     // provide our source code
-    try {
-      GL20C.glShaderSource(shaderId, info.toArray(new String[info.size()]));
-    } catch (final NullPointerException ex) {
-      throw new Ardor3dException("Shader of type '" + type.name() + "' was null.");
-    }
+    GL20C.glShaderSource(shaderId, info.toArray(new String[0]));
 
     // compile
     GL20C.glCompileShader(shaderId);
@@ -244,7 +234,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         case Ardor3dState:
           // use default in getValue
           value = getValue(mesh, (Ardor3dStateProperty) uniform.getValue(), uniform.getExtra(),
-              uniform.getDefaultValue(), stack, _renderer);
+              uniform.getDefaultValue(), stack);
           break;
         case Function:
           // send default to function
@@ -462,30 +452,11 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
           return stack.mallocInt(1).put(((Enum<?>) value).ordinal()).flip();
         }
         return (IntBuffer) value;
-      case Int2:
-      case UInt2:
+      case Int2, UInt2, Int3, UInt3, Int4, UInt4:
         return (IntBuffer) value;
-      case Int3:
-      case UInt3:
-        return (IntBuffer) value;
-      case Int4:
-      case UInt4:
-        return (IntBuffer) value;
-      case Matrix2x2:
+      case Matrix2x2, Matrix2x3, Matrix2x4, Matrix3x2, Matrix3x4, Matrix4x2, Matrix4x3:
         return (FloatBuffer) value;
-      case Matrix2x2D:
-        return (DoubleBuffer) value;
-      case Matrix2x3:
-        return (FloatBuffer) value;
-      case Matrix2x3D:
-        return (DoubleBuffer) value;
-      case Matrix2x4:
-        return (FloatBuffer) value;
-      case Matrix2x4D:
-        return (DoubleBuffer) value;
-      case Matrix3x2:
-        return (FloatBuffer) value;
-      case Matrix3x2D:
+      case Matrix2x2D, Matrix2x3D, Matrix2x4D, Matrix3x2D, Matrix3x4D, Matrix4x2D, Matrix4x3D:
         return (DoubleBuffer) value;
       case Matrix3x3:
         if (value instanceof Matrix3 mat) {
@@ -514,18 +485,6 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
           }
           return buff.flip();
         }
-        return (DoubleBuffer) value;
-      case Matrix3x4:
-        return (FloatBuffer) value;
-      case Matrix3x4D:
-        return (DoubleBuffer) value;
-      case Matrix4x2:
-        return (FloatBuffer) value;
-      case Matrix4x2D:
-        return (DoubleBuffer) value;
-      case Matrix4x3:
-        return (FloatBuffer) value;
-      case Matrix4x3D:
         return (DoubleBuffer) value;
       case Matrix4x4:
         if (value instanceof Matrix4 mat) {
@@ -562,7 +521,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
   }
 
   private static Buffer getValue(final Mesh mesh, final Ardor3dStateProperty propertyType, final Object extra,
-      final Object defaultValue, final MemoryStack stack, final Lwjgl3Renderer renderer) {
+      final Object defaultValue, final MemoryStack stack) {
     switch (propertyType) {
       case MeshDefaultColorRGB:
       case MeshDefaultColorRGBA: {
@@ -674,7 +633,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
 
       GL15C.glBindBuffer(target, id);
       if (newBuffer) {
-        GL15C.glBufferData(target, dataBuffer.capacity() * buffer.getByteCount(),
+        GL15C.glBufferData(target, (long) dataBuffer.capacity() * buffer.getByteCount(),
             getGLVBOAccessMode(buffer.getVboAccessMode()));
       }
 
@@ -701,7 +660,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     final int tupleSize = buffer.getValuesPerTuple();
     final int bytesPerTuple = tupleSize * buffer.getByteCount();
     final int strideBytes = bytesPerTuple * attrib.getStride();
-    final long offsetBytes = bytesPerTuple * attrib.getOffset();
+    final long offsetBytes = (long) bytesPerTuple * attrib.getOffset();
     final int glDataType = getGLDataType(buffer.getBuffer());
     final boolean normalized = attrib.isNormalized();
     final int span = attrib.getSpan();
@@ -717,7 +676,7 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
       for (int i = 0; i < span; i++) {
         GL20C.glEnableVertexAttribArray(loc + i);
         GL20C.glVertexAttribPointer(loc + i, tupleSize, glDataType, normalized, matrixStride,
-            offsetBytes + i * (strideBytes + bytesPerTuple));
+            offsetBytes + (long) i * (strideBytes + bytesPerTuple));
         GL33C.glVertexAttribDivisor(loc + i, divisor);
       }
     }
@@ -738,37 +697,18 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
   }
 
   protected static int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
-    int glMode = GL15C.GL_STATIC_DRAW;
-    switch (vboAccessMode) {
-      case StaticDraw:
-        glMode = GL15C.GL_STATIC_DRAW;
-        break;
-      case StaticRead:
-        glMode = GL15C.GL_STATIC_READ;
-        break;
-      case StaticCopy:
-        glMode = GL15C.GL_STATIC_COPY;
-        break;
-      case DynamicDraw:
-        glMode = GL15C.GL_DYNAMIC_DRAW;
-        break;
-      case DynamicRead:
-        glMode = GL15C.GL_DYNAMIC_READ;
-        break;
-      case DynamicCopy:
-        glMode = GL15C.GL_DYNAMIC_COPY;
-        break;
-      case StreamDraw:
-        glMode = GL15C.GL_STREAM_DRAW;
-        break;
-      case StreamRead:
-        glMode = GL15C.GL_STREAM_READ;
-        break;
-      case StreamCopy:
-        glMode = GL15C.GL_STREAM_COPY;
-        break;
-    }
-    return glMode;
+    return switch (vboAccessMode) {
+      case StaticDraw -> GL15C.GL_STATIC_DRAW;
+      case StaticRead -> GL15C.GL_STATIC_READ;
+      case StaticCopy -> GL15C.GL_STATIC_COPY;
+      case DynamicDraw -> GL15C.GL_DYNAMIC_DRAW;
+      case DynamicRead -> GL15C.GL_DYNAMIC_READ;
+      case DynamicCopy -> GL15C.GL_DYNAMIC_COPY;
+      case StreamDraw -> GL15C.GL_STREAM_DRAW;
+      case StreamRead -> GL15C.GL_STREAM_READ;
+      case StreamCopy -> GL15C.GL_STREAM_COPY;
+      default -> throw new Ardor3dException("Unhandled VBOAccessMode: " + vboAccessMode);
+    };
   }
 
   @Override

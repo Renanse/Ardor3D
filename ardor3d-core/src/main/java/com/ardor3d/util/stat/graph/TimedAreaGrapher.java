@@ -168,7 +168,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
       }
 
       // - Update the params with the verts and count.
-      final FloatBuffer fb = BufferUtils.createFloatBuffer(entry.verts.toArray(new Vector3[entry.verts.size()]));
+      final FloatBuffer fb = BufferUtils.createFloatBuffer(entry.verts.toArray(new Vector3[0]));
       fb.rewind();
       entry.area.getMeshData().setVertexBuffer(fb);
       entry.area.setScale(new Vector3(scaleWidth, scaleHeight, 1));

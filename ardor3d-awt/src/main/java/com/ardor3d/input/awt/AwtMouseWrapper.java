@@ -270,28 +270,18 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
   }
 
   protected MouseButton getButtonForEvent(final MouseEvent e) {
-    switch (e.getButton()) {
-      case MouseEvent.BUTTON1:
-        return MouseButton.LEFT;
-      case MouseEvent.BUTTON2:
-        return MouseButton.MIDDLE;
-      case MouseEvent.BUTTON3:
-        return MouseButton.RIGHT;
-      case 4:
-        return MouseButton.FOUR;
-      case 5:
-        return MouseButton.FIVE;
-      case 6:
-        return MouseButton.SIX;
-      case 7:
-        return MouseButton.SEVEN;
-      case 8:
-        return MouseButton.EIGHT;
-      case 9:
-        return MouseButton.NINE;
-      default:
-        return MouseButton.UNKNOWN;
-    }
+    return switch (e.getButton()) {
+      case MouseEvent.BUTTON1 -> MouseButton.LEFT;
+      case MouseEvent.BUTTON2 -> MouseButton.MIDDLE;
+      case MouseEvent.BUTTON3 -> MouseButton.RIGHT;
+      case 4 -> MouseButton.FOUR;
+      case 5 -> MouseButton.FIVE;
+      case 6 -> MouseButton.SIX;
+      case 7 -> MouseButton.SEVEN;
+      case 8 -> MouseButton.EIGHT;
+      case 9 -> MouseButton.NINE;
+      default -> MouseButton.UNKNOWN;
+    };
   }
 
   public boolean isFlipY() { return _flipY; }

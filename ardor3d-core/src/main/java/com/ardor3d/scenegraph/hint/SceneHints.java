@@ -11,6 +11,8 @@
 package com.ardor3d.scenegraph.hint;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -383,14 +385,10 @@ public class SceneHints implements Savable {
     final PickingHint[] pickHints = capsule.readEnumArray("pickingHints", PickingHint.class, null);
     _pickingHints.clear();
     if (pickHints != null) {
-      for (final PickingHint hint : pickHints) {
-        _pickingHints.add(hint);
-      }
+      _pickingHints.addAll(Arrays.asList(pickHints));
     } else {
       // default is all values set.
-      for (final PickingHint hint : PickingHint.values()) {
-        _pickingHints.add(hint);
-      }
+      Collections.addAll(_pickingHints, PickingHint.values());
     }
   }
 

@@ -123,7 +123,7 @@ public class TriggerChannel extends AbstractAnimationChannel {
       timesArray[i++] = time;
     }
     // return
-    return new TriggerChannel(name, timesArray, keys.toArray(new String[keys.size()]));
+    return new TriggerChannel(name, timesArray, keys.toArray(new String[0]));
   }
 
   // /////////////////

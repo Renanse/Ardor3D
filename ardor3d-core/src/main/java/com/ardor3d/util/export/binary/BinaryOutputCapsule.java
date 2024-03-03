@@ -17,6 +17,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -665,7 +666,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
       return;
     }
     // write our output as UTF-8. Java misspells UTF-8 as UTF8 for official use in java.lang
-    final byte[] bytes = value.getBytes("UTF8");
+    final byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
     write(bytes.length);
     _baos.write(bytes);
   }
@@ -730,9 +731,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
 
     final byte[] rVal = new byte[1 + size];
     rVal[0] = (byte) size;
-    for (int x = 1; x < rVal.length; x++) {
-      rVal[x] = bytes[bytes.length - size - 1 + x];
-    }
+    System.arraycopy(bytes, bytes.length - size, rVal, 1, rVal.length - 1);
 
     return rVal;
   }
@@ -828,11 +827,11 @@ public class BinaryOutputCapsule implements OutputCapsule {
     write(map.size());
 
     // write String array for keys
-    final String[] keys = map.keySet().toArray(new String[map.size()]);
+    final String[] keys = map.keySet().toArray(new String[0]);
     write(keys);
 
     // write Savable array for values
-    final Savable[] values = map.values().toArray(new Savable[map.size()]);
+    final Savable[] values = map.values().toArray(new Savable[0]);
     write(values);
   }
 
@@ -844,13 +843,13 @@ public class BinaryOutputCapsule implements OutputCapsule {
     write(map.size());
 
     // write keys
-    final String[] keys = map.keySet().toArray(new String[map.size()]);
+    final String[] keys = map.keySet().toArray(new String[0]);
     for (int x = 0; x < keys.length; x++) {
       write(keys[x]);
     }
 
     // write values - if they are writable types
-    final Object[] values = map.values().toArray(new Object[map.size()]);
+    final Object[] values = map.values().toArray(new Object[0]);
     for (int x = 0; x < values.length; x++) {
       final Object value = values[x];
       tryToWriteValue(value);
@@ -931,7 +930,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     }
     if (value instanceof FloatBuffer) {
       write(BinaryClassField.FLOATBUFFER);
-      write((ByteBuffer) value);
+      write((FloatBuffer) value);
       return;
     }
     if (value instanceof Integer) {
@@ -1020,12 +1019,12 @@ public class BinaryOutputCapsule implements OutputCapsule {
       return;
     }
     if (value instanceof List<?> list) {
-      if (list.size() == 0) {
+      if (list.isEmpty()) {
         write(BinaryClassField.UNHANDLED);
         return;
       }
       final Object first = list.get(0);
-      if (list instanceof ByteBuffer) {
+      if (first instanceof ByteBuffer) {
         write(BinaryClassField.BYTEBUFFER_ARRAYLIST);
         writeByteBufferArrayList((List<ByteBuffer>) value);
         return;

@@ -60,7 +60,7 @@ public class DOMInputCapsule implements InputCapsule {
     if (s == null) {
       return null;
     }
-    s = s.replaceAll("\\&quot;", "\"").replaceAll("\\&lt;", "<").replaceAll("\\&amp;", "&");
+    s = s.replaceAll("&quot;", "\"").replaceAll("&lt;", "<").replaceAll("&amp;", "&");
     return s;
   }
 
@@ -1169,7 +1169,7 @@ public class DOMInputCapsule implements InputCapsule {
         if (n instanceof Element elem && n.getNodeName().equals("MapEntry")) {
           _currentElem = elem;
           final String key = _currentElem.getAttribute("key");
-          final Object val = tryToReadValue("value");
+          final Object val = tryToReadValue();
           ret.put(key, val);
         }
       }
@@ -1180,7 +1180,7 @@ public class DOMInputCapsule implements InputCapsule {
     return ret;
   }
 
-  private Object tryToReadValue(final String string) throws IOException {
+  private Object tryToReadValue() throws IOException {
     final byte type = readByte("type", (byte) -1);
     switch (type) {
       case BinaryClassField.BITSET: {
@@ -1283,24 +1283,16 @@ public class DOMInputCapsule implements InputCapsule {
         return readSavable("value", null);
 
       }
-      case BinaryClassField.SAVABLE_1D: {
+      case BinaryClassField.SAVABLE_1D, BinaryClassField.SAVABLE_ARRAYLIST_1D: {
         return readSavableArray("value", null);
 
       }
-      case BinaryClassField.SAVABLE_2D: {
+      case BinaryClassField.SAVABLE_2D, BinaryClassField.SAVABLE_ARRAYLIST_2D: {
         return readSavableArray2D("value", null);
 
       }
       case BinaryClassField.SAVABLE_ARRAYLIST: {
         return readSavableList("value", null);
-
-      }
-      case BinaryClassField.SAVABLE_ARRAYLIST_1D: {
-        return readSavableArray("value", null);
-
-      }
-      case BinaryClassField.SAVABLE_ARRAYLIST_2D: {
-        return readSavableArray2D("value", null);
 
       }
       case BinaryClassField.SAVABLE_MAP: {

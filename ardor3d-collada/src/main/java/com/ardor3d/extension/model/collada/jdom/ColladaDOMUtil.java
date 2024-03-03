@@ -285,7 +285,7 @@ public class ColladaDOMUtil {
     while (tokenizer.hasMoreTokens()) {
       list.add(tokenizer.nextToken());
     }
-    final String[] stringArray = list.toArray(new String[list.size()]);
+    final String[] stringArray = list.toArray(new String[0]);
 
     _dataCache.getStringArrays().put(node, stringArray);
 

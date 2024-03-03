@@ -202,7 +202,7 @@ public class RectLayoutData implements UILayoutData {
       final int offsetY) {
     final int left = offsetX;
     final int right = -childWidth - offsetX;
-    final int bottom = +offsetY;
+    final int bottom = offsetY;
     final int top = -childHeight - offsetY;
     return new RectLayoutData(0, 0, 0, 0, top, left, bottom, right);
   }
@@ -225,7 +225,7 @@ public class RectLayoutData implements UILayoutData {
       final int offsetY) {
     final int left = -childWidth + offsetX;
     final int right = -offsetX;
-    final int bottom = +offsetY;
+    final int bottom = offsetY;
     final int top = -childHeight - offsetY;
     return new RectLayoutData(1, 0, 1, 0, top, left, bottom, right);
   }
