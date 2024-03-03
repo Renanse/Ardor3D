@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 allprojects  {
 	apply plugin: 'java-library'
 	group = 'com.ardor3d'
-	version = '1.6.1'
+	version = '1.6.2'
     project.ext.lwjglVersion = "3.3.3"
     
 	switch ( OperatingSystem.current() ) {
@@ -23,13 +23,12 @@ subprojects {
 	apply plugin: 'java-library'
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
-	
-	tasks.withType(JavaCompile) {
-	  	options.encoding = 'UTF-8'
+
+	tasks.withType(JavaCompile).configureEach {
+		options.encoding = 'UTF-8'
 	}
 
-	task packageSources(type: Jar) {
-		classifier = 'sources'
+	tasks.register('packageSources', Jar) {
 		from sourceSets.main.allSource
 	}
 	
@@ -39,7 +38,7 @@ subprojects {
 		maven { url "https://repo.maven.apache.org/maven2" }
 	}
 
-	configurations.all {
+	configurations.configureEach {
 		resolutionStrategy {
 	        dependencySubstitution {
 	            // The maven property ${osgi.platform} is not handled by Gradle

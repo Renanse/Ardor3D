@@ -11,12 +11,14 @@
 package com.ardor3d.tool.editor.particle.swing.panel;
 
 import java.awt.BorderLayout;
+import java.io.Serial;
 
 import com.ardor3d.extension.effect.particle.SimpleParticleInfluenceFactory;
 import com.ardor3d.tool.editor.swing.widget.Vector3Panel;
 
 public class GravityInfluencePanel extends InfluenceEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final Vector3Panel _inflVector = new Vector3Panel(-Double.MAX_VALUE, Double.MAX_VALUE, 0.1);

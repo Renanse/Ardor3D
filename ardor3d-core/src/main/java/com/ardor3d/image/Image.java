@@ -11,6 +11,7 @@
 package com.ardor3d.image;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import com.ardor3d.util.export.Savable;
  */
 public class Image implements Serializable, Savable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // image attributes

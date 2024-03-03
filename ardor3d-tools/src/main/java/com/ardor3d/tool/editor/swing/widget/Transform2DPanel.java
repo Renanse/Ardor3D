@@ -14,6 +14,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.Serial;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
@@ -25,6 +26,7 @@ import com.ardor3d.math.util.MathUtils;
 
 public class Transform2DPanel extends JPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static Font LABEL_FONT = new Font("Arial", Font.BOLD, 13);

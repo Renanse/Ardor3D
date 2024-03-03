@@ -10,11 +10,14 @@
 
 package com.ardor3d.extension.model.collada.jdom;
 
+import java.io.Serial;
+
 /**
  * Customer exception thrown when something unexpected is encountered in a Collada file.
  */
 public class ColladaException extends RuntimeException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public ColladaException(final String message, final Object source) {

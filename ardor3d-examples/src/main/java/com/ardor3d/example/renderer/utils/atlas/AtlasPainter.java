@@ -4,6 +4,7 @@ package com.ardor3d.example.renderer.utils.atlas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.Serial;
 
 import javax.swing.JPanel;
 
@@ -12,6 +13,7 @@ import com.ardor3d.extension.atlas.AtlasPacker;
 import com.ardor3d.math.Rectangle2;
 
 public class AtlasPainter extends JPanel {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final AtlasPacker packer;

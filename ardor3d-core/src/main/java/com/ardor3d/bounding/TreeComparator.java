@@ -61,33 +61,10 @@ public class TreeComparator implements Comparator<PrimitiveKey> {
       centerB = _bCompare[0].divideLocal(_bCompare.length);
     }
 
-    switch (_axis) {
-      case X:
-        if (centerA.getX() < centerB.getX()) {
-          return -1;
-        }
-        if (centerA.getX() > centerB.getX()) {
-          return 1;
-        }
-        return 0;
-      case Y:
-        if (centerA.getY() < centerB.getY()) {
-          return -1;
-        }
-        if (centerA.getY() > centerB.getY()) {
-          return 1;
-        }
-        return 0;
-      case Z:
-        if (centerA.getZ() < centerB.getZ()) {
-          return -1;
-        }
-        if (centerA.getZ() > centerB.getZ()) {
-          return 1;
-        }
-        return 0;
-      default:
-        return 0;
-    }
+    return switch (_axis) {
+      case X -> Double.compare(centerA.getX(), centerB.getX());
+      case Y -> Double.compare(centerA.getY(), centerB.getY());
+      case Z -> Double.compare(centerA.getZ(), centerB.getZ());
+    };
   }
 }

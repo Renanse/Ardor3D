@@ -14,6 +14,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
 
+import java.io.Serial;
+
 /**
  * Vector3InterpolationController class is a base class for controllers that can interpolate on
  * vectors.
@@ -21,6 +23,7 @@ import com.ardor3d.scenegraph.Spatial;
 public abstract class Vector3InterpolationController extends InterpolationController<ReadOnlyVector3, Spatial> {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** @see #setConstantSpeed(boolean) */

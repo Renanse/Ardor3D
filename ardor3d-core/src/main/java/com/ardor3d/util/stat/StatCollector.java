@@ -39,7 +39,7 @@ public abstract class StatCollector {
    * time sample. For example, if sampleRate = 1.0, then current will hold values collected since the
    * last 1 second ping.
    */
-  protected static HashMap<StatType, StatValue> current = new HashMap<>();
+  protected static final HashMap<StatType, StatValue> current = new HashMap<>();
 
   protected static List<MultiStatSample> historical = Collections.synchronizedList(new LinkedList<MultiStatSample>());
 

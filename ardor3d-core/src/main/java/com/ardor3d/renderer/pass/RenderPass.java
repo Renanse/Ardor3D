@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.pass;
 
+import java.io.Serial;
 import java.util.List;
 
 import com.ardor3d.image.Texture;
@@ -23,6 +24,7 @@ import com.ardor3d.scenegraph.Spatial;
  */
 public class RenderPass extends Pass {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

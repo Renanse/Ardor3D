@@ -14,6 +14,8 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.scenegraph.Spatial;
 
+import java.io.Serial;
+
 /**
  * QuaternionInterpolationController class interpolates a {@link Spatial}s rotation using
  * {@link Quaternion}s.
@@ -21,6 +23,7 @@ import com.ardor3d.scenegraph.Spatial;
 public class QuaternionInterpolationController extends InterpolationController<ReadOnlyQuaternion, Spatial> {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** @see #setLocalRotation(boolean) */

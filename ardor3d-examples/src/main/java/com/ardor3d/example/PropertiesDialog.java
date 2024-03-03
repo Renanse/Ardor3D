@@ -20,6 +20,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import com.ardor3d.util.Ardor3dException;
 public final class PropertiesDialog extends JDialog {
   private static final Logger logger = Logger.getLogger(PropertiesDialog.class.getName());
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // connection to properties file.

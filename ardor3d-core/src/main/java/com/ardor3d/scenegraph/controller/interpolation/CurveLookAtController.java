@@ -14,6 +14,7 @@
 
 package com.ardor3d.scenegraph.controller.interpolation;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import com.ardor3d.math.Matrix3;
@@ -34,6 +35,7 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 public class CurveLookAtController implements SpatialController<Spatial>, Serializable {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** The world up vector to use in matrix look at */

@@ -10,6 +10,7 @@
 
 package com.ardor3d.scenegraph.controller.interpolation;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 public abstract class InterpolationController<C, T extends Spatial> extends ComplexSpatialController<T> {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** The minimum allowed delta */

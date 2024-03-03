@@ -6,3 +6,6 @@ target/
 .gradle/
 */build/*
 build/
+.metadata/
+.idea/
+ardorSettings.properties

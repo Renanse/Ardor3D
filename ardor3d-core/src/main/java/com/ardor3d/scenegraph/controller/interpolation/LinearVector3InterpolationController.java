@@ -14,6 +14,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
 
+import java.io.Serial;
+
 /**
  * LinearVector3InterpolationController class interpolates a {@link Spatial}s vectors using
  * {@link Vector3#lerpLocal(ReadOnlyVector3, ReadOnlyVector3, double)}
@@ -21,6 +23,7 @@ import com.ardor3d.scenegraph.Spatial;
 public class LinearVector3InterpolationController extends Vector3InterpolationController {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @Override

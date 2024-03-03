@@ -13,6 +13,7 @@ package com.ardor3d.tool.editor.swing.widget;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.Serial;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -24,6 +25,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class Vector3Panel extends JPanel implements ChangeListener {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ValuePanel _xPanel, _yPanel, _zPanel;

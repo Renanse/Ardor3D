@@ -1160,9 +1160,7 @@ public class ColladaAnimUtils {
   }
 
   private static void addSpacing(final StringBuilder str, final int depth) {
-    for (int i = 0; i < depth; i++) {
-      str.append("  ");
-    }
+    str.append("  ".repeat(Math.max(0, depth)));
   }
 
   private enum AccessorType {

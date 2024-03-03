@@ -450,18 +450,12 @@ public class BMFont implements Savable {
 
   private void processNode(final Node node) {
     final String tagName = node.getNodeName();
-    if (tagName != null) {
-      if (tagName.equals("info")) {
-        processInfoNode(node);
-      } else if (tagName.equals("common")) {
-        processCommonNode(node);
-      } else if (tagName.equals("page")) {
-        processPageNode(node);
-      } else if (tagName.equals("char")) {
-        processCharNode(node);
-      } else if (tagName.equals("kerning")) {
-        procesKerningNode(node);
-      }
+    switch (tagName) {
+      case "info" -> processInfoNode(node);
+      case "common" -> processCommonNode(node);
+      case "page" -> processPageNode(node);
+      case "char" -> processCharNode(node);
+      case "kerning" -> procesKerningNode(node);
     }
   }
 

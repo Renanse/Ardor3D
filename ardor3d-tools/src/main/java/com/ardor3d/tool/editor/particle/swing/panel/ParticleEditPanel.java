@@ -11,6 +11,7 @@
 package com.ardor3d.tool.editor.particle.swing.panel;
 
 import java.awt.Font;
+import java.io.Serial;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,6 +20,7 @@ import javax.swing.border.TitledBorder;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 
 public abstract class ParticleEditPanel extends JPanel {
+  @Serial
   private static final long serialVersionUID = 1L;
   private ParticleSystem _particles;
 

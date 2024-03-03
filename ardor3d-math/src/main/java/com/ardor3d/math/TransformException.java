@@ -10,8 +10,11 @@
 
 package com.ardor3d.math;
 
+import java.io.Serial;
+
 public class TransformException extends RuntimeException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public TransformException() {}

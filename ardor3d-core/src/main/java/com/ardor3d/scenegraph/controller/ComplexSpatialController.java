@@ -11,6 +11,7 @@
 package com.ardor3d.scenegraph.controller;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -28,6 +29,7 @@ import com.ardor3d.util.export.Savable;
 public abstract class ComplexSpatialController<T extends Spatial>
     implements SpatialController<T>, Serializable, Savable {
 
+  @Serial
   private static final long serialVersionUID = 1;
 
   public enum RepeatType {

@@ -16,6 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serial;
 
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
@@ -27,6 +28,7 @@ import com.ardor3d.image.util.awt.AwtColorUtil;
 import com.ardor3d.math.ColorRGBA;
 
 public abstract class RGBAChooserPanel extends JPanel {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final JSpinner _alphaSpinner;

@@ -39,10 +39,10 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
   /** Specifies the number of coordinates per vertex. Must be 1 - 4. */
   protected int _valuesPerTuple;
 
-  private static Map<AbstractBufferData<?>, Object> _identityCache = new MapMaker().weakKeys().makeMap();
+  private static final Map<AbstractBufferData<?>, Object> _identityCache = new MapMaker().weakKeys().makeMap();
   private static final Object STATIC_REF = new Object();
 
-  private static ReferenceQueue<AbstractBufferData<?>> _vboRefQueue = new ReferenceQueue<>();
+  private static final ReferenceQueue<AbstractBufferData<?>> _vboRefQueue = new ReferenceQueue<>();
 
   static {
     ContextManager.addContextCleanListener(renderContext -> AbstractBufferData.cleanAllBuffers(null, renderContext));
@@ -54,7 +54,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
    * list of OpenGL contexts we believe have up to date values from this buffer. For use in
    * multi-context mode.
    */
-  protected transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
+  protected final transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
 
   /** if true, we believe we are fully uploaded to OpenGL. For use in single-context mode. */
   protected transient boolean _uploaded;
@@ -74,6 +74,8 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     _identityCache.put(this, STATIC_REF);
     if (Constants.useMultipleContexts) {
       _uploadedContexts = new HashSet<>();
+    } else {
+      _uploadedContexts = null;
     }
   }
 
@@ -155,7 +157,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     if (_bufferIdCache != null) {
       final Integer id = _bufferIdCache.getValue(contextRef);
       if (id != null) {
-        return id.intValue();
+        return id;
       }
     }
     return 0;
@@ -186,7 +188,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     } else {
       _uploaded = false;
     }
-    return id != null ? id.intValue() : 0;
+    return id != null ? id : 0;
   }
 
   /**
@@ -320,7 +322,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
       // only worry about buffers that have received ids.
       if (buf._bufferIdCache != null) {
         final Integer id = buf._bufferIdCache.removeValue(glRef);
-        if (id != null && id.intValue() != 0) {
+        if (id != null && id != 0) {
           idMap.put(context.getSharableContextRef(), id);
         }
       }

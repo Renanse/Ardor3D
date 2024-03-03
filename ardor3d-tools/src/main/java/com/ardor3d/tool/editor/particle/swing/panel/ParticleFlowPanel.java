@@ -14,6 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -24,6 +25,7 @@ import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 
 public class ParticleFlowPanel extends ParticleEditPanel {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // flow panel components
@@ -38,6 +40,7 @@ public class ParticleFlowPanel extends ParticleEditPanel {
     setLayout(new GridBagLayout());
 
     _rateBox = new JCheckBox(new AbstractAction("Regulate Flow") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -70,6 +73,7 @@ public class ParticleFlowPanel extends ParticleEditPanel {
         GridBagConstraints.HORIZONTAL, new Insets(5, 5, 10, 5), 0, 0));
 
     _spawnBox = new JCheckBox(new AbstractAction("Respawn 'dead' particles.") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -84,6 +88,7 @@ public class ParticleFlowPanel extends ParticleEditPanel {
     _spawnBox.setSelected(true);
 
     final JButton spawnButton = new JButton(new AbstractAction("Force Respawn") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

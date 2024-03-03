@@ -13,6 +13,7 @@ package com.ardor3d.tool.editor.swing.widget;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.Serial;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -25,6 +26,7 @@ import com.ardor3d.math.util.MathUtils;
 
 public class SphericalUnitVectorPanel extends JPanel implements ChangeListener {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ValuePanel _azimuthPanel = new ValuePanel("Azimuth: ", "", -180.0, +180.0, 1.0);

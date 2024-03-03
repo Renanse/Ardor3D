@@ -17,13 +17,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -90,6 +84,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
  */
 public class ExampleRunner extends JFrame {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private final Logger logger = Logger.getLogger(ExampleRunner.class.getCanonicalName());
   private final JTree tree;
@@ -142,6 +137,7 @@ public class ExampleRunner extends JFrame {
     });
     final AbstractAction expandAction = new AbstractAction() {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -182,6 +178,7 @@ public class ExampleRunner extends JFrame {
 
     runSelectedAction = new AbstractAction() {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -199,6 +196,7 @@ public class ExampleRunner extends JFrame {
 
     browseSelectedAction = new AbstractAction() {
 
+      @Serial
       private static final long serialVersionUID = 1L;
 
       {
@@ -216,6 +214,7 @@ public class ExampleRunner extends JFrame {
 
     previousMatchAction = new AbstractAction() {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       {
         putValue(Action.NAME, "Previous match");
@@ -232,6 +231,7 @@ public class ExampleRunner extends JFrame {
 
     nextMatchAction = new AbstractAction() {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       {
         putValue(Action.NAME, "Next match");
@@ -248,6 +248,7 @@ public class ExampleRunner extends JFrame {
 
     firstMatchAction = new AbstractAction() {
 
+      @Serial
       private static final long serialVersionUID = 1L;
       {
         putValue(Action.NAME, "First match");
@@ -891,6 +892,7 @@ public class ExampleRunner extends JFrame {
 
   private static class DisplayConsole extends JPanel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final int MAX_CHARACTERS = 50000;
     private final JTextArea textArea;
@@ -937,6 +939,7 @@ public class ExampleRunner extends JFrame {
 
   private static class ErasableTextField extends JPanel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private final JTextField textField;
     private final JButton btClear;
@@ -949,6 +952,7 @@ public class ExampleRunner extends JFrame {
       defaultTextBackground = textField.getBackground();
       btClear = new JButton(new AbstractAction() {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         {

@@ -10,12 +10,15 @@
 
 package com.ardor3d.input.keyboard;
 
+import java.io.Serial;
+
 /**
  * Thrown when an attempt at fetching a {@link Key} instance for an invalid/unknown key code is
  * made.
  */
 public class KeyNotFoundException extends RuntimeException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public KeyNotFoundException(final int keyCode) {

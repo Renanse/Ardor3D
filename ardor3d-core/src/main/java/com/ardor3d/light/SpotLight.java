@@ -11,6 +11,7 @@
 package com.ardor3d.light;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.function.Supplier;
 
 import com.ardor3d.light.shadow.AbstractShadowData;
@@ -33,6 +34,7 @@ import com.ardor3d.util.export.OutputCapsule;
  */
 public class SpotLight extends PointLight {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private float _angle, _innerAngle;

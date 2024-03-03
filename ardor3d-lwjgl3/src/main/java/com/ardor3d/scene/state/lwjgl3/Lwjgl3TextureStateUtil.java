@@ -376,9 +376,9 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final Texture3D texture, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S), caps);
-    final int wrapT = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.T), caps);
-    final int wrapR = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.R), caps);
+    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S));
+    final int wrapT = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.T));
+    final int wrapR = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.R));
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -409,7 +409,7 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final Texture1D texture, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S), caps);
+    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S));
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -451,8 +451,8 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final Texture2D texture, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S), caps);
-    final int wrapT = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.T), caps);
+    final int wrapS = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.S));
+    final int wrapT = TextureConstants.getGLWrap(texture.getWrap(WrapAxis.T));
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);
@@ -478,9 +478,9 @@ public abstract class Lwjgl3TextureStateUtil {
    */
   public static void applyWrap(final TextureCubeMap cubeMap, final TextureRecord texRecord, final int unit,
       final TextureStateRecord record, final ContextCapabilities caps) {
-    final int wrapS = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.S), caps);
-    final int wrapT = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.T), caps);
-    final int wrapR = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.R), caps);
+    final int wrapS = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.S));
+    final int wrapT = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.T));
+    final int wrapR = TextureConstants.getGLWrap(cubeMap.getWrap(WrapAxis.R));
 
     if (!texRecord.isValid() || texRecord.wrapS != wrapS) {
       checkAndSetUnit(unit, record, caps);

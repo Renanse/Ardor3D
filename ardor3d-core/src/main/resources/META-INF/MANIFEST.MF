@@ -1,7 +1,7 @@
 Bundle-Name: Ardor3D Core
 Bundle-SymbolicName: com.ardor3d.core
 Bundle-ManifestVersion: 2
-Bundle-Version: 0.7
+Bundle-Version: 1.6.2
 Export-Package: com.ardor3d.annotation,
  com.ardor3d.bounding,
  com.ardor3d.framework,

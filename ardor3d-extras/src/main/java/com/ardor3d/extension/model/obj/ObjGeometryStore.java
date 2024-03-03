@@ -257,8 +257,8 @@ public class ObjGeometryStore {
       boolean hasNormals = false, hasUVs = false;
 
       int j = 0;
-      final long[] vertGroups = new long[_meshManager.getStore().size()];
-      final List<Long> groups = new ArrayList<>();
+      final int[] vertGroups = new int[_meshManager.getStore().size()];
+      final List<Integer> groups = new ArrayList<>();
       Vector3 vector;
       for (final ObjIndexSet set : _meshManager.getStore().keySet()) {
         vertGroups[j] = set.getSmoothGroup();

@@ -14,6 +14,7 @@
 
 package com.ardor3d.spline;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -240,6 +241,7 @@ public class ArcLengthTable {
    */
   private static class ArcLengthEntry implements Serializable {
     /** Serial UID */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final double _delta;

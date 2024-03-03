@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 import com.ardor3d.math.type.ReadOnlyRing;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -30,6 +27,7 @@ import com.ardor3d.util.export.Savable;
  */
 
 public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, Poolable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Ring> RING_POOL = ObjectPool.create(Ring.class, MathConstants.maxMathPoolSize);

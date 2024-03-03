@@ -10,10 +10,7 @@
 
 package com.ardor3d.renderer;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,6 +42,7 @@ import com.ardor3d.util.export.Savable;
  */
 public class Camera implements Savable, Externalizable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final Logger _logger = Logger.getLogger(Camera.class.getName());

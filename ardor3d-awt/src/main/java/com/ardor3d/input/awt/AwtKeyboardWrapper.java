@@ -129,7 +129,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener, Charact
     return AwtKey.findByCode(e.getKeyCode());
   }
 
-  private class AwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
+  protected class AwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
     @Override
     protected KeyEvent computeNext() {
       synchronized (AwtKeyboardWrapper.this) {
@@ -142,7 +142,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener, Charact
     }
   }
 
-  private class AwtCharacterIterator extends AbstractIterator<CharacterInputEvent>
+  protected class AwtCharacterIterator extends AbstractIterator<CharacterInputEvent>
       implements PeekingIterator<CharacterInputEvent> {
     @Override
     protected CharacterInputEvent computeNext() {

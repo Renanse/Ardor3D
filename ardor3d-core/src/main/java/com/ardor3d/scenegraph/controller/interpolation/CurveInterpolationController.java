@@ -10,6 +10,7 @@
 
 package com.ardor3d.scenegraph.controller.interpolation;
 
+import java.io.Serial;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.Vector3;
@@ -29,6 +30,7 @@ import com.ardor3d.spline.Spline;
 public class CurveInterpolationController extends Vector3InterpolationController {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** Classes logger */

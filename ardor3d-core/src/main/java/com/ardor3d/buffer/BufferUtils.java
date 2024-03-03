@@ -156,7 +156,7 @@ public final class BufferUtils {
   /**
    * Generates a ColorRGBA array from the given FloatBufferData.
    *
-   * @param buff
+   * @param data
    *          the FloatBufferData to read from
    * @param defaults
    *          a default value to set each color to, used when the tuple size of the given
@@ -229,10 +229,6 @@ public final class BufferUtils {
    * data.length long and contain the vector data as data[0].x, data[0].y, data[0].z, data[0].w,
    * data[1].x... etc.
    *
-   * @param offset
-   *          the starting index to read from in our data array
-   * @param length
-   *          the number of vectors to read
    * @param data
    *          array of Vector4 objects to place into a new FloatBuffer
    */
@@ -363,7 +359,7 @@ public final class BufferUtils {
   /**
    * Generates a Vector4 array from the given FloatBufferData.
    *
-   * @param buff
+   * @param data
    *          the FloatBufferData to read from
    * @param defaults
    *          a default value to set each color to, used when the tuple size of the given
@@ -621,7 +617,7 @@ public final class BufferUtils {
   /**
    * Generates a Vector3 array from the given FloatBufferData.
    *
-   * @param buff
+   * @param data
    *          the FloatBufferData to read from
    * @param defaults
    *          a default value to set each color to, used when the tuple size of the given
@@ -863,7 +859,7 @@ public final class BufferUtils {
   /**
    * Generates a Vector2 array from the given FloatBufferData.
    *
-   * @param buff
+   * @param data
    *          the FloatBufferData to read from
    * @param defaults
    *          a default value to set each color to, used when the tuple size of the given
@@ -1705,19 +1701,19 @@ public final class BufferUtils {
         bBufsM += b.capacity();
         bBufs++;
       } else if (b instanceof FloatBuffer) {
-        totalHeld += b.capacity() * 4;
+        totalHeld += b.capacity() * 4L;
         fBufsM += b.capacity() * 4;
         fBufs++;
       } else if (b instanceof IntBuffer) {
-        totalHeld += b.capacity() * 4;
+        totalHeld += b.capacity() * 4L;
         iBufsM += b.capacity() * 4;
         iBufs++;
       } else if (b instanceof ShortBuffer) {
-        totalHeld += b.capacity() * 2;
+        totalHeld += b.capacity() * 2L;
         sBufsM += b.capacity() * 2;
         sBufs++;
       } else if (b instanceof DoubleBuffer) {
-        totalHeld += b.capacity() * 8;
+        totalHeld += b.capacity() * 8L;
         dBufsM += b.capacity() * 8;
         dBufs++;
       }

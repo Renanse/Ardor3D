@@ -143,53 +143,54 @@ public class AssimpModelImporter {
     final AIFileOpenProcI fileOpenProc = new AIFileOpenProc() {
       @Override
       public long invoke(final long pFileIO, final long fileName, final long openMode) {
-        final AIFile aiFile = AIFile.create();
-        final ByteBuffer data;
-        final String fileNameUtf8 = memUTF8(fileName);
-        try {
-          final ResourceSource source;
-          if (_modelLocator == null) {
-            source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, fileNameUtf8);
-          } else {
-            source = _modelLocator.locateResource(fileNameUtf8);
-          }
-          applyRootResource(source);
-          logger.log(Level.FINE, () -> "loading resource: " + fileNameUtf8);
-          data = loadResourceAsByteBuffer(source, 8192);
-        } catch (final Exception e) {
-          throw new RuntimeException("Could not open file: " + fileNameUtf8);
-        }
-        final AIFileReadProcI fileReadProc = new AIFileReadProc() {
-          @Override
-          public long invoke(final long pFile, final long pBuffer, final long size, final long count) {
-            final long max = Math.min(data.remaining(), size * count);
-            memCopy(memAddress(data) + data.position(), pBuffer, max);
-            return max;
-          }
-        };
-        final AIFileSeekI fileSeekProc = new AIFileSeek() {
-          @Override
-          public int invoke(final long pFile, final long offset, final int origin) {
-            if (origin == Assimp.aiOrigin_CUR) {
-              data.position(data.position() + (int) offset);
-            } else if (origin == Assimp.aiOrigin_SET) {
-              data.position((int) offset);
-            } else if (origin == Assimp.aiOrigin_END) {
-              data.position(data.limit() + (int) offset);
+        try (AIFile aiFile = AIFile.create()) {
+          final ByteBuffer data;
+          final String fileNameUtf8 = memUTF8(fileName);
+          try {
+            final ResourceSource source;
+            if (_modelLocator == null) {
+              source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, fileNameUtf8);
+            } else {
+              source = _modelLocator.locateResource(fileNameUtf8);
             }
-            return 0;
+            applyRootResource(source);
+            logger.log(Level.FINE, () -> "loading resource: " + fileNameUtf8);
+            data = loadResourceAsByteBuffer(source, 8192);
+          } catch (final Exception e) {
+            throw new RuntimeException("Could not open file: " + fileNameUtf8);
           }
-        };
-        final AIFileTellProcI fileTellProc = new AIFileTellProc() {
-          @Override
-          public long invoke(final long pFile) {
-            return data.limit();
-          }
-        };
-        aiFile.ReadProc(fileReadProc);
-        aiFile.SeekProc(fileSeekProc);
-        aiFile.FileSizeProc(fileTellProc);
-        return aiFile.address();
+          final AIFileReadProcI fileReadProc = new AIFileReadProc() {
+            @Override
+            public long invoke(final long pFile, final long pBuffer, final long size, final long count) {
+              final long max = Math.min(data.remaining(), size * count);
+              memCopy(memAddress(data) + data.position(), pBuffer, max);
+              return max;
+            }
+          };
+          final AIFileSeekI fileSeekProc = new AIFileSeek() {
+            @Override
+            public int invoke(final long pFile, final long offset, final int origin) {
+              if (origin == Assimp.aiOrigin_CUR) {
+                data.position(data.position() + (int) offset);
+              } else if (origin == Assimp.aiOrigin_SET) {
+                data.position((int) offset);
+              } else if (origin == Assimp.aiOrigin_END) {
+                data.position(data.limit() + (int) offset);
+              }
+              return 0;
+            }
+          };
+          final AIFileTellProcI fileTellProc = new AIFileTellProc() {
+            @Override
+            public long invoke(final long pFile) {
+              return data.limit();
+            }
+          };
+          aiFile.ReadProc(fileReadProc);
+          aiFile.SeekProc(fileSeekProc);
+          aiFile.FileSizeProc(fileTellProc);
+          return aiFile.address();
+        }
       }
     };
     final AIFileCloseProcI fileCloseProc = new AIFileCloseProc() {
@@ -202,7 +203,7 @@ public class AssimpModelImporter {
     try {
       final AIScene scene = Assimp.aiImportFileEx(resource, Assimp.aiProcess_JoinIdenticalVertices
           | Assimp.aiProcess_GenSmoothNormals | Assimp.aiProcess_Triangulate | Assimp.aiProcess_SortByPType, fileIo);
-      if (scene == null) {
+      if (scene == null || scene.mRootNode() == null) {
         throw new IllegalStateException(Assimp.aiGetErrorString());
       }
 
@@ -212,7 +213,10 @@ public class AssimpModelImporter {
       // where the Z axis is pointing up.
       // Hopefully this doesn't undo legit use of the root node transformation...
       // Note that this is also what RViz does internally.
-      scene.mRootNode().mTransformation(AIMatrix4x4.create().set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+      try (var matrix = AIMatrix4x4.create()) {
+        matrix.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        scene.mRootNode().mTransformation(matrix);
+      }
 
       final ModelDataStore store = new ModelDataStore();
       readMaterialInfo(scene, store);

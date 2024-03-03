@@ -1,10 +1,12 @@
 
 package com.ardor3d.extension.terrain.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
 public class Tile implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final int x, y;

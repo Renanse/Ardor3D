@@ -15,6 +15,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -36,6 +37,7 @@ import com.ardor3d.math.Vector3;
 
 public class ParticleInfluencePanel extends ParticleEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final InfluenceListModel _influenceModel = new InfluenceListModel();
@@ -48,6 +50,7 @@ public class ParticleInfluencePanel extends ParticleEditPanel {
     setLayout(new GridBagLayout());
 
     final JButton newInfluenceButton = new JButton(new AbstractAction("Add Influence") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -89,6 +92,7 @@ public class ParticleInfluencePanel extends ParticleEditPanel {
     newInfluenceButton.setMargin(new Insets(2, 2, 2, 2));
 
     _deleteInfluenceButton = new JButton(new AbstractAction("Delete") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -193,6 +197,7 @@ public class ParticleInfluencePanel extends ParticleEditPanel {
 
   class InfluenceListModel extends AbstractListModel<String> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

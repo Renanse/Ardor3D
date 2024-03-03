@@ -34,7 +34,7 @@ public class IntersectionRecord {
 
     @Override
     public int compareTo(final Intersection other) {
-      return _distance == other._distance ? 0 : (_distance < other._distance ? -1 : 1);
+      return Double.compare(_distance, other._distance);
     }
   }
 

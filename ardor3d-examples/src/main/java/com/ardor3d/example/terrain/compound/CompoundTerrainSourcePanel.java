@@ -11,6 +11,7 @@
 package com.ardor3d.example.terrain.compound;
 
 import java.awt.BorderLayout;
+import java.io.Serial;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,6 +30,7 @@ import com.ardor3d.extension.terrain.providers.procedural.ProceduralTerrainSourc
 
 public class CompoundTerrainSourcePanel extends JPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   final private CompoundTerrainSource _source;
@@ -59,6 +61,7 @@ public class CompoundTerrainSourcePanel extends JPanel {
       /**
       *
       */
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

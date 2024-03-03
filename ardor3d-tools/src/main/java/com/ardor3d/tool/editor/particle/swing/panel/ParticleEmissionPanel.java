@@ -16,6 +16,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
@@ -38,6 +39,7 @@ import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 import com.ardor3d.tool.editor.swing.widget.Vector3Panel;
 
 public class ParticleEmissionPanel extends ParticleEditPanel {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   enum EmitTypes {
@@ -70,6 +72,7 @@ public class ParticleEmissionPanel extends ParticleEditPanel {
     setLayout(new GridBagLayout());
 
     _rotateWithEmitterBox = new JCheckBox(new AbstractAction("Rotate With Emitter") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

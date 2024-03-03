@@ -15,6 +15,8 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 
+import java.io.Serial;
+
 /**
  * ColorRGBAInterpolationController class interpolates the {@link Mesh#getDefaultColor() default
  * colour} of a mesh using {@link ReadOnlyColorRGBA}s.
@@ -26,6 +28,7 @@ import com.ardor3d.scenegraph.MeshData;
 public class DefaultColorInterpolationController extends InterpolationController<ReadOnlyColorRGBA, Mesh> {
 
   /** Serial UID */
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

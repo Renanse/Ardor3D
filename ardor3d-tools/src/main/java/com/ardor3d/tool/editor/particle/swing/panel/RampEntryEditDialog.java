@@ -18,6 +18,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serial;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,6 +39,7 @@ import com.ardor3d.tool.editor.swing.widget.ValueSpinner;
 
 public class RampEntryEditDialog extends JDialog {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final JColorChooser _colorChooser = new JColorChooser();

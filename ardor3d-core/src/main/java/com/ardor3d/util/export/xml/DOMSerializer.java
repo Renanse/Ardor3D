@@ -48,11 +48,7 @@ public class DOMSerializer {
   public void setEncoding(final String encoding) { _encoding = encoding; }
 
   public void setIndent(final int numSpaces) {
-    final StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < numSpaces; i++) {
-      buffer.append('\t');
-    }
-    _indent = buffer.toString();
+    _indent = "\t".repeat(Math.max(0, numSpaces));
   }
 
   public void serialize(final Document doc, final OutputStream out) throws IOException {

@@ -13,12 +13,14 @@ package com.ardor3d.tool.editor.particle.swing.panel;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.Serial;
 
 import com.ardor3d.extension.effect.particle.WanderInfluence;
 import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 
 public class WanderInfluencePanel extends InfluenceEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ValuePanel _wanderRadius = new ValuePanel("Wander Circle Radius: ", "", 0, Double.MAX_VALUE, 0.01);

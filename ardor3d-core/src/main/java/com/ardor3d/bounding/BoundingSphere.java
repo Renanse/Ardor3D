@@ -11,6 +11,7 @@
 package com.ardor3d.bounding;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +41,7 @@ import com.ardor3d.util.export.OutputCapsule;
 public class BoundingSphere extends BoundingVolume {
   private static final Logger logger = Logger.getLogger(BoundingSphere.class.getName());
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private double _radius;

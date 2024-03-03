@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.List;
@@ -67,6 +68,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public abstract class ParticleAppearancePanel extends ParticleEditPanel {
   private static final Logger logger = Logger.getLogger(ParticleAppearancePanel.class.getName());
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private File _newTexture = null;
@@ -123,6 +125,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
     _parentDirectionUpPanel.setVisible(false);
 
     _velocityAlignedBox = new JCheckBox(new AbstractAction("Align with Velocity") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -133,6 +136,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
     _velocityAlignedBox.setFont(new Font("Arial", Font.BOLD, 13));
 
     _cameraAlignedBox = new JCheckBox(new AbstractAction("Align with Camera") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -338,6 +342,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
         GridBagConstraints.HORIZONTAL, new Insets(5, 5, 0, 5), 0, 0));
 
     _additiveBlendingBox = new JCheckBox(new AbstractAction("Additive Blending") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -354,6 +359,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
 
     final JLabel textureLabel = createBoldLabel("Texture Image:");
     final JButton changeTextureButton = new JButton(new AbstractAction("Browse...") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -365,6 +371,7 @@ public abstract class ParticleAppearancePanel extends ParticleEditPanel {
     changeTextureButton.setMargin(new Insets(2, 2, 2, 2));
 
     final JButton clearTextureButton = new JButton(new AbstractAction("Clear") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

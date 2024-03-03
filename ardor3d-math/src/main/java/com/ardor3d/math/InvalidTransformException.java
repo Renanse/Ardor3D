@@ -1,8 +1,11 @@
 
 package com.ardor3d.math;
 
+import java.io.Serial;
+
 public class InvalidTransformException extends RuntimeException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public InvalidTransformException() {

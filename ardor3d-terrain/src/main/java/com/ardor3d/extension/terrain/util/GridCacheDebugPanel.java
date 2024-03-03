@@ -13,6 +13,7 @@ package com.ardor3d.extension.terrain.util;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -23,6 +24,7 @@ import javax.swing.SwingUtilities;
 import com.ardor3d.extension.terrain.client.AbstractGridCache;
 
 public class GridCacheDebugPanel extends JPanel implements Runnable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final List<AbstractGridCache> cacheList = new ArrayList<>();

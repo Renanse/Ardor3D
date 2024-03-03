@@ -30,6 +30,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -124,6 +125,7 @@ public class ParticleEditorFrame extends JFrame {
 
   public static final Object GLOBAL_CONTEXT = new Object();
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final String[] EXAMPLE_NAMES =
       {"Fire", "Fountain", "Lava", "Smoke", "Jet", "Snow", "Rain", "Explosion", "Ground Fog", "Fireflies"};
@@ -193,6 +195,7 @@ public class ParticleEditorFrame extends JFrame {
     setJMenuBar(createMenuBar());
 
     appearancePanel = new ParticleAppearancePanel(prefs) {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -291,6 +294,7 @@ public class ParticleEditorFrame extends JFrame {
 
   private JMenuBar createMenuBar() {
     final Action newAction = new AbstractAction("New") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -301,6 +305,7 @@ public class ParticleEditorFrame extends JFrame {
     newAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
 
     final Action open = new AbstractAction("Open...") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -311,6 +316,7 @@ public class ParticleEditorFrame extends JFrame {
     open.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
 
     final Action importAction = new AbstractAction("Merge Layers...") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -321,6 +327,7 @@ public class ParticleEditorFrame extends JFrame {
     importAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_I);
 
     final AbstractAction save = new AbstractAction("Save") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -331,6 +338,7 @@ public class ParticleEditorFrame extends JFrame {
     save.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
 
     final Action saveAs = new AbstractAction("Save As...") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -341,6 +349,7 @@ public class ParticleEditorFrame extends JFrame {
     saveAs.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
 
     final Action quit = new AbstractAction("Quit") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -361,6 +370,7 @@ public class ParticleEditorFrame extends JFrame {
     file.add(quit);
 
     spawnAction = new AbstractAction("Force Spawn") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -380,6 +390,7 @@ public class ParticleEditorFrame extends JFrame {
     edit.add(spawnAction);
 
     final Action showGrid = new AbstractAction("Show Grid") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -392,6 +403,7 @@ public class ParticleEditorFrame extends JFrame {
     showGrid.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_G);
 
     final Action changeBackground = new AbstractAction("Change Background Color...") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -402,6 +414,7 @@ public class ParticleEditorFrame extends JFrame {
     changeBackground.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
 
     final Action recenter = new AbstractAction("Recenter Camera") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -457,6 +470,7 @@ public class ParticleEditorFrame extends JFrame {
     });
 
     newLayerButton = new JButton(new AbstractAction("New") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -471,6 +485,7 @@ public class ParticleEditorFrame extends JFrame {
     newLayerButton.setMargin(new Insets(2, 14, 2, 14));
 
     deleteLayerButton = new JButton(new AbstractAction("Delete") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -506,6 +521,7 @@ public class ParticleEditorFrame extends JFrame {
     });
 
     exampleButton = new JButton(new AbstractAction("Apply") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -1177,6 +1193,7 @@ public class ParticleEditorFrame extends JFrame {
 
   class LayerTableModel extends AbstractTableModel {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

@@ -11,6 +11,7 @@
 package com.ardor3d.extension.model.util;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -58,6 +59,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
 
   private static final Logger logger = Logger.getLogger(KeyframeController.class.getName());
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**
@@ -764,6 +766,7 @@ public class KeyframeController<T extends Spatial> extends ComplexSpatialControl
     public Class<?> getClassTag() { return this.getClass(); }
   }
 
+  @Serial
   @SuppressWarnings("unchecked")
   private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();

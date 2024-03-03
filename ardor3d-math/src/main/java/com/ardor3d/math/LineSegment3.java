@@ -13,6 +13,7 @@ package com.ardor3d.math;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import com.ardor3d.math.type.ReadOnlyLineSegment3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -28,6 +29,7 @@ import com.ardor3d.util.export.OutputCapsule;
  */
 public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poolable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<LineSegment3> LINESEG3_POOL =

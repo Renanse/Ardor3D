@@ -14,6 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
@@ -24,6 +25,7 @@ import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 
 public class WindInfluencePanel extends InfluenceEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ValuePanel _windStrengthPanel = new ValuePanel("Strength: ", "", 0.0, 100.0, 0.1);
@@ -40,6 +42,7 @@ public class WindInfluencePanel extends InfluenceEditPanel {
     _windStrengthPanel.addChangeListener(e -> ((SimpleParticleInfluenceFactory.BasicWind) getEdittedInfluence())
         .setStrength(_windStrengthPanel.getDoubleValue()));
     _windRandomBox = new JCheckBox(new AbstractAction("Vary Randomly") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

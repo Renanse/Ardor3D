@@ -15,8 +15,11 @@ import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 
+import java.io.Serial;
+
 public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Ray3> RAY_POOL = ObjectPool.create(Ray3.class, MathConstants.maxMathPoolSize);

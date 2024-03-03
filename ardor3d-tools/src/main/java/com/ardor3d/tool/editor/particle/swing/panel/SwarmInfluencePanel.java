@@ -13,6 +13,7 @@ package com.ardor3d.tool.editor.particle.swing.panel;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.Serial;
 
 import com.ardor3d.extension.effect.particle.SwarmInfluence;
 import com.ardor3d.math.util.MathUtils;
@@ -21,6 +22,7 @@ import com.ardor3d.tool.editor.swing.widget.Vector3Panel;
 
 public class SwarmInfluencePanel extends InfluenceEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ValuePanel _swarmRange = new ValuePanel("Range: ", "", -Double.MIN_VALUE, Double.MAX_VALUE, 0.1);

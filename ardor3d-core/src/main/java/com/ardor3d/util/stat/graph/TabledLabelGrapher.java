@@ -238,12 +238,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
       decimals = 1; // use 1 spot anyway.
     }
 
-    final StringBuilder format = new StringBuilder(decimals > 0 ? "0.0" : "0");
-    for (int x = 1; x < decimals; x++) {
-      format.append('0');
-    }
-
-    return new DecimalFormat(format.toString()).format(val) + post;
+    return new DecimalFormat((decimals > 0 ? "0.0" : "0") + "0".repeat(Math.max(0, decimals - 1))).format(val) + post;
   }
 
   public int getThreshold() { return _threshold; }

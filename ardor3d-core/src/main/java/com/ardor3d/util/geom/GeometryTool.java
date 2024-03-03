@@ -130,7 +130,7 @@ public final class GeometryTool {
       final Map<Integer, Integer> indexRemap = new HashMap<>();
       Map<VertKey, Integer> store;
       int good = 0;
-      long group;
+      int group;
       for (int x = 0, max = verts.length; x < max; x++) {
         group = groupData.getGroupForVertex(x);
         final VertKey vkey = new VertKey(verts[x], norms != null ? norms[x] : null, colors != null ? colors[x] : null,

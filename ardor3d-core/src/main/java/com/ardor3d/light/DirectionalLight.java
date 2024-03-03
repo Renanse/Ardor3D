@@ -10,6 +10,7 @@
 
 package com.ardor3d.light;
 
+import java.io.Serial;
 import java.util.function.Supplier;
 
 import com.ardor3d.light.shadow.DirectionalShadowData;
@@ -27,6 +28,7 @@ import com.ardor3d.renderer.material.uniform.UniformType;
  * direction field of this class identifies the direction in which the light is traveling.
  */
 public class DirectionalLight extends Light {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // Locally cached direction vector for our light.

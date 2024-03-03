@@ -12,6 +12,7 @@ package com.ardor3d.framework.lwjgl3.awt;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -33,6 +34,7 @@ import com.ardor3d.input.mouse.MouseManager;
  */
 public class Lwjgl3AwtCanvas extends AWTGLCanvas implements Canvas {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected CanvasRenderer _canvasRenderer;

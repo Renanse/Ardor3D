@@ -11,6 +11,7 @@
 package com.ardor3d.tool.editor.particle.swing.panel;
 
 import java.awt.BorderLayout;
+import java.io.Serial;
 
 import com.ardor3d.extension.effect.particle.FloorInfluence;
 import com.ardor3d.tool.editor.swing.widget.ValuePanel;
@@ -18,6 +19,7 @@ import com.ardor3d.tool.editor.swing.widget.Vector3Panel;
 
 public class FloorInfluencePanel extends InfluenceEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final ValuePanel _constantValue = new ValuePanel("Constant: ", "", -Double.MAX_VALUE, Double.MAX_VALUE, 0.1);

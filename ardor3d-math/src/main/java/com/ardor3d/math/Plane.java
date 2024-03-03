@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -31,6 +28,7 @@ import com.ardor3d.util.export.Savable;
  */
 public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane, Poolable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Plane> PLANE_POOL = ObjectPool.create(Plane.class, MathConstants.maxMathPoolSize);

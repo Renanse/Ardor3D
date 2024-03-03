@@ -39,31 +39,31 @@ import com.ardor3d.util.resource.ResourceSource;
 final public class TextureKey implements Savable {
 
   /** The source of the image used in this Texture. */
-  protected ResourceSource _source = null;
+  private ResourceSource _source = null;
 
   /** Whether we had asked the loader of the image to flip vertically. */
-  protected boolean _flipped;
+  private boolean _flipped;
 
   /** The stored format of our image. */
-  protected TextureStoreFormat _format = TextureStoreFormat.GuessCompressedFormat;
+  private TextureStoreFormat _format = TextureStoreFormat.GuessCompressedFormat;
 
   /**
    * An optional id, used to differentiate keys where the rest of the values are the same. RTT
    * operations are a good example.
    */
-  protected String _id;
+  private String _id;
 
   /**
    * The minification filter used on our texture (generally determines what mipmaps are created - if
    * any - and how.)
    */
-  protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
+  private Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
 
   /**
    * list of OpenGL contexts we believe have up to date values from all buffers and indices. For use
    * in multi-context mode.
    */
-  protected transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
+  private final transient Set<WeakReference<RenderContextRef>> _uploadedContexts;
 
   /**
    * In single-context rendering this is used to track if this texture is in need of updating.
@@ -71,24 +71,26 @@ final public class TextureKey implements Savable {
   private boolean _uploaded;
 
   /** cache of OpenGL context specific texture ids for the associated texture. */
-  protected final transient ContextValueReference<TextureKey, Integer> _idCache =
+  private final transient ContextValueReference<TextureKey, Integer> _idCache =
       ContextValueReference.newReference(this, TextureManager.getRefQueue());
 
   /** cached hashcode value. */
-  protected transient int _code = Integer.MAX_VALUE;
+  private transient int _code = Integer.MAX_VALUE;
 
   /** cache of texturekey objects allowing us to find an existing texture key. */
-  protected static final List<WeakReference<TextureKey>> _keyCache = new LinkedList<>();
+  private static final List<WeakReference<TextureKey>> _keyCache = new LinkedList<>();
 
   private static final Integer ZERO = 0;
 
   /** RTT code use */
-  private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
+  private static final AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
 
   /** DO NOT USE. FOR INTERNAL USE ONLY */
-  protected TextureKey() {
+  private TextureKey() {
     if (Constants.useMultipleContexts) {
       _uploadedContexts = new HashSet<>();
+    } else {
+      _uploadedContexts = null;
     }
   }
 
@@ -232,7 +234,7 @@ final public class TextureKey implements Savable {
   }
 
   /**
-   * @param context
+   * @param contextRef
    *          the reference to a shared OpenGL context that a texture belongs to.
    * @return the texture id of a texture in the given context. If the texture is not found in the
    *         given context, 0 is returned.
@@ -281,7 +283,7 @@ final public class TextureKey implements Savable {
     } else {
       _uploaded = false;
     }
-    return id != null ? id.intValue() : 0;
+    return id != null ? id : 0;
   }
 
   /**
@@ -321,11 +323,10 @@ final public class TextureKey implements Savable {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof TextureKey)) {
+    if (!(other instanceof TextureKey that)) {
       return false;
     }
 
-    final TextureKey that = (TextureKey) other;
     if (_source == null) {
       if (that._source != null) {
         return false;
@@ -387,9 +388,8 @@ final public class TextureKey implements Savable {
 
   @Override
   public String toString() {
-    final String x = "tkey: src:" + _source + " flip: " + _flipped + " code: " + hashCode() + " imageType: " + _format
+    return "tkey: src:" + _source + " flip: " + _flipped + " code: " + hashCode() + " imageType: " + _format
         + " id: " + _id;
-    return x;
   }
 
   // /////////////////

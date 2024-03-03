@@ -14,6 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
@@ -27,6 +28,7 @@ import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 
 public class VortexInfluencePanel extends InfluenceEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final JComboBox<String> _vortexTypeBox = new JComboBox<>(new String[] {"Cylinder", "Torus"});
@@ -68,6 +70,7 @@ public class VortexInfluencePanel extends InfluenceEditPanel {
     _vortexDivergencePanel.addChangeListener(e -> ((SimpleParticleInfluenceFactory.BasicVortex) getEdittedInfluence())
         .setDivergence(_vortexDivergencePanel.getDoubleValue() * MathUtils.DEG_TO_RAD));
     _vortexRandomBox = new JCheckBox(new AbstractAction("Vary Randomly") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

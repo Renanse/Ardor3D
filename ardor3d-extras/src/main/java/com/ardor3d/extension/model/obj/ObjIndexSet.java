@@ -12,10 +12,10 @@ package com.ardor3d.extension.model.obj;
 
 public class ObjIndexSet {
   private final int _vIndex, _vtIndex;
-  private final long _sGroup;
+  private final int _sGroup;
   private int _vnIndex;
 
-  public ObjIndexSet(final String parts, final ObjDataStore store, final long smoothGroup) {
+  public ObjIndexSet(final String parts, final ObjDataStore store, final int smoothGroup) {
     final String[] tokens = parts.split("/");
     _vIndex = tokens.length < 1 ? -1 : parseValue(tokens[0], store.getVertices().size());
     _vtIndex = tokens.length < 2 ? -1 : parseValue(tokens[1], store.getUvs().size());
@@ -24,7 +24,7 @@ public class ObjIndexSet {
   }
 
   private int parseValue(final String token, final int currentPosition) {
-    if (token == null || "".equals(token)) {
+    if (token == null || token.isEmpty()) {
       return -1;
     } else {
       int value = Integer.parseInt(token);
@@ -38,7 +38,7 @@ public class ObjIndexSet {
     }
   }
 
-  public long getSmoothGroup() {
+  public int getSmoothGroup() {
     // normals override smoothing
     if (_vnIndex >= 0) {
       return 0;
@@ -60,7 +60,7 @@ public class ObjIndexSet {
     result = 31 * result + _vIndex;
     result = 31 * result + _vtIndex;
     result = 31 * result + _vnIndex;
-    result = 31 * result + (int) (_sGroup ^ _sGroup >>> 32);
+    result = 31 * result + _sGroup;
     return result;
   }
 

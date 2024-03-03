@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 import com.ardor3d.math.type.ReadOnlyRectangle2;
 import com.ardor3d.math.util.EqualsUtil;
@@ -31,6 +28,7 @@ import com.ardor3d.util.export.Savable;
  */
 
 public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyRectangle2, Poolable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Rectangle2> RECTANGLE_POOL =

@@ -14,8 +14,11 @@ import com.ardor3d.math.type.ReadOnlyLine3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.EqualsUtil;
 
+import java.io.Serial;
+
 public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Line3> LINE3_POOL = ObjectPool.create(Line3.class, MathConstants.maxMathPoolSize);

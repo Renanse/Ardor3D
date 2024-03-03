@@ -11,6 +11,7 @@
 package com.ardor3d.bounding;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.buffer.BufferUtils;
@@ -30,6 +31,7 @@ import com.ardor3d.util.export.OutputCapsule;
 
 public class OrientedBoundingBox extends BoundingVolume {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** X axis of the Oriented Box. */

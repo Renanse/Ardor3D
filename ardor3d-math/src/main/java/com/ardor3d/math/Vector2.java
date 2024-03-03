@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.util.EqualsUtil;
@@ -29,6 +26,7 @@ import com.ardor3d.util.export.Savable;
  */
 public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVector2, Poolable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Vector2> VEC_POOL = ObjectPool.create(Vector2.class, MathConstants.maxMathPoolSize);

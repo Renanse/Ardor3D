@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.util.Objects;
@@ -42,6 +39,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
    */
   public static final double ALLOWED_DEVIANCE = 0.00000001;
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Transform> TRANS_POOL =

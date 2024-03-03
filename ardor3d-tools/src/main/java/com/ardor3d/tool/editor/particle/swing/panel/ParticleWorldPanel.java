@@ -15,6 +15,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -29,6 +30,7 @@ import com.ardor3d.tool.editor.swing.widget.ValuePanel;
 
 public class ParticleWorldPanel extends ParticleEditPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final JLabel _countLabel;
@@ -43,6 +45,7 @@ public class ParticleWorldPanel extends ParticleEditPanel {
 
     _countLabel = createBoldLabel("Particles: 300");
     final JButton countButton = new JButton(new AbstractAction("Change...") {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

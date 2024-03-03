@@ -10,6 +10,7 @@
 
 package com.ardor3d.bounding;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import com.ardor3d.scenegraph.Spatial;
  */
 public class CollisionTree implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public enum Type {

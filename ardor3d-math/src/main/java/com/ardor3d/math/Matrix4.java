@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 import java.nio.BufferOverflowException;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
@@ -44,6 +41,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   public static final double ALLOWED_DEVIANCE = 0.00000001;
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Matrix4> MAT_POOL = ObjectPool.create(Matrix4.class, MathConstants.maxMathPoolSize);
@@ -304,84 +302,43 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
    */
   public Matrix4 setValue(final int row, final int column, final double value) {
     switch (row) {
-      case 0:
+      case 0 -> {
         switch (column) {
-          case 0:
-            _m00 = value;
-            break;
-          case 1:
-            _m01 = value;
-            break;
-          case 2:
-            _m02 = value;
-            break;
-          case 3:
-            _m03 = value;
-            break;
-          default:
-            throw new IllegalArgumentException();
+          case 0 -> _m00 = value;
+          case 1 -> _m01 = value;
+          case 2 -> _m02 = value;
+          case 3 -> _m03 = value;
+          default -> throw new IllegalArgumentException();
         }
-        break;
-
-      case 1:
+      }
+      case 1 -> {
         switch (column) {
-          case 0:
-            _m10 = value;
-            break;
-          case 1:
-            _m11 = value;
-            break;
-          case 2:
-            _m12 = value;
-            break;
-          case 3:
-            _m13 = value;
-            break;
-          default:
-            throw new IllegalArgumentException();
+          case 0 -> _m10 = value;
+          case 1 -> _m11 = value;
+          case 2 -> _m12 = value;
+          case 3 -> _m13 = value;
+          default -> throw new IllegalArgumentException();
         }
-        break;
-
-      case 2:
+      }
+      case 2 -> {
         switch (column) {
-          case 0:
-            _m20 = value;
-            break;
-          case 1:
-            _m21 = value;
-            break;
-          case 2:
-            _m22 = value;
-            break;
-          case 3:
-            _m23 = value;
-            break;
-          default:
-            throw new IllegalArgumentException();
+          case 0 -> _m20 = value;
+          case 1 -> _m21 = value;
+          case 2 -> _m22 = value;
+          case 3 -> _m23 = value;
+          default -> throw new IllegalArgumentException();
         }
-        break;
-
-      case 3:
+      }
+      case 3 -> {
         switch (column) {
-          case 0:
-            _m30 = value;
-            break;
-          case 1:
-            _m31 = value;
-            break;
-          case 2:
-            _m32 = value;
-            break;
-          case 3:
-            _m33 = value;
-            break;
-          default:
-            throw new IllegalArgumentException();
+          case 0 -> _m30 = value;
+          case 1 -> _m31 = value;
+          case 2 -> _m32 = value;
+          case 3 -> _m33 = value;
+          default -> throw new IllegalArgumentException();
         }
-        break;
-
-      default:
-        throw new IllegalArgumentException();
+      }
+      default -> throw new IllegalArgumentException();
     }
 
     return this;

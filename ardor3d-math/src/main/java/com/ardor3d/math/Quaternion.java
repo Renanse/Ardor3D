@@ -10,10 +10,7 @@
 
 package com.ardor3d.math;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
@@ -39,6 +36,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
    */
   public static final double ALLOWED_DEVIANCE = 0.00000001;
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private static final ObjectPool<Quaternion> QUAT_POOL =

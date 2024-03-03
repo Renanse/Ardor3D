@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.pass;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -37,6 +38,7 @@ import com.ardor3d.scenegraph.Spatial;
  */
 public abstract class Pass implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /** list of Spatial objects registered with this pass. */

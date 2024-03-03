@@ -119,7 +119,7 @@ public class ObjImporter {
   public ObjGeometryStore load(final ResourceSource resource) {
     try {
       final ObjGeometryStore store = new ObjGeometryStore();
-      long currentSmoothGroup = -1;
+      int currentSmoothGroup = -1;
 
       final BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()));
       String line;
@@ -238,7 +238,7 @@ public class ObjImporter {
           if ("off".equalsIgnoreCase(tokens[1])) {
             currentSmoothGroup = 0;
           } else {
-            currentSmoothGroup = Long.parseLong(tokens[1]);
+            currentSmoothGroup = Integer.parseInt(tokens[1]);
           }
         }
 

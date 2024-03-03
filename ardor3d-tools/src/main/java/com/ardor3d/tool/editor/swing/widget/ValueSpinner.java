@@ -15,6 +15,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.io.Serial;
 
 import javax.swing.JButton;
 import javax.swing.JSpinner;
@@ -24,6 +25,7 @@ import javax.swing.event.MouseInputAdapter;
 import com.ardor3d.math.util.MathUtils;
 
 public class ValueSpinner extends JSpinner {
+  @Serial
   private static final long serialVersionUID = 1L;
   private final NumberEditor _ne;
 
@@ -64,6 +66,7 @@ public class ValueSpinner extends JSpinner {
       protected Point _last = new Point();
     };
     _ne = new NumberEditor(this) {
+      @Serial
       private static final long serialVersionUID = 1L;
 
       @Override

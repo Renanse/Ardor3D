@@ -11,6 +11,7 @@
 package com.ardor3d.light;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ import com.ardor3d.util.export.Savable;
  */
 public abstract class Light extends Spatial implements Serializable, Savable, IUniformSupplier {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   protected final List<UniformRef> _cachedUniforms = new ArrayList<>();

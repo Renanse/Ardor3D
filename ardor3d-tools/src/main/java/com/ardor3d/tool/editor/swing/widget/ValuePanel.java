@@ -11,6 +11,7 @@
 package com.ardor3d.tool.editor.swing.widget;
 
 import java.awt.Font;
+import java.io.Serial;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,6 +19,7 @@ import javax.swing.event.ChangeListener;
 
 public class ValuePanel extends JPanel {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public static Font LABEL_FONT = new Font("Arial", Font.BOLD, 13);

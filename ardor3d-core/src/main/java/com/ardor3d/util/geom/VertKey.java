@@ -23,17 +23,17 @@ public class VertKey {
   private final Vector3 _norm;
   private final ColorRGBA _color;
   private final Vector2[] _texs;
-  private final long _smoothGroup;
+  private final int _smoothGroup;
   private final EnumSet<MatchCondition> _options;
   private int _hashCode = 0;
 
   public VertKey(final Vector3 vert, final Vector3 norm, final ColorRGBA color, final Vector2[] texs,
     final EnumSet<MatchCondition> options) {
-    this(vert, norm, color, texs, options, 0);
+    this(vert, norm, color, texs, options, VertGroupData.DEFAULT_GROUP);
   }
 
   public VertKey(final Vector3 vert, final Vector3 norm, final ColorRGBA color, final Vector2[] texs,
-    final EnumSet<MatchCondition> options, final long smoothGroup) {
+    final EnumSet<MatchCondition> options, final int smoothGroup) {
     _vert = vert;
     _options = options != null ? options : EnumSet.noneOf(MatchCondition.class);
     _norm = (_options.contains(MatchCondition.Normal)) ? norm : null;
@@ -94,11 +94,9 @@ public class VertKey {
       return true;
     }
 
-    if (!(obj instanceof VertKey)) {
+    if (!(obj instanceof VertKey other)) {
       return false;
     }
-
-    final VertKey other = (VertKey) obj;
 
     if (other._options != _options) {
       return false;

@@ -11,6 +11,7 @@
 package com.ardor3d.bounding;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.FloatBuffer;
 
@@ -26,6 +27,7 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
 public abstract class BoundingVolume implements Serializable, Savable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public enum Type {

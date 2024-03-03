@@ -10,8 +10,11 @@
 
 package com.ardor3d.util;
 
+import java.io.Serial;
+
 public class Ardor3dException extends RuntimeException {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public Ardor3dException() {
