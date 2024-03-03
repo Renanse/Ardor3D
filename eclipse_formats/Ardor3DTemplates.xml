@@ -14,7 +14,7 @@ ${body_statement}</template><template autoinsert="true" context="settercomment_c
 </template><template autoinsert="true" context="gettercomment_context" deleted="false" description="Comment for getter method" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.gettercomment" name="gettercomment">/**
  * @return the ${bare_field_name}
  */</template><template autoinsert="true" context="setterbody_context" deleted="false" description="Code in created setters" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.setterbody" name="setterbody">${field} = ${param};</template><template autoinsert="false" context="newtype_context" deleted="false" description="Newly created files" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.newtype" name="newtype">/**
- * Copyright (c) 2008-2021 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2024 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *

@@ -9,7 +9,7 @@ importPackage(Packages.com.ardor3d.extension.animation.skeletal.layer);
 importPackage(Packages.com.ardor3d.extension.animation.skeletal.state);
 
 /**
- * Copyright (c) 2008-2021 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2024 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
