@@ -115,34 +115,34 @@ public class Md2Importer {
           bis.readInt(), bis.readInt(), bis.readInt(), bis.readInt(), bis.readInt());
 
       // Check magic word and version
-      if (header.magic != ('2' << 24) + ('P' << 16) + ('D' << 8) + 'I') {
+      if (header.magic() != ('2' << 24) + ('P' << 16) + ('D' << 8) + 'I') {
         throw new Ardor3dException("Not an MD2 file.");
       }
-      if (header.version != 8) {
+      if (header.version() != 8) {
         throw new Ardor3dException("Invalid file version (Version not 8)!");
       }
 
       // Parse out texture names
-      final String[] texNames = new String[header.numSkins];
-      bis.seek(header.offsetSkins);
-      for (int i = 0; i < header.numSkins; i++) {
+      final String[] texNames = new String[header.numSkins()];
+      bis.seek(header.offsetSkins());
+      for (int i = 0; i < header.numSkins(); i++) {
         texNames[i] = bis.readString(64);
       }
 
       // Parse out tex coords
-      final float[] texCoords = new float[2 * header.numTexCoords];
-      bis.seek(header.offsetTexCoords);
-      final float inverseWidth = 1f / header.skinWidth;
-      final float inverseHeight = 1f / header.skinHeight;
-      for (int i = 0; i < header.numTexCoords; i++) {
+      final float[] texCoords = new float[2 * header.numTexCoords()];
+      bis.seek(header.offsetTexCoords());
+      final float inverseWidth = 1f / header.skinWidth();
+      final float inverseHeight = 1f / header.skinHeight();
+      for (int i = 0; i < header.numTexCoords(); i++) {
         texCoords[i * 2 + 0] = bis.readShort() * inverseWidth;
         texCoords[i * 2 + 1] = bis.readShort() * inverseHeight;
       }
 
       // Parse out triangles
-      final short[] triangles = new short[header.numTriangles * 6];
-      bis.seek(header.offsetTriangles);
-      for (int i = 0; i < header.numTriangles; i++) {
+      final short[] triangles = new short[header.numTriangles() * 6];
+      bis.seek(header.offsetTriangles());
+      for (int i = 0; i < header.numTriangles(); i++) {
         triangles[i * 6 + 0] = bis.readShort(); // vert index 0
         triangles[i * 6 + 1] = bis.readShort(); // vert index 1
         triangles[i * 6 + 2] = bis.readShort(); // vert index 2
@@ -152,13 +152,13 @@ public class Md2Importer {
       }
 
       // Parse out gl commands
-      final Md2GlCommand[] commands = new Md2GlCommand[header.numGlCommands];
-      bis.seek(header.offsetGlCommands);
+      final Md2GlCommand[] commands = new Md2GlCommand[header.numGlCommands()];
+      bis.seek(header.offsetGlCommands());
       int length, absLength;
       Md2GlCommand cmd;
       final List<Integer> fanIndices = new ArrayList<>();
       final List<Integer> stripIndices = new ArrayList<>();
-      for (int i = 0; i < header.numGlCommands; i++) {
+      for (int i = 0; i < header.numGlCommands(); i++) {
         length = bis.readInt();
         if (length == 0) {
           break;
@@ -178,22 +178,22 @@ public class Md2Importer {
       }
 
       // Parse out frames
-      final Md2Frame[] frames = new Md2Frame[header.numFrames];
-      bis.seek(header.offsetFrames);
+      final Md2Frame[] frames = new Md2Frame[header.numFrames()];
+      bis.seek(header.offsetFrames());
       final Vector3 scale = new Vector3();
       final Vector3 translate = new Vector3();
-      for (int i = 0; i < header.numFrames; i++) {
+      for (int i = 0; i < header.numFrames(); i++) {
         scale.set(bis.readFloat(), bis.readFloat(), bis.readFloat());
         translate.set(bis.readFloat(), bis.readFloat(), bis.readFloat());
         final String name = bis.readString(16);
-        final byte[] vertData = new byte[header.numVertices * 4];
+        final byte[] vertData = new byte[header.numVertices() * 4];
         bis.readFully(vertData);
         frames[i] = new Md2Frame(vertData, name, scale, translate);
       }
 
       // make index modes/counts to be used throughout meshes
       int vertexCount = 0;
-      int fanIndex = stripIndices.size() != 0 ? 1 : 0;
+      int fanIndex = !stripIndices.isEmpty() ? 1 : 0;
       final IndexMode[] modes = new IndexMode[fanIndices.size() + fanIndex];
       final int[] counts = new int[modes.length];
       for (final Integer index : fanIndices) {
@@ -202,7 +202,7 @@ public class Md2Importer {
         vertexCount += counts[fanIndex];
         fanIndex++;
       }
-      if (stripIndices.size() != 0) {
+      if (!stripIndices.isEmpty()) {
         int triCounts = 0;
         int vertCount;
         int extra = 0;
@@ -219,9 +219,9 @@ public class Md2Importer {
       vertexCount++;
 
       // Create each frame as a Mesh using glcommands if given
-      final Mesh[] meshes = new Mesh[header.numFrames];
+      final Mesh[] meshes = new Mesh[header.numFrames()];
       MeshData mData;
-      for (int i = 0; i < header.numFrames; i++) {
+      for (int i = 0; i < header.numFrames(); i++) {
         final Md2Frame frame = frames[i];
 
         meshes[i] = new Mesh(frames[i].name);
@@ -241,7 +241,7 @@ public class Md2Importer {
 
         // go through the triangle strips/fans and add them in
         // first the strips
-        if (stripIndices.size() != 0) {
+        if (!stripIndices.isEmpty()) {
           for (int maxJ = stripIndices.size(), j = 0; j < maxJ; j++) {
             cmd = commands[stripIndices.get(j)];
             if (cmd.vertIndices.length < 3) {
