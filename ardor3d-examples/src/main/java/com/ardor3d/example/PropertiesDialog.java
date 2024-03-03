@@ -509,7 +509,7 @@ public final class PropertiesDialog extends JDialog {
       final String res = modes[i].getWidth() + " x " + modes[i].getHeight();
       final String depth =
           (modes[i].getBitDepth() != DisplayMode.BIT_DEPTH_MULTI) ? modes[i].getBitDepth() + " bpp" : "? bpp";
-      if (res.equals(resolution) && !depths.contains(depth)) {
+      if (res.equals(resolution)) {
         depths.add(depth);
       }
     }

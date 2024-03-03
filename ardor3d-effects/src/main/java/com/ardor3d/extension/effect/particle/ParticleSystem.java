@@ -253,11 +253,11 @@ public abstract class ParticleSystem extends Node {
 
   public double getEndSize() { return _endSize; }
 
-  public void setEndSize(final double size) { _endSize = size >= 0.0 ? size : 0.0; }
+  public void setEndSize(final double size) { _endSize = Math.max(size, 0.0); }
 
   public double getStartSize() { return _startSize; }
 
-  public void setStartSize(final double size) { _startSize = size >= 0.0 ? size : 0.0; }
+  public void setStartSize(final double size) { _startSize = Math.max(size, 0.0); }
 
   /**
    * Set the start color for particles.
@@ -355,7 +355,7 @@ public abstract class ParticleSystem extends Node {
    * @param f
    *          The new emission minimum angle.
    */
-  public void setMinimumAngle(final double f) { _minimumAngle = f >= 0.0 ? f : 0.0; }
+  public void setMinimumAngle(final double f) { _minimumAngle = Math.max(f, 0.0); }
 
   /**
    * getEmissionMinimumAngle returns the minimum emission angle.
@@ -371,7 +371,7 @@ public abstract class ParticleSystem extends Node {
    * @param f
    *          The new emission maximum angle.
    */
-  public void setMaximumAngle(final double f) { _maximumAngle = f >= 0.0 ? f : 0.0; }
+  public void setMaximumAngle(final double f) { _maximumAngle = Math.max(f, 0.0); }
 
   /**
    * getEmissionMaximumAngle returns the maximum emission angle.

@@ -153,9 +153,7 @@ public abstract class AbstractGridCache {
         tileIterator.remove();
 
         // remove the tile from the back accumulator list, since we don't need it anymore.
-        if (backThreadTiles.contains(data)) {
-          backThreadTiles.remove(data);
-        }
+        backThreadTiles.remove(data);
       }
 
       // If the tile IS in the new data set and doesn't need retry,

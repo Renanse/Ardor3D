@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.providers.procedural;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -107,9 +108,7 @@ public class ProceduralTerrainSource implements TerrainSource {
 
   public void markInvalid() {
     synchronized (_invalidLevels) {
-      for (int i = 0; i < _invalidLevels.length; i++) {
-        _invalidLevels[i] = true;
-      }
+      Arrays.fill(_invalidLevels, true);
     }
   }
 

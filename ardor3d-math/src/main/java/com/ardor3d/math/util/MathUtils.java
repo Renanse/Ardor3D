@@ -467,15 +467,15 @@ public class MathUtils {
   }
 
   public static double clamp(final double val, final double min, final double max) {
-    return val < min ? min : val > max ? max : val;
+    return val < min ? min : Math.min(val, max);
   }
 
   public static float clamp(final float val, final float min, final float max) {
-    return val < min ? min : val > max ? max : val;
+    return val < min ? min : Math.min(val, max);
   }
 
   public static int clamp(final int val, final int min, final int max) {
-    return val < min ? min : val > max ? max : val;
+    return val < min ? min : Math.min(val, max);
   }
 
   public static double clamp01(final double val) {

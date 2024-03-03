@@ -381,13 +381,11 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
   }
 
   protected int getMinimumContentWidth() {
-    return Math.max(_minimumContentsSize.getWidth() > 0 ? _minimumContentsSize.getWidth() : 0,
-        _layoutMinimumContentsSize.getWidth());
+    return Math.max(Math.max(_minimumContentsSize.getWidth(), 0), _layoutMinimumContentsSize.getWidth());
   }
 
   protected int getMinimumContentHeight() {
-    return Math.max(_minimumContentsSize.getHeight() > 0 ? _minimumContentsSize.getHeight() : 0,
-        _layoutMinimumContentsSize.getHeight());
+    return Math.max(Math.max(_minimumContentsSize.getHeight(), 0), _layoutMinimumContentsSize.getHeight());
   }
 
   /**

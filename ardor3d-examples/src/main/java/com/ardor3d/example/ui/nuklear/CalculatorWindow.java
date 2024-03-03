@@ -112,8 +112,9 @@ class CalculatorWindow extends NuklearWindow {
               op = 0;
             }
           } else if (((i + 1) % 4) != 0) {
-            if (nk_button_text(ctx, Character.toString(NUMS.charAt((i / 4) * 3 + i % 4)))) {
-              current[0] = current[0] * 10.0f + (NUMS.charAt((i / 4) * 3 + i % 4) - '0');
+            var c = NUMS.charAt((i / 4) * 3 + i % 4);
+            if (nk_button_text(ctx, Character.toString(c))) {
+              current[0] = current[0] * 10.0f + (c - '0');
               set = false;
             }
           } else if (nk_button_text(ctx, Character.toString(OPS.charAt(i / 4)))) {

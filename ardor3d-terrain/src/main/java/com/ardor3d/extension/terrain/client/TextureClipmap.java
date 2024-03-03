@@ -485,7 +485,7 @@ public class TextureClipmap {
   public Texture getTexture() { return textureClipmap; }
 
   public static int clamp(final int x, final int low, final int high) {
-    return x < low ? low : x > high ? high : x;
+    return x < low ? low : Math.min(x, high);
   }
 
   private Texture createTexture() {
