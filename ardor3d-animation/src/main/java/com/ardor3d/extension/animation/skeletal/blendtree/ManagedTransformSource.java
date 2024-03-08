@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.animation.skeletal.blendtree;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,6 @@ import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.extension.animation.skeletal.clip.JointData;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * This tree source maintains its own source data, which can be modified directly using setJointXXX.
@@ -116,7 +116,7 @@ public class ManagedTransformSource implements BlendTreeSource {
    */
   @Override
   public Map<String, JointData> getSourceData(final AnimationManager manager) {
-    return ImmutableMap.copyOf(data);
+    return Collections.unmodifiableMap(data);
   }
 
   /**

@@ -10,7 +10,7 @@
 
 package com.ardor3d.input.controller;
 
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 public interface ControllerWrapper {
   /**

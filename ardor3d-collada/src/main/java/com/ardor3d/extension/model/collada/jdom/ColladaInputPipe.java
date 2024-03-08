@@ -56,20 +56,14 @@ public class ColladaInputPipe {
 
     @Override
     public String toString() {
-      switch (paramType) {
-        case bool_param:
-          return "SourceData [boolArray=" + Arrays.toString(boolArray) + "]";
-        case float_param:
-          return "SourceData [floatArray=" + Arrays.toString(floatArray) + "]";
-        case idref_param:
-          return "SourceData [idrefArray=" + Arrays.toString(stringArray) + "]";
-        case int_param:
-          return "SourceData [intArray=" + Arrays.toString(intArray) + "]";
-        case name_param:
-          return "SourceData [nameArray=" + Arrays.toString(stringArray) + "]";
-        default:
-          return "Unknown paramType";
-      }
+      return switch (paramType) {
+        case bool_param -> "SourceData [boolArray=" + Arrays.toString(boolArray) + "]";
+        case float_param -> "SourceData [floatArray=" + Arrays.toString(floatArray) + "]";
+        case idref_param -> "SourceData [idrefArray=" + Arrays.toString(stringArray) + "]";
+        case int_param -> "SourceData [intArray=" + Arrays.toString(intArray) + "]";
+        case name_param -> "SourceData [nameArray=" + Arrays.toString(stringArray) + "]";
+        default -> "Unknown paramType";
+      };
     }
   }
 

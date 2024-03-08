@@ -154,15 +154,15 @@ public class RampEntry implements Savable {
     }
 
     if (_size != DEFAULT_SIZE) {
-      builder.append("  size: " + _size);
+      builder.append("  size: ").append(_size);
     }
 
     if (_mass != DEFAULT_MASS) {
-      builder.append("  mass: " + _spin);
+      builder.append("  mass: ").append(_spin);
     }
 
     if (_spin != DEFAULT_SPIN) {
-      builder.append("  spin: " + _spin);
+      builder.append("  spin: ").append(_spin);
     }
 
     return builder.toString();

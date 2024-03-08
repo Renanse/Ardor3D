@@ -10,7 +10,7 @@
 
 package com.ardor3d.input.character;
 
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 /**
  * Defines the API for character input wrappers - these classes supply characters input into the

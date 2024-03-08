@@ -18,7 +18,6 @@ import java.util.Map;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -83,7 +82,7 @@ public enum CollisionTreeManager {
   /**
    * private constructor for the Singleton. Initializes the cache.
    */
-  private CollisionTreeManager() {
+  CollisionTreeManager() {
     _cache = new MapMaker().weakKeys().makeMap();
     _protectedList = Collections.synchronizedList(new ArrayList<>(1));
     setCollisionTreeController(new UsageTreeController());
@@ -127,9 +126,7 @@ public enum CollisionTreeManager {
    * @return the tree associated with a given mesh
    */
   public synchronized CollisionTree getCollisionTree(final Mesh mesh) {
-    CollisionTree toReturn = null;
-
-    toReturn = cacheGet(mesh);
+    var toReturn = cacheGet(mesh);
 
     // we didn't have it in the cache, create it if possible.
     if (toReturn == null) {
@@ -211,7 +208,7 @@ public enum CollisionTreeManager {
    * @param protect
    *          true if this tree is to be protected, false otherwise.
    */
-  protected void generateCollisionTree(final CollisionTree tree, final Mesh mesh, final boolean protect) {
+  private void generateCollisionTree(final CollisionTree tree, final Mesh mesh, final boolean protect) {
     tree.construct(mesh, _doSort);
     cachePut(mesh, tree);
     // This mesh has been added by outside sources and labeled
@@ -389,5 +386,5 @@ public enum CollisionTreeManager {
    * 
    * @return an immutable copy of the list of protected meshes.
    */
-  public List<Mesh> getProtectedMeshes() { return ImmutableList.copyOf(_protectedList); }
+  public List<Mesh> getProtectedMeshes() { return List.copyOf(_protectedList); }
 }

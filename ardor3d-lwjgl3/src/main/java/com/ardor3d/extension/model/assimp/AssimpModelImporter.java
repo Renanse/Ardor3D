@@ -135,7 +135,7 @@ public class AssimpModelImporter {
 
   public ModelDataStore load(final String resource) {
     if (resource == null) {
-      throw new Error("Unable to locate '" + resource + "'");
+      throw new Error("Unable to locate model - passed in resource was null.");
     }
     _originalResource = null;
 

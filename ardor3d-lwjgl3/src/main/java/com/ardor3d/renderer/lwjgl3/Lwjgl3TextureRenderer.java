@@ -55,12 +55,10 @@ import com.ardor3d.util.TextureKey;
 public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
   private static final Logger logger = Logger.getLogger(Lwjgl3TextureRenderer.class.getName());
 
-  private final Consumer<Renderable> drawRendConsumer = (final Renderable r) -> this.doDraw(r);
-  private final Consumer<List<? extends Renderable>> drawRendListConsumer =
-      (final List<? extends Renderable> list) -> this.doDraw(list);
-  private final Consumer<Spatial> drawSpatConsumer = (final Spatial s) -> doDrawSpatial(s);
-  private final Consumer<List<? extends Spatial>> drawSpatListConsumer =
-      (final List<? extends Spatial> list) -> doDrawSpatials(list);
+  private final Consumer<Renderable> drawRendConsumer = this::doDraw;
+  private final Consumer<List<? extends Renderable>> drawRendListConsumer = this::doDraw;
+  private final Consumer<Spatial> drawSpatConsumer = this::doDrawSpatial;
+  private final Consumer<List<? extends Spatial>> drawSpatListConsumer = this::doDrawSpatials;
 
   public Lwjgl3TextureRenderer(final int width, final int height, final int layers, final int depthBits,
     final int samples, final Renderer parentRenderer, final ContextCapabilities caps) {

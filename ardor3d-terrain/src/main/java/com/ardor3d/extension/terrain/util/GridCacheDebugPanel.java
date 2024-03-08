@@ -44,7 +44,7 @@ public class GridCacheDebugPanel extends JPanel implements Runnable {
   public void run() {
     _run = true;
     while (_run) {
-      SwingUtilities.invokeLater(() -> repaint());
+      SwingUtilities.invokeLater(this::repaint);
       try {
         Thread.sleep(250);
       } catch (final InterruptedException e) {}

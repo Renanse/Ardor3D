@@ -70,7 +70,7 @@ public abstract class PickResults {
   public PickData getPickData(final int i) {
     if (modified) {
       if (_checkDistance) {
-        Collections.sort(_nodeList, _distanceCompare);
+        _nodeList.sort(_distanceCompare);
       }
       modified = false;
     }

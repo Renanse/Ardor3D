@@ -41,8 +41,7 @@ import com.ardor3d.input.keyboard.KeyboardState;
 import com.ardor3d.input.keyboard.KeyboardWrapper;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.input.mouse.MouseWrapper;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 /**
  * Provides access to the physical layer of the input system. This is done via one method that polls
@@ -70,7 +69,7 @@ public class PhysicalLayer {
   protected boolean _inited = false;
 
   protected static final long MAX_INPUT_POLL_TIME = TimeUnit.SECONDS.toNanos(2);
-  protected static final List<InputState> EMPTY_LIST = ImmutableList.of();
+  protected static final List<InputState> EMPTY_LIST = List.of();
 
   protected PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
     final ControllerWrapper controllerWrapper, final GestureWrapper gestureWrapper, final FocusWrapper focusWrapper,
@@ -98,6 +97,7 @@ public class PhysicalLayer {
     }
 
     KeyboardState oldKeyState = _currentKeyboardState;
+    //noinspection StatementWithEmptyBody
     if (_currentMouseState.getDwheel() == 0 && _currentMouseState.getDx() == 0 && _currentMouseState.getDy() == 0) {
       // we can reuse - do nothing
     } else {
@@ -273,12 +273,12 @@ public class PhysicalLayer {
   public GestureWrapper getGestureWrapper() { return _gestureWrapper; }
 
   public static final class Builder {
-    protected KeyboardWrapper _keyboardWrapper = DummyKeyboardWrapper.INSTANCE;
-    protected MouseWrapper _mouseWrapper = DummyMouseWrapper.INSTANCE;
-    protected FocusWrapper _focusWrapper = DummyFocusWrapper.INSTANCE;
-    protected ControllerWrapper _controllerWrapper = DummyControllerWrapper.INSTANCE;
-    protected GestureWrapper _gestureWrapper = DummyGestureWrapper.INSTANCE;
-    protected CharacterInputWrapper _characterWrapper = DummyCharacterInputWrapper.INSTANCE;
+    private KeyboardWrapper _keyboardWrapper = DummyKeyboardWrapper.INSTANCE;
+    private MouseWrapper _mouseWrapper = DummyMouseWrapper.INSTANCE;
+    private FocusWrapper _focusWrapper = DummyFocusWrapper.INSTANCE;
+    private ControllerWrapper _controllerWrapper = DummyControllerWrapper.INSTANCE;
+    private GestureWrapper _gestureWrapper = DummyGestureWrapper.INSTANCE;
+    private CharacterInputWrapper _characterWrapper = DummyCharacterInputWrapper.INSTANCE;
 
     public Builder with(final KeyboardWrapper wrapper) {
       _keyboardWrapper = wrapper;

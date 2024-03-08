@@ -10,14 +10,13 @@
 
 package com.ardor3d.input.logical;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.ardor3d.util.Preconditions.checkNotNull;
 
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.InputState;
 
 /**
- * Wrapper class to make it possible to use {@link com.google.common.base.Predicate}-based
- * conditions for triggering actions based on user input.
+ * Wrapper class to make it possible to evaluate before/after conditions for triggering actions based on user input.
  */
 @Immutable
 public final class TwoInputStates {

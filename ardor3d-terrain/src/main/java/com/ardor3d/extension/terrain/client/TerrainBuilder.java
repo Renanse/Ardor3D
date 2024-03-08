@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -25,7 +27,6 @@ import com.ardor3d.extension.terrain.util.GridCacheDebugPanel;
 import com.ardor3d.extension.terrain.util.PriorityExecutors;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class TerrainBuilder {
 
@@ -39,10 +40,18 @@ public class TerrainBuilder {
 
   public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera) {
     this(terrainDataProvider, camera, //
-        PriorityExecutors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder() //
-            .setThreadFactory(Executors.defaultThreadFactory())//
-            .setDaemon(true).setNameFormat("TileCacheThread-%s")//
-            .build()));
+        PriorityExecutors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+          private final AtomicInteger threadNumber = new AtomicInteger(1);
+          private final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+
+          @Override
+          public Thread newThread(Runnable r) {
+            Thread thread = defaultFactory.newThread(r);
+            thread.setName("TileCacheThread-" + threadNumber.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+          }
+        }));
   }
 
   public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera,

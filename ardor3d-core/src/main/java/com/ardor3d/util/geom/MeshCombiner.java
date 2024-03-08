@@ -30,8 +30,7 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 
 /**
  * Utility for combining multiple Meshes into a single Mesh. Note that you generally will want to
@@ -301,7 +300,7 @@ public class MeshCombiner {
 
 
 class IndexCombiner {
-  Multimap<IndexMode, int[]> sectionMap = ArrayListMultimap.create();
+  SimpleMultimap<IndexMode, int[]> sectionMap = new SimpleMultimap<>();
 
   public void addEntry(final MeshData source, final int vertexOffset) {
     // arrays or elements?
@@ -363,7 +362,7 @@ class IndexCombiner {
     int max = 0;
     // walk through index modes and combine those we can.
     for (final IndexMode mode : sectionMap.keySet()) {
-      final Collection<int[]> sources = sectionMap.get(mode);
+      final Collection<int[]> sources = sectionMap.values(mode);
       switch (mode) {
         case Triangles:
         case Lines:

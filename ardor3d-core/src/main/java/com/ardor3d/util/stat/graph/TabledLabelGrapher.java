@@ -234,7 +234,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
     }
 
     int decimals = getIntConfig(type, ConfigKeys.Decimals.name(), DEFAULT_DECIMALS);
-    if (!"".equals(post) && decimals == 0) {
+    if (!post.isEmpty() && decimals == 0) {
       decimals = 1; // use 1 spot anyway.
     }
 

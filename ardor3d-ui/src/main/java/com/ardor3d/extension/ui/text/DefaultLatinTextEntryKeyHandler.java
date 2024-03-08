@@ -67,7 +67,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
 
     // divide the text based on caret position.
     String s1 = text.substring(0, caretPosition);
-    String s2 = text.substring(caretPosition, text.length());
+    String s2 = text.substring(caretPosition);
 
     // look to handle special keys
     RenderedText uiText = _textEntry._uiText;
@@ -122,7 +122,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
             caretPosition = _textEntry.setCaretPosition(selection.getStartIndex());
             _textEntry.clearSelection();
             s1 = text.substring(0, caretPosition);
-            s2 = text.substring(caretPosition, text.length());
+            s2 = text.substring(caretPosition);
           }
           final int before = uiText != null ? uiText.getData()._characters.size() : 0;
           _textEntry.setText(s1 + clipContents + s2);
@@ -163,7 +163,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
           _textEntry.setCaretPosition(selection.getStartIndex());
           _textEntry.clearSelection();
         } else if (s2.length() > 0) {
-          _textEntry.setText(s1 + s2.substring(1, s2.length()));
+          _textEntry.setText(s1 + s2.substring(1));
         }
 
         return true;
@@ -345,7 +345,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
 
       // divide the text based on caret position.
       String s1 = text.substring(0, caretPosition);
-      String s2 = text.substring(caretPosition, text.length());
+      String s2 = text.substring(caretPosition);
 
       char c = value;
       if (c == '\r') {
@@ -362,7 +362,7 @@ public class DefaultLatinTextEntryKeyHandler implements UIKeyHandler {
           caretPosition = _textEntry.setCaretPosition(selection.getStartIndex());
           _textEntry.clearSelection();
           s1 = text.substring(0, caretPosition);
-          s2 = text.substring(caretPosition, text.length());
+          s2 = text.substring(caretPosition);
         }
 
         if (c == '\t') {

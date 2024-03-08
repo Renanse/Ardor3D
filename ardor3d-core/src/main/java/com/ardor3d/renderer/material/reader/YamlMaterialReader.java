@@ -551,27 +551,16 @@ public class YamlMaterialReader {
 
   private static Object readUniformValue(final Object doc, final UniformType type, final UniformSource source,
       final String shaderKey) {
-    switch (source) {
-      case Ardor3dState:
-        return Enum.valueOf(Ardor3dStateProperty.class, getString(doc));
-
-      case RendererMatrix:
-        return Enum.valueOf(RenderMatrixType.class, getString(doc));
-
-      case SpatialProperty: {
+    return switch (source) {
+      case Ardor3dState -> Enum.valueOf(Ardor3dStateProperty.class, getString(doc));
+      case RendererMatrix -> Enum.valueOf(RenderMatrixType.class, getString(doc));
+      case SpatialProperty -> {
         final String key = getString(doc);
-        return (key == null) ? shaderKey : key;
+        yield (doc == null) ? shaderKey : key;
       }
-
-      case Value:
-        return getBufferForType(doc, type);
-
-      case Function:
-      case Supplier:
-      default:
-        throw new Ardor3dException("unhandled UniformSource: " + source);
-
-    }
+      case Value -> getBufferForType(doc, type);
+      default -> throw new Ardor3dException("unhandled UniformSource: " + source);
+    };
   }
 
   private static Buffer getBufferForType(final Object doc, final UniformType type) {
@@ -579,74 +568,39 @@ public class YamlMaterialReader {
       return null;
     }
 
-    switch (type) {
-      case Double1:
-        return getDoubleBuffer(doc, 1);
-      case Double2:
-        return getDoubleBuffer(doc, 2);
-      case Double3:
-        return getDoubleBuffer(doc, 3);
-      case Double4:
-        return getDoubleBuffer(doc, 4);
-      case Float1:
-        return getFloatBuffer(doc, 1);
-      case Float2:
-        return getFloatBuffer(doc, 2);
-      case Float3:
-        return getFloatBuffer(doc, 3);
-      case Float4:
-        return getFloatBuffer(doc, 4);
-      case Int1:
-      case UInt1:
-        return getIntBuffer(doc, 1);
-      case Int2:
-      case UInt2:
-        return getIntBuffer(doc, 2);
-      case Int3:
-      case UInt3:
-        return getIntBuffer(doc, 3);
-      case Int4:
-      case UInt4:
-        return getIntBuffer(doc, 4);
-      case Matrix2x2:
-        return getFloatBuffer(doc, 2, 2);
-      case Matrix2x2D:
-        return getDoubleBuffer(doc, 2, 2);
-      case Matrix2x3:
-        return getFloatBuffer(doc, 2, 3);
-      case Matrix2x3D:
-        return getDoubleBuffer(doc, 2, 3);
-      case Matrix2x4:
-        return getFloatBuffer(doc, 2, 4);
-      case Matrix2x4D:
-        return getDoubleBuffer(doc, 2, 4);
-      case Matrix3x2:
-        return getFloatBuffer(doc, 3, 2);
-      case Matrix3x2D:
-        return getDoubleBuffer(doc, 3, 2);
-      case Matrix3x3:
-        return getFloatBuffer(doc, 3, 3);
-      case Matrix3x3D:
-        return getDoubleBuffer(doc, 3, 3);
-      case Matrix3x4:
-        return getFloatBuffer(doc, 3, 4);
-      case Matrix3x4D:
-        return getDoubleBuffer(doc, 3, 4);
-      case Matrix4x2:
-        return getFloatBuffer(doc, 4, 2);
-      case Matrix4x2D:
-        return getDoubleBuffer(doc, 4, 2);
-      case Matrix4x3:
-        return getFloatBuffer(doc, 4, 3);
-      case Matrix4x3D:
-        return getDoubleBuffer(doc, 4, 3);
-      case Matrix4x4:
-        return getFloatBuffer(doc, 4, 4);
-      case Matrix4x4D:
-        return getDoubleBuffer(doc, 4, 4);
-      default:
-        throw new Ardor3dException("Unhandled uniform type: " + type);
-    }
+    return switch (type) {
+      case Double1 -> getDoubleBuffer(doc, 1);
+      case Double2 -> getDoubleBuffer(doc, 2);
+      case Double3 -> getDoubleBuffer(doc, 3);
+      case Double4 -> getDoubleBuffer(doc, 4);
+      case Float1 -> getFloatBuffer(doc, 1);
+      case Float2 -> getFloatBuffer(doc, 2);
+      case Float3 -> getFloatBuffer(doc, 3);
+      case Float4 -> getFloatBuffer(doc, 4);
+      case Int1, UInt1 -> getIntBuffer(doc, 1);
+      case Int2, UInt2 -> getIntBuffer(doc, 2);
+      case Int3, UInt3 -> getIntBuffer(doc, 3);
+      case Int4, UInt4 -> getIntBuffer(doc, 4);
+      case Matrix2x2 -> getFloatBuffer(doc, 2, 2);
+      case Matrix2x2D -> getDoubleBuffer(doc, 2, 2);
+      case Matrix2x3 -> getFloatBuffer(doc, 2, 3);
+      case Matrix2x3D -> getDoubleBuffer(doc, 2, 3);
+      case Matrix2x4 -> getFloatBuffer(doc, 2, 4);
+      case Matrix2x4D -> getDoubleBuffer(doc, 2, 4);
+      case Matrix3x2 -> getFloatBuffer(doc, 3, 2);
+      case Matrix3x2D -> getDoubleBuffer(doc, 3, 2);
+      case Matrix3x3 -> getFloatBuffer(doc, 3, 3);
+      case Matrix3x3D -> getDoubleBuffer(doc, 3, 3);
+      case Matrix3x4 -> getFloatBuffer(doc, 3, 4);
+      case Matrix3x4D -> getDoubleBuffer(doc, 3, 4);
+      case Matrix4x2 -> getFloatBuffer(doc, 4, 2);
+      case Matrix4x2D -> getDoubleBuffer(doc, 4, 2);
+      case Matrix4x3 -> getFloatBuffer(doc, 4, 3);
+      case Matrix4x3D -> getDoubleBuffer(doc, 4, 3);
+      case Matrix4x4 -> getFloatBuffer(doc, 4, 4);
+      case Matrix4x4D -> getDoubleBuffer(doc, 4, 4);
+      default -> throw new Ardor3dException("Unhandled uniform type: " + type);
+    };
   }
 
   /// PROPERTY READERS

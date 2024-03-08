@@ -170,24 +170,12 @@ public class OrientedBoundingBox extends BoundingVolume {
       return this;
     }
 
-    switch (volume.getType()) {
-
-      case OBB: {
-        return mergeOBB((OrientedBoundingBox) volume);
-      }
-
-      case AABB: {
-        return mergeAABB((BoundingBox) volume);
-      }
-
-      case Sphere: {
-        return mergeSphere((BoundingSphere) volume);
-      }
-
-      default:
-        return null;
-
-    }
+    return switch (volume.getType()) {
+      case OBB -> mergeOBB((OrientedBoundingBox) volume);
+      case AABB -> mergeAABB((BoundingBox) volume);
+      case Sphere -> mergeSphere((BoundingSphere) volume);
+      default -> null;
+    };
   }
 
   @Override
@@ -196,24 +184,18 @@ public class OrientedBoundingBox extends BoundingVolume {
       return null;
     }
 
-    switch (newType) {
-      case AABB: {
+    return switch (newType) {
+      case AABB -> {
         final BoundingBox box = new BoundingBox(_center, 0, 0, 0);
-        return box.merge(this);
+        yield box.merge(this);
       }
-
-      case Sphere: {
+      case Sphere -> {
         final BoundingSphere sphere = new BoundingSphere(0, _center);
-        return sphere.merge(this);
+        yield sphere.merge(this);
       }
-
-      case OBB: {
-        return this.clone(null);
-      }
-
-      default:
-        return null;
-    }
+      case OBB -> this.clone(null);
+      default -> null;
+    };
   }
 
   private BoundingVolume mergeSphere(final BoundingSphere volume) {

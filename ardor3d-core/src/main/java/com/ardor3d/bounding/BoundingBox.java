@@ -391,24 +391,18 @@ public class BoundingBox extends BoundingVolume {
       return this;
     }
 
-    switch (volume.getType()) {
-      case AABB: {
+    return switch (volume.getType()) {
+      case AABB -> {
         final BoundingBox vBox = (BoundingBox) volume;
-        return merge(vBox._center, vBox.getXExtent(), vBox.getYExtent(), vBox.getZExtent(), this);
+        yield merge(vBox._center, vBox.getXExtent(), vBox.getYExtent(), vBox.getZExtent(), this);
       }
-
-      case Sphere: {
+      case Sphere -> {
         final BoundingSphere vSphere = (BoundingSphere) volume;
-        return merge(vSphere._center, vSphere.getRadius(), vSphere.getRadius(), vSphere.getRadius(), this);
+        yield merge(vSphere._center, vSphere.getRadius(), vSphere.getRadius(), vSphere.getRadius(), this);
       }
-
-      case OBB: {
-        return mergeOBB((OrientedBoundingBox) volume);
-      }
-
-      default:
-        return null;
-    }
+      case OBB -> mergeOBB((OrientedBoundingBox) volume);
+      default -> null;
+    };
   }
 
   @Override

@@ -311,15 +311,10 @@ public class GeoSphere extends Mesh {
       texBuf.put((float) ((Math.atan2(yNorm, xNorm) / (2 * Math.PI) + 1) % 1));
     }
 
-    double vPos = 0;
-    switch (_textureMode) {
-      case Original:
-        vPos = .5 * (zNorm + 1);
-        break;
-      case Projected:
-        vPos = MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(zNorm));
-        break;
-    }
+    double vPos = switch (_textureMode) {
+      case Original -> .5 * (zNorm + 1);
+      case Projected -> MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(zNorm));
+    };
     texBuf.put((float) vPos);
   }
 

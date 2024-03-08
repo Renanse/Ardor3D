@@ -10,12 +10,17 @@
 
 package com.ardor3d.input.swt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.ardor3d.util.Preconditions.checkNotNull;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
 
+import com.ardor3d.util.AbstractIterator;
+import com.ardor3d.util.PeekingIterator;
+import com.ardor3d.util.collection.ImmutableMultiset;
+import com.ardor3d.util.collection.Multiset;
+import com.ardor3d.util.collection.SimpleEnumMultiset;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -30,10 +35,6 @@ import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.Vector2;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.EnumMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.PeekingIterator;
 
 /**
  * A mouse wrapper for use with SWT.
@@ -46,7 +47,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
   @GuardedBy("this")
   private SwtMouseIterator _currentIterator = null;
 
-  private final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
+  private final Multiset<MouseButton> _clicks = new SimpleEnumMultiset<>(MouseButton.class);
   private final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
   private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
@@ -178,35 +179,25 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
   private void addNextState(final MouseEvent mouseEvent, final int wheelDX) {
     final MouseState newState =
         new MouseState(getArdor3DX(mouseEvent), getArdor3DY(mouseEvent), getDX(mouseEvent), getDY(mouseEvent), wheelDX,
-            new EnumMap<>(_lastButtonState), !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null);
+            new EnumMap<>(_lastButtonState), !_clicks.isEmpty() ? ImmutableMultiset.of(_clicks) : null);
 
     _upcomingEvents.add(newState);
     _lastState = newState;
   }
 
   private MouseButton getButtonForEvent(final MouseEvent e) {
-    switch (e.button) {
-      case 1:
-        return MouseButton.LEFT;
-      case 2:
-        return MouseButton.MIDDLE;
-      case 3:
-        return MouseButton.RIGHT;
-      case 4:
-        return MouseButton.FOUR;
-      case 5:
-        return MouseButton.FIVE;
-      case 6:
-        return MouseButton.SIX;
-      case 7:
-        return MouseButton.SEVEN;
-      case 8:
-        return MouseButton.EIGHT;
-      case 9:
-        return MouseButton.NINE;
-      default:
-        return MouseButton.UNKNOWN;
-    }
+    return switch (e.button) {
+      case 1 -> MouseButton.LEFT;
+      case 2 -> MouseButton.MIDDLE;
+      case 3 -> MouseButton.RIGHT;
+      case 4 -> MouseButton.FOUR;
+      case 5 -> MouseButton.FIVE;
+      case 6 -> MouseButton.SIX;
+      case 7 -> MouseButton.SEVEN;
+      case 8 -> MouseButton.EIGHT;
+      case 9 -> MouseButton.NINE;
+      default -> MouseButton.UNKNOWN;
+    };
   }
 
   @Override

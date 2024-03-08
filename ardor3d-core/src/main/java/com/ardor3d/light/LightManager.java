@@ -86,7 +86,7 @@ public class LightManager implements IUniformSupplier {
 
   public void sortLightsFor(final Mesh mesh) {
     lightComparator.setBoundingVolume(mesh.getWorldBound());
-    Collections.sort(_lightRefs, lightComparator);
+    _lightRefs.sort(lightComparator);
   }
 
   public Light getCurrentLight(final int index) {

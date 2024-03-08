@@ -486,10 +486,7 @@ public class NormalGenerator {
       // Check every border edge of the split mesh. If its indices are
       // already set in borderIndices, the corresponding vertices are
       // already used by another split and have to be duplicated
-      final ListIterator<Edge> edgeIt = edges0.listIterator();
-      while (edgeIt.hasNext()) {
-        final Edge edge = edgeIt.next();
-
+      for (Edge edge : edges0) {
         if (edge.newI0 == -1) {
           if (_borderIndices[edge.i0]) {
             if (replacementIndices[edge.i0] == -1) {

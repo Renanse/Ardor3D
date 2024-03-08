@@ -269,16 +269,12 @@ public class CollisionTree implements Serializable {
    * @return true if there is an intersect, false otherwise.
    */
   public boolean intersectsBounding(final BoundingVolume volume) {
-    switch (volume.getType()) {
-      case AABB:
-        return _worldBounds.intersectsBoundingBox((BoundingBox) volume);
-      case OBB:
-        return _worldBounds.intersectsOrientedBoundingBox((OrientedBoundingBox) volume);
-      case Sphere:
-        return _worldBounds.intersectsSphere((BoundingSphere) volume);
-      default:
-        return false;
-    }
+    return switch (volume.getType()) {
+      case AABB -> _worldBounds.intersectsBoundingBox((BoundingBox) volume);
+      case OBB -> _worldBounds.intersectsOrientedBoundingBox((OrientedBoundingBox) volume);
+      case Sphere -> _worldBounds.intersectsSphere((BoundingSphere) volume);
+      default -> false;
+    };
 
   }
 

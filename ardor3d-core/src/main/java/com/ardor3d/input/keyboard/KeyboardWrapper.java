@@ -10,7 +10,7 @@
 
 package com.ardor3d.input.keyboard;
 
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 /**
  * Defines the API for keyboard wrappers.

@@ -226,7 +226,7 @@ public enum MaterialManager {
     if (firstLF == -1) {
       firstLF = program.indexOf('\r');
     }
-    sb.append(program.substring(0, firstLF));
+    sb.append(program, 0, firstLF);
     sb.append('\n');
     injects.forEach((final String inj) -> sb.append(inj).append('\n'));
     sb.append(program.substring(firstLF + 1));
@@ -248,7 +248,7 @@ public enum MaterialManager {
     if (firstLF == -1) {
       firstLF = program.indexOf('\r');
     }
-    sb.append(program.substring(0, firstLF));
+    sb.append(program, 0, firstLF);
     sb.append('\n');
     sb.append(line);
     sb.append('\n');

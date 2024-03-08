@@ -770,7 +770,7 @@ public class ParticleEditorFrame extends JFrame {
     if (exampleList == null || exampleList.getSelectedValue() == null) {
       return;
     }
-    final String examType = exampleList.getSelectedValue().toString();
+    final String examType = exampleList.getSelectedValue();
     editScene.particleGeom.clearInfluences();
     if ("FIRE".equalsIgnoreCase(examType)) {
       editScene.particleGeom.setEmissionDirection(new Vector3(0.0f, 1.0f, 0.0f));
@@ -1107,9 +1107,6 @@ public class ParticleEditorFrame extends JFrame {
         panCamera(-difX, -difY);
       }
     }
-
-    @Override
-    public void mouseMoved(final MouseEvent arg0) {}
 
     @Override
     public void mousePressed(final MouseEvent arg0) {

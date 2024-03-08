@@ -28,32 +28,17 @@ public abstract class Lwjgl3ZBufferStateUtil {
 
     enableDepthTest(state.isEnabled(), record);
     if (state.isEnabled()) {
-      int depthFunc = 0;
-      switch (state.getFunction()) {
-        case Never:
-          depthFunc = GL11C.GL_NEVER;
-          break;
-        case LessThan:
-          depthFunc = GL11C.GL_LESS;
-          break;
-        case EqualTo:
-          depthFunc = GL11C.GL_EQUAL;
-          break;
-        case LessThanOrEqualTo:
-          depthFunc = GL11C.GL_LEQUAL;
-          break;
-        case GreaterThan:
-          depthFunc = GL11C.GL_GREATER;
-          break;
-        case NotEqualTo:
-          depthFunc = GL11C.GL_NOTEQUAL;
-          break;
-        case GreaterThanOrEqualTo:
-          depthFunc = GL11C.GL_GEQUAL;
-          break;
-        case Always:
-          depthFunc = GL11C.GL_ALWAYS;
-      }
+      int depthFunc = switch (state.getFunction()) {
+        case Never -> GL11C.GL_NEVER;
+        case LessThan -> GL11C.GL_LESS;
+        case EqualTo -> GL11C.GL_EQUAL;
+        case LessThanOrEqualTo -> GL11C.GL_LEQUAL;
+        case GreaterThan -> GL11C.GL_GREATER;
+        case NotEqualTo -> GL11C.GL_NOTEQUAL;
+        case GreaterThanOrEqualTo -> GL11C.GL_GEQUAL;
+        case Always -> GL11C.GL_ALWAYS;
+        default -> throw new IllegalStateException("Unexpected value: " + state.getFunction());
+      };
       applyFunction(depthFunc, record);
     }
 

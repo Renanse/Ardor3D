@@ -180,7 +180,6 @@ public class Functions {
    * @return a function that returns simplex noise.
    */
   public static Function3D simplexNoise() {
-    final SimplexNoise noiseGenerator = new SimplexNoise();
-    return (x, y, z) -> noiseGenerator.noise(x, y, z);
+    return new SimplexNoise()::noise;
   }
 }

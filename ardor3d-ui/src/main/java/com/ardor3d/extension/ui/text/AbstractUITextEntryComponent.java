@@ -10,7 +10,9 @@
 
 package com.ardor3d.extension.ui.text;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import com.ardor3d.extension.ui.StateBasedUIComponent;
 import com.ardor3d.extension.ui.Textable;
@@ -24,7 +26,6 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent implements Textable {
   /** tracking variable for dirty use only */
@@ -315,7 +316,7 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
   }
 
   @Override
-  public ImmutableSet<UIState> getStates() { return ImmutableSet.of(_defaultState, _disabledState, _writingState); }
+  public Set<UIState> getStates() { return Set.of(_defaultState, _disabledState, _writingState); }
 
   protected class DefaultTextEntryState extends UIState {
     @Override

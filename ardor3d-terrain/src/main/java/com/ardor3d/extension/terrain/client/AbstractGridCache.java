@@ -10,8 +10,11 @@
 
 package com.ardor3d.extension.terrain.client;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -20,7 +23,6 @@ import com.ardor3d.extension.terrain.util.PriorityExecutors.PriorityRunnable;
 import com.ardor3d.extension.terrain.util.Region;
 import com.ardor3d.extension.terrain.util.Tile;
 import com.ardor3d.math.util.MathUtils;
-import com.google.common.collect.Sets;
 
 public abstract class AbstractGridCache {
 
@@ -31,9 +33,9 @@ public abstract class AbstractGridCache {
   protected final CacheData[][] cache;
   protected final int destinationSize;
 
-  protected final Set<TileLoadingData> currentTiles = Sets.newConcurrentHashSet();
-  protected Set<TileLoadingData> newThreadTiles = Sets.newConcurrentHashSet();
-  protected Set<TileLoadingData> backThreadTiles = Sets.newConcurrentHashSet();
+  protected final Set<TileLoadingData> currentTiles = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  protected Set<TileLoadingData> newThreadTiles = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  protected Set<TileLoadingData> backThreadTiles = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
   protected final int meshClipIndex;
   protected final int dataClipIndex;
@@ -48,7 +50,7 @@ public abstract class AbstractGridCache {
 
   // Debug
   protected boolean enableDebug = true;
-  protected final Set<TileLoadingData> debugTiles = Sets.newConcurrentHashSet();
+  protected final Set<TileLoadingData> debugTiles = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
   protected final ExecutorService tileThreadService;
 
@@ -198,7 +200,7 @@ public abstract class AbstractGridCache {
     int tileX;
     int tileY;
 
-    final Set<TileLoadingData> toProcess = new HashSet<>();
+    final Set<TileLoadingData> toProcess;
     synchronized (SWAP_LOCK) {
       // Swap our tile sets so we work on data accumulated recently.
       final Set<TileLoadingData> tmp = newThreadTiles;
@@ -206,7 +208,7 @@ public abstract class AbstractGridCache {
       backThreadTiles = tmp;
       backThreadTiles.clear();
 
-      toProcess.addAll(newThreadTiles);
+      toProcess = new HashSet<>(newThreadTiles);
     }
 
     tileX = backCurrentTileX;
@@ -423,14 +425,8 @@ public abstract class AbstractGridCache {
       } else if (!destTile.equals(other.destTile)) {
         return false;
       }
-      if (sourceTile == null) {
-        if (other.sourceTile != null) {
-          return false;
-        }
-      } else if (!sourceTile.equals(other.sourceTile)) {
-        return false;
-      }
-      return true;
+
+      return Objects.equals(sourceTile, other.sourceTile);
     }
 
     @Override

@@ -72,14 +72,11 @@ public abstract class Lwjgl3OffsetStateUtil {
   }
 
   private static int getGLType(final OffsetType type) {
-    switch (type) {
-      case Fill:
-        return GL11C.GL_POLYGON_OFFSET_FILL;
-      case Line:
-        return GL11C.GL_POLYGON_OFFSET_LINE;
-      case Point:
-        return GL11C.GL_POLYGON_OFFSET_POINT;
-    }
-    throw new IllegalArgumentException("invalid type: " + type);
+    return switch (type) {
+      case Fill -> GL11C.GL_POLYGON_OFFSET_FILL;
+      case Line -> GL11C.GL_POLYGON_OFFSET_LINE;
+      case Point -> GL11C.GL_POLYGON_OFFSET_POINT;
+      default -> throw new IllegalArgumentException("invalid type: " + type);
+    };
   }
 }

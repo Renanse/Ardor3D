@@ -12,7 +12,7 @@ package com.ardor3d.input.dummy;
 
 import com.ardor3d.input.character.CharacterInputEvent;
 import com.ardor3d.input.character.CharacterInputWrapper;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 public class DummyCharacterInputWrapper implements CharacterInputWrapper {
 

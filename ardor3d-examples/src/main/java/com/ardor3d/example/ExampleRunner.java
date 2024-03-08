@@ -24,7 +24,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -386,7 +385,7 @@ public class ExampleRunner extends JFrame {
         htmlDescription = getHtmlDescription(purpose);
       }
       // default to Ardor3D logo if no image available.
-      if ("".equals(imgURL)) {
+      if (imgURL.isEmpty()) {
         imgURL = "<img src=\"" + ResourceLocatorTool.getClassPathResource(ExampleRunner.class,
             "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"/>";
       }
@@ -551,7 +550,7 @@ public class ExampleRunner extends JFrame {
       }
       size++;
       cl.add(clazz);
-      Collections.sort(cl, classComparator);
+      cl.sort(classComparator);
     }
 
     @Override
@@ -565,10 +564,8 @@ public class ExampleRunner extends JFrame {
         final String className = entry.getKey().getSimpleName();
         boolean matches = false;
         boolean needsUpdate = false;
-        if ("".equals(pattern)) {
-          matches = false;
-        } else {
-          matches = !pattern.equals("") && className.toLowerCase().contains(lcPattern);
+        if (!pattern.isEmpty()) {
+          matches = className.toLowerCase().contains(lcPattern);
           if (!matches) {
             final String htmlDescription = getHtmlDescription(entry.getKey());
             matches = htmlDescription.toLowerCase().contains(lcPattern);

@@ -140,20 +140,12 @@ public class GridLayout extends UILayout {
     grid.updateMinimalSize();
     final int height = grid.minHeight;
     final int heightDiff = container.getContentHeight() > height ? container.getContentHeight() - height : 0;
-    int rowHeightDiff = heightDiff;
-    switch (verticalAlignment) {
-      case TOP:
-        rowHeightDiff = heightDiff;
-        break;
-      case MIDDLE:
-        rowHeightDiff = heightDiff / 2;
-        break;
-      case BOTTOM:
-        rowHeightDiff = 0;
-        break;
-      default:
-        rowHeightDiff = heightDiff;
-    }
+    int rowHeightDiff = switch (verticalAlignment) {
+      case TOP -> heightDiff;
+      case MIDDLE -> heightDiff / 2;
+      case BOTTOM -> 0;
+      default -> heightDiff;
+    };
     for (final LayoutComponent lc : grid.components) {
       if (fillVerticalSpace) {
         rowHeightDiff = Math.round(heightDiff * (1f - (float) lc.firstRow / grid.maxRow));

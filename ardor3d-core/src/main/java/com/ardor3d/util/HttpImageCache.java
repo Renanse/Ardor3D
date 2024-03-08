@@ -35,17 +35,17 @@ import java.util.regex.Pattern;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.loader.ImageLoaderUtil;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.util.concurrent.StripedLocks;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
-import com.google.common.util.concurrent.Striped;
 
 public enum HttpImageCache {
   Instance;
 
   final Comparator<ImageCacheItem> DateCompare = (a, b) -> b.lastAccessed.compareTo(a.lastAccessed);
   final ConcurrentMap<String, ImageCacheItem> MemoryCache = new ConcurrentHashMap<>();
-  final Striped<Lock> Locks = Striped.lazyWeakLock(10);
+  final StripedLocks Locks = new StripedLocks(Constants.httpImageStripeCount);
 
   boolean checkModified = false;
   long maxMemoryCacheSize = 8 * 1024 * 1024;
@@ -154,7 +154,7 @@ public enum HttpImageCache {
     // Convert our name to a key to be used in our in memory hash and file system
     final String key = convertUrlToFileName(uri.toString(), type, flipped);
 
-    final Lock lock = Locks.get(key);
+    final Lock lock = Locks.getLock(key);
 
     try {
       lock.lock();
@@ -265,7 +265,7 @@ public enum HttpImageCache {
 
     try {
       if (!cacheDir.exists()) {
-        cacheDir.mkdir();
+        cacheDir.mkdirs();
       }
 
       // Now cache to file system

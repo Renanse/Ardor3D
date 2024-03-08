@@ -445,12 +445,10 @@ public class ColladaAnimUtils {
           // Grab the MeshVertPairs from Global for this mesh.
           final Collection<MeshVertPairs> vertPairsList = _dataCache.getVertMappings().get(geometry);
           MeshVertPairs pairsMap = null;
-          if (vertPairsList != null) {
-            for (final MeshVertPairs pairs : vertPairsList) {
-              if (pairs.getMesh() == sourceMesh) {
-                pairsMap = pairs;
-                break;
-              }
+          for (final MeshVertPairs pairs : vertPairsList) {
+            if (pairs.getMesh() == sourceMesh) {
+              pairsMap = pairs;
+              break;
             }
           }
 
@@ -979,7 +977,7 @@ public class ColladaAnimUtils {
     target.id = id;
 
     if (hasSid) {
-      final String sidGroup = baseString.substring(sidIndex + 1, baseString.length());
+      final String sidGroup = baseString.substring(sidIndex + 1);
 
       final StringTokenizer tokenizer = new StringTokenizer(sidGroup, "/");
       while (tokenizer.hasMoreTokens()) {
@@ -989,7 +987,7 @@ public class ColladaAnimUtils {
     }
 
     if (hasAccessor) {
-      String accessorString = targetString.substring(accessorIndex, targetString.length());
+      String accessorString = targetString.substring(accessorIndex);
       accessorString = accessorString.replace(".", "");
 
       if (accessorString.length() > 0 && accessorString.charAt(0) == '(') {
@@ -997,7 +995,7 @@ public class ColladaAnimUtils {
         final String indexXString = accessorString.substring(1, endPara);
         target.accessorIndexX = Integer.parseInt(indexXString);
         if (endPara < accessorString.length() - 1) {
-          final String lastAccessorString = accessorString.substring(endPara + 1, accessorString.length());
+          final String lastAccessorString = accessorString.substring(endPara + 1);
           endPara = lastAccessorString.indexOf(")");
           final String indexYString = lastAccessorString.substring(1, endPara);
           target.accessorIndexY = Integer.parseInt(indexYString);

@@ -233,7 +233,7 @@ public class TextureClipmap {
         }
       }
 
-      Collections.sort(regionList, regionSorter);
+      regionList.sort(regionSorter);
 
       final int start = regionList.size() - 1;
       for (int i = start; i >= 0; i--) {
@@ -254,7 +254,7 @@ public class TextureClipmap {
         }
       }
 
-      Collections.sort(regionList, regionSorter);
+      regionList.sort(regionSorter);
 
       final Set<Integer> affectedUnits = new HashSet<>();
       for (int i = regionList.size() - 1; i >= 0; i--) {

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.ardor3d.extension.animation.skeletal.AnimationListener;
-import com.google.common.collect.ImmutableList;
 
 /**
  * Maintains state information about an instance of a specific animation clip, such as time scaling
@@ -81,9 +80,9 @@ public class AnimationClipInstance {
    */
   public List<AnimationListener> getAnimationListeners() {
     if (animationListeners == null) {
-      return ImmutableList.of();
+      return List.of();
     }
-    return ImmutableList.copyOf(animationListeners);
+    return List.copyOf(animationListeners);
   }
 
   public boolean isActive() { return _active; }

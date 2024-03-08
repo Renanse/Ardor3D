@@ -143,16 +143,12 @@ public abstract class ParticleSystem extends Node {
     if (type == null) {
       throw new NullPointerException("type is null");
     }
-    switch (type) {
-      case Triangle:
-      case GeomMesh:
-        return 3;
-      case Point:
-        return 1;
-      case Line:
-        return 2;
-    }
-    throw new IllegalArgumentException("Invalid ParticleType: " + type);
+    return switch (type) {
+      case Triangle, GeomMesh -> 3;
+      case Point -> 1;
+      case Line -> 2;
+      default -> throw new IllegalArgumentException("Unhandled particle type: " + type);
+    };
   }
 
   public void forceRespawn() {

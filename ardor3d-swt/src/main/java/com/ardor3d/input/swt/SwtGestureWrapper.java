@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import com.ardor3d.util.AbstractIterator;
+import com.ardor3d.util.PeekingIterator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TouchEvent;
 import org.eclipse.swt.events.TouchListener;
@@ -36,8 +38,6 @@ import com.ardor3d.input.gesture.touch.TouchHistory;
 import com.ardor3d.input.gesture.touch.TouchStatus;
 import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.util.MathUtils;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.PeekingIterator;
 
 /**
  * A gesture wrapper for use with SWT.

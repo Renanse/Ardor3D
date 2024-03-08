@@ -10,15 +10,11 @@
 
 package com.ardor3d.extension.animation.skeletal.blendtree;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
-import com.google.common.collect.ImmutableList;
 
 /**
  * Similar to a ClipSource, this class samples and returns values from the channels of an
@@ -83,7 +79,7 @@ public class InclusiveClipSource extends ClipSource {
   /**
    * @return a COPY of the enabled channel list.
    */
-  public ImmutableList<String> getEnabledChannels() { return ImmutableList.copyOf(_enabledChannels); }
+  public List<String> getEnabledChannels() { return Collections.unmodifiableList(_enabledChannels); }
 
   @Override
   public Map<String, ? extends Object> getSourceData(final AnimationManager manager) {

@@ -25,7 +25,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.google.common.collect.ImmutableList;
 
 /**
  * An animation channel consisting of a series of transforms interpolated over time.
@@ -246,11 +245,20 @@ public class TransformChannel extends AbstractAnimationChannel {
         scales.toArray(new ReadOnlyVector3[0]));
   }
 
-  public ImmutableList<ReadOnlyVector3> getTranslations() { return ImmutableList.copyOf(_translations); }
+  /**
+   * @return an unmodifiable copy of our translations list.
+   */
+  public List<ReadOnlyVector3> getTranslations() { return List.of(_translations); }
 
-  public ImmutableList<ReadOnlyVector3> getScales() { return ImmutableList.copyOf(_scales); }
+  /**
+   * @return an unmodifiable copy of our scales list.
+   */
+  public List<ReadOnlyVector3> getScales() { return List.of(_scales); }
 
-  public ImmutableList<ReadOnlyQuaternion> getRotations() { return ImmutableList.copyOf(_rotations); }
+  /**
+   * @return an unmodifiable copy of our rotations list.
+   */
+  public List<ReadOnlyQuaternion> getRotations() { return List.of(_rotations); }
 
   protected TransformChannel newChannel(final String name, final float[] times, final ReadOnlyQuaternion[] rotations,
       final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {

@@ -151,17 +151,13 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
    */
   @Override
   public float getValue(final int index) {
-    switch (index) {
-      case 0:
-        return getRed();
-      case 1:
-        return getGreen();
-      case 2:
-        return getBlue();
-      case 3:
-        return getAlpha();
-    }
-    throw new IllegalArgumentException("index must be either 0, 1, 2 or 3");
+    return switch (index) {
+      case 0 -> getRed();
+      case 1 -> getGreen();
+      case 2 -> getBlue();
+      case 3 -> getAlpha();
+      default -> throw new IllegalArgumentException("index must be either 0, 1, 2 or 3");
+    };
   }
 
   /**

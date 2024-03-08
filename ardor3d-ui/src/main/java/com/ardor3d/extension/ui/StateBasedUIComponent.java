@@ -17,7 +17,8 @@ import com.ardor3d.input.InputState;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
 
 /**
  * StateBasedUIComponent describes a component that acts as a state machine, containing multiple
@@ -215,7 +216,7 @@ public abstract class StateBasedUIComponent extends UIComponent {
   }
 
   /**
-   * @return an ImmutableSet of possible states for this component.
+   * @return an {@link java.util.Collections.UnmodifiableSet} of possible states for this component.
    */
-  public abstract ImmutableSet<UIState> getStates();
+  public abstract Set<UIState> getStates();
 }

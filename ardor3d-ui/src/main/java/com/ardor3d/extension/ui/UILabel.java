@@ -11,7 +11,8 @@
 package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.util.SubTex;
-import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
 
 /**
  * Basic implementation of {@link AbstractLabelUIComponent}.
@@ -51,5 +52,5 @@ public class UILabel extends AbstractLabelUIComponent {
   public LabelState getDisabledState() { return _disabledState; }
 
   @Override
-  public ImmutableSet<UIState> getStates() { return ImmutableSet.of((UIState) _defaultState, _disabledState); }
+  public Set<UIState> getStates() { return Set.of(_defaultState, _disabledState); }
 }

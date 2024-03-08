@@ -227,24 +227,16 @@ public abstract class RenderState implements Savable {
   }
 
   public static RenderState createState(final StateType type) {
-    switch (type) {
-      case Blend:
-        return new BlendState();
-      case ColorMask:
-        return new ColorMaskState();
-      case Cull:
-        return new CullState();
-      case Offset:
-        return new OffsetState();
-      case Stencil:
-        return new StencilState();
-      case Texture:
-        return new TextureState();
-      case Wireframe:
-        return new WireframeState();
-      case ZBuffer:
-        return new ZBufferState();
-    }
-    throw new IllegalArgumentException("Unknown state type: " + type);
+    return switch (type) {
+      case Blend -> new BlendState();
+      case ColorMask -> new ColorMaskState();
+      case Cull -> new CullState();
+      case Offset -> new OffsetState();
+      case Stencil -> new StencilState();
+      case Texture -> new TextureState();
+      case Wireframe -> new WireframeState();
+      case ZBuffer -> new ZBufferState();
+      default -> throw new IllegalArgumentException("Unhandled state type: " + type);
+    };
   }
 }

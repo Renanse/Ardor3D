@@ -12,6 +12,8 @@ package com.ardor3d.input.glfw;
 
 import java.util.LinkedList;
 
+import com.ardor3d.util.AbstractIterator;
+import com.ardor3d.util.PeekingIterator;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
@@ -21,8 +23,6 @@ import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.keyboard.KeyEvent;
 import com.ardor3d.input.keyboard.KeyState;
 import com.ardor3d.input.keyboard.KeyboardWrapper;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.PeekingIterator;
 
 public class GLFWKeyboardWrapper implements KeyboardWrapper {
 

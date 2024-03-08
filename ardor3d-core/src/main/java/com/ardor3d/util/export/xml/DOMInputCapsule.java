@@ -1182,161 +1182,47 @@ public class DOMInputCapsule implements InputCapsule {
 
   private Object tryToReadValue() throws IOException {
     final byte type = readByte("type", (byte) -1);
-    switch (type) {
-      case BinaryClassField.BITSET: {
-        return readBitSet("value", null);
-
-      }
-      case BinaryClassField.BOOLEAN: {
-        return readBoolean("value", false);
-
-      }
-      case BinaryClassField.BOOLEAN_1D: {
-        return readBooleanArray("value", null);
-
-      }
-      case BinaryClassField.BOOLEAN_2D: {
-        return readBooleanArray2D("value", null);
-
-      }
-      case BinaryClassField.BYTE: {
-        return readByte("value", (byte) 0);
-
-      }
-      case BinaryClassField.BYTE_1D: {
-        return readByteArray("value", null);
-
-      }
-      case BinaryClassField.BYTE_2D: {
-        return readByteArray2D("value", null);
-
-      }
-      case BinaryClassField.BYTEBUFFER: {
-        return readByteBuffer("value", null);
-
-      }
-      case BinaryClassField.DOUBLE: {
-        return readDouble("value", 0.0);
-
-      }
-      case BinaryClassField.DOUBLE_1D: {
-        return readDoubleArray("value", null);
-
-      }
-      case BinaryClassField.DOUBLE_2D: {
-        return readDoubleArray2D("value", null);
-
-      }
-      case BinaryClassField.FLOAT: {
-        return readFloat("value", 0f);
-
-      }
-      case BinaryClassField.FLOAT_1D: {
-        return readFloatArray("value", null);
-
-      }
-      case BinaryClassField.FLOAT_2D: {
-        return readFloatArray2D("value", null);
-
-      }
-      case BinaryClassField.FLOATBUFFER: {
-        return readFloatBuffer("value", null);
-
-      }
-      case BinaryClassField.FLOATBUFFER_ARRAYLIST: {
-        return readFloatBufferList("value", null);
-
-      }
-      case BinaryClassField.BYTEBUFFER_ARRAYLIST: {
-        return readByteBufferList("value", null);
-
-      }
-      case BinaryClassField.INT: {
-        return readInt("value", 0);
-
-      }
-      case BinaryClassField.INT_1D: {
-        return readIntArray("value", null);
-
-      }
-      case BinaryClassField.INT_2D: {
-        return readIntArray2D("value", null);
-
-      }
-      case BinaryClassField.INTBUFFER: {
-        return readIntBuffer("value", null);
-
-      }
-      case BinaryClassField.LONG: {
-        return readLong("value", 0L);
-
-      }
-      case BinaryClassField.LONG_1D: {
-        return readLongArray("value", null);
-
-      }
-      case BinaryClassField.LONG_2D: {
-        return readLongArray2D("value", null);
-
-      }
-      case BinaryClassField.SAVABLE: {
-        return readSavable("value", null);
-
-      }
-      case BinaryClassField.SAVABLE_1D, BinaryClassField.SAVABLE_ARRAYLIST_1D: {
-        return readSavableArray("value", null);
-
-      }
-      case BinaryClassField.SAVABLE_2D, BinaryClassField.SAVABLE_ARRAYLIST_2D: {
-        return readSavableArray2D("value", null);
-
-      }
-      case BinaryClassField.SAVABLE_ARRAYLIST: {
-        return readSavableList("value", null);
-
-      }
-      case BinaryClassField.SAVABLE_MAP: {
-        return readSavableMap("value", null);
-
-      }
-      case BinaryClassField.STRING_SAVABLE_MAP: {
-        return readStringSavableMap("value", null);
-
-      }
-      case BinaryClassField.STRING_OBJECT_MAP: {
-        return readStringObjectMap("value", null);
-
-      }
-      case BinaryClassField.SHORT: {
-        return readShort("value", (short) 0);
-
-      }
-      case BinaryClassField.SHORT_1D: {
-        return readShortArray("value", null);
-
-      }
-      case BinaryClassField.SHORT_2D: {
-        return readShortArray2D("value", null);
-
-      }
-      case BinaryClassField.SHORTBUFFER: {
-        return readShortBuffer("value", null);
-
-      }
-      case BinaryClassField.STRING: {
-        return readString("value", null);
-
-      }
-      case BinaryClassField.STRING_1D: {
-        return readStringArray("value", null);
-
-      }
-      case BinaryClassField.STRING_2D: {
-        return readStringArray2D("value", null);
-
-      }
-    }
-    return null;
+    return switch (type) {
+      case BinaryClassField.BITSET -> readBitSet("value", null);
+      case BinaryClassField.BOOLEAN -> readBoolean("value", false);
+      case BinaryClassField.BOOLEAN_1D -> readBooleanArray("value", null);
+      case BinaryClassField.BOOLEAN_2D -> readBooleanArray2D("value", null);
+      case BinaryClassField.BYTE -> readByte("value", (byte) 0);
+      case BinaryClassField.BYTE_1D -> readByteArray("value", null);
+      case BinaryClassField.BYTE_2D -> readByteArray2D("value", null);
+      case BinaryClassField.BYTEBUFFER -> readByteBuffer("value", null);
+      case BinaryClassField.DOUBLE -> readDouble("value", 0.0);
+      case BinaryClassField.DOUBLE_1D -> readDoubleArray("value", null);
+      case BinaryClassField.DOUBLE_2D -> readDoubleArray2D("value", null);
+      case BinaryClassField.FLOAT -> readFloat("value", 0f);
+      case BinaryClassField.FLOAT_1D -> readFloatArray("value", null);
+      case BinaryClassField.FLOAT_2D -> readFloatArray2D("value", null);
+      case BinaryClassField.FLOATBUFFER -> readFloatBuffer("value", null);
+      case BinaryClassField.FLOATBUFFER_ARRAYLIST -> readFloatBufferList("value", null);
+      case BinaryClassField.BYTEBUFFER_ARRAYLIST -> readByteBufferList("value", null);
+      case BinaryClassField.INT -> readInt("value", 0);
+      case BinaryClassField.INT_1D -> readIntArray("value", null);
+      case BinaryClassField.INT_2D -> readIntArray2D("value", null);
+      case BinaryClassField.INTBUFFER -> readIntBuffer("value", null);
+      case BinaryClassField.LONG -> readLong("value", 0L);
+      case BinaryClassField.LONG_1D -> readLongArray("value", null);
+      case BinaryClassField.LONG_2D -> readLongArray2D("value", null);
+      case BinaryClassField.SAVABLE -> readSavable("value", null);
+      case BinaryClassField.SAVABLE_1D, BinaryClassField.SAVABLE_ARRAYLIST_1D -> readSavableArray("value", null);
+      case BinaryClassField.SAVABLE_2D, BinaryClassField.SAVABLE_ARRAYLIST_2D -> readSavableArray2D("value", null);
+      case BinaryClassField.SAVABLE_ARRAYLIST -> readSavableList("value", null);
+      case BinaryClassField.SAVABLE_MAP -> readSavableMap("value", null);
+      case BinaryClassField.STRING_SAVABLE_MAP -> readStringSavableMap("value", null);
+      case BinaryClassField.STRING_OBJECT_MAP -> readStringObjectMap("value", null);
+      case BinaryClassField.SHORT -> readShort("value", (short) 0);
+      case BinaryClassField.SHORT_1D -> readShortArray("value", null);
+      case BinaryClassField.SHORT_2D -> readShortArray2D("value", null);
+      case BinaryClassField.SHORTBUFFER -> readShortBuffer("value", null);
+      case BinaryClassField.STRING -> readString("value", null);
+      case BinaryClassField.STRING_1D -> readStringArray("value", null);
+      case BinaryClassField.STRING_2D -> readStringArray2D("value", null);
+      default -> null;
+    };
   }
 
   /**

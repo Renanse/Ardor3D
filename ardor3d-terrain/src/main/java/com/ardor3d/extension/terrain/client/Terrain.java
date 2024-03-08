@@ -408,7 +408,7 @@ public class Terrain extends Node implements Pickable, Runnable {
     }
 
     // sort regions in order of their level.
-    Collections.sort(regionList, regionSorter);
+    regionList.sort(regionSorter);
   }
 
   protected void recursiveAddUpdates(final List<Region> regionList, final int level, final int x, final int y,

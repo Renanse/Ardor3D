@@ -10,15 +10,14 @@
 
 package com.ardor3d.input.mouse;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Map;
 
 import com.ardor3d.annotation.Immutable;
-import com.google.common.collect.EnumMultiset;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableMultiset.Builder;
-import com.google.common.collect.Multiset;
+import com.ardor3d.util.collection.ImmutableMultiset;
+import com.ardor3d.util.collection.Multiset;
 
 /**
  * Describes the mouse state at some point in time.
@@ -44,7 +43,7 @@ public class MouseState {
   private final int _dx;
   private final int _dy;
   private final int _dwheel;
-  private final ImmutableMap<MouseButton, ButtonState> _buttonStates;
+  private final Map<MouseButton, ButtonState> _buttonStates;
   private final ImmutableMultiset<MouseButton> _clickCounts;
 
   /**
@@ -73,14 +72,12 @@ public class MouseState {
     _dy = dy;
     _dwheel = dwheel;
     if (buttonStates != null) {
-      final com.google.common.collect.ImmutableMap.Builder<MouseButton, ButtonState> builder = ImmutableMap.builder();
-      _buttonStates = builder.putAll(buttonStates).build();
+      _buttonStates = Collections.unmodifiableMap(buttonStates);
     } else {
-      _buttonStates = ImmutableMap.of();
+      _buttonStates = Map.of();
     }
     if (clicks != null) {
-      final Builder<MouseButton> builder = ImmutableMultiset.builder();
-      _clickCounts = builder.addAll(clicks).build();
+      _clickCounts = ImmutableMultiset.of(clicks);
     } else {
       _clickCounts = ImmutableMultiset.of();
     }
@@ -189,28 +186,10 @@ public class MouseState {
    * Returns all the buttons' states. It could be easier for most classes to use the
    * {@link #getClickCount(MouseButton)} method, and that also results in less object creation.
    *
-   * @return a defensive copy of the click counts of all the buttons at this point in time.
+   * @return an immutable multiset of the click counts of all the buttons at this point in time.
    */
-  public Multiset<MouseButton> getClickCounts() {
-    if (_clickCounts.isEmpty()) {
-      return EnumMultiset.create(MouseButton.class);
-    } else {
-      return EnumMultiset.create(_clickCounts);
-    }
-  }
-
-  public Multiset<MouseButton> getClickCounts(final EnumMultiset<MouseButton> store) {
-    final EnumMultiset<MouseButton> rVal = store;
-    if (store == null) {
-      if (_clickCounts.isEmpty()) {
-        return EnumMultiset.create(MouseButton.class);
-      } else {
-        return EnumMultiset.create(_clickCounts);
-      }
-    }
-    rVal.clear();
-    rVal.addAll(_clickCounts);
-    return rVal;
+  public ImmutableMultiset<MouseButton> getClickCounts() {
+    return ImmutableMultiset.of(_clickCounts);
   }
 
   /**

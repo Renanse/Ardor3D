@@ -38,6 +38,11 @@ public class Constants {
 
   public static final boolean ignoreMissingMaterials;
 
+  /**
+   * The number of concurrent locks to use when loading images from the web.  Default is 16.
+   */
+  public static final int httpImageStripeCount;
+
   static {
     boolean hasPropertyAccess = true;
     try {
@@ -61,6 +66,9 @@ public class Constants {
       strictVertexAttributes = (System.getProperty("ardor3d.strictVertexAttributes") != null);
       logOpenGLDebug = (System.getProperty("ardor3d.logOpenGLDebug") != null);
       ignoreMissingMaterials = (System.getProperty("ardor3d.ignoreMissingMaterials") != null);
+      httpImageStripeCount = (System.getProperty("ardor3d.httpImageStripeCount") != null
+          ? Integer.parseInt(System.getProperty("ardor3d.httpImageStripeCount"))
+          : 16);
     } else {
       stats = false;
       trackDirectMemory = false;
@@ -72,6 +80,7 @@ public class Constants {
       strictVertexAttributes = false;
       logOpenGLDebug = false;
       ignoreMissingMaterials = false;
+      httpImageStripeCount = 16;
     }
   }
 }

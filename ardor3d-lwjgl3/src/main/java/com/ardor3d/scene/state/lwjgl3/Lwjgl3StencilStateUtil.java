@@ -72,47 +72,31 @@ public abstract class Lwjgl3StencilStateUtil {
   }
 
   private static int getGLStencilFunction(final StencilFunction function) {
-    switch (function) {
-      case Always:
-        return GL11C.GL_ALWAYS;
-      case Never:
-        return GL11C.GL_NEVER;
-      case EqualTo:
-        return GL11C.GL_EQUAL;
-      case NotEqualTo:
-        return GL11C.GL_NOTEQUAL;
-      case GreaterThan:
-        return GL11C.GL_GREATER;
-      case GreaterThanOrEqualTo:
-        return GL11C.GL_GEQUAL;
-      case LessThan:
-        return GL11C.GL_LESS;
-      case LessThanOrEqualTo:
-        return GL11C.GL_LEQUAL;
-    }
-    throw new IllegalArgumentException("unknown function: " + function);
+    return switch (function) {
+      case Always -> GL11C.GL_ALWAYS;
+      case Never -> GL11C.GL_NEVER;
+      case EqualTo -> GL11C.GL_EQUAL;
+      case NotEqualTo -> GL11C.GL_NOTEQUAL;
+      case GreaterThan -> GL11C.GL_GREATER;
+      case GreaterThanOrEqualTo -> GL11C.GL_GEQUAL;
+      case LessThan -> GL11C.GL_LESS;
+      case LessThanOrEqualTo -> GL11C.GL_LEQUAL;
+      default -> throw new IllegalArgumentException("unknown function: " + function);
+    };
   }
 
   private static int getGLStencilOp(final StencilOperation operation) {
-    switch (operation) {
-      case Keep:
-        return GL11C.GL_KEEP;
-      case DecrementWrap:
-        return GL14C.GL_DECR_WRAP;
-      case Decrement:
-        return GL11C.GL_DECR;
-      case IncrementWrap:
-        return GL14C.GL_INCR_WRAP;
-      case Increment:
-        return GL11C.GL_INCR;
-      case Invert:
-        return GL11C.GL_INVERT;
-      case Replace:
-        return GL11C.GL_REPLACE;
-      case Zero:
-        return GL11C.GL_ZERO;
-    }
-    throw new IllegalArgumentException("unknown operation: " + operation);
+    return switch (operation) {
+      case Keep -> GL11C.GL_KEEP;
+      case DecrementWrap -> GL14C.GL_DECR_WRAP;
+      case Decrement -> GL11C.GL_DECR;
+      case IncrementWrap -> GL14C.GL_INCR_WRAP;
+      case Increment -> GL11C.GL_INCR;
+      case Invert -> GL11C.GL_INVERT;
+      case Replace -> GL11C.GL_REPLACE;
+      case Zero -> GL11C.GL_ZERO;
+      default -> throw new IllegalArgumentException("unknown operation: " + operation);
+    };
   }
 
   private static void setEnabled(final boolean enable, final StencilStateRecord record) {

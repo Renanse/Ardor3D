@@ -31,7 +31,7 @@ public class GestureState {
   }
 
   public List<AbstractGestureEvent> getEvents() {
-    Collections.sort(_eventsSinceLastState, (o1, o2) -> (int) (o2.getNanos() - o1.getNanos()));
+    _eventsSinceLastState.sort((o1, o2) -> (int) (o2.getNanos() - o1.getNanos()));
 
     return Collections.unmodifiableList(_eventsSinceLastState);
   }

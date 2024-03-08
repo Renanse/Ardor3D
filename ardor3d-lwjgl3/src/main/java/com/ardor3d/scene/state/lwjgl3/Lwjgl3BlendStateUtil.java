@@ -214,80 +214,50 @@ public abstract class Lwjgl3BlendStateUtil {
   }
 
   protected static int getGLSrcValue(final SourceFunction function, final ContextCapabilities caps) {
-    switch (function) {
-      case Zero:
-        return GL11C.GL_ZERO;
-      case DestinationColor:
-        return GL11C.GL_DST_COLOR;
-      case OneMinusDestinationColor:
-        return GL11C.GL_ONE_MINUS_DST_COLOR;
-      case SourceAlpha:
-        return GL11C.GL_SRC_ALPHA;
-      case OneMinusSourceAlpha:
-        return GL11C.GL_ONE_MINUS_SRC_ALPHA;
-      case DestinationAlpha:
-        return GL11C.GL_DST_ALPHA;
-      case OneMinusDestinationAlpha:
-        return GL11C.GL_ONE_MINUS_DST_ALPHA;
-      case SourceAlphaSaturate:
-        return GL11C.GL_SRC_ALPHA_SATURATE;
-      case ConstantColor:
-        return GL14C.GL_CONSTANT_COLOR;
-      case OneMinusConstantColor:
-        return GL14C.GL_ONE_MINUS_CONSTANT_COLOR;
-      case ConstantAlpha:
-        return GL14C.GL_CONSTANT_ALPHA;
-      case OneMinusConstantAlpha:
-        return GL14C.GL_ONE_MINUS_CONSTANT_ALPHA;
-      case One:
-        return GL11C.GL_ONE;
-    }
-    throw new IllegalArgumentException("Invalid source function type: " + function);
+    return switch (function) {
+      case Zero -> GL11C.GL_ZERO;
+      case DestinationColor -> GL11C.GL_DST_COLOR;
+      case OneMinusDestinationColor -> GL11C.GL_ONE_MINUS_DST_COLOR;
+      case SourceAlpha -> GL11C.GL_SRC_ALPHA;
+      case OneMinusSourceAlpha -> GL11C.GL_ONE_MINUS_SRC_ALPHA;
+      case DestinationAlpha -> GL11C.GL_DST_ALPHA;
+      case OneMinusDestinationAlpha -> GL11C.GL_ONE_MINUS_DST_ALPHA;
+      case SourceAlphaSaturate -> GL11C.GL_SRC_ALPHA_SATURATE;
+      case ConstantColor -> GL14C.GL_CONSTANT_COLOR;
+      case OneMinusConstantColor -> GL14C.GL_ONE_MINUS_CONSTANT_COLOR;
+      case ConstantAlpha -> GL14C.GL_CONSTANT_ALPHA;
+      case OneMinusConstantAlpha -> GL14C.GL_ONE_MINUS_CONSTANT_ALPHA;
+      case One -> GL11C.GL_ONE;
+      default -> throw new IllegalArgumentException("Invalid source function type: " + function);
+    };
   }
 
   protected static int getGLDstValue(final DestinationFunction function, final ContextCapabilities caps) {
-    switch (function) {
-      case Zero:
-        return GL11C.GL_ZERO;
-      case SourceColor:
-        return GL11C.GL_SRC_COLOR;
-      case OneMinusSourceColor:
-        return GL11C.GL_ONE_MINUS_SRC_COLOR;
-      case SourceAlpha:
-        return GL11C.GL_SRC_ALPHA;
-      case OneMinusSourceAlpha:
-        return GL11C.GL_ONE_MINUS_SRC_ALPHA;
-      case DestinationAlpha:
-        return GL11C.GL_DST_ALPHA;
-      case OneMinusDestinationAlpha:
-        return GL11C.GL_ONE_MINUS_DST_ALPHA;
-      case ConstantColor:
-        return GL14C.GL_CONSTANT_COLOR;
-      case OneMinusConstantColor:
-        return GL14C.GL_ONE_MINUS_CONSTANT_COLOR;
-      case ConstantAlpha:
-        return GL14C.GL_CONSTANT_ALPHA;
-      case OneMinusConstantAlpha:
-        return GL14C.GL_ONE_MINUS_CONSTANT_ALPHA;
-      case One:
-        return GL11C.GL_ONE;
-    }
-    throw new IllegalArgumentException("Invalid destination function type: " + function);
+    return switch (function) {
+      case Zero -> GL11C.GL_ZERO;
+      case SourceColor -> GL11C.GL_SRC_COLOR;
+      case OneMinusSourceColor -> GL11C.GL_ONE_MINUS_SRC_COLOR;
+      case SourceAlpha -> GL11C.GL_SRC_ALPHA;
+      case OneMinusSourceAlpha -> GL11C.GL_ONE_MINUS_SRC_ALPHA;
+      case DestinationAlpha -> GL11C.GL_DST_ALPHA;
+      case OneMinusDestinationAlpha -> GL11C.GL_ONE_MINUS_DST_ALPHA;
+      case ConstantColor -> GL14C.GL_CONSTANT_COLOR;
+      case OneMinusConstantColor -> GL14C.GL_ONE_MINUS_CONSTANT_COLOR;
+      case ConstantAlpha -> GL14C.GL_CONSTANT_ALPHA;
+      case OneMinusConstantAlpha -> GL14C.GL_ONE_MINUS_CONSTANT_ALPHA;
+      case One -> GL11C.GL_ONE;
+      default -> throw new IllegalArgumentException("Invalid destination function type: " + function);
+    };
   }
 
   protected static int getGLEquationValue(final BlendEquation eq, final ContextCapabilities caps) {
-    switch (eq) {
-      case Min:
-        return GL14C.GL_MIN;
-      case Max:
-        return GL14C.GL_MAX;
-      case Subtract:
-        return GL14C.GL_FUNC_SUBTRACT;
-      case ReverseSubtract:
-        return GL14C.GL_FUNC_REVERSE_SUBTRACT;
-      case Add:
-        return GL14C.GL_FUNC_ADD;
-    }
-    throw new IllegalArgumentException("Invalid blend equation: " + eq);
+    return switch (eq) {
+      case Min -> GL14C.GL_MIN;
+      case Max -> GL14C.GL_MAX;
+      case Subtract -> GL14C.GL_FUNC_SUBTRACT;
+      case ReverseSubtract -> GL14C.GL_FUNC_REVERSE_SUBTRACT;
+      case Add -> GL14C.GL_FUNC_ADD;
+      default -> throw new IllegalArgumentException("Invalid blend equation: " + eq);
+    };
   }
 }

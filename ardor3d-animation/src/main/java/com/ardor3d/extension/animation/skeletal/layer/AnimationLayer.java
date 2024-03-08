@@ -153,7 +153,7 @@ public class AnimationLayer implements StateOwner {
         transition = _transitions.get("*");
       }
       if (transition != null) {
-        setCurrentState(transition.doTransition(state, this), true);
+        setCurrentState(transition.doTransition(null, this), true);
         return true;
       }
     }

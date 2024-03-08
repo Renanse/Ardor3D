@@ -32,10 +32,10 @@ import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.Vector2;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.EnumMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.AbstractIterator;
+import com.ardor3d.util.PeekingIterator;
+import com.ardor3d.util.collection.Multiset;
+import com.ardor3d.util.collection.SimpleEnumMultiset;
 
 /**
  * Mouse wrapper class for use with AWT.
@@ -47,7 +47,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
   @GuardedBy("this")
   protected AwtMouseIterator _currentIterator = null;
 
-  protected final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
+  protected final Multiset<MouseButton> _clicks = new SimpleEnumMultiset<>(MouseButton.class);
   protected final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
   protected final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
@@ -261,7 +261,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
   private void addNextState(final MouseEvent mouseEvent, final int wheelDX) {
     final MouseState newState =
         new MouseState(getArdor3DX(mouseEvent), getArdor3DY(mouseEvent), getDX(mouseEvent), getDY(mouseEvent), wheelDX,
-            new EnumMap<>(_lastButtonState), !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null);
+            new EnumMap<>(_lastButtonState), !_clicks.isEmpty() ? _clicks.copyOf() : null);
 
     synchronized (AwtMouseWrapper.this) {
       _upcomingEvents.add(newState);
@@ -313,7 +313,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     }
     for (final var button : MouseButton.values()) {
       if (clear || System.currentTimeMillis() - _lastClickTime.get(button) > MouseState.CLICK_TIME_MS) {
-        _clicks.setCount(button, 0);
+        _clicks.remove(button);
         _clickArmed.remove(button);
       }
     }

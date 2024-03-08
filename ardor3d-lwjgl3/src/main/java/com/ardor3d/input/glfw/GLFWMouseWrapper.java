@@ -14,6 +14,11 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
 
+import com.ardor3d.util.AbstractIterator;
+import com.ardor3d.util.PeekingIterator;
+import com.ardor3d.util.collection.ImmutableMultiset;
+import com.ardor3d.util.collection.Multiset;
+import com.ardor3d.util.collection.SimpleEnumMultiset;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
@@ -27,10 +32,6 @@ import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.input.mouse.MouseWrapper;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.util.MathUtils;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.EnumMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.PeekingIterator;
 
 public class GLFWMouseWrapper implements MouseWrapper {
 
@@ -48,7 +49,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
   private MouseIterator _currentIterator = null;
 
-  private final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
+  private final Multiset<MouseButton> _clicks = new SimpleEnumMultiset<>(MouseButton.class);
   private final EnumMap<MouseButton, Long> _lastClickTime = new EnumMap<>(MouseButton.class);
   private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
@@ -94,7 +95,7 @@ public class GLFWMouseWrapper implements MouseWrapper {
 
         // Add our new state
         addNextState(new MouseState(x, y, 0, 0, 0, new EnumMap<>(_lastButtonState),
-            !_clicks.isEmpty() ? EnumMultiset.create(_clicks) : null));
+            !_clicks.isEmpty() ? ImmutableMultiset.of(_clicks) : null));
       }
     });
 
@@ -153,26 +154,17 @@ public class GLFWMouseWrapper implements MouseWrapper {
   }
 
   protected static MouseButton getButtonByIndex(final int glfwButtonIndex) {
-    switch (glfwButtonIndex) {
-      case GLFW.GLFW_MOUSE_BUTTON_1:
-        return MouseButton.LEFT;
-      case GLFW.GLFW_MOUSE_BUTTON_2:
-        return MouseButton.RIGHT;
-      case GLFW.GLFW_MOUSE_BUTTON_3:
-        return MouseButton.MIDDLE;
-      case GLFW.GLFW_MOUSE_BUTTON_4:
-        return MouseButton.FOUR;
-      case GLFW.GLFW_MOUSE_BUTTON_5:
-        return MouseButton.FIVE;
-      case GLFW.GLFW_MOUSE_BUTTON_6:
-        return MouseButton.SIX;
-      case GLFW.GLFW_MOUSE_BUTTON_7:
-        return MouseButton.SEVEN;
-      case GLFW.GLFW_MOUSE_BUTTON_8:
-        return MouseButton.EIGHT;
-      default:
-        return MouseButton.UNKNOWN;
-    }
+    return switch (glfwButtonIndex) {
+      case GLFW.GLFW_MOUSE_BUTTON_1 -> MouseButton.LEFT;
+      case GLFW.GLFW_MOUSE_BUTTON_2 -> MouseButton.RIGHT;
+      case GLFW.GLFW_MOUSE_BUTTON_3 -> MouseButton.MIDDLE;
+      case GLFW.GLFW_MOUSE_BUTTON_4 -> MouseButton.FOUR;
+      case GLFW.GLFW_MOUSE_BUTTON_5 -> MouseButton.FIVE;
+      case GLFW.GLFW_MOUSE_BUTTON_6 -> MouseButton.SIX;
+      case GLFW.GLFW_MOUSE_BUTTON_7 -> MouseButton.SEVEN;
+      case GLFW.GLFW_MOUSE_BUTTON_8 -> MouseButton.EIGHT;
+      default -> MouseButton.UNKNOWN;
+    };
   }
 
   @Override

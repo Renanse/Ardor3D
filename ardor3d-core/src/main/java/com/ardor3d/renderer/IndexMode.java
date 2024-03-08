@@ -75,23 +75,11 @@ public enum IndexMode {
   }
 
   public int getVertexCount() {
-    switch (this) {
-      case Triangles:
-      case TriangleStrip:
-      case TriangleFan:
-      case TrianglesAdjacency:
-      case TriangleStripAdjacency:
-        return 3;
-      case Lines:
-      case LineStrip:
-      case LineLoop:
-      case LinesAdjacency:
-      case LineStripAdjacency:
-        return 2;
-      case Points:
-        return 1;
-    }
-    throw new IllegalArgumentException("Unhandled type: " + this);
+    return switch (this) {
+      case Triangles, TriangleStrip, TriangleFan, TrianglesAdjacency, TriangleStripAdjacency -> 3;
+      case Lines, LineStrip, LineLoop, LinesAdjacency, LineStripAdjacency -> 2;
+      case Points -> 1;
+    };
   }
 
   /**
@@ -101,30 +89,15 @@ public enum IndexMode {
    *         size using the given index mode.
    */
   public static int getPrimitiveCount(final IndexMode indexMode, final int size) {
-    switch (indexMode) {
-      case Triangles:
-        return size / 3;
-      case TriangleFan:
-      case TriangleStrip:
-      case LineStripAdjacency:
-        return size - 2;
-      case Lines:
-        return size / 2;
-      case LineStrip:
-        return size - 1;
-      case LineLoop:
-        return size;
-      case Points:
-        return size;
-      case LinesAdjacency:
-        return size / 4;
-      case TrianglesAdjacency:
-        return size / 6;
-      case TriangleStripAdjacency:
-        return (size / 2) - 2;
-
-    }
-
-    throw new IllegalArgumentException("unimplemented index mode: " + indexMode);
+    return switch (indexMode) {
+      case Triangles -> size / 3;
+      case TriangleFan, TriangleStrip, LineStripAdjacency -> size - 2;
+      case Lines -> size / 2;
+      case LineStrip -> size - 1;
+      case LineLoop, Points -> size;
+      case LinesAdjacency -> size / 4;
+      case TrianglesAdjacency -> size / 6;
+      case TriangleStripAdjacency -> (size / 2) - 2;
+    };
   }
 }

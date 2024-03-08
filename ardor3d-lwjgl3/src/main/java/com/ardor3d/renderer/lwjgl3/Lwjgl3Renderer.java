@@ -390,43 +390,20 @@ public class Lwjgl3Renderer extends AbstractRenderer {
   }
 
   private int getGLIndexMode(final IndexMode indexMode) {
-    int glMode = GL11C.GL_TRIANGLES;
-    switch (indexMode) {
-      case Triangles:
-        glMode = GL11C.GL_TRIANGLES;
-        break;
-      case TriangleStrip:
-        glMode = GL11C.GL_TRIANGLE_STRIP;
-        break;
-      case TriangleFan:
-        glMode = GL11C.GL_TRIANGLE_FAN;
-        break;
-      case TrianglesAdjacency:
-        glMode = GL32C.GL_TRIANGLES_ADJACENCY;
-        break;
-      case TriangleStripAdjacency:
-        glMode = GL32C.GL_TRIANGLE_STRIP_ADJACENCY;
-        break;
-      case Lines:
-        glMode = GL11C.GL_LINES;
-        break;
-      case LineStrip:
-        glMode = GL11C.GL_LINE_STRIP;
-        break;
-      case LineLoop:
-        glMode = GL11C.GL_LINE_LOOP;
-        break;
-      case LinesAdjacency:
-        glMode = GL32C.GL_LINES_ADJACENCY;
-        break;
-      case LineStripAdjacency:
-        glMode = GL32C.GL_LINE_STRIP_ADJACENCY;
-        break;
-      case Points:
-        glMode = GL11C.GL_POINTS;
-        break;
-    }
-    return glMode;
+    return switch (indexMode) {
+      case Triangles -> GL11C.GL_TRIANGLES;
+      case TriangleStrip -> GL11C.GL_TRIANGLE_STRIP;
+      case TriangleFan -> GL11C.GL_TRIANGLE_FAN;
+      case TrianglesAdjacency -> GL32C.GL_TRIANGLES_ADJACENCY;
+      case TriangleStripAdjacency -> GL32C.GL_TRIANGLE_STRIP_ADJACENCY;
+      case Lines -> GL11C.GL_LINES;
+      case LineStrip -> GL11C.GL_LINE_STRIP;
+      case LineLoop -> GL11C.GL_LINE_LOOP;
+      case LinesAdjacency -> GL32C.GL_LINES_ADJACENCY;
+      case LineStripAdjacency -> GL32C.GL_LINE_STRIP_ADJACENCY;
+      case Points -> GL11C.GL_POINTS;
+      default -> throw new IllegalArgumentException("Unknown index mode: " + indexMode);
+    };
   }
 
   private int getGLDataType(final IndexBufferData<?> indices) {

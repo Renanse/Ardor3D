@@ -11,7 +11,7 @@
 package com.ardor3d.input.gesture;
 
 import com.ardor3d.input.gesture.event.AbstractGestureEvent;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 public interface GestureWrapper {
 

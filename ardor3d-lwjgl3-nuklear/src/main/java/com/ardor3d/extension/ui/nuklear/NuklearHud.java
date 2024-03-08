@@ -274,18 +274,11 @@ public class NuklearHud extends Spatial implements Renderable {
           final EnumSet<MouseButton> pressed = currentMState.getButtonsPressedSince(previousMState);
           if (!pressed.isEmpty()) {
             for (final MouseButton button : pressed) {
-              int nkButton;
-              switch (button) {
-                case MIDDLE:
-                  nkButton = NK_BUTTON_MIDDLE;
-                  break;
-                case RIGHT:
-                  nkButton = NK_BUTTON_RIGHT;
-                  break;
-                default:
-                  nkButton = NK_BUTTON_LEFT;
-                  break;
-              }
+              int nkButton = switch (button) {
+                case MIDDLE -> NK_BUTTON_MIDDLE;
+                case RIGHT -> NK_BUTTON_RIGHT;
+                default -> NK_BUTTON_LEFT;
+              };
               nk_input_button(_ctx, nkButton, x, y, true);
             }
           }
@@ -296,18 +289,11 @@ public class NuklearHud extends Spatial implements Renderable {
           final EnumSet<MouseButton> released = currentMState.getButtonsReleasedSince(previousMState);
           if (!released.isEmpty()) {
             for (final MouseButton button : released) {
-              int nkButton;
-              switch (button) {
-                case MIDDLE:
-                  nkButton = NK_BUTTON_MIDDLE;
-                  break;
-                case RIGHT:
-                  nkButton = NK_BUTTON_RIGHT;
-                  break;
-                default:
-                  nkButton = NK_BUTTON_LEFT;
-                  break;
-              }
+              int nkButton = switch (button) {
+                case MIDDLE -> NK_BUTTON_MIDDLE;
+                case RIGHT -> NK_BUTTON_RIGHT;
+                default -> NK_BUTTON_LEFT;
+              };
               nk_input_button(_ctx, nkButton, x, y, false);
             }
           }

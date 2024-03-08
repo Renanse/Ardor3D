@@ -12,7 +12,7 @@ package com.ardor3d.input.dummy;
 
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.input.mouse.MouseWrapper;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 /**
  * A "do-nothing" implementation of MouseWrapper useful when you want to ignore (or do not need)

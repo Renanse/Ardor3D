@@ -10,10 +10,7 @@
 
 package com.ardor3d.renderer.material;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.lang.ref.ReferenceQueue;
 import java.nio.Buffer;
 import java.util.ArrayList;
@@ -37,7 +34,6 @@ import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.gc.ContextValueReference;
-import com.google.common.io.CharStreams;
 
 public class TechniquePass {
   /** Name of this pass - optional, useful for debug, etc. */
@@ -96,7 +92,9 @@ public class TechniquePass {
   public void setShader(final ShaderType type, final InputStream shaderContents) throws IOException {
     String text;
     try (final Reader reader = new InputStreamReader(shaderContents)) {
-      text = CharStreams.toString(reader);
+      var writer = new StringWriter();
+      reader.transferTo(writer);
+      text = writer.toString();
     }
 
     setShader(type, text);

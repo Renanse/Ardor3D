@@ -10,10 +10,9 @@
 
 package com.ardor3d.util.resource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import com.ardor3d.util.collection.SimpleMultimap;
+
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -21,15 +20,11 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.common.io.CharStreams;
 
 /**
  * Manager class for locator utility classes used to find various assets. (XXX: Needs more
@@ -46,7 +41,7 @@ public class ResourceLocatorTool {
   public static final String TYPE_MATERIAL = "material";
   public static final String TYPE_FONT = "font";
 
-  private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<>();
+  private static final SimpleMultimap<String, ResourceLocator> _locatorMap = new SimpleMultimap<>();
 
   public static ResourceSource locateResource(final String resourceType, String resourceName) {
     if (resourceName == null) {
@@ -56,7 +51,7 @@ public class ResourceLocatorTool {
     resourceName = URLDecoder.decode(resourceName, StandardCharsets.UTF_8);
 
     synchronized (_locatorMap) {
-      final List<ResourceLocator> bases = _locatorMap.get(resourceType);
+      final List<ResourceLocator> bases = _locatorMap.values(resourceType);
       if (bases != null) {
         for (int i = bases.size(); --i >= 0;) {
           final ResourceLocator loc = bases.get(i);
@@ -87,20 +82,16 @@ public class ResourceLocatorTool {
       return;
     }
     synchronized (_locatorMap) {
-      List<ResourceLocator> bases = _locatorMap.computeIfAbsent(resourceType, k -> new ArrayList<>());
+      List<ResourceLocator> bases = _locatorMap.values(resourceType);
       if (!bases.contains(locator)) {
-        bases.add(locator);
+        _locatorMap.put(resourceType, locator);
       }
     }
   }
 
   public static boolean removeResourceLocator(final String resourceType, final ResourceLocator locator) {
     synchronized (_locatorMap) {
-      final List<ResourceLocator> bases = _locatorMap.get(resourceType);
-      if (bases == null) {
-        return false;
-      }
-      return bases.remove(locator);
+      return _locatorMap.remove(resourceType, locator);
     }
   }
 
@@ -174,8 +165,10 @@ public class ResourceLocatorTool {
       return null;
     }
     String text = null;
-    try (final Reader reader = new InputStreamReader(stream)) {
-      text = CharStreams.toString(reader);
+    try (final var reader = new InputStreamReader(stream)) {
+      var writer = new StringWriter();
+      reader.transferTo(writer);
+      text = writer.toString();
     }
     return text;
   }

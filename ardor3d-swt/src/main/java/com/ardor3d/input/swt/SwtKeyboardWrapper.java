@@ -10,10 +10,12 @@
 
 package com.ardor3d.input.swt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.ardor3d.util.Preconditions.checkNotNull;
 
 import java.util.LinkedList;
 
+import com.ardor3d.util.AbstractIterator;
+import com.ardor3d.util.PeekingIterator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
@@ -26,8 +28,6 @@ import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.keyboard.KeyEvent;
 import com.ardor3d.input.keyboard.KeyState;
 import com.ardor3d.input.keyboard.KeyboardWrapper;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.PeekingIterator;
 
 /**
  * Keyboard wrapper for SWT input.
@@ -46,7 +46,7 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener, Charact
   private SwtKeyboardIterator _currentKeyIterator = null;
 
   @GuardedBy("this")
-  protected SwtCharacterIterator _currentCharacterIterator = null;
+  private SwtCharacterIterator _currentCharacterIterator = null;
 
   @GuardedBy("this")
   private Key _lastKeyPressed = null;

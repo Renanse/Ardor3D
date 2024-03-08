@@ -78,9 +78,9 @@ public class AnimationEntry implements Savable {
     builder.append((int) (_offset * 100));
     builder.append("% age...");
 
-    builder.append("  rate: " + _rate);
+    builder.append("  rate: ").append(_rate);
 
-    builder.append("  sequence: " + makeText(_frames));
+    builder.append("  sequence: ").append(makeText(_frames));
 
     return builder.toString();
   }

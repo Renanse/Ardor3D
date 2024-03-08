@@ -15,7 +15,6 @@ import java.util.Objects;
 
 import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.math.util.EqualsUtil;
 import com.ardor3d.math.util.HashUtil;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.util.export.InputCapsule;
@@ -108,15 +107,13 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
   @Override
   public ReadOnlyVector3 get(final int index) {
-    switch (index) {
-      case 0:
-        return getA();
-      case 1:
-        return getB();
-      case 2:
-        return getC();
-    }
-    throw new IllegalArgumentException("invalid index: " + index);
+    return switch (index) {
+      case 0 -> getA();
+      case 1 -> getB();
+      case 2 -> getC();
+      default -> throw new IllegalArgumentException("invalid index: " + index);
+    };
+
   }
 
   @Override

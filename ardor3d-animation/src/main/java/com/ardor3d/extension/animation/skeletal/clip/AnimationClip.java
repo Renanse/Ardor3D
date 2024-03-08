@@ -19,7 +19,6 @@ import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.ImmutableList;
 
 /**
  * AnimationClip manages a set of animation channels as a single clip entity.
@@ -122,7 +121,7 @@ public class AnimationClip implements Savable {
   /**
    * @return an immutable copy of the channels in this clip.
    */
-  public ImmutableList<AbstractAnimationChannel> getChannels() { return ImmutableList.copyOf(_channels); }
+  public List<AbstractAnimationChannel> getChannels() { return List.copyOf(_channels); }
 
   /**
    * @return the maximum (local) time value of this clip, as described by the channels it manages.

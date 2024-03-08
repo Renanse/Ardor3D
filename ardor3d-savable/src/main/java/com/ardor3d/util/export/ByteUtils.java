@@ -408,9 +408,7 @@ public abstract class ByteUtils {
   public static byte[] rightAlignBytes(final byte[] bytes, final int width) {
     if (bytes.length != width) {
       final byte[] rVal = new byte[width];
-      for (int x = width - bytes.length; x < width; x++) {
-        rVal[x] = bytes[x - (width - bytes.length)];
-      }
+      System.arraycopy(bytes, 0, rVal, width - bytes.length, width - (width - bytes.length));
       return rVal;
     }
 

@@ -122,13 +122,12 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
    */
   @Override
   public double getValue(final int index) {
-    switch (index) {
-      case 0:
-        return getX();
-      case 1:
-        return getY();
-    }
-    throw new IllegalArgumentException("index must be either 0 or 1");
+    return switch (index) {
+      case 0 -> getX();
+      case 1 -> getY();
+      default -> throw new IllegalArgumentException("index must be either 0 or 1: " + index);
+    };
+
   }
 
   /**

@@ -18,14 +18,12 @@ import java.util.logging.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
 import org.jdom2.DefaultJDOMFactory;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMFactory;
 import org.jdom2.Namespace;
 import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.SAXHandler;
-import org.xml.sax.SAXException;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
@@ -40,7 +38,6 @@ import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 
 /**
@@ -131,7 +128,7 @@ public class ColladaImporter {
 
   public void setOptimizeMeshes(final boolean optimizeMeshes) { _optimizeMeshes = optimizeMeshes; }
 
-  public Set<MatchCondition> getOptimizeSettings() { return ImmutableSet.copyOf(_optimizeSettings); }
+  public Set<MatchCondition> getOptimizeSettings() { return Set.copyOf(_optimizeSettings); }
 
   public void setOptimizeSettings(final MatchCondition... optimizeSettings) {
     _optimizeSettings.clear();
@@ -235,7 +232,7 @@ public class ColladaImporter {
       for (final MeshData key : temp.keySet()) {
         // only copy multiple channels since their data is lost
         final Collection<FloatBuffer> val = temp.get(key);
-        if (val != null && val.size() > 1) {
+        if (val.size() > 1) {
           colors.putAll(key, val);
         }
       }
@@ -265,17 +262,12 @@ public class ColladaImporter {
       final JDOMFactory jdomFac = new ArdorFactory(dataCache);
       final SAXBuilder builder = new SAXBuilder(null, factory -> new SAXHandler(jdomFac) {
         @Override
-        public void startPrefixMapping(final String prefix, final String uri) throws SAXException {
+        public void startPrefixMapping(final String prefix, final String uri) {
           // Just kill what's usually done here...
         }
       }, jdomFac);
 
-      final Document doc = builder.build(resource.openStream());
-      final Element collada = doc.getRootElement();
-
-      // ColladaDOMUtil.stripNamespace(collada);
-
-      return collada;
+      return builder.build(resource.openStream()).getRootElement();
     } catch (final Exception e) {
       throw new RuntimeException("Unable to load collada resource from source: " + resource, e);
     }
@@ -308,7 +300,7 @@ public class ColladaImporter {
         switch (bufferType) {
           case Float: {
             final String normalizedText = Text.normalizeString(text);
-            if (normalizedText.length() == 0) {
+            if (normalizedText.isEmpty()) {
               return new Text("");
             }
             final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
@@ -323,7 +315,7 @@ public class ColladaImporter {
           }
           case Double: {
             final String normalizedText = Text.normalizeString(text);
-            if (normalizedText.length() == 0) {
+            if (normalizedText.isEmpty()) {
               return new Text("");
             }
             final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
@@ -338,7 +330,7 @@ public class ColladaImporter {
           }
           case Int: {
             final String normalizedText = Text.normalizeString(text);
-            if (normalizedText.length() == 0) {
+            if (normalizedText.isEmpty()) {
               return new Text("");
             }
             final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
@@ -355,7 +347,7 @@ public class ColladaImporter {
           case P: {
             list.clear();
             final String normalizedText = Text.normalizeString(text);
-            if (normalizedText.length() == 0) {
+            if (normalizedText.isEmpty()) {
               return new Text("");
             }
             final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");

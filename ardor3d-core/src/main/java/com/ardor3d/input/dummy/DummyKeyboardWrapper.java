@@ -12,7 +12,7 @@ package com.ardor3d.input.dummy;
 
 import com.ardor3d.input.keyboard.KeyEvent;
 import com.ardor3d.input.keyboard.KeyboardWrapper;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 /**
  * A "do-nothing" implementation of KeyboardWrapper useful when you want to ignore (or do not need)

@@ -30,7 +30,7 @@ public class ForumLikeMarkupParser implements StyleParser {
 
   @Override
   public String parseStyleSpans(final String text, final List<StyleSpan> store) {
-    final StringBuilder rVal = new StringBuilder("");
+    final StringBuilder rVal = new StringBuilder();
     int index = 0;
     TagStatus tagStatus = TagStatus.NONE;
     String currTagText = "";
@@ -179,8 +179,7 @@ public class ForumLikeMarkupParser implements StyleParser {
     }
 
     // list of spans, sorted by start index
-    final List<StyleSpan> starts = new ArrayList<>();
-    starts.addAll(spans);
+    final List<StyleSpan> starts = new ArrayList<>(spans);
     Collections.sort(starts);
 
     // list of spans, to be sorted by end index
@@ -208,7 +207,7 @@ public class ForumLikeMarkupParser implements StyleParser {
           builder.append(getMarkup(span, false));
           ends.add(span);
           starts.remove(0);
-          Collections.sort(ends, endSorter);
+          ends.sort(endSorter);
         } else {
           break;
         }

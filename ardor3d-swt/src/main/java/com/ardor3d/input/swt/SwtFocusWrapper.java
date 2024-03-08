@@ -10,7 +10,7 @@
 
 package com.ardor3d.input.swt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.ardor3d.util.Preconditions.checkNotNull;
 
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;

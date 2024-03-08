@@ -449,15 +449,12 @@ public abstract class Texture implements Savable {
    *           if axis is null or invalid for this type of texture
    */
   public final WrapMode getWrap(final WrapAxis axis) {
-    switch (axis) {
-      case S:
-        return _wrapS;
-      case T:
-        return _wrapT;
-      case R:
-        return _wrapR;
-    }
-    throw new IllegalArgumentException("invalid WrapAxis: " + axis);
+    return switch (axis) {
+      case S -> _wrapS;
+      case T -> _wrapT;
+      case R -> _wrapR;
+      default -> throw new IllegalArgumentException("invalid WrapAxis: " + axis);
+    };
   }
 
   /**

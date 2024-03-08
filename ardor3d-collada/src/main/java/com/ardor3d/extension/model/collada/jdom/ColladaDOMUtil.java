@@ -12,7 +12,6 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;

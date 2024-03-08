@@ -13,7 +13,7 @@ package com.ardor3d.input.dummy;
 import com.ardor3d.input.controller.ControllerEvent;
 import com.ardor3d.input.controller.ControllerInfo;
 import com.ardor3d.input.controller.ControllerWrapper;
-import com.google.common.collect.PeekingIterator;
+import com.ardor3d.util.PeekingIterator;
 
 public class DummyControllerWrapper implements ControllerWrapper {
   public static final DummyControllerWrapper INSTANCE = new DummyControllerWrapper();
