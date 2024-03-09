@@ -15,10 +15,10 @@ import java.lang.ref.ReferenceQueue;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import com.ardor3d.renderer.RenderContext.RenderContextRef;
 import com.ardor3d.util.Constants;
-import com.google.common.collect.MapMaker;
 
 /**
  * Context based reference to item T, holding value of type U.
@@ -41,7 +41,7 @@ public class ContextValueReference<T, U> extends PhantomReference<T> {
   public ContextValueReference(final T reference, final ReferenceQueue<? super T> queue) {
     super(reference, queue);
     if (Constants.useMultipleContexts) {
-      _valueCache = new MapMaker().initialCapacity(2).weakKeys().makeMap();
+      _valueCache = new WeakHashMap<>(2);
     } else {
       _valueCache = null;
     }

@@ -17,13 +17,8 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import com.ardor3d.buffer.AbstractBufferData;
@@ -47,13 +42,12 @@ import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.gc.ContextValueReference;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Multimap;
 
 /**
  * MeshData contains all the commonly used buffers for rendering a mesh.
@@ -74,10 +68,10 @@ public class MeshData implements Savable {
   /** The Constant logger. */
   private static final Logger logger = Logger.getLogger(MeshData.class.getName());
 
-  private static Map<MeshData, Object> _identityCache = new MapMaker().weakKeys().makeMap();
+  private static final Map<MeshData, Object> _identityCache = new WeakHashMap<>();
   private static final Object STATIC_REF = new Object();
 
-  private static ReferenceQueue<MeshData> _vaoRefQueue = new ReferenceQueue<>();
+  private static final ReferenceQueue<MeshData> _vaoRefQueue = new ReferenceQueue<>();
 
   static {
     ContextManager.addContextCleanListener(renderContext -> MeshData.cleanAllVertexArrays(null, renderContext));
@@ -130,7 +124,7 @@ public class MeshData implements Savable {
     if (_vaoIdCache != null) {
       final Integer id = _vaoIdCache.getValue(contextRef);
       if (id != null) {
-        return id.intValue();
+        return id;
       }
     }
     return -1;
@@ -145,7 +139,7 @@ public class MeshData implements Savable {
    */
   public int removeVAOID(final RenderContext context) {
     final Integer id = _vaoIdCache.removeValue(context.getUniqueContextRef());
-    return id != null ? id.intValue() : 0;
+    return id != null ? id : 0;
   }
 
   /**
@@ -462,14 +456,7 @@ public class MeshData implements Savable {
   }
 
   public void clearAllTextureCoords() {
-    final Iterator<Entry<String, AbstractBufferData<? extends Buffer>>> items = _vertexDataItems.entrySet().iterator();
-
-    while (items.hasNext()) {
-      final Entry<String, AbstractBufferData<? extends Buffer>> entry = items.next();
-      if (entry.getKey().startsWith(MeshData.KEY_TextureCoordsPrefix)) {
-        items.remove();
-      }
-    }
+    _vertexDataItems.entrySet().removeIf(entry -> entry.getKey().startsWith(MeshData.KEY_TextureCoordsPrefix));
   }
 
   /**
@@ -1205,7 +1192,7 @@ public class MeshData implements Savable {
   }
 
   public static void cleanAllVertexArrays(final IShaderUtils utils) {
-    final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();
+    final Multimap<RenderContextRef, Integer> idMap = new SimpleMultimap<>();
 
     // gather up expired vaos... these don't exist in our cache
     gatherGCdIds(idMap);
@@ -1231,7 +1218,7 @@ public class MeshData implements Savable {
   }
 
   public static void cleanAllVertexArrays(final IShaderUtils utils, final RenderContext context) {
-    final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();
+    final Multimap<RenderContextRef, Integer> idMap = new SimpleMultimap<>();
 
     // gather up expired vaos... these don't exist in our cache
     gatherGCdIds(idMap);
@@ -1242,7 +1229,7 @@ public class MeshData implements Savable {
       // only worry about data that have received ids.
       if (data._vaoIdCache != null) {
         final Integer id = data._vaoIdCache.removeValue(uniqueRef);
-        if (id != null && id.intValue() != 0) {
+        if (id != null && id != 0) {
           idMap.put(uniqueRef, id);
         }
       }
@@ -1263,7 +1250,7 @@ public class MeshData implements Savable {
           final Integer id = valRef.getValue(rep);
           if (id != null) {
             if (store == null) { // lazy init
-              store = ArrayListMultimap.create();
+              store = new SimpleMultimap<>();
             }
             store.put(rep, id);
           }
@@ -1272,7 +1259,7 @@ public class MeshData implements Savable {
         final Integer id = valRef.getValue(null);
         if (id != null) {
           if (store == null) { // lazy init
-            store = ArrayListMultimap.create();
+            store = new SimpleMultimap<>();
           }
           store.put(ContextManager.getCurrentContext().getUniqueContextRef(), id);
         }
@@ -1293,15 +1280,15 @@ public class MeshData implements Savable {
     for (final RenderContextRef uniqueRef : idMap.keySet()) {
       // If we have a deleter and the context is current, immediately delete
       if (utils != null && uniqueRef.equals(currentUniqueRef)) {
-        utils.deleteVertexArrays(idMap.get(uniqueRef));
+        utils.deleteVertexArrays(idMap.values(uniqueRef));
       }
       // Otherwise, add a delete request to that context's render task queue.
       else {
         GameTaskQueueManager.getManager(ContextManager.getContextForUniqueRef(uniqueRef))
             .render(new RendererCallable<Void>() {
               @Override
-              public Void call() throws Exception {
-                getRenderer().getShaderUtils().deleteVertexArrays(idMap.get(uniqueRef));
+              public Void call() {
+                getRenderer().getShaderUtils().deleteVertexArrays(idMap.values(uniqueRef));
                 return null;
               }
             });

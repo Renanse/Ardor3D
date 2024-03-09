@@ -11,6 +11,7 @@
 package com.ardor3d.util;
 
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -31,12 +32,12 @@ import com.ardor3d.renderer.RenderContext.RenderContextRef;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.texture.ITextureUtils;
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
+import com.ardor3d.util.collection.WeakKeyWeakValueMap;
 import com.ardor3d.util.gc.ContextValueReference;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Multimap;
 
 /**
  * <code>TextureManager</code> provides static methods for building or retrieving a
@@ -45,9 +46,9 @@ import com.google.common.collect.Multimap;
 final public class TextureManager {
   private static final Logger logger = Logger.getLogger(TextureManager.class.getName());
 
-  private static Map<TextureKey, Texture> _tCache = new MapMaker().weakKeys().weakValues().makeMap();
+  private static final WeakKeyWeakValueMap<TextureKey, Texture> _tCache = new WeakKeyWeakValueMap<>();
 
-  private static ReferenceQueue<TextureKey> _textureRefQueue = new ReferenceQueue<>();
+  private static final ReferenceQueue<TextureKey> _textureRefQueue = new ReferenceQueue<>();
 
   static {
     ContextManager.addContextCleanListener(renderContext -> TextureManager.cleanAllTextures(null, renderContext, null));
@@ -300,7 +301,7 @@ final public class TextureManager {
     for (final TextureKey key : _tCache.keySet()) {
       // possibly lazy init
       if (idMap == null) {
-        idMap = ArrayListMultimap.create();
+        idMap = new SimpleMultimap<>();
       }
 
       if (Constants.useMultipleContexts) {
@@ -350,7 +351,7 @@ final public class TextureManager {
     for (final TextureKey key : _tCache.keySet()) {
       // possibly lazy init
       if (idMap == null) {
-        idMap = ArrayListMultimap.create();
+        idMap = new SimpleMultimap<>();
       }
 
       final Integer id = key.getTextureIdForContext(context);
@@ -418,20 +419,20 @@ final public class TextureManager {
     while ((ref = (ContextValueReference<TextureKey, Integer>) _textureRefQueue.poll()) != null) {
       // lazy init
       if (idMap == null) {
-        idMap = ArrayListMultimap.create();
+        idMap = new SimpleMultimap<>();
       }
       if (Constants.useMultipleContexts) {
         final Set<RenderContextRef> contextRefs = ref.getContextRefs();
         for (final RenderContextRef contextRef : contextRefs) {
           id = ref.getValue(contextRef);
-          if (id != null && id.intValue() != 0) {
+          if (id != null && id != 0) {
             // Add id to map
             idMap.put(contextRef, id);
           }
         }
       } else {
         id = ref.getValue(null);
-        if (id != null && id.intValue() != 0) {
+        if (id != null && id != 0) {
           idMap.put(ContextManager.getCurrentContext().getSharableContextRef(), id);
         }
       }
@@ -451,7 +452,7 @@ final public class TextureManager {
     for (final RenderContextRef sharableRef : idMap.keySet()) {
       // If we have a deleter and the context is current, immediately delete
       if (currentSharableRef != null && (!Constants.useMultipleContexts || sharableRef.equals(currentSharableRef))) {
-        utils.deleteTextureIds(idMap.get(sharableRef));
+        utils.deleteTextureIds(idMap.values(sharableRef));
       }
       // Otherwise, add a delete request to that context's render task queue.
       else {
@@ -459,7 +460,7 @@ final public class TextureManager {
             .getManager(ContextManager.getContextForSharableRef(sharableRef)).render(new RendererCallable<>() {
               @Override
               public Void call() throws Exception {
-                getRenderer().getTextureUtils().deleteTextureIds(idMap.get(sharableRef));
+                getRenderer().getTextureUtils().deleteTextureIds(idMap.values(sharableRef));
                 return null;
               }
             });
@@ -472,7 +473,11 @@ final public class TextureManager {
 
   @MainThread
   public static void preloadCache(final ITextureUtils util) {
-    for (final Texture t : _tCache.values()) {
+    for (final WeakReference<Texture> tRef : _tCache.values()) {
+      if (tRef == null) {
+        continue;
+      }
+      var t = tRef.get();
       if (t == null) {
         continue;
       }

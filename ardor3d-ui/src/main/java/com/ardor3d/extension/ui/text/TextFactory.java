@@ -35,8 +35,8 @@ import com.ardor3d.renderer.material.uniform.AlphaTestConsts;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.MeshData;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 
 public enum TextFactory {
   INSTANCE;
@@ -134,7 +134,7 @@ public enum TextFactory {
     final List<Integer> lineEnds = textData._lineEnds;
     final List<Integer> lineHeights = textData._lineHeights;
     // indexed by the used Texture
-    final Multimap<Texture2D, Integer> descIndices = ArrayListMultimap.create();
+    final Multimap<Texture2D, Integer> descIndices = new SimpleMultimap<>();
     int maxLineHeight = 0, xOffset = 0, maxSizeHeight = 0;
     UIFont prevFont = null;
     double scale = 1, prevScale = 0;
@@ -290,7 +290,7 @@ public enum TextFactory {
       // apply render states
       applyStates(tMesh, tex);
 
-      indices = descIndices.get(tex);
+      indices = descIndices.values(tex);
 
       // setup buffers based on number of indices we have
       final MeshData mData = tMesh.getMeshData();

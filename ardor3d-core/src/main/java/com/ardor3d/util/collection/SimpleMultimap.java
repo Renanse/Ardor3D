@@ -15,38 +15,26 @@ import java.util.*;
 /**
  * A simple multimap implementation that uses a Map of Lists to store its data.
  */
-public class SimpleMultimap<K, V> {
+public class SimpleMultimap<K, V> implements Multimap<K, V> {
   private final Map<K, List<V>> map = new HashMap<>();
 
-  /**
-   * Adds the given value to the list of values for the given key.
-   *
-   * @param key   the key to add the value to
-   * @param value the value to add
-   */
+  @Override
   public void put(K key, V value) {
     map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
   }
 
-  /**
-   * Returns an unmodifiable list of values for the given key. If the key is not present, an empty list is returned.
-   *
-   * @param key the key to look up
-   * @return an unmodifiable list of values for the given key, or an empty list if the key is not present.
-   */
+  @Override
+  public void putAll(K key, Collection<V> val) {
+    map.computeIfAbsent(key, k -> new ArrayList<>()).addAll(val);
+  }
+
+  @Override
   public List<V> values(K key) {
     var values = map.get(key);
     return (values == null) ? Collections.emptyList() :  Collections.unmodifiableList(values);
   }
 
-  /**
-   * Removes the given value from the list of values for the given key. If the key is not present, or the value is not
-   * present in the list, nothing happens.
-   *
-   * @param key   the key to remove the value from
-   * @param value the value to remove
-   * @return true if the value was removed, false otherwise.
-   */
+  @Override
   public boolean remove(K key, V value) {
     if (!map.containsKey(key)) return false;
 
@@ -58,28 +46,24 @@ public class SimpleMultimap<K, V> {
     return result;
   }
 
-  /**
-   * Removes all values for the given key.
-   *
-   * @param key the key to remove all values for
-   */
+  @Override
   public void removeAll(K key) {
     map.remove(key);
   }
 
-  /**
-   * @param key the key to check for
-   * @return true if the given key is present and has at least one value, false otherwise.
-   */
+  @Override
   public boolean containsKey(K key) {
     return map.containsKey(key) && !map.get(key).isEmpty();
   }
 
-  /**
-   * @return a set of all keys present in this multimap.
-   */
+  @Override
   public Set<K> keySet() {
     return map.keySet();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return map.isEmpty();
   }
 }
 

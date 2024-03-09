@@ -13,6 +13,7 @@ package com.ardor3d.extension.animation.skeletal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
@@ -22,7 +23,6 @@ import com.ardor3d.extension.animation.skeletal.util.LoggingMap;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
-import com.google.common.collect.MapMaker;
 
 /**
  * <p>
@@ -58,7 +58,7 @@ public class AnimationManager {
   /**
    * Local instance information for any clips referenced by the layers/blend trees in this manager.
    */
-  protected final Map<AnimationClip, AnimationClipInstance> _clipInstances = new MapMaker().weakKeys().makeMap();
+  protected final Map<AnimationClip, AnimationClipInstance> _clipInstances = new WeakHashMap<>();
 
   /** A logic object responsible for taking animation data and applying it to skeleton poses. */
   protected AnimationApplier _applier;

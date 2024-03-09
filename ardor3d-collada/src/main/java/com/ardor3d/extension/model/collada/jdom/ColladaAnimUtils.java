@@ -26,6 +26,8 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
 import org.jdom2.Element;
@@ -65,8 +67,6 @@ import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.VertMap;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * Methods for parsing Collada data related to animation, skinning and morphing.
@@ -104,10 +104,9 @@ public class ColladaAnimUtils {
     final String instanceControllerName =
         ic.getAttributeValue("name", (String) null) != null ? ic.getAttributeValue("name", (String) null)
             : ic.getAttributeValue("sid", (String) null);
-    final String storeName = (controllerName != null ? controllerName : "")
+    return (controllerName != null ? controllerName : "")
         + (controllerName != null && instanceControllerName != null ? " : " : "")
         + (instanceControllerName != null ? instanceControllerName : "");
-    return storeName;
   }
 
   /**
@@ -443,7 +442,7 @@ public class ColladaAnimUtils {
           }
 
           // Grab the MeshVertPairs from Global for this mesh.
-          final Collection<MeshVertPairs> vertPairsList = _dataCache.getVertMappings().get(geometry);
+          final Collection<MeshVertPairs> vertPairsList = _dataCache.getVertMappings().values(geometry);
           MeshVertPairs pairsMap = null;
           for (final MeshVertPairs pairs : vertPairsList) {
             if (pairs.getMesh() == sourceMesh) {
@@ -566,7 +565,7 @@ public class ColladaAnimUtils {
     final Skeleton skeleton = skPose.getSkeleton();
     for (final Joint joint : skeleton.getJoints()) {
       if (_dataCache.getAttachmentPoints().containsKey(joint)) {
-        for (final AttachmentPoint point : _dataCache.getAttachmentPoints().get(joint)) {
+        for (final AttachmentPoint point : _dataCache.getAttachmentPoints().values(joint)) {
           point.setJointIndex(joint.getIndex());
           skPose.addPoseListener(point);
         }
@@ -630,12 +629,12 @@ public class ColladaAnimUtils {
     final AnimationItem animationItemRoot = new AnimationItem("Animation Root");
     _colladaStorage.setAnimationItemRoot(animationItemRoot);
 
-    final Multimap<Element, TargetChannel> channelMap = ArrayListMultimap.create();
+    final Multimap<Element, TargetChannel> channelMap = new SimpleMultimap<>();
 
     parseAnimations(channelMap, libraryAnimations, animationItemRoot);
 
     for (final Element key : channelMap.keySet()) {
-      buildAnimations(key, channelMap.get(key));
+      buildAnimations(key, channelMap.values(key));
     }
   }
 
@@ -834,7 +833,7 @@ public class ColladaAnimUtils {
    * @param animationItemRoot
    */
   private void parseAnimations(final Multimap<Element, TargetChannel> channelMap, final Element animationRoot,
-      final AnimationItem animationItemRoot) {
+                               final AnimationItem animationItemRoot) {
     if (animationRoot.getChild("animation") != null) {
       Attribute nameAttribute = animationRoot.getAttribute("name");
       if (nameAttribute == null) {

@@ -10,32 +10,22 @@
 
 package com.ardor3d.input.awt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.LinkedList;
-
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.mouse.ButtonState;
-import com.ardor3d.input.mouse.GrabbedState;
-import com.ardor3d.input.mouse.MouseButton;
-import com.ardor3d.input.mouse.MouseManager;
-import com.ardor3d.input.mouse.MouseState;
-import com.ardor3d.input.mouse.MouseWrapper;
+import com.ardor3d.input.mouse.*;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.util.AbstractIterator;
 import com.ardor3d.util.PeekingIterator;
 import com.ardor3d.util.collection.Multiset;
 import com.ardor3d.util.collection.SimpleEnumMultiset;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.LinkedList;
+
+import static com.ardor3d.util.Preconditions.checkNotNull;
 
 /**
  * Mouse wrapper class for use with AWT.

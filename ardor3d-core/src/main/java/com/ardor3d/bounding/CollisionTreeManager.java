@@ -10,15 +10,11 @@
 
 package com.ardor3d.bounding;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.MapMaker;
 
 /**
  * CollisionTreeManager is an automated system for handling the creation and deletion of
@@ -83,7 +79,7 @@ public enum CollisionTreeManager {
    * private constructor for the Singleton. Initializes the cache.
    */
   CollisionTreeManager() {
-    _cache = new MapMaker().weakKeys().makeMap();
+    _cache = new WeakHashMap<>();
     _protectedList = Collections.synchronizedList(new ArrayList<>(1));
     setCollisionTreeController(new UsageTreeController());
   }

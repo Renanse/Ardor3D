@@ -10,6 +10,7 @@
 
 package com.ardor3d.util.resource;
 
+import com.ardor3d.util.collection.Multimap;
 import com.ardor3d.util.collection.SimpleMultimap;
 
 import java.io.*;
@@ -18,7 +19,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +41,7 @@ public class ResourceLocatorTool {
   public static final String TYPE_MATERIAL = "material";
   public static final String TYPE_FONT = "font";
 
-  private static final SimpleMultimap<String, ResourceLocator> _locatorMap = new SimpleMultimap<>();
+  private static final Multimap<String, ResourceLocator> _locatorMap = new SimpleMultimap<>();
 
   public static ResourceSource locateResource(final String resourceType, String resourceName) {
     if (resourceName == null) {

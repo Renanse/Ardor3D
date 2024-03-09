@@ -393,8 +393,10 @@ public class ColladaNodeUtils {
   }
 
   public void reattachAttachments(final Node scene) {
-    for (final AttachmentPoint point : _dataCache.getAttachmentPoints().values()) {
-      scene.attachChild(point.getAttachment());
+    for (final var joint: _dataCache.getAttachmentPoints().keySet()) {
+      for (final var point: _dataCache.getAttachmentPoints().values(joint)) {
+        scene.attachChild(point.getAttachment());
+      }
     }
   }
 }

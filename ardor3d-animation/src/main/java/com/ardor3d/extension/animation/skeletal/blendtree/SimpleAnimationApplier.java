@@ -11,6 +11,7 @@
 package com.ardor3d.extension.animation.skeletal.blendtree;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import com.ardor3d.extension.animation.skeletal.AnimationApplier;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
@@ -21,9 +22,8 @@ import com.ardor3d.extension.animation.skeletal.clip.TriggerCallback;
 import com.ardor3d.extension.animation.skeletal.clip.TriggerData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Multimap;
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 
 /**
  * Very simple applier. Just applies joint transform data, calls any callbacks and updates the
@@ -31,16 +31,16 @@ import com.google.common.collect.Multimap;
  */
 public class SimpleAnimationApplier implements AnimationApplier {
 
-  private final Multimap<String, TriggerCallback> _triggerCallbacks = ArrayListMultimap.create(0, 0);
+  private final Multimap<String, TriggerCallback> _triggerCallbacks = new SimpleMultimap<>();
 
-  private final Map<String, Spatial> _spatialCache = new MapMaker().weakValues().makeMap();
+  private final Map<String, Spatial> _spatialCache = new WeakHashMap<>();
 
   @Override
   public void apply(final Spatial root, final AnimationManager manager) {
     if (root == null) {
       return;
     }
-    final Map<String, ? extends Object> data = manager.getCurrentSourceData();
+    final Map<String, ?> data = manager.getCurrentSourceData();
 
     // cycle through, pulling out and applying those we know about
     if (data != null) {
@@ -76,7 +76,7 @@ public class SimpleAnimationApplier implements AnimationApplier {
 
   @Override
   public void applyTo(final SkeletonPose applyToPose, final AnimationManager manager) {
-    final Map<String, ? extends Object> data = manager.getCurrentSourceData();
+    final Map<String, ?> data = manager.getCurrentSourceData();
 
     // cycle through, pulling out and applying those we know about
     if (data != null) {
@@ -90,7 +90,7 @@ public class SimpleAnimationApplier implements AnimationApplier {
             try {
               // pull callback(s) for the current trigger key, if exists, and call.
               for (final String curTrig : trigger.getCurrentTriggers()) {
-                for (final TriggerCallback cb : _triggerCallbacks.get(curTrig)) {
+                for (final TriggerCallback cb : _triggerCallbacks.values(curTrig)) {
                   cb.doTrigger(applyToPose, manager);
                 }
               }

@@ -10,12 +10,12 @@
 
 package com.ardor3d.util;
 
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
-
-import com.google.common.collect.MapMaker;
 
 /**
  * <code>GameTaskQueueManager</code> is just a simple Singleton class allowing easy access to task
@@ -24,7 +24,7 @@ import com.google.common.collect.MapMaker;
 public final class GameTaskQueueManager {
 
   private static final Object MAP_LOCK = new Object();
-  private static final ConcurrentMap<Object, GameTaskQueueManager> _managers = new MapMaker().weakKeys().makeMap();
+  private static final Map<Object, GameTaskQueueManager> _managers = new WeakHashMap<>();
 
   private final ConcurrentMap<String, GameTaskQueue> _managedQueues = new ConcurrentHashMap<>(2);
 
@@ -40,7 +40,9 @@ public final class GameTaskQueueManager {
   }
 
   public static GameTaskQueueManager clearManager(final Object key) {
-    return _managers.remove(key);
+    synchronized (MAP_LOCK) {
+      return _managers.remove(key);
+    }
   }
 
   private GameTaskQueueManager() {

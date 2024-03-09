@@ -14,10 +14,7 @@ import java.io.IOException;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.nio.Buffer;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -26,20 +23,19 @@ import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.material.IShaderUtils;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.gc.ContextValueReference;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Multimap;
 
 public abstract class AbstractBufferData<T extends Buffer> implements Savable {
 
   /** Specifies the number of coordinates per vertex. Must be 1 - 4. */
   protected int _valuesPerTuple;
 
-  private static final Map<AbstractBufferData<?>, Object> _identityCache = new MapMaker().weakKeys().makeMap();
+  private static final Map<AbstractBufferData<?>, Object> _identityCache = new WeakHashMap<>();
   private static final Object STATIC_REF = new Object();
 
   private static final ReferenceQueue<AbstractBufferData<?>> _vboRefQueue = new ReferenceQueue<>();
@@ -285,7 +281,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
   public void setVboAccessMode(final VBOAccessMode vboAccessMode) { this._vboAccessMode = vboAccessMode; }
 
   public static void cleanAllBuffers(final IShaderUtils utils) {
-    final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();
+    final Multimap<RenderContextRef, Integer> idMap = new SimpleMultimap<>();
 
     // gather up expired vbos... these don't exist in our cache
     gatherGCdIds(idMap);
@@ -311,7 +307,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
   }
 
   public static void cleanAllBuffers(final IShaderUtils utils, final RenderContext context) {
-    final Multimap<RenderContextRef, Integer> idMap = ArrayListMultimap.create();
+    final Multimap<RenderContextRef, Integer> idMap = new SimpleMultimap<>();
 
     // gather up expired vbos... these don't exist in our cache
     gatherGCdIds(idMap);
@@ -366,7 +362,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
           final Integer id = ref.getValue(renderRef);
           if (id != null) {
             if (store == null) { // lazy init
-              store = ArrayListMultimap.create();
+              store = new SimpleMultimap<>();
             }
             store.put(renderRef, id);
           }
@@ -375,7 +371,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
         final Integer id = ref.getValue(null);
         if (id != null) {
           if (store == null) { // lazy init
-            store = ArrayListMultimap.create();
+            store = new SimpleMultimap<>();
           }
           store.put(ContextManager.getCurrentContext().getSharableContextRef(), id);
         }
@@ -396,7 +392,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
     for (final RenderContextRef sharableRef : idMap.keySet()) {
       // If we have a deleter and the context is current, immediately delete
       if (utils != null && sharableRef.equals(currentSharableRef)) {
-        utils.deleteBuffers(idMap.get(sharableRef));
+        utils.deleteBuffers(idMap.values(sharableRef));
       }
       // Otherwise, add a delete request to that context's render task queue.
       else {
@@ -404,7 +400,7 @@ public abstract class AbstractBufferData<T extends Buffer> implements Savable {
             .render(new RendererCallable<Void>() {
               @Override
               public Void call() throws Exception {
-                getRenderer().getShaderUtils().deleteBuffers(idMap.get(sharableRef));
+                getRenderer().getShaderUtils().deleteBuffers(idMap.values(sharableRef));
                 return null;
               }
             });

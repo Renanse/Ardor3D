@@ -13,9 +13,9 @@ package com.ardor3d.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import com.ardor3d.renderer.RenderContext.RenderContextRef;
-import com.google.common.collect.MapMaker;
 
 public class ContextManager {
 
@@ -23,7 +23,7 @@ public class ContextManager {
 
   private static List<ContextCleanListener> _cleanListeners = new ArrayList<>();
 
-  protected static final Map<Object, RenderContext> contextStore = new MapMaker().weakKeys().makeMap();
+  protected static final Map<Object, RenderContext> contextStore = new WeakHashMap<>();
 
   /**
    * @return a RenderContext object representing the current OpenGL context.

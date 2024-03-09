@@ -23,10 +23,10 @@ import com.ardor3d.extension.animation.skeletal.clip.TransformChannel;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.collection.Multimap;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.google.common.collect.Multimap;
 
 /**
  * Data storage object meant to hold objects parsed from a Collada file that the user might want to

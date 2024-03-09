@@ -30,6 +30,7 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.collection.Multimap;
 import com.ardor3d.util.collection.SimpleMultimap;
 
 /**
@@ -300,7 +301,7 @@ public class MeshCombiner {
 
 
 class IndexCombiner {
-  SimpleMultimap<IndexMode, int[]> sectionMap = new SimpleMultimap<>();
+  Multimap<IndexMode, int[]> sectionMap = new SimpleMultimap<>();
 
   public void addEntry(final MeshData source, final int vertexOffset) {
     // arrays or elements?

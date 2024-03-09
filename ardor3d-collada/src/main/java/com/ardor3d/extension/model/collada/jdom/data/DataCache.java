@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 import org.jdom2.Element;
 import org.jdom2.xpath.XPathExpression;
 
@@ -30,8 +32,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.geom.VertMap;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * Performance cache and temp storage during parsing.
@@ -65,7 +65,7 @@ public class DataCache {
   private final Map<Skeleton, SkeletonPose> _skeletonPoseMapping;
   private final List<Skeleton> _skeletons;
   private final List<ControllerStore> _controllers;
-  private final Multimap<Joint, AttachmentPoint> _attachmentPoints = ArrayListMultimap.create();
+  private final Multimap<Joint, AttachmentPoint> _attachmentPoints;
 
   public DataCache() {
     _boundMaterials = new HashMap<>();
@@ -82,9 +82,9 @@ public class DataCache {
     _booleanArrays = new HashMap<>();
     _intArrays = new HashMap<>();
     _stringArrays = new HashMap<>();
-    _vertMappings = ArrayListMultimap.create();
+    _vertMappings = new SimpleMultimap<>();
     _meshVertMap = new IdentityHashMap<>();
-    _parsedVertexColors = ArrayListMultimap.create();
+    _parsedVertexColors = new SimpleMultimap<>();
     _materialInfoMap = new HashMap<>();
     _meshMaterialMap = new IdentityHashMap<>();
 
@@ -96,6 +96,7 @@ public class DataCache {
     _jointSkeletonMapping = new HashMap<>();
     _skeletonPoseMapping = new HashMap<>();
     _controllers = new ArrayList<>();
+    _attachmentPoints = new SimpleMultimap<>();
   }
 
   public void bindMaterial(final String ref, final Element material) {

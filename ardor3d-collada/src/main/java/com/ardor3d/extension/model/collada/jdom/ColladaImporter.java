@@ -15,6 +15,8 @@ import java.nio.FloatBuffer;
 import java.util.*;
 import java.util.logging.Logger;
 
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
 import org.jdom2.DefaultJDOMFactory;
@@ -37,8 +39,6 @@ import com.ardor3d.util.resource.RelativeResourceLocator;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * Main class for importing Collada files.
@@ -227,11 +227,11 @@ public class ColladaImporter {
       }
 
       // copy across our mesh colors - only for objects with multiple channels
-      final Multimap<MeshData, FloatBuffer> colors = ArrayListMultimap.create();
+      final Multimap<MeshData, FloatBuffer> colors = new SimpleMultimap<>();
       final Multimap<MeshData, FloatBuffer> temp = dataCache.getParsedVertexColors();
       for (final MeshData key : temp.keySet()) {
         // only copy multiple channels since their data is lost
-        final Collection<FloatBuffer> val = temp.get(key);
+        final Collection<FloatBuffer> val = temp.values(key);
         if (val.size() > 1) {
           colors.putAll(key, val);
         }
