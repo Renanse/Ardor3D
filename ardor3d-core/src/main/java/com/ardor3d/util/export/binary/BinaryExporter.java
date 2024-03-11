@@ -10,11 +10,7 @@
 
 package com.ardor3d.util.export.binary;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -309,9 +305,9 @@ public class BinaryExporter implements Ardor3dExporter {
       parentDirectory.mkdirs();
     }
 
-    final FileOutputStream fos = new FileOutputStream(file);
-    save(object, fos);
-    fos.close();
+    try (var bos = new BufferedOutputStream(new FileOutputStream(file))) {
+      save(object, bos);
+    }
   }
 
   public int processBinarySavable(final Savable object) throws IOException {
@@ -357,7 +353,6 @@ public class BinaryExporter implements Ardor3dExporter {
   }
 
   protected BinaryIdContentPair generateIdContentPair(final BinaryClassObject bco) {
-    final BinaryIdContentPair pair = new BinaryIdContentPair(_idCount++, new BinaryOutputCapsule(this, bco));
-    return pair;
+    return new BinaryIdContentPair(_idCount++, new BinaryOutputCapsule(this, bco));
   }
 }
