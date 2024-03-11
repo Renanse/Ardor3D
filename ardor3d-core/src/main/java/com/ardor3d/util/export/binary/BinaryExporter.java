@@ -295,9 +295,8 @@ public class BinaryExporter implements Ardor3dExporter {
   protected byte[] fixClassAlias(final byte[] bytes, final int width) {
     if (bytes.length != width) {
       final byte[] newAlias = new byte[width];
-      for (int x = width - bytes.length; x < width; x++) {
-        newAlias[x] = bytes[x - bytes.length];
-      }
+      int startPos = width - bytes.length;
+      System.arraycopy(bytes, 0, newAlias, startPos, bytes.length);
       return newAlias;
     }
     return bytes;
