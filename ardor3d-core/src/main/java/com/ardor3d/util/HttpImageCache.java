@@ -397,10 +397,10 @@ public enum HttpImageCache {
       final String part2 = bytesToHex(md.digest());
       return part1 + part2 + ".abi";
     } catch (final NoSuchAlgorithmException ex) {
-      String rt = "";
+      StringBuilder rt = new StringBuilder();
       final Matcher matcher = HttpImageCache.NameRegex.matcher(urlText);
       while (matcher.find()) {
-        rt += matcher.group() + "_";
+        rt.append(matcher.group()).append("_");
       }
 
       // ugly default...
