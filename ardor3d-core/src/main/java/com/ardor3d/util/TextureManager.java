@@ -148,7 +148,8 @@ final public class TextureManager {
   }
 
   /**
-   * Creates a texture from a given Ardor3D Image object.
+   * Creates a texture from a given Ardor3D Image object.  NB: It is advised to make sure the Image
+   * passed in has a data id set, as this will allow for proper lookup in the texture cache.
    *
    * @param image
    *          the Ardor3D image.

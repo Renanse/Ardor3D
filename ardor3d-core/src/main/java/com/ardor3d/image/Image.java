@@ -14,10 +14,7 @@ import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -40,6 +37,7 @@ public class Image implements Serializable, Savable {
   protected int _width, _height, _depth;
   protected int[] _mipMapSizes;
   protected List<ByteBuffer> _data;
+  protected String _dataId;
 
   /**
    * Constructor instantiates a new <code>Image</code> object. All values are undefined.
@@ -298,6 +296,24 @@ public class Image implements Serializable, Savable {
    */
   public int[] getMipMapByteSizes() { return _mipMapSizes; }
 
+  /**
+   * Returns the data id for this image. This is used to track the data's source, such as a file or
+   * resource id.
+   *
+   * @return the data id for this image.
+   */
+  public String getDataId() { return _dataId; }
+
+  /**
+   * Sets the data id for this image. This is used to track the data's source, such as a file or
+   * resource id.  If you create textures directly from Image, having a data id can help prevent unintended texture
+   * sharing.
+   *
+   * @param dataId
+   *          the data id for this image.
+   */
+  public void setDataId(String dataId) { _dataId = dataId; }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -305,10 +321,11 @@ public class Image implements Serializable, Savable {
     result = prime * result + getWidth();
     result = prime * result + getHeight();
     result = prime * result + getDepth();
-    result = prime * result + ((getData() == null) ? 0 : getData().hashCode());
     result = prime * result + ((getDataFormat() == null) ? 0 : getDataFormat().hashCode());
     result = prime * result + Arrays.hashCode(getMipMapByteSizes());
     result = prime * result + ((getDataType() == null) ? 0 : getDataType().hashCode());
+    result = prime * result + ((getData() == null) ? 0 : getData().hashCode());
+    result = prime * result + ((getDataId() == null) ? 0 : getDataId().hashCode());
     return result;
   }
 
@@ -332,10 +349,16 @@ public class Image implements Serializable, Savable {
     if (getHeight() != that.getHeight()) {
       return false;
     }
-    if (!this.getData().equals(that.getData())) {
+    if (getDepth() != that.getDepth()) {
+      return false;
+    }
+    if (!getData().equals(that.getData())) {
       return false;
     }
     if (!Arrays.equals(getMipMapByteSizes(), that.getMipMapByteSizes())) {
+      return false;
+    }
+    if (!Objects.equals(getDataId(), that.getDataId())) {
       return false;
     }
 
