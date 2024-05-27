@@ -47,7 +47,7 @@ public class TestSwtKeyboardWrapper {
   }
 
   @Test
-  public void testKeys1() throws Exception {
+  public void testKeys1() {
 
     e1.keyCode = 'a';
 
@@ -70,7 +70,7 @@ public class TestSwtKeyboardWrapper {
   }
 
   @Test
-  public void testKeys2() throws Exception {
+  public void testKeys2() {
     e1.keyCode = 'a';
     e2.keyCode = 'b';
 
@@ -97,7 +97,7 @@ public class TestSwtKeyboardWrapper {
   }
 
   @Test
-  public void testKeysRepeat() throws Exception {
+  public void testKeysRepeat() {
 
     e1.keyCode = 'a';
 
