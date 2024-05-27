@@ -787,4 +787,12 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
     }
   }
 
+  @Override
+  public void deleteShaderPrograms(final List<Integer> ids) {
+    for (final Integer i : ids) {
+      if (i != null && i != 0) {
+        GL20C.glDeleteProgram(i);
+      }
+    }
+  }
 }

@@ -60,7 +60,7 @@ public interface IShaderUtils {
    * Attempts to delete a vertex array associated with this mesh data that is relevant to the current
    * RenderContext.
    *
-   * @param ids
+   * @param data
    */
   void deleteVertexArray(MeshData data);
 
@@ -71,4 +71,10 @@ public interface IShaderUtils {
    */
   void deleteVertexArrays(Collection<Integer> ids);
 
+  /**
+   * Attempts to delete shader programs with the given ids. Ignores null ids or ids < 1.
+   *
+   * @param ids
+   */
+  void deleteShaderPrograms(List<Integer> ids);
 }

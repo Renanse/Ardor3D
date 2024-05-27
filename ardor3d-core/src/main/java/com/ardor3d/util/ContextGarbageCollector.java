@@ -12,6 +12,7 @@ package com.ardor3d.util;
 
 import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.material.TechniquePass;
 import com.ardor3d.scenegraph.MeshData;
 
 public class ContextGarbageCollector {
@@ -30,7 +31,11 @@ public class ContextGarbageCollector {
    */
   public static void doRuntimeCleanup(final Renderer renderer) {
     TextureManager.cleanExpiredTextures(renderer.getTextureUtils(), null);
-    AbstractBufferData.cleanExpiredVBOs(renderer.getShaderUtils());
+
+    final var shaderUtils = renderer.getShaderUtils();
+    AbstractBufferData.cleanExpiredVBOs(shaderUtils);
+    MeshData.cleanExpiredVertexArrays(shaderUtils);
+    TechniquePass.cleanExpiredPrograms(shaderUtils);
   }
 
   /**
@@ -46,7 +51,10 @@ public class ContextGarbageCollector {
    */
   public static void doFinalCleanup(final Renderer renderer) {
     TextureManager.cleanAllTextures(renderer.getTextureUtils(), null);
-    AbstractBufferData.cleanAllBuffers(renderer.getShaderUtils());
-    MeshData.cleanAllVertexArrays(renderer.getShaderUtils());
+
+    final var shaderUtils = renderer.getShaderUtils();
+    AbstractBufferData.cleanAllBuffers(shaderUtils);
+    MeshData.cleanAllVertexArrays(shaderUtils);
+    TechniquePass.cleanAllPrograms(shaderUtils);
   }
 }

@@ -13,17 +13,14 @@ package com.ardor3d.renderer.material;
 import java.io.*;
 import java.lang.ref.ReferenceQueue;
 import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.light.LightManager;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.material.uniform.Ardor3dStateProperty;
 import com.ardor3d.renderer.material.uniform.UniformRef;
 import com.ardor3d.renderer.material.uniform.UniformType;
@@ -33,11 +30,17 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.SceneIndexer;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
+import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.collection.Multimap;
+import com.ardor3d.util.collection.SimpleMultimap;
 import com.ardor3d.util.gc.ContextValueReference;
 
 public class TechniquePass {
   /** Name of this pass - optional, useful for debug, etc. */
   protected String _name;
+
+  private static final Map<TechniquePass, Object> _identityCache = Collections.synchronizedMap(new WeakHashMap<>());
+  private static final Object STATIC_REF = new Object();
 
   /** Our shaders, mapped by their type. */
   protected Map<ShaderType, List<String>> _shaders = new EnumMap<>(ShaderType.class);
@@ -54,9 +57,29 @@ public class TechniquePass {
 
   protected Map<UniformRef, Integer> _cachedLocations = new IdentityHashMap<>();
 
+  public TechniquePass() {
+    synchronized (_identityCache) {
+      _identityCache.put(this, STATIC_REF);
+    }
+  }
+
+  /**
+   * @param context the OpenGL context to get our id for.
+   * @return the program id of a shader program in the given context. If the program is not found in the given
+   * *         context rep, 0 is returned.
+   */
   public int getProgramId(final RenderContext context) {
+    return getProgramIdByRef(context.getSharableContextRef());
+  }
+
+  /**
+   * @param contextRef the reference to a shared GL context to get our id for.
+   * @return the program id of a shader program in the given context. If the program is not found in the given
+   * context rep, 0 is returned.
+   */
+  public int getProgramIdByRef(final RenderContext.RenderContextRef contextRef) {
     if (_shaderIdCache != null) {
-      final Integer id = _shaderIdCache.getValue(context.getSharableContextRef());
+      final Integer id = _shaderIdCache.getValue(contextRef);
       if (id != null) {
         return id;
       }
@@ -73,6 +96,187 @@ public class TechniquePass {
       _shaderIdCache = ContextValueReference.newReference(this, TechniquePass._shaderRefQueue);
     }
     _shaderIdCache.put(context.getSharableContextRef(), id);
+  }
+
+  /**
+   * Clean all tracked Shader Programs from the hardware, using the given utility object to do the work immediately,
+   * if given. If not, we will delete in the next execution of the appropriate context's game task
+   * render queue.
+   *
+   * @param utils
+   *          the util class to use. If null, execution will not occur immediately.
+   */
+  public static void cleanAllPrograms(final IShaderUtils utils) {
+    final Multimap<RenderContext.RenderContextRef, Integer> idMap = new SimpleMultimap<>();
+
+    // gather up expired shader program ids... these don't exist in our cache
+    gatherGCdIds(idMap);
+
+    Set<TechniquePass> keySetCopy;
+    synchronized (_identityCache) {
+      keySetCopy = new HashSet<>(_identityCache.keySet());
+    }
+
+    // Walk through the cached items and delete those too.
+    for (final TechniquePass pass : keySetCopy) {
+      if (pass._shaderIdCache != null) {
+        if (Constants.useMultipleContexts) {
+          final Set<RenderContext.RenderContextRef> contextObjects = pass._shaderIdCache.getContextRefs();
+          for (final RenderContext.RenderContextRef o : contextObjects) {
+            // Add id to map
+            idMap.put(o, pass.getProgramIdByRef(o));
+          }
+        } else {
+          idMap.put(ContextManager.getCurrentContext().getSharableContextRef(), pass.getProgramIdByRef(null));
+        }
+        pass._shaderIdCache.clear();
+      }
+    }
+
+    // send to be deleted (perhaps on next render.)
+    handleProgramDelete(utils, idMap);
+  }
+
+  /**
+   * Clean all tracked Shader Programs associated with the given RenderContext from the hardware, using the given utility object to do the work immediately,
+   * if given. If not, we will delete in the next execution of the appropriate context's game task
+   * render queue.
+   *
+   * @param utils   the util class to use. If null, execution will not occur immediately.
+   * @param context the context to clean programs for.
+   */
+  public static void cleanAllPrograms(final IShaderUtils utils, final RenderContext context) {
+    final Multimap<RenderContext.RenderContextRef, Integer> idMap = new SimpleMultimap<>();
+
+    // gather up expired vbos... these don't exist in our cache
+    gatherGCdIds(idMap);
+
+    final RenderContext.RenderContextRef glRef = context.getSharableContextRef();
+
+    Set<TechniquePass> keySetCopy;
+    synchronized (_identityCache) {
+      keySetCopy = new HashSet<>(_identityCache.keySet());
+    }
+
+    // Walk through the cached items and delete those too.
+    for (final TechniquePass pass : keySetCopy) {
+      // only worry about buffers that have received ids.
+      if (pass._shaderIdCache != null) {
+        final Integer id = pass._shaderIdCache.removeValue(glRef);
+        if (id != null && id != 0) {
+          idMap.put(context.getSharableContextRef(), id);
+        }
+      }
+    }
+
+    // send to be deleted (perhaps on next render.)
+    handleProgramDelete(utils, idMap);
+  }
+
+  /**
+   * Clean tracked Shader Programs from the hardware for this TechniquePass, using the given utility object to do the work immediately,
+   * if given. If not, we will delete in the next execution of the appropriate context's game task
+   * render queue.
+   *
+   * @param utils the util class to use. If null, execution will not occur immediately.
+   */
+  public void cleanProgram(final IShaderUtils utils) {
+    if (_shaderIdCache != null) {
+      final Multimap<RenderContext.RenderContextRef, Integer> idMap = new SimpleMultimap<>();
+
+      if (Constants.useMultipleContexts) {
+        final Set<RenderContext.RenderContextRef> contextObjects = _shaderIdCache.getContextRefs();
+        for (final RenderContext.RenderContextRef o : contextObjects) {
+          // Add id to map
+          idMap.put(o, getProgramIdByRef(o));
+        }
+      } else {
+        idMap.put(ContextManager.getCurrentContext().getSharableContextRef(), getProgramIdByRef(null));
+      }
+
+      // clear out the cache
+      _shaderIdCache.clear();
+
+      // send to be deleted (perhaps on next render.)
+      handleProgramDelete(utils, idMap);
+    }
+  }
+
+  /**
+   * Clean any tracked, expired Shader Programs from the hardware, using the given utility object to do the work immediately,
+   * if given. If not, we will delete in the next execution of the appropriate context's game task
+   * render queue.
+   * <p>
+   * A Shader Program is considered expired if it has been garbage collected by Java.
+   *
+   * @param utils the util class to use. If null, execution will not occur immediately.
+   */
+  public static void cleanExpiredPrograms(final IShaderUtils utils) {
+    // gather up expired vbos...
+    final Multimap<RenderContext.RenderContextRef, Integer> idMap = gatherGCdIds(null);
+
+    if (idMap != null) {
+      // send to be deleted (perhaps on next render.)
+      handleProgramDelete(utils, idMap);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Multimap<RenderContext.RenderContextRef, Integer> gatherGCdIds(Multimap<RenderContext.RenderContextRef, Integer> store) {
+    // Pull all expired shader programs from ref queue and add to an id multimap.
+    ContextValueReference<TechniquePass, Integer> ref;
+    while ((ref = (ContextValueReference<TechniquePass, Integer>) _shaderRefQueue.poll()) != null) {
+      if (Constants.useMultipleContexts) {
+        final Set<RenderContext.RenderContextRef> renderRefs = ref.getContextRefs();
+        for (final RenderContext.RenderContextRef renderRef : renderRefs) {
+          // Add id to map
+          final Integer id = ref.getValue(renderRef);
+          if (id != null) {
+            if (store == null) { // lazy init
+              store = new SimpleMultimap<>();
+            }
+            store.put(renderRef, id);
+          }
+        }
+      } else {
+        final Integer id = ref.getValue(null);
+        if (id != null) {
+          if (store == null) { // lazy init
+            store = new SimpleMultimap<>();
+          }
+          store.put(ContextManager.getCurrentContext().getSharableContextRef(), id);
+        }
+      }
+      ref.clear();
+    }
+
+    return store;
+  }
+
+  private static void handleProgramDelete(final IShaderUtils utils, final Multimap<RenderContext.RenderContextRef, Integer> idMap) {
+    RenderContext.RenderContextRef currentSharableRef = null;
+    // Grab the current context, if any.
+    if (utils != null && ContextManager.getCurrentContext() != null) {
+      currentSharableRef = ContextManager.getCurrentContext().getSharableContextRef();
+    }
+    // For each affected context...
+    for (final RenderContext.RenderContextRef sharableRef : idMap.keySet()) {
+      // If we have a deleter and the context is current, immediately delete
+      if (utils != null && sharableRef.equals(currentSharableRef)) {
+        utils.deleteShaderPrograms(idMap.values(sharableRef));
+      }
+      // Otherwise, add a delete request to that context's render task queue.
+      else {
+        GameTaskQueueManager.getManager(ContextManager.getContextForSharableRef(sharableRef))
+            .render(new RendererCallable<Void>() {
+              @Override
+              public Void call() {
+                getRenderer().getShaderUtils().deleteShaderPrograms(idMap.values(sharableRef));
+                return null;
+              }
+            });
+      }
+    }
   }
 
   public void setName(final String name) { _name = name; }

@@ -1191,6 +1191,16 @@ public class MeshData implements Savable {
     updatePrimitiveCounts();
   }
 
+  public static void cleanExpiredVertexArrays(final IShaderUtils utils) {
+    // gather up expired vertex arrays...
+    final Multimap<RenderContextRef, Integer> idMap = gatherGCdIds(null);
+
+    if (idMap != null) {
+      // send to be deleted (perhaps on next render.)
+      handleVAODelete(utils, idMap);
+    }
+  }
+
   public static void cleanAllVertexArrays(final IShaderUtils utils) {
     final Multimap<RenderContextRef, Integer> idMap = new SimpleMultimap<>();
 
