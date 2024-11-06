@@ -871,12 +871,12 @@ public class DOMOutputCapsule implements OutputCapsule {
       return;
     }
     if (value instanceof List<?> list) {
-      if (list.size() == 0) {
+      if (list.isEmpty()) {
         write(BinaryClassField.UNHANDLED, "type", (byte) -1);
         return;
       }
       final Object first = list.get(0);
-      if (list instanceof ByteBuffer) {
+      if (first instanceof ByteBuffer) {
         write(BinaryClassField.BYTEBUFFER_ARRAYLIST, "type", (byte) -1);
         writeByteBufferList((List<ByteBuffer>) value, "value", null);
         return;
