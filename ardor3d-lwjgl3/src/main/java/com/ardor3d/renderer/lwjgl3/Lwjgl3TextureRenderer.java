@@ -592,5 +592,22 @@ public class Lwjgl3TextureRenderer extends AbstractFBOTextureRenderer {
       GL30C.glDeleteRenderbuffers(_depthRBID);
       _depthRBID = 0;
     }
+
+    if (_msfboID != 0) {
+      GL30C.glDeleteFramebuffers(_msfboID);
+      _msfboID = 0;
+    }
+
+    if (_mscolorRBID != 0) {
+      GL30C.glDeleteRenderbuffers(_mscolorRBID);
+      _mscolorRBID = 0;
+    }
+
+    if (_msdepthRBID != 0) {
+      GL30C.glDeleteRenderbuffers(_msdepthRBID);
+      _msdepthRBID = 0;
+    }
+
+    _usingDepthRB = false;
   }
 }
