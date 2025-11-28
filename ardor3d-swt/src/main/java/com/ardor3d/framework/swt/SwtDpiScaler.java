@@ -18,12 +18,22 @@ public enum SwtDpiScaler implements IDpiScaleProvider {
 
   @Override
   public double scaleToScreenDpi(final double size) {
-    return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleUp((int) Math.round(size)) : size;
+    if (!ApplyScale) {
+      return size;
+    }
+    final double scaled = org.eclipse.swt.internal.DPIUtil.autoScaleUp((int) Math.round(size));
+    // Guard against degenerate values
+    return Double.isFinite(scaled) ? scaled : size;
   }
 
   @Override
   public double scaleFromScreenDpi(final double size) {
-    return ApplyScale ? org.eclipse.swt.internal.DPIUtil.autoScaleDown((int) Math.round(size)) : size;
+    if (!ApplyScale) {
+      return size;
+    }
+    final double scaled = org.eclipse.swt.internal.DPIUtil.autoScaleDown((int) Math.round(size));
+    // Guard against degenerate values
+    return Double.isFinite(scaled) ? scaled : size;
   }
 
   public int scaleToScreenDpiInt(final double size) {

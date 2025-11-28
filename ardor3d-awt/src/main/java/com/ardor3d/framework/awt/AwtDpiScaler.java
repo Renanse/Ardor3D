@@ -78,7 +78,12 @@ public enum AwtDpiScaler {
       return 1.0;
     }
     // Use X scale - typically X and Y scale are the same
-    return transform.getScaleX();
+    final double scale = transform.getScaleX();
+    // Guard against degenerate values
+    if (!Double.isFinite(scale) || scale <= 0) {
+      return 1.0;
+    }
+    return scale;
   }
 
   public int scaleToScreenDpiInt(final Component component, final double size) {
