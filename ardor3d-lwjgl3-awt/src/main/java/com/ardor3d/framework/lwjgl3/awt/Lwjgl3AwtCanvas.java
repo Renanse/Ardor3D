@@ -26,6 +26,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.ICanvasListener;
+import com.ardor3d.framework.awt.AwtDpiScaler;
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer;
 import com.ardor3d.input.mouse.MouseManager;
 
@@ -151,4 +152,14 @@ public class Lwjgl3AwtCanvas extends AWTGLCanvas implements Canvas {
   }
 
   public boolean isInited() { return _inited; }
+
+  @Override
+  public double scaleToScreenDpi(final double size) {
+    return AwtDpiScaler.INSTANCE.scaleToScreenDpi(this, size);
+  }
+
+  @Override
+  public double scaleFromScreenDpi(final double size) {
+    return AwtDpiScaler.INSTANCE.scaleFromScreenDpi(this, size);
+  }
 }
