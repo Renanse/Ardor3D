@@ -1,3 +1,6 @@
+plugins {
+	application
+}
 
 description = "Ardor 3D Examples"
 
@@ -13,4 +16,9 @@ dependencies {
 	implementation(project(":ardor3d-collada"))
 	implementation(project(":ardor3d-terrain"))
 	implementation(project(":ardor3d-ui"))
+}
+
+// Launch the chooser with: ./gradlew :ardor3d-examples:run
+application {
+	mainClass.set("com.ardor3d.example.ExampleRunner")
 }
