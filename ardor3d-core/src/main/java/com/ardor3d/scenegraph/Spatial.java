@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -1158,7 +1158,7 @@ public abstract class Spatial implements Savable, Hintable {
     }
 
     if (mode == PropertyMode.UseOursLast) {
-      if (parent.hasProperty(key)) {
+      if (parent != null && parent.hasProperty(key)) {
         return parent.getProperty(key, defaultValue);
       }
 
