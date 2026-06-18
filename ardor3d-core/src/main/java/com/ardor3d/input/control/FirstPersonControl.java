@@ -32,6 +32,7 @@ public class FirstPersonControl {
   protected final Vector3 _upAxis = new Vector3();
   protected double _mouseRotateSpeed = .005;
   protected double _moveSpeed = 50;
+  protected double _shiftMultiplier = 3.0;
   protected double _keyRotateSpeed = 2.25;
   protected final Matrix3 _workerMatrix = new Matrix3();
   protected final Vector3 _workerStoreA = new Vector3();
@@ -59,6 +60,10 @@ public class FirstPersonControl {
   public double getMoveSpeed() { return _moveSpeed; }
 
   public void setMoveSpeed(final double speed) { _moveSpeed = speed; }
+
+  public double getShiftMultiplier() { return _shiftMultiplier; }
+
+  public void setShiftMultiplier(final double multiplier) { _shiftMultiplier = multiplier; }
 
   public double getKeyRotateSpeed() { return _keyRotateSpeed; }
 
@@ -92,7 +97,9 @@ public class FirstPersonControl {
       } else if (strafeLR == -1) {
         loc.subtractLocal(camera.getLeft());
       }
-      loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
+      // Apply speed multiplier when shift is held
+      final double speed = (kb.isDown(Key.LEFT_SHIFT) || kb.isDown(Key.RIGHT_SHIFT)) ? _moveSpeed * _shiftMultiplier : _moveSpeed;
+      loc.normalizeLocal().multiplyLocal(speed * tpf).addLocal(camera.getLocation());
       camera.setLocation(loc);
     }
 
