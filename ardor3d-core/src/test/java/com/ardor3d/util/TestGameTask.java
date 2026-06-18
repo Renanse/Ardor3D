@@ -55,4 +55,19 @@ public class TestGameTask {
     task.cancel(false);
     task.get();
   }
+
+  /**
+   * Cancellation takes precedence over a stored exception. The queue normally skips cancelled tasks,
+   * but if one is cancelled and still runs and throws, get() must honor the Future contract and throw
+   * CancellationException, not the incidental ExecutionException.
+   */
+  @Test(expected = CancellationException.class)
+  public void testCancellationTakesPrecedenceOverException() throws Exception {
+    final GameTask<String> task = new GameTask<>(() -> {
+      throw new RuntimeException("boom");
+    });
+    task.cancel(false); // mark cancelled first
+    task.invoke();      // the queue would skip this; invoked directly to force the cancelled+threw state
+    task.get();
+  }
 }

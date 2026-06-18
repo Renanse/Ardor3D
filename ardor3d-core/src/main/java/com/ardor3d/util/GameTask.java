@@ -68,11 +68,11 @@ public class GameTask<V> implements Future<V> {
       while (!isDone()) {
         _finishedCondition.await();
       }
-      if (_exception != null) {
-        throw _exception;
-      }
       if (_cancelled) {
         throw new CancellationException();
+      }
+      if (_exception != null) {
+        throw _exception;
       }
       return _result;
     } finally {
@@ -92,11 +92,11 @@ public class GameTask<V> implements Future<V> {
       if (!isDone()) {
         throw new TimeoutException("Object not returned in time allocated.");
       }
-      if (_exception != null) {
-        throw _exception;
-      }
       if (_cancelled) {
         throw new CancellationException();
+      }
+      if (_exception != null) {
+        throw _exception;
       }
       return _result;
     } finally {
