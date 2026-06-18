@@ -52,4 +52,34 @@ public class TestBinaryByteBufferRoundTrip {
     restored.buffer.get(restoredBytes);
     assertArrayEquals(new byte[] {10, 20, 30, 40}, restoredBytes);
   }
+
+  /**
+   * A sliced heap ByteBuffer has arrayOffset() > 0. Serialization must copy length bytes starting at
+   * arrayOffset (not index 0), so both the slice's content and the field written after it survive.
+   */
+  @Test
+  public void testSlicedHeapByteBufferRoundTrips() throws Exception {
+    final ByteBuffer backing = ByteBuffer.allocate(16);
+    backing.put(new byte[] {99, 99}); // junk preceding the slice -> slice.arrayOffset() == 2
+    backing.position(2);
+    final ByteBuffer slice = backing.slice();
+    slice.put(new byte[] {10, 20, 30, 40});
+    slice.flip(); // position 0, limit 4, arrayOffset 2
+
+    final SavableByteBufferHolder holder = new SavableByteBufferHolder();
+    holder.buffer = slice;
+    holder.marker = 7;
+
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    new BinaryExporter().save(holder, out);
+    final SavableByteBufferHolder restored =
+        (SavableByteBufferHolder) new BinaryImporter().load(new ByteArrayInputStream(out.toByteArray()));
+
+    assertEquals(7, restored.marker);
+    assertNotNull(restored.buffer);
+    assertEquals(4, restored.buffer.remaining());
+    final byte[] restoredBytes = new byte[restored.buffer.remaining()];
+    restored.buffer.get(restoredBytes);
+    assertArrayEquals(new byte[] {10, 20, 30, 40}, restoredBytes);
+  }
 }

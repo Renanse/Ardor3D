@@ -71,6 +71,9 @@ public class GameTask<V> implements Future<V> {
       if (_exception != null) {
         throw _exception;
       }
+      if (_cancelled) {
+        throw new CancellationException();
+      }
       return _result;
     } finally {
       _stateLock.unlock();

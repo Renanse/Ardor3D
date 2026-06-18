@@ -47,4 +47,12 @@ public class TestGameTask {
     task.cancel(false);
     task.get(2, TimeUnit.SECONDS);
   }
+
+  /** The untimed get() must also report cancellation (Future contract), not return a null result. */
+  @Test(expected = CancellationException.class)
+  public void testUntimedGetReportsCancellation() throws Exception {
+    final GameTask<String> task = new GameTask<>(() -> "done");
+    task.cancel(false);
+    task.get();
+  }
 }
