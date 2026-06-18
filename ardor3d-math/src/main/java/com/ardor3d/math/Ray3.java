@@ -200,57 +200,69 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
     final Vector3 edge2 = Vector3.fetchTempInstance().set(pointC).subtractLocal(pointA);
     final Vector3 norm = Vector3.fetchTempInstance().set(edge1).crossLocal(edge2);
 
-    double dirDotNorm = _direction.dot(norm);
-    double sign;
-    if (dirDotNorm > MathUtils.EPSILON) {
-      sign = 1.0;
-    } else if (dirDotNorm < -MathUtils.EPSILON) {
-      sign = -1.0;
-      dirDotNorm = -dirDotNorm;
-    } else {
-      // ray and triangle/quad are parallel
-      return false;
-    }
+    try {
+      double dirDotNorm = _direction.dot(norm);
 
-    final double dirDotDiffxEdge2 = sign * _direction.dot(diff.cross(edge2, edge2));
-    boolean result = false;
-    if (dirDotDiffxEdge2 >= 0.0) {
-      final double dirDotEdge1xDiff = sign * _direction.dot(edge1.crossLocal(diff));
-      if (dirDotEdge1xDiff >= 0.0) {
-        if (dirDotDiffxEdge2 + dirDotEdge1xDiff <= dirDotNorm) {
-          final double diffDotNorm = -sign * diff.dot(norm);
-          if (diffDotNorm >= 0.0) {
-            // ray intersects triangle
-            // if storage vector is null, just return true,
-            if (locationStore == null) {
+      // Decide whether the ray runs parallel to the triangle's plane. The tolerance must be relative to
+      // the magnitudes involved (|direction| * |norm|), so that this behaves like a threshold on the angle
+      // between the ray and the plane and is independent of the triangle's size. Comparing the raw dot
+      // product against a fixed epsilon would incorrectly reject small (but valid) triangles, since
+      // |norm| == twice the triangle's area and shrinks with it. See issue #126. We compare squared values
+      // to avoid the square roots that |direction| and |norm| would otherwise require.
+      final double parallelLimitSq =
+          MathUtils.EPSILON * MathUtils.EPSILON * _direction.lengthSquared() * norm.lengthSquared();
+      double sign;
+      if (dirDotNorm * dirDotNorm <= parallelLimitSq) {
+        // ray and triangle/quad are parallel
+        return false;
+      } else if (dirDotNorm > 0.0) {
+        sign = 1.0;
+      } else {
+        sign = -1.0;
+        dirDotNorm = -dirDotNorm;
+      }
+
+      final double dirDotDiffxEdge2 = sign * _direction.dot(diff.cross(edge2, edge2));
+      if (dirDotDiffxEdge2 >= 0.0) {
+        final double dirDotEdge1xDiff = sign * _direction.dot(edge1.crossLocal(diff));
+        if (dirDotEdge1xDiff >= 0.0) {
+          if (dirDotDiffxEdge2 + dirDotEdge1xDiff <= dirDotNorm) {
+            final double diffDotNorm = -sign * diff.dot(norm);
+            if (diffDotNorm >= 0.0) {
+              // ray intersects triangle
+              // if storage vector is null, just return true,
+              if (locationStore == null) {
+                return true;
+              }
+              // else fill in.
+              final double inv = 1f / dirDotNorm;
+              final double t = diffDotNorm * inv;
+              if (!doPlanar) {
+                locationStore.set(_origin).addLocal(_direction.getX() * t, _direction.getY() * t,
+                    _direction.getZ() * t);
+              } else {
+                // these weights can be used to determine
+                // interpolated values, such as texture coord.
+                // eg. texcoord s,t at intersection point:
+                // s = w0*s0 + w1*s1 + w2*s2;
+                // t = w0*t0 + w1*t1 + w2*t2;
+                final double w1 = dirDotDiffxEdge2 * inv;
+                final double w2 = dirDotEdge1xDiff * inv;
+                // double w0 = 1.0 - w1 - w2;
+                locationStore.set(t, w1, w2);
+              }
               return true;
             }
-            // else fill in.
-            final double inv = 1f / dirDotNorm;
-            final double t = diffDotNorm * inv;
-            if (!doPlanar) {
-              locationStore.set(_origin).addLocal(_direction.getX() * t, _direction.getY() * t, _direction.getZ() * t);
-            } else {
-              // these weights can be used to determine
-              // interpolated values, such as texture coord.
-              // eg. texcoord s,t at intersection point:
-              // s = w0*s0 + w1*s1 + w2*s2;
-              // t = w0*t0 + w1*t1 + w2*t2;
-              final double w1 = dirDotDiffxEdge2 * inv;
-              final double w2 = dirDotEdge1xDiff * inv;
-              // double w0 = 1.0 - w1 - w2;
-              locationStore.set(t, w1, w2);
-            }
-            result = true;
           }
         }
       }
+      return false;
+    } finally {
+      Vector3.releaseTempInstance(diff);
+      Vector3.releaseTempInstance(edge1);
+      Vector3.releaseTempInstance(edge2);
+      Vector3.releaseTempInstance(norm);
     }
-    Vector3.releaseTempInstance(diff);
-    Vector3.releaseTempInstance(edge1);
-    Vector3.releaseTempInstance(edge2);
-    Vector3.releaseTempInstance(norm);
-    return result;
   }
 
   /**

@@ -146,6 +146,47 @@ public class TestRay3 {
   }
 
   @Test
+  public void testIntersectsSmallTriangle() {
+    // Regression test for issue #126. The parallel/degenerate guard must be relative to the triangle's
+    // size: a ray that clearly passes through a very small triangle must still register a hit, even though
+    // |edge1 x edge2| (== twice the triangle's area) is tiny. Previously the raw dot product was compared
+    // against a fixed epsilon, so these triangles were misclassified as "parallel" and produced 0 hits.
+    final double s = 1e-9;
+
+    // axis-aligned tiny triangle in the z=0 plane (normal along +z)
+    final Vector3 v0 = new Vector3(0, 0, 0);
+    final Vector3 v1 = new Vector3(s, 0, 0);
+    final Vector3 v2 = new Vector3(0, s, 0);
+
+    final Vector3 intersectionPoint = new Vector3();
+
+    // ray pointing straight down through the interior
+    Ray3 pickRay = new Ray3(new Vector3(s / 4, s / 4, 1), new Vector3(0, 0, -1));
+    assertTrue(pickRay.intersectsTriangle(v0, v1, v2, intersectionPoint));
+    assertEquals(s / 4, intersectionPoint.getX(), 1e-12);
+    assertEquals(s / 4, intersectionPoint.getY(), 1e-12);
+    assertEquals(0.0, intersectionPoint.getZ(), 1e-12);
+
+    // a ray genuinely parallel to the triangle's plane must still miss
+    pickRay = new Ray3(new Vector3(s / 4, s / 4, 1), new Vector3(1, 0, 0));
+    assertFalse(pickRay.intersectsTriangle(v0, v1, v2, intersectionPoint));
+
+    // a ray just outside the (tiny) diagonal edge must still miss
+    pickRay = new Ray3(new Vector3(s, s, 1), new Vector3(0, 0, -1));
+    assertFalse(pickRay.intersectsTriangle(v0, v1, v2, intersectionPoint));
+
+    // the reporter's own geometry, scaled down: normal along -y, ray pointing down -y
+    final Vector3 a = new Vector3(0, 0, 0);
+    final Vector3 b = new Vector3(0, 0, -2 * s);
+    final Vector3 c = new Vector3(2 * s, 0, 0);
+    pickRay = new Ray3(new Vector3(s / 2, 1, -s / 2), new Vector3(0, -1, 0));
+    assertTrue(pickRay.intersectsTriangle(a, b, c, intersectionPoint));
+    assertEquals(s / 2, intersectionPoint.getX(), 1e-12);
+    assertEquals(0.0, intersectionPoint.getY(), 1e-12);
+    assertEquals(-s / 2, intersectionPoint.getZ(), 1e-12);
+  }
+
+  @Test
   public void testIntersectsPlane() {
     final Vector3 intersectionPoint = new Vector3();
 
