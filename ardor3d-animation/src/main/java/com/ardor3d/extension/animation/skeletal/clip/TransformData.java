@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -180,6 +180,6 @@ public class TransformData implements Savable {
   public void read(final InputCapsule capsule) throws IOException {
     setRotation(capsule.readSavable("rotation", (Quaternion) Quaternion.IDENTITY));
     setScale(capsule.readSavable("scale", (Vector3) Vector3.ONE));
-    setTranslation(capsule.readSavable("rotation", (Vector3) Vector3.ZERO));
+    setTranslation(capsule.readSavable("translation", (Vector3) Vector3.ZERO));
   }
 }
