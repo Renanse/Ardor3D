@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -115,8 +115,8 @@ public abstract class UIContainer extends UIComponent {
       final Spatial child = getChild(i);
       if (child.equals(component)) {
         return true;
-      } else if (recurse && component instanceof UIContainer) {
-        if (((UIContainer) component).contains(component, true)) {
+      } else if (recurse && child instanceof UIContainer) {
+        if (((UIContainer) child).contains(component, true)) {
           return true;
         }
       }

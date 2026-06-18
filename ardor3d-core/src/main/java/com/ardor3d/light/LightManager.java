@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -159,13 +159,9 @@ public class LightManager implements IUniformSupplier {
     public int compare(final WeakReference<Light> l1, final WeakReference<Light> l2) {
       final double v1 = getValueFor(l1, _bv);
       final double v2 = getValueFor(l2, _bv);
-      final double cmp = v1 - v2;
-      if (0 > cmp) {
-        return 1;
-      } else if (0 < cmp) {
-        return -1;
-      }
-      return 0;
+      // Descending by value. Double.compare gives a total order even for the -Infinity values
+      // getValueFor returns for disabled/collected lights, where v1 - v2 could yield NaN.
+      return Double.compare(v2, v1);
     }
   }
 

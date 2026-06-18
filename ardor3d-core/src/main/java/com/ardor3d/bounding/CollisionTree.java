@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -230,7 +230,7 @@ public class CollisionTree implements Serializable {
     // check to see if we are a leaf, if the number of primitives we reference is less than or equal to
     // the maximum
     // defined by the CollisionTreeManager we are done.
-    if (_end - _start + 1 <= CollisionTreeManager.getInstance().getMaxPrimitivesPerLeaf()) {
+    if (_end - _start <= CollisionTreeManager.getInstance().getMaxPrimitivesPerLeaf()) {
       return;
     }
 

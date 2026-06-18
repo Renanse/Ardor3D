@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -131,11 +131,10 @@ public abstract class PickResults {
 
     @Override
     public int compare(final PickData o1, final PickData o2) {
-      if (o1.getIntersectionRecord().getClosestDistance() <= o2.getIntersectionRecord().getClosestDistance()) {
-        return -1;
-      }
-
-      return 1;
+      // Ascending by closest distance. Must be a true total order (equal distances -> 0), otherwise
+      // sorting throws "Comparison method violates its general contract!".
+      return Double.compare(o1.getIntersectionRecord().getClosestDistance(),
+          o2.getIntersectionRecord().getClosestDistance());
     }
   }
 

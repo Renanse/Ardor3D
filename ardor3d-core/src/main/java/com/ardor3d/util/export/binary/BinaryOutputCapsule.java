@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -1231,8 +1231,10 @@ public class BinaryOutputCapsule implements OutputCapsule {
     write(_forceDirectNioBuffers || source.isDirect());
 
     final byte[] array;
+    final int offset;
     if (source.hasArray()) {
       array = source.array();
+      offset = source.arrayOffset();
     } else {
       // duplicate buffer to allow modification of limit/position without changing original.
       final ByteBuffer value = source.duplicate();
@@ -1241,10 +1243,11 @@ public class BinaryOutputCapsule implements OutputCapsule {
       array = new byte[length];
       value.rewind();
       value.get(array);
+      offset = 0;
     }
 
-    // write to stream
-    _baos.write(array);
+    // write to stream - exactly `length` bytes, not the whole backing array
+    _baos.write(array, offset, length);
   }
 
   @Override

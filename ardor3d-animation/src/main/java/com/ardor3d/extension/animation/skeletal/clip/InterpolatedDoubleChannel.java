@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -76,7 +76,7 @@ public class InterpolatedDoubleChannel extends AbstractAnimationChannel {
     final float[] times = new float[samples];
     final double[] values = new double[samples];
 
-    for (int i = 0; i <= samples; i++) {
+    for (int i = 0; i < samples; i++) {
       times[i] = _times[i + startSample];
       values[i] = _values[i + startSample];
     }

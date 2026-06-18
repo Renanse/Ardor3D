@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -77,7 +77,7 @@ public final class BufferUtils {
       return null;
     }
     final FloatBuffer buff = createFloatBuffer(4 * length);
-    for (int x = offset; x < length; x++) {
+    for (int x = offset; x < offset + length; x++) {
       if (data[x] != null) {
         buff.put(data[x].getRed()).put(data[x].getGreen()).put(data[x].getBlue()).put(data[x].getAlpha());
       } else {
@@ -252,11 +252,11 @@ public final class BufferUtils {
       return null;
     }
     final FloatBuffer buff = createFloatBuffer(4 * length);
-    for (int x = offset; x < length; x++) {
+    for (int x = offset; x < offset + length; x++) {
       if (data[x] != null) {
         buff.put(data[x].getXf()).put(data[x].getYf()).put(data[x].getZf()).put(data[x].getWf());
       } else {
-        buff.put(0).put(0).put(0);
+        buff.put(0).put(0).put(0).put(0);
       }
     }
     buff.flip();
@@ -513,7 +513,7 @@ public final class BufferUtils {
       return null;
     }
     final FloatBuffer buff = createFloatBuffer(3 * length);
-    for (int x = offset; x < length; x++) {
+    for (int x = offset; x < offset + length; x++) {
       if (data[x] != null) {
         buff.put(data[x].getXf()).put(data[x].getYf()).put(data[x].getZf());
       } else {
@@ -766,7 +766,7 @@ public final class BufferUtils {
       return null;
     }
     final FloatBuffer buff = createFloatBuffer(2 * length);
-    for (int x = offset; x < length; x++) {
+    for (int x = offset; x < offset + length; x++) {
       if (data[x] != null) {
         buff.put(data[x].getXf()).put(data[x].getYf());
       } else {

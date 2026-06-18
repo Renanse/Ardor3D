@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -163,7 +163,7 @@ public abstract class SortUtil {
       for (int i = left + h; i <= right; i++) {
         int j = i;
         final T val = array[i];
-        while (j >= left + h && val.compareTo(array[j - 1]) < 0) {
+        while (j >= left + h && val.compareTo(array[j - h]) < 0) {
           array[j] = array[j - h];
           j -= h;
         }

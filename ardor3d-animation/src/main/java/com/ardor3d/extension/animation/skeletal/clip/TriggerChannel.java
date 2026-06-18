@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -79,7 +79,7 @@ public class TriggerChannel extends AbstractAnimationChannel {
     final float[] times = new float[samples];
     final String[] keys = new String[samples];
 
-    for (int i = 0; i <= samples; i++) {
+    for (int i = 0; i < samples; i++) {
       times[i] = _times[i + startSample];
       keys[i] = _keys[i + startSample];
     }

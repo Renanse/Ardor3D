@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -586,7 +586,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
     // must be non-null
     final FloatBufferData verts = meshData.getVertexCoords().makeCopy();
 
-    final FloatBufferData norms = meshData.getNormalBuffer() != null ? meshData.getVertexCoords().makeCopy() : null;
+    final FloatBufferData norms = meshData.getNormalBuffer() != null ? meshData.getNormalCoords().makeCopy() : null;
     final FloatBufferData colors = meshData.getColorBuffer() != null ? meshData.getColorCoords().makeCopy() : null;
     final FloatBufferData tangents =
         meshData.getTangentBuffer() != null ? meshData.getTangentCoords().makeCopy() : null;
