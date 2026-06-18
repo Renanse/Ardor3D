@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -81,14 +82,18 @@ public class GameTask<V> implements Future<V> {
       throws InterruptedException, ExecutionException, TimeoutException {
     _stateLock.lock();
     try {
+      long remainingNanos = unit.toNanos(timeout);
+      while (!isDone() && remainingNanos > 0) {
+        remainingNanos = _finishedCondition.awaitNanos(remainingNanos);
+      }
       if (!isDone()) {
-        _finishedCondition.await(timeout, unit);
+        throw new TimeoutException("Object not returned in time allocated.");
       }
       if (_exception != null) {
         throw _exception;
       }
-      if (_result == null) {
-        throw new TimeoutException("Object not returned in time allocated.");
+      if (_cancelled) {
+        throw new CancellationException();
       }
       return _result;
     } finally {
