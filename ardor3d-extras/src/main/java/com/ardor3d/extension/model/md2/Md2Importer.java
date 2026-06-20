@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -101,8 +101,7 @@ public class Md2Importer {
       throw new IllegalArgumentException("resource was null");
     }
 
-    try {
-      final InputStream md2Stream = resource.openStream();
+    try (final InputStream md2Stream = resource.openStream()) {
       if (md2Stream == null) {
         throw new IOException("resource stream was null");
       }
@@ -345,7 +344,7 @@ public class Md2Importer {
 
       return store;
     } catch (final Exception e) {
-      throw new Error("Unable to load md2 resource from URL: " + resource, e);
+      throw new Ardor3dException("Unable to load md2 resource from URL: " + resource, e);
     }
   }
 
@@ -398,7 +397,7 @@ public class Md2Importer {
     }
 
     if (source == null) {
-      throw new Error("Unable to locate '" + resource + "'");
+      throw new Ardor3dException("Unable to locate '" + resource + "'");
     }
 
     return load(source);

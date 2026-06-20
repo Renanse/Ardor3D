@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -266,6 +266,16 @@ public class ColladaImporter {
           // Just kill what's usually done here...
         }
       }, jdomFac);
+
+      // Harden against XXE / external-entity / billion-laughs attacks in untrusted .dae files.
+      // COLLADA is an XSD-schema format and never legitimately uses a DOCTYPE, so disallowing
+      // DOCTYPE outright is safe and is the strongest single mitigation; the remaining features are
+      // defense-in-depth for parsers that do not honor disallow-doctype-decl.
+      builder.setExpandEntities(false);
+      builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
       return builder.build(resource.openStream()).getRootElement();
     } catch (final Exception e) {

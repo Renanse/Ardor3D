@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -29,6 +29,7 @@ import org.jdom2.xpath.XPathFactory;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.util.Ardor3dException;
 
 /**
  * Utility methods for parsing Collada data related to node hierarchy and arrays, using XPath or
@@ -133,11 +134,13 @@ public class ColladaDOMUtil {
     }
 
     final XPathFactory xpf = XPathFactory.instance();
-    XPathExpression<?> xPathExpression = null;
+    final XPathExpression<?> xPathExpression;
     try {
       xPathExpression = xpf.compile(query);
     } catch (final Exception e) {
-      e.printStackTrace();
+      // Fail loud rather than swallow the error and cache a null that callers would then silently
+      // treat as "no results". The queries are internal constants, so a failure here is a bug.
+      throw new Ardor3dException("Unable to compile XPath query: " + query, e);
     }
 
     _dataCache.getxPathExpressions().put(query, xPathExpression);
