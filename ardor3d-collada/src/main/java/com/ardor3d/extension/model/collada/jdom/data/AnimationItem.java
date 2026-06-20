@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ import com.ardor3d.util.export.Savable;
 
 @SavableFactory(factoryMethod = "initSavable")
 public class AnimationItem implements Savable {
-  private final String _name;
+  private String _name;
   private final List<AnimationItem> _children = new ArrayList<>();
   private AnimationClip _animationClip;
 
@@ -53,14 +52,7 @@ public class AnimationItem implements Savable {
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    final String name = capsule.readString("name", "");
-    try {
-      final Field field1 = AnimationClip.class.getDeclaredField("_name");
-      field1.setAccessible(true);
-      field1.set(this, name);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _name = capsule.readString("name", "");
     _children.clear();
     _children.addAll(capsule.readSavableList("children", new ArrayList<>()));
     _animationClip = capsule.readSavable("animationClip", null);

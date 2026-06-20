@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,19 +30,19 @@ import com.ardor3d.util.export.Savable;
 public class SkeletonPose implements Savable {
 
   /** The skeleton being "posed". */
-  private final Skeleton _skeleton;
+  private Skeleton _skeleton;
 
   /** Local transforms for the joints of the associated skeleton. */
-  private final Transform[] _localTransforms;
+  private Transform[] _localTransforms;
 
   /** Global transforms for the joints of the associated skeleton. Not saved to savable. */
-  private transient final Transform[] _globalTransforms;
+  private transient Transform[] _globalTransforms;
 
   /**
    * A palette of matrices used in skin deformation - basically the global transform X the inverse
    * bind pose transform. Not saved to savable.
    */
-  private transient final Matrix4[] _matrixPalette;
+  private transient Matrix4[] _matrixPalette;
 
   /**
    * The list of elements interested in notification when this SkeletonPose updates. Not saved to
@@ -243,43 +242,24 @@ public class SkeletonPose implements Savable {
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    final Skeleton skeleton = capsule.readSavable("skeleton", null);
-    final Transform[] localTransforms =
-        CapsuleUtils.asArray(capsule.readSavableArray("localTransforms", null), Transform.class);
-    try {
-      final Field field1 = SkeletonPose.class.getDeclaredField("_skeleton");
-      field1.setAccessible(true);
-      field1.set(this, skeleton);
+    _skeleton = capsule.readSavable("skeleton", null);
+    _localTransforms = CapsuleUtils.asArray(capsule.readSavableArray("localTransforms", null), Transform.class);
 
-      final int jointCount = _skeleton.getJoints().length;
+    final int jointCount = _skeleton.getJoints().length;
 
-      // init local transforms
-      final Field field2 = SkeletonPose.class.getDeclaredField("_localTransforms");
-      field2.setAccessible(true);
-      field2.set(this, localTransforms);
-
-      // init global transforms
-      final Transform[] globalTransforms = new Transform[jointCount];
-      for (int i = 0; i < jointCount; i++) {
-        globalTransforms[i] = new Transform();
-      }
-      final Field field3 = SkeletonPose.class.getDeclaredField("_globalTransforms");
-      field3.setAccessible(true);
-      field3.set(this, globalTransforms);
-
-      // init palette
-      final Matrix4[] matrixPalette = new Matrix4[jointCount];
-      for (int i = 0; i < jointCount; i++) {
-        matrixPalette[i] = new Matrix4();
-      }
-      final Field field4 = SkeletonPose.class.getDeclaredField("_matrixPalette");
-      field4.setAccessible(true);
-      field4.set(this, matrixPalette);
-
-      updateTransforms();
-    } catch (final Exception e) {
-      e.printStackTrace();
+    // init global transforms
+    _globalTransforms = new Transform[jointCount];
+    for (int i = 0; i < jointCount; i++) {
+      _globalTransforms[i] = new Transform();
     }
+
+    // init palette
+    _matrixPalette = new Matrix4[jointCount];
+    for (int i = 0; i < jointCount; i++) {
+      _matrixPalette[i] = new Matrix4();
+    }
+
+    updateTransforms();
   }
 
   public static SkeletonPose initSavable() {

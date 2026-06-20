@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -13,6 +13,7 @@ package com.ardor3d.util.export.binary;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -163,10 +164,9 @@ public class BinaryImporter implements Ardor3dImporter {
   }
 
   public Savable load(final URL url, final ReadListener listener) throws IOException {
-    final InputStream is = url.openStream();
-    final Savable rVal = load(is, listener);
-    is.close();
-    return rVal;
+    try (InputStream is = url.openStream()) {
+      return load(is, listener);
+    }
   }
 
   @Override
@@ -175,23 +175,31 @@ public class BinaryImporter implements Ardor3dImporter {
   }
 
   public Savable load(final File file, final ReadListener listener) throws IOException {
-    final FileInputStream fis = new FileInputStream(file);
-    final Savable rVal = load(fis, listener);
-    fis.close();
-    return rVal;
+    try (FileInputStream fis = new FileInputStream(file)) {
+      return load(fis, listener);
+    }
   }
 
   @Override
   public Savable load(final byte[] data) throws IOException {
-    final ByteArrayInputStream bais = new ByteArrayInputStream(data);
-    final Savable rVal = load(bais);
-    bais.close();
-    return rVal;
+    try (ByteArrayInputStream bais = new ByteArrayInputStream(data)) {
+      return load(bais);
+    }
   }
 
   protected String readString(final InputStream is, final int length) throws IOException {
-    final byte[] data = new byte[length];
-    is.read(data, 0, length);
+    if (length < 0) {
+      // a corrupt/tampered header can decode a negative length; surface it as a corrupt-file
+      // IOException rather than letting readNBytes throw an unchecked IllegalArgumentException.
+      throw new IOException("Invalid negative string length in stream: " + length);
+    }
+    // readNBytes loops until length bytes are read or the stream ends; a single read() may return
+    // fewer bytes than requested (notably through the buffered/gzip streams this reads through),
+    // which previously left the tail of the name zeroed.
+    final byte[] data = is.readNBytes(length);
+    if (data.length != length) {
+      throw new EOFException("Expected " + length + " bytes but reached end of stream after " + data.length);
+    }
     return new String(data, StandardCharsets.UTF_8);
   }
 
