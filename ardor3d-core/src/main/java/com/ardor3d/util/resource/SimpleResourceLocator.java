@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Objects;
 
 /**
  * This locator takes a base location for finding resources specified with a relative path. If it
@@ -143,5 +144,13 @@ public class SimpleResourceLocator implements ResourceLocator {
       return _baseDir.equals(((SimpleResourceLocator) obj)._baseDir);
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    // Keyed on the base dir only, and intentionally inherited by MultiFormatResourceLocator: equals
+    // above treats any SimpleResourceLocator with a matching base dir as equal, so a base-dir-only
+    // hash is what keeps the equals/hashCode contract consistent across both types.
+    return Objects.hashCode(_baseDir);
   }
 }
