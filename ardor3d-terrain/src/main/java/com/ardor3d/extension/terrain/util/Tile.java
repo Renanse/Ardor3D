@@ -23,8 +23,8 @@ public class Tile implements Serializable {
   @Override
   public int hashCode() {
     int result = 17;
-    result += 31 * result + x;
-    result += 31 * result + y;
+    result = 31 * result + x;
+    result = 31 * result + y;
     return result;
   }
 
