@@ -361,5 +361,9 @@ public class ObjGeometryStore {
    *         may map to more than one spatial (e.g. one Mesh per material or per "o" object). Geometry
    *         declared without a group is filed under {@value #DEFAULT_GROUP}.
    */
-  public Map<String, List<Spatial>> getGroupMap() { return Collections.unmodifiableMap(_groupMap); }
+  public Map<String, List<Spatial>> getGroupMap() {
+    final Map<String, List<Spatial>> view = new HashMap<>();
+    _groupMap.forEach((name, spatials) -> view.put(name, Collections.unmodifiableList(spatials)));
+    return Collections.unmodifiableMap(view);
+  }
 }
