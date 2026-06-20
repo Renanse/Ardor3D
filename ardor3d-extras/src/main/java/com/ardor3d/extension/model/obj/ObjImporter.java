@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -21,6 +21,7 @@ import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -103,7 +104,7 @@ public class ObjImporter {
     }
 
     if (source == null) {
-      throw new Error("Unable to locate '" + resource + "'");
+      throw new Ardor3dException("Unable to locate '" + resource + "'");
     }
 
     return load(source);
@@ -117,11 +118,11 @@ public class ObjImporter {
    * @return an ObjGeometryStore data object containing the scene and other useful elements.
    */
   public ObjGeometryStore load(final ResourceSource resource) {
-    try {
+    try (final BufferedReader reader =
+        new BufferedReader(new InputStreamReader(resource.openStream()))) {
       final ObjGeometryStore store = new ObjGeometryStore();
       int currentSmoothGroup = -1;
 
-      final BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()));
       String line;
       int lineNo = 0;
       while ((line = reader.readLine()) != null) {
@@ -219,7 +220,7 @@ public class ObjImporter {
           if (argCount <= 2) {
             store.setCurrentGroupNames(null);
             continue;
-            // throw new Error("wrong number of args. g must have at least 1 argument. (line " + lineNo
+            // throw new Ardor3dException("wrong number of args. g must have at least 1 argument. (line " + lineNo
             // + ") " + line);
           }
 
@@ -232,7 +233,7 @@ public class ObjImporter {
         // if smoothing group
         else if ("s".equals(keyword)) {
           if (argCount != 1) {
-            throw new Error("wrong number of args.  s must have 1 argument.  (line " + lineNo + ") " + line);
+            throw new Ardor3dException("wrong number of args.  s must have 1 argument.  (line " + lineNo + ") " + line);
           }
 
           if ("off".equalsIgnoreCase(tokens[1])) {
@@ -251,7 +252,7 @@ public class ObjImporter {
         // if object name
         else if ("o".equals(keyword)) {
           if (argCount < 1) {
-            throw new Error("wrong number of args.  o must have 1 argument.  (line " + lineNo + ") " + line);
+            throw new Ardor3dException("wrong number of args.  o must have 1 argument.  (line " + lineNo + ") " + line);
           }
           store.setCurrentObjectName(tokens[1]);
         }
@@ -261,7 +262,7 @@ public class ObjImporter {
         // if material library(ies)
         else if ("mtllib".equals(keyword)) {
           if (argCount < 1) {
-            throw new Error(
+            throw new Ardor3dException(
                 "wrong number of args.  mtllib must have at least 1 argument.  (line " + lineNo + ") " + line);
           }
 
@@ -274,7 +275,7 @@ public class ObjImporter {
         // if use material command
         else if ("usemtl".equals(keyword)) {
           if (argCount != 1) {
-            throw new Error("wrong number of args.  usemtl must have 1 argument.  (line " + lineNo + ") " + line);
+            throw new Ardor3dException("wrong number of args.  usemtl must have 1 argument.  (line " + lineNo + ") " + line);
           }
 
           // set new material
@@ -306,7 +307,7 @@ public class ObjImporter {
         // if face
         else if (("f".equals(keyword) || "fo".equals(keyword)) && argCount > 0) {
           if (argCount < 3) {
-            throw new Error("wrong number of args.  f must have at least 3 vertices.  (line " + lineNo + ") " + line);
+            throw new Ardor3dException("wrong number of args.  f must have at least 3 vertices.  (line " + lineNo + ") " + line);
           }
 
           // Each token corresponds to 1 vertex entry and possibly one texture entry and normal entry.
@@ -340,7 +341,7 @@ public class ObjImporter {
       store.cleanup();
       return store;
     } catch (final Exception e) {
-      throw new Error("Unable to load obj resource from URL: " + resource, e);
+      throw new Ardor3dException("Unable to load obj resource from URL: " + resource, e);
     }
   }
 
@@ -365,7 +366,7 @@ public class ObjImporter {
     }
 
     if (source == null) {
-      throw new Error("Unable to locate mtllib '" + fileName + "'");
+      throw new Ardor3dException("Unable to locate mtllib '" + fileName + "'");
     }
 
     loadMaterialLibrary(source, store);
@@ -380,8 +381,8 @@ public class ObjImporter {
    *          our material store to place the contents of the file in.
    */
   private void loadMaterialLibrary(final ResourceSource resource, final Map<String, ObjMaterial> store) {
-    try {
-      final BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()));
+    try (final BufferedReader reader =
+        new BufferedReader(new InputStreamReader(resource.openStream()))) {
       String line;
       ObjMaterial currentMaterial = null;
       while ((line = reader.readLine()) != null) {
@@ -487,7 +488,7 @@ public class ObjImporter {
         }
       }
     } catch (final Exception e) {
-      throw new Error("Unable to load mtllib resource from URL: " + resource, e);
+      throw new Ardor3dException("Unable to load mtllib resource from URL: " + resource, e);
     }
   }
 }
