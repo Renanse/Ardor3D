@@ -43,7 +43,7 @@ public class ObjGeometryStore {
   private int _totalLines = 0;
   private int _totalMeshes = 0;
   private final Node _root = new Node();
-  private final Map<String, Spatial> _groupMap = new HashMap<>();
+  private final Map<String, List<Spatial>> _groupMap = new HashMap<>();
 
   private ObjMaterial _currentMaterial = new ObjMaterial("default");
   private String _currentObjectName;
@@ -341,19 +341,25 @@ public class ObjGeometryStore {
   private void mapToGroups(final Spatial target) {
     if (_currentGroupNames != null) {
       for (final String groupName : _currentGroupNames) {
-        _groupMap.put(groupName, target);
+        addToGroup(groupName, target);
       }
     } else {
-      _groupMap.put(ObjGeometryStore.DEFAULT_GROUP, target);
+      addToGroup(ObjGeometryStore.DEFAULT_GROUP, target);
     }
+  }
 
+  private void addToGroup(final String groupName, final Spatial target) {
+    // A single group can span several spatials (e.g. one Mesh per material or per "o" object), so
+    // accumulate rather than overwrite.
+    _groupMap.computeIfAbsent(groupName, k -> new ArrayList<>()).add(target);
   }
 
   public Map<Spatial, String> getMaterialMap() { return _materialMap; }
 
   /**
-   * @return a map of group name (from the OBJ "g" statement) to the spatial filed under it. Geometry
+   * @return a map of group name (from the OBJ "g" statement) to the spatials filed under it. A group
+   *         may map to more than one spatial (e.g. one Mesh per material or per "o" object). Geometry
    *         declared without a group is filed under {@value #DEFAULT_GROUP}.
    */
-  public Map<String, Spatial> getGroupMap() { return Collections.unmodifiableMap(_groupMap); }
+  public Map<String, List<Spatial>> getGroupMap() { return Collections.unmodifiableMap(_groupMap); }
 }
