@@ -217,11 +217,10 @@ public class ObjImporter {
 
         // if group name(s)
         else if ("g".equals(keyword)) {
-          if (argCount <= 2) {
+          if (argCount < 1) {
+            // A bare "g" with no names selects the default group.
             store.setCurrentGroupNames(null);
             continue;
-            // throw new Ardor3dException("wrong number of args. g must have at least 1 argument. (line " + lineNo
-            // + ") " + line);
           }
 
           // Each token is a name
