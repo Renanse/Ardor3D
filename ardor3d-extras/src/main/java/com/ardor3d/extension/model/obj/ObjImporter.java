@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -216,11 +216,10 @@ public class ObjImporter {
 
         // if group name(s)
         else if ("g".equals(keyword)) {
-          if (argCount <= 2) {
+          if (argCount < 1) {
+            // A bare "g" with no names selects the default group.
             store.setCurrentGroupNames(null);
             continue;
-            // throw new Error("wrong number of args. g must have at least 1 argument. (line " + lineNo
-            // + ") " + line);
           }
 
           // Each token is a name

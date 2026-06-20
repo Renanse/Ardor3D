@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -349,4 +349,10 @@ public class ObjGeometryStore {
   }
 
   public Map<Spatial, String> getMaterialMap() { return _materialMap; }
+
+  /**
+   * @return a map of group name (from the OBJ "g" statement) to the spatial filed under it. Geometry
+   *         declared without a group is filed under {@value #DEFAULT_GROUP}.
+   */
+  public Map<String, Spatial> getGroupMap() { return _groupMap; }
 }
