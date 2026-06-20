@@ -1,2 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Pin the Gradle launcher line endings so the Unix wrapper stays runnable on
+# Linux/WSL/macOS even when checked out on Windows (text=auto would otherwise
+# give gradlew CRLF and break its shebang).
+gradlew     text eol=lf
+gradlew.bat text eol=crlf
