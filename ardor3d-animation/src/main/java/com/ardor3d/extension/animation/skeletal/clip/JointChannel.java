@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.extension.animation.skeletal.Joint;
@@ -32,7 +31,7 @@ public class JointChannel extends TransformChannel {
   public static final String JOINT_CHANNEL_NAME = "_jnt";
 
   /** The human readable version of the name. */
-  private final String _jointName;
+  private String _jointName;
 
   /** The joint index. */
   private int _jointIndex;
@@ -152,14 +151,7 @@ public class JointChannel extends TransformChannel {
   @Override
   public void read(final InputCapsule capsule) throws IOException {
     super.read(capsule);
-    final String jointName = capsule.readString("jointName", null);
-    try {
-      final Field field1 = JointChannel.class.getDeclaredField("_jointName");
-      field1.setAccessible(true);
-      field1.set(this, jointName);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _jointName = capsule.readString("jointName", null);
 
     if (_channelName.startsWith(JointChannel.JOINT_CHANNEL_NAME)) {
       _jointIndex = Integer.parseInt(_channelName.substring(JointChannel.JOINT_CHANNEL_NAME.length()));

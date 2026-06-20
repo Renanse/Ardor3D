@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,13 +39,13 @@ public class TransformChannel extends AbstractAnimationChannel {
   // (s)lerps.
 
   /** Our rotation samples. */
-  private final ReadOnlyQuaternion[] _rotations;
+  private ReadOnlyQuaternion[] _rotations;
 
   /** Our translation samples. */
-  private final ReadOnlyVector3[] _translations;
+  private ReadOnlyVector3[] _translations;
 
   /** Our scale samples. */
-  private final ReadOnlyVector3[] _scales;
+  private ReadOnlyVector3[] _scales;
 
   private final Quaternion _compQuat1 = new Quaternion();
   private final Quaternion _compQuat2 = new Quaternion();
@@ -288,27 +287,9 @@ public class TransformChannel extends AbstractAnimationChannel {
   @Override
   public void read(final InputCapsule capsule) throws IOException {
     super.read(capsule);
-    final ReadOnlyQuaternion[] rotations =
-        CapsuleUtils.asArray(capsule.readSavableArray("rotations", null), ReadOnlyQuaternion.class);
-    final ReadOnlyVector3[] scales =
-        CapsuleUtils.asArray(capsule.readSavableArray("scales", null), ReadOnlyVector3.class);
-    final ReadOnlyVector3[] translations =
-        CapsuleUtils.asArray(capsule.readSavableArray("translations", null), ReadOnlyVector3.class);
-    try {
-      final Field field1 = TransformChannel.class.getDeclaredField("_rotations");
-      field1.setAccessible(true);
-      field1.set(this, rotations);
-
-      final Field field2 = TransformChannel.class.getDeclaredField("_scales");
-      field2.setAccessible(true);
-      field2.set(this, scales);
-
-      final Field field3 = TransformChannel.class.getDeclaredField("_translations");
-      field3.setAccessible(true);
-      field3.set(this, translations);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _rotations = CapsuleUtils.asArray(capsule.readSavableArray("rotations", null), ReadOnlyQuaternion.class);
+    _scales = CapsuleUtils.asArray(capsule.readSavableArray("scales", null), ReadOnlyVector3.class);
+    _translations = CapsuleUtils.asArray(capsule.readSavableArray("translations", null), ReadOnlyVector3.class);
   }
 
   public static TransformChannel initSavable() {

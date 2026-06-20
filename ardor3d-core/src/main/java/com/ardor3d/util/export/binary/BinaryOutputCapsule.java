@@ -1264,15 +1264,15 @@ public class BinaryOutputCapsule implements OutputCapsule {
 
   @Override
   public void write(final Enum<?>[] value, final String name) throws IOException {
-    if (value == null) {
-      write(NULL_OBJECT);
-    } else {
-      final String[] toWrite = new String[value.length];
+    // route both cases through the aliased String[] writer so a null array is handled like any other
+    String[] toWrite = null;
+    if (value != null) {
+      toWrite = new String[value.length];
       int i = 0;
       for (final Enum<?> val : value) {
         toWrite[i++] = val.name();
       }
-      write(toWrite, name, null);
     }
+    write(toWrite, name, null);
   }
 }

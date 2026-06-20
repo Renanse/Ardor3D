@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.Transform;
@@ -32,7 +31,7 @@ public class Joint implements Savable {
   private final Transform _inverseBindPose = new Transform(Transform.IDENTITY);
 
   /** A name, for display or debugging purposes. */
-  private final String _name;
+  private String _name;
 
   protected short _index;
 
@@ -99,14 +98,7 @@ public class Joint implements Savable {
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    final String name = capsule.readString("name", null);
-    try {
-      final Field field1 = Joint.class.getDeclaredField("_name");
-      field1.setAccessible(true);
-      field1.set(this, name);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _name = capsule.readString("name", null);
 
     _index = capsule.readShort("index", (short) 0);
     _parentIndex = capsule.readShort("parentIndex", (short) 0);

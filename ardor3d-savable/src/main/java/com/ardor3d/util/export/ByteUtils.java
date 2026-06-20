@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.util.export;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -91,7 +92,7 @@ public abstract class ByteUtils {
     final byte[] byteArray = new byte[2];
 
     // Read in the next 2 bytes
-    inputStream.read(byteArray);
+    readFully(inputStream, byteArray);
 
     final short number = convertShortFromBytes(byteArray);
 
@@ -151,7 +152,7 @@ public abstract class ByteUtils {
     final byte[] byteArray = new byte[4];
 
     // Read in the next 4 bytes
-    inputStream.read(byteArray);
+    readFully(inputStream, byteArray);
 
     final int number = convertIntFromBytes(byteArray);
 
@@ -224,7 +225,7 @@ public abstract class ByteUtils {
     final byte[] byteArray = new byte[8];
 
     // Read in the next 8 bytes
-    inputStream.read(byteArray);
+    readFully(inputStream, byteArray);
 
     final long number = convertLongFromBytes(byteArray);
 
@@ -281,7 +282,7 @@ public abstract class ByteUtils {
     final byte[] byteArray = new byte[8];
 
     // Read in the next 8 bytes
-    inputStream.read(byteArray);
+    readFully(inputStream, byteArray);
 
     final double number = convertDoubleFromBytes(byteArray);
 
@@ -336,7 +337,7 @@ public abstract class ByteUtils {
     final byte[] byteArray = new byte[4];
 
     // Read in the next 4 bytes
-    inputStream.read(byteArray);
+    readFully(inputStream, byteArray);
 
     final float number = convertFloatFromBytes(byteArray);
 
@@ -392,7 +393,7 @@ public abstract class ByteUtils {
     final byte[] byteArray = new byte[1];
 
     // Read in the next byte
-    inputStream.read(byteArray);
+    readFully(inputStream, byteArray);
 
     return convertBooleanFromBytes(byteArray);
   }
@@ -403,6 +404,25 @@ public abstract class ByteUtils {
 
   public static boolean convertBooleanFromBytes(final byte[] byteArray, final int offset) {
     return byteArray[offset] != 0;
+  }
+
+  /**
+   * Fill the given array completely from the stream, looping until it is full. A single
+   * InputStream.read can legally return fewer bytes than requested (notably through buffered or
+   * inflating streams), so callers that need an exact count must not trust one read.
+   *
+   * @throws EOFException
+   *           if the stream ends before the array is filled.
+   */
+  private static void readFully(final InputStream inputStream, final byte[] bytes) throws IOException {
+    int pos = 0;
+    while (pos < bytes.length) {
+      final int read = inputStream.read(bytes, pos, bytes.length - pos);
+      if (read < 0) {
+        throw new EOFException("Expected " + bytes.length + " bytes but reached end of stream after " + pos);
+      }
+      pos += read;
+    }
   }
 
   public static byte[] rightAlignBytes(final byte[] bytes, final int width) {

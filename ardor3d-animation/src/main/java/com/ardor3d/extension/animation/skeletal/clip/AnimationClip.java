@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import com.ardor3d.util.export.Savable;
 public class AnimationClip implements Savable {
 
   /** A referenceable name for this clip. In general, this should be unique. */
-  private final String _name;
+  private String _name;
 
   /** A list of animation channels managed by this clip. */
   private final List<AbstractAnimationChannel> _channels;
@@ -162,14 +161,7 @@ public class AnimationClip implements Savable {
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    final String name = capsule.readString("name", null);
-    try {
-      final Field field1 = AnimationClip.class.getDeclaredField("_name");
-      field1.setAccessible(true);
-      field1.set(this, name);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _name = capsule.readString("name", null);
 
     _channels.clear();
     final List<Savable> channels = capsule.readSavableList("channels", null);

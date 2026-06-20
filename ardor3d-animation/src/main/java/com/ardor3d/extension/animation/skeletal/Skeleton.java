@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.util.export.CapsuleUtils;
@@ -30,10 +29,10 @@ public class Skeleton implements Savable {
   /**
    * An array of Joints associated with this Skeleton.
    */
-  private final Joint[] _joints;
+  private Joint[] _joints;
 
   /** A name, for display or debugging purposes. */
-  private final String _name;
+  private String _name;
 
   /**
    * 
@@ -87,19 +86,8 @@ public class Skeleton implements Savable {
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    final String name = capsule.readString("name", null);
-    final Joint[] joints = CapsuleUtils.asArray(capsule.readSavableArray("joints", null), Joint.class);
-    try {
-      final Field field1 = Skeleton.class.getDeclaredField("_name");
-      field1.setAccessible(true);
-      field1.set(this, name);
-
-      final Field field2 = Skeleton.class.getDeclaredField("_joints");
-      field2.setAccessible(true);
-      field2.set(this, joints);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _name = capsule.readString("name", null);
+    _joints = CapsuleUtils.asArray(capsule.readSavableArray("joints", null), Joint.class);
   }
 
   public static Skeleton initSavable() {

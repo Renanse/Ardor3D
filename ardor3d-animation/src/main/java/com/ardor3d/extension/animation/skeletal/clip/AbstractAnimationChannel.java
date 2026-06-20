@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,7 +11,6 @@
 package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -25,13 +24,13 @@ import com.ardor3d.util.export.Savable;
 public abstract class AbstractAnimationChannel implements Savable {
 
   /** The name of this channel. */
-  protected final String _channelName;
+  protected String _channelName;
 
   /**
    * Our time indices. Each index of the array should contain a value that is > the value in the
    * previous index.
    */
-  protected final float[] _times;
+  protected float[] _times;
 
   /**
    * Construct a new channel.
@@ -196,18 +195,7 @@ public abstract class AbstractAnimationChannel implements Savable {
 
   @Override
   public void read(final InputCapsule capsule) throws IOException {
-    final String channelName = capsule.readString("channelName", null);
-    final float[] times = capsule.readFloatArray("times", null);
-    try {
-      final Field field1 = AbstractAnimationChannel.class.getDeclaredField("_channelName");
-      field1.setAccessible(true);
-      field1.set(this, channelName);
-
-      final Field field2 = AbstractAnimationChannel.class.getDeclaredField("_times");
-      field2.setAccessible(true);
-      field2.set(this, times);
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
+    _channelName = capsule.readString("channelName", null);
+    _times = capsule.readFloatArray("times", null);
   }
 }
