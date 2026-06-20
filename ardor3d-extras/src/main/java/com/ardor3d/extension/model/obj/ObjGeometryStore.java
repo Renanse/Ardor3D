@@ -13,6 +13,7 @@ package com.ardor3d.extension.model.obj;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -354,5 +355,5 @@ public class ObjGeometryStore {
    * @return a map of group name (from the OBJ "g" statement) to the spatial filed under it. Geometry
    *         declared without a group is filed under {@value #DEFAULT_GROUP}.
    */
-  public Map<String, Spatial> getGroupMap() { return _groupMap; }
+  public Map<String, Spatial> getGroupMap() { return Collections.unmodifiableMap(_groupMap); }
 }
