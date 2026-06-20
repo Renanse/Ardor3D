@@ -60,9 +60,11 @@ subprojects {
         from(sourceSets.main.get().allSource)
     }
 
-    artifacts {
-        add("archives", tasks["jar"])
-        add("archives", tasks["packageSources"])
+    // 'jar' is already wired into 'assemble'; attach the sources jar directly rather than
+    // via the legacy 'archives' configuration, which is deprecated for artifact declaration
+    // and will fail in Gradle 10.
+    tasks.named("assemble") {
+        dependsOn("packageSources")
     }
 
     repositories {
