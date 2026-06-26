@@ -397,6 +397,14 @@ public class ColladaNodeUtils {
         logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
       }
     }
+    if (_importer.isOrthonormalizeTransforms()) {
+      try {
+        finalMat.orthonormalizeLocal();
+      } catch (final ArithmeticException e) {
+        logger.warning("Could not orthonormalize a node transform with a rank-deficient rotation "
+            + "block; leaving it as-is.");
+      }
+    }
     return new Transform().fromHomogeneousMatrix(finalMat);
   }
 

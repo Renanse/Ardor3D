@@ -74,13 +74,15 @@ import com.ardor3d.util.geom.VertMap;
 public class ColladaAnimUtils {
   private static final Logger logger = Logger.getLogger(ColladaAnimUtils.class.getName());
 
+  private final ColladaImporter _importer;
   private final ColladaStorage _colladaStorage;
   private final DataCache _dataCache;
   private final ColladaDOMUtil _colladaDOMUtil;
   private final ColladaMeshUtils _colladaMeshUtils;
 
-  public ColladaAnimUtils(final ColladaStorage colladaStorage, final DataCache dataCache,
-    final ColladaDOMUtil colladaDOMUtil, final ColladaMeshUtils colladaMeshUtils) {
+  public ColladaAnimUtils(final ColladaImporter importer, final ColladaStorage colladaStorage,
+    final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil, final ColladaMeshUtils colladaMeshUtils) {
+    _importer = importer;
     _colladaStorage = colladaStorage;
     _dataCache = dataCache;
     _colladaDOMUtil = colladaDOMUtil;
@@ -1088,6 +1090,14 @@ public class ColladaAnimUtils {
         if (logger.isLoggable(Level.WARNING)) {
           logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
         }
+      }
+    }
+    if (_importer.isOrthonormalizeTransforms()) {
+      try {
+        finalMat.orthonormalizeLocal();
+      } catch (final ArithmeticException e) {
+        logger.warning("Could not orthonormalize an animation transform with a rank-deficient "
+            + "rotation block; leaving it as-is.");
       }
     }
     return new Transform().fromHomogeneousMatrix(finalMat);
