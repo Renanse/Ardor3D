@@ -363,49 +363,54 @@ public class ColladaNodeUtils {
     final Matrix4 workingMat = Matrix4.fetchTempInstance();
     final Matrix4 finalMat = Matrix4.fetchTempInstance();
     finalMat.setIdentity();
-    for (final Element transform : transforms) {
-      final double[] array = _colladaDOMUtil.parseDoubleArray(transform);
-      if ("translate".equals(transform.getName())) {
-        workingMat.setIdentity();
-        workingMat.setColumn(3, new Vector4(array[0], array[1], array[2], 1.0));
-        finalMat.multiplyLocal(workingMat);
-      } else if ("rotate".equals(transform.getName())) {
-        if (array[3] != 0) {
+    try {
+      for (final Element transform : transforms) {
+        final double[] array = _colladaDOMUtil.parseDoubleArray(transform);
+        if ("translate".equals(transform.getName())) {
           workingMat.setIdentity();
-          final Matrix3 rotate =
-              new Matrix3().fromAngleAxis(array[3] * MathUtils.DEG_TO_RAD, new Vector3(array[0], array[1], array[2]));
-          workingMat.set(rotate);
+          workingMat.setColumn(3, new Vector4(array[0], array[1], array[2], 1.0));
           finalMat.multiplyLocal(workingMat);
+        } else if ("rotate".equals(transform.getName())) {
+          if (array[3] != 0) {
+            workingMat.setIdentity();
+            final Matrix3 rotate =
+                new Matrix3().fromAngleAxis(array[3] * MathUtils.DEG_TO_RAD, new Vector3(array[0], array[1], array[2]));
+            workingMat.set(rotate);
+            finalMat.multiplyLocal(workingMat);
+          }
+        } else if ("scale".equals(transform.getName())) {
+          workingMat.setIdentity();
+          workingMat.scale(new Vector4(array[0], array[1], array[2], 1), workingMat);
+          finalMat.multiplyLocal(workingMat);
+        } else if ("matrix".equals(transform.getName())) {
+          workingMat.fromArray(array);
+          finalMat.multiplyLocal(workingMat);
+        } else if ("lookat".equals(transform.getName())) {
+          final Vector3 pos = new Vector3(array[0], array[1], array[2]);
+          final Vector3 target = new Vector3(array[3], array[4], array[5]);
+          final Vector3 up = new Vector3(array[6], array[7], array[8]);
+          final Matrix3 rot = new Matrix3();
+          rot.lookAt(target.subtractLocal(pos), up);
+          workingMat.set(rot);
+          workingMat.setColumn(3, new Vector4(array[0], array[1], array[2], 1));
+          finalMat.multiplyLocal(workingMat);
+        } else {
+          logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
         }
-      } else if ("scale".equals(transform.getName())) {
-        workingMat.setIdentity();
-        workingMat.scale(new Vector4(array[0], array[1], array[2], 1), workingMat);
-        finalMat.multiplyLocal(workingMat);
-      } else if ("matrix".equals(transform.getName())) {
-        workingMat.fromArray(array);
-        finalMat.multiplyLocal(workingMat);
-      } else if ("lookat".equals(transform.getName())) {
-        final Vector3 pos = new Vector3(array[0], array[1], array[2]);
-        final Vector3 target = new Vector3(array[3], array[4], array[5]);
-        final Vector3 up = new Vector3(array[6], array[7], array[8]);
-        final Matrix3 rot = new Matrix3();
-        rot.lookAt(target.subtractLocal(pos), up);
-        workingMat.set(rot);
-        workingMat.setColumn(3, new Vector4(array[0], array[1], array[2], 1));
-        finalMat.multiplyLocal(workingMat);
-      } else {
-        logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
       }
-    }
-    if (_importer.isOrthonormalizeTransforms()) {
-      try {
-        finalMat.orthonormalizeLocal();
-      } catch (final ArithmeticException e) {
-        logger.warning("Could not orthonormalize a node transform with a rank-deficient rotation "
-            + "block; leaving it as-is.");
+      if (_importer.isOrthonormalizeTransforms()) {
+        try {
+          finalMat.orthonormalizeLocal();
+        } catch (final ArithmeticException e) {
+          logger.warning("Could not orthonormalize a node transform with a rank-deficient rotation "
+              + "block; leaving it as-is.");
+        }
       }
+      return new Transform().fromHomogeneousMatrix(finalMat);
+    } finally {
+      Matrix4.releaseTempInstance(workingMat);
+      Matrix4.releaseTempInstance(finalMat);
     }
-    return new Transform().fromHomogeneousMatrix(finalMat);
   }
 
   public void reattachAttachments(final Node scene) {
