@@ -56,6 +56,7 @@ public class ColladaImporter {
   private ResourceLocator _modelLocator;
   private boolean _compressTextures = false;
   private boolean _optimizeMeshes = false;
+  private boolean _orthonormalizeTransforms = false;
   private final EnumSet<MatchCondition> _optimizeSettings =
       EnumSet.of(MatchCondition.UVs, MatchCondition.Normal, MatchCondition.Color);
   private Map<String, Joint> _externalJointMapping;
@@ -128,6 +129,24 @@ public class ColladaImporter {
 
   public void setOptimizeMeshes(final boolean optimizeMeshes) { _optimizeMeshes = optimizeMeshes; }
 
+  public boolean isOrthonormalizeTransforms() { return _orthonormalizeTransforms; }
+
+  /**
+   * @param orthonormalizeTransforms
+   *          if true, the rotational (upper-left 3x3) part of every imported node and animation
+   *          channel transform is orthonormalized (Gram-Schmidt) as it is baked. This cleans up the
+   *          rounding error some exporters (e.g. Autodesk FBX-to-Collada, OpenCollada) bake into
+   *          {@code <matrix>} transforms, which otherwise leaves Transforms reporting non-rotational
+   *          matrices and degrades rotation extraction (notably the warning flood on skeletal
+   *          import). Off by default: enabling it discards any scale or shear carried in those
+   *          matrices, so only turn it on when your source encodes pure rotation plus translation.
+   * @return this importer, for chaining
+   */
+  public ColladaImporter setOrthonormalizeTransforms(final boolean orthonormalizeTransforms) {
+    _orthonormalizeTransforms = orthonormalizeTransforms;
+    return this;
+  }
+
   public Set<MatchCondition> getOptimizeSettings() { return Set.copyOf(_optimizeSettings); }
 
   public void setOptimizeSettings(final MatchCondition... optimizeSettings) {
@@ -180,7 +199,7 @@ public class ColladaImporter {
     final ColladaMeshUtils colladaMeshUtils =
         new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils, _optimizeMeshes, _optimizeSettings);
     final ColladaAnimUtils colladaAnimUtils =
-        new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil, colladaMeshUtils);
+        new ColladaAnimUtils(this, colladaStorage, dataCache, colladaDOMUtil, colladaMeshUtils);
     final ColladaNodeUtils colladaNodeUtils =
         new ColladaNodeUtils(this, dataCache, colladaDOMUtil, colladaMaterialUtils, colladaMeshUtils, colladaAnimUtils);
 
