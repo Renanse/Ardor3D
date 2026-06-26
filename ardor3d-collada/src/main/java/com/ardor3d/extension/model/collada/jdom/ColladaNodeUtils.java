@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -40,15 +40,17 @@ import com.ardor3d.scenegraph.Spatial;
 public class ColladaNodeUtils {
   private static final Logger logger = Logger.getLogger(ColladaNodeUtils.class.getName());
 
+  private final ColladaImporter _importer;
   private final DataCache _dataCache;
   private final ColladaDOMUtil _colladaDOMUtil;
   private final ColladaMaterialUtils _colladaMaterialUtils;
   private final ColladaMeshUtils _colladaMeshUtils;
   private final ColladaAnimUtils _colladaAnimUtils;
 
-  public ColladaNodeUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
+  public ColladaNodeUtils(final ColladaImporter importer, final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
     final ColladaMaterialUtils colladaMaterialUtils, final ColladaMeshUtils colladaMeshUtils,
     final ColladaAnimUtils colladaAnimUtils) {
+    _importer = importer;
     _dataCache = dataCache;
     _colladaDOMUtil = colladaDOMUtil;
     _colladaMaterialUtils = colladaMaterialUtils;
@@ -320,6 +322,12 @@ public class ColladaNodeUtils {
           createJointAttachment(jointChildNode, node, subNode);
         }
       }
+    }
+
+    // process any extra information for this node with registered plugins, handing them the
+    // freshly built Ardor3D node as context.
+    for (final Element extra : dNode.getChildren("extra")) {
+      _importer.readExtra(extra, node);
     }
 
     // Cache reference

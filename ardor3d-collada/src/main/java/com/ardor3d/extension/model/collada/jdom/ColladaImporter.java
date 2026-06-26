@@ -182,7 +182,7 @@ public class ColladaImporter {
     final ColladaAnimUtils colladaAnimUtils =
         new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil, colladaMeshUtils);
     final ColladaNodeUtils colladaNodeUtils =
-        new ColladaNodeUtils(dataCache, colladaDOMUtil, colladaMaterialUtils, colladaMeshUtils, colladaAnimUtils);
+        new ColladaNodeUtils(this, dataCache, colladaDOMUtil, colladaMaterialUtils, colladaMeshUtils, colladaAnimUtils);
 
     try {
       // Pull in the DOM tree of the Collada resource.
