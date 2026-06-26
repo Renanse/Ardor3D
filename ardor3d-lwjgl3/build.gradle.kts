@@ -1,8 +1,8 @@
 
 description = "Ardor 3D LWJGL3"
 
-val lwjglVersion: String? = project.findProperty("lwjglVersion") as String?
-val lwjglNatives: String? = project.findProperty("lwjglNatives") as String?
+val lwjglVersion = rootProject.extra["lwjglVersion"] as String
+val lwjglNatives = rootProject.extra["lwjglNatives"] as String
 
 dependencies {
 	api(project(":ardor3d-core"))
