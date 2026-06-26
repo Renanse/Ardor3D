@@ -12,7 +12,7 @@ version = "1.7.0"
 
 val collectJarsDir = layout.buildDirectory.dir("collected-jars")
 
-extra["lwjglVersion"] = "3.3.3"
+extra["lwjglVersion"] = "3.4.1"
 extra["lwjglNatives"] = when {
     OperatingSystem.current().isWindows -> "natives-windows"
     OperatingSystem.current().isLinux -> "natives-linux"
