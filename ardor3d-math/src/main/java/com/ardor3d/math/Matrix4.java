@@ -1644,6 +1644,95 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   }
 
   /**
+   * Produces a version of this matrix whose rotational upper-left 3x3 block has been orthonormalized
+   * via the Gram-Schmidt process. The translation column (m03, m13, m23) and bottom row (m30, m31,
+   * m32, m33) are copied through unchanged. This is useful for cleaning up the rounding error
+   * frequently present in transform matrices coming from external tools (e.g. Collada/FBX exporters),
+   * whose rotational block can otherwise fail an {@link Matrix3#isOrthonormal()} check and degrade
+   * downstream rotation extraction. Any scale or shear in the 3x3 block is discarded; only the
+   * rotational basis is recovered. The direction of the first row of the block is preserved exactly;
+   * the remaining two rows are made orthogonal to it (and to each other) and of unit length.
+   *
+   * @param store
+   *          The matrix to store the result in. If null, a new matrix is created. It is safe to pass
+   *          this matrix as the store.
+   * @return a matrix with an orthonormal 3x3 block (this matrix is left unchanged unless passed as the
+   *         store)
+   * @throws ArithmeticException
+   *           if the 3x3 block is rank-deficient (a row collapses to zero length during the process)
+   *           and so has no orthonormal basis to recover.
+   * @see <a href="http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">wikipedia.org-Gram-Schmidt process</a>
+   */
+  public Matrix4 orthonormalize(final Matrix4 store) {
+    Matrix4 result = store;
+    if (result == null) {
+      result = new Matrix4();
+    }
+
+    // Row 0: normalize.
+    double r0x = _m00, r0y = _m01, r0z = _m02;
+    double len = Math.sqrt(r0x * r0x + r0y * r0y + r0z * r0z);
+    if (len <= MathUtils.EPSILON) {
+      throw new ArithmeticException("This matrix cannot be orthonormalized.");
+    }
+    double inv = 1.0 / len;
+    r0x *= inv;
+    r0y *= inv;
+    r0z *= inv;
+
+    // Row 1: remove its projection onto row 0, then normalize.
+    double r1x = _m10, r1y = _m11, r1z = _m12;
+    final double d10 = r1x * r0x + r1y * r0y + r1z * r0z;
+    r1x -= d10 * r0x;
+    r1y -= d10 * r0y;
+    r1z -= d10 * r0z;
+    len = Math.sqrt(r1x * r1x + r1y * r1y + r1z * r1z);
+    if (len <= MathUtils.EPSILON) {
+      throw new ArithmeticException("This matrix cannot be orthonormalized.");
+    }
+    inv = 1.0 / len;
+    r1x *= inv;
+    r1y *= inv;
+    r1z *= inv;
+
+    // Row 2: remove its projections onto rows 0 and 1, then normalize.
+    double r2x = _m20, r2y = _m21, r2z = _m22;
+    final double d20 = r2x * r0x + r2y * r0y + r2z * r0z;
+    final double d21 = r2x * r1x + r2y * r1y + r2z * r1z;
+    r2x -= d20 * r0x + d21 * r1x;
+    r2y -= d20 * r0y + d21 * r1y;
+    r2z -= d20 * r0z + d21 * r1z;
+    len = Math.sqrt(r2x * r2x + r2y * r2y + r2z * r2z);
+    if (len <= MathUtils.EPSILON) {
+      throw new ArithmeticException("This matrix cannot be orthonormalized.");
+    }
+    inv = 1.0 / len;
+    r2x *= inv;
+    r2y *= inv;
+    r2z *= inv;
+
+    // Write the cleaned 3x3 block, passing the translation column and bottom row through unchanged.
+    return result.set( //
+        r0x, r0y, r0z, _m03, //
+        r1x, r1y, r1z, _m13, //
+        r2x, r2y, r2z, _m23, //
+        _m30, _m31, _m32, _m33);
+  }
+
+  /**
+   * Modifies this matrix in place, orthonormalizing its rotational upper-left 3x3 block via the
+   * Gram-Schmidt process while leaving its translation column and bottom row unchanged.
+   *
+   * @return this matrix for chaining
+   * @throws ArithmeticException
+   *           if the 3x3 block is rank-deficient and so has no orthonormal basis to recover.
+   * @see #orthonormalize(Matrix4)
+   */
+  public Matrix4 orthonormalizeLocal() {
+    return orthonormalize(this);
+  }
+
+  /**
    * @param store
    *          The matrix to store the result in. If null, a new matrix is created.
    * @return The adjugate, or classical adjoint, of this matrix

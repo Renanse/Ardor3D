@@ -877,6 +877,46 @@ public class TestMatrix4 {
   }
 
   @Test
+  public void testOrthonormalize() {
+    // a near-rotation matrix carrying rounding error in its 3x3 block, plus a translation we expect
+    // to keep.
+    final Matrix4 skewed = new Matrix4( //
+        1.0, 0.02, 0.0, 5.0, //
+        0.0, 1.0, 0.03, 6.0, //
+        0.04, 0.0, 1.0, 7.0, //
+        0.0, 0.0, 0.0, 1.0);
+    assertFalse(skewed.toMatrix3(null).isOrthonormal());
+
+    // the rotational 3x3 is cleaned, into both a new matrix and a supplied store...
+    final Matrix4 result = skewed.orthonormalize(null);
+    assertTrue(result.toMatrix3(null).isOrthonormal());
+    final Matrix4 store = new Matrix4();
+    assertSame(store, skewed.orthonormalize(store));
+    assertTrue(store.toMatrix3(null).isOrthonormal());
+
+    // ...while the translation column and bottom row are left untouched.
+    assertEquals(new Vector4(5, 6, 7, 1), result.getColumn(3, null));
+    assertEquals(new Vector4(0, 0, 0, 1), result.getRow(3, null));
+
+    // a translation-free pure rotation is already orthonormal in the full 4x4 sense and comes back
+    // unchanged.
+    final Matrix4 rotOnly = new Matrix4().set(new Matrix3().applyRotationX(MathUtils.QUARTER_PI));
+    assertEquals(rotOnly, rotOnly.orthonormalize(null));
+    assertTrue(rotOnly.orthonormalize(null).isOrthonormal());
+
+    // the local variant mutates in place, preserving the translation.
+    assertSame(skewed, skewed.orthonormalizeLocal());
+    assertTrue(skewed.toMatrix3(null).isOrthonormal());
+    assertEquals(new Vector4(5, 6, 7, 1), skewed.getColumn(3, null));
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testBadOrthonormalize() {
+    // a rank-deficient rotational block has no orthonormal basis to recover.
+    new Matrix4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1).orthonormalizeLocal();
+  }
+
+  @Test
   public void testApplyVector4() {
     final Matrix4 mat4 = new Matrix4().applyRotationX(MathUtils.HALF_PI);
     final Vector4 vec4 = new Vector4(0, 1, 0, 1);
