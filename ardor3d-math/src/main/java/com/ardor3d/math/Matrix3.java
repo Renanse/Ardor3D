@@ -1321,6 +1321,86 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
   }
 
   /**
+   * Produces an orthonormal version of this matrix by applying the Gram-Schmidt process to its rows.
+   * This is useful for cleaning up the rounding error frequently present in rotation matrices coming
+   * from external tools (e.g. Collada/FBX exporters), which can otherwise fail {@link #isOrthonormal()}
+   * and degrade downstream rotation extraction. Any scale or shear is discarded; only the rotational
+   * basis is recovered. The direction of the first row is preserved exactly; the remaining rows are
+   * made orthogonal to it (and to each other) and of unit length.
+   *
+   * @param store
+   *          The matrix to store the result in. If null, a new matrix is created. It is safe to pass
+   *          this matrix as the store.
+   * @return an orthonormal matrix (this matrix is left unchanged unless passed as the store)
+   * @throws ArithmeticException
+   *           if this matrix is rank-deficient (a row collapses to zero length during the process)
+   *           and so has no orthonormal basis to recover.
+   * @see <a href="http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">wikipedia.org-Gram-Schmidt process</a>
+   */
+  public Matrix3 orthonormalize(final Matrix3 store) {
+    Matrix3 result = store;
+    if (result == null) {
+      result = new Matrix3();
+    }
+
+    // Row 0: normalize.
+    double r0x = _m00, r0y = _m01, r0z = _m02;
+    double len = Math.sqrt(r0x * r0x + r0y * r0y + r0z * r0z);
+    if (len <= MathUtils.EPSILON) {
+      throw new ArithmeticException("This matrix cannot be orthonormalized.");
+    }
+    double inv = 1.0 / len;
+    r0x *= inv;
+    r0y *= inv;
+    r0z *= inv;
+
+    // Row 1: remove its projection onto row 0, then normalize.
+    double r1x = _m10, r1y = _m11, r1z = _m12;
+    final double d10 = r1x * r0x + r1y * r0y + r1z * r0z;
+    r1x -= d10 * r0x;
+    r1y -= d10 * r0y;
+    r1z -= d10 * r0z;
+    len = Math.sqrt(r1x * r1x + r1y * r1y + r1z * r1z);
+    if (len <= MathUtils.EPSILON) {
+      throw new ArithmeticException("This matrix cannot be orthonormalized.");
+    }
+    inv = 1.0 / len;
+    r1x *= inv;
+    r1y *= inv;
+    r1z *= inv;
+
+    // Row 2: remove its projections onto rows 0 and 1, then normalize.
+    double r2x = _m20, r2y = _m21, r2z = _m22;
+    final double d20 = r2x * r0x + r2y * r0y + r2z * r0z;
+    final double d21 = r2x * r1x + r2y * r1y + r2z * r1z;
+    r2x -= d20 * r0x + d21 * r1x;
+    r2y -= d20 * r0y + d21 * r1y;
+    r2z -= d20 * r0z + d21 * r1z;
+    len = Math.sqrt(r2x * r2x + r2y * r2y + r2z * r2z);
+    if (len <= MathUtils.EPSILON) {
+      throw new ArithmeticException("This matrix cannot be orthonormalized.");
+    }
+    inv = 1.0 / len;
+    r2x *= inv;
+    r2y *= inv;
+    r2z *= inv;
+
+    return result.set(r0x, r0y, r0z, r1x, r1y, r1z, r2x, r2y, r2z);
+  }
+
+  /**
+   * Modifies this matrix in place to be an orthonormal (Gram-Schmidt) version of itself.
+   *
+   * @return this matrix for chaining
+   * @throws ArithmeticException
+   *           if this matrix is rank-deficient and so has no orthonormal basis to recover.
+   * @see #orthonormalize(Matrix3)
+   */
+  public Matrix3 orthonormalizeLocal() {
+    return orthonormalize(this);
+  }
+
+  /**
    * @param store
    *          The matrix to store the result in. If null, a new matrix is created.
    * @return The adjugate, or classical adjoint, of this matrix

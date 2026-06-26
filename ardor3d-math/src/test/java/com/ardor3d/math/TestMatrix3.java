@@ -743,6 +743,38 @@ public class TestMatrix3 {
   }
 
   @Test
+  public void testOrthonormalize() {
+    // a near-rotation matrix carrying rounding error (e.g. from a Collada/FBX export) is not
+    // orthonormal...
+    final Matrix3 skewed = new Matrix3( //
+        1.0, 0.02, 0.0, //
+        0.0, 1.0, 0.03, //
+        0.04, 0.0, 1.0);
+    assertFalse(skewed.isOrthonormal());
+
+    // ...but Gram-Schmidt produces an orthonormal matrix, into both a supplied store and a new one.
+    assertTrue(skewed.orthonormalize(null).isOrthonormal());
+    final Matrix3 store = new Matrix3();
+    assertSame(store, skewed.orthonormalize(store));
+    assertTrue(store.isOrthonormal());
+
+    // a matrix that is already a pure rotation comes back essentially unchanged.
+    final Matrix3 rot = new Matrix3().applyRotationX(MathUtils.QUARTER_PI);
+    assertEquals(rot, rot.orthonormalize(null));
+
+    // the local variant mutates in place.
+    assertFalse(skewed.isOrthonormal());
+    assertSame(skewed, skewed.orthonormalizeLocal());
+    assertTrue(skewed.isOrthonormal());
+  }
+
+  @Test(expected = ArithmeticException.class)
+  public void testBadOrthonormalize() {
+    // a rank-deficient matrix has no orthonormal basis to recover.
+    new Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0).orthonormalizeLocal();
+  }
+
+  @Test
   public void testApplyVector3() {
     final Matrix3 mat3 = new Matrix3().applyRotationX(MathUtils.HALF_PI);
     final Vector3 vec3 = new Vector3(0, 1, 0);
