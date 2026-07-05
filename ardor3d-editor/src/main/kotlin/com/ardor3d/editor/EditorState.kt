@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <https://git.io/fjRmv>.
+ */
+
 package com.ardor3d.editor
 
 import androidx.compose.runtime.getValue
@@ -22,11 +32,14 @@ class EditorState {
     // Current transform mode
     var transformMode: TransformMode by mutableStateOf(TransformMode.TRANSLATE)
 
-    // Is the editor currently playing/simulating?
-    var isPlaying: Boolean by mutableStateOf(false)
-
-    // Version counter - incremented when transforms change to trigger UI refresh
+    // Version counter observed by the inspector - bumped when a transform
+    // actually changes so the UI recomposes only when needed.
     var transformVersion: Long by mutableStateOf(0L)
+        private set
+
+    // Version counter observed by the hierarchy - bumped when the scene
+    // structure changes (attach/detach/rename).
+    var structureVersion: Long by mutableStateOf(0L)
         private set
 
     /**
@@ -34,6 +47,13 @@ class EditorState {
      */
     fun notifyTransformChanged() {
         transformVersion++
+    }
+
+    /**
+     * Called when the scene structure changes (attach, detach, rename) to trigger UI updates.
+     */
+    fun notifyStructureChanged() {
+        structureVersion++
     }
 
     /**

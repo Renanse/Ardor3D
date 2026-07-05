@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <https://git.io/fjRmv>.
+ */
+
 package com.ardor3d.editor.inspector
 
 import androidx.compose.foundation.background
@@ -16,6 +26,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
+import com.ardor3d.editor.util.EulerUtil
 import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.type.ReadOnlyColorRGBA
 import com.ardor3d.math.type.ReadOnlyTransform
@@ -25,6 +36,7 @@ import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
 import com.ardor3d.surface.ColorSurface
+import java.util.Locale
 
 @Composable
 fun InspectorPanel(
@@ -62,7 +74,7 @@ fun InspectorPanel(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // Name section
-                    NameSection(selection)
+                    NameSection(selection, editorState)
 
                     // Transform section - observe transformVersion to trigger refresh
                     TransformSection(selection, editorState)
@@ -92,7 +104,7 @@ fun InspectorPanel(
 }
 
 @Composable
-private fun NameSection(spatial: Spatial) {
+private fun NameSection(spatial: Spatial, editorState: EditorState) {
     var name by remember(spatial) { mutableStateOf(spatial.name ?: "") }
 
     OutlinedTextField(
@@ -100,6 +112,7 @@ private fun NameSection(spatial: Spatial) {
         onValueChange = {
             name = it
             spatial.name = it
+            editorState.notifyStructureChanged()
         },
         label = { Text("Name") },
         modifier = Modifier.fillMaxWidth(),
@@ -140,34 +153,26 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Rotation (as Euler angles for simplicity)
-        val rotMatrix = spatial.rotation
-        val quat = com.ardor3d.math.Quaternion().fromRotationMatrix(rotMatrix)
-        val angles = quat.toEulerAngles(null)
+        // Rotation (as XYZ Euler angles for simplicity)
+        val angles = EulerUtil.toEulerDegrees(spatial.rotation)
         Vector3Field(
             label = "Rotation",
-            x = Math.toDegrees(angles[0]),
-            y = Math.toDegrees(angles[1]),
-            z = Math.toDegrees(angles[2]),
+            x = angles[0],
+            y = angles[1],
+            z = angles[2],
             onXChange = { newX ->
-                val currentAngles = com.ardor3d.math.Quaternion().fromRotationMatrix(spatial.rotation).toEulerAngles(null)
-                val q = com.ardor3d.math.Quaternion()
-                q.fromEulerAngles(Math.toRadians(newX), currentAngles[1], currentAngles[2])
-                spatial.setRotation(q)
+                val current = EulerUtil.toEulerDegrees(spatial.rotation)
+                spatial.setRotation(EulerUtil.fromEulerDegrees(newX, current[1], current[2]))
                 editorState.notifyTransformChanged()
             },
             onYChange = { newY ->
-                val currentAngles = com.ardor3d.math.Quaternion().fromRotationMatrix(spatial.rotation).toEulerAngles(null)
-                val q = com.ardor3d.math.Quaternion()
-                q.fromEulerAngles(currentAngles[0], Math.toRadians(newY), currentAngles[2])
-                spatial.setRotation(q)
+                val current = EulerUtil.toEulerDegrees(spatial.rotation)
+                spatial.setRotation(EulerUtil.fromEulerDegrees(current[0], newY, current[2]))
                 editorState.notifyTransformChanged()
             },
             onZChange = { newZ ->
-                val currentAngles = com.ardor3d.math.Quaternion().fromRotationMatrix(spatial.rotation).toEulerAngles(null)
-                val q = com.ardor3d.math.Quaternion()
-                q.fromEulerAngles(currentAngles[0], currentAngles[1], Math.toRadians(newZ))
-                spatial.setRotation(q)
+                val current = EulerUtil.toEulerDegrees(spatial.rotation)
+                spatial.setRotation(EulerUtil.fromEulerDegrees(current[0], current[1], newZ))
                 editorState.notifyTransformChanged()
             }
         )
@@ -368,7 +373,7 @@ private fun ShininessSlider(surface: ColorSurface) {
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = String.format("%.0f", shininess),
+                text = String.format(Locale.ROOT, "%.0f", shininess),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.width(32.dp)
             )
@@ -383,7 +388,7 @@ private fun ColorSlider(
     color: Color,
     onValueChange: (Float) -> Unit
 ) {
-    var textValue by remember(value) { mutableStateOf(String.format("%.2f", value)) }
+    var textValue by remember(value) { mutableStateOf(String.format(Locale.ROOT, "%.2f", value)) }
     var isFocused by remember { mutableStateOf(false) }
 
     Row(
@@ -402,7 +407,7 @@ private fun ColorSlider(
             value = value.coerceIn(0f, 1f),
             onValueChange = {
                 onValueChange(it)
-                textValue = String.format("%.2f", it)
+                textValue = String.format(Locale.ROOT, "%.2f", it)
             },
             valueRange = 0f..1f,
             modifier = Modifier.weight(1f),
@@ -413,7 +418,7 @@ private fun ColorSlider(
         )
         // Text field allows HDR values > 1.0
         OutlinedTextField(
-            value = if (isFocused) textValue else String.format("%.2f", value),
+            value = if (isFocused) textValue else String.format(Locale.ROOT, "%.2f", value),
             onValueChange = { newText ->
                 textValue = newText
                 newText.toFloatOrNull()?.let {
@@ -424,7 +429,7 @@ private fun ColorSlider(
                 .width(56.dp)
                 .onFocusChanged {
                     isFocused = it.isFocused
-                    if (it.isFocused) textValue = String.format("%.2f", value)
+                    if (it.isFocused) textValue = String.format(Locale.ROOT, "%.2f", value)
                 },
             textStyle = MaterialTheme.typography.labelSmall,
             singleLine = true
@@ -555,7 +560,7 @@ private fun ComponentField(
     var editText by remember { mutableStateOf("") }
 
     // When not focused, display the live value from the transform
-    val displayText = if (isFocused) editText else String.format("%.3f", value)
+    val displayText = if (isFocused) editText else String.format(Locale.ROOT, "%.3f", value)
 
     OutlinedTextField(
         value = displayText,
@@ -567,7 +572,7 @@ private fun ComponentField(
         modifier = modifier.onFocusChanged { focusState ->
             if (focusState.isFocused && !isFocused) {
                 // Entering focus - copy current value to edit buffer
-                editText = String.format("%.3f", value)
+                editText = String.format(Locale.ROOT, "%.3f", value)
             }
             isFocused = focusState.isFocused
         },

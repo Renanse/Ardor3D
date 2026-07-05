@@ -35,6 +35,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
     // Note: Skia classes (DirectContext, Surface, etc.) come transitively via compose.desktop.currentOs
+
+    testImplementation(kotlin("test-junit"))
+    testImplementation("junit:junit:4.13.2")
 }
 
 compose.desktop {

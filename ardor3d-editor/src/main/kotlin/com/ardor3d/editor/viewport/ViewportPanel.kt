@@ -1,6 +1,15 @@
+/**
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <https://git.io/fjRmv>.
+ */
+
 package com.ardor3d.editor.viewport
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.OpenWith
@@ -8,61 +17,11 @@ import androidx.compose.material.icons.filled.Rotate90DegreesCcw
 import androidx.compose.material.icons.filled.ZoomOutMap
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.TransformMode
-
-@Composable
-fun ViewportPanel(
-    editorState: EditorState,
-    modifier: Modifier = Modifier
-) {
-    Box(modifier = modifier) {
-        // Viewport background (placeholder for GL rendering)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF2D2D30))
-        ) {
-            // Placeholder text - will be replaced with actual GL viewport
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "3D Viewport",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color(0xFF808080)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Ardor3D rendering will appear here",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF606060)
-                )
-            }
-        }
-
-        // Toolbar overlay (top-left)
-        ViewportToolbar(
-            editorState = editorState,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(8.dp)
-        )
-
-        // Status bar (bottom)
-        ViewportStatusBar(
-            editorState = editorState,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .fillMaxWidth()
-        )
-    }
-}
 
 @Composable
 fun ViewportToolbar(
@@ -82,7 +41,7 @@ fun ViewportToolbar(
             // Translate tool
             TransformToolButton(
                 icon = Icons.Default.OpenWith,
-                contentDescription = "Translate (W)",
+                contentDescription = "Translate",
                 selected = editorState.transformMode == TransformMode.TRANSLATE,
                 onClick = { editorState.transformMode = TransformMode.TRANSLATE }
             )
@@ -90,7 +49,7 @@ fun ViewportToolbar(
             // Rotate tool
             TransformToolButton(
                 icon = Icons.Default.Rotate90DegreesCcw,
-                contentDescription = "Rotate (E)",
+                contentDescription = "Rotate",
                 selected = editorState.transformMode == TransformMode.ROTATE,
                 onClick = { editorState.transformMode = TransformMode.ROTATE }
             )
@@ -98,7 +57,7 @@ fun ViewportToolbar(
             // Scale tool
             TransformToolButton(
                 icon = Icons.Default.ZoomOutMap,
-                contentDescription = "Scale (R)",
+                contentDescription = "Scale",
                 selected = editorState.transformMode == TransformMode.SCALE,
                 onClick = { editorState.transformMode = TransformMode.SCALE }
             )

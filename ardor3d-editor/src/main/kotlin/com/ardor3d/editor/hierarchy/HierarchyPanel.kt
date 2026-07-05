@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <https://git.io/fjRmv>.
+ */
+
 package com.ardor3d.editor.hierarchy
 
 import androidx.compose.foundation.background
@@ -11,7 +21,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
@@ -28,8 +37,8 @@ fun HierarchyPanel(
     // Track expanded nodes by their names (or a unique id)
     val expandedNodes = remember { mutableStateMapOf<String, Boolean>() }
 
-    // Observe transform version for live tree updates
-    val version = editorState.transformVersion
+    // Observe structure version so the tree refreshes on attach/detach/rename
+    val version = editorState.structureVersion
 
     Surface(
         modifier = modifier,
@@ -155,7 +164,6 @@ private fun NodeTreeItem(
         spatial.children.count { !isEditorInternal(it) }
     } else 0
     val hasChildren = visibleChildCount > 0
-    val isHidden = spatial.name?.startsWith("Editor") == true || spatial.name?.startsWith("Light") == true
 
     Column {
         Row(
@@ -196,7 +204,6 @@ private fun NodeTreeItem(
                 tint = when {
                     isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
                     spatial is Light -> MaterialTheme.colorScheme.tertiary
-                    isHidden -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
             )
@@ -207,10 +214,8 @@ private fun NodeTreeItem(
             Text(
                 text = spatial.name ?: "(unnamed)",
                 style = MaterialTheme.typography.bodySmall,
-                fontStyle = if (isHidden) FontStyle.Italic else FontStyle.Normal,
                 color = when {
                     isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
-                    isHidden -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     else -> MaterialTheme.colorScheme.onSurface
                 },
                 maxLines = 1,
@@ -244,45 +249,3 @@ private fun NodeTreeItem(
     }
 }
 
-/**
- * Context menu for hierarchy items (for future use).
- */
-@Composable
-private fun HierarchyContextMenu(
-    spatial: Spatial,
-    onDismiss: () -> Unit,
-    onDelete: () -> Unit,
-    onDuplicate: () -> Unit,
-    onRename: () -> Unit
-) {
-    DropdownMenu(
-        expanded = true,
-        onDismissRequest = onDismiss
-    ) {
-        DropdownMenuItem(
-            text = { Text("Rename") },
-            onClick = {
-                onRename()
-                onDismiss()
-            },
-            leadingIcon = { Icon(Icons.Default.Edit, null) }
-        )
-        DropdownMenuItem(
-            text = { Text("Duplicate") },
-            onClick = {
-                onDuplicate()
-                onDismiss()
-            },
-            leadingIcon = { Icon(Icons.Default.ContentCopy, null) }
-        )
-        HorizontalDivider()
-        DropdownMenuItem(
-            text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-            onClick = {
-                onDelete()
-                onDismiss()
-            },
-            leadingIcon = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) }
-        )
-    }
-}

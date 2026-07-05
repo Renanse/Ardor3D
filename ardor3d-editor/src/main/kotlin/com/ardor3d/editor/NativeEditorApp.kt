@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <https://git.io/fjRmv>.
+ */
+
 package com.ardor3d.editor
 
 import androidx.compose.foundation.background
@@ -63,7 +73,11 @@ import com.ardor3d.util.resource.ResourceLocatorTool
 import com.ardor3d.util.resource.SimpleResourceLocator
 import org.lwjgl.opengl.awt.GLData
 import java.awt.Dimension
+import java.util.logging.Level
+import java.util.logging.Logger
 import javax.swing.Timer as SwingTimer
+
+private val logger = Logger.getLogger("com.ardor3d.editor")
 
 /**
  * Sets up the default resource locators for materials and shaders.
@@ -92,7 +106,7 @@ private fun addDefaultResourceLocators() {
             ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "occluder/basic.yaml")
         )
     } catch (ex: Exception) {
-        ex.printStackTrace()
+        logger.log(Level.SEVERE, "Failed to set up default resource locators", ex)
     }
 }
 
@@ -218,6 +232,7 @@ private fun createArdor3DCanvas(scene: EditorScene): Lwjgl3AwtCanvas {
     val keyboardWrapper = AwtKeyboardWrapper(canvas)
     val focusWrapper = AwtFocusWrapper(canvas)
     val physicalLayer = PhysicalLayer.Builder()
+        // Cast disambiguates: AwtKeyboardWrapper is both a KeyboardWrapper and a CharacterInputWrapper
         .with(keyboardWrapper as KeyboardWrapper)
         .with(mouseWrapper)
         .with(focusWrapper)
@@ -296,6 +311,11 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     private var scaleWidget: SimpleScaleWidget? = null
     private var lastTransformMode: TransformMode? = null
 
+    // Reconciliation caches used by update() to notify the UI only on real changes.
+    private var lastSelection: Spatial? = null
+    private val lastSelectedTransform = Transform()
+    private var transformCacheValid = false
+
     fun resetLastDimensions() {
         lastWidth = 0
         lastHeight = 0
@@ -337,7 +357,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     /**
      * Updates the interact manager's target to match the editor selection.
      */
-    fun updateInteractTarget() {
+    private fun updateInteractTarget() {
         val selected = editorState.primarySelection
         if (selected != null && selected != gridNode && selected != lightGizmo) {
             interactManager?.setSpatialTarget(selected)
@@ -388,10 +408,10 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // Add to scene
         root.attachChild(shape)
         MaterialUtil.autoMaterials(shape)
+        editorState.notifyStructureChanged()
 
-        // Select the new shape
+        // Select the new shape; update() syncs the gizmo target
         editorState.select(shape)
-        updateInteractTarget()
     }
 
     init {
@@ -452,12 +472,10 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 val picked = pickData.target as? Spatial
                 if (picked != null && picked != gridNode && picked != lightGizmo) {
                     editorState.select(picked)
-                    updateInteractTarget()
                 }
             } else {
                 // Clicked on nothing - clear selection
                 editorState.clearSelection()
-                updateInteractTarget()
             }
         }
 
@@ -528,8 +546,6 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             }
         }
 
-        Debugger.drawBounds(root, renderer, true)
-
         return true
     }
 
@@ -559,14 +575,30 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             it.update(timer)
         } ?: logicalLayer?.checkTriggers(timer.timePerFrame)
 
+        // Sync the gizmo target with the editor selection (which may have been
+        // changed by the hierarchy panel, picking, or programmatically).
+        if (lastSelection !== editorState.primarySelection) {
+            lastSelection = editorState.primarySelection
+            transformCacheValid = false
+            updateInteractTarget()
+        }
+
+        // Notify the UI when the selected spatial's transform actually changed
+        // (e.g. dragged by a gizmo) so the inspector refreshes.
+        val selected = lastSelection
+        if (selected != null) {
+            if (!transformCacheValid || lastSelectedTransform != selected.transform) {
+                lastSelectedTransform.set(selected.transform)
+                transformCacheValid = true
+                editorState.notifyTransformChanged()
+            }
+        }
+
         // Update light gizmo position to match light
         lightGizmo.setTranslation(light.translation)
 
         // Update geometric state for all scene objects
         root.updateGeometricState(timer.timePerFrame, true)
-
-        // Notify UI to refresh transform values (for live animation display)
-        editorState.notifyTransformChanged()
     }
 
     /**
