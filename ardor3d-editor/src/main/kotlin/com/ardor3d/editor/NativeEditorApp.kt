@@ -65,7 +65,9 @@ import com.ardor3d.input.logical.MouseButtonClickedCondition
 import com.ardor3d.input.mouse.MouseButton
 import com.ardor3d.intersection.BoundingPickResults
 import com.ardor3d.intersection.PickingUtil
+import com.ardor3d.light.Light
 import com.ardor3d.light.PointLight
+import com.ardor3d.extension.model.obj.ObjImporter
 import com.ardor3d.math.*
 import com.ardor3d.renderer.ContextManager
 import com.ardor3d.renderer.Renderer
@@ -78,9 +80,13 @@ import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.SceneIndexer
 import com.ardor3d.scenegraph.Spatial
+import com.ardor3d.scenegraph.hint.CullHint
 import com.ardor3d.scenegraph.hint.PickingHint
 import com.ardor3d.scenegraph.shape.*
 import com.ardor3d.util.*
+import com.ardor3d.util.export.binary.BinaryExporter
+import com.ardor3d.util.export.binary.BinaryImporter
+import com.ardor3d.util.resource.URLResourceSource
 import com.ardor3d.util.geom.Debugger
 import com.ardor3d.util.resource.ResourceLocatorTool
 import com.ardor3d.util.resource.SimpleResourceLocator
@@ -129,10 +135,23 @@ fun main() = application {
     val editorState = remember { EditorState() }
     val windowState = rememberWindowState(size = DpSize(1600.dp, 900.dp))
 
+    // Confirm before losing unsaved changes on exit
+    val requestExit = {
+        if (!editorState.dirty || javax.swing.JOptionPane.showConfirmDialog(
+                null,
+                "You have unsaved changes. Exit anyway?",
+                "Exit",
+                javax.swing.JOptionPane.OK_CANCEL_OPTION
+            ) == javax.swing.JOptionPane.OK_OPTION
+        ) {
+            exitApplication()
+        }
+    }
+
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = requestExit,
         state = windowState,
-        title = "Ardor3D Editor",
+        title = "Ardor3D Editor - ${editorState.documentTitle}",
         onPreviewKeyEvent = { event ->
             val modifier = event.isCtrlPressed || event.isMetaPressed
             if (event.type == KeyEventType.KeyDown && modifier) {
@@ -155,13 +174,41 @@ fun main() = application {
         }
     ) {
         EditorTheme {
-            NativeEditorApp(editorState)
+            NativeEditorApp(editorState, window, requestExit)
         }
     }
 }
 
+/**
+ * Shows an AWT file dialog owned by [owner]. Returns the chosen file, appending [extension]
+ * on save when the user leaves it off.
+ */
+private fun promptForFile(owner: java.awt.Frame, title: String, save: Boolean, extension: String): java.io.File? {
+    val dialog = java.awt.FileDialog(owner, title, if (save) java.awt.FileDialog.SAVE else java.awt.FileDialog.LOAD)
+    dialog.setFilenameFilter { _, name -> name.endsWith(".$extension", ignoreCase = true) }
+    dialog.isVisible = true
+    val fileName = dialog.file ?: return null
+    val fixed = if (save && !fileName.endsWith(".$extension", ignoreCase = true)) "$fileName.$extension" else fileName
+    return java.io.File(dialog.directory, fixed)
+}
+
+/**
+ * Asks to proceed when the document has unsaved changes.
+ */
+private fun confirmDiscard(editorState: EditorState, owner: java.awt.Frame, what: String): Boolean {
+    if (!editorState.dirty) {
+        return true
+    }
+    return javax.swing.JOptionPane.showConfirmDialog(
+        owner,
+        "You have unsaved changes. $what anyway?",
+        what,
+        javax.swing.JOptionPane.OK_CANCEL_OPTION
+    ) == javax.swing.JOptionPane.OK_OPTION
+}
+
 @Composable
-fun NativeEditorApp(editorState: EditorState) {
+fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExit: () -> Unit) {
     val editorScene = remember { EditorScene(editorState) }
     val sceneOperations = remember(editorScene) {
         SceneOperations(
@@ -170,6 +217,32 @@ fun NativeEditorApp(editorState: EditorState) {
             duplicateSpatial = editorScene::duplicateSpatial,
             renameSpatial = editorScene::renameSpatial,
             createEmpty = editorScene::createEmptyNode
+        )
+    }
+    val fileOperations = remember(editorScene, window) {
+        fun saveTo(file: java.io.File?) {
+            (file ?: promptForFile(window, "Save Scene", save = true, extension = "a3d"))
+                ?.let(editorScene::saveScene)
+        }
+        FileOperations(
+            newScene = {
+                if (confirmDiscard(editorState, window, "New Scene")) {
+                    editorScene.newScene()
+                }
+            },
+            openScene = {
+                if (confirmDiscard(editorState, window, "Open")) {
+                    promptForFile(window, "Open Scene", save = false, extension = "a3d")
+                        ?.let(editorScene::openScene)
+                }
+            },
+            saveScene = { saveTo(editorState.currentFile) },
+            saveSceneAs = { saveTo(null) },
+            importModel = {
+                promptForFile(window, "Import OBJ Model", save = false, extension = "obj")
+                    ?.let(editorScene::importObjModel)
+            },
+            exit = requestExit
         )
     }
 
@@ -181,7 +254,8 @@ fun NativeEditorApp(editorState: EditorState) {
             // Menu bar at top
             EditorMenuBar(
                 editorState = editorState,
-                operations = sceneOperations
+                operations = sceneOperations,
+                fileOperations = fileOperations
             )
 
             // Main content
@@ -329,8 +403,14 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     // they never appear in the hierarchy, picking, or saved scenes.
     private val overlayRoot = Node("EditorOverlay")
     private val gridNode = createGrid()
-    private val light = PointLight()
     private val lightGizmo = createLightGizmo()
+
+    // First light found in the document; the overlay gizmo follows it.
+    private var trackedLight: Light? = null
+    private var lastStructureVersion = -1L
+
+    // Document lifecycle actions deferred to update() so they run with the GL context current.
+    private val pendingActions = java.util.concurrent.ConcurrentLinkedQueue<() -> Unit>()
 
     var logicalLayer: LogicalLayer? = null
         set(value) {
@@ -498,12 +578,29 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     private fun populateDefaultScene() {
         root.attachChild(createTestCube())
 
+        val light = PointLight()
         light.name = "Main Light"
         light.color = ColorRGBA.WHITE
         light.intensity = 0.75f
         light.setTranslation(5.0, 8.0, 5.0)
         light.isEnabled = true
         root.attachChild(light)
+        trackedLight = light
+    }
+
+    /**
+     * Finds the light the overlay gizmo should follow.
+     */
+    private fun findFirstLight(spatial: Spatial): Light? {
+        if (spatial is Light) {
+            return spatial
+        }
+        if (spatial is Node) {
+            for (child in spatial.children) {
+                findFirstLight(child)?.let { return it }
+            }
+        }
+        return null
     }
 
     /**
@@ -605,6 +702,114 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
+     * Replaces the current document with a fresh default scene.
+     */
+    fun newScene() {
+        pendingActions.add {
+            installDocumentRoot(Node("Scene Root"))
+            populateDefaultScene()
+            MaterialUtil.autoMaterials(root)
+            editorState.markSaved(null)
+        }
+    }
+
+    /**
+     * Writes the document to [file] using Ardor3D's binary format.
+     */
+    fun saveScene(file: java.io.File) {
+        pendingActions.add {
+            try {
+                BinaryExporter().save(root, file)
+                editorState.markSaved(file)
+            } catch (ex: Exception) {
+                logger.log(Level.SEVERE, "Failed to save scene to $file", ex)
+            }
+        }
+    }
+
+    /**
+     * Loads a binary scene file as the new document.
+     */
+    fun openScene(file: java.io.File) {
+        pendingActions.add {
+            try {
+                val loaded = BinaryImporter().load(file) as? Node
+                if (loaded == null) {
+                    logger.severe("$file did not contain a scene root Node")
+                    return@add
+                }
+                installDocumentRoot(loaded)
+                editorState.markSaved(file)
+            } catch (ex: Exception) {
+                logger.log(Level.SEVERE, "Failed to open scene $file", ex)
+            }
+        }
+    }
+
+    /**
+     * Imports a Wavefront OBJ file as a child of the scene root (undoable).
+     */
+    fun importObjModel(file: java.io.File) {
+        pendingActions.add {
+            try {
+                val importer = ObjImporter().setLoadTextures(true)
+                file.parentFile?.let { importer.setTextureLocator(SimpleResourceLocator(it.toURI())) }
+                val imported = importer.load(URLResourceSource(file.toURI().toURL())).scene
+                imported.name = file.name.substringBeforeLast('.')
+                // Make sure everything is pickable
+                imported.acceptVisitor({ spatial ->
+                    if (spatial is Mesh && spatial.modelBound == null) {
+                        spatial.setModelBound(com.ardor3d.bounding.BoundingBox())
+                    }
+                }, false)
+                MaterialUtil.autoMaterials(imported)
+                imported.updateGeometricState(0.0, true)
+                editorState.execute(
+                    AttachChildCommand(
+                        parent = root,
+                        child = imported,
+                        name = "Import ${file.name}",
+                        onExecuted = { editorState.select(imported) },
+                        onUndone = { if (editorState.isSelected(imported)) editorState.clearSelection() }
+                    )
+                )
+                editorState.sealUndoMerge()
+            } catch (ex: Exception) {
+                logger.log(Level.SEVERE, "Failed to import model $file", ex)
+            }
+        }
+    }
+
+    /**
+     * Swaps the document root, moving SceneIndexer registration and resetting editor caches.
+     */
+    private fun installDocumentRoot(newRoot: Node) {
+        val oldRoot = root
+        if (initialized) {
+            SceneIndexer.getCurrent()?.removeSceneRoot(oldRoot)
+        }
+
+        val zBuffer = ZBufferState()
+        zBuffer.isEnabled = true
+        zBuffer.function = ZBufferState.TestFunction.LessThanOrEqualTo
+        newRoot.setRenderState(zBuffer)
+        newRoot.sceneHints.renderBucketType = RenderBucketType.Opaque
+
+        editorState.replaceSceneRoot(newRoot)
+        MaterialUtil.autoMaterials(newRoot)
+        if (initialized) {
+            SceneIndexer.getCurrent()?.addSceneRoot(newRoot)
+        }
+
+        trackedLight = findFirstLight(newRoot)
+        lastStructureVersion = editorState.structureVersion
+        interactManager?.setSpatialTarget(null)
+        lastSelection = null
+        transformCacheValid = false
+        newRoot.updateGeometricState(0.0, true)
+    }
+
+    /**
      * Creates an empty Node under the selected node (or the scene root) and selects it.
      */
     fun createEmptyNode() {
@@ -700,6 +905,12 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     override fun update(timer: ReadOnlyTimer) {
+        // Run deferred document actions (new/open/save/import) with the context current
+        while (true) {
+            val action = pendingActions.poll() ?: break
+            action()
+        }
+
         // Execute updateQueue item
         GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.UPDATE).execute()
 
@@ -733,8 +944,20 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             }
         }
 
-        // Update light gizmo position to match light
-        lightGizmo.setTranslation(light.translation)
+        // Re-resolve the tracked light when the structure changed (delete, open, etc.)
+        if (lastStructureVersion != editorState.structureVersion) {
+            lastStructureVersion = editorState.structureVersion
+            trackedLight = findFirstLight(root)
+        }
+
+        // Update light gizmo to match the tracked light, hiding it when there is none
+        val light = trackedLight
+        if (light != null) {
+            lightGizmo.sceneHints.cullHint = CullHint.Inherit
+            lightGizmo.setTranslation(light.worldTranslation)
+        } else {
+            lightGizmo.sceneHints.cullHint = CullHint.Always
+        }
 
         // Update geometric state for the document and the editor overlay
         root.updateGeometricState(timer.timePerFrame, true)

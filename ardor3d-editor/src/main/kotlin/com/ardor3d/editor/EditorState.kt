@@ -18,6 +18,7 @@ import com.ardor3d.editor.command.CommandStack
 import com.ardor3d.editor.command.EditorCommand
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
+import java.io.File
 
 /**
  * Global editor state that manages selection, scene, and editor mode.
@@ -53,6 +54,18 @@ class EditorState {
     var historyVersion: Long by mutableStateOf(0L)
         private set
 
+    // File the document was loaded from / saved to, if any
+    var currentFile: File? by mutableStateOf(null)
+        private set
+
+    // True when the document has changes not yet written to currentFile
+    var dirty: Boolean by mutableStateOf(false)
+        private set
+
+    // Shown in the window title
+    val documentTitle: String
+        get() = (currentFile?.name ?: "Untitled") + (if (dirty) " *" else "")
+
     // Undo/redo history. All edits made through the UI should go through execute()/record().
     val commandStack = CommandStack { command ->
         if (command.affectsStructure) {
@@ -61,6 +74,28 @@ class EditorState {
         transformVersion++
         propertyVersion++
         historyVersion++
+        dirty = true
+    }
+
+    /**
+     * Swaps in a new document root (New Scene / Open), clearing selection and history.
+     */
+    fun replaceSceneRoot(newRoot: Node) {
+        clearSelection()
+        commandStack.clear()
+        sceneRoot = newRoot
+        structureVersion++
+        transformVersion++
+        propertyVersion++
+        historyVersion++
+    }
+
+    /**
+     * Marks the document as persisted to [file] (or as a fresh document when null).
+     */
+    fun markSaved(file: File?) {
+        currentFile = file
+        dirty = false
     }
 
     /** Executes an [EditorCommand] and records it for undo. */

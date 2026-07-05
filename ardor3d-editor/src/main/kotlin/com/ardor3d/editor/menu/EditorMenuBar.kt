@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
+import com.ardor3d.editor.FileOperations
 import com.ardor3d.editor.SceneOperations
 
 enum class ShapeType {
@@ -42,6 +43,7 @@ enum class ShapeType {
 fun EditorMenuBar(
     editorState: EditorState,
     operations: SceneOperations,
+    fileOperations: FileOperations,
     modifier: Modifier = Modifier
 ) {
     val onAddShape = operations.addShape
@@ -65,29 +67,47 @@ fun EditorMenuBar(
             ) {
                 DropdownMenuItem(
                     text = { Text("New Scene") },
-                    enabled = false,
-                    onClick = { fileMenuExpanded = false }
+                    onClick = {
+                        fileOperations.newScene()
+                        fileMenuExpanded = false
+                    }
                 )
                 DropdownMenuItem(
                     text = { Text("Open...") },
-                    enabled = false,
-                    onClick = { fileMenuExpanded = false }
+                    onClick = {
+                        fileOperations.openScene()
+                        fileMenuExpanded = false
+                    }
                 )
                 DropdownMenuItem(
                     text = { Text("Save") },
-                    enabled = false,
-                    onClick = { fileMenuExpanded = false }
+                    onClick = {
+                        fileOperations.saveScene()
+                        fileMenuExpanded = false
+                    }
                 )
                 DropdownMenuItem(
                     text = { Text("Save As...") },
-                    enabled = false,
-                    onClick = { fileMenuExpanded = false }
+                    onClick = {
+                        fileOperations.saveSceneAs()
+                        fileMenuExpanded = false
+                    }
+                )
+                HorizontalDivider()
+                DropdownMenuItem(
+                    text = { Text("Import OBJ...") },
+                    onClick = {
+                        fileOperations.importModel()
+                        fileMenuExpanded = false
+                    }
                 )
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = { Text("Exit") },
-                    enabled = false,
-                    onClick = { fileMenuExpanded = false }
+                    onClick = {
+                        fileMenuExpanded = false
+                        fileOperations.exit()
+                    }
                 )
             }
 
