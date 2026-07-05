@@ -6,6 +6,7 @@ target/
 .gradle/
 */build/*
 build/
+ardor3d-bsp/
 .metadata/
 .idea/
 ardorSettings.properties

@@ -26,6 +26,9 @@ tasks.named<Jar>("jar") {
 }
 
 subprojects {
+    // Skip Java-specific configuration for Kotlin modules
+    if (name == "ardor3d-editor") return@subprojects
+
     apply(plugin = "java-library")
 
     group = "com.ardor3d"

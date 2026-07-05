@@ -1,4 +1,14 @@
 rootProject.name = "ardor3d"
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+}
+
 include(":ardor3d-savable")
 include(":ardor3d-math")
 include(":ardor3d-core")
@@ -16,6 +26,7 @@ include(":ardor3d-ui")
 include(":ardor3d-terrain")
 include(":ardor3d-tools")
 include(":ardor3d-examples")
+include(":ardor3d-editor")
 
 project(":ardor3d-savable").projectDir = File("$rootDir/ardor3d-savable")
 project(":ardor3d-math").projectDir = File("$rootDir/ardor3d-math")
@@ -34,3 +45,11 @@ project(":ardor3d-ui").projectDir = File("$rootDir/ardor3d-ui")
 project(":ardor3d-terrain").projectDir = File("$rootDir/ardor3d-terrain")
 project(":ardor3d-tools").projectDir = File("$rootDir/ardor3d-tools")
 project(":ardor3d-examples").projectDir = File("$rootDir/ardor3d-examples")
+project(":ardor3d-editor").projectDir = File("$rootDir/ardor3d-editor")
+
+// Local-only module (gitignored); only configure it when the directory is
+// actually present so fresh clones still build.
+if (file("$rootDir/ardor3d-bsp").isDirectory) {
+    include(":ardor3d-bsp")
+    project(":ardor3d-bsp").projectDir = File("$rootDir/ardor3d-bsp")
+}
