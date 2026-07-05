@@ -14,6 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.ardor3d.editor.command.CommandStack
+import com.ardor3d.editor.command.EditorCommand
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
 
@@ -41,6 +43,42 @@ class EditorState {
     // structure changes (attach/detach/rename).
     var structureVersion: Long by mutableStateOf(0L)
         private set
+
+    // Version counter observed by property editors (name, colors, flags) so
+    // locally-remembered field state re-reads after undo/redo.
+    var propertyVersion: Long by mutableStateOf(0L)
+        private set
+
+    // Version counter observed by menu items to refresh undo/redo enabled state.
+    var historyVersion: Long by mutableStateOf(0L)
+        private set
+
+    // Undo/redo history. All edits made through the UI should go through execute()/record().
+    val commandStack = CommandStack { command ->
+        if (command.affectsStructure) {
+            structureVersion++
+        }
+        transformVersion++
+        propertyVersion++
+        historyVersion++
+    }
+
+    /** Executes an [EditorCommand] and records it for undo. */
+    fun execute(command: EditorCommand) = commandStack.execute(command)
+
+    /** Records a command whose effect is already applied (e.g. a finished gizmo drag). */
+    fun record(command: EditorCommand) = commandStack.record(command)
+
+    fun undo() {
+        commandStack.undo()
+    }
+
+    fun redo() {
+        commandStack.redo()
+    }
+
+    /** Marks a gesture boundary so subsequent edits start a new undo step. */
+    fun sealUndoMerge() = commandStack.sealMerge()
 
     /**
      * Called when a spatial's transform is modified to trigger UI updates.

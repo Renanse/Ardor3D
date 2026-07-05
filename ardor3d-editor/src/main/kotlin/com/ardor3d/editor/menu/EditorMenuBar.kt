@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ardor3d.editor.EditorState
 
 enum class ShapeType {
     BOX,
@@ -38,6 +39,7 @@ enum class ShapeType {
 
 @Composable
 fun EditorMenuBar(
+    editorState: EditorState,
     onAddShape: (ShapeType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,23 +63,28 @@ fun EditorMenuBar(
             ) {
                 DropdownMenuItem(
                     text = { Text("New Scene") },
+                    enabled = false,
                     onClick = { fileMenuExpanded = false }
                 )
                 DropdownMenuItem(
                     text = { Text("Open...") },
+                    enabled = false,
                     onClick = { fileMenuExpanded = false }
                 )
                 DropdownMenuItem(
                     text = { Text("Save") },
+                    enabled = false,
                     onClick = { fileMenuExpanded = false }
                 )
                 DropdownMenuItem(
                     text = { Text("Save As...") },
+                    enabled = false,
                     onClick = { fileMenuExpanded = false }
                 )
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = { Text("Exit") },
+                    enabled = false,
                     onClick = { fileMenuExpanded = false }
                 )
             }
@@ -90,21 +97,35 @@ fun EditorMenuBar(
                 expanded = editMenuExpanded,
                 onDismissRequest = { editMenuExpanded = false }
             ) {
+                // Observe historyVersion so enabled state and labels refresh
+                @Suppress("UNUSED_VARIABLE")
+                val historyTick = editorState.historyVersion
                 DropdownMenuItem(
-                    text = { Text("Undo") },
-                    onClick = { editMenuExpanded = false }
+                    text = { Text(editorState.commandStack.undoName?.let { "Undo $it" } ?: "Undo") },
+                    enabled = editorState.commandStack.canUndo,
+                    onClick = {
+                        editorState.undo()
+                        editMenuExpanded = false
+                    }
                 )
                 DropdownMenuItem(
-                    text = { Text("Redo") },
-                    onClick = { editMenuExpanded = false }
+                    text = { Text(editorState.commandStack.redoName?.let { "Redo $it" } ?: "Redo") },
+                    enabled = editorState.commandStack.canRedo,
+                    onClick = {
+                        editorState.redo()
+                        editMenuExpanded = false
+                    }
                 )
                 HorizontalDivider()
+                // Not implemented yet - disabled rather than silently doing nothing
                 DropdownMenuItem(
                     text = { Text("Delete") },
+                    enabled = false,
                     onClick = { editMenuExpanded = false }
                 )
                 DropdownMenuItem(
                     text = { Text("Duplicate") },
+                    enabled = false,
                     onClick = { editMenuExpanded = false }
                 )
             }
@@ -122,6 +143,7 @@ fun EditorMenuBar(
             ) {
                 DropdownMenuItem(
                     text = { Text("Create Empty") },
+                    enabled = false,
                     onClick = { gameObjectMenuExpanded = false }
                 )
                 HorizontalDivider()
@@ -244,10 +266,12 @@ fun EditorMenuBar(
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = { Text("Light") },
+                    enabled = false,
                     onClick = { gameObjectMenuExpanded = false }
                 )
                 DropdownMenuItem(
                     text = { Text("Camera") },
+                    enabled = false,
                     onClick = { gameObjectMenuExpanded = false }
                 )
             }

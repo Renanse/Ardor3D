@@ -26,8 +26,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
+import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.util.EulerUtil
 import com.ardor3d.math.ColorRGBA
+import com.ardor3d.math.Matrix3
+import com.ardor3d.math.Vector3
 import com.ardor3d.math.type.ReadOnlyColorRGBA
 import com.ardor3d.math.type.ReadOnlyTransform
 import com.ardor3d.renderer.state.RenderState
@@ -81,7 +84,7 @@ fun InspectorPanel(
 
                     // Type-specific sections
                     when (selection) {
-                        is Mesh -> MeshSection(selection)
+                        is Mesh -> MeshSection(selection, editorState)
                         is Node -> NodeSection(selection)
                     }
                 }
@@ -105,17 +108,28 @@ fun InspectorPanel(
 
 @Composable
 private fun NameSection(spatial: Spatial, editorState: EditorState) {
-    var name by remember(spatial) { mutableStateOf(spatial.name ?: "") }
+    // Re-read the name after undo/redo (propertyVersion) or selection change
+    var name by remember(spatial, editorState.propertyVersion) { mutableStateOf(spatial.name ?: "") }
 
     OutlinedTextField(
         value = name,
-        onValueChange = {
-            name = it
-            spatial.name = it
-            editorState.notifyStructureChanged()
+        onValueChange = { newName ->
+            name = newName
+            editorState.execute(
+                SetterCommand(
+                    name = "Rename",
+                    oldValue = spatial.name ?: "",
+                    newValue = newName,
+                    mergeKey = "name:${System.identityHashCode(spatial)}",
+                    affectsStructure = true,
+                    setter = { spatial.name = it }
+                )
+            )
         },
         label = { Text("Name") },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { if (!it.isFocused) editorState.sealUndoMerge() },
         singleLine = true
     )
 }
@@ -124,9 +138,49 @@ private fun NameSection(spatial: Spatial, editorState: EditorState) {
 private fun TransformSection(spatial: Spatial, editorState: EditorState) {
     // Observe transformVersion to trigger recomposition when transforms change
     val version = editorState.transformVersion
+    val spatialId = System.identityHashCode(spatial)
+
+    // Edits to a single component merge into one undo step until the field loses focus.
+    fun editTranslation(axis: String, newValue: Vector3) {
+        editorState.execute(
+            SetterCommand(
+                name = "Move ${spatial.name ?: "object"}",
+                oldValue = Vector3(spatial.translation),
+                newValue = newValue,
+                mergeKey = "translation.$axis:$spatialId",
+                setter = { spatial.translation = it }
+            )
+        )
+    }
+
+    fun editRotation(axis: String, newAngles: DoubleArray) {
+        editorState.execute(
+            SetterCommand(
+                name = "Rotate ${spatial.name ?: "object"}",
+                oldValue = Matrix3(spatial.rotation),
+                newValue = EulerUtil.fromEulerDegrees(newAngles[0], newAngles[1], newAngles[2])
+                    .toRotationMatrix(Matrix3()),
+                mergeKey = "rotation.$axis:$spatialId",
+                setter = { spatial.setRotation(it) }
+            )
+        )
+    }
+
+    fun editScale(axis: String, newValue: Vector3) {
+        editorState.execute(
+            SetterCommand(
+                name = "Scale ${spatial.name ?: "object"}",
+                oldValue = Vector3(spatial.scale),
+                newValue = newValue,
+                mergeKey = "scale.$axis:$spatialId",
+                setter = { spatial.scale = it }
+            )
+        )
+    }
 
     InspectorSection(title = "Transform") {
         val transform = spatial.transform
+        val sealMerge = { editorState.sealUndoMerge() }
 
         // Position - each component reads current values from spatial when changed
         Vector3Field(
@@ -134,21 +188,10 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
             x = transform.translation.x,
             y = transform.translation.y,
             z = transform.translation.z,
-            onXChange = { newX ->
-                val t = spatial.translation
-                spatial.translation = com.ardor3d.math.Vector3(newX, t.y, t.z)
-                editorState.notifyTransformChanged()
-            },
-            onYChange = { newY ->
-                val t = spatial.translation
-                spatial.translation = com.ardor3d.math.Vector3(t.x, newY, t.z)
-                editorState.notifyTransformChanged()
-            },
-            onZChange = { newZ ->
-                val t = spatial.translation
-                spatial.translation = com.ardor3d.math.Vector3(t.x, t.y, newZ)
-                editorState.notifyTransformChanged()
-            }
+            onXChange = { newX -> editTranslation("x", Vector3(newX, spatial.translation.y, spatial.translation.z)) },
+            onYChange = { newY -> editTranslation("y", Vector3(spatial.translation.x, newY, spatial.translation.z)) },
+            onZChange = { newZ -> editTranslation("z", Vector3(spatial.translation.x, spatial.translation.y, newZ)) },
+            onEditFinished = sealMerge
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -162,19 +205,17 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
             z = angles[2],
             onXChange = { newX ->
                 val current = EulerUtil.toEulerDegrees(spatial.rotation)
-                spatial.setRotation(EulerUtil.fromEulerDegrees(newX, current[1], current[2]))
-                editorState.notifyTransformChanged()
+                editRotation("x", doubleArrayOf(newX, current[1], current[2]))
             },
             onYChange = { newY ->
                 val current = EulerUtil.toEulerDegrees(spatial.rotation)
-                spatial.setRotation(EulerUtil.fromEulerDegrees(current[0], newY, current[2]))
-                editorState.notifyTransformChanged()
+                editRotation("y", doubleArrayOf(current[0], newY, current[2]))
             },
             onZChange = { newZ ->
                 val current = EulerUtil.toEulerDegrees(spatial.rotation)
-                spatial.setRotation(EulerUtil.fromEulerDegrees(current[0], current[1], newZ))
-                editorState.notifyTransformChanged()
-            }
+                editRotation("z", doubleArrayOf(current[0], current[1], newZ))
+            },
+            onEditFinished = sealMerge
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -185,27 +226,16 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
             x = transform.scale.x,
             y = transform.scale.y,
             z = transform.scale.z,
-            onXChange = { newX ->
-                val s = spatial.scale
-                spatial.scale = com.ardor3d.math.Vector3(newX, s.y, s.z)
-                editorState.notifyTransformChanged()
-            },
-            onYChange = { newY ->
-                val s = spatial.scale
-                spatial.scale = com.ardor3d.math.Vector3(s.x, newY, s.z)
-                editorState.notifyTransformChanged()
-            },
-            onZChange = { newZ ->
-                val s = spatial.scale
-                spatial.scale = com.ardor3d.math.Vector3(s.x, s.y, newZ)
-                editorState.notifyTransformChanged()
-            }
+            onXChange = { newX -> editScale("x", Vector3(newX, spatial.scale.y, spatial.scale.z)) },
+            onYChange = { newY -> editScale("y", Vector3(spatial.scale.x, newY, spatial.scale.z)) },
+            onZChange = { newZ -> editScale("z", Vector3(spatial.scale.x, spatial.scale.y, newZ)) },
+            onEditFinished = sealMerge
         )
     }
 }
 
 @Composable
-private fun MeshSection(mesh: Mesh) {
+private fun MeshSection(mesh: Mesh, editorState: EditorState) {
     InspectorSection(title = "Mesh") {
         val meshData = mesh.meshData
         if (meshData != null) {
@@ -223,23 +253,39 @@ private fun MeshSection(mesh: Mesh) {
     Spacer(modifier = Modifier.height(8.dp))
 
     // Material section
-    MaterialSection(mesh)
+    MaterialSection(mesh, editorState)
 }
 
 @Composable
-private fun MaterialSection(mesh: Mesh) {
+private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
     InspectorSection(title = "Material") {
         // Get or create ColorSurface for this mesh
         val surface = remember(mesh) {
             mesh.getProperty<ColorSurface>(ColorSurface.DefaultPropertyKey, null)
                 ?: ColorSurface().also { mesh.setProperty(ColorSurface.DefaultPropertyKey, it) }
         }
+        val surfaceId = System.identityHashCode(surface)
+
+        // Slider/text edits to the same channel merge into one undo step.
+        fun editColor(channel: String, old: ColorRGBA, new: ColorRGBA, setter: (ColorRGBA) -> Unit) {
+            editorState.execute(
+                SetterCommand(
+                    name = "Edit $channel",
+                    oldValue = old,
+                    newValue = new,
+                    mergeKey = "$channel:$surfaceId",
+                    setter = setter
+                )
+            )
+        }
 
         // Diffuse color (main color)
         ColorPropertyField(
             label = "Diffuse",
             color = surface.diffuse,
-            onColorChange = { surface.diffuse = it }
+            version = editorState.propertyVersion,
+            onColorChange = { editColor("Diffuse", ColorRGBA(surface.diffuse), it) { c -> surface.diffuse = c } },
+            onEditFinished = { editorState.sealUndoMerge() }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -248,7 +294,9 @@ private fun MaterialSection(mesh: Mesh) {
         ColorPropertyField(
             label = "Ambient",
             color = surface.ambient,
-            onColorChange = { surface.ambient = it }
+            version = editorState.propertyVersion,
+            onColorChange = { editColor("Ambient", ColorRGBA(surface.ambient), it) { c -> surface.ambient = c } },
+            onEditFinished = { editorState.sealUndoMerge() }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -257,13 +305,15 @@ private fun MaterialSection(mesh: Mesh) {
         ColorPropertyField(
             label = "Specular",
             color = surface.specular,
-            onColorChange = { surface.specular = it }
+            version = editorState.propertyVersion,
+            onColorChange = { editColor("Specular", ColorRGBA(surface.specular), it) { c -> surface.specular = c } },
+            onEditFinished = { editorState.sealUndoMerge() }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // Shininess slider
-        ShininessSlider(surface)
+        ShininessSlider(surface, editorState)
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -286,7 +336,9 @@ private fun MaterialSection(mesh: Mesh) {
             ColorPropertyField(
                 label = "",
                 color = surface.emissive,
-                onColorChange = { surface.emissive = it }
+                version = editorState.propertyVersion,
+                onColorChange = { editColor("Emissive", ColorRGBA(surface.emissive), it) { c -> surface.emissive = c } },
+                onEditFinished = { editorState.sealUndoMerge() }
             )
         }
 
@@ -295,7 +347,7 @@ private fun MaterialSection(mesh: Mesh) {
         Spacer(modifier = Modifier.height(12.dp))
 
         // Wireframe toggle
-        WireframeToggle(mesh)
+        WireframeToggle(mesh, editorState)
     }
 }
 
@@ -303,11 +355,14 @@ private fun MaterialSection(mesh: Mesh) {
 private fun ColorPropertyField(
     label: String,
     color: ReadOnlyColorRGBA,
-    onColorChange: (ColorRGBA) -> Unit
+    version: Long = 0L,
+    onColorChange: (ColorRGBA) -> Unit,
+    onEditFinished: () -> Unit = {}
 ) {
-    var red by remember(color) { mutableStateOf(color.red) }
-    var green by remember(color) { mutableStateOf(color.green) }
-    var blue by remember(color) { mutableStateOf(color.blue) }
+    // Keyed on version so the sliders re-read the color after undo/redo
+    var red by remember(color, version) { mutableStateOf(color.red) }
+    var green by remember(color, version) { mutableStateOf(color.green) }
+    var blue by remember(color, version) { mutableStateOf(color.blue) }
 
     Column {
         if (label.isNotEmpty()) {
@@ -332,15 +387,15 @@ private fun ColorPropertyField(
         Spacer(modifier = Modifier.height(8.dp))
 
         // RGB sliders (compact)
-        ColorSlider(label = "R", value = red, color = Color.Red) {
+        ColorSlider(label = "R", value = red, color = Color.Red, onEditFinished = onEditFinished) {
             red = it
             onColorChange(ColorRGBA(red, green, blue, 1f))
         }
-        ColorSlider(label = "G", value = green, color = Color.Green) {
+        ColorSlider(label = "G", value = green, color = Color.Green, onEditFinished = onEditFinished) {
             green = it
             onColorChange(ColorRGBA(red, green, blue, 1f))
         }
-        ColorSlider(label = "B", value = blue, color = Color.Blue) {
+        ColorSlider(label = "B", value = blue, color = Color.Blue, onEditFinished = onEditFinished) {
             blue = it
             onColorChange(ColorRGBA(red, green, blue, 1f))
         }
@@ -348,8 +403,8 @@ private fun ColorPropertyField(
 }
 
 @Composable
-private fun ShininessSlider(surface: ColorSurface) {
-    var shininess by remember(surface) { mutableStateOf(surface.shininess) }
+private fun ShininessSlider(surface: ColorSurface, editorState: EditorState) {
+    var shininess by remember(surface, editorState.propertyVersion) { mutableStateOf(surface.shininess) }
 
     Column {
         Text(
@@ -365,10 +420,19 @@ private fun ShininessSlider(surface: ColorSurface) {
         ) {
             Slider(
                 value = shininess,
-                onValueChange = {
-                    shininess = it
-                    surface.shininess = it
+                onValueChange = { new ->
+                    shininess = new
+                    editorState.execute(
+                        SetterCommand(
+                            name = "Edit Shininess",
+                            oldValue = surface.shininess,
+                            newValue = new,
+                            mergeKey = "shininess:${System.identityHashCode(surface)}",
+                            setter = { surface.shininess = it }
+                        )
+                    )
                 },
+                onValueChangeFinished = { editorState.sealUndoMerge() },
                 valueRange = 0f..128f,
                 modifier = Modifier.weight(1f)
             )
@@ -386,6 +450,7 @@ private fun ColorSlider(
     label: String,
     value: Float,
     color: Color,
+    onEditFinished: () -> Unit = {},
     onValueChange: (Float) -> Unit
 ) {
     var textValue by remember(value) { mutableStateOf(String.format(Locale.ROOT, "%.2f", value)) }
@@ -409,6 +474,7 @@ private fun ColorSlider(
                 onValueChange(it)
                 textValue = String.format(Locale.ROOT, "%.2f", it)
             },
+            onValueChangeFinished = onEditFinished,
             valueRange = 0f..1f,
             modifier = Modifier.weight(1f),
             colors = SliderDefaults.colors(
@@ -428,6 +494,7 @@ private fun ColorSlider(
             modifier = Modifier
                 .width(56.dp)
                 .onFocusChanged {
+                    if (!it.isFocused && isFocused) onEditFinished()
                     isFocused = it.isFocused
                     if (it.isFocused) textValue = String.format(Locale.ROOT, "%.2f", value)
                 },
@@ -438,11 +505,10 @@ private fun ColorSlider(
 }
 
 @Composable
-private fun WireframeToggle(mesh: Mesh) {
-    // Check if mesh has wireframe state
-    var isWireframe by remember(mesh) {
-        val state = mesh.getLocalRenderState(RenderState.StateType.Wireframe) as? WireframeState
-        mutableStateOf(state?.isEnabled ?: false)
+private fun WireframeToggle(mesh: Mesh, editorState: EditorState) {
+    // Re-read from the mesh after undo/redo
+    val isWireframe = remember(mesh, editorState.propertyVersion) {
+        (mesh.getLocalRenderState(RenderState.StateType.Wireframe) as? WireframeState)?.isEnabled ?: false
     }
 
     Row(
@@ -457,14 +523,23 @@ private fun WireframeToggle(mesh: Mesh) {
         Switch(
             checked = isWireframe,
             onCheckedChange = { enabled ->
-                isWireframe = enabled
-                if (enabled) {
-                    val wireState = WireframeState()
-                    wireState.isEnabled = true
-                    mesh.setRenderState(wireState)
-                } else {
-                    mesh.clearRenderState(RenderState.StateType.Wireframe)
-                }
+                editorState.execute(
+                    SetterCommand(
+                        name = if (enabled) "Enable Wireframe" else "Disable Wireframe",
+                        oldValue = !enabled,
+                        newValue = enabled,
+                        setter = { on ->
+                            if (on) {
+                                val wireState = WireframeState()
+                                wireState.isEnabled = true
+                                mesh.setRenderState(wireState)
+                            } else {
+                                mesh.clearRenderState(RenderState.StateType.Wireframe)
+                            }
+                        }
+                    )
+                )
+                editorState.sealUndoMerge()
             }
         )
     }
@@ -511,7 +586,8 @@ private fun Vector3Field(
     z: Double,
     onXChange: (Double) -> Unit,
     onYChange: (Double) -> Unit,
-    onZChange: (Double) -> Unit
+    onZChange: (Double) -> Unit,
+    onEditFinished: () -> Unit = {}
 ) {
     Column {
         Text(
@@ -529,21 +605,24 @@ private fun Vector3Field(
                 value = x,
                 label = "X",
                 modifier = Modifier.weight(1f),
-                onValueChange = onXChange
+                onValueChange = onXChange,
+                onEditFinished = onEditFinished
             )
             // Y
             ComponentField(
                 value = y,
                 label = "Y",
                 modifier = Modifier.weight(1f),
-                onValueChange = onYChange
+                onValueChange = onYChange,
+                onEditFinished = onEditFinished
             )
             // Z
             ComponentField(
                 value = z,
                 label = "Z",
                 modifier = Modifier.weight(1f),
-                onValueChange = onZChange
+                onValueChange = onZChange,
+                onEditFinished = onEditFinished
             )
         }
     }
@@ -554,7 +633,8 @@ private fun ComponentField(
     value: Double,
     label: String,
     modifier: Modifier = Modifier,
-    onValueChange: (Double) -> Unit
+    onValueChange: (Double) -> Unit,
+    onEditFinished: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var editText by remember { mutableStateOf("") }
@@ -573,6 +653,9 @@ private fun ComponentField(
             if (focusState.isFocused && !isFocused) {
                 // Entering focus - copy current value to edit buffer
                 editText = String.format(Locale.ROOT, "%.3f", value)
+            }
+            if (!focusState.isFocused && isFocused) {
+                onEditFinished()
             }
             isFocused = focusState.isFocused
         },

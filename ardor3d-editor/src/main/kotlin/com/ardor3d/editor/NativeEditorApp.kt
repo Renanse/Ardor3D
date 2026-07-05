@@ -18,13 +18,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.ardor3d.editor.command.AttachChildCommand
 import com.ardor3d.editor.hierarchy.HierarchyPanel
 import com.ardor3d.editor.inspector.InspectorPanel
+import com.ardor3d.editor.interact.GizmoUndoFilter
 import com.ardor3d.editor.menu.EditorMenuBar
 import com.ardor3d.editor.menu.ShapeType
 import com.ardor3d.editor.ui.EditorTheme
@@ -113,22 +122,42 @@ private fun addDefaultResourceLocators() {
 fun main() = application {
     // Initialize resource locators before anything else
     addDefaultResourceLocators()
+    val editorState = remember { EditorState() }
     val windowState = rememberWindowState(size = DpSize(1600.dp, 900.dp))
 
     Window(
         onCloseRequest = ::exitApplication,
         state = windowState,
-        title = "Ardor3D Editor"
+        title = "Ardor3D Editor",
+        onPreviewKeyEvent = { event ->
+            val modifier = event.isCtrlPressed || event.isMetaPressed
+            if (event.type == KeyEventType.KeyDown && modifier) {
+                when (event.key) {
+                    Key.Z -> {
+                        if (event.isShiftPressed) editorState.redo() else editorState.undo()
+                        true
+                    }
+
+                    Key.Y -> {
+                        editorState.redo()
+                        true
+                    }
+
+                    else -> false
+                }
+            } else {
+                false
+            }
+        }
     ) {
         EditorTheme {
-            NativeEditorApp()
+            NativeEditorApp(editorState)
         }
     }
 }
 
 @Composable
-fun NativeEditorApp() {
-    val editorState = remember { EditorState() }
+fun NativeEditorApp(editorState: EditorState) {
     val editorScene = remember { EditorScene(editorState) }
 
     Surface(
@@ -138,6 +167,7 @@ fun NativeEditorApp() {
         Column(modifier = Modifier.fillMaxSize()) {
             // Menu bar at top
             EditorMenuBar(
+                editorState = editorState,
                 onAddShape = { shapeType -> editorScene.addShape(shapeType) }
             )
 
@@ -338,6 +368,9 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         interactManager?.addWidget(rotateWidget)
         interactManager?.addWidget(scaleWidget)
 
+        // Record completed gizmo drags in the undo history
+        interactManager?.addFilterToWidgets(GizmoUndoFilter(editorState))
+
         // Set default widget based on editor state
         updateActiveWidget()
     }
@@ -405,13 +438,17 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         shape.modelBound = com.ardor3d.bounding.BoundingBox()
         shape.updateModelBound()
 
-        // Add to scene
-        root.attachChild(shape)
+        // Materials are assigned once here; re-attaching on redo keeps them.
         MaterialUtil.autoMaterials(shape)
-        editorState.notifyStructureChanged()
 
-        // Select the new shape; update() syncs the gizmo target
-        editorState.select(shape)
+        editorState.execute(
+            AttachChildCommand(
+                parent = root,
+                child = shape,
+                onExecuted = { editorState.select(shape) },
+                onUndone = { if (editorState.isSelected(shape)) editorState.clearSelection() }
+            )
+        )
     }
 
     init {
