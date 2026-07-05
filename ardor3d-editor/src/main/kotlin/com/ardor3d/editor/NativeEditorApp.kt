@@ -31,6 +31,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.ardor3d.editor.command.AttachChildCommand
+import com.ardor3d.editor.command.DetachChildCommand
+import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.hierarchy.HierarchyPanel
 import com.ardor3d.editor.inspector.InspectorPanel
 import com.ardor3d.editor.interact.GizmoUndoFilter
@@ -55,7 +57,9 @@ import com.ardor3d.input.awt.AwtMouseManager
 import com.ardor3d.input.awt.AwtMouseWrapper
 import com.ardor3d.input.control.FirstPersonControl
 import com.ardor3d.input.keyboard.KeyboardWrapper
+import com.ardor3d.input.keyboard.Key as ArdorKey
 import com.ardor3d.input.logical.InputTrigger
+import com.ardor3d.input.logical.KeyPressedCondition
 import com.ardor3d.input.logical.LogicalLayer
 import com.ardor3d.input.logical.MouseButtonClickedCondition
 import com.ardor3d.input.mouse.MouseButton
@@ -159,6 +163,15 @@ fun main() = application {
 @Composable
 fun NativeEditorApp(editorState: EditorState) {
     val editorScene = remember { EditorScene(editorState) }
+    val sceneOperations = remember(editorScene) {
+        SceneOperations(
+            addShape = editorScene::addShape,
+            deleteSpatial = editorScene::deleteSpatial,
+            duplicateSpatial = editorScene::duplicateSpatial,
+            renameSpatial = editorScene::renameSpatial,
+            createEmpty = editorScene::createEmptyNode
+        )
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -168,7 +181,7 @@ fun NativeEditorApp(editorState: EditorState) {
             // Menu bar at top
             EditorMenuBar(
                 editorState = editorState,
-                onAddShape = { shapeType -> editorScene.addShape(shapeType) }
+                operations = sceneOperations
             )
 
             // Main content
@@ -176,6 +189,7 @@ fun NativeEditorApp(editorState: EditorState) {
                 // Left panel: Hierarchy
                 HierarchyPanel(
                     editorState = editorState,
+                    operations = sceneOperations,
                     modifier = Modifier
                         .width(250.dp)
                         .fillMaxHeight()
@@ -307,10 +321,14 @@ private fun createArdor3DCanvas(scene: EditorScene): Lwjgl3AwtCanvas {
  * Editor scene that wraps the scene root and provides the Scene interface for Ardor3D.
  */
 class EditorScene(private val editorState: EditorState) : Scene, Updater {
-    // Use editorState's sceneRoot directly so inspector changes are reflected
+    // Use editorState's sceneRoot directly so inspector changes are reflected.
+    // This is the document: what the user edits (and, later, saves).
     private val root: Node get() = editorState.sceneRoot
+
+    // Editor-only visuals (grid, light gizmos) live outside the document so
+    // they never appear in the hierarchy, picking, or saved scenes.
+    private val overlayRoot = Node("EditorOverlay")
     private val gridNode = createGrid()
-    private val testCube = createTestCube()
     private val light = PointLight()
     private val lightGizmo = createLightGizmo()
 
@@ -388,11 +406,12 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
-     * Updates the interact manager's target to match the editor selection.
+     * Updates the interact manager's target to match the editor selection. The scene root
+     * itself never gets a gizmo.
      */
     private fun updateInteractTarget() {
         val selected = editorState.primarySelection
-        if (selected != null && selected != gridNode && selected != lightGizmo) {
+        if (selected != null && selected.parent != null) {
             interactManager?.setSpatialTarget(selected)
         } else {
             interactManager?.setSpatialTarget(null)
@@ -452,35 +471,39 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     init {
-        // Setup ZBufferState for depth testing
-        val zBuffer = ZBufferState()
-        zBuffer.isEnabled = true
-        zBuffer.function = ZBufferState.TestFunction.LessThanOrEqualTo
-        root.setRenderState(zBuffer)
+        // Setup ZBufferState for depth testing on both roots
+        for (node in listOf(root, overlayRoot)) {
+            val zBuffer = ZBufferState()
+            zBuffer.isEnabled = true
+            zBuffer.function = ZBufferState.TestFunction.LessThanOrEqualTo
+            node.setRenderState(zBuffer)
+            node.sceneHints.renderBucketType = RenderBucketType.Opaque
+        }
 
-        // Setup render bucket
-        root.sceneHints.renderBucketType = RenderBucketType.Opaque
-
-        // Add grid (not pickable)
+        // Editor overlay: grid and light gizmo
         gridNode.sceneHints.setPickingHint(PickingHint.Pickable, false)
-        root.attachChild(gridNode)
+        lightGizmo.sceneHints.setPickingHint(PickingHint.Pickable, false)
+        overlayRoot.attachChild(gridNode)
+        overlayRoot.attachChild(lightGizmo)
 
-        // Add test cube
-        root.attachChild(testCube)
+        populateDefaultScene()
 
-        // Setup light
+        MaterialUtil.autoMaterials(root)
+        MaterialUtil.autoMaterials(overlayRoot)
+    }
+
+    /**
+     * Fills the document with the default starter content (a cube and a light).
+     */
+    private fun populateDefaultScene() {
+        root.attachChild(createTestCube())
+
         light.name = "Main Light"
         light.color = ColorRGBA.WHITE
         light.intensity = 0.75f
         light.setTranslation(5.0, 8.0, 5.0)
         light.isEnabled = true
         root.attachChild(light)
-
-        // Add light gizmo visualization (not pickable by default, but can be made pickable)
-        lightGizmo.sceneHints.setPickingHint(PickingHint.Pickable, false)
-        root.attachChild(lightGizmo)
-
-        MaterialUtil.autoMaterials(root)
     }
 
     /**
@@ -507,7 +530,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 // Get the closest picked object
                 val pickData = results.getPickData(0)
                 val picked = pickData.target as? Spatial
-                if (picked != null && picked != gridNode && picked != lightGizmo) {
+                if (picked != null) {
                     editorState.select(picked)
                 }
             } else {
@@ -517,6 +540,86 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         }
 
         layer.registerTrigger(pickTrigger)
+
+        // Delete key removes the current selection (canvas-focused only)
+        val deleteTrigger = InputTrigger(KeyPressedCondition(ArdorKey.DELETE)) { _, _, _ ->
+            editorState.primarySelection?.let { deleteSpatial(it) }
+        }
+        layer.registerTrigger(deleteTrigger)
+    }
+
+    /**
+     * Deletes the given spatial from the document (undoable). The scene root cannot be deleted.
+     */
+    fun deleteSpatial(spatial: Spatial) {
+        val parent = spatial.parent ?: return
+        editorState.execute(
+            DetachChildCommand(
+                parent = parent,
+                child = spatial,
+                onExecuted = { if (editorState.isSelected(spatial)) editorState.clearSelection() },
+                onUndone = { editorState.select(spatial) }
+            )
+        )
+        editorState.sealUndoMerge()
+    }
+
+    /**
+     * Duplicates the given spatial as a sibling (undoable) and selects the copy.
+     */
+    fun duplicateSpatial(spatial: Spatial) {
+        val parent = spatial.parent ?: return
+        val copy = spatial.makeCopy(true)
+        copy.name = "${spatial.name ?: "object"} Copy"
+        MaterialUtil.autoMaterials(copy)
+        editorState.execute(
+            AttachChildCommand(
+                parent = parent,
+                child = copy,
+                name = "Duplicate ${spatial.name ?: "object"}",
+                onExecuted = { editorState.select(copy) },
+                onUndone = { if (editorState.isSelected(copy)) editorState.clearSelection() }
+            )
+        )
+        editorState.sealUndoMerge()
+    }
+
+    /**
+     * Renames the given spatial (undoable).
+     */
+    fun renameSpatial(spatial: Spatial, newName: String) {
+        val oldName = spatial.name ?: ""
+        if (oldName == newName) {
+            return
+        }
+        editorState.execute(
+            SetterCommand(
+                name = "Rename",
+                oldValue = oldName,
+                newValue = newName,
+                affectsStructure = true,
+                setter = { spatial.name = it }
+            )
+        )
+        editorState.sealUndoMerge()
+    }
+
+    /**
+     * Creates an empty Node under the selected node (or the scene root) and selects it.
+     */
+    fun createEmptyNode() {
+        val parent = (editorState.primarySelection as? Node) ?: root
+        val node = Node("Empty")
+        editorState.execute(
+            AttachChildCommand(
+                parent = parent,
+                child = node,
+                name = "Create Empty",
+                onExecuted = { editorState.select(node) },
+                onUndone = { if (editorState.isSelected(node)) editorState.clearSelection() }
+            )
+        )
+        editorState.sealUndoMerge()
     }
 
     fun setupCamera() {
@@ -570,6 +673,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         SceneIndexer.getCurrent()?.onRender(renderer)
 
         renderer.draw(root)
+        renderer.draw(overlayRoot)
 
         // Render interact widgets (transform gizmos)
         interactManager?.render(renderer)
@@ -577,9 +681,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // Draw selection highlight (bounding box) for selected objects (only if no gizmo active)
         if (interactManager?.spatialTarget == null) {
             for (selected in editorState.selection) {
-                if (selected != gridNode && selected != lightGizmo) {
-                    Debugger.drawBounds(selected, renderer, false)
-                }
+                Debugger.drawBounds(selected, renderer, false)
             }
         }
 
@@ -634,8 +736,9 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // Update light gizmo position to match light
         lightGizmo.setTranslation(light.translation)
 
-        // Update geometric state for all scene objects
+        // Update geometric state for the document and the editor overlay
         root.updateGeometricState(timer.timePerFrame, true)
+        overlayRoot.updateGeometricState(timer.timePerFrame, true)
     }
 
     /**

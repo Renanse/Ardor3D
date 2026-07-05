@@ -87,3 +87,35 @@ class AttachChildCommand(
         onUndone()
     }
 }
+
+/**
+ * Detaches [child] from [parent] on execute and re-attaches it at its original child index on
+ * undo, so undoing a delete restores hierarchy order.
+ */
+class DetachChildCommand(
+    private val parent: Node,
+    private val child: Spatial,
+    override val name: String = "Delete ${child.name ?: "object"}",
+    private val onExecuted: () -> Unit = {},
+    private val onUndone: () -> Unit = {}
+) : EditorCommand {
+
+    private var index = -1
+
+    override val affectsStructure: Boolean get() = true
+
+    override fun execute() {
+        index = parent.children.indexOf(child)
+        parent.detachChild(child)
+        onExecuted()
+    }
+
+    override fun undo() {
+        if (index in 0..parent.numberOfChildren) {
+            parent.attachChildAt(child, index)
+        } else {
+            parent.attachChild(child)
+        }
+        onUndone()
+    }
+}

@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
+import com.ardor3d.editor.SceneOperations
 
 enum class ShapeType {
     BOX,
@@ -40,9 +41,10 @@ enum class ShapeType {
 @Composable
 fun EditorMenuBar(
     editorState: EditorState,
-    onAddShape: (ShapeType) -> Unit,
+    operations: SceneOperations,
     modifier: Modifier = Modifier
 ) {
+    val onAddShape = operations.addShape
     var fileMenuExpanded by remember { mutableStateOf(false) }
     var editMenuExpanded by remember { mutableStateOf(false) }
     var gameObjectMenuExpanded by remember { mutableStateOf(false) }
@@ -117,16 +119,24 @@ fun EditorMenuBar(
                     }
                 )
                 HorizontalDivider()
-                // Not implemented yet - disabled rather than silently doing nothing
+                // The scene root itself cannot be deleted or duplicated
+                val selection = editorState.primarySelection
+                val selectionEditable = selection != null && selection.parent != null
                 DropdownMenuItem(
                     text = { Text("Delete") },
-                    enabled = false,
-                    onClick = { editMenuExpanded = false }
+                    enabled = selectionEditable,
+                    onClick = {
+                        selection?.let(operations.deleteSpatial)
+                        editMenuExpanded = false
+                    }
                 )
                 DropdownMenuItem(
                     text = { Text("Duplicate") },
-                    enabled = false,
-                    onClick = { editMenuExpanded = false }
+                    enabled = selectionEditable,
+                    onClick = {
+                        selection?.let(operations.duplicateSpatial)
+                        editMenuExpanded = false
+                    }
                 )
             }
 
@@ -143,8 +153,10 @@ fun EditorMenuBar(
             ) {
                 DropdownMenuItem(
                     text = { Text("Create Empty") },
-                    enabled = false,
-                    onClick = { gameObjectMenuExpanded = false }
+                    onClick = {
+                        operations.createEmpty()
+                        gameObjectMenuExpanded = false
+                    }
                 )
                 HorizontalDivider()
 

@@ -196,6 +196,27 @@ class CommandStackTest {
     }
 
     @Test
+    fun detachChildCommandRestoresOriginalIndexOnUndo() {
+        val parent = Node("parent")
+        val a = Node("a")
+        val b = Node("b")
+        val c = Node("c")
+        parent.attachChild(a)
+        parent.attachChild(b)
+        parent.attachChild(c)
+        val stack = CommandStack()
+
+        stack.execute(DetachChildCommand(parent, b))
+        assertEquals(listOf("a", "c"), parent.children.map { it.name })
+
+        stack.undo()
+        assertEquals(listOf("a", "b", "c"), parent.children.map { it.name })
+
+        stack.redo()
+        assertEquals(listOf("a", "c"), parent.children.map { it.name })
+    }
+
+    @Test
     fun clearEmptiesBothStacks() {
         val stack = CommandStack()
         val holder = Holder()
