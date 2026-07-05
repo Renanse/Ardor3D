@@ -133,8 +133,9 @@ private fun addDefaultResourceLocators() {
 }
 
 fun main() = application {
-    // Initialize resource locators before anything else
-    addDefaultResourceLocators()
+    // Initialize resource locators before anything else. The application block is a
+    // composable, so guard against re-running on recomposition.
+    remember { addDefaultResourceLocators() }
     val editorState = remember { EditorState() }
     val windowState = rememberWindowState(size = DpSize(1600.dp, 900.dp))
 
