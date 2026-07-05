@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.FileOperations
+import com.ardor3d.editor.LightType
 import com.ardor3d.editor.SceneOperations
 
 enum class ShapeType {
@@ -51,6 +52,7 @@ fun EditorMenuBar(
     var editMenuExpanded by remember { mutableStateOf(false) }
     var gameObjectMenuExpanded by remember { mutableStateOf(false) }
     var shapesSubmenuExpanded by remember { mutableStateOf(false) }
+    var lightsSubmenuExpanded by remember { mutableStateOf(false) }
 
     Surface(
         tonalElevation = 2.dp,
@@ -169,6 +171,7 @@ fun EditorMenuBar(
                 onDismissRequest = {
                     gameObjectMenuExpanded = false
                     shapesSubmenuExpanded = false
+                    lightsSubmenuExpanded = false
                 }
             ) {
                 DropdownMenuItem(
@@ -296,11 +299,39 @@ fun EditorMenuBar(
                 }
 
                 HorizontalDivider()
+
+                // Light submenu
                 DropdownMenuItem(
-                    text = { Text("Light") },
-                    enabled = false,
-                    onClick = { gameObjectMenuExpanded = false }
+                    text = { Text("Light  ▶") },
+                    onClick = { lightsSubmenuExpanded = !lightsSubmenuExpanded }
                 )
+                if (lightsSubmenuExpanded) {
+                    DropdownMenuItem(
+                        text = { Text("    Point Light") },
+                        onClick = {
+                            operations.addLight(LightType.POINT)
+                            gameObjectMenuExpanded = false
+                            lightsSubmenuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("    Directional Light") },
+                        onClick = {
+                            operations.addLight(LightType.DIRECTIONAL)
+                            gameObjectMenuExpanded = false
+                            lightsSubmenuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("    Spot Light") },
+                        onClick = {
+                            operations.addLight(LightType.SPOT)
+                            gameObjectMenuExpanded = false
+                            lightsSubmenuExpanded = false
+                        }
+                    )
+                }
+
                 DropdownMenuItem(
                     text = { Text("Camera") },
                     enabled = false,

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.util.EulerUtil
+import com.ardor3d.light.Light
 import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.Matrix3
 import com.ardor3d.math.Vector3
@@ -84,6 +85,7 @@ fun InspectorPanel(
 
                     // Type-specific sections
                     when (selection) {
+                        is Light -> LightSection(selection, editorState)
                         is Mesh -> MeshSection(selection, editorState)
                         is Node -> NodeSection(selection)
                     }
@@ -541,6 +543,101 @@ private fun WireframeToggle(mesh: Mesh, editorState: EditorState) {
                 )
                 editorState.sealUndoMerge()
             }
+        )
+    }
+}
+
+@Composable
+private fun LightSection(light: Light, editorState: EditorState) {
+    val lightId = System.identityHashCode(light)
+
+    InspectorSection(title = "Light") {
+        // Enabled switch
+        val enabled = remember(light, editorState.propertyVersion) { light.isEnabled }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Enabled",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Switch(
+                checked = enabled,
+                onCheckedChange = { on ->
+                    editorState.execute(
+                        SetterCommand(
+                            name = if (on) "Enable Light" else "Disable Light",
+                            oldValue = !on,
+                            newValue = on,
+                            setter = { light.isEnabled = it }
+                        )
+                    )
+                    editorState.sealUndoMerge()
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Intensity slider
+        var intensity by remember(light, editorState.propertyVersion) { mutableStateOf(light.intensity) }
+        Text(
+            text = "Intensity",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Slider(
+                value = intensity,
+                onValueChange = { new ->
+                    intensity = new
+                    editorState.execute(
+                        SetterCommand(
+                            name = "Edit Intensity",
+                            oldValue = light.intensity,
+                            newValue = new,
+                            mergeKey = "intensity:$lightId",
+                            setter = { light.intensity = it }
+                        )
+                    )
+                },
+                onValueChangeFinished = { editorState.sealUndoMerge() },
+                valueRange = 0f..4f,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = String.format(Locale.ROOT, "%.2f", intensity),
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.width(36.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Color
+        ColorPropertyField(
+            label = "Color",
+            color = light.color,
+            version = editorState.propertyVersion,
+            onColorChange = { new ->
+                editorState.execute(
+                    SetterCommand(
+                        name = "Edit Light Color",
+                        oldValue = ColorRGBA(light.color),
+                        newValue = new,
+                        mergeKey = "lightColor:$lightId",
+                        setter = { light.color = it }
+                    )
+                )
+            },
+            onEditFinished = { editorState.sealUndoMerge() }
         )
     }
 }

@@ -62,11 +62,14 @@ import com.ardor3d.input.logical.InputTrigger
 import com.ardor3d.input.logical.KeyPressedCondition
 import com.ardor3d.input.logical.LogicalLayer
 import com.ardor3d.input.logical.MouseButtonClickedCondition
+import com.ardor3d.input.logical.MouseWheelMovedCondition
 import com.ardor3d.input.mouse.MouseButton
-import com.ardor3d.intersection.BoundingPickResults
 import com.ardor3d.intersection.PickingUtil
+import com.ardor3d.intersection.PrimitivePickResults
+import com.ardor3d.light.DirectionalLight
 import com.ardor3d.light.Light
 import com.ardor3d.light.PointLight
+import com.ardor3d.light.SpotLight
 import com.ardor3d.extension.model.obj.ObjImporter
 import com.ardor3d.math.*
 import com.ardor3d.renderer.ContextManager
@@ -213,6 +216,7 @@ fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExi
     val sceneOperations = remember(editorScene) {
         SceneOperations(
             addShape = editorScene::addShape,
+            addLight = editorScene::addLight,
             deleteSpatial = editorScene::deleteSpatial,
             duplicateSpatial = editorScene::duplicateSpatial,
             renameSpatial = editorScene::renameSpatial,
@@ -403,14 +407,17 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     // they never appear in the hierarchy, picking, or saved scenes.
     private val overlayRoot = Node("EditorOverlay")
     private val gridNode = createGrid()
-    private val lightGizmo = createLightGizmo()
 
-    // First light found in the document; the overlay gizmo follows it.
-    private var trackedLight: Light? = null
+    // One overlay gizmo per light in the document, refreshed on structure changes.
+    private val lightGizmos = mutableMapOf<Light, Node>()
     private var lastStructureVersion = -1L
 
     // Document lifecycle actions deferred to update() so they run with the GL context current.
     private val pendingActions = java.util.concurrent.ConcurrentLinkedQueue<() -> Unit>()
+
+    // Frame counting for the status bar FPS display
+    private var fpsAccumulatedTime = 0.0
+    private var fpsFrameCount = 0
 
     var logicalLayer: LogicalLayer? = null
         set(value) {
@@ -498,15 +505,14 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         }
     }
 
-    // Counter for generating unique shape names
-    private val shapeCounters = mutableMapOf<ShapeType, Int>()
+    // Counters for generating unique object names, keyed by type name
+    private val shapeCounters = mutableMapOf<String, Int>()
 
     /**
      * Adds a new shape to the scene.
      */
     fun addShape(shapeType: ShapeType) {
-        val count = shapeCounters.getOrDefault(shapeType, 0) + 1
-        shapeCounters[shapeType] = count
+        val count = shapeCounters.merge(shapeType.name, 1, Int::plus)!!
 
         val shape: Mesh = when (shapeType) {
             ShapeType.BOX -> Box("Box$count", Vector3.ZERO, 0.5, 0.5, 0.5)
@@ -550,6 +556,46 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         )
     }
 
+    /**
+     * Adds a new light to the scene (undoable) and selects it.
+     */
+    fun addLight(lightType: LightType) {
+        val count = shapeCounters.merge(lightType.name, 1, Int::plus)!!
+        val light: Light = when (lightType) {
+            LightType.POINT -> PointLight().apply {
+                name = "Point Light $count"
+                setTranslation(0.0, 3.0, 0.0)
+            }
+
+            LightType.DIRECTIONAL -> DirectionalLight().apply {
+                name = "Directional Light $count"
+                setTranslation(0.0, 5.0, 0.0)
+                // Aim down toward the scene by default
+                setRotation(Quaternion().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_X))
+            }
+
+            LightType.SPOT -> SpotLight().apply {
+                name = "Spot Light $count"
+                setTranslation(0.0, 5.0, 0.0)
+                setRotation(Quaternion().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_X))
+            }
+        }
+        light.color = ColorRGBA.WHITE
+        light.intensity = 1.0f
+        light.isEnabled = true
+
+        editorState.execute(
+            AttachChildCommand(
+                parent = root,
+                child = light,
+                name = "Add ${light.name}",
+                onExecuted = { editorState.select(light) },
+                onUndone = { if (editorState.isSelected(light)) editorState.clearSelection() }
+            )
+        )
+        editorState.sealUndoMerge()
+    }
+
     init {
         // Setup ZBufferState for depth testing on both roots
         for (node in listOf(root, overlayRoot)) {
@@ -560,16 +606,15 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             node.sceneHints.renderBucketType = RenderBucketType.Opaque
         }
 
-        // Editor overlay: grid and light gizmo
+        // Editor overlay: grid (light gizmos are added per light as the scene changes)
         gridNode.sceneHints.setPickingHint(PickingHint.Pickable, false)
-        lightGizmo.sceneHints.setPickingHint(PickingHint.Pickable, false)
         overlayRoot.attachChild(gridNode)
-        overlayRoot.attachChild(lightGizmo)
 
         populateDefaultScene()
 
         MaterialUtil.autoMaterials(root)
         MaterialUtil.autoMaterials(overlayRoot)
+        refreshLightGizmos()
     }
 
     /**
@@ -585,22 +630,41 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         light.setTranslation(5.0, 8.0, 5.0)
         light.isEnabled = true
         root.attachChild(light)
-        trackedLight = light
     }
 
     /**
-     * Finds the light the overlay gizmo should follow.
+     * Collects all lights in the document.
      */
-    private fun findFirstLight(spatial: Spatial): Light? {
+    private fun collectLights(spatial: Spatial, into: MutableList<Light>) {
         if (spatial is Light) {
-            return spatial
+            into.add(spatial)
         }
         if (spatial is Node) {
             for (child in spatial.children) {
-                findFirstLight(child)?.let { return it }
+                collectLights(child, into)
             }
         }
-        return null
+    }
+
+    /**
+     * Keeps one overlay gizmo per light in the document.
+     */
+    private fun refreshLightGizmos() {
+        val lights = mutableListOf<Light>()
+        collectLights(root, lights)
+
+        val stale = lightGizmos.keys - lights.toSet()
+        for (light in stale) {
+            lightGizmos.remove(light)?.let(overlayRoot::detachChild)
+        }
+        for (light in lights) {
+            lightGizmos.getOrPut(light) {
+                val gizmo = createLightGizmo()
+                overlayRoot.attachChild(gizmo)
+                MaterialUtil.autoMaterials(gizmo)
+                gizmo
+            }
+        }
     }
 
     /**
@@ -618,8 +682,9 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             val screenPos = Vector2(mouseState.x.toDouble(), mouseState.y.toDouble())
             val pickRay = camera.getPickRay(screenPos, false, null)
 
-            // Perform pick
-            val results = BoundingPickResults()
+            // Perform pick against actual primitives so clicks near (but not on)
+            // an object don't select it
+            val results = PrimitivePickResults()
             results.setCheckDistance(true)
             PickingUtil.findPick(root, pickRay, results)
 
@@ -643,6 +708,54 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             editorState.primarySelection?.let { deleteSpatial(it) }
         }
         layer.registerTrigger(deleteTrigger)
+
+        // F frames the selection (or the whole scene)
+        layer.registerTrigger(InputTrigger(KeyPressedCondition(ArdorKey.F)) { _, _, _ ->
+            frameSelection()
+        })
+
+        // Mouse wheel dollies the camera along its view direction
+        layer.registerTrigger(InputTrigger(MouseWheelMovedCondition()) { _, inputStates, _ ->
+            val camera = canvasRenderer?.camera ?: return@InputTrigger
+            val clicks = inputStates.current.mouseState.dwheel
+            if (clicks != 0) {
+                val move = Vector3(camera.direction).multiplyLocal(clicks * 0.75)
+                camera.location = Vector3(camera.location).addLocal(move)
+            }
+        })
+
+        // 1/2/3 switch transform mode (matching the viewport toolbar)
+        val modeKeys = listOf(
+            ArdorKey.ONE to TransformMode.TRANSLATE,
+            ArdorKey.TWO to TransformMode.ROTATE,
+            ArdorKey.THREE to TransformMode.SCALE
+        )
+        for ((key, mode) in modeKeys) {
+            layer.registerTrigger(InputTrigger(KeyPressedCondition(key)) { _, _, _ ->
+                editorState.transformMode = mode
+            })
+        }
+    }
+
+    /**
+     * Moves the camera to frame the current selection, or the whole scene when nothing is
+     * selected.
+     */
+    fun frameSelection() {
+        val camera = canvasRenderer?.camera ?: return
+        val target = editorState.primarySelection ?: root
+        val bound = target.worldBound
+        val center = Vector3(bound?.center ?: target.worldTranslation)
+        val radius = when (bound) {
+            is com.ardor3d.bounding.BoundingSphere -> bound.radius
+            is com.ardor3d.bounding.BoundingBox ->
+                Vector3(bound.xExtent, bound.yExtent, bound.zExtent).length()
+
+            else -> 5.0
+        }.coerceAtLeast(0.5)
+        val newLocation = Vector3(center).subtractLocal(Vector3(camera.direction).multiplyLocal(radius * 3.0))
+        camera.location = newLocation
+        camera.lookAt(center, Vector3.UNIT_Y)
     }
 
     /**
@@ -709,6 +822,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             installDocumentRoot(Node("Scene Root"))
             populateDefaultScene()
             MaterialUtil.autoMaterials(root)
+            refreshLightGizmos()
             editorState.markSaved(null)
         }
     }
@@ -801,8 +915,8 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             SceneIndexer.getCurrent()?.addSceneRoot(newRoot)
         }
 
-        trackedLight = findFirstLight(newRoot)
         lastStructureVersion = editorState.structureVersion
+        refreshLightGizmos()
         interactManager?.setSpatialTarget(null)
         lastSelection = null
         transformCacheValid = false
@@ -893,8 +1007,8 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         return true
     }
 
-    override fun doPick(pickRay: Ray3): BoundingPickResults {
-        val results = BoundingPickResults()
+    override fun doPick(pickRay: Ray3): PrimitivePickResults {
+        val results = PrimitivePickResults()
         results.setCheckDistance(true)
         PickingUtil.findPick(root, pickRay, results)
         return results
@@ -944,24 +1058,29 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             }
         }
 
-        // Re-resolve the tracked light when the structure changed (delete, open, etc.)
+        // Re-resolve light gizmos when the structure changed (add, delete, open, etc.)
         if (lastStructureVersion != editorState.structureVersion) {
             lastStructureVersion = editorState.structureVersion
-            trackedLight = findFirstLight(root)
+            refreshLightGizmos()
         }
 
-        // Update light gizmo to match the tracked light, hiding it when there is none
-        val light = trackedLight
-        if (light != null) {
-            lightGizmo.sceneHints.cullHint = CullHint.Inherit
-            lightGizmo.setTranslation(light.worldTranslation)
-        } else {
-            lightGizmo.sceneHints.cullHint = CullHint.Always
+        // Keep light gizmos over their lights
+        for ((light, gizmo) in lightGizmos) {
+            gizmo.setTranslation(light.worldTranslation)
         }
 
         // Update geometric state for the document and the editor overlay
         root.updateGeometricState(timer.timePerFrame, true)
         overlayRoot.updateGeometricState(timer.timePerFrame, true)
+
+        // Status bar FPS, refreshed twice a second
+        fpsAccumulatedTime += timer.timePerFrame
+        fpsFrameCount++
+        if (fpsAccumulatedTime >= 0.5) {
+            editorState.framesPerSecond = (fpsFrameCount / fpsAccumulatedTime).toInt()
+            fpsAccumulatedTime = 0.0
+            fpsFrameCount = 0
+        }
     }
 
     /**

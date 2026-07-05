@@ -41,7 +41,7 @@ fun ViewportToolbar(
             // Translate tool
             TransformToolButton(
                 icon = Icons.Default.OpenWith,
-                contentDescription = "Translate",
+                contentDescription = "Translate (1)",
                 selected = editorState.transformMode == TransformMode.TRANSLATE,
                 onClick = { editorState.transformMode = TransformMode.TRANSLATE }
             )
@@ -49,7 +49,7 @@ fun ViewportToolbar(
             // Rotate tool
             TransformToolButton(
                 icon = Icons.Default.Rotate90DegreesCcw,
-                contentDescription = "Rotate",
+                contentDescription = "Rotate (2)",
                 selected = editorState.transformMode == TransformMode.ROTATE,
                 onClick = { editorState.transformMode = TransformMode.ROTATE }
             )
@@ -57,7 +57,7 @@ fun ViewportToolbar(
             // Scale tool
             TransformToolButton(
                 icon = Icons.Default.ZoomOutMap,
-                contentDescription = "Scale",
+                contentDescription = "Scale (3)",
                 selected = editorState.transformMode == TransformMode.SCALE,
                 onClick = { editorState.transformMode = TransformMode.SCALE }
             )
@@ -122,12 +122,19 @@ fun ViewportStatusBar(
                 color = Color(0xFFAAAAAA)
             )
 
-            // Transform mode
-            Text(
-                text = editorState.transformMode.name,
-                style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFFAAAAAA)
-            )
+            // Transform mode and frame rate
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    text = editorState.transformMode.name,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFFAAAAAA)
+                )
+                Text(
+                    text = "${editorState.framesPerSecond} FPS",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFFAAAAAA)
+                )
+            }
         }
     }
 }

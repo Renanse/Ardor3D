@@ -35,6 +35,9 @@ class EditorState {
     // Current transform mode
     var transformMode: TransformMode by mutableStateOf(TransformMode.TRANSLATE)
 
+    // Render loop frame rate, updated by the scene for the status bar
+    var framesPerSecond: Int by mutableStateOf(0)
+
     // Version counter observed by the inspector - bumped when a transform
     // actually changes so the UI recomposes only when needed.
     var transformVersion: Long by mutableStateOf(0L)
