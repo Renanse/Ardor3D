@@ -981,7 +981,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
     }
 
     // XXX: should we parse words too? eg 'red'...
-    if (colorString.length() == 0 || colorString.charAt(0) != '#') {
+    if (colorString.isEmpty() || colorString.charAt(0) != '#') {
       throw new IllegalArgumentException("must start with #.");
     }
 
