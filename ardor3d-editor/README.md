@@ -26,10 +26,13 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 - **Multi-select** — ctrl-click toggles membership (hierarchy and viewport), shift-click selects
   a range in the hierarchy. Delete/Duplicate act on the whole selection as one undo step;
   selecting a node covers its descendants so they aren't processed twice.
-- **Reparenting** — drag a hierarchy row onto a Node row to move it there (drop targets
-  highlight; cycles and no-ops are rejected). World transforms are preserved across the move,
-  and undo restores the original parent, position and local transform. Dragging an item that is
-  part of a multi-selection moves the whole selection. "Move to Root" is in the context menu.
+- **Reparenting and reordering** — drag a hierarchy row onto the middle of a Node row to move
+  it there (target highlights), or onto another row's top/bottom edge to insert before/after it
+  (an insertion line shows where; dropping just below an expanded node inserts as its first
+  child). Cycles and no-ops are rejected. World transforms are preserved across every move, and
+  undo restores the original parent, position and local transform. Dragging an item that is
+  part of a multi-selection onto a Node moves the whole selection; edge drops move just the
+  dragged row. "Move to Root" is in the context menu.
 - **Inspector panel** — name, transform (position / XYZ Euler rotation / scale), mesh info,
   ColorSurface material (diffuse/ambient/specular/emissive, shininess), wireframe toggle, and
   light properties (enabled / intensity / color).
@@ -86,8 +89,6 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   the pre-existing undo/redo binding; Compose offers no clean focus check at the Window level.
 - Hiding a Node disables only lights hidden *directly*; lights nested inside a hidden subtree
   keep illuminating (the engine collects lights regardless of cull state).
-- Drag-to-reparent drops *onto* a node (append as last child); there is no between-row
-  reordering yet.
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
 - Rotation is edited as XYZ Euler angles. The inspector keeps the angles you type (even at the
   attitude ±90° singularity, where the decomposition isn't unique) and only re-derives them from

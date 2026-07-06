@@ -34,9 +34,11 @@ import androidx.compose.ui.window.rememberWindowState
 import com.ardor3d.editor.command.AttachChildCommand
 import com.ardor3d.editor.command.CompositeCommand
 import com.ardor3d.editor.command.DetachChildCommand
+import com.ardor3d.editor.command.ReorderChildCommand
 import com.ardor3d.editor.command.ReparentCommand
 import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.io.ModelImport
+import com.ardor3d.editor.util.Insertion
 import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.hierarchy.HierarchyPanel
 import com.ardor3d.editor.inspector.InspectorPanel
@@ -275,6 +277,7 @@ fun NativeEditorApp(
             duplicateSelection = editorScene::duplicateSelection,
             renameSpatial = editorScene::renameSpatial,
             reparentSpatial = editorScene::reparentSpatial,
+            insertSpatial = editorScene::insertSpatial,
             toggleVisibility = editorScene::toggleVisibility,
             createEmpty = editorScene::createEmptyNode
         )
@@ -998,6 +1001,20 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 )
             )
         }
+        editorState.sealUndoMerge()
+    }
+
+    /**
+     * Moves the given spatial to a resolved insertion point - a reorder among its current
+     * siblings, or an indexed placement under a new parent (world transform preserved). Edge
+     * drops move only the dragged spatial, not the rest of a multi-selection.
+     */
+    fun insertSpatial(spatial: Spatial, insertion: Insertion) {
+        val command = when (insertion) {
+            is Insertion.Reorder -> ReorderChildCommand(insertion.parent, spatial, insertion.newIndex)
+            is Insertion.Insert -> ReparentCommand(spatial, insertion.parent, insertIndex = insertion.index)
+        }
+        editorState.execute(command)
         editorState.sealUndoMerge()
     }
 

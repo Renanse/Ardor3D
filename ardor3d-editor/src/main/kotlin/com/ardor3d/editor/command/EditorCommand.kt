@@ -115,18 +115,22 @@ class AttachChildCommand(
 }
 
 /**
- * Moves [child] from its current parent under [newParent] (appended as the last child). By
- * default the child's world transform is preserved by rewriting its local transform against the
- * new parent; pass [keepWorldTransform] = false to keep the local transform instead. Undo
- * restores the original parent, child index and local transform.
+ * Moves [child] from its current parent under [newParent] - appended as the last child, or at
+ * [insertIndex] when one is given. By default the child's world transform is preserved by
+ * rewriting its local transform against the new parent; pass [keepWorldTransform] = false to
+ * keep the local transform instead. Undo restores the original parent, child index and local
+ * transform.
  *
  * World transforms must be current when the command executes (the editor updates them every
- * frame). Callers should validate with [isValidReparent] first; an invalid move throws.
+ * frame). Callers should validate with [isValidReparent] first; an invalid move throws. An
+ * [insertIndex] requires a genuinely new parent - for moves among current siblings use
+ * [ReorderChildCommand] (attachChildAt is a no-op when the parent is unchanged).
  */
 class ReparentCommand(
     private val child: Spatial,
     private val newParent: Node,
     private val keepWorldTransform: Boolean = true,
+    private val insertIndex: Int = -1,
     override val name: String = "Reparent ${child.name ?: "object"}"
 ) : EditorCommand {
 
@@ -147,8 +151,12 @@ class ReparentCommand(
         } else {
             null
         }
-        // attachChild detaches from the old parent (and rejects cycles) internally
-        newParent.attachChild(child)
+        // attachChild/attachChildAt detach from the old parent (and reject cycles) internally
+        if (insertIndex >= 0) {
+            newParent.attachChildAt(child, insertIndex.coerceAtMost(newParent.numberOfChildren))
+        } else {
+            newParent.attachChild(child)
+        }
         newLocal?.let { child.transform = it }
     }
 
@@ -170,6 +178,35 @@ class ReparentCommand(
             }
             return !(child is Node && newParent.hasAncestor(child))
         }
+    }
+}
+
+/**
+ * Moves [child] to [newIndex] among its current siblings under [parent]. [newIndex] is the
+ * child's position after it is lifted out of the list (post-removal indexing). The parent does
+ * not change, so the local (and world) transform is untouched. Undo restores the original
+ * position.
+ */
+class ReorderChildCommand(
+    private val parent: Node,
+    private val child: Spatial,
+    private val newIndex: Int,
+    override val name: String = "Reorder ${child.name ?: "object"}"
+) : EditorCommand {
+
+    override val affectsStructure: Boolean get() = true
+
+    private var oldIndex = -1
+
+    override fun execute() {
+        // attachChildAt is a no-op when the child already has this parent, so lift it out first
+        oldIndex = parent.detachChild(child)
+        parent.attachChildAt(child, newIndex.coerceIn(0, parent.numberOfChildren))
+    }
+
+    override fun undo() {
+        parent.detachChild(child)
+        parent.attachChildAt(child, oldIndex.coerceIn(0, parent.numberOfChildren))
     }
 }
 

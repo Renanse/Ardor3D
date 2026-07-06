@@ -11,6 +11,7 @@
 package com.ardor3d.editor
 
 import com.ardor3d.editor.menu.ShapeType
+import com.ardor3d.editor.util.Insertion
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
 
@@ -33,6 +34,7 @@ class SceneOperations(
     val duplicateSelection: () -> Unit,
     val renameSpatial: (Spatial, String) -> Unit,
     val reparentSpatial: (Spatial, Node) -> Unit,
+    val insertSpatial: (Spatial, Insertion) -> Unit,
     val toggleVisibility: (Spatial) -> Unit,
     val createEmpty: () -> Unit
 )

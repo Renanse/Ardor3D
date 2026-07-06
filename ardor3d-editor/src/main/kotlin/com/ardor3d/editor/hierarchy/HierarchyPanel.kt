@@ -24,6 +24,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.SceneOperations
 import com.ardor3d.editor.command.ReparentCommand
+import com.ardor3d.editor.util.ReorderUtil
 import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.light.Light
 import com.ardor3d.scenegraph.Mesh
@@ -45,17 +49,26 @@ import com.ardor3d.scenegraph.Spatial
 import com.ardor3d.scenegraph.hint.CullHint
 
 /**
- * Shared state for drag-to-reparent: the spatial being dragged, the currently valid drop
- * target, and each visible row's layout coordinates for pointer hit-testing.
+ * Where a hierarchy drag is currently aiming: onto a Node row (reparent, appended) or at a
+ * row's edge (insert before/after among siblings).
+ */
+private sealed interface DropSpot {
+    data class Into(val node: Node) : DropSpot
+    data class Edge(val row: Spatial, val after: Boolean) : DropSpot
+}
+
+/**
+ * Shared state for drag-to-reparent/reorder: the spatial being dragged, the currently valid
+ * drop spot, and each visible row's layout coordinates for pointer hit-testing.
  */
 private class DragReparentState {
     var dragging: Spatial? by mutableStateOf(null)
-    var dropTarget: Node? by mutableStateOf(null)
+    var dropSpot: DropSpot? by mutableStateOf(null)
     val rowCoords = mutableMapOf<Spatial, LayoutCoordinates>()
 
     fun reset() {
         dragging = null
-        dropTarget = null
+        dropSpot = null
     }
 }
 
@@ -97,7 +110,7 @@ fun HierarchyPanel(
 
             shift && anchor != null -> {
                 val visible = mutableListOf<Spatial>()
-                flattenVisible(editorState.sceneRoot, expandedNodes, 0, visible)
+                flattenVisible(editorState.sceneRoot, expandedNodes, visible)
                 val anchorIndex = visible.indexOfFirst { it === anchor }
                 val clickedIndex = visible.indexOfFirst { it === spatial }
                 if (anchorIndex >= 0 && clickedIndex >= 0) {
@@ -202,11 +215,11 @@ fun HierarchyPanel(
 }
 
 /**
- * The single expansion rule shared by rendering and range selection: a node is expanded when
- * toggled so, and only the root starts expanded.
+ * The single expansion rule shared by rendering, range selection and drop resolution: a node
+ * is expanded when toggled so, and only the (parentless) root starts expanded.
  */
-private fun isExpanded(expandedNodes: Map<Int, Boolean>, spatial: Spatial, depth: Int): Boolean =
-    expandedNodes[System.identityHashCode(spatial)] ?: (depth == 0)
+private fun isExpanded(expandedNodes: Map<Int, Boolean>, spatial: Spatial): Boolean =
+    expandedNodes[System.identityHashCode(spatial)] ?: (spatial.parent == null)
 
 /**
  * Collects the spatials currently visible in the tree, in display order.
@@ -214,14 +227,36 @@ private fun isExpanded(expandedNodes: Map<Int, Boolean>, spatial: Spatial, depth
 private fun flattenVisible(
     spatial: Spatial,
     expandedNodes: Map<Int, Boolean>,
-    depth: Int,
     into: MutableList<Spatial>
 ) {
     into.add(spatial)
-    if (isExpanded(expandedNodes, spatial, depth) && spatial is Node) {
+    if (isExpanded(expandedNodes, spatial) && spatial is Node) {
         for (child in spatial.children) {
-            flattenVisible(child, expandedNodes, depth + 1, into)
+            flattenVisible(child, expandedNodes, into)
         }
+    }
+}
+
+/**
+ * Classifies a drag hover into a drop spot by where the pointer sits in the hovered row: the
+ * middle of a valid Node target reparents into it (appended), while the edges insert
+ * before/after the row. A Node row keeps a quarter-height edge zone at each end; other rows
+ * split at the middle. Returns null when the aimed drop is invalid or would change nothing.
+ */
+private fun resolveDropSpot(
+    dragged: Spatial,
+    row: Spatial,
+    expandedNodes: Map<Int, Boolean>,
+    pointerWindowY: Float,
+    rowBounds: Rect
+): DropSpot? {
+    val fraction = ((pointerWindowY - rowBounds.top) / rowBounds.height).coerceIn(0f, 1f)
+    if (row is Node && fraction in 0.25f..0.75f && ReparentCommand.isValidReparent(dragged, row)) {
+        return DropSpot.Into(row)
+    }
+    val after = fraction >= 0.5f
+    return DropSpot.Edge(row, after).takeIf {
+        ReorderUtil.resolveInsertion(dragged, row, after, isExpanded(expandedNodes, row)) != null
     }
 }
 
@@ -280,7 +315,7 @@ private fun NodeTreeItem(
     inheritedHidden: Boolean = false
 ) {
     val spatialKey = System.identityHashCode(spatial)
-    val expanded = isExpanded(expandedNodes, spatial, depth)
+    val expanded = isExpanded(expandedNodes, spatial)
     val isSelected = editorState.isSelected(spatial)
     val childCount = if (spatial is Node) spatial.numberOfChildren else 0
     val hasChildren = childCount > 0
@@ -321,22 +356,40 @@ private fun NodeTreeItem(
                 }
             }
         }) {
+            val dropSpot = dragState.dropSpot
+            val edgeAt = (dropSpot as? DropSpot.Edge)?.takeIf { it.row === spatial }
+            val indicatorColor = MaterialTheme.colorScheme.tertiary
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
                         when {
-                            dragState.dropTarget === spatial -> MaterialTheme.colorScheme.tertiaryContainer
+                            dropSpot is DropSpot.Into && dropSpot.node === spatial ->
+                                MaterialTheme.colorScheme.tertiaryContainer
+
                             isSelected -> MaterialTheme.colorScheme.primaryContainer
                             else -> MaterialTheme.colorScheme.surface
                         }
                     )
+                    // Insertion indicator: a line along the edge the drag would drop at
+                    .drawBehind {
+                        edgeAt?.let {
+                            val y = if (it.after) size.height - 1.dp.toPx() else 1.dp.toPx()
+                            drawLine(
+                                color = indicatorColor,
+                                start = Offset(0f, y),
+                                end = Offset(size.width, y),
+                                strokeWidth = 2.dp.toPx()
+                            )
+                        }
+                    }
                     .onGloballyPositioned { dragState.rowCoords[spatial] = it }
                     .pointerInput(spatial, isRoot) {
                         if (isRoot) {
                             return@pointerInput
                         }
-                        // Drag a row onto a Node row to reparent (world transform preserved)
+                        // Drag a row onto a Node row to reparent (world transform preserved),
+                        // or onto another row's edge to insert before/after it
                         detectDragGestures(
                             onDragStart = { dragState.dragging = spatial },
                             onDrag = { change, _ ->
@@ -344,16 +397,23 @@ private fun NodeTreeItem(
                                 val coords = dragState.rowCoords[spatial]
                                 if (coords != null && coords.isAttached) {
                                     val windowPos = coords.localToWindow(change.position)
-                                    val hovered = dragState.rowCoords.entries.firstOrNull { (other, c) ->
+                                    dragState.dropSpot = dragState.rowCoords.entries.firstOrNull { (other, c) ->
                                         other !== spatial && c.isAttached &&
                                             c.boundsInWindow().contains(windowPos)
-                                    }?.key
-                                    dragState.dropTarget = (hovered as? Node)
-                                        ?.takeIf { ReparentCommand.isValidReparent(spatial, it) }
+                                    }?.let { (row, c) ->
+                                        resolveDropSpot(spatial, row, expandedNodes, windowPos.y, c.boundsInWindow())
+                                    }
                                 }
                             },
                             onDragEnd = {
-                                dragState.dropTarget?.let { operations.reparentSpatial(spatial, it) }
+                                when (val spot = dragState.dropSpot) {
+                                    is DropSpot.Into -> operations.reparentSpatial(spatial, spot.node)
+                                    is DropSpot.Edge -> ReorderUtil.resolveInsertion(
+                                        spatial, spot.row, spot.after, isExpanded(expandedNodes, spot.row)
+                                    )?.let { operations.insertSpatial(spatial, it) }
+
+                                    null -> {}
+                                }
                                 dragState.reset()
                             },
                             onDragCancel = { dragState.reset() }

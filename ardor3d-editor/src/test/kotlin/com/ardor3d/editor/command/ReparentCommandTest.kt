@@ -133,6 +133,29 @@ class ReparentCommandTest {
     }
 
     @Test
+    fun insertIndexPlacesChildAmongNewSiblings() {
+        val rig = Rig()
+        val b1 = Node("b1")
+        val b2 = Node("b2")
+        rig.b.attachChild(b1)
+        rig.b.attachChild(b2)
+        rig.root.updateGeometricState(0.0, true)
+        val worldBefore = com.ardor3d.math.Transform().set(rig.child.worldTransform)
+
+        val stack = CommandStack()
+        stack.execute(ReparentCommand(child = rig.child, newParent = rig.b, insertIndex = 1))
+        rig.root.updateGeometricState(0.0, true)
+
+        assertEquals(listOf("b1", "child", "b2"), rig.b.children.map { it.name })
+        assertTransformEquals(worldBefore, rig.child.worldTransform)
+
+        stack.undo()
+        rig.root.updateGeometricState(0.0, true)
+        assertSame(rig.a, rig.child.parent)
+        assertEquals(listOf("b1", "b2"), rig.b.children.map { it.name })
+    }
+
+    @Test
     fun validationRejectsBadTargets() {
         val rig = Rig()
         val grandchild = Node("grandchild")
