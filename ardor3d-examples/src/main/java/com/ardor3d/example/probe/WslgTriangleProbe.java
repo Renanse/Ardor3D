@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL11C;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.PropertiesGameSettings;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -61,6 +62,12 @@ public class WslgTriangleProbe extends ExampleBase {
 
   public static void main(final String[] args) {
     start(WslgTriangleProbe.class);
+  }
+
+  @Override
+  protected PropertiesGameSettings getAttributes(final PropertiesGameSettings settings) {
+    // Never show the settings dialog - this probe runs unattended.
+    return settings;
   }
 
   @Override
@@ -113,6 +120,10 @@ public class WslgTriangleProbe extends ExampleBase {
     System.out.println("PROBE GL_VENDOR:   " + GL11C.glGetString(GL11C.GL_VENDOR));
     System.out.println("PROBE GL_RENDERER: " + GL11C.glGetString(GL11C.GL_RENDERER));
     System.out.println("PROBE GL_VERSION:  " + GL11C.glGetString(GL11C.GL_VERSION));
+    System.out.println("PROBE MAX_TEXTURE_IMAGE_UNITS (fragment): "
+        + GL11C.glGetInteger(org.lwjgl.opengl.GL20C.GL_MAX_TEXTURE_IMAGE_UNITS));
+    System.out.println("PROBE MAX_COMBINED_TEXTURE_IMAGE_UNITS:   "
+        + GL11C.glGetInteger(org.lwjgl.opengl.GL20C.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS));
 
     final Camera cam = _canvas.getCanvasRenderer().getCamera();
     final int width = cam.getWidth();
