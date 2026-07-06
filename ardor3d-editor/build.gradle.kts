@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":ardor3d-lwjgl3-awt"))
     implementation(project(":ardor3d-awt"))  // For AWT input wrappers
     implementation(project(":ardor3d-extras"))  // For interact widgets
+    implementation(project(":ardor3d-collada"))  // For COLLADA model import
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")

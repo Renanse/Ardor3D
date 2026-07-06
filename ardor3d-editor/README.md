@@ -39,8 +39,8 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
   (`com.ardor3d.editor.command`). Continuous gestures (slider drags, typing, gizmo drags)
   coalesce into single undo steps. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`.
 - **Persistence** — File > New / Open / Save / Save As using Ardor3D's binary format (`.a3d`),
-  plus Wavefront OBJ import. Unsaved changes are flagged in the title bar and confirmed before
-  being discarded.
+  plus Wavefront OBJ and COLLADA (`.dae`) import. Unsaved changes are flagged in the title bar
+  and confirmed before being discarded.
 - **Object creation** — GameObject menu: 13 primitive shapes, empty nodes, and
   point/directional/spot lights. New objects are created under the selected Node (or the scene
   root).
@@ -87,5 +87,6 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
 - Rotation is edited as XYZ Euler angles and will jump near the attitude (Z) ±90° singularity.
 - No camera objects or play mode.
-- OBJ is the only model import wired up; COLLADA support exists in `ardor3d-collada` and could
-  be added the same way.
+- Model import covers OBJ and COLLADA (static geometry; COLLADA animations are not brought into
+  the editor). Other formats in `ardor3d-extras` could be added to
+  `com.ardor3d.editor.io.ModelImport` the same way.

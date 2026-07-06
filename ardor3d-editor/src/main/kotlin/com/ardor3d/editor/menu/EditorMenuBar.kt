@@ -97,7 +97,7 @@ fun EditorMenuBar(
                 )
                 HorizontalDivider()
                 DropdownMenuItem(
-                    text = { Text("Import OBJ...") },
+                    text = { Text("Import Model (OBJ, DAE)...") },
                     onClick = {
                         fileOperations.importModel()
                         fileMenuExpanded = false

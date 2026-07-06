@@ -35,6 +35,7 @@ import com.ardor3d.editor.command.CompositeCommand
 import com.ardor3d.editor.command.DetachChildCommand
 import com.ardor3d.editor.command.ReparentCommand
 import com.ardor3d.editor.command.SetterCommand
+import com.ardor3d.editor.io.ModelImport
 import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.hierarchy.HierarchyPanel
 import com.ardor3d.editor.inspector.InspectorPanel
@@ -73,7 +74,6 @@ import com.ardor3d.light.DirectionalLight
 import com.ardor3d.light.Light
 import com.ardor3d.light.PointLight
 import com.ardor3d.light.SpotLight
-import com.ardor3d.extension.model.obj.ObjImporter
 import com.ardor3d.math.*
 import com.ardor3d.renderer.ContextManager
 import com.ardor3d.renderer.Renderer
@@ -92,7 +92,6 @@ import com.ardor3d.scenegraph.shape.*
 import com.ardor3d.util.*
 import com.ardor3d.util.export.binary.BinaryExporter
 import com.ardor3d.util.export.binary.BinaryImporter
-import com.ardor3d.util.resource.URLResourceSource
 import com.ardor3d.util.geom.Debugger
 import com.ardor3d.util.resource.ResourceLocatorTool
 import com.ardor3d.util.resource.SimpleResourceLocator
@@ -221,15 +220,24 @@ fun main() = application {
 }
 
 /**
- * Shows an AWT file dialog owned by [owner]. Returns the chosen file, appending [extension]
- * on save when the user leaves it off.
+ * Shows an AWT file dialog owned by [owner]. Accepts any of [extensions]; on save, the first
+ * one is appended when the user leaves it off.
  */
-private fun promptForFile(owner: java.awt.Frame, title: String, save: Boolean, extension: String): java.io.File? {
+private fun promptForFile(
+    owner: java.awt.Frame,
+    title: String,
+    save: Boolean,
+    vararg extensions: String
+): java.io.File? {
     val dialog = java.awt.FileDialog(owner, title, if (save) java.awt.FileDialog.SAVE else java.awt.FileDialog.LOAD)
-    dialog.setFilenameFilter { _, name -> name.endsWith(".$extension", ignoreCase = true) }
+    dialog.setFilenameFilter { _, name -> extensions.any { name.endsWith(".$it", ignoreCase = true) } }
     dialog.isVisible = true
     val fileName = dialog.file ?: return null
-    val fixed = if (save && !fileName.endsWith(".$extension", ignoreCase = true)) "$fileName.$extension" else fileName
+    val fixed = if (save && extensions.none { fileName.endsWith(".$it", ignoreCase = true) }) {
+        "$fileName.${extensions.first()}"
+    } else {
+        fileName
+    }
     return java.io.File(dialog.directory, fixed)
 }
 
@@ -272,7 +280,7 @@ fun NativeEditorApp(
     }
     val fileOperations = remember(editorScene, window) {
         fun saveTo(file: java.io.File?) {
-            (file ?: promptForFile(window, "Save Scene", save = true, extension = "a3d"))
+            (file ?: promptForFile(window, "Save Scene", save = true, "a3d"))
                 ?.let(editorScene::saveScene)
         }
         FileOperations(
@@ -283,15 +291,15 @@ fun NativeEditorApp(
             },
             openScene = {
                 if (confirmDiscard(editorState, window, "Open")) {
-                    promptForFile(window, "Open Scene", save = false, extension = "a3d")
+                    promptForFile(window, "Open Scene", save = false, "a3d")
                         ?.let(editorScene::openScene)
                 }
             },
             saveScene = { saveTo(editorState.currentFile) },
             saveSceneAs = { saveTo(null) },
             importModel = {
-                promptForFile(window, "Import OBJ Model", save = false, extension = "obj")
-                    ?.let(editorScene::importObjModel)
+                promptForFile(window, "Import Model", save = false, *ModelImport.supportedExtensions.toTypedArray())
+                    ?.let(editorScene::importModelFile)
             },
             exit = requestExit
         )
@@ -1032,21 +1040,12 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
-     * Imports a Wavefront OBJ file as a child of the scene root (undoable).
+     * Imports a model file (Wavefront OBJ or COLLADA) as a child of the scene root (undoable).
      */
-    fun importObjModel(file: java.io.File) {
+    fun importModelFile(file: java.io.File) {
         pendingActions.add {
             try {
-                val importer = ObjImporter().setLoadTextures(true)
-                file.parentFile?.let { importer.setTextureLocator(SimpleResourceLocator(it.toURI())) }
-                val imported = importer.load(URLResourceSource(file.toURI().toURL())).scene
-                imported.name = file.name.substringBeforeLast('.')
-                // Make sure everything is pickable
-                imported.acceptVisitor({ spatial ->
-                    if (spatial is Mesh && spatial.modelBound == null) {
-                        spatial.setModelBound(com.ardor3d.bounding.BoundingBox())
-                    }
-                }, false)
+                val imported = ModelImport.load(file)
                 MaterialUtil.autoMaterials(imported)
                 imported.updateGeometricState(0.0, true)
                 editorState.execute(
