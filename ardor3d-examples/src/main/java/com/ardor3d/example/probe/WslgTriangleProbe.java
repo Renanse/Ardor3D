@@ -43,6 +43,20 @@ import com.ardor3d.util.MaterialUtil;
  */
 public class WslgTriangleProbe extends ExampleBase {
 
+  /** Background clear color; pixel classification matches readback against its 8-bit channels. */
+  private static final ColorRGBA CLEAR_COLOR = new ColorRGBA(0.1f, 0.15f, 0.3f, 1f);
+  private static final int BG_RED = Math.round(CLEAR_COLOR.getRed() * 255);
+  private static final int BG_GREEN = Math.round(CLEAR_COLOR.getGreen() * 255);
+  private static final int BG_BLUE = Math.round(CLEAR_COLOR.getBlue() * 255);
+  /** Max per-channel distance from the clear color to still count as background. */
+  private static final int BG_TOLERANCE = 15;
+  /** The control line is saturated green: green above this floor and dominating red/blue. */
+  private static final int LINE_MIN_GREEN = 96;
+  private static final int LINE_GREEN_DOMINANCE = 2;
+  /** The box is bright and near-neutral: red/blue floors plus an overall brightness floor. */
+  private static final int BOX_MIN_RED_BLUE = 40;
+  private static final int BOX_MIN_BRIGHTNESS = 150;
+
   private int _frames = 0;
 
   public static void main(final String[] args) {
@@ -87,7 +101,7 @@ public class WslgTriangleProbe extends ExampleBase {
     if (_frames == 0) {
       // Non-black clear color: if the readback can't even see this, glReadPixels itself is
       // broken and pixel counts of zero say nothing about drawing.
-      renderer.setBackgroundColor(new ColorRGBA(0.1f, 0.15f, 0.3f, 1f));
+      renderer.setBackgroundColor(CLEAR_COLOR);
     }
 
     super.renderExample(renderer);
@@ -113,12 +127,12 @@ public class WslgTriangleProbe extends ExampleBase {
       final int r = buff.get(i * 3) & 0xFF;
       final int g = buff.get(i * 3 + 1) & 0xFF;
       final int b = buff.get(i * 3 + 2) & 0xFF;
-      // clear color is (0.1, 0.15, 0.3) -> roughly (26, 38, 77)
-      if (Math.abs(r - 26) < 15 && Math.abs(g - 38) < 15 && Math.abs(b - 77) < 15) {
+      if (Math.abs(r - BG_RED) < BG_TOLERANCE && Math.abs(g - BG_GREEN) < BG_TOLERANCE
+          && Math.abs(b - BG_BLUE) < BG_TOLERANCE) {
         background++;
-      } else if (g > 96 && g > 2 * r && g > 2 * b) {
+      } else if (g > LINE_MIN_GREEN && g > LINE_GREEN_DOMINANCE * r && g > LINE_GREEN_DOMINANCE * b) {
         linePixels++; // saturated green - the control line
-      } else if (r > 40 && b > 40 && r + g + b > 150) {
+      } else if (r > BOX_MIN_RED_BLUE && b > BOX_MIN_RED_BLUE && r + g + b > BOX_MIN_BRIGHTNESS) {
         boxPixels++; // white/gray - the box under white light (or unlit white)
       }
     }
