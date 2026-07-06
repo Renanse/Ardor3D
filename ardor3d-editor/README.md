@@ -26,6 +26,10 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 - **Multi-select** — ctrl-click toggles membership (hierarchy and viewport), shift-click selects
   a range in the hierarchy. Delete/Duplicate act on the whole selection as one undo step;
   selecting a node covers its descendants so they aren't processed twice.
+- **Reparenting** — drag a hierarchy row onto a Node row to move it there (drop targets
+  highlight; cycles and no-ops are rejected). World transforms are preserved across the move,
+  and undo restores the original parent, position and local transform. Dragging an item that is
+  part of a multi-selection moves the whole selection. "Move to Root" is in the context menu.
 - **Inspector panel** — name, transform (position / XYZ Euler rotation / scale), mesh info,
   ColorSurface material (diffuse/ambient/specular/emissive, shininess), wireframe toggle, and
   light properties (enabled / intensity / color).
@@ -72,7 +76,8 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 ## Known limitations / next steps
 
 - The inspector edits the primary (first) selected object only.
-- No reparenting via drag-and-drop in the hierarchy.
+- Drag-to-reparent drops *onto* a node (append as last child); there is no between-row
+  reordering yet.
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
 - Rotation is edited as XYZ Euler angles and will jump near the attitude (Z) ±90° singularity.
 - No camera objects or play mode.

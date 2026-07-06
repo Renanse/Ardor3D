@@ -11,6 +11,7 @@
 package com.ardor3d.editor
 
 import com.ardor3d.editor.menu.ShapeType
+import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
 
 enum class LightType {
@@ -31,5 +32,6 @@ class SceneOperations(
     val deleteSelection: () -> Unit,
     val duplicateSelection: () -> Unit,
     val renameSpatial: (Spatial, String) -> Unit,
+    val reparentSpatial: (Spatial, Node) -> Unit,
     val createEmpty: () -> Unit
 )

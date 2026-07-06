@@ -33,6 +33,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.ardor3d.editor.command.AttachChildCommand
 import com.ardor3d.editor.command.CompositeCommand
 import com.ardor3d.editor.command.DetachChildCommand
+import com.ardor3d.editor.command.ReparentCommand
 import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.hierarchy.HierarchyPanel
@@ -225,6 +226,7 @@ fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExi
             deleteSelection = editorScene::deleteSelection,
             duplicateSelection = editorScene::duplicateSelection,
             renameSpatial = editorScene::renameSpatial,
+            reparentSpatial = editorScene::reparentSpatial,
             createEmpty = editorScene::createEmptyNode
         )
     }
@@ -861,6 +863,31 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 editorState.sealUndoMerge()
             }
         }
+    }
+
+    /**
+     * Moves the given spatial - or the whole selection when it is part of one - under
+     * [newParent] as one undo step, preserving world transforms. Invalid moves (the scene root,
+     * the current parent, a descendant of a moved spatial) are skipped.
+     */
+    fun reparentSpatial(spatial: Spatial, newParent: Node) {
+        val requested = if (editorState.isSelected(spatial) && editorState.selection.size > 1) {
+            SelectionUtil.topMost(editorState.selection)
+        } else {
+            listOf(spatial)
+        }
+        val targets = requested.filter { ReparentCommand.isValidReparent(it, newParent) }
+        when {
+            targets.isEmpty() -> return
+            targets.size == 1 -> editorState.execute(ReparentCommand(child = targets[0], newParent = newParent))
+            else -> editorState.execute(
+                CompositeCommand(
+                    name = "Reparent ${targets.size} objects",
+                    commands = targets.map { ReparentCommand(child = it, newParent = newParent) }
+                )
+            )
+        }
+        editorState.sealUndoMerge()
     }
 
     /**

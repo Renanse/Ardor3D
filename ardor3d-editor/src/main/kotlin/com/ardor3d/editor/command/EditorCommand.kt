@@ -10,6 +10,7 @@
 
 package com.ardor3d.editor.command
 
+import com.ardor3d.math.Transform
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
 
@@ -110,6 +111,65 @@ class AttachChildCommand(
     override fun undo() {
         parent.detachChild(child)
         onUndone()
+    }
+}
+
+/**
+ * Moves [child] from its current parent under [newParent] (appended as the last child). By
+ * default the child's world transform is preserved by rewriting its local transform against the
+ * new parent; pass [keepWorldTransform] = false to keep the local transform instead. Undo
+ * restores the original parent, child index and local transform.
+ *
+ * World transforms must be current when the command executes (the editor updates them every
+ * frame). Callers should validate with [isValidReparent] first; an invalid move throws.
+ */
+class ReparentCommand(
+    private val child: Spatial,
+    private val newParent: Node,
+    private val keepWorldTransform: Boolean = true,
+    override val name: String = "Reparent ${child.name ?: "object"}"
+) : EditorCommand {
+
+    override val affectsStructure: Boolean get() = true
+
+    private var oldParent: Node? = null
+    private var oldIndex = -1
+    private val oldLocal = Transform()
+
+    override fun execute() {
+        val parent = requireNotNull(child.parent) { "cannot reparent the scene root" }
+        oldParent = parent
+        oldIndex = parent.children.indexOf(child)
+        oldLocal.set(child.transform)
+
+        val newLocal = if (keepWorldTransform) {
+            newParent.worldTransform.invert(Transform()).multiply(child.worldTransform, Transform())
+        } else {
+            null
+        }
+        // attachChild detaches from the old parent (and rejects cycles) internally
+        newParent.attachChild(child)
+        newLocal?.let { child.transform = it }
+    }
+
+    override fun undo() {
+        val parent = oldParent ?: return
+        parent.attachChildAt(child, oldIndex)
+        child.transform = oldLocal
+    }
+
+    companion object {
+        /**
+         * True when [child] can be moved under [newParent]: the child must not be the scene
+         * root, and the target must not be the child itself, its current parent (a no-op) or
+         * one of its own descendants (a cycle).
+         */
+        fun isValidReparent(child: Spatial, newParent: Node): Boolean {
+            if (child.parent == null || newParent === child || newParent === child.parent) {
+                return false
+            }
+            return !(child is Node && newParent.hasAncestor(child))
+        }
     }
 }
 

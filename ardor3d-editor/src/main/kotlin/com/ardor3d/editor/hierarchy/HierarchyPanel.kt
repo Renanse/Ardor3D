@@ -14,6 +14,7 @@ import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,14 +28,34 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.SceneOperations
+import com.ardor3d.editor.command.ReparentCommand
 import com.ardor3d.light.Light
 import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
+
+/**
+ * Shared state for drag-to-reparent: the spatial being dragged, the currently valid drop
+ * target, and each visible row's layout coordinates for pointer hit-testing.
+ */
+private class DragReparentState {
+    var dragging: Spatial? by mutableStateOf(null)
+    var dropTarget: Node? by mutableStateOf(null)
+    val rowCoords = mutableMapOf<Spatial, LayoutCoordinates>()
+
+    fun reset() {
+        dragging = null
+        dropTarget = null
+    }
+}
 
 @Composable
 fun HierarchyPanel(
@@ -44,6 +65,9 @@ fun HierarchyPanel(
 ) {
     // Track expanded nodes by identity
     val expandedNodes = remember { mutableStateMapOf<Int, Boolean>() }
+
+    // Drag-to-reparent bookkeeping
+    val dragState = remember { DragReparentState() }
 
     // Spatial currently being renamed via the context menu, if any
     var renameTarget by remember { mutableStateOf<Spatial?>(null) }
@@ -134,6 +158,7 @@ fun HierarchyPanel(
                         expandedNodes = expandedNodes,
                         onRequestRename = { renameTarget = it },
                         onItemClick = onItemClick,
+                        dragState = dragState,
                         depth = 0
                     )
                 }
@@ -237,6 +262,7 @@ private fun NodeTreeItem(
     expandedNodes: MutableMap<Int, Boolean>,
     onRequestRename: (Spatial) -> Unit,
     onItemClick: (Spatial, Boolean, Boolean) -> Unit,
+    dragState: DragReparentState,
     depth: Int
 ) {
     val spatialKey = System.identityHashCode(spatial)
@@ -259,11 +285,16 @@ private fun NodeTreeItem(
                     ContextMenuItem("Delete $count objects") { operations.deleteSelection() }
                 )
             } else {
-                listOf(
-                    ContextMenuItem("Rename") { onRequestRename(spatial) },
-                    ContextMenuItem("Duplicate") { operations.duplicateSpatial(spatial) },
-                    ContextMenuItem("Delete") { operations.deleteSpatial(spatial) }
-                )
+                buildList {
+                    add(ContextMenuItem("Rename") { onRequestRename(spatial) })
+                    add(ContextMenuItem("Duplicate") { operations.duplicateSpatial(spatial) })
+                    add(ContextMenuItem("Delete") { operations.deleteSpatial(spatial) })
+                    if (spatial.parent !== editorState.sceneRoot) {
+                        add(ContextMenuItem("Move to Root") {
+                            operations.reparentSpatial(spatial, editorState.sceneRoot)
+                        })
+                    }
+                }
             }
         }) {
             Row(
@@ -271,10 +302,39 @@ private fun NodeTreeItem(
                     .fillMaxWidth()
                     .background(
                         when {
+                            dragState.dropTarget === spatial -> MaterialTheme.colorScheme.tertiaryContainer
                             isSelected -> MaterialTheme.colorScheme.primaryContainer
                             else -> MaterialTheme.colorScheme.surface
                         }
                     )
+                    .onGloballyPositioned { dragState.rowCoords[spatial] = it }
+                    .pointerInput(spatial, isRoot) {
+                        if (isRoot) {
+                            return@pointerInput
+                        }
+                        // Drag a row onto a Node row to reparent (world transform preserved)
+                        detectDragGestures(
+                            onDragStart = { dragState.dragging = spatial },
+                            onDrag = { change, _ ->
+                                change.consume()
+                                val coords = dragState.rowCoords[spatial]
+                                if (coords != null && coords.isAttached) {
+                                    val windowPos = coords.localToWindow(change.position)
+                                    val hovered = dragState.rowCoords.entries.firstOrNull { (other, c) ->
+                                        other !== spatial && c.isAttached &&
+                                            c.boundsInWindow().contains(windowPos)
+                                    }?.key
+                                    dragState.dropTarget = (hovered as? Node)
+                                        ?.takeIf { ReparentCommand.isValidReparent(spatial, it) }
+                                }
+                            },
+                            onDragEnd = {
+                                dragState.dropTarget?.let { operations.reparentSpatial(spatial, it) }
+                                dragState.reset()
+                            },
+                            onDragCancel = { dragState.reset() }
+                        )
+                    }
                     .onClick(
                         keyboardModifiers = { isCtrlPressed || isMetaPressed },
                         onClick = { onItemClick(spatial, true, false) }
@@ -355,6 +415,7 @@ private fun NodeTreeItem(
                     expandedNodes = expandedNodes,
                     onRequestRename = onRequestRename,
                     onItemClick = onItemClick,
+                    dragState = dragState,
                     depth = depth + 1
                 )
             }
