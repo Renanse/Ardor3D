@@ -42,7 +42,10 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
   plus Wavefront OBJ import. Unsaved changes are flagged in the title bar and confirmed before
   being discarded.
 - **Object creation** — GameObject menu: 13 primitive shapes, empty nodes, and
-  point/directional/spot lights.
+  point/directional/spot lights. New objects are created under the selected Node (or the scene
+  root).
+- **Visibility** — per-row eye toggle in the hierarchy hides/shows a subtree (undoable). Hidden
+  objects are culled and unpickable, so viewport clicks pass through them.
 
 ### Keyboard shortcuts
 
@@ -51,8 +54,11 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 | `1` / `2` / `3` | Translate / Rotate / Scale mode (viewport focused) |
 | `F` | Frame selection (viewport focused) |
 | `Delete` | Delete selection (viewport focused) |
+| `Escape` | Clear selection (viewport focused) |
 | `W A S D` + right-drag | Fly camera (viewport focused) |
 | `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y` | Undo / Redo (window-wide) |
+| `Ctrl+D` | Duplicate selection (window-wide) |
+| `Ctrl+N` / `Ctrl+O` / `Ctrl+S` / `Ctrl+Shift+S` | New / Open / Save / Save As (window-wide) |
 
 ## Architecture notes
 

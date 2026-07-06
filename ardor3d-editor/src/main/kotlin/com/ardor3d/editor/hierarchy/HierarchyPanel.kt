@@ -41,6 +41,7 @@ import com.ardor3d.light.Light
 import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
+import com.ardor3d.scenegraph.hint.CullHint
 
 /**
  * Shared state for drag-to-reparent: the spatial being dragged, the currently valid drop
@@ -75,9 +76,13 @@ fun HierarchyPanel(
     // Anchor for shift-click range selection: the last plainly-clicked or toggled item
     var selectionAnchor by remember { mutableStateOf<Spatial?>(null) }
 
-    // Observe structure version so the tree refreshes on attach/detach/rename
+    // Observe structure version so the tree refreshes on attach/detach/rename, and property
+    // version so row decorations (visibility) refresh on undo/redo
     @Suppress("UNUSED_VARIABLE")
     val version = editorState.structureVersion
+
+    @Suppress("UNUSED_VARIABLE")
+    val propertyTick = editorState.propertyVersion
 
     // Plain click selects; ctrl-click toggles; shift-click selects the visible range from the
     // anchor (falling back to a plain select when the anchor is gone).
@@ -381,14 +386,16 @@ private fun NodeTreeItem(
 
                 Spacer(modifier = Modifier.width(6.dp))
 
-                // Name
+                val isHidden = spatial.sceneHints.cullHint == CullHint.Always
+
+                // Name (dimmed when hidden)
                 Text(
                     text = spatial.name ?: "(unnamed)",
                     style = MaterialTheme.typography.bodySmall,
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
                         else -> MaterialTheme.colorScheme.onSurface
-                    },
+                    }.let { if (isHidden) it.copy(alpha = 0.45f) else it },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -400,6 +407,20 @@ private fun NodeTreeItem(
                         text = "$childCount",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                }
+
+                // Visibility (eye) toggle
+                IconButton(
+                    onClick = { operations.toggleVisibility(spatial) },
+                    modifier = Modifier.size(20.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = if (isHidden) "Show" else "Hide",
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            .copy(alpha = if (isHidden) 1f else 0.5f)
                     )
                 }
             }

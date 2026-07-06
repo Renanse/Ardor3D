@@ -135,11 +135,21 @@ private fun addDefaultResourceLocators() {
     }
 }
 
+/**
+ * Bridges the window-level shortcut handler in [main] to the operations built inside
+ * [NativeEditorApp] (they need the window and scene, which don't exist yet at Window setup).
+ */
+class ShortcutActions {
+    var fileOperations: FileOperations? = null
+    var sceneOperations: SceneOperations? = null
+}
+
 fun main() = application {
     // Initialize resource locators before anything else. The application block is a
     // composable, so guard against re-running on recomposition.
     remember { addDefaultResourceLocators() }
     val editorState = remember { EditorState() }
+    val shortcuts = remember { ShortcutActions() }
     val windowState = rememberWindowState(size = DpSize(1600.dp, 900.dp))
 
     // Confirm before losing unsaved changes on exit
@@ -173,6 +183,30 @@ fun main() = application {
                         true
                     }
 
+                    Key.D -> {
+                        shortcuts.sceneOperations?.duplicateSelection?.invoke()
+                        true
+                    }
+
+                    Key.N -> {
+                        shortcuts.fileOperations?.newScene?.invoke()
+                        true
+                    }
+
+                    Key.O -> {
+                        shortcuts.fileOperations?.openScene?.invoke()
+                        true
+                    }
+
+                    Key.S -> {
+                        if (event.isShiftPressed) {
+                            shortcuts.fileOperations?.saveSceneAs?.invoke()
+                        } else {
+                            shortcuts.fileOperations?.saveScene?.invoke()
+                        }
+                        true
+                    }
+
                     else -> false
                 }
             } else {
@@ -181,7 +215,7 @@ fun main() = application {
         }
     ) {
         EditorTheme {
-            NativeEditorApp(editorState, window, requestExit)
+            NativeEditorApp(editorState, window, requestExit, shortcuts)
         }
     }
 }
@@ -215,7 +249,12 @@ private fun confirmDiscard(editorState: EditorState, owner: java.awt.Frame, what
 }
 
 @Composable
-fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExit: () -> Unit) {
+fun NativeEditorApp(
+    editorState: EditorState,
+    window: java.awt.Frame,
+    requestExit: () -> Unit,
+    shortcuts: ShortcutActions = ShortcutActions()
+) {
     val editorScene = remember { EditorScene(editorState) }
     val sceneOperations = remember(editorScene) {
         SceneOperations(
@@ -227,6 +266,7 @@ fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExi
             duplicateSelection = editorScene::duplicateSelection,
             renameSpatial = editorScene::renameSpatial,
             reparentSpatial = editorScene::reparentSpatial,
+            toggleVisibility = editorScene::toggleVisibility,
             createEmpty = editorScene::createEmptyNode
         )
     }
@@ -256,6 +296,10 @@ fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExi
             exit = requestExit
         )
     }
+
+    // Expose the operations to the window-level shortcut handler
+    shortcuts.fileOperations = fileOperations
+    shortcuts.sceneOperations = sceneOperations
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -555,13 +599,19 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
 
         editorState.execute(
             AttachChildCommand(
-                parent = root,
+                parent = creationParent(),
                 child = shape,
                 onExecuted = { editorState.select(shape) },
                 onUndone = { if (editorState.isSelected(shape)) editorState.clearSelection() }
             )
         )
     }
+
+    /**
+     * New objects are created under the selected Node (matching Create Empty), or the scene
+     * root when the selection is not a Node.
+     */
+    private fun creationParent(): Node = (editorState.primarySelection as? Node) ?: root
 
     /**
      * Adds a new light to the scene (undoable) and selects it.
@@ -593,11 +643,31 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
 
         editorState.execute(
             AttachChildCommand(
-                parent = root,
+                parent = creationParent(),
                 child = light,
                 name = "Add ${light.name}",
                 onExecuted = { editorState.select(light) },
                 onUndone = { if (editorState.isSelected(light)) editorState.clearSelection() }
+            )
+        )
+        editorState.sealUndoMerge()
+    }
+
+    /**
+     * Toggles viewport visibility of the given spatial (undoable). Hidden spatials are culled
+     * and made unpickable, so clicks pass through them; both flags restore on undo.
+     */
+    fun toggleVisibility(spatial: Spatial) {
+        val hide = spatial.sceneHints.cullHint != CullHint.Always
+        editorState.execute(
+            SetterCommand(
+                name = if (hide) "Hide ${spatial.name ?: "object"}" else "Show ${spatial.name ?: "object"}",
+                oldValue = !hide,
+                newValue = hide,
+                setter = { hidden ->
+                    spatial.sceneHints.cullHint = if (hidden) CullHint.Always else CullHint.Inherit
+                    spatial.sceneHints.setPickingHint(PickingHint.Pickable, !hidden)
+                }
             )
         )
         editorState.sealUndoMerge()
@@ -728,6 +798,11 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // F frames the selection (or the whole scene)
         layer.registerTrigger(InputTrigger(KeyPressedCondition(ArdorKey.F)) { _, _, _ ->
             frameSelection()
+        })
+
+        // Escape clears the selection
+        layer.registerTrigger(InputTrigger(KeyPressedCondition(ArdorKey.ESCAPE)) { _, _, _ ->
+            editorState.clearSelection()
         })
 
         // Mouse wheel dollies the camera along its view direction

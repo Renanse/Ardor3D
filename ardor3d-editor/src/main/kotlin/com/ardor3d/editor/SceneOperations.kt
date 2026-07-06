@@ -33,5 +33,6 @@ class SceneOperations(
     val duplicateSelection: () -> Unit,
     val renameSpatial: (Spatial, String) -> Unit,
     val reparentSpatial: (Spatial, Node) -> Unit,
+    val toggleVisibility: (Spatial) -> Unit,
     val createEmpty: () -> Unit
 )
