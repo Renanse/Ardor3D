@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -36,6 +36,8 @@ import org.lwjgl.system.MemoryStack;
 
 import com.ardor3d.buffer.AbstractBufferData;
 import com.ardor3d.buffer.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.light.LightManager;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.Matrix3;
@@ -585,6 +587,32 @@ public class Lwjgl3ShaderUtils implements IShaderUtils {
         final var unit = LightManager.FIRST_SHADOW_INDEX + index;
         // bind to texture unit
         if (tex != null) {
+          Lwjgl3TextureStateUtil.doTextureBind(tex, unit, false);
+        }
+        return stack.mallocInt(1).put(unit).flip();
+      }
+
+      // Spot and point shadow samplers have different GLSL types, so they get disjoint texture
+      // unit ranges - two sampler uniforms of different types pointing at the same unit make
+      // strict drivers (all of Mesa) reject every draw with GL_INVALID_OPERATION. Each case
+      // binds only its own texture kind; the light at this index has at most one of the two.
+      case SpotShadowTexture: {
+        final int index = ((Number) extra).intValue();
+        final var lm = SceneIndexer.getCurrent().getLightManager();
+        final var tex = lm.getCurrentShadowTexture(index);
+        final var unit = LightManager.FIRST_SHADOW_INDEX + index;
+        if (tex instanceof Texture2D) {
+          Lwjgl3TextureStateUtil.doTextureBind(tex, unit, false);
+        }
+        return stack.mallocInt(1).put(unit).flip();
+      }
+
+      case PointShadowTexture: {
+        final int index = ((Number) extra).intValue();
+        final var lm = SceneIndexer.getCurrent().getLightManager();
+        final var tex = lm.getCurrentShadowTexture(index);
+        final var unit = LightManager.FIRST_SHADOW_INDEX + LightManager.MAX_LIGHTS + index;
+        if (tex instanceof TextureCubeMap) {
           Lwjgl3TextureStateUtil.doTextureBind(tex, unit, false);
         }
         return stack.mallocInt(1).put(unit).flip();

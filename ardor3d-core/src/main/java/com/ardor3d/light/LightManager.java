@@ -54,10 +54,13 @@ public class LightManager implements IUniformSupplier {
     for (int i = 0; i < LightManager.MAX_LIGHTS; i++) {
       _cachedUniforms.add(new UniformRef("lights[" + i + "]", UniformType.UniformSupplier, UniformSource.Ardor3dState,
           Ardor3dStateProperty.Light, i, null));
+      // The two sampler arrays have different GLSL types, so they must resolve to disjoint
+      // texture units - strict drivers (all of Mesa) reject draws where two sampler types
+      // share a unit with GL_INVALID_OPERATION.
       _cachedUniforms.add(new UniformRef("spotShadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
-          Ardor3dStateProperty.ShadowTexture, i, null));
+          Ardor3dStateProperty.SpotShadowTexture, i, null));
       _cachedUniforms.add(new UniformRef("pointShadowMaps[" + i + "]", UniformType.Int1, UniformSource.Ardor3dState,
-          Ardor3dStateProperty.ShadowTexture, i, null));
+          Ardor3dStateProperty.PointShadowTexture, i, null));
     }
 
     _cachedUniforms.add(new UniformRef("globalAmbient", UniformType.Float3, UniformSource.Ardor3dState,
