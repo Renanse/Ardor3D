@@ -82,6 +82,10 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 ## Known limitations / next steps
 
 - The inspector edits the primary (first) selected object only.
+- Window-wide shortcuts (Ctrl+Z/D/N/O/S) fire even while a text field has focus — same seam as
+  the pre-existing undo/redo binding; Compose offers no clean focus check at the Window level.
+- Hiding a Node disables only lights hidden *directly*; lights nested inside a hidden subtree
+  keep illuminating (the engine collects lights regardless of cull state).
 - Drag-to-reparent drops *onto* a node (append as last child); there is no between-row
   reordering yet.
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
