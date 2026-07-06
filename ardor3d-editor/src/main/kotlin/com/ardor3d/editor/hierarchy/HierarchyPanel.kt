@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.SceneOperations
 import com.ardor3d.editor.command.ReparentCommand
+import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.light.Light
 import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
@@ -102,7 +103,9 @@ fun HierarchyPanel(
                 if (anchorIndex >= 0 && clickedIndex >= 0) {
                     val range = if (anchorIndex <= clickedIndex) anchorIndex..clickedIndex
                     else clickedIndex..anchorIndex
-                    editorState.selectAll(range.map { visible[it] })
+                    // The clicked item leads so it becomes the primary selection
+                    val ordered = range.map { visible[it] }
+                    editorState.selectAll(listOf(spatial) + ordered.filter { it !== spatial })
                 } else {
                     editorState.select(spatial)
                     selectionAnchor = spatial
@@ -199,8 +202,14 @@ fun HierarchyPanel(
 }
 
 /**
- * Collects the spatials currently visible in the tree, in display order, honoring the same
- * default-expansion rule as rendering (only the root starts expanded).
+ * The single expansion rule shared by rendering and range selection: a node is expanded when
+ * toggled so, and only the root starts expanded.
+ */
+private fun isExpanded(expandedNodes: Map<Int, Boolean>, spatial: Spatial, depth: Int): Boolean =
+    expandedNodes[System.identityHashCode(spatial)] ?: (depth == 0)
+
+/**
+ * Collects the spatials currently visible in the tree, in display order.
  */
 private fun flattenVisible(
     spatial: Spatial,
@@ -209,8 +218,7 @@ private fun flattenVisible(
     into: MutableList<Spatial>
 ) {
     into.add(spatial)
-    val expanded = expandedNodes[System.identityHashCode(spatial)] ?: (depth == 0)
-    if (expanded && spatial is Node) {
+    if (isExpanded(expandedNodes, spatial, depth) && spatial is Node) {
         for (child in spatial.children) {
             flattenVisible(child, expandedNodes, depth + 1, into)
         }
@@ -268,26 +276,37 @@ private fun NodeTreeItem(
     onRequestRename: (Spatial) -> Unit,
     onItemClick: (Spatial, Boolean, Boolean) -> Unit,
     dragState: DragReparentState,
-    depth: Int
+    depth: Int,
+    inheritedHidden: Boolean = false
 ) {
     val spatialKey = System.identityHashCode(spatial)
-    val expanded = expandedNodes.getOrPut(spatialKey) { depth == 0 }  // Root expanded by default
+    val expanded = isExpanded(expandedNodes, spatial, depth)
     val isSelected = editorState.isSelected(spatial)
     val childCount = if (spatial is Node) spatial.numberOfChildren else 0
     val hasChildren = childCount > 0
     // The scene root cannot be deleted, duplicated or renamed from the tree
     val isRoot = spatial.parent == null
+    val isHidden = spatial.sceneHints.cullHint == CullHint.Always
+    val effectiveHidden = isHidden || inheritedHidden
+
+    // Drop this row's drag hit-test coordinates when it leaves the composition
+    // (delete, collapse, document swap) so the map doesn't retain dead spatials.
+    DisposableEffect(spatial) {
+        onDispose { dragState.rowCoords.remove(spatial) }
+    }
 
     Column {
         ContextMenuArea(items = {
             if (isRoot) {
                 emptyList()
             } else if (isSelected && editorState.selection.size > 1) {
-                // Acting on an item that is part of a multi-selection acts on all of it
-                val count = editorState.selection.size
+                // Acting on an item that is part of a multi-selection acts on all of it.
+                // Count what the operations will actually process: top-most, non-root.
+                val count = SelectionUtil.topMost(editorState.selection.filter { it.parent != null }).size
+                val what = if (count == 1) "1 object" else "$count objects"
                 listOf(
-                    ContextMenuItem("Duplicate $count objects") { operations.duplicateSelection() },
-                    ContextMenuItem("Delete $count objects") { operations.deleteSelection() }
+                    ContextMenuItem("Duplicate $what") { operations.duplicateSelection() },
+                    ContextMenuItem("Delete $what") { operations.deleteSelection() }
                 )
             } else {
                 buildList {
@@ -386,16 +405,14 @@ private fun NodeTreeItem(
 
                 Spacer(modifier = Modifier.width(6.dp))
 
-                val isHidden = spatial.sceneHints.cullHint == CullHint.Always
-
-                // Name (dimmed when hidden)
+                // Name (dimmed when hidden directly or through a hidden ancestor)
                 Text(
                     text = spatial.name ?: "(unnamed)",
                     style = MaterialTheme.typography.bodySmall,
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
                         else -> MaterialTheme.colorScheme.onSurface
-                    }.let { if (isHidden) it.copy(alpha = 0.45f) else it },
+                    }.let { if (effectiveHidden) it.copy(alpha = 0.45f) else it },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -410,18 +427,20 @@ private fun NodeTreeItem(
                     )
                 }
 
-                // Visibility (eye) toggle
-                IconButton(
-                    onClick = { operations.toggleVisibility(spatial) },
-                    modifier = Modifier.size(20.dp)
-                ) {
-                    Icon(
-                        imageVector = if (isHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (isHidden) "Show" else "Hide",
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            .copy(alpha = if (isHidden) 1f else 0.5f)
-                    )
+                // Visibility (eye) toggle; the scene root is protected like its other operations
+                if (!isRoot) {
+                    IconButton(
+                        onClick = { operations.toggleVisibility(spatial) },
+                        modifier = Modifier.size(20.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (isHidden) "Show" else "Hide",
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                .copy(alpha = if (isHidden) 1f else 0.5f)
+                        )
+                    }
                 }
             }
         }
@@ -437,7 +456,8 @@ private fun NodeTreeItem(
                     onRequestRename = onRequestRename,
                     onItemClick = onItemClick,
                     dragState = dragState,
-                    depth = depth + 1
+                    depth = depth + 1,
+                    inheritedHidden = effectiveHidden
                 )
             }
         }

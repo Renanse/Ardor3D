@@ -20,6 +20,7 @@ import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.FileOperations
 import com.ardor3d.editor.LightType
 import com.ardor3d.editor.SceneOperations
+import com.ardor3d.editor.util.SelectionUtil
 
 enum class ShapeType {
     BOX,
@@ -141,8 +142,9 @@ fun EditorMenuBar(
                     }
                 )
                 HorizontalDivider()
-                // The scene root itself cannot be deleted or duplicated
-                val editableCount = editorState.selection.count { it.parent != null }
+                // Count what Delete/Duplicate will actually process: top-most, non-root
+                val editableCount =
+                    SelectionUtil.topMost(editorState.selection.filter { it.parent != null }).size
                 val plural = if (editableCount > 1) " $editableCount objects" else ""
                 DropdownMenuItem(
                     text = { Text("Delete$plural") },

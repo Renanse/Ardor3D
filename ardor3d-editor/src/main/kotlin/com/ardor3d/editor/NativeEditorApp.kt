@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
@@ -306,8 +307,10 @@ fun NativeEditorApp(
     }
 
     // Expose the operations to the window-level shortcut handler
-    shortcuts.fileOperations = fileOperations
-    shortcuts.sceneOperations = sceneOperations
+    SideEffect {
+        shortcuts.fileOperations = fileOperations
+        shortcuts.sceneOperations = sceneOperations
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -662,19 +665,34 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
-     * Toggles viewport visibility of the given spatial (undoable). Hidden spatials are culled
-     * and made unpickable, so clicks pass through them; both flags restore on undo.
+     * State captured and applied by the visibility (eye) toggle: the cull hint plus, for
+     * lights, the enabled flag - a culled light still illuminates the scene, so hiding one
+     * must also disable it.
+     */
+    private data class VisibilityState(val cullHint: CullHint, val lightEnabled: Boolean?)
+
+    /**
+     * Toggles viewport visibility of the given spatial (undoable). Hiding culls the subtree,
+     * which also removes it from picking (findPick skips CullHint.Always subtrees), so no other
+     * hints are modified. Undo restores the exact previous state; Show restores Inherit.
      */
     fun toggleVisibility(spatial: Spatial) {
         val hide = spatial.sceneHints.cullHint != CullHint.Always
+        val oldState = VisibilityState(spatial.sceneHints.cullHint, (spatial as? Light)?.isEnabled)
+        val newState = VisibilityState(
+            cullHint = if (hide) CullHint.Always else CullHint.Inherit,
+            lightEnabled = if (spatial is Light) !hide else null
+        )
         editorState.execute(
             SetterCommand(
                 name = if (hide) "Hide ${spatial.name ?: "object"}" else "Show ${spatial.name ?: "object"}",
-                oldValue = !hide,
-                newValue = hide,
-                setter = { hidden ->
-                    spatial.sceneHints.cullHint = if (hidden) CullHint.Always else CullHint.Inherit
-                    spatial.sceneHints.setPickingHint(PickingHint.Pickable, !hidden)
+                oldValue = oldState,
+                newValue = newState,
+                setter = { state ->
+                    spatial.sceneHints.cullHint = state.cullHint
+                    if (state.lightEnabled != null && spatial is Light) {
+                        spatial.isEnabled = state.lightEnabled
+                    }
                 }
             )
         )
@@ -774,9 +792,9 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             PickingUtil.findPick(root, pickRay, results)
 
             // Ctrl-click toggles membership in the selection instead of replacing it
-            val keyboard = inputStates.current.keyboardState
-            val toggle = keyboard.isDown(ArdorKey.LEFT_CONTROL) || keyboard.isDown(ArdorKey.RIGHT_CONTROL) ||
-                keyboard.isDown(ArdorKey.LEFT_META) || keyboard.isDown(ArdorKey.RIGHT_META)
+            val toggle = inputStates.current.keyboardState.isAtLeastOneDown(
+                ArdorKey.LEFT_CONTROL, ArdorKey.RIGHT_CONTROL, ArdorKey.LEFT_META, ArdorKey.RIGHT_META
+            )
 
             if (results.number > 0) {
                 // Get the closest picked object
@@ -874,11 +892,18 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
+     * The selected spatials an operation should actually process: the undeletable scene root
+     * is dropped first (so it cannot shadow its selected children), then covered descendants.
+     */
+    private fun operableSelection(): List<Spatial> =
+        SelectionUtil.topMost(editorState.selection.filter { it.parent != null })
+
+    /**
      * Deletes every selected spatial as one undo step. The scene root is never deleted, and a
      * spatial whose selected ancestor already covers it is skipped.
      */
     fun deleteSelection() {
-        val targets = SelectionUtil.topMost(editorState.selection).filter { it.parent != null }
+        val targets = operableSelection()
         when {
             targets.isEmpty() -> return
             targets.size == 1 -> deleteSpatial(targets[0])
@@ -897,13 +922,21 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
+     * Builds the ready-to-attach copy a Duplicate operation adds to the scene.
+     */
+    private fun makeDuplicate(spatial: Spatial): Spatial {
+        val copy = spatial.makeCopy(true)
+        copy.name = "${spatial.name ?: "object"} Copy"
+        MaterialUtil.autoMaterials(copy)
+        return copy
+    }
+
+    /**
      * Duplicates the given spatial as a sibling (undoable) and selects the copy.
      */
     fun duplicateSpatial(spatial: Spatial) {
         val parent = spatial.parent ?: return
-        val copy = spatial.makeCopy(true)
-        copy.name = "${spatial.name ?: "object"} Copy"
-        MaterialUtil.autoMaterials(copy)
+        val copy = makeDuplicate(spatial)
         editorState.execute(
             AttachChildCommand(
                 parent = parent,
@@ -920,17 +953,12 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
      * Duplicates every selected spatial as one undo step and selects the copies.
      */
     fun duplicateSelection() {
-        val targets = SelectionUtil.topMost(editorState.selection).filter { it.parent != null }
+        val targets = operableSelection()
         when {
             targets.isEmpty() -> return
             targets.size == 1 -> duplicateSpatial(targets[0])
             else -> {
-                val copies = targets.map { spatial ->
-                    val copy = spatial.makeCopy(true)
-                    copy.name = "${spatial.name ?: "object"} Copy"
-                    MaterialUtil.autoMaterials(copy)
-                    spatial.parent!! to copy
-                }
+                val copies = targets.map { spatial -> spatial.parent!! to makeDuplicate(spatial) }
                 editorState.execute(
                     CompositeCommand(
                         name = "Duplicate ${targets.size} objects",
@@ -955,7 +983,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
      */
     fun reparentSpatial(spatial: Spatial, newParent: Node) {
         val requested = if (editorState.isSelected(spatial) && editorState.selection.size > 1) {
-            SelectionUtil.topMost(editorState.selection)
+            operableSelection()
         } else {
             listOf(spatial)
         }
@@ -1236,9 +1264,11 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             refreshLightGizmos()
         }
 
-        // Keep light gizmos over their lights
+        // Keep light gizmos over their lights, hidden along with them
         for ((light, gizmo) in lightGizmos) {
             gizmo.setTranslation(light.worldTranslation)
+            gizmo.sceneHints.cullHint =
+                if (light.sceneHints.cullHint == CullHint.Always) CullHint.Always else CullHint.Inherit
         }
 
         // Update geometric state for the document and the editor overlay
