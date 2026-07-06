@@ -15,9 +15,9 @@ itself.
 Requires Java 17+. The module builds with its own Kotlin/Compose plugins and is skipped by the
 root project's Java conventions.
 
-Note: under WSLg (Linux GUI on Windows), the UI, grid and lines render but triangle meshes do
-not — the same is true of the stock `LwjglAwtExample`, so it is an engine/driver interaction
-with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real use.
+Note: on WSLg (and Mesa drivers generally), lit meshes were historically invisible — that was
+an engine bug (two shadow-sampler types sharing a texture unit; strict drivers reject the draw),
+fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under WSLg.
 
 ## Features
 
