@@ -23,8 +23,15 @@ jobs:
         distribution: 'temurin'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Install Xvfb and Mesa for the GL smoke test
+      run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libxrandr2 libxinerama1 libxcursor1 libxi6
+    # Xvfb + llvmpipe give the GL smoke test (GlLitRenderSmokeTest) a strict software GL stack;
+    # ARDOR3D_REQUIRE_GL_SMOKE turns its no-GL-available skip into a failure so the net can't rot.
     - name: Build with Gradle
-      run: ./gradlew build
+      run: xvfb-run -a --server-args="-screen 0 1280x720x24" ./gradlew build
+      env:
+        LIBGL_ALWAYS_SOFTWARE: "1"
+        ARDOR3D_REQUIRE_GL_SMOKE: "1"
     - name: Publish artifacts
       uses: actions/upload-artifact@v4.3.3
       with:
