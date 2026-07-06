@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -126,6 +126,20 @@ public class PointLight extends Light {
    *          the maximum world distance at which this light will affect geometry
    */
   public void setRange(final float range) { _range = range; }
+
+  @Override
+  public PointLight makeCopy(final boolean shareGeometricData) {
+    // get copy of basic light info
+    final PointLight light = (PointLight) super.makeCopy(shareGeometricData);
+
+    // copy our attenuation properties
+    light.setConstant(_constant);
+    light.setLinear(_linear);
+    light.setQuadratic(_quadratic);
+    light.setRange(_range);
+
+    return light;
+  }
 
   @Override
   public AbstractShadowData getShadowData() { return _shadowData; }

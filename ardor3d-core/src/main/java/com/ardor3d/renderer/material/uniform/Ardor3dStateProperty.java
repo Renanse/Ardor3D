@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -46,6 +46,20 @@ public enum Ardor3dStateProperty {
    * Bind a shadow texture to a given unit and return the unit to the shader.
    */
   ShadowTexture,
+
+  /**
+   * Unit for a spot light's 2D shadow map (sampler2DShadow). The light index comes from the extra
+   * field. Uses a texture unit range disjoint from {@link #PointShadowTexture} - two sampler
+   * uniforms of different types must never point at the same unit, or strict drivers reject the
+   * draw with GL_INVALID_OPERATION.
+   */
+  SpotShadowTexture,
+
+  /**
+   * Unit for a point light's cube shadow map (samplerCubeShadow). The light index comes from the
+   * extra field. See {@link #SpotShadowTexture} for why the ranges are disjoint.
+   */
+  PointShadowTexture,
 
   /**
    * Current global ambient set on the current LightManager (from current SceneIndexer).

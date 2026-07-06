@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -147,6 +147,18 @@ public class SpotLight extends PointLight {
    *          the angle (in radians)
    */
   public void setInnerAngle(final float angle) { _innerAngle = angle; }
+
+  @Override
+  public SpotLight makeCopy(final boolean shareGeometricData) {
+    // get copy of basic light info
+    final SpotLight light = (SpotLight) super.makeCopy(shareGeometricData);
+
+    // copy our cone properties
+    light.setAngle(_angle);
+    light.setInnerAngle(_innerAngle);
+
+    return light;
+  }
 
   /**
    * <code>getType</code> returns the type of this light (Type.Spot).

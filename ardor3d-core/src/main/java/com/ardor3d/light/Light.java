@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -151,6 +151,20 @@ public abstract class Light extends Spatial implements Serializable, Savable, IU
    *          appropriate RenderMaterial.)
    */
   public void setShadowCaster(final boolean mayCastShadows) { _shadowCaster = mayCastShadows; }
+
+  @Override
+  public Light makeCopy(final boolean shareGeometricData) {
+    // get copy of basic spatial info
+    final Light light = (Light) super.makeCopy(shareGeometricData);
+
+    // copy our light properties
+    light.setColor(_color);
+    light.setIntensity(_intensity);
+    light.setEnabled(_enabled);
+    light.setShadowCaster(_shadowCaster);
+
+    return light;
+  }
 
   @Override
   public List<UniformRef> getUniforms() { return _cachedUniforms; }
