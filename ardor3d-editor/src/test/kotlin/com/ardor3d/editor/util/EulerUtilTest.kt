@@ -15,6 +15,8 @@ import com.ardor3d.math.Quaternion
 import com.ardor3d.math.Vector3
 import com.ardor3d.math.util.MathUtils
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class EulerUtilTest {
@@ -57,6 +59,33 @@ class EulerUtilTest {
                 assertEquals("component $check for input axis $index", input[check], output[check], 1e-9)
             }
         }
+    }
+
+    @Test
+    fun representsRotationAcceptsTheAnglesThatBuiltTheMatrix() {
+        val samples = listOf(
+            Triple(10.0, 20.0, 30.0),
+            Triple(-45.0, 60.0, -75.0),
+            // At and near the attitude (Z) singularity, where a naive to-Euler
+            // round trip returns a different (equivalent) triplet
+            Triple(10.0, 20.0, 90.0),
+            Triple(-30.0, 45.0, -90.0),
+            Triple(15.0, -60.0, 89.9999)
+        )
+        for ((x, y, z) in samples) {
+            val rotation = EulerUtil.fromEulerDegrees(x, y, z).toRotationMatrix(Matrix3())
+            assertTrue(
+                "($x, $y, $z) should represent the matrix it built",
+                EulerUtil.representsRotation(doubleArrayOf(x, y, z), rotation)
+            )
+        }
+    }
+
+    @Test
+    fun representsRotationRejectsADifferentRotation() {
+        val rotation = EulerUtil.fromEulerDegrees(10.0, 20.0, 30.0).toRotationMatrix(Matrix3())
+        assertFalse(EulerUtil.representsRotation(doubleArrayOf(11.0, 20.0, 30.0), rotation))
+        assertFalse(EulerUtil.representsRotation(doubleArrayOf(10.0, 20.0, -30.0), rotation))
     }
 
     @Test

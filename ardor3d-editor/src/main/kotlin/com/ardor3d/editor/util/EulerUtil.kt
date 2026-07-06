@@ -10,6 +10,7 @@
 
 package com.ardor3d.editor.util
 
+import com.ardor3d.math.Matrix3
 import com.ardor3d.math.Quaternion
 import com.ardor3d.math.type.ReadOnlyMatrix3
 
@@ -45,4 +46,23 @@ object EulerUtil {
             Math.toRadians(zDegrees), // attitude (Z)
             Math.toRadians(xDegrees)  // bank (X)
         )
+
+    /**
+     * True when the inspector-facing [anglesDegrees] (X, Y, Z) produce [rotation]. Near the
+     * attitude (Z) +/-90 degree singularity many angle triplets build the same matrix, so this
+     * - not an angle comparison - is the way to decide whether an edited triplet still matches
+     * the spatial's rotation or the rotation was changed externally (gizmo drag, undo).
+     */
+    fun representsRotation(anglesDegrees: DoubleArray, rotation: ReadOnlyMatrix3, epsilon: Double = 1e-7): Boolean {
+        val built = fromEulerDegrees(anglesDegrees[0], anglesDegrees[1], anglesDegrees[2])
+            .toRotationMatrix(Matrix3())
+        for (row in 0..2) {
+            for (col in 0..2) {
+                if (Math.abs(built.getValue(row, col) - rotation.getValue(row, col)) > epsilon) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
 }

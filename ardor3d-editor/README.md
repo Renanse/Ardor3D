@@ -85,7 +85,10 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 - Drag-to-reparent drops *onto* a node (append as last child); there is no between-row
   reordering yet.
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
-- Rotation is edited as XYZ Euler angles and will jump near the attitude (Z) ±90° singularity.
+- Rotation is edited as XYZ Euler angles. The inspector keeps the angles you type (even at the
+  attitude ±90° singularity, where the decomposition isn't unique) and only re-derives them from
+  the matrix after a gizmo drag or undo — after one of those, an equivalent-but-different
+  triplet may be shown.
 - No camera objects or play mode.
 - Model import covers OBJ and COLLADA (static geometry; COLLADA animations are not brought into
   the editor). Other formats in `ardor3d-extras` could be added to

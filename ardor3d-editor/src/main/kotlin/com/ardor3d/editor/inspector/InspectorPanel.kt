@@ -151,6 +151,15 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
     val version = editorState.transformVersion
     val spatialId = System.identityHashCode(spatial)
 
+    // The inspector owns the Euler angles it displays while editing; they re-derive from the
+    // rotation matrix only when the matrix stops matching them (gizmo drag, undo/redo).
+    // Re-deriving on every keystroke would make the other two fields jump near the attitude
+    // (Z) +/-90 degree singularity, where the Euler decomposition is not unique.
+    val eulerAngles = remember(spatial) { EulerUtil.toEulerDegrees(spatial.rotation) }
+    if (!EulerUtil.representsRotation(eulerAngles, spatial.rotation)) {
+        EulerUtil.toEulerDegrees(spatial.rotation).copyInto(eulerAngles)
+    }
+
     // Edits to a single component merge into one undo step until the field loses focus.
     fun editTranslation(axis: String, newValue: Vector3) {
         editorState.execute(
@@ -164,12 +173,13 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
         )
     }
 
-    fun editRotation(axis: String, newAngles: DoubleArray) {
+    fun editRotation(axis: Int, valueDegrees: Double) {
+        eulerAngles[axis] = valueDegrees
         editorState.execute(
             SetterCommand(
                 name = "Rotate ${spatial.name ?: "object"}",
                 oldValue = Matrix3(spatial.rotation),
-                newValue = EulerUtil.fromEulerDegrees(newAngles[0], newAngles[1], newAngles[2])
+                newValue = EulerUtil.fromEulerDegrees(eulerAngles[0], eulerAngles[1], eulerAngles[2])
                     .toRotationMatrix(Matrix3()),
                 mergeKey = "rotation.$axis:$spatialId",
                 setter = { spatial.setRotation(it) }
@@ -208,24 +218,14 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
         Spacer(modifier = Modifier.height(8.dp))
 
         // Rotation (as XYZ Euler angles for simplicity)
-        val angles = EulerUtil.toEulerDegrees(spatial.rotation)
         Vector3Field(
             label = "Rotation",
-            x = angles[0],
-            y = angles[1],
-            z = angles[2],
-            onXChange = { newX ->
-                val current = EulerUtil.toEulerDegrees(spatial.rotation)
-                editRotation("x", doubleArrayOf(newX, current[1], current[2]))
-            },
-            onYChange = { newY ->
-                val current = EulerUtil.toEulerDegrees(spatial.rotation)
-                editRotation("y", doubleArrayOf(current[0], newY, current[2]))
-            },
-            onZChange = { newZ ->
-                val current = EulerUtil.toEulerDegrees(spatial.rotation)
-                editRotation("z", doubleArrayOf(current[0], current[1], newZ))
-            },
+            x = eulerAngles[0],
+            y = eulerAngles[1],
+            z = eulerAngles[2],
+            onXChange = { editRotation(0, it) },
+            onYChange = { editRotation(1, it) },
+            onZChange = { editRotation(2, it) },
             onEditFinished = sealMerge
         )
 
