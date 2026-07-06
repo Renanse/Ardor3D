@@ -31,8 +31,10 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.ardor3d.editor.command.AttachChildCommand
+import com.ardor3d.editor.command.CompositeCommand
 import com.ardor3d.editor.command.DetachChildCommand
 import com.ardor3d.editor.command.SetterCommand
+import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.hierarchy.HierarchyPanel
 import com.ardor3d.editor.inspector.InspectorPanel
 import com.ardor3d.editor.interact.GizmoUndoFilter
@@ -220,6 +222,8 @@ fun NativeEditorApp(editorState: EditorState, window: java.awt.Frame, requestExi
             addLight = editorScene::addLight,
             deleteSpatial = editorScene::deleteSpatial,
             duplicateSpatial = editorScene::duplicateSpatial,
+            deleteSelection = editorScene::deleteSelection,
+            duplicateSelection = editorScene::duplicateSelection,
             renameSpatial = editorScene::renameSpatial,
             createEmpty = editorScene::createEmptyNode
         )
@@ -689,14 +693,23 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             results.setCheckDistance(true)
             PickingUtil.findPick(root, pickRay, results)
 
+            // Ctrl-click toggles membership in the selection instead of replacing it
+            val keyboard = inputStates.current.keyboardState
+            val toggle = keyboard.isDown(ArdorKey.LEFT_CONTROL) || keyboard.isDown(ArdorKey.RIGHT_CONTROL) ||
+                keyboard.isDown(ArdorKey.LEFT_META) || keyboard.isDown(ArdorKey.RIGHT_META)
+
             if (results.number > 0) {
                 // Get the closest picked object
                 val pickData = results.getPickData(0)
                 val picked = pickData.target as? Spatial
                 if (picked != null) {
-                    editorState.select(picked)
+                    if (toggle) {
+                        editorState.toggleSelection(picked)
+                    } else {
+                        editorState.select(picked)
+                    }
                 }
-            } else {
+            } else if (!toggle) {
                 // Clicked on nothing - clear selection
                 editorState.clearSelection()
             }
@@ -706,7 +719,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
 
         // Delete key removes the current selection (canvas-focused only)
         val deleteTrigger = InputTrigger(KeyPressedCondition(ArdorKey.DELETE)) { _, _, _ ->
-            editorState.primarySelection?.let { deleteSpatial(it) }
+            deleteSelection()
         }
         layer.registerTrigger(deleteTrigger)
 
@@ -776,6 +789,29 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
+     * Deletes every selected spatial as one undo step. The scene root is never deleted, and a
+     * spatial whose selected ancestor already covers it is skipped.
+     */
+    fun deleteSelection() {
+        val targets = SelectionUtil.topMost(editorState.selection).filter { it.parent != null }
+        when {
+            targets.isEmpty() -> return
+            targets.size == 1 -> deleteSpatial(targets[0])
+            else -> {
+                editorState.execute(
+                    CompositeCommand(
+                        name = "Delete ${targets.size} objects",
+                        commands = targets.map { DetachChildCommand(parent = it.parent!!, child = it) },
+                        onExecuted = { editorState.clearSelection() },
+                        onUndone = { editorState.selectAll(targets) }
+                    )
+                )
+                editorState.sealUndoMerge()
+            }
+        }
+    }
+
+    /**
      * Duplicates the given spatial as a sibling (undoable) and selects the copy.
      */
     fun duplicateSpatial(spatial: Spatial) {
@@ -793,6 +829,38 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             )
         )
         editorState.sealUndoMerge()
+    }
+
+    /**
+     * Duplicates every selected spatial as one undo step and selects the copies.
+     */
+    fun duplicateSelection() {
+        val targets = SelectionUtil.topMost(editorState.selection).filter { it.parent != null }
+        when {
+            targets.isEmpty() -> return
+            targets.size == 1 -> duplicateSpatial(targets[0])
+            else -> {
+                val copies = targets.map { spatial ->
+                    val copy = spatial.makeCopy(true)
+                    copy.name = "${spatial.name ?: "object"} Copy"
+                    MaterialUtil.autoMaterials(copy)
+                    spatial.parent!! to copy
+                }
+                editorState.execute(
+                    CompositeCommand(
+                        name = "Duplicate ${targets.size} objects",
+                        commands = copies.map { (parent, copy) -> AttachChildCommand(parent = parent, child = copy) },
+                        onExecuted = { editorState.selectAll(copies.map { it.second }) },
+                        onUndone = {
+                            if (copies.any { editorState.isSelected(it.second) }) {
+                                editorState.clearSelection()
+                            }
+                        }
+                    )
+                )
+                editorState.sealUndoMerge()
+            }
+        }
     }
 
     /**
@@ -998,9 +1066,11 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // Render interact widgets (transform gizmos)
         interactManager?.render(renderer)
 
-        // Draw selection highlight (bounding box) for selected objects (only if no gizmo active)
-        if (interactManager?.spatialTarget == null) {
-            for (selected in editorState.selection) {
+        // Draw selection highlight (bounding box) for selected objects. The gizmo target
+        // already has a widget on it, so skip its bounds.
+        val gizmoTarget = interactManager?.spatialTarget
+        for (selected in editorState.selection) {
+            if (selected !== gizmoTarget) {
                 Debugger.drawBounds(selected, renderer, false)
             }
         }

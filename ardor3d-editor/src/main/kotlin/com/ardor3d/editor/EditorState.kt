@@ -141,6 +141,18 @@ class EditorState {
     }
 
     /**
+     * Replaces the selection with [spatials]; the first entry becomes the primary selection.
+     */
+    fun selectAll(spatials: List<Spatial>) {
+        _selection.clear()
+        for (spatial in spatials) {
+            if (spatial !in _selection) {
+                _selection.add(spatial)
+            }
+        }
+    }
+
+    /**
      * Add a spatial to the current selection.
      */
     fun addToSelection(spatial: Spatial) {

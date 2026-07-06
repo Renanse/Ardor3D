@@ -64,6 +64,31 @@ class SetterCommand<T>(
 }
 
 /**
+ * Groups several commands into one undo step: executes them in order and undoes them in
+ * reverse. Used for operations over a multi-selection (delete, duplicate). The optional
+ * callbacks run after all children and let callers keep selection state in sync.
+ */
+class CompositeCommand(
+    override val name: String,
+    private val commands: List<EditorCommand>,
+    private val onExecuted: () -> Unit = {},
+    private val onUndone: () -> Unit = {}
+) : EditorCommand {
+
+    override val affectsStructure: Boolean = commands.any { it.affectsStructure }
+
+    override fun execute() {
+        commands.forEach { it.execute() }
+        onExecuted()
+    }
+
+    override fun undo() {
+        commands.asReversed().forEach { it.undo() }
+        onUndone()
+    }
+}
+
+/**
  * Attaches [child] to [parent] on execute and detaches it on undo. The optional callbacks let
  * callers keep selection state in sync.
  */

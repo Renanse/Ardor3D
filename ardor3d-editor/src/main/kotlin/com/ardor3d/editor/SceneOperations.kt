@@ -28,6 +28,8 @@ class SceneOperations(
     val addLight: (LightType) -> Unit,
     val deleteSpatial: (Spatial) -> Unit,
     val duplicateSpatial: (Spatial) -> Unit,
+    val deleteSelection: () -> Unit,
+    val duplicateSelection: () -> Unit,
     val renameSpatial: (Spatial, String) -> Unit,
     val createEmpty: () -> Unit
 )

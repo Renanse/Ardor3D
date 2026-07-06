@@ -12,9 +12,10 @@ package com.ardor3d.editor.hierarchy
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -23,6 +24,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.input.pointer.isMetaPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
@@ -44,9 +48,44 @@ fun HierarchyPanel(
     // Spatial currently being renamed via the context menu, if any
     var renameTarget by remember { mutableStateOf<Spatial?>(null) }
 
+    // Anchor for shift-click range selection: the last plainly-clicked or toggled item
+    var selectionAnchor by remember { mutableStateOf<Spatial?>(null) }
+
     // Observe structure version so the tree refreshes on attach/detach/rename
     @Suppress("UNUSED_VARIABLE")
     val version = editorState.structureVersion
+
+    // Plain click selects; ctrl-click toggles; shift-click selects the visible range from the
+    // anchor (falling back to a plain select when the anchor is gone).
+    val onItemClick: (Spatial, Boolean, Boolean) -> Unit = { spatial, ctrl, shift ->
+        val anchor = selectionAnchor
+        when {
+            ctrl -> {
+                editorState.toggleSelection(spatial)
+                selectionAnchor = spatial
+            }
+
+            shift && anchor != null -> {
+                val visible = mutableListOf<Spatial>()
+                flattenVisible(editorState.sceneRoot, expandedNodes, 0, visible)
+                val anchorIndex = visible.indexOfFirst { it === anchor }
+                val clickedIndex = visible.indexOfFirst { it === spatial }
+                if (anchorIndex >= 0 && clickedIndex >= 0) {
+                    val range = if (anchorIndex <= clickedIndex) anchorIndex..clickedIndex
+                    else clickedIndex..anchorIndex
+                    editorState.selectAll(range.map { visible[it] })
+                } else {
+                    editorState.select(spatial)
+                    selectionAnchor = spatial
+                }
+            }
+
+            else -> {
+                editorState.select(spatial)
+                selectionAnchor = spatial
+            }
+        }
+    }
 
     Surface(
         modifier = modifier,
@@ -94,6 +133,7 @@ fun HierarchyPanel(
                         operations = operations,
                         expandedNodes = expandedNodes,
                         onRequestRename = { renameTarget = it },
+                        onItemClick = onItemClick,
                         depth = 0
                     )
                 }
@@ -125,6 +165,25 @@ fun HierarchyPanel(
                 TextButton(onClick = { renameTarget = null }) { Text("Cancel") }
             }
         )
+    }
+}
+
+/**
+ * Collects the spatials currently visible in the tree, in display order, honoring the same
+ * default-expansion rule as rendering (only the root starts expanded).
+ */
+private fun flattenVisible(
+    spatial: Spatial,
+    expandedNodes: Map<Int, Boolean>,
+    depth: Int,
+    into: MutableList<Spatial>
+) {
+    into.add(spatial)
+    val expanded = expandedNodes[System.identityHashCode(spatial)] ?: (depth == 0)
+    if (expanded && spatial is Node) {
+        for (child in spatial.children) {
+            flattenVisible(child, expandedNodes, depth + 1, into)
+        }
     }
 }
 
@@ -169,6 +228,7 @@ private fun getTypeDescription(spatial: Spatial): String {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NodeTreeItem(
     spatial: Spatial,
@@ -176,6 +236,7 @@ private fun NodeTreeItem(
     operations: SceneOperations,
     expandedNodes: MutableMap<Int, Boolean>,
     onRequestRename: (Spatial) -> Unit,
+    onItemClick: (Spatial, Boolean, Boolean) -> Unit,
     depth: Int
 ) {
     val spatialKey = System.identityHashCode(spatial)
@@ -190,6 +251,13 @@ private fun NodeTreeItem(
         ContextMenuArea(items = {
             if (isRoot) {
                 emptyList()
+            } else if (isSelected && editorState.selection.size > 1) {
+                // Acting on an item that is part of a multi-selection acts on all of it
+                val count = editorState.selection.size
+                listOf(
+                    ContextMenuItem("Duplicate $count objects") { operations.duplicateSelection() },
+                    ContextMenuItem("Delete $count objects") { operations.deleteSelection() }
+                )
             } else {
                 listOf(
                     ContextMenuItem("Rename") { onRequestRename(spatial) },
@@ -207,7 +275,18 @@ private fun NodeTreeItem(
                             else -> MaterialTheme.colorScheme.surface
                         }
                     )
-                    .clickable { editorState.select(spatial) }
+                    .onClick(
+                        keyboardModifiers = { isCtrlPressed || isMetaPressed },
+                        onClick = { onItemClick(spatial, true, false) }
+                    )
+                    .onClick(
+                        keyboardModifiers = { isShiftPressed && !isCtrlPressed && !isMetaPressed },
+                        onClick = { onItemClick(spatial, false, true) }
+                    )
+                    .onClick(
+                        keyboardModifiers = { !isCtrlPressed && !isMetaPressed && !isShiftPressed },
+                        onClick = { onItemClick(spatial, false, false) }
+                    )
                     .padding(start = (depth * 16).dp, top = 2.dp, bottom = 2.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -275,6 +354,7 @@ private fun NodeTreeItem(
                     operations = operations,
                     expandedNodes = expandedNodes,
                     onRequestRename = onRequestRename,
+                    onItemClick = onItemClick,
                     depth = depth + 1
                 )
             }

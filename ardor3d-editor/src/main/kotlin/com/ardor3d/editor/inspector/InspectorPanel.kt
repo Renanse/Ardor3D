@@ -77,6 +77,15 @@ fun InspectorPanel(
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // With a multi-selection, the inspector edits the primary item only
+                    if (editorState.selection.size > 1) {
+                        Text(
+                            text = "${editorState.selection.size} objects selected - editing the first",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
                     // Name section
                     NameSection(selection, editorState)
 

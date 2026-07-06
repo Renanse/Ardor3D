@@ -142,21 +142,21 @@ fun EditorMenuBar(
                 )
                 HorizontalDivider()
                 // The scene root itself cannot be deleted or duplicated
-                val selection = editorState.primarySelection
-                val selectionEditable = selection != null && selection.parent != null
+                val editableCount = editorState.selection.count { it.parent != null }
+                val plural = if (editableCount > 1) " $editableCount objects" else ""
                 DropdownMenuItem(
-                    text = { Text("Delete") },
-                    enabled = selectionEditable,
+                    text = { Text("Delete$plural") },
+                    enabled = editableCount > 0,
                     onClick = {
-                        selection?.let(operations.deleteSpatial)
+                        operations.deleteSelection()
                         editMenuExpanded = false
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Duplicate") },
-                    enabled = selectionEditable,
+                    text = { Text("Duplicate$plural") },
+                    enabled = editableCount > 0,
                     onClick = {
-                        selection?.let(operations.duplicateSpatial)
+                        operations.duplicateSelection()
                         editMenuExpanded = false
                     }
                 )

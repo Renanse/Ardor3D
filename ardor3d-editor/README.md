@@ -23,6 +23,9 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 
 - **Hierarchy panel** — live scene tree with selection, right-click context menu
   (Rename / Duplicate / Delete).
+- **Multi-select** — ctrl-click toggles membership (hierarchy and viewport), shift-click selects
+  a range in the hierarchy. Delete/Duplicate act on the whole selection as one undo step;
+  selecting a node covers its descendants so they aren't processed twice.
 - **Inspector panel** — name, transform (position / XYZ Euler rotation / scale), mesh info,
   ColorSurface material (diffuse/ambient/specular/emissive, shininess), wireframe toggle, and
   light properties (enabled / intensity / color).
@@ -68,7 +71,7 @@ with WSLg's OpenGL stack, not an editor issue. Run on a native desktop for real 
 
 ## Known limitations / next steps
 
-- Single selection only (the state model supports multi-select; the UI doesn't yet).
+- The inspector edits the primary (first) selected object only.
 - No reparenting via drag-and-drop in the hierarchy.
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
 - Rotation is edited as XYZ Euler angles and will jump near the attitude (Z) ±90° singularity.
