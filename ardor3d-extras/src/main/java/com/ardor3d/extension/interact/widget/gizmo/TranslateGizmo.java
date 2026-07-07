@@ -20,7 +20,6 @@ import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Plane;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
@@ -202,8 +201,8 @@ public class TranslateGizmo extends AbstractGizmo {
       return;
     }
 
-    final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
-    final Vector3 offset = getNewOffset(handle, oldMouse, current, camera, manager);
+    _calcVec2A.set(previous.getX(), previous.getY());
+    final Vector3 offset = getNewOffset(handle, _calcVec2A, current, camera, manager);
     final Transform transform = manager.getSpatialState().getTransform();
     transform.setTranslation(offset.addLocal(transform.getTranslation()));
 
@@ -224,12 +223,12 @@ public class TranslateGizmo extends AbstractGizmo {
       case AxisX, AxisY, AxisZ -> {
         // Constrain to the axis: project the two mouse hits onto the axis line.
         final Vector3 dragAxis = _handle.getRotation().applyPost(handle.getAxis(), _calcVec3D).normalizeLocal();
-        final Vector2 axisT = new Vector2();
-        if (!projectOnAxis(dragAxis, oldMouse, new Vector2(current.getX(), current.getY()), camera, axisT)) {
+        _calcVec2B.set(current.getX(), current.getY());
+        if (!projectOnAxis(dragAxis, oldMouse, _calcVec2B, camera, _calcVec2C)) {
           return _calcVec3A.zero();
         }
-        _calcVec3A.set(dragAxis).multiplyLocal(axisT.getX()).addLocal(origin);
-        _calcVec3B.set(dragAxis).multiplyLocal(axisT.getY()).addLocal(origin);
+        _calcVec3A.set(dragAxis).multiplyLocal(_calcVec2C.getX()).addLocal(origin);
+        _calcVec3B.set(dragAxis).multiplyLocal(_calcVec2C.getY()).addLocal(origin);
       }
       case PlaneXY, PlaneXZ, PlaneYZ, Center -> {
         // Free drag against a plane through the gizmo origin.
@@ -239,14 +238,15 @@ public class TranslateGizmo extends AbstractGizmo {
         } else {
           _handle.getRotation().applyPost(handle.getAxis(), normal).normalizeLocal();
         }
-        final Plane pickPlane = new Plane(normal, normal.dot(origin));
+        _calcPlane.setNormal(normal);
+        _calcPlane.setConstant(normal.dot(origin));
 
         getPickRay(oldMouse, camera);
-        if (!_calcRay.intersectsPlane(pickPlane, _calcVec3A)) {
+        if (!_calcRay.intersectsPlane(_calcPlane, _calcVec3A)) {
           return _calcVec3A.zero();
         }
-        getPickRay(new Vector2(current.getX(), current.getY()), camera);
-        if (!_calcRay.intersectsPlane(pickPlane, _calcVec3B)) {
+        getPickRay(_calcVec2B.set(current.getX(), current.getY()), camera);
+        if (!_calcRay.intersectsPlane(_calcPlane, _calcVec3B)) {
           return _calcVec3A.zero();
         }
       }

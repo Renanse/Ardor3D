@@ -227,11 +227,15 @@ public class InteractGizmoExample extends ExampleBase {
     scaleGizmo = new ScaleGizmo().withAllHandles();
     manager.addWidget(scaleGizmo);
 
-    manager.setActiveWidget(switch (System.getProperty("gizmo.widget", "translate")) {
-      case "rotate" -> rotateGizmo;
-      case "scale" -> scaleGizmo;
-      default -> translateGizmo;
-    });
+    // The ring-drag simulation drives the rotate gizmo directly; it must also be the active
+    // widget or the manager would render a different gizmo than the one being dragged.
+    final boolean simulatedRingDrag = "ringx".equals(System.getProperty("gizmo.drag"));
+    manager.setActiveWidget(simulatedRingDrag ? rotateGizmo
+        : switch (System.getProperty("gizmo.widget", "translate")) {
+          case "rotate" -> rotateGizmo;
+          case "scale" -> scaleGizmo;
+          default -> translateGizmo;
+        });
 
     // switch widgets
     manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE),

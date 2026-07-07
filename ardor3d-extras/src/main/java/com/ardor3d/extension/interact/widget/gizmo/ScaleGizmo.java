@@ -167,8 +167,8 @@ public class ScaleGizmo extends AbstractGizmo {
       return;
     }
 
-    final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
-    final double factor = getScaleFactor(handle, oldMouse, current, camera);
+    _calcVec2A.set(previous.getX(), previous.getY());
+    final double factor = getScaleFactor(handle, _calcVec2A, current, camera);
 
     final Transform transform = manager.getSpatialState().getTransform();
     final Vector3 scale = new Vector3(transform.getScale());
@@ -201,12 +201,12 @@ public class ScaleGizmo extends AbstractGizmo {
       case AxisX, AxisY, AxisZ -> {
         // Scale by the ratio of the grab point's distance from the gizmo center along the axis.
         final Vector3 dragAxis = _handle.getRotation().applyPost(handle.getAxis(), _calcVec3D).normalizeLocal();
-        final Vector2 axisT = new Vector2();
-        if (!projectOnAxis(dragAxis, oldMouse, new Vector2(current.getX(), current.getY()), camera, axisT)
-            || Math.abs(axisT.getX()) < 1e-8) {
+        _calcVec2B.set(current.getX(), current.getY());
+        if (!projectOnAxis(dragAxis, oldMouse, _calcVec2B, camera, _calcVec2C)
+            || Math.abs(_calcVec2C.getX()) < 1e-8) {
           return 1.0;
         }
-        factor = axisT.getY() / axisT.getX();
+        factor = _calcVec2C.getY() / _calcVec2C.getX();
       }
       case Center ->
         // Uniform: grow dragging up/right, shrink dragging down/left.

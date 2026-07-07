@@ -86,6 +86,12 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   protected final ZBufferState _ghostZState = new ZBufferState();
 
+  // scratch objects for the drag hot path, complementing the _calcVec3* pool in the base class
+  protected final Vector2 _calcVec2A = new Vector2();
+  protected final Vector2 _calcVec2B = new Vector2();
+  protected final Vector2 _calcVec2C = new Vector2();
+  protected final Plane _calcPlane = new Plane();
+
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
     LightProperties.setLightReceiver(_handle, false);
@@ -266,14 +272,15 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
       return false;
     }
     normal.normalizeLocal();
-    final Plane pickPlane = new Plane(normal, normal.dot(origin));
+    _calcPlane.setNormal(normal);
+    _calcPlane.setConstant(normal.dot(origin));
 
     getPickRay(oldMouse, camera);
-    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3A)) {
+    if (!_calcRay.intersectsPlane(_calcPlane, _calcVec3A)) {
       return false;
     }
     getPickRay(newMouse, camera);
-    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3B)) {
+    if (!_calcRay.intersectsPlane(_calcPlane, _calcVec3B)) {
       return false;
     }
 

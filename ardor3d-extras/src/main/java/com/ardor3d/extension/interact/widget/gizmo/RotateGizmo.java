@@ -23,7 +23,6 @@ import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Plane;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
@@ -37,6 +36,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BasicText;
@@ -58,6 +58,8 @@ public class RotateGizmo extends AbstractGizmo {
   public static final double PICK_PROXY_TUBE_RADIUS = 0.06;
   public static final double PIE_RADIUS = 0.95;
   public static final float PIE_ALPHA = 0.3f;
+  /** Cap on pie wedge tessellation; beyond this, segments span more than 5 degrees each. */
+  public static final int PIE_MAX_SEGMENTS = 256;
   public static final int ARC_SAMPLES = 48;
   public static final int TUBE_SAMPLES = 8;
 
@@ -82,6 +84,9 @@ public class RotateGizmo extends AbstractGizmo {
   protected final Vector3 _dragAxis = new Vector3();
 
   protected final Mesh _pieMesh;
+  /** Reused vertex storage for the pie wedge, so dragging stays allocation-free. */
+  protected final FloatBuffer _pieBuffer =
+      BufferUtils.createVector3Buffer(RotateGizmo.PIE_MAX_SEGMENTS + 2);
   protected final BasicText _angleText;
 
   public RotateGizmo() {
@@ -91,8 +96,9 @@ public class RotateGizmo extends AbstractGizmo {
     // to match the dragged ring.
     _pieMesh = new Mesh("dragPie");
     _pieMesh.getMeshData().setIndexMode(IndexMode.TriangleFan);
-    // seed with a degenerate wedge; updatePie() replaces it while dragging
-    _pieMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(3));
+    // seed with a degenerate wedge; updatePie() rewrites the buffer while dragging
+    _pieBuffer.limit(3 * 3);
+    _pieMesh.getMeshData().setVertexBuffer(_pieBuffer);
     LightProperties.setLightReceiver(_pieMesh, false);
     final CullState pieCull = new CullState();
     pieCull.setCullFace(CullState.Face.None);
@@ -291,18 +297,21 @@ public class RotateGizmo extends AbstractGizmo {
     _handle.getRotation().applyPre(e1, e1);
     final Vector3 e2 = axisLocal.cross(e1, _calcVec3C);
 
-    final int segments = Math.max(1, (int) Math.ceil(Math.abs(_displayAngle) / (5 * MathUtils.DEG_TO_RAD)));
-    final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(segments + 2);
-    vertexBuffer.put(0).put(0).put(0);
+    final int segments = MathUtils.clamp(
+        (int) Math.ceil(Math.abs(_displayAngle) / (5 * MathUtils.DEG_TO_RAD)), 1, RotateGizmo.PIE_MAX_SEGMENTS);
+    _pieBuffer.clear();
+    _pieBuffer.put(0).put(0).put(0);
     for (int i = 0; i <= segments; i++) {
       final double angle = _displayAngle * i / segments;
       final double c = Math.cos(angle) * RotateGizmo.PIE_RADIUS;
       final double s = Math.sin(angle) * RotateGizmo.PIE_RADIUS;
-      vertexBuffer.put((float) (e1.getX() * c + e2.getX() * s)) //
+      _pieBuffer.put((float) (e1.getX() * c + e2.getX() * s)) //
           .put((float) (e1.getY() * c + e2.getY() * s)) //
           .put((float) (e1.getZ() * c + e2.getZ() * s));
     }
-    _pieMesh.getMeshData().setVertexBuffer(vertexBuffer);
+    _pieBuffer.flip();
+    _pieMesh.getMeshData().updateVertexCount();
+    _pieMesh.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
   }
 
   @Override
@@ -337,8 +346,8 @@ public class RotateGizmo extends AbstractGizmo {
       return;
     }
 
-    final Vector2 oldMouse = new Vector2(previous.getX(), previous.getY());
-    final ReadOnlyQuaternion rot = getNewRotation(handle, oldMouse, current, camera, manager);
+    _calcVec2A.set(previous.getX(), previous.getY());
+    final ReadOnlyQuaternion rot = getNewRotation(handle, _calcVec2A, current, camera, manager);
     final Transform transform = manager.getSpatialState().getTransform();
     rot.toRotationMatrix(_calcMat3).multiply(transform.getMatrix(), _calcMat3);
     transform.setRotation(_calcMat3);
@@ -365,14 +374,15 @@ public class RotateGizmo extends AbstractGizmo {
     }
 
     // Drag against the ring's plane.
-    final Plane pickPlane = new Plane(_dragAxis, _dragAxis.dot(origin));
+    _calcPlane.setNormal(_dragAxis);
+    _calcPlane.setConstant(_dragAxis.dot(origin));
 
     getPickRay(oldMouse, camera);
-    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3A)) {
+    if (!_calcRay.intersectsPlane(_calcPlane, _calcVec3A)) {
       return Quaternion.IDENTITY;
     }
-    getPickRay(new Vector2(current.getX(), current.getY()), camera);
-    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3B)) {
+    getPickRay(_calcVec2B.set(current.getX(), current.getY()), camera);
+    if (!_calcRay.intersectsPlane(_calcPlane, _calcVec3B)) {
       return Quaternion.IDENTITY;
     }
 

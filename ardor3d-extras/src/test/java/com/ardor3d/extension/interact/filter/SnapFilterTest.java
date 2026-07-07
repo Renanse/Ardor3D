@@ -195,6 +195,18 @@ public class SnapFilterTest {
   }
 
   @Test
+  public void testAngleSnapDisabled() {
+    final AngleSnapFilter filter = new AngleSnapFilter(15 * MathUtils.DEG_TO_RAD);
+    filter.setEnabled(false);
+    filter.beginDrag(_manager, _widget, null);
+
+    final Matrix3 rot = new Matrix3().fromAngleNormalAxis(20 * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
+    _manager.getSpatialState().getTransform().setRotation(rot);
+    filter.applyFilter(_manager, _widget);
+    assertMatrixEquals(rot, _manager.getSpatialState().getTransform().getMatrix());
+  }
+
+  @Test
   public void testAngleSnapWithoutDragIsANoOp() {
     final AngleSnapFilter filter = new AngleSnapFilter(15 * MathUtils.DEG_TO_RAD);
     // no beginDrag
