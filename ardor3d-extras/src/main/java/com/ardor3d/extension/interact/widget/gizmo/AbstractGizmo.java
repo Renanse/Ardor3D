@@ -21,9 +21,11 @@ import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
@@ -232,6 +234,51 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
       final float alpha = handle.getBaseColor().getAlpha() * (float) handle.getFadeAlpha() * alphaMultiplier;
       handle.applyColor(rgb, alpha);
     }
+  }
+
+  /**
+   * Project the pick-ray hits for two mouse positions onto a world-space axis line through the
+   * gizmo origin. The hits are taken against the plane containing the axis that most directly
+   * faces the camera - the standard construction for single-axis drags.
+   *
+   * @param axis
+   *          unit direction of the axis, in world space.
+   * @param oldMouse
+   *          previous mouse position.
+   * @param newMouse
+   *          current mouse position.
+   * @param camera
+   *          the viewing camera.
+   * @param store
+   *          on success, x holds the old hit's signed distance along the axis from the gizmo
+   *          origin and y the new hit's.
+   * @return false if the axis is aligned with the view direction (ill-conditioned) or a pick ray
+   *         missed the plane.
+   */
+  protected boolean projectOnAxis(final ReadOnlyVector3 axis, final Vector2 oldMouse, final Vector2 newMouse,
+      final Camera camera, final Vector2 store) {
+    final ReadOnlyVector3 origin = _handle.getWorldTranslation();
+
+    // The plane's normal is the component of the view direction perpendicular to the axis.
+    final Vector3 normal = _calcVec3C.set(camera.getDirection())
+        .subtractLocal(axis.multiply(camera.getDirection().dot(axis), _calcVec3A));
+    if (normal.lengthSquared() < 1e-10) {
+      return false;
+    }
+    normal.normalizeLocal();
+    final Plane pickPlane = new Plane(normal, normal.dot(origin));
+
+    getPickRay(oldMouse, camera);
+    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3A)) {
+      return false;
+    }
+    getPickRay(newMouse, camera);
+    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3B)) {
+      return false;
+    }
+
+    store.set(_calcVec3A.subtractLocal(origin).dot(axis), _calcVec3B.subtractLocal(origin).dot(axis));
+    return true;
   }
 
   @Override

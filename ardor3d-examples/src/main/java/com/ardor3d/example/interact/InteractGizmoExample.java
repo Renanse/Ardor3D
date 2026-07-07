@@ -27,6 +27,7 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
 import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo;
+import com.ardor3d.extension.interact.widget.gizmo.ScaleGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.TranslateGizmo;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
@@ -81,6 +82,7 @@ public class InteractGizmoExample extends ExampleBase {
   private InteractManager manager;
   private TranslateGizmo translateGizmo;
   private RotateGizmo rotateGizmo;
+  private ScaleGizmo scaleGizmo;
 
   private int _frames = 0;
 
@@ -215,16 +217,24 @@ public class InteractGizmoExample extends ExampleBase {
     // the angle readout is screen-space ui - it renders with the ortho pass
     _orthoRoot.attachChild(rotateGizmo.getAngleReadout());
 
-    manager.setActiveWidget(
-        "rotate".equals(System.getProperty("gizmo.widget")) ? rotateGizmo : translateGizmo);
+    scaleGizmo = new ScaleGizmo().withAllHandles();
+    manager.addWidget(scaleGizmo);
+
+    manager.setActiveWidget(switch (System.getProperty("gizmo.widget", "translate")) {
+      case "rotate" -> rotateGizmo;
+      case "scale" -> scaleGizmo;
+      default -> translateGizmo;
+    });
 
     // switch widgets
     manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE),
         (source, inputStates, tpf) -> manager.setActiveWidget(translateGizmo)));
     manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.TWO),
         (source, inputStates, tpf) -> manager.setActiveWidget(rotateGizmo)));
+    manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.THREE),
+        (source, inputStates, tpf) -> manager.setActiveWidget(scaleGizmo)));
 
-    // toggle world/local interact frame
+    // toggle world/local interact frame (the scale gizmo is always local)
     manager.getLogicalLayer()
         .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), (source, inputStates, tpf) -> {
           final InteractMatrix next =

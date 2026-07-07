@@ -220,49 +220,39 @@ public class TranslateGizmo extends AbstractGizmo {
 
     final ReadOnlyVector3 origin = _handle.getWorldTranslation();
 
-    // Establish the plane we drag against and, for single-axis handles, the axis to constrain to.
-    Vector3 dragAxis = null;
-    final Vector3 normal = _calcVec3C;
     switch (handle.getPart()) {
       case AxisX, AxisY, AxisZ -> {
-        dragAxis = _handle.getRotation().applyPost(handle.getAxis(), _calcVec3D).normalizeLocal();
-        // The plane through the axis that most directly faces the camera: its normal is the
-        // component of the view direction perpendicular to the axis.
-        normal.set(camera.getDirection())
-            .subtractLocal(dragAxis.multiply(camera.getDirection().dot(dragAxis), _calcVec3A));
-        if (normal.lengthSquared() < 1e-10) {
-          // Axis is aligned with the view direction; the drag is ill-conditioned (and the handle
-          // is faded out). Ignore.
+        // Constrain to the axis: project the two mouse hits onto the axis line.
+        final Vector3 dragAxis = _handle.getRotation().applyPost(handle.getAxis(), _calcVec3D).normalizeLocal();
+        final Vector2 axisT = new Vector2();
+        if (!projectOnAxis(dragAxis, oldMouse, new Vector2(current.getX(), current.getY()), camera, axisT)) {
           return _calcVec3A.zero();
         }
-        normal.normalizeLocal();
+        _calcVec3A.set(dragAxis).multiplyLocal(axisT.getX()).addLocal(origin);
+        _calcVec3B.set(dragAxis).multiplyLocal(axisT.getY()).addLocal(origin);
       }
-      case PlaneXY, PlaneXZ, PlaneYZ -> _handle.getRotation().applyPost(handle.getAxis(), normal).normalizeLocal();
-      case Center -> normal.set(camera.getDirection());
+      case PlaneXY, PlaneXZ, PlaneYZ, Center -> {
+        // Free drag against a plane through the gizmo origin.
+        final Vector3 normal = _calcVec3C;
+        if (handle.getPart() == GizmoPart.Center) {
+          normal.set(camera.getDirection());
+        } else {
+          _handle.getRotation().applyPost(handle.getAxis(), normal).normalizeLocal();
+        }
+        final Plane pickPlane = new Plane(normal, normal.dot(origin));
+
+        getPickRay(oldMouse, camera);
+        if (!_calcRay.intersectsPlane(pickPlane, _calcVec3A)) {
+          return _calcVec3A.zero();
+        }
+        getPickRay(new Vector2(current.getX(), current.getY()), camera);
+        if (!_calcRay.intersectsPlane(pickPlane, _calcVec3B)) {
+          return _calcVec3A.zero();
+        }
+      }
       default -> {
         return _calcVec3A.zero();
       }
-    }
-    final Plane pickPlane = new Plane(normal, normal.dot(origin));
-
-    // find out where we were hitting the plane before
-    getPickRay(oldMouse, camera);
-    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3A)) {
-      return _calcVec3A.zero();
-    }
-
-    // find out where we are hitting the plane now
-    getPickRay(new Vector2(current.getX(), current.getY()), camera);
-    if (!_calcRay.intersectsPlane(pickPlane, _calcVec3B)) {
-      return _calcVec3A.zero();
-    }
-
-    if (dragAxis != null) {
-      // Constrain to the axis: replace the two hits with their projections onto the axis line.
-      final double oldT = _calcVec3A.subtractLocal(origin).dot(dragAxis);
-      final double newT = _calcVec3B.subtractLocal(origin).dot(dragAxis);
-      _calcVec3A.set(dragAxis).multiplyLocal(oldT).addLocal(origin);
-      _calcVec3B.set(dragAxis).multiplyLocal(newT).addLocal(origin);
     }
 
     // convert to target coord space
