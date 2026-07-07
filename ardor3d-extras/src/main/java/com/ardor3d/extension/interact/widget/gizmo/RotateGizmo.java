@@ -34,34 +34,41 @@ import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.MaterialUtil;
+import com.ardor3d.util.geom.GeometryTool;
 
 /**
  * A v2 rotation gizmo: three axis rings drawn as half-circles kept facing the camera (the back
  * half of a rotation circle is not usefully draggable), plus an outer ring for rolling about the
- * view direction. While dragging, a translucent pie wedge sweeps out the accumulated rotation and
- * a text readout shows the angle in degrees. See {@link AbstractGizmo} for the shared visual
+ * view direction. Rings are antialiased screen-space strokes holding a constant pixel width.
+ * While dragging, a translucent pie wedge with stroked edges sweeps out the accumulated rotation
+ * and a text readout shows the angle in degrees. See {@link AbstractGizmo} for the shared visual
  * behavior.
  */
 public class RotateGizmo extends AbstractGizmo {
 
   // All geometry is built to a gizmo of radius ~1.0, sized on screen by AbstractGizmo.
+  // Stroke widths are in screen pixels at 1:1 DPI scale.
   public static final double RING_RADIUS = 1.0;
   public static final double VIEW_RING_RADIUS = 1.18;
-  public static final double TUBE_RADIUS = 0.011;
+  public static final float RING_WIDTH = 2f;
   public static final double PICK_PROXY_TUBE_RADIUS = 0.06;
   public static final double PIE_RADIUS = 0.95;
   public static final float PIE_ALPHA = 0.3f;
+  public static final float PIE_EDGE_WIDTH = 1.75f;
+  public static final float PIE_EDGE_ALPHA = 0.9f;
   /** Cap on pie wedge tessellation; beyond this, segments span more than 5 degrees each. */
   public static final int PIE_MAX_SEGMENTS = 256;
   public static final int ARC_SAMPLES = 48;
-  public static final int TUBE_SAMPLES = 8;
+
+  /** The roll ring's white, a touch brighter than the shared center-handle gray. */
+  public static final ReadOnlyColorRGBA VIEW_RING_COLOR = new ColorRGBA(0.95f, 0.95f, 0.95f, 0.9f);
 
   protected GizmoHandle _viewRingHandle;
 
@@ -87,6 +94,9 @@ public class RotateGizmo extends AbstractGizmo {
   /** Reused vertex storage for the pie wedge, so dragging stays allocation-free. */
   protected final FloatBuffer _pieBuffer =
       BufferUtils.createVector3Buffer(RotateGizmo.PIE_MAX_SEGMENTS + 2);
+  /** Stroke along the pie wedge's two radial edges: grab direction and current direction. */
+  protected final Line _pieEdgeLine;
+  protected final FloatBuffer _pieEdgeBuffer = BufferUtils.createVector3Buffer(3);
   protected final BasicText _angleText;
 
   public RotateGizmo() {
@@ -100,13 +110,25 @@ public class RotateGizmo extends AbstractGizmo {
     _pieBuffer.limit(3 * 3);
     _pieMesh.getMeshData().setVertexBuffer(_pieBuffer);
     LightProperties.setLightReceiver(_pieMesh, false);
-    final CullState pieCull = new CullState();
-    pieCull.setCullFace(CullState.Face.None);
-    _pieMesh.setRenderState(pieCull);
     _pieMesh.getSceneHints().setAllPickingHints(false);
     _pieMesh.getSceneHints().setCullHint(CullHint.Always);
     _handle.attachChild(_pieMesh);
     MaterialUtil.autoMaterials(_pieMesh);
+
+    // Crisp edges on the wedge's radii: rim at the grab direction, center, rim at the current
+    // direction. updatePie() rewrites the three points while dragging.
+    _pieEdgeLine = new Line("dragPieEdges");
+    _pieEdgeLine.getMeshData().setVertexBuffer(_pieEdgeBuffer);
+    _pieEdgeLine.getMeshData().setIndexMode(IndexMode.LineStripAdjacency);
+    _pieEdgeLine.getMeshData()
+        .setIndices(GeometryTool.generateAdjacencyIndices(IndexMode.LineStripAdjacency, 3));
+    _pieEdgeLine.setAntialiased(true);
+    _pieEdgeLine.setLineWidth(RotateGizmo.PIE_EDGE_WIDTH);
+    LightProperties.setLightReceiver(_pieEdgeLine, false);
+    _pieEdgeLine.getSceneHints().setAllPickingHints(false);
+    _pieEdgeLine.getSceneHints().setCullHint(CullHint.Always);
+    _handle.attachChild(_pieEdgeLine);
+    MaterialUtil.autoMaterials(_pieEdgeLine);
 
     // Screen-space angle readout, living in the ortho render queue. The gizmo shows, hides,
     // positions and updates it during ring drags; the application decides where it renders by
@@ -141,9 +163,8 @@ public class RotateGizmo extends AbstractGizmo {
     final Node root = new Node(GizmoPart.RingView.name());
     LightProperties.setLightReceiver(root, false);
 
-    final Mesh ring = GizmoGeometry.arcTube("ring", RotateGizmo.VIEW_RING_RADIUS, RotateGizmo.TUBE_RADIUS, 0,
-        MathUtils.TWO_PI, RotateGizmo.ARC_SAMPLES * 2, RotateGizmo.TUBE_SAMPLES);
-    ring.updateModelBound();
+    final Line ring = GizmoGeometry.arcStroke("ring", RotateGizmo.VIEW_RING_RADIUS, 0, MathUtils.TWO_PI,
+        RotateGizmo.ARC_SAMPLES * 2, RotateGizmo.RING_WIDTH);
     root.attachChild(ring);
 
     final Mesh proxy = GizmoGeometry.arcTube("pickProxy", RotateGizmo.VIEW_RING_RADIUS,
@@ -152,7 +173,8 @@ public class RotateGizmo extends AbstractGizmo {
     proxy.getSceneHints().setCullHint(CullHint.Always);
     root.attachChild(proxy);
 
-    _viewRingHandle = new GizmoHandle(GizmoPart.RingView, root, DEFAULT_CENTER_COLOR, Vector3.ZERO, FadeMode.None);
+    _viewRingHandle = new GizmoHandle(GizmoPart.RingView, root, RotateGizmo.VIEW_RING_COLOR, Vector3.ZERO,
+        FadeMode.None);
     addGizmoHandle(_viewRingHandle);
     MaterialUtil.autoMaterials(root);
     return this;
@@ -164,9 +186,8 @@ public class RotateGizmo extends AbstractGizmo {
 
     // A half circle in the XY plane centered on +X; updateCameraFacingHandles turns it so +Z is
     // the rotation axis and +X faces the camera.
-    final Mesh arc = GizmoGeometry.arcTube("arc", RotateGizmo.RING_RADIUS, RotateGizmo.TUBE_RADIUS, -MathUtils.HALF_PI,
-        MathUtils.HALF_PI, RotateGizmo.ARC_SAMPLES, RotateGizmo.TUBE_SAMPLES);
-    arc.updateModelBound();
+    final Line arc = GizmoGeometry.arcStroke("arc", RotateGizmo.RING_RADIUS, -MathUtils.HALF_PI, MathUtils.HALF_PI,
+        RotateGizmo.ARC_SAMPLES, RotateGizmo.RING_WIDTH);
     root.attachChild(arc);
 
     final Mesh proxy = GizmoGeometry.arcTube("pickProxy", RotateGizmo.RING_RADIUS,
@@ -284,11 +305,16 @@ public class RotateGizmo extends AbstractGizmo {
     final GizmoHandle active = _dragState != DragState.NONE ? findGizmoHandle(_lastDragSpatial) : null;
     if (active == null || _dragStartDir == null) {
       _pieMesh.getSceneHints().setCullHint(CullHint.Always);
+      _pieEdgeLine.getSceneHints().setCullHint(CullHint.Always);
       return;
     }
     _pieMesh.getSceneHints().setCullHint(CullHint.Never);
     _pieMesh.setDefaultColor(active.getBaseColor().getRed(), active.getBaseColor().getGreen(),
         active.getBaseColor().getBlue(), RotateGizmo.PIE_ALPHA);
+    _pieEdgeLine.getSceneHints().setCullHint(CullHint.Never);
+    _pieEdgeLine.setDefaultColor(active.getBaseColor().getRed(), active.getBaseColor().getGreen(),
+        active.getBaseColor().getBlue(), RotateGizmo.PIE_EDGE_ALPHA);
+    _pieEdgeLine.setLineWidth(RotateGizmo.PIE_EDGE_WIDTH * (float) _appliedDpiScale);
 
     // Work in the gizmo's local frame: in-plane basis from the grab direction and drag axis.
     final Vector3 axisLocal = _calcVec3A.set(_dragAxis);
@@ -312,6 +338,21 @@ public class RotateGizmo extends AbstractGizmo {
     _pieBuffer.flip();
     _pieMesh.getMeshData().updateVertexCount();
     _pieMesh.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+
+    // Edge stroke: rim at the grab direction, through the center, to the rim at the current
+    // direction.
+    final double cosEnd = Math.cos(_displayAngle) * RotateGizmo.PIE_RADIUS;
+    final double sinEnd = Math.sin(_displayAngle) * RotateGizmo.PIE_RADIUS;
+    _pieEdgeBuffer.clear();
+    _pieEdgeBuffer.put((float) (e1.getX() * RotateGizmo.PIE_RADIUS)) //
+        .put((float) (e1.getY() * RotateGizmo.PIE_RADIUS)) //
+        .put((float) (e1.getZ() * RotateGizmo.PIE_RADIUS));
+    _pieEdgeBuffer.put(0).put(0).put(0);
+    _pieEdgeBuffer.put((float) (e1.getX() * cosEnd + e2.getX() * sinEnd)) //
+        .put((float) (e1.getY() * cosEnd + e2.getY() * sinEnd)) //
+        .put((float) (e1.getZ() * cosEnd + e2.getZ() * sinEnd));
+    _pieEdgeBuffer.rewind();
+    _pieEdgeLine.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
   }
 
   @Override
@@ -331,6 +372,8 @@ public class RotateGizmo extends AbstractGizmo {
     final Camera camera = source.getCanvasRenderer().getCamera();
     final MouseState current = inputStates.getCurrent().getMouseState();
     final MouseState previous = inputStates.getPrevious().getMouseState();
+
+    captureDpiScaleProvider(source);
 
     // first process mouse over state
     checkMouseOver(source, current, manager);

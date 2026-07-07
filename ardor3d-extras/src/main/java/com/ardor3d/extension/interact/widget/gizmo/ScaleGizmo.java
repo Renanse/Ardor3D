@@ -28,6 +28,7 @@ import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -37,7 +38,8 @@ import com.ardor3d.util.MaterialUtil;
 
 /**
  * A v2 scale gizmo: three cube-tipped axis handles for non-uniform, per-axis scaling and a center
- * cube for uniform scaling. See {@link AbstractGizmo} for the shared visual behavior.
+ * cube for uniform scaling. Shafts are antialiased screen-space strokes holding a constant pixel
+ * width; the cubes are solid geometry. See {@link AbstractGizmo} for the shared visual behavior.
  *
  * Because a non-uniform scale is only meaningful along the target's own axes, this gizmo always
  * operates in the target's local frame - the interact matrix setting is ignored.
@@ -49,10 +51,11 @@ import com.ardor3d.util.MaterialUtil;
 public class ScaleGizmo extends AbstractGizmo {
 
   // All geometry is built to a gizmo of length 1.0, sized on screen by AbstractGizmo. Slightly
-  // shorter than the translate arrows so the two read differently at a glance.
-  public static final double SHAFT_RADIUS = 0.015;
+  // shorter than the translate arrows so the two read differently at a glance. Stroke widths are
+  // in screen pixels at 1:1 DPI scale.
   public static final double SHAFT_START = 0.18;
-  public static final double TIP_HALF_EXTENT = 0.05;
+  public static final float SHAFT_WIDTH = 2.5f;
+  public static final double TIP_HALF_EXTENT = 0.06;
   public static final double TIP_CENTER = 0.87;
   public static final double PICK_PROXY_RADIUS = 0.06;
   public static final double CENTER_HALF_EXTENT = 0.07;
@@ -104,10 +107,8 @@ public class ScaleGizmo extends AbstractGizmo {
     LightProperties.setLightReceiver(root, false);
 
     // Geometry is built pointing down +Z, then the whole part is rotated onto its axis.
-    final double shaftLength = ScaleGizmo.TIP_CENTER - ScaleGizmo.TIP_HALF_EXTENT - ScaleGizmo.SHAFT_START;
-    final Cylinder shaft = new Cylinder("shaft", 2, 12, ScaleGizmo.SHAFT_RADIUS, shaftLength, false);
-    shaft.getMeshData().translatePoints(0, 0, ScaleGizmo.SHAFT_START + shaftLength * 0.5);
-    shaft.updateModelBound();
+    final Line shaft = GizmoGeometry.segmentStroke("shaft", new Vector3(0, 0, ScaleGizmo.SHAFT_START),
+        new Vector3(0, 0, ScaleGizmo.TIP_CENTER - ScaleGizmo.TIP_HALF_EXTENT), ScaleGizmo.SHAFT_WIDTH);
     root.attachChild(shaft);
 
     final Box tip = new Box("tip", Vector3.ZERO, ScaleGizmo.TIP_HALF_EXTENT, ScaleGizmo.TIP_HALF_EXTENT,
@@ -152,6 +153,8 @@ public class ScaleGizmo extends AbstractGizmo {
     final Camera camera = source.getCanvasRenderer().getCamera();
     final MouseState current = inputStates.getCurrent().getMouseState();
     final MouseState previous = inputStates.getPrevious().getMouseState();
+
+    captureDpiScaleProvider(source);
 
     // first process mouse over state
     checkMouseOver(source, current, manager);

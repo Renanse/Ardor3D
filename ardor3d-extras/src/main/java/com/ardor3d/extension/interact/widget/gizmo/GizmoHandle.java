@@ -11,12 +11,15 @@
 package com.ardor3d.extension.interact.widget.gizmo;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -44,6 +47,12 @@ public class GizmoHandle {
   protected final Vector3 _axis = new Vector3();
   protected final FadeMode _fadeMode;
   protected final List<Mesh> _meshes = new ArrayList<>();
+
+  /** Per-mesh alpha multipliers, for parts mixing solid strokes with dimmer fills. */
+  protected final Map<Mesh, Float> _alphaScales = new IdentityHashMap<>();
+
+  /** Stroke widths as authored, in pixels, so they can be rescaled for display DPI. */
+  protected final Map<Line, Float> _baseLineWidths = new IdentityHashMap<>();
 
   /** Most recently calculated view-angle fade, applied as an alpha multiplier. */
   protected double _fadeAlpha = 1.0;
@@ -75,6 +84,9 @@ public class GizmoHandle {
   protected void collectMeshes(final Spatial spatial) {
     if (spatial instanceof Mesh mesh) {
       _meshes.add(mesh);
+      if (mesh instanceof Line line) {
+        _baseLineWidths.put(line, line.getLineWidth());
+      }
     } else if (spatial instanceof Node node) {
       for (int i = 0; i < node.getNumberOfChildren(); i++) {
         collectMeshes(node.getChild(i));
@@ -83,12 +95,33 @@ public class GizmoHandle {
   }
 
   /**
-   * Set the given color on all of this handle's meshes, replacing the alpha with the given value.
+   * Set the given color on all of this handle's meshes, replacing the alpha with the given value
+   * (scaled per mesh - see {@link #setAlphaScale(Mesh, float)}).
    */
   public void applyColor(final ReadOnlyColorRGBA rgb, final float alpha) {
     for (int i = _meshes.size(); --i >= 0;) {
       final Mesh mesh = _meshes.get(i);
-      mesh.setDefaultColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), alpha);
+      final Float scale = _alphaScales.get(mesh);
+      mesh.setDefaultColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(),
+          scale == null ? alpha : alpha * scale.floatValue());
+    }
+  }
+
+  /**
+   * Give one of this handle's meshes an extra alpha multiplier on top of the handle-wide alpha,
+   * e.g. a translucent fill inside a solid border.
+   */
+  public void setAlphaScale(final Mesh mesh, final float scale) {
+    _alphaScales.put(mesh, scale);
+  }
+
+  /**
+   * Rescale this handle's stroke widths, multiplying each stroke's authored pixel width - used to
+   * match the display's DPI scale.
+   */
+  public void applyLineWidthScale(final float scale) {
+    for (final Map.Entry<Line, Float> entry : _baseLineWidths.entrySet()) {
+      entry.getKey().setLineWidth(entry.getValue().floatValue() * scale);
     }
   }
 
