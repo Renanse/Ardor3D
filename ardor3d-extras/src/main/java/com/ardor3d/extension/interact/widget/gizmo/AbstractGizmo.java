@@ -79,10 +79,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   public static final float HIGHLIGHT_CHROMA_FLOOR = 0.15f;
 
   /** Default on-screen footprint of a gizmo, in pixels. */
-  public static final double DEFAULT_PIXEL_SIZE = 90;
+  public static final double DEFAULT_PIXEL_SIZE = 100;
 
-  /** Alpha multiplier for the occluded (x-ray) render pass. */
-  public static final float DEFAULT_GHOST_ALPHA = 0.28f;
+  /**
+   * Alpha multiplier for the occluded (x-ray) render pass. High enough that the gizmo stays
+   * assertive when buried in its target - occlusion should read as a hint, not hide the tool.
+   */
+  public static final float DEFAULT_GHOST_ALPHA = 0.5f;
 
   /** Handles are not pickable once faded below this alpha. */
   public static final double PICK_ALPHA_FLOOR = 0.2;

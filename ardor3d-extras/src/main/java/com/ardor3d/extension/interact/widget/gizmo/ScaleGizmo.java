@@ -54,11 +54,11 @@ public class ScaleGizmo extends AbstractGizmo {
   // shorter than the translate arrows so the two read differently at a glance. Stroke widths are
   // in screen pixels at 1:1 DPI scale.
   public static final double SHAFT_START = 0.18;
-  public static final float SHAFT_WIDTH = 2.5f;
-  public static final double TIP_HALF_EXTENT = 0.06;
+  public static final float SHAFT_WIDTH = 3.5f;
+  public static final double TIP_HALF_EXTENT = 0.075;
   public static final double TIP_CENTER = 0.87;
-  public static final double PICK_PROXY_RADIUS = 0.06;
-  public static final double CENTER_HALF_EXTENT = 0.07;
+  public static final double PICK_PROXY_RADIUS = 0.09;
+  public static final double CENTER_HALF_EXTENT = 0.085;
 
   /** Uniform scale factor applied per pixel of center-cube mouse movement. */
   public static final double UNIFORM_SCALE_RATE = 0.005;

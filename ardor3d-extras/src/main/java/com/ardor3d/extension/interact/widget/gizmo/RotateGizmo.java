@@ -57,11 +57,11 @@ public class RotateGizmo extends AbstractGizmo {
   // Stroke widths are in screen pixels at 1:1 DPI scale.
   public static final double RING_RADIUS = 1.0;
   public static final double VIEW_RING_RADIUS = 1.18;
-  public static final float RING_WIDTH = 2f;
-  public static final double PICK_PROXY_TUBE_RADIUS = 0.06;
+  public static final float RING_WIDTH = 3f;
+  public static final double PICK_PROXY_TUBE_RADIUS = 0.08;
   public static final double PIE_RADIUS = 0.95;
   public static final float PIE_ALPHA = 0.3f;
-  public static final float PIE_EDGE_WIDTH = 1.75f;
+  public static final float PIE_EDGE_WIDTH = 2.5f;
   public static final float PIE_EDGE_ALPHA = 0.9f;
   /** Cap on pie wedge tessellation; beyond this, segments span more than 5 degrees each. */
   public static final int PIE_MAX_SEGMENTS = 256;

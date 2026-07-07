@@ -49,18 +49,18 @@ public class TranslateGizmo extends AbstractGizmo {
   // All geometry is built to a gizmo of length 1.0, sized on screen by AbstractGizmo.
   // Stroke widths are in screen pixels at 1:1 DPI scale.
   public static final double SHAFT_START = 0.18;
-  public static final float SHAFT_WIDTH = 2.5f;
-  public static final float OUTLINE_WIDTH = 2f;
-  public static final double TIP_RADIUS = 0.07;
-  public static final double TIP_LENGTH = 0.18;
+  public static final float SHAFT_WIDTH = 3.5f;
+  public static final float OUTLINE_WIDTH = 3f;
+  public static final double TIP_RADIUS = 0.085;
+  public static final double TIP_LENGTH = 0.22;
   public static final int TIP_SAMPLES = 24;
-  public static final double PICK_PROXY_RADIUS = 0.06;
-  public static final double PLANE_QUAD_SIZE = 0.24;
-  public static final double PLANE_QUAD_CENTER = 0.38;
-  public static final double CENTER_RADIUS = 0.08;
-  public static final double CENTER_PICK_RADIUS = 0.11;
+  public static final double PICK_PROXY_RADIUS = 0.09;
+  public static final double PLANE_QUAD_SIZE = 0.32;
+  public static final double PLANE_QUAD_CENTER = 0.42;
+  public static final double CENTER_RADIUS = 0.1;
+  public static final double CENTER_PICK_RADIUS = 0.13;
   public static final int CIRCLE_SAMPLES = 48;
-  public static final float PLANE_FILL_ALPHA = 0.35f;
+  public static final float PLANE_FILL_ALPHA = 0.45f;
 
   protected GizmoHandle _centerHandle;
 
