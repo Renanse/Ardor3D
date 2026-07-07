@@ -36,8 +36,9 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 - **Inspector panel** — name, transform (position / XYZ Euler rotation / scale), mesh info,
   ColorSurface material (diffuse/ambient/specular/emissive, shininess), wireframe toggle, and
   light properties (enabled / intensity / color). With a multi-selection, transform edits apply
-  the edited component to every selected object (each keeps its other components) as one
-  merged undo step; fields show a dash where the selection disagrees.
+  the edited component to every selected object (each keeps its other components), material
+  edits to every selected mesh, and light edits to every selected light - each gesture is one
+  merged undo step. Transform fields show a dash where the selection disagrees.
 - **Viewport** — WASD + drag fly camera, mouse-wheel dolly, primitive-accurate click selection,
   interact-widget gizmos for translate/rotate/scale, per-light overlay gizmos, reference grid.
 - **Undo/redo everywhere** — every mutation goes through a command stack
@@ -86,8 +87,9 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 
 ## Known limitations / next steps
 
-- With a multi-selection the inspector's transform section edits all selected objects, but the
-  name and type-specific sections (material, light) still edit the primary (first) object only.
+- With a multi-selection the inspector's name field still edits the primary (first) object
+  only, and the material/light sections display the primary's values (no mixed-value dash
+  there, unlike the transform fields).
 - Window-wide shortcuts (Ctrl+Z/D/N/O/S) fire even while a text field has focus — same seam as
   the pre-existing undo/redo binding; Compose offers no clean focus check at the Window level.
 - Hiding a Node disables only lights hidden *directly*; lights nested inside a hidden subtree

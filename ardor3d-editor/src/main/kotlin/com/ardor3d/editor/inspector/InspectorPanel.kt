@@ -86,12 +86,13 @@ fun InspectorPanel(
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // With a multi-selection, transform edits apply to every selected object;
-                    // the other sections still edit the primary (first) item only
+                    // With a multi-selection, transform edits apply to every selected object
+                    // and material/light edits to every object of that type; only the name
+                    // field is limited to the primary (first) item
                     if (editorState.selection.size > 1) {
                         Text(
-                            text = "${editorState.selection.size} objects selected - transform edits" +
-                                " apply to all, other sections edit the first",
+                            text = "${editorState.selection.size} objects selected - edits apply" +
+                                " to all of matching type (name edits the first)",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -198,22 +199,6 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
         return angles
     }
 
-    // Per-keystroke commands with the same key coalesce into one undo step until the field
-    // loses focus; a multi-selection wraps the per-target commands in a like-keyed composite.
-    fun executeForTargets(verb: String, propertyKey: String, build: (Spatial) -> SetterCommand<*>) {
-        if (targets.size == 1) {
-            editorState.execute(build(targets[0]))
-        } else {
-            editorState.execute(
-                CompositeCommand(
-                    name = "$verb ${targets.size} objects",
-                    commands = targets.map(build),
-                    mergeKey = "$propertyKey:$targetsKey"
-                )
-            )
-        }
-    }
-
     fun withAxis(v: ReadOnlyVector3, axis: String, value: Double) = when (axis) {
         "x" -> Vector3(value, v.y, v.z)
         "y" -> Vector3(v.x, value, v.z)
@@ -221,7 +206,7 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
     }
 
     fun editTranslation(axis: String, value: Double) {
-        executeForTargets("Move", "translation.$axis") { t ->
+        executeAll(editorState, targets, "Move ${targets.size} objects", "translation.$axis:$targetsKey") { t ->
             SetterCommand(
                 name = "Move ${t.name ?: "object"}",
                 oldValue = Vector3(t.translation),
@@ -237,7 +222,7 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
         // matched the primary adopt its pre-edit triplet
         targets.forEach { if (it !== spatial) anglesFor(it) }
         eulerAngles[axis] = valueDegrees
-        executeForTargets("Rotate", "rotation.$axis") { t ->
+        executeAll(editorState, targets, "Rotate ${targets.size} objects", "rotation.$axis:$targetsKey") { t ->
             // The primary uses the typed triplet; other targets keep their own retained
             // triplet on the untouched axes, so only the edited axis is aligned across the
             // selection
@@ -258,7 +243,7 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
     }
 
     fun editScale(axis: String, value: Double) {
-        executeForTargets("Scale", "scale.$axis") { t ->
+        executeAll(editorState, targets, "Scale ${targets.size} objects", "scale.$axis:$targetsKey") { t ->
             SetterCommand(
                 name = "Scale ${t.name ?: "object"}",
                 oldValue = Vector3(t.scale),
@@ -354,27 +339,34 @@ private fun MeshSection(mesh: Mesh, editorState: EditorState) {
     MaterialSection(mesh, editorState)
 }
 
+/** Gets or lazily creates the [ColorSurface] a mesh's material edits act on. */
+private fun surfaceOf(mesh: Mesh): ColorSurface =
+    mesh.getProperty<ColorSurface>(ColorSurface.DefaultPropertyKey, null)
+        ?: ColorSurface().also { mesh.setProperty(ColorSurface.DefaultPropertyKey, it) }
+
 @Composable
 private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
-    InspectorSection(title = "Material") {
-        // Get or create ColorSurface for this mesh
-        val surface = remember(mesh) {
-            mesh.getProperty<ColorSurface>(ColorSurface.DefaultPropertyKey, null)
-                ?: ColorSurface().also { mesh.setProperty(ColorSurface.DefaultPropertyKey, it) }
-        }
-        val surfaceId = System.identityHashCode(surface)
+    // Material edits apply to every selected mesh; the fields display the primary's values
+    val targets = editorState.selection.filterIsInstance<Mesh>().ifEmpty { listOf(mesh) }
+    val targetsKey = targets.joinToString(",") { System.identityHashCode(it).toString() }
+    val title = if (targets.size > 1) "Material (${targets.size} meshes)" else "Material"
+
+    InspectorSection(title = title) {
+        val surface = remember(mesh) { surfaceOf(mesh) }
 
         // Slider/text edits to the same channel merge into one undo step.
-        fun editColor(channel: String, old: ColorRGBA, new: ColorRGBA, setter: (ColorRGBA) -> Unit) {
-            editorState.execute(
+        fun editColor(channel: String, new: ColorRGBA, get: (ColorSurface) -> ReadOnlyColorRGBA,
+                      set: (ColorSurface, ColorRGBA) -> Unit) {
+            executeAll(editorState, targets, "Edit $channel (${targets.size})", "$channel:$targetsKey") { m ->
+                val s = surfaceOf(m)
                 SetterCommand(
                     name = "Edit $channel",
-                    oldValue = old,
+                    oldValue = ColorRGBA(get(s)),
                     newValue = new,
-                    mergeKey = "$channel:$surfaceId",
-                    setter = setter
+                    mergeKey = "$channel:${System.identityHashCode(s)}",
+                    setter = { c -> set(s, c) }
                 )
-            )
+            }
         }
 
         // Diffuse color (main color)
@@ -382,7 +374,7 @@ private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
             label = "Diffuse",
             color = surface.diffuse,
             version = editorState.propertyVersion,
-            onColorChange = { editColor("Diffuse", ColorRGBA(surface.diffuse), it) { c -> surface.diffuse = c } },
+            onColorChange = { editColor("Diffuse", it, { s -> s.diffuse }, { s, c -> s.diffuse = c }) },
             onEditFinished = { editorState.sealUndoMerge() }
         )
 
@@ -393,7 +385,7 @@ private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
             label = "Ambient",
             color = surface.ambient,
             version = editorState.propertyVersion,
-            onColorChange = { editColor("Ambient", ColorRGBA(surface.ambient), it) { c -> surface.ambient = c } },
+            onColorChange = { editColor("Ambient", it, { s -> s.ambient }, { s, c -> s.ambient = c }) },
             onEditFinished = { editorState.sealUndoMerge() }
         )
 
@@ -404,14 +396,14 @@ private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
             label = "Specular",
             color = surface.specular,
             version = editorState.propertyVersion,
-            onColorChange = { editColor("Specular", ColorRGBA(surface.specular), it) { c -> surface.specular = c } },
+            onColorChange = { editColor("Specular", it, { s -> s.specular }, { s, c -> s.specular = c }) },
             onEditFinished = { editorState.sealUndoMerge() }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // Shininess slider
-        ShininessSlider(surface, editorState)
+        ShininessSlider(surface, targets, targetsKey, editorState)
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -435,7 +427,7 @@ private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
                 label = "",
                 color = surface.emissive,
                 version = editorState.propertyVersion,
-                onColorChange = { editColor("Emissive", ColorRGBA(surface.emissive), it) { c -> surface.emissive = c } },
+                onColorChange = { editColor("Emissive", it, { s -> s.emissive }, { s, c -> s.emissive = c }) },
                 onEditFinished = { editorState.sealUndoMerge() }
             )
         }
@@ -445,7 +437,7 @@ private fun MaterialSection(mesh: Mesh, editorState: EditorState) {
         Spacer(modifier = Modifier.height(12.dp))
 
         // Wireframe toggle
-        WireframeToggle(mesh, editorState)
+        WireframeToggle(mesh, targets, editorState)
     }
 }
 
@@ -501,7 +493,12 @@ private fun ColorPropertyField(
 }
 
 @Composable
-private fun ShininessSlider(surface: ColorSurface, editorState: EditorState) {
+private fun ShininessSlider(
+    surface: ColorSurface,
+    targets: List<Mesh>,
+    targetsKey: String,
+    editorState: EditorState
+) {
     var shininess by remember(surface, editorState.propertyVersion) { mutableStateOf(surface.shininess) }
 
     Column {
@@ -520,15 +517,16 @@ private fun ShininessSlider(surface: ColorSurface, editorState: EditorState) {
                 value = shininess,
                 onValueChange = { new ->
                     shininess = new
-                    editorState.execute(
+                    executeAll(editorState, targets, "Edit Shininess (${targets.size})", "shininess:$targetsKey") { m ->
+                        val s = surfaceOf(m)
                         SetterCommand(
                             name = "Edit Shininess",
-                            oldValue = surface.shininess,
+                            oldValue = s.shininess,
                             newValue = new,
-                            mergeKey = "shininess:${System.identityHashCode(surface)}",
-                            setter = { surface.shininess = it }
+                            mergeKey = "shininess:${System.identityHashCode(s)}",
+                            setter = { s.shininess = it }
                         )
-                    )
+                    }
                 },
                 onValueChangeFinished = { editorState.sealUndoMerge() },
                 valueRange = 0f..128f,
@@ -603,8 +601,8 @@ private fun ColorSlider(
 }
 
 @Composable
-private fun WireframeToggle(mesh: Mesh, editorState: EditorState) {
-    // Re-read from the mesh after undo/redo
+private fun WireframeToggle(mesh: Mesh, targets: List<Mesh>, editorState: EditorState) {
+    // Re-read from the (primary) mesh after undo/redo
     val isWireframe = remember(mesh, editorState.propertyVersion) {
         (mesh.getLocalRenderState(RenderState.StateType.Wireframe) as? WireframeState)?.isEnabled ?: false
     }
@@ -621,22 +619,27 @@ private fun WireframeToggle(mesh: Mesh, editorState: EditorState) {
         Switch(
             checked = isWireframe,
             onCheckedChange = { enabled ->
-                editorState.execute(
+                val name = if (enabled) "Enable Wireframe" else "Disable Wireframe"
+                executeAll(editorState, targets, "$name (${targets.size})", null) { m ->
+                    // Old value is per-mesh so undo restores each mesh's own prior state
+                    val wasEnabled =
+                        (m.getLocalRenderState(RenderState.StateType.Wireframe) as? WireframeState)
+                            ?.isEnabled ?: false
                     SetterCommand(
-                        name = if (enabled) "Enable Wireframe" else "Disable Wireframe",
-                        oldValue = !enabled,
+                        name = name,
+                        oldValue = wasEnabled,
                         newValue = enabled,
                         setter = { on ->
                             if (on) {
                                 val wireState = WireframeState()
                                 wireState.isEnabled = true
-                                mesh.setRenderState(wireState)
+                                m.setRenderState(wireState)
                             } else {
-                                mesh.clearRenderState(RenderState.StateType.Wireframe)
+                                m.clearRenderState(RenderState.StateType.Wireframe)
                             }
                         }
                     )
-                )
+                }
                 editorState.sealUndoMerge()
             }
         )
@@ -645,9 +648,12 @@ private fun WireframeToggle(mesh: Mesh, editorState: EditorState) {
 
 @Composable
 private fun LightSection(light: Light, editorState: EditorState) {
-    val lightId = System.identityHashCode(light)
+    // Light edits apply to every selected light; the fields display the primary's values
+    val targets = editorState.selection.filterIsInstance<Light>().ifEmpty { listOf(light) }
+    val targetsKey = targets.joinToString(",") { System.identityHashCode(it).toString() }
+    val title = if (targets.size > 1) "Light (${targets.size} lights)" else "Light"
 
-    InspectorSection(title = "Light") {
+    InspectorSection(title = title) {
         // Enabled switch
         val enabled = remember(light, editorState.propertyVersion) { light.isEnabled }
         Row(
@@ -662,14 +668,15 @@ private fun LightSection(light: Light, editorState: EditorState) {
             Switch(
                 checked = enabled,
                 onCheckedChange = { on ->
-                    editorState.execute(
+                    val name = if (on) "Enable Light" else "Disable Light"
+                    executeAll(editorState, targets, "$name (${targets.size})", null) { l ->
                         SetterCommand(
-                            name = if (on) "Enable Light" else "Disable Light",
-                            oldValue = !on,
+                            name = name,
+                            oldValue = l.isEnabled,
                             newValue = on,
-                            setter = { light.isEnabled = it }
+                            setter = { l.isEnabled = it }
                         )
-                    )
+                    }
                     editorState.sealUndoMerge()
                 }
             )
@@ -694,15 +701,15 @@ private fun LightSection(light: Light, editorState: EditorState) {
                 value = intensity,
                 onValueChange = { new ->
                     intensity = new
-                    editorState.execute(
+                    executeAll(editorState, targets, "Edit Intensity (${targets.size})", "intensity:$targetsKey") { l ->
                         SetterCommand(
                             name = "Edit Intensity",
-                            oldValue = light.intensity,
+                            oldValue = l.intensity,
                             newValue = new,
-                            mergeKey = "intensity:$lightId",
-                            setter = { light.intensity = it }
+                            mergeKey = "intensity:${System.identityHashCode(l)}",
+                            setter = { l.intensity = it }
                         )
-                    )
+                    }
                 },
                 onValueChangeFinished = { editorState.sealUndoMerge() },
                 valueRange = 0f..4f,
@@ -723,15 +730,15 @@ private fun LightSection(light: Light, editorState: EditorState) {
             color = light.color,
             version = editorState.propertyVersion,
             onColorChange = { new ->
-                editorState.execute(
+                executeAll(editorState, targets, "Edit Light Color (${targets.size})", "lightColor:$targetsKey") { l ->
                     SetterCommand(
                         name = "Edit Light Color",
-                        oldValue = ColorRGBA(light.color),
+                        oldValue = ColorRGBA(l.color),
                         newValue = new,
-                        mergeKey = "lightColor:$lightId",
-                        setter = { light.color = it }
+                        mergeKey = "lightColor:${System.identityHashCode(l)}",
+                        setter = { l.color = it }
                     )
-                )
+                }
             },
             onEditFinished = { editorState.sealUndoMerge() }
         )
@@ -867,6 +874,29 @@ private fun ComponentField(
         },
         singleLine = true
     )
+}
+
+/**
+ * Executes one [SetterCommand] per target as a single undo step. Per-keystroke commands with
+ * the same keys coalesce until the gesture ends (focus loss / slider release seals the merge);
+ * a multi-target edit wraps its commands in a [CompositeCommand] keyed by [compositeKey],
+ * which must encode the property and the target identities. A single target executes its
+ * command directly, keeping the command's own name in the undo menu.
+ */
+private fun <T> executeAll(
+    editorState: EditorState,
+    targets: List<T>,
+    compositeName: String,
+    compositeKey: String?,
+    build: (T) -> SetterCommand<*>
+) {
+    if (targets.size == 1) {
+        editorState.execute(build(targets[0]))
+    } else {
+        editorState.execute(
+            CompositeCommand(name = compositeName, commands = targets.map(build), mergeKey = compositeKey)
+        )
+    }
 }
 
 @Composable
