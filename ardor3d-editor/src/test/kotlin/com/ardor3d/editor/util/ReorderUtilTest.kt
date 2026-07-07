@@ -12,7 +12,9 @@ package com.ardor3d.editor.util
 
 import com.ardor3d.scenegraph.Node
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ReorderUtilTest {
@@ -112,6 +114,20 @@ class ReorderUtilTest {
             Insertion.Reorder(rig.root, 1),
             ReorderUtil.resolveInsertion(rig.a, rig.b, after = true, rowExpanded = false)
         )
+    }
+
+    @Test
+    fun isInSceneRejectsDetachedTargets() {
+        val rig = Rig()
+        assertTrue(ReorderUtil.isInScene(rig.root, rig.root))
+        assertTrue(ReorderUtil.isInScene(rig.b1, rig.root))
+
+        // A node detached mid-drag (e.g. by undo) must not be a drop target - nor may its
+        // children, which still have a parent but no path to the scene root
+        rig.root.detachChild(rig.b)
+        assertFalse(ReorderUtil.isInScene(rig.b, rig.root))
+        assertFalse(ReorderUtil.isInScene(rig.b1, rig.root))
+        assertTrue(ReorderUtil.isInScene(rig.a, rig.root))
     }
 
     @Test

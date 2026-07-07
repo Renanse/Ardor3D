@@ -28,6 +28,15 @@ sealed interface Insertion {
 object ReorderUtil {
 
     /**
+     * True when [spatial] is [root] or lives somewhere under it - i.e. is still part of the
+     * scene being edited. Drop handlers must check this on their resolved target: a drop spot
+     * can go stale between hover and release (e.g. a mid-drag undo detaching the hovered
+     * node), and inserting under a detached node makes the dragged object silently vanish.
+     */
+    fun isInScene(spatial: Spatial, root: Node): Boolean =
+        spatial === root || spatial.hasAncestor(root)
+
+    /**
      * Resolves dropping [child] on the edge of [row] - before its top edge, or when [after] is
      * true below its bottom edge - into a concrete [Insertion], or null when the drop is
      * invalid (root row, cycle, the row itself) or would change nothing.
@@ -35,6 +44,9 @@ object ReorderUtil {
      * Dropping just below an expanded node with children ([rowExpanded]) inserts at the top of
      * that node's children, matching what an indicator line drawn between the node and its
      * first child suggests. Otherwise the insertion lands among [row]'s siblings.
+     *
+     * [row] is assumed to belong to the scene being edited; callers holding a possibly stale
+     * row must verify with [isInScene] first (a parentless [row] here means the scene root).
      */
     fun resolveInsertion(
         child: Spatial,

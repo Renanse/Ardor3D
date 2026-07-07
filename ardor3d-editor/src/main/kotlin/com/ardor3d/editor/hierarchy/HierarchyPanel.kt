@@ -406,11 +406,21 @@ private fun NodeTreeItem(
                                 }
                             },
                             onDragEnd = {
+                                // The drop spot can go stale between the last hover and the
+                                // release (a mid-drag undo may detach the hovered node);
+                                // dropping into a detached target would lose the object
                                 when (val spot = dragState.dropSpot) {
-                                    is DropSpot.Into -> operations.reparentSpatial(spatial, spot.node)
-                                    is DropSpot.Edge -> ReorderUtil.resolveInsertion(
-                                        spatial, spot.row, spot.after, isExpanded(expandedNodes, spot.row)
-                                    )?.let { operations.insertSpatial(spatial, it) }
+                                    is DropSpot.Into ->
+                                        if (ReorderUtil.isInScene(spot.node, editorState.sceneRoot)) {
+                                            operations.reparentSpatial(spatial, spot.node)
+                                        }
+
+                                    is DropSpot.Edge ->
+                                        if (ReorderUtil.isInScene(spot.row, editorState.sceneRoot)) {
+                                            ReorderUtil.resolveInsertion(
+                                                spatial, spot.row, spot.after, isExpanded(expandedNodes, spot.row)
+                                            )?.let { operations.insertSpatial(spatial, it) }
+                                        }
 
                                     null -> {}
                                 }

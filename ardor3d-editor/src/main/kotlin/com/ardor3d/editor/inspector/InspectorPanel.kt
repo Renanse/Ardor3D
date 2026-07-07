@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.command.CompositeCommand
@@ -48,6 +49,13 @@ fun InspectorPanel(
     editorState: EditorState,
     modifier: Modifier = Modifier
 ) {
+    // A focused field must not survive a selection change: it would show the old object's
+    // text and apply it to the new selection on the next keystroke. Clearing focus also
+    // fires the field's onFocusChanged, sealing the previous gesture's undo merge.
+    val focusManager = LocalFocusManager.current
+    val selectionKey = editorState.selection.joinToString(",") { System.identityHashCode(it).toString() }
+    LaunchedEffect(selectionKey) { focusManager.clearFocus() }
+
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surface,
@@ -170,6 +178,26 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
         EulerUtil.toEulerDegrees(spatial.rotation).copyInto(eulerAngles)
     }
 
+    // Non-primary targets get the same protection: their triplets persist across keystrokes
+    // and resync only when the rotation stops matching (gizmo drag, undo/redo). A target
+    // rotated identically to the primary adopts the primary's triplet, so a shared edit keeps
+    // them aligned even at the singularity, where the decomposition alone couldn't tell.
+    val targetAngles = remember(spatial) { mutableMapOf<Spatial, DoubleArray>() }
+    fun primaryOrDerived(t: Spatial): DoubleArray =
+        if (EulerUtil.representsRotation(eulerAngles, t.rotation)) {
+            eulerAngles.copyOf()
+        } else {
+            EulerUtil.toEulerDegrees(t.rotation)
+        }
+
+    fun anglesFor(t: Spatial): DoubleArray {
+        val angles = targetAngles.getOrPut(t) { primaryOrDerived(t) }
+        if (!EulerUtil.representsRotation(angles, t.rotation)) {
+            primaryOrDerived(t).copyInto(angles)
+        }
+        return angles
+    }
+
     // Per-keystroke commands with the same key coalesce into one undo step until the field
     // loses focus; a multi-selection wraps the per-target commands in a like-keyed composite.
     fun executeForTargets(verb: String, propertyKey: String, build: (Spatial) -> SetterCommand<*>) {
@@ -205,14 +233,18 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
     }
 
     fun editRotation(axis: Int, valueDegrees: Double) {
+        // Seed the retained triplets before typing mutates the primary's, so targets that
+        // matched the primary adopt its pre-edit triplet
+        targets.forEach { if (it !== spatial) anglesFor(it) }
         eulerAngles[axis] = valueDegrees
         executeForTargets("Rotate", "rotation.$axis") { t ->
-            // The primary uses the typed triplet; other targets keep their own rotation on the
-            // untouched axes, so only the edited axis is aligned across the selection
+            // The primary uses the typed triplet; other targets keep their own retained
+            // triplet on the untouched axes, so only the edited axis is aligned across the
+            // selection
             val angles = if (t === spatial) {
                 eulerAngles
             } else {
-                EulerUtil.toEulerDegrees(t.rotation).also { it[axis] = valueDegrees }
+                anglesFor(t).also { it[axis] = valueDegrees }
             }
             SetterCommand(
                 name = "Rotate ${t.name ?: "object"}",
