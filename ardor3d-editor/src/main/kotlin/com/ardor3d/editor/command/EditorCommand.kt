@@ -54,24 +54,34 @@ class SetterCommand<T>(
 
     override fun undo() = setter(oldValue)
 
+    /** True when [mergeWith] would absorb [next]; checks without mutating. */
+    fun canMergeWith(next: EditorCommand): Boolean =
+        mergeKey != null && next is SetterCommand<*> && next.mergeKey == mergeKey
+
     override fun mergeWith(next: EditorCommand): Boolean {
-        if (mergeKey == null || next !is SetterCommand<*> || next.mergeKey != mergeKey) {
+        if (!canMergeWith(next)) {
             return false
         }
         @Suppress("UNCHECKED_CAST")
-        newValue = next.newValue as T
+        newValue = (next as SetterCommand<*>).newValue as T
         return true
     }
 }
 
 /**
  * Groups several commands into one undo step: executes them in order and undoes them in
- * reverse. Used for operations over a multi-selection (delete, duplicate). The optional
- * callbacks run after all children and let callers keep selection state in sync.
+ * reverse. Used for operations over a multi-selection (delete, duplicate, transform edits).
+ * The optional callbacks run after all children and let callers keep selection state in sync.
+ *
+ * Composites with the same non-null [mergeKey] coalesce like [SetterCommand]s do, so a
+ * continuous gesture over a multi-selection (typing, slider drag) stays one undo step. Merging
+ * requires the children to be [SetterCommand]s that pair up by their own merge keys - build
+ * the composite key from the property and the target ids so mismatched pairings can't occur.
  */
 class CompositeCommand(
     override val name: String,
     private val commands: List<EditorCommand>,
+    private val mergeKey: String? = null,
     private val onExecuted: () -> Unit = {},
     private val onUndone: () -> Unit = {}
 ) : EditorCommand {
@@ -86,6 +96,22 @@ class CompositeCommand(
     override fun undo() {
         commands.asReversed().forEach { it.undo() }
         onUndone()
+    }
+
+    override fun mergeWith(next: EditorCommand): Boolean {
+        if (mergeKey == null || next !is CompositeCommand || next.mergeKey != mergeKey
+            || next.commands.size != commands.size
+        ) {
+            return false
+        }
+        // Verify every pair merges before mutating any child, so a mismatch cannot leave
+        // this composite half-merged
+        val pairs = commands.zip(next.commands)
+        if (!pairs.all { (mine, theirs) -> mine is SetterCommand<*> && mine.canMergeWith(theirs) }) {
+            return false
+        }
+        pairs.forEach { (mine, theirs) -> (mine as SetterCommand<*>).mergeWith(theirs) }
+        return true
     }
 }
 

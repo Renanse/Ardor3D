@@ -114,10 +114,88 @@ class CompositeCommandTest {
     }
 
     @Test
-    fun neverMerges() {
+    fun keylessCompositesNeverMerge() {
         val recorder = Recorder()
         val first = CompositeCommand("x", listOf(logCommand(recorder, "a")))
         val second = CompositeCommand("y", listOf(logCommand(recorder, "b")))
+        assertFalse(first.mergeWith(second))
+    }
+
+    /** A keystroke-like composite: one SetterCommand per target, all writing into [values]. */
+    private fun setterComposite(values: DoubleArray, mergeKey: String, vararg newValues: Double) =
+        CompositeCommand(
+            name = "Move ${newValues.size} objects",
+            commands = newValues.mapIndexed { i, newValue ->
+                SetterCommand(
+                    name = "Move $i",
+                    oldValue = values[i],
+                    newValue = newValue,
+                    mergeKey = "x:$i",
+                    setter = { values[i] = it }
+                )
+            },
+            mergeKey = mergeKey
+        )
+
+    @Test
+    fun keyedCompositesMergeIntoOneUndoStep() {
+        val values = doubleArrayOf(0.0, 10.0)
+        val stack = CommandStack()
+
+        // Two keystrokes of a continuous edit over both targets
+        stack.execute(setterComposite(values, "x:0,1", 1.0, 11.0))
+        stack.execute(setterComposite(values, "x:0,1", 1.5, 11.5))
+
+        assertEquals(1, stack.undoCount)
+        assertEquals(1.5, values[0], 0.0)
+        assertEquals(11.5, values[1], 0.0)
+
+        // One undo returns both targets to their pre-gesture values
+        stack.undo()
+        assertEquals(0.0, values[0], 0.0)
+        assertEquals(10.0, values[1], 0.0)
+
+        stack.redo()
+        assertEquals(1.5, values[0], 0.0)
+        assertEquals(11.5, values[1], 0.0)
+    }
+
+    @Test
+    fun differentKeysOrSizesDoNotMerge() {
+        val values = doubleArrayOf(0.0, 10.0)
+        assertFalse(
+            setterComposite(values, "x:0,1", 1.0, 11.0)
+                .mergeWith(setterComposite(values, "y:0,1", 2.0, 12.0))
+        )
+        assertFalse(
+            setterComposite(values, "x:0,1", 1.0, 11.0)
+                .mergeWith(
+                    CompositeCommand(
+                        name = "Move 1 object",
+                        commands = listOf(
+                            SetterCommand("Move 0", values[0], 2.0, mergeKey = "x:0", setter = { values[0] = it })
+                        ),
+                        mergeKey = "x:0,1"
+                    )
+                )
+        )
+    }
+
+    @Test
+    fun sealBlocksCompositeMerging() {
+        val values = doubleArrayOf(0.0, 10.0)
+        val stack = CommandStack()
+        stack.execute(setterComposite(values, "x:0,1", 1.0, 11.0))
+        stack.sealMerge()
+        stack.execute(setterComposite(values, "x:0,1", 2.0, 12.0))
+        assertEquals(2, stack.undoCount)
+    }
+
+    @Test
+    fun nonSetterChildrenDoNotMerge() {
+        val recorder = Recorder()
+        val first = CompositeCommand("x", listOf(logCommand(recorder, "a")), mergeKey = "k")
+        val second = CompositeCommand("x", listOf(logCommand(recorder, "b")), mergeKey = "k")
         assertFalse(first.mergeWith(second))
     }
 }

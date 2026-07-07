@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
+import com.ardor3d.editor.command.CompositeCommand
 import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.util.EulerUtil
 import com.ardor3d.light.Light
@@ -33,7 +34,7 @@ import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.Matrix3
 import com.ardor3d.math.Vector3
 import com.ardor3d.math.type.ReadOnlyColorRGBA
-import com.ardor3d.math.type.ReadOnlyTransform
+import com.ardor3d.math.type.ReadOnlyVector3
 import com.ardor3d.renderer.state.RenderState
 import com.ardor3d.renderer.state.WireframeState
 import com.ardor3d.scenegraph.Mesh
@@ -77,10 +78,12 @@ fun InspectorPanel(
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // With a multi-selection, the inspector edits the primary item only
+                    // With a multi-selection, transform edits apply to every selected object;
+                    // the other sections still edit the primary (first) item only
                     if (editorState.selection.size > 1) {
                         Text(
-                            text = "${editorState.selection.size} objects selected - editing the first",
+                            text = "${editorState.selection.size} objects selected - transform edits" +
+                                " apply to all, other sections edit the first",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -149,7 +152,14 @@ private fun NameSection(spatial: Spatial, editorState: EditorState) {
 private fun TransformSection(spatial: Spatial, editorState: EditorState) {
     // Observe transformVersion to trigger recomposition when transforms change
     val version = editorState.transformVersion
-    val spatialId = System.identityHashCode(spatial)
+
+    // Transform edits apply to every selected spatial. Each keeps its own untouched
+    // components; only the edited axis is set, as an absolute local value. Fields display the
+    // primary's values, with a dash where the selection disagrees.
+    val targets: List<Spatial> =
+        if (editorState.selection.size > 1) editorState.selection.toList() else listOf(spatial)
+    val multi = targets.size > 1
+    val targetsKey = targets.joinToString(",") { System.identityHashCode(it).toString() }
 
     // The inspector owns the Euler angles it displays while editing; they re-derive from the
     // rotation matrix only when the matrix stops matching them (gizmo drag, undo/redo).
@@ -160,69 +170,111 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
         EulerUtil.toEulerDegrees(spatial.rotation).copyInto(eulerAngles)
     }
 
-    // Edits to a single component merge into one undo step until the field loses focus.
-    fun editTranslation(axis: String, newValue: Vector3) {
-        editorState.execute(
-            SetterCommand(
-                name = "Move ${spatial.name ?: "object"}",
-                oldValue = Vector3(spatial.translation),
-                newValue = newValue,
-                mergeKey = "translation.$axis:$spatialId",
-                setter = { spatial.translation = it }
+    // Per-keystroke commands with the same key coalesce into one undo step until the field
+    // loses focus; a multi-selection wraps the per-target commands in a like-keyed composite.
+    fun executeForTargets(verb: String, propertyKey: String, build: (Spatial) -> SetterCommand<*>) {
+        if (targets.size == 1) {
+            editorState.execute(build(targets[0]))
+        } else {
+            editorState.execute(
+                CompositeCommand(
+                    name = "$verb ${targets.size} objects",
+                    commands = targets.map(build),
+                    mergeKey = "$propertyKey:$targetsKey"
+                )
             )
-        )
+        }
+    }
+
+    fun withAxis(v: ReadOnlyVector3, axis: String, value: Double) = when (axis) {
+        "x" -> Vector3(value, v.y, v.z)
+        "y" -> Vector3(v.x, value, v.z)
+        else -> Vector3(v.x, v.y, value)
+    }
+
+    fun editTranslation(axis: String, value: Double) {
+        executeForTargets("Move", "translation.$axis") { t ->
+            SetterCommand(
+                name = "Move ${t.name ?: "object"}",
+                oldValue = Vector3(t.translation),
+                newValue = withAxis(t.translation, axis, value),
+                mergeKey = "translation.$axis:${System.identityHashCode(t)}",
+                setter = { t.translation = it }
+            )
+        }
     }
 
     fun editRotation(axis: Int, valueDegrees: Double) {
         eulerAngles[axis] = valueDegrees
-        editorState.execute(
+        executeForTargets("Rotate", "rotation.$axis") { t ->
+            // The primary uses the typed triplet; other targets keep their own rotation on the
+            // untouched axes, so only the edited axis is aligned across the selection
+            val angles = if (t === spatial) {
+                eulerAngles
+            } else {
+                EulerUtil.toEulerDegrees(t.rotation).also { it[axis] = valueDegrees }
+            }
             SetterCommand(
-                name = "Rotate ${spatial.name ?: "object"}",
-                oldValue = Matrix3(spatial.rotation),
-                newValue = EulerUtil.fromEulerDegrees(eulerAngles[0], eulerAngles[1], eulerAngles[2])
+                name = "Rotate ${t.name ?: "object"}",
+                oldValue = Matrix3(t.rotation),
+                newValue = EulerUtil.fromEulerDegrees(angles[0], angles[1], angles[2])
                     .toRotationMatrix(Matrix3()),
-                mergeKey = "rotation.$axis:$spatialId",
-                setter = { spatial.setRotation(it) }
+                mergeKey = "rotation.$axis:${System.identityHashCode(t)}",
+                setter = { t.setRotation(it) }
             )
-        )
+        }
     }
 
-    fun editScale(axis: String, newValue: Vector3) {
-        editorState.execute(
+    fun editScale(axis: String, value: Double) {
+        executeForTargets("Scale", "scale.$axis") { t ->
             SetterCommand(
-                name = "Scale ${spatial.name ?: "object"}",
-                oldValue = Vector3(spatial.scale),
-                newValue = newValue,
-                mergeKey = "scale.$axis:$spatialId",
-                setter = { spatial.scale = it }
+                name = "Scale ${t.name ?: "object"}",
+                oldValue = Vector3(t.scale),
+                newValue = withAxis(t.scale, axis, value),
+                mergeKey = "scale.$axis:${System.identityHashCode(t)}",
+                setter = { t.scale = it }
             )
-        )
+        }
     }
+
+    fun mixedAmong(get: (Spatial) -> Double): Boolean =
+        multi && targets.any { kotlin.math.abs(get(it) - get(spatial)) > 1e-9 }
 
     InspectorSection(title = "Transform") {
         val transform = spatial.transform
         val sealMerge = { editorState.sealUndoMerge() }
 
-        // Position - each component reads current values from spatial when changed
+        // Position - each component reads current values from its target when changed
         Vector3Field(
             label = "Position",
             x = transform.translation.x,
             y = transform.translation.y,
             z = transform.translation.z,
-            onXChange = { newX -> editTranslation("x", Vector3(newX, spatial.translation.y, spatial.translation.z)) },
-            onYChange = { newY -> editTranslation("y", Vector3(spatial.translation.x, newY, spatial.translation.z)) },
-            onZChange = { newZ -> editTranslation("z", Vector3(spatial.translation.x, spatial.translation.y, newZ)) },
+            mixedX = mixedAmong { it.translation.x },
+            mixedY = mixedAmong { it.translation.y },
+            mixedZ = mixedAmong { it.translation.z },
+            onXChange = { editTranslation("x", it) },
+            onYChange = { editTranslation("y", it) },
+            onZChange = { editTranslation("z", it) },
             onEditFinished = sealMerge
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Rotation (as XYZ Euler angles for simplicity)
+        // Rotation (as XYZ Euler angles for simplicity); a differing rotation anywhere in the
+        // selection marks all three fields mixed - per-axis comparison isn't meaningful when
+        // the Euler decomposition differs
+        val rotationMixed = multi && targets.any { t ->
+            t !== spatial && !EulerUtil.representsRotation(eulerAngles, t.rotation)
+        }
         Vector3Field(
             label = "Rotation",
             x = eulerAngles[0],
             y = eulerAngles[1],
             z = eulerAngles[2],
+            mixedX = rotationMixed,
+            mixedY = rotationMixed,
+            mixedZ = rotationMixed,
             onXChange = { editRotation(0, it) },
             onYChange = { editRotation(1, it) },
             onZChange = { editRotation(2, it) },
@@ -237,9 +289,12 @@ private fun TransformSection(spatial: Spatial, editorState: EditorState) {
             x = transform.scale.x,
             y = transform.scale.y,
             z = transform.scale.z,
-            onXChange = { newX -> editScale("x", Vector3(newX, spatial.scale.y, spatial.scale.z)) },
-            onYChange = { newY -> editScale("y", Vector3(spatial.scale.x, newY, spatial.scale.z)) },
-            onZChange = { newZ -> editScale("z", Vector3(spatial.scale.x, spatial.scale.y, newZ)) },
+            mixedX = mixedAmong { it.scale.x },
+            mixedY = mixedAmong { it.scale.y },
+            mixedZ = mixedAmong { it.scale.z },
+            onXChange = { editScale("x", it) },
+            onYChange = { editScale("y", it) },
+            onZChange = { editScale("z", it) },
             onEditFinished = sealMerge
         )
     }
@@ -690,6 +745,9 @@ private fun Vector3Field(
     x: Double,
     y: Double,
     z: Double,
+    mixedX: Boolean = false,
+    mixedY: Boolean = false,
+    mixedZ: Boolean = false,
     onXChange: (Double) -> Unit,
     onYChange: (Double) -> Unit,
     onZChange: (Double) -> Unit,
@@ -710,6 +768,7 @@ private fun Vector3Field(
             ComponentField(
                 value = x,
                 label = "X",
+                mixed = mixedX,
                 modifier = Modifier.weight(1f),
                 onValueChange = onXChange,
                 onEditFinished = onEditFinished
@@ -718,6 +777,7 @@ private fun Vector3Field(
             ComponentField(
                 value = y,
                 label = "Y",
+                mixed = mixedY,
                 modifier = Modifier.weight(1f),
                 onValueChange = onYChange,
                 onEditFinished = onEditFinished
@@ -726,6 +786,7 @@ private fun Vector3Field(
             ComponentField(
                 value = z,
                 label = "Z",
+                mixed = mixedZ,
                 modifier = Modifier.weight(1f),
                 onValueChange = onZChange,
                 onEditFinished = onEditFinished
@@ -738,6 +799,7 @@ private fun Vector3Field(
 private fun ComponentField(
     value: Double,
     label: String,
+    mixed: Boolean = false,
     modifier: Modifier = Modifier,
     onValueChange: (Double) -> Unit,
     onEditFinished: () -> Unit = {}
@@ -745,8 +807,14 @@ private fun ComponentField(
     var isFocused by remember { mutableStateOf(false) }
     var editText by remember { mutableStateOf("") }
 
-    // When not focused, display the live value from the transform
-    val displayText = if (isFocused) editText else String.format(Locale.ROOT, "%.3f", value)
+    // When not focused, display the live value from the transform - or a dash when a
+    // multi-selection disagrees on this component. Editing starts from the primary's value
+    // and applies to all.
+    val displayText = when {
+        isFocused -> editText
+        mixed -> "—"
+        else -> String.format(Locale.ROOT, "%.3f", value)
+    }
 
     OutlinedTextField(
         value = displayText,
