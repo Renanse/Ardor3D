@@ -63,20 +63,65 @@ public class SnapFilterTest {
   // --- GridSnapFilter ---
 
   @Test
-  public void testGridSnapRoundsTranslation() {
+  public void testGridSnapRoundsDragOffset() {
     final GridSnapFilter filter = new GridSnapFilter(0.5);
+    filter.beginDrag(_manager, _widget, null);
     _manager.getSpatialState().getTransform().setTranslation(1.2, 0.26, -0.9);
     filter.applyFilter(_manager, _widget);
     assertVectorEquals(1.0, 0.5, -1.0, _manager.getSpatialState().getTransform().getTranslation());
   }
 
   @Test
+  public void testGridSnapStepsFromDragStart() {
+    // Snapping is relative to where the drag began, so off-grid targets move in whole steps
+    // rather than jumping onto the absolute grid.
+    _target.setTranslation(0.3, 0, 0);
+    _target.updateGeometricState(0);
+    _manager.getSpatialState().copyState(_target);
+
+    final GridSnapFilter filter = new GridSnapFilter(1.0);
+    filter.beginDrag(_manager, _widget, null);
+    _manager.getSpatialState().getTransform().setTranslation(1.0, 0, 0);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.3, 0.0, 0.0, _manager.getSpatialState().getTransform().getTranslation());
+  }
+
+  @Test
   public void testGridSnapDisabled() {
     final GridSnapFilter filter = new GridSnapFilter(0.5);
     filter.setEnabled(false);
+    filter.beginDrag(_manager, _widget, null);
     _manager.getSpatialState().getTransform().setTranslation(1.2, 0.26, -0.9);
     filter.applyFilter(_manager, _widget);
     assertVectorEquals(1.2, 0.26, -0.9, _manager.getSpatialState().getTransform().getTranslation());
+  }
+
+  @Test
+  public void testGridSnapWithoutDragIsANoOp() {
+    final GridSnapFilter filter = new GridSnapFilter(0.5);
+    // no beginDrag
+    _manager.getSpatialState().getTransform().setTranslation(1.2, 0.26, -0.9);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.2, 0.26, -0.9, _manager.getSpatialState().getTransform().getTranslation());
+  }
+
+  @Test
+  public void testGridSnapAccumulatesAcrossInputCycles() {
+    final GridSnapFilter filter = new GridSnapFilter(1.0);
+    filter.beginDrag(_manager, _widget, null);
+
+    // The manager copies the state from the target before every input event, so each event's
+    // widget delta (0.2 units here) is far below the grid size. Ten of them must accumulate to
+    // 2 units - not round away to nothing cycle after cycle.
+    for (int i = 0; i < 10; i++) {
+      _manager.getSpatialState().copyState(_target);
+      _manager.getSpatialState().getTransform().setTranslation(
+          _manager.getSpatialState().getTransform().getTranslation().add(0.2, 0, 0, new Vector3()));
+      filter.applyFilter(_manager, _widget);
+      _manager.getSpatialState().applyState(_target);
+    }
+
+    assertVectorEquals(2.0, 0.0, 0.0, _target.getTranslation());
   }
 
   // --- AngleSnapFilter ---
@@ -93,6 +138,26 @@ public class SnapFilterTest {
 
     assertMatrixEquals(new Matrix3().fromAngleNormalAxis(15 * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z),
         _manager.getSpatialState().getTransform().getMatrix());
+  }
+
+  @Test
+  public void testAngleSnapAccumulatesAcrossInputCycles() {
+    final AngleSnapFilter filter = new AngleSnapFilter(15 * MathUtils.DEG_TO_RAD);
+    filter.beginDrag(_manager, _widget, null);
+
+    // Per-event deltas of 2 degrees are far below the 7.5 degree rounding threshold; a slow
+    // 20 degree drag must still snap the target to 15 degrees, not stay pinned at the start.
+    final Matrix3 eventDelta = new Matrix3().fromAngleNormalAxis(2 * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
+    for (int i = 0; i < 10; i++) {
+      _manager.getSpatialState().copyState(_target);
+      _manager.getSpatialState().getTransform()
+          .setRotation(eventDelta.multiply(_manager.getSpatialState().getTransform().getMatrix(), new Matrix3()));
+      filter.applyFilter(_manager, _widget);
+      _manager.getSpatialState().applyState(_target);
+    }
+
+    assertMatrixEquals(new Matrix3().fromAngleNormalAxis(15 * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z),
+        _target.getRotation());
   }
 
   @Test

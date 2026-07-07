@@ -51,6 +51,7 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
@@ -267,6 +268,11 @@ public class InteractGizmoExample extends ExampleBase {
           gridSnap.setEnabled(false);
           angleSnap.setEnabled(false);
         }));
+    if (System.getProperty("gizmo.snap") != null) {
+      // Simulated-drag screenshot runs mute real input, so Ctrl can't reach the triggers.
+      gridSnap.setEnabled(true);
+      angleSnap.setEnabled(true);
+    }
   }
 
   private void addObjects() {
@@ -376,9 +382,10 @@ public class InteractGizmoExample extends ExampleBase {
         + " bluePixels=" + blue + " highlightPixels=" + highlight
         + (maxX < 0 ? " bbox=none" : " bbox=" + (maxX - minX + 1) + "x" + (maxY - minY + 1)));
     if (System.getProperty("gizmo.drag") != null) {
+      final double targetAngle =
+          new Quaternion().fromRotationMatrix(manager.getSpatialTarget().getRotation()).toAngleAxis(new Vector3());
       System.out.println("GIZMO dragAngle=" + rotateGizmo.getDragAngle() + " text='"
-          + rotateGizmo.getAngleReadout().getText() + "' textScreen="
-          + rotateGizmo.getAngleReadout().getTranslation());
+          + rotateGizmo.getAngleReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
     }
 
     try {

@@ -65,11 +65,19 @@ public class RotateGizmo extends AbstractGizmo {
 
   protected final Quaternion _calcQuat = new Quaternion();
   protected final Matrix3 _calcMat3 = new Matrix3();
+  protected final Matrix3 _calcMat3B = new Matrix3();
 
-  /** Accumulated angle of the active drag, in radians. */
+  /** Accumulated raw angle of the active drag, in radians, before any filters. */
   protected double _dragAngle;
+  /**
+   * The drag angle actually applied to the state after filters ran (e.g. angle snapping), used
+   * for the pie wedge and readout. Matches _dragAngle when no filter modifies the rotation.
+   */
+  protected double _displayAngle;
   /** World-space direction from the gizmo center to the initial drag grab point. */
   protected Vector3 _dragStartDir = null;
+  /** State rotation captured when the drag started, for measuring the applied delta. */
+  protected Matrix3 _dragStartRotation = null;
   /** World-space rotation axis of the active drag. */
   protected final Vector3 _dragAxis = new Vector3();
 
@@ -200,8 +208,47 @@ public class RotateGizmo extends AbstractGizmo {
 
   @Override
   public void render(final Renderer renderer, final InteractManager manager) {
+    _displayAngle = calculateAppliedAngle(manager);
     super.render(renderer, manager);
     updateAngleReadout(manager);
+  }
+
+  /**
+   * The drag angle actually applied to the spatial state, read back after filters ran. A snap
+   * filter, for example, leaves the state at quantized steps while the raw drag angle moves
+   * continuously - the pie wedge and readout must show the former. The result is unwrapped
+   * against the raw angle so drags past a half revolution keep counting.
+   */
+  protected double calculateAppliedAngle(final InteractManager manager) {
+    if (_dragState == DragState.NONE || _dragStartDir == null || _dragStartRotation == null
+        || manager.getSpatialTarget() == null) {
+      return _dragAngle;
+    }
+
+    // Applied delta since drag start, in the target's parent frame.
+    _calcMat3.set(_dragStartRotation).transposeLocal();
+    manager.getSpatialState().getTransform().getMatrix().multiply(_calcMat3, _calcMat3B);
+    final double angle = _calcQuat.fromRotationMatrix(_calcMat3B).toAngleAxis(_calcVec3A);
+
+    // Sign the angle against the drag axis, expressed in the same frame.
+    final Vector3 axis = _calcVec3B.set(_dragAxis);
+    final Node parent = manager.getSpatialTarget().getParent();
+    if (parent != null) {
+      parent.getWorldTransform().applyInverseVector(axis);
+    }
+    if (axis.lengthSquared() < 1e-12) {
+      return _dragAngle;
+    }
+    final double signed = _calcVec3A.dot(axis) < 0 ? -angle : angle;
+
+    // Unwrap: the applied angle is only known modulo a full turn; anchor it to the raw angle.
+    double diff = (signed - _dragAngle) % MathUtils.TWO_PI;
+    if (diff > Math.PI) {
+      diff -= MathUtils.TWO_PI;
+    } else if (diff < -Math.PI) {
+      diff += MathUtils.TWO_PI;
+    }
+    return _dragAngle + diff;
   }
 
   protected void updateAngleReadout(final InteractManager manager) {
@@ -213,7 +260,7 @@ public class RotateGizmo extends AbstractGizmo {
     // Show the readout just above the gizmo center, in screen coordinates (ortho space).
     final Camera camera = Camera.getCurrentCamera();
     final Vector3 screen = camera.getScreenCoordinates(_handle.getWorldTranslation(), _calcVec3A);
-    _angleText.setText(String.format("%.1f°", _dragAngle * MathUtils.RAD_TO_DEG));
+    _angleText.setText(String.format("%.1f°", _displayAngle * MathUtils.RAD_TO_DEG));
     _angleText.setTranslation((int) (screen.getX() + 12), (int) (screen.getY() + 12), 0);
     _angleText.getSceneHints().setCullHint(CullHint.Never);
   }
@@ -244,11 +291,11 @@ public class RotateGizmo extends AbstractGizmo {
     _handle.getRotation().applyPre(e1, e1);
     final Vector3 e2 = axisLocal.cross(e1, _calcVec3C);
 
-    final int segments = Math.max(1, (int) Math.ceil(Math.abs(_dragAngle) / (5 * MathUtils.DEG_TO_RAD)));
+    final int segments = Math.max(1, (int) Math.ceil(Math.abs(_displayAngle) / (5 * MathUtils.DEG_TO_RAD)));
     final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(segments + 2);
     vertexBuffer.put(0).put(0).put(0);
     for (int i = 0; i <= segments; i++) {
-      final double angle = _dragAngle * i / segments;
+      final double angle = _displayAngle * i / segments;
       final double c = Math.cos(angle) * RotateGizmo.PIE_RADIUS;
       final double s = Math.sin(angle) * RotateGizmo.PIE_RADIUS;
       vertexBuffer.put((float) (e1.getX() * c + e2.getX() * s)) //
@@ -262,7 +309,9 @@ public class RotateGizmo extends AbstractGizmo {
   public void endDrag(final InteractManager manager, final MouseState current) {
     super.endDrag(manager, current);
     _dragStartDir = null;
+    _dragStartRotation = null;
     _dragAngle = 0;
+    _displayAngle = 0;
     hideAngleReadout();
   }
 
@@ -336,9 +385,11 @@ public class RotateGizmo extends AbstractGizmo {
     newDir.normalizeLocal();
 
     // Track the accumulated angle for the pie wedge and readout, anchoring the wedge at the
-    // first grab direction.
+    // first grab direction. The state still holds the pristine pre-drag rotation here - the
+    // widget's delta is applied after this method returns.
     if (_dragStartDir == null) {
       _dragStartDir = new Vector3(oldDir);
+      _dragStartRotation = new Matrix3(manager.getSpatialState().getTransform().getMatrix());
       _dragAngle = 0;
     }
     _dragAngle += GizmoMath.signedAngle(oldDir, newDir, _dragAxis);
