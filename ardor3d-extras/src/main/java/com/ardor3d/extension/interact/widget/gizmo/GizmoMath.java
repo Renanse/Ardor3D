@@ -123,6 +123,27 @@ public final class GizmoMath {
   }
 
   /**
+   * The signed angle that rotates one direction onto another about an axis, in radians. Positive
+   * angles are counter-clockwise looking down the axis (right-hand rule). The inputs are expected
+   * to be unit length and reasonably close to the plane perpendicular to the axis.
+   *
+   * @param from
+   *          unit start direction.
+   * @param to
+   *          unit end direction.
+   * @param axis
+   *          unit rotation axis.
+   * @return the signed angle, in radians, in (-pi, pi].
+   */
+  public static double signedAngle(final ReadOnlyVector3 from, final ReadOnlyVector3 to,
+      final ReadOnlyVector3 axis) {
+    final double crossDot = axis.getX() * (from.getY() * to.getZ() - from.getZ() * to.getY())
+        + axis.getY() * (from.getZ() * to.getX() - from.getX() * to.getZ())
+        + axis.getZ() * (from.getX() * to.getY() - from.getY() * to.getX());
+    return Math.atan2(crossDot, from.dot(to));
+  }
+
+  /**
    * Map a view angle to a fade alpha: 0 at or below hideBelow, 1 at or above fullAbove, linear in
    * between. Used to fade out handles whose drag direction is ill-conditioned at the current view
    * angle.

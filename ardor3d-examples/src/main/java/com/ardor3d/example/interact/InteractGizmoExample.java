@@ -13,6 +13,8 @@ package com.ardor3d.example.interact;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.EnumMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
 
@@ -24,18 +26,28 @@ import com.ardor3d.example.PropertiesGameSettings;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
+import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.TranslateGizmo;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
+import com.ardor3d.input.InputState;
+import com.ardor3d.input.character.CharacterInputState;
+import com.ardor3d.input.controller.ControllerState;
+import com.ardor3d.input.gesture.GestureState;
 import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyboardState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
+import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.mouse.ButtonState;
+import com.ardor3d.input.mouse.MouseButton;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
@@ -50,13 +62,15 @@ import com.ardor3d.util.TextureManager;
 
 /**
  * Showcases the v2 interact gizmos. Hover a handle to highlight it, drag to manipulate the
- * target. Click objects to change the interact target. Press R to toggle between world and local
- * interact frames.
+ * target. Click objects to change the interact target. Press 1 for the translate gizmo, 2 for
+ * rotate, and R to toggle between world and local interact frames.
  *
  * For unattended verification, -Dgizmo.shot=path skips the settings dialog, grabs a frame to the
  * given PNG once the scene has settled, prints a summary of gizmo-colored pixels and exits.
  * -Dgizmo.camera=far|xaxis overrides the start camera (to check constant screen sizing and axis
- * fading); -Dgizmo.hover=x simulates the mouse resting on the +X arrow (to check highlighting).
+ * fading); -Dgizmo.hover=x simulates the mouse resting on the +X arrow (to check highlighting);
+ * -Dgizmo.widget=rotate starts with the rotate gizmo active; -Dgizmo.drag=ringx simulates a slow
+ * drag around the X ring (to check the pie wedge and angle readout).
  */
 @Purpose(
     htmlDescriptionKey = "com.ardor3d.example.interact.InteractGizmoExample", //
@@ -66,6 +80,7 @@ public class InteractGizmoExample extends ExampleBase {
 
   private InteractManager manager;
   private TranslateGizmo translateGizmo;
+  private RotateGizmo rotateGizmo;
 
   private int _frames = 0;
 
@@ -102,6 +117,9 @@ public class InteractGizmoExample extends ExampleBase {
       // (absent) mouse each update.
       simulateHoverOnXArrow();
     }
+    if (shot != null && _frames >= 20 && "ringx".equals(System.getProperty("gizmo.drag"))) {
+      simulateDragOnXRing();
+    }
 
     manager.render(renderer);
 
@@ -124,6 +142,46 @@ public class InteractGizmoExample extends ExampleBase {
     final MouseState hover =
         new MouseState((int) screen.getX(), (int) screen.getY(), 0, 0, 0, null, null);
     translateGizmo.checkMouseOver(_canvas, hover, manager);
+  }
+
+  private MouseState _lastDragMouse = null;
+
+  /**
+   * Feed the rotate gizmo a synthetic left-button drag that walks around the X ring, driving the
+   * full processInput path so a screenshot run can verify the pie wedge and angle readout.
+   */
+  private void simulateDragOnXRing() {
+    final Camera cam = _canvas.getCanvasRenderer().getCamera();
+    final Spatial target = manager.getSpatialTarget();
+    final ReadOnlyVector3 origin = target.getWorldTranslation();
+    final double scale = rotateGizmo.getHandle().getScale().getX();
+
+    // The point on the X ring facing the camera, swung around the ring a bit more each frame.
+    final Vector3 toCam = new Vector3(cam.getDirection()).negateLocal();
+    final Vector3 e1 = toCam.subtract(Vector3.UNIT_X.multiply(toCam.dot(Vector3.UNIT_X), null), null).normalizeLocal();
+    final Vector3 e2 = Vector3.UNIT_X.cross(e1, null);
+    final double angle = (_frames - 20) * 0.04;
+    final Vector3 onRing = new Vector3(e1).multiplyLocal(Math.cos(angle) * RotateGizmo.RING_RADIUS * scale)
+        .addLocal(e2.multiply(Math.sin(angle) * RotateGizmo.RING_RADIUS * scale, null)).addLocal(origin);
+    final Vector3 screen = cam.getScreenCoordinates(onRing);
+
+    final EnumMap<MouseButton, ButtonState> buttons = new EnumMap<>(MouseButton.class);
+    buttons.put(MouseButton.LEFT, ButtonState.DOWN);
+    // First frame: previous state has the button up at the same spot, starting the drag there.
+    final MouseState previous = _lastDragMouse != null ? _lastDragMouse
+        : new MouseState((int) screen.getX(), (int) screen.getY(), 0, 0, 0, null, null);
+    final MouseState current = new MouseState((int) screen.getX(), (int) screen.getY(),
+        (int) screen.getX() - previous.getX(), (int) screen.getY() - previous.getY(), 0, buttons, null);
+    _lastDragMouse = current;
+
+    final InputState previousState = new InputState(KeyboardState.NOTHING, previous, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+    final InputState currentState = new InputState(KeyboardState.NOTHING, current, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+
+    rotateGizmo.processInput(_canvas, new TwoInputStates(previousState, currentState), new AtomicBoolean(false),
+        manager);
+    manager.getSpatialState().applyState(target);
   }
 
   @Override
@@ -152,7 +210,19 @@ public class InteractGizmoExample extends ExampleBase {
     translateGizmo = new TranslateGizmo().withAllHandles();
     manager.addWidget(translateGizmo);
 
-    manager.setActiveWidget(translateGizmo);
+    rotateGizmo = new RotateGizmo().withAllHandles();
+    manager.addWidget(rotateGizmo);
+    // the angle readout is screen-space ui - it renders with the ortho pass
+    _orthoRoot.attachChild(rotateGizmo.getAngleReadout());
+
+    manager.setActiveWidget(
+        "rotate".equals(System.getProperty("gizmo.widget")) ? rotateGizmo : translateGizmo);
+
+    // switch widgets
+    manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE),
+        (source, inputStates, tpf) -> manager.setActiveWidget(translateGizmo)));
+    manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.TWO),
+        (source, inputStates, tpf) -> manager.setActiveWidget(rotateGizmo)));
 
     // toggle world/local interact frame
     manager.getLogicalLayer()
@@ -160,7 +230,8 @@ public class InteractGizmoExample extends ExampleBase {
           final InteractMatrix next =
               translateGizmo.getInteractMatrix() == InteractMatrix.World ? InteractMatrix.Local : InteractMatrix.World;
           translateGizmo.setInteractMatrix(next);
-          translateGizmo.targetDataUpdated(manager);
+          rotateGizmo.setInteractMatrix(next);
+          manager.fireTargetDataUpdated();
         }));
   }
 
@@ -206,6 +277,10 @@ public class InteractGizmoExample extends ExampleBase {
 
   @Override
   protected void updateLogicalLayer(final ReadOnlyTimer timer) {
+    if (System.getProperty("gizmo.shot") != null && System.getProperty("gizmo.drag") != null) {
+      // A simulated drag is driving the widgets; real (idle) input would end it every frame.
+      return;
+    }
     manager.getLogicalLayer().checkTriggers(timer.getTimePerFrame());
   }
 
@@ -266,6 +341,11 @@ public class InteractGizmoExample extends ExampleBase {
     System.out.println("GIZMO size=" + width + "x" + height + " redPixels=" + red + " greenPixels=" + green
         + " bluePixels=" + blue + " highlightPixels=" + highlight
         + (maxX < 0 ? " bbox=none" : " bbox=" + (maxX - minX + 1) + "x" + (maxY - minY + 1)));
+    if (System.getProperty("gizmo.drag") != null) {
+      System.out.println("GIZMO dragAngle=" + rotateGizmo.getDragAngle() + " text='"
+          + rotateGizmo.getAngleReadout().getText() + "' textScreen="
+          + rotateGizmo.getAngleReadout().getTranslation());
+    }
 
     try {
       final BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

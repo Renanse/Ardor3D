@@ -161,6 +161,25 @@ public class GizmoMathTest {
     assertEquals(MathUtils.HALF_PI, plane, EPS);
   }
 
+  // --- signedAngle ---
+
+  @Test
+  public void testSignedAngle() {
+    // Counter-clockwise about +Z (right-hand rule): X to Y is +90 degrees.
+    assertEquals(MathUtils.HALF_PI, GizmoMath.signedAngle(Vector3.UNIT_X, Vector3.UNIT_Y, Vector3.UNIT_Z), EPS);
+    // ...and clockwise is negative.
+    assertEquals(-MathUtils.HALF_PI, GizmoMath.signedAngle(Vector3.UNIT_Y, Vector3.UNIT_X, Vector3.UNIT_Z), EPS);
+    // Flipping the axis flips the sign.
+    assertEquals(-MathUtils.HALF_PI, GizmoMath.signedAngle(Vector3.UNIT_X, Vector3.UNIT_Y, Vector3.NEG_UNIT_Z), EPS);
+    // Identity and half-turn.
+    assertEquals(0.0, GizmoMath.signedAngle(Vector3.UNIT_X, Vector3.UNIT_X, Vector3.UNIT_Z), EPS);
+    assertEquals(MathUtils.PI, Math.abs(GizmoMath.signedAngle(Vector3.UNIT_X, Vector3.NEG_UNIT_X, Vector3.UNIT_Z)),
+        EPS);
+    // 45 degrees.
+    final Vector3 diag = new Vector3(1, 1, 0).normalizeLocal();
+    assertEquals(MathUtils.QUARTER_PI, GizmoMath.signedAngle(Vector3.UNIT_X, diag, Vector3.UNIT_Z), EPS);
+  }
+
   // --- fadeAlpha ---
 
   @Test
