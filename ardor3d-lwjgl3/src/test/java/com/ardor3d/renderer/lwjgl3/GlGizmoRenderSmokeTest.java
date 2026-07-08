@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.nio.ByteBuffer;
+import java.text.DecimalFormatSymbols;
 import java.util.EnumMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -321,7 +322,12 @@ public class GlGizmoRenderSmokeTest {
       if (text == null) {
         return 0;
       }
-      final String digits = text.replaceAll("[^0-9.\\-]", "");
+      // RotateGizmo formats the readout with String.format's default (FORMAT-category) locale, whose
+      // decimal separator may be a comma; normalize it to a dot before stripping the rest so the
+      // parse matches the format instead of turning e.g. "43,0" into "430".
+      final char separator = DecimalFormatSymbols.getInstance().getDecimalSeparator();
+      final String normalized = separator == '.' ? text : text.replace(separator, '.');
+      final String digits = normalized.replaceAll("[^0-9.\\-]", "");
       return digits.isEmpty() ? 0 : Double.parseDouble(digits);
     }
 
