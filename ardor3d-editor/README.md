@@ -4,7 +4,7 @@ A visual scene editor for Ardor3D, built with Compose for Desktop. The 3D viewpo
 `Lwjgl3AwtCanvas` embedded via `SwingPanel`, so everything you see is rendered by the engine
 itself.
 
-![Editor screenshot](../editor.png)
+![Editor screenshot](docs/editor.png)
 
 ## Running
 
