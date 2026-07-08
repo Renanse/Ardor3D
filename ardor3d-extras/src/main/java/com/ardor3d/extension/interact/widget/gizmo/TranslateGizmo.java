@@ -18,7 +18,6 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.light.LightProperties;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
@@ -30,7 +29,7 @@ import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -39,23 +38,29 @@ import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.MaterialUtil;
 
 /**
- * A v2 translation gizmo: three thin, cone-tipped axis arrows, three corner quads for dragging in
- * the planes spanned by axis pairs, and a camera-facing center disk for dragging in the view
- * plane. See {@link AbstractGizmo} for the shared visual behavior (constant screen size,
- * per-handle highlighting, x-ray rendering, view-angle fades).
+ * A v2 translation gizmo: three cone-tipped axis arrows, three corner quads for dragging in the
+ * planes spanned by axis pairs, and a camera-facing center circle for dragging in the view plane.
+ * Shafts and outlines are antialiased screen-space strokes holding a constant pixel width; only
+ * the cone tips are solid geometry. See {@link AbstractGizmo} for the shared visual behavior
+ * (constant screen size, per-handle highlighting, x-ray rendering, view-angle fades).
  */
 public class TranslateGizmo extends AbstractGizmo {
 
   // All geometry is built to a gizmo of length 1.0, sized on screen by AbstractGizmo.
-  public static final double SHAFT_RADIUS = 0.015;
+  // Stroke widths are in screen pixels at 1:1 DPI scale.
   public static final double SHAFT_START = 0.18;
-  public static final double TIP_RADIUS = 0.055;
-  public static final double TIP_LENGTH = 0.2;
-  public static final double PICK_PROXY_RADIUS = 0.06;
-  public static final double PLANE_QUAD_SIZE = 0.24;
-  public static final double PLANE_QUAD_CENTER = 0.38;
-  public static final double CENTER_RADIUS = 0.08;
-  public static final float PLANE_FILL_ALPHA = 0.55f;
+  public static final float SHAFT_WIDTH = 3.5f;
+  public static final float OUTLINE_WIDTH = 3f;
+  public static final double TIP_RADIUS = 0.085;
+  public static final double TIP_LENGTH = 0.22;
+  public static final int TIP_SAMPLES = 24;
+  public static final double PICK_PROXY_RADIUS = 0.09;
+  public static final double PLANE_QUAD_SIZE = 0.32;
+  public static final double PLANE_QUAD_CENTER = 0.42;
+  public static final double CENTER_RADIUS = 0.1;
+  public static final double CENTER_PICK_RADIUS = 0.13;
+  public static final int CIRCLE_SAMPLES = 48;
+  public static final float PLANE_FILL_ALPHA = 0.45f;
 
   protected GizmoHandle _centerHandle;
 
@@ -92,18 +97,20 @@ public class TranslateGizmo extends AbstractGizmo {
     return this;
   }
 
-  /** Add the camera-facing center disk for view-plane drags. */
+  /** Add the camera-facing center circle for view-plane drags. */
   public TranslateGizmo withViewPlaneHandle() {
     final Node root = new Node(GizmoPart.Center.name());
     LightProperties.setLightReceiver(root, false);
 
-    final Disk disk = new Disk("center", 2, 24, TranslateGizmo.CENTER_RADIUS);
-    disk.updateModelBound();
-    root.attachChild(disk);
+    final Line circle = GizmoGeometry.arcStroke("center", TranslateGizmo.CENTER_RADIUS, 0, MathUtils.TWO_PI,
+        TranslateGizmo.CIRCLE_SAMPLES, TranslateGizmo.OUTLINE_WIDTH);
+    root.attachChild(circle);
 
-    final CullState cull = new CullState();
-    cull.setCullFace(CullState.Face.None);
-    root.setRenderState(cull);
+    // The circle is an outline a couple of pixels wide - pick against an invisible filled disk.
+    final Disk proxy = new Disk("pickProxy", 2, 24, TranslateGizmo.CENTER_PICK_RADIUS);
+    proxy.updateModelBound();
+    proxy.getSceneHints().setCullHint(CullHint.Always);
+    root.attachChild(proxy);
 
     _centerHandle = new GizmoHandle(GizmoPart.Center, root, DEFAULT_CENTER_COLOR, Vector3.ZERO, FadeMode.None);
     addGizmoHandle(_centerHandle);
@@ -117,14 +124,12 @@ public class TranslateGizmo extends AbstractGizmo {
     LightProperties.setLightReceiver(root, false);
 
     // Geometry is built pointing down +Z, then the whole part is rotated onto its axis.
-    final double shaftLength = 1.0 - TranslateGizmo.TIP_LENGTH - TranslateGizmo.SHAFT_START;
-    final Cylinder shaft =
-        new Cylinder("shaft", 2, 12, TranslateGizmo.SHAFT_RADIUS, shaftLength, false);
-    shaft.getMeshData().translatePoints(0, 0, TranslateGizmo.SHAFT_START + shaftLength * 0.5);
-    shaft.updateModelBound();
+    final Line shaft = GizmoGeometry.segmentStroke("shaft", new Vector3(0, 0, TranslateGizmo.SHAFT_START),
+        new Vector3(0, 0, 1.0 - TranslateGizmo.TIP_LENGTH), TranslateGizmo.SHAFT_WIDTH);
     root.attachChild(shaft);
 
-    final Cylinder tip = new Cylinder("tip", 2, 16, TranslateGizmo.TIP_RADIUS, TranslateGizmo.TIP_LENGTH, true);
+    final Cylinder tip = new Cylinder("tip", 2, TranslateGizmo.TIP_SAMPLES, TranslateGizmo.TIP_RADIUS,
+        TranslateGizmo.TIP_LENGTH, true);
     // Taper the +Z end to a point, leaving the base radius at -Z: a cone pointing along the axis.
     tip.setRadius1(0);
     tip.getMeshData().translatePoints(0, 0, 1.0 - TranslateGizmo.TIP_LENGTH * 0.5);
@@ -153,17 +158,21 @@ public class TranslateGizmo extends AbstractGizmo {
     final Quad fill = new Quad("fill", TranslateGizmo.PLANE_QUAD_SIZE, TranslateGizmo.PLANE_QUAD_SIZE);
     fill.getMeshData().translatePoints(TranslateGizmo.PLANE_QUAD_CENTER, TranslateGizmo.PLANE_QUAD_CENTER, 0);
     fill.updateModelBound();
+    GizmoGeometry.disableDepthWrite(fill);
     root.attachChild(fill);
 
-    final CullState cull = new CullState();
-    cull.setCullFace(CullState.Face.None);
-    root.setRenderState(cull);
+    final double near = TranslateGizmo.PLANE_QUAD_CENTER - TranslateGizmo.PLANE_QUAD_SIZE * 0.5;
+    final double far = TranslateGizmo.PLANE_QUAD_CENTER + TranslateGizmo.PLANE_QUAD_SIZE * 0.5;
+    final Line border = GizmoGeometry.polylineStroke("border", new ReadOnlyVector3[] {new Vector3(near, near, 0),
+        new Vector3(far, near, 0), new Vector3(far, far, 0), new Vector3(near, far, 0)}, true,
+        TranslateGizmo.OUTLINE_WIDTH);
+    root.attachChild(border);
 
     root.setRotation(rotation);
 
-    final ColorRGBA fillColor = new ColorRGBA(color.getRed(), color.getGreen(), color.getBlue(),
-        TranslateGizmo.PLANE_FILL_ALPHA);
-    addGizmoHandle(new GizmoHandle(part, root, fillColor, normal, FadeMode.Plane));
+    final GizmoHandle handle = new GizmoHandle(part, root, color, normal, FadeMode.Plane);
+    handle.setAlphaScale(fill, TranslateGizmo.PLANE_FILL_ALPHA);
+    addGizmoHandle(handle);
     MaterialUtil.autoMaterials(root);
   }
 
@@ -186,6 +195,8 @@ public class TranslateGizmo extends AbstractGizmo {
     final Camera camera = source.getCanvasRenderer().getCamera();
     final MouseState current = inputStates.getCurrent().getMouseState();
     final MouseState previous = inputStates.getPrevious().getMouseState();
+
+    captureDpiScaleProvider(source);
 
     // first process mouse over state
     checkMouseOver(source, current, manager);

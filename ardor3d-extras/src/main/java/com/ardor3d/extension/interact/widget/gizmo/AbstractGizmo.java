@@ -17,6 +17,8 @@ import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
+import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
@@ -33,6 +35,7 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -61,13 +64,28 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   public static final ReadOnlyColorRGBA DEFAULT_Y_COLOR = new ColorRGBA(0.44f, 0.79f, 0.16f, 1.0f);
   public static final ReadOnlyColorRGBA DEFAULT_Z_COLOR = new ColorRGBA(0.20f, 0.51f, 0.92f, 1.0f);
   public static final ReadOnlyColorRGBA DEFAULT_CENTER_COLOR = new ColorRGBA(0.85f, 0.85f, 0.85f, 0.8f);
+
+  /**
+   * Hover tint for handles whose base color is too gray to visibly brighten in-hue. Chromatic
+   * handles ignore this and brighten toward white instead, keeping their axis identity - see
+   * {@link #highlightColorFor(GizmoHandle)}.
+   */
   public static final ReadOnlyColorRGBA DEFAULT_HIGHLIGHT_COLOR = new ColorRGBA(1.0f, 0.86f, 0.18f, 1.0f);
 
-  /** Default on-screen footprint of a gizmo, in pixels. */
-  public static final double DEFAULT_PIXEL_SIZE = 90;
+  /** Fraction a hovered chromatic handle's color moves toward white. */
+  public static final float HIGHLIGHT_BRIGHTEN = 0.55f;
 
-  /** Alpha multiplier for the occluded (x-ray) render pass. */
-  public static final float DEFAULT_GHOST_ALPHA = 0.28f;
+  /** Chroma (max minus min channel) below which a handle counts as gray for highlighting. */
+  public static final float HIGHLIGHT_CHROMA_FLOOR = 0.15f;
+
+  /** Default on-screen footprint of a gizmo, in pixels. */
+  public static final double DEFAULT_PIXEL_SIZE = 100;
+
+  /**
+   * Alpha multiplier for the occluded (x-ray) render pass. High enough that the gizmo stays
+   * assertive when buried in its target - occlusion should read as a hint, not hide the tool.
+   */
+  public static final float DEFAULT_GHOST_ALPHA = 0.5f;
 
   /** Handles are not pickable once faded below this alpha. */
   public static final double PICK_ALPHA_FLOOR = 0.2;
@@ -86,11 +104,20 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   protected final ZBufferState _ghostZState = new ZBufferState();
 
+  /**
+   * Source of the display's DPI scale, applied to the gizmo's pixel footprint and stroke widths.
+   * Captured from the interacting canvas if not set explicitly.
+   */
+  protected IDpiScaleProvider _dpiScaleProvider;
+  /** DPI scale currently applied to stroke widths, so rescaling only happens on change. */
+  protected double _appliedDpiScale = 1.0;
+
   // scratch objects for the drag hot path, complementing the _calcVec3* pool in the base class
   protected final Vector2 _calcVec2A = new Vector2();
   protected final Vector2 _calcVec2B = new Vector2();
   protected final Vector2 _calcVec2C = new Vector2();
   protected final Plane _calcPlane = new Plane();
+  protected final ColorRGBA _calcColor = new ColorRGBA();
 
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
@@ -103,6 +130,12 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     final ZBufferState zstate = new ZBufferState();
     zstate.setFunction(TestFunction.LessThanOrEqualTo);
     _handle.setRenderState(zstate);
+
+    // Two-sided: plane fills and camera-facing parts are viewed from either side, and stroke
+    // geometry is expanded in screen space by its material, where winding is not meaningful.
+    final CullState cull = new CullState();
+    cull.setCullFace(CullState.Face.None);
+    _handle.setRenderState(cull);
 
     // Render immediately when drawn rather than queueing - the gizmo is drawn once per pass by
     // render(), after the scene buckets have flushed.
@@ -171,9 +204,11 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
     final Camera camera = Camera.getCurrentCamera();
 
+    updateDpiScale();
+
     _handle.setTranslation(target.getWorldTranslation());
     _handle.setScale(Math.max(AbstractInteractWidget.MIN_SCALE,
-        GizmoMath.calculateFixedScreenScale(camera, _handle.getTranslation(), _pixelSize)));
+        GizmoMath.calculateFixedScreenScale(camera, _handle.getTranslation(), _pixelSize * _appliedDpiScale)));
 
     updateCameraFacingHandles(camera);
     updateHandleFades(camera);
@@ -207,6 +242,29 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected void updateCameraFacingHandles(final Camera camera) {
     /**/}
 
+  /**
+   * Track the display's DPI scale, rescaling the gizmo's stroke widths when it changes. The
+   * gizmo's pixel footprint picks the scale up in render(). No-op until a scale provider is known
+   * - set one directly or let processInput capture the interacting canvas.
+   */
+  protected void updateDpiScale() {
+    final double scale = _dpiScaleProvider != null ? _dpiScaleProvider.scaleToScreenDpi(1.0) : 1.0;
+    if (scale == _appliedDpiScale || scale <= 0) {
+      return;
+    }
+    _appliedDpiScale = scale;
+    for (int i = _gizmoHandles.size(); --i >= 0;) {
+      _gizmoHandles.get(i).applyLineWidthScale((float) scale);
+    }
+  }
+
+  /** Capture the canvas as our DPI scale source, unless one was set explicitly. */
+  protected void captureDpiScaleProvider(final Canvas source) {
+    if (_dpiScaleProvider == null && source != null) {
+      _dpiScaleProvider = source;
+    }
+  }
+
   protected void updateHandleFades(final Camera camera) {
     for (int i = _gizmoHandles.size(); --i >= 0;) {
       final GizmoHandle handle = _gizmoHandles.get(i);
@@ -236,10 +294,27 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected void applyHandleColors(final GizmoHandle active, final float alphaMultiplier) {
     for (int i = _gizmoHandles.size(); --i >= 0;) {
       final GizmoHandle handle = _gizmoHandles.get(i);
-      final ReadOnlyColorRGBA rgb = handle == active ? _highlightColor : handle.getBaseColor();
+      final ReadOnlyColorRGBA rgb = handle == active ? highlightColorFor(handle) : handle.getBaseColor();
       final float alpha = handle.getBaseColor().getAlpha() * (float) handle.getFadeAlpha() * alphaMultiplier;
       handle.applyColor(rgb, alpha);
     }
+  }
+
+  /**
+   * The hover color for a handle: its own color brightened toward white, so the handle stays
+   * identifiable while clearly lit up. Handles too gray to visibly brighten (center disks, roll
+   * rings) use the configured highlight tint instead.
+   */
+  protected ReadOnlyColorRGBA highlightColorFor(final GizmoHandle handle) {
+    final ReadOnlyColorRGBA base = handle.getBaseColor();
+    final float max = Math.max(base.getRed(), Math.max(base.getGreen(), base.getBlue()));
+    final float min = Math.min(base.getRed(), Math.min(base.getGreen(), base.getBlue()));
+    if (max - min < AbstractGizmo.HIGHLIGHT_CHROMA_FLOOR) {
+      return _highlightColor;
+    }
+    final float keep = 1f - AbstractGizmo.HIGHLIGHT_BRIGHTEN;
+    return _calcColor.set(1f - (1f - base.getRed()) * keep, 1f - (1f - base.getGreen()) * keep,
+        1f - (1f - base.getBlue()) * keep, base.getAlpha());
   }
 
   /**
@@ -299,8 +374,19 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   public double getPixelSize() { return _pixelSize; }
 
-  /** Set the on-screen footprint the gizmo is scaled to hold, in pixels. */
+  /**
+   * Set the on-screen footprint the gizmo is scaled to hold, in pixels at 1:1 DPI scale. On
+   * scaled displays the footprint and stroke widths are multiplied by the DPI scale.
+   */
   public void setPixelSize(final double pixels) { _pixelSize = pixels; }
+
+  public IDpiScaleProvider getDpiScaleProvider() { return _dpiScaleProvider; }
+
+  /**
+   * Set the source of the display's DPI scale. Optional: the gizmo captures the canvas it
+   * receives input from if none was set.
+   */
+  public void setDpiScaleProvider(final IDpiScaleProvider provider) { _dpiScaleProvider = provider; }
 
   public ReadOnlyColorRGBA getHighlightColor() { return _highlightColor; }
 

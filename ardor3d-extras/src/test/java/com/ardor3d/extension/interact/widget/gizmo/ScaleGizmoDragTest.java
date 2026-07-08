@@ -12,6 +12,7 @@ package com.ardor3d.extension.interact.widget.gizmo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -115,6 +116,40 @@ public class ScaleGizmoDragTest {
     assertEquals(1.1, drag(GizmoPart.Center, 50, 50, 70, 50), EPS);
     assertEquals(1.1, drag(GizmoPart.Center, 50, 50, 50, 70), EPS);
     assertEquals(0.9, drag(GizmoPart.Center, 50, 50, 40, 40), EPS);
+  }
+
+  @Test
+  public void testAxisStretchMovesShaftEndpointAndTip() {
+    _gizmo.setAxisStretch(GizmoPart.AxisX, 2.0);
+
+    final var shaft = _gizmo._axisShafts.get(GizmoPart.AxisX);
+    final var tip = _gizmo._axisTips.get(GizmoPart.AxisX);
+    // The shaft's far endpoint (vertex 1) tracks the near face of the stretched tip cube...
+    assertEquals(2.0 * ScaleGizmo.TIP_CENTER - ScaleGizmo.TIP_HALF_EXTENT,
+        shaft.getMeshData().getVertexBuffer().get(5), 1e-6);
+    // ...and the tip translates to the stretched distance without deforming.
+    assertEquals(ScaleGizmo.TIP_CENTER * (2.0 - 1.0), tip.getTranslation().getZ(), EPS);
+
+    // Back to rest.
+    _gizmo.setAxisStretch(GizmoPart.AxisX, 1.0);
+    assertEquals(ScaleGizmo.TIP_CENTER - ScaleGizmo.TIP_HALF_EXTENT,
+        shaft.getMeshData().getVertexBuffer().get(5), 1e-6);
+    assertEquals(0.0, tip.getTranslation().getZ(), EPS);
+  }
+
+  @Test
+  public void testAxisStretchIsClampedForDisplay() {
+    final var shaft = _gizmo._axisShafts.get(GizmoPart.AxisX);
+    final var tip = _gizmo._axisTips.get(GizmoPart.AxisX);
+
+    // Extreme scale-ups display at the cap...
+    _gizmo.setAxisStretch(GizmoPart.AxisX, 1000.0);
+    assertEquals(ScaleGizmo.TIP_CENTER * (ScaleGizmo.MAX_DISPLAY_STRETCH - 1.0), tip.getTranslation().getZ(), EPS);
+
+    // ...and extreme scale-downs never invert the shaft through the gizmo center.
+    _gizmo.setAxisStretch(GizmoPart.AxisX, 1e-6);
+    assertTrue(shaft.getMeshData().getVertexBuffer().get(5) > (float) ScaleGizmo.SHAFT_START);
+    assertEquals(ScaleGizmo.TIP_CENTER * (ScaleGizmo.MIN_DISPLAY_STRETCH - 1.0), tip.getTranslation().getZ(), EPS);
   }
 
   @Test
