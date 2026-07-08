@@ -50,6 +50,9 @@ import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.LightProperties;
+import com.ardor3d.light.shadow.AbstractShadowData;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -279,6 +282,29 @@ public class InteractGizmoExample extends ExampleBase {
     }
   }
 
+  /**
+   * A warm directional sun casting shadows, so dragging objects reads with some heft; the base
+   * class point light is kept as a soft fill.
+   */
+  @Override
+  protected void setupLight() {
+    super.setupLight();
+    light.setIntensity(0.35f);
+
+    final DirectionalLight sun = new DirectionalLight();
+    sun.setColor(new ColorRGBA(1.0f, 0.97f, 0.9f, 1.0f));
+    sun.setIntensity(0.85f);
+    sun.setShadowCaster(true);
+    sun.getShadowData().setFilterMode(AbstractShadowData.FILTER_MODE_PCF);
+    sun.getShadowData().setMaxDistance(60);
+    sun.getShadowData().setCascades(2);
+    // High and to the right, slightly past the scene, so shadows fall toward the default camera
+    // where dragging an object visibly moves them.
+    sun.setTranslation(18, 25, -5);
+    sun.lookAt(0, 0, 0);
+    _root.attachChild(sun);
+  }
+
   private void addObjects() {
     final Box floor = new Box("floor", Vector3.ZERO, 20, 0.5, 20);
     floor.setTranslation(0, -0.5, 0);
@@ -287,6 +313,8 @@ public class InteractGizmoExample extends ExampleBase {
     floor.setRenderState(ts);
     floor.getSceneHints().setPickingHint(PickingHint.Pickable, false);
     floor.setModelBound(new BoundingBox());
+    // The floor only receives shadows - it has nothing sensible to cast on.
+    LightProperties.setShadowCaster(floor, false);
     _root.attachChild(floor);
 
     final Box box = new Box("box", Vector3.ZERO, 3, 3, 3);
