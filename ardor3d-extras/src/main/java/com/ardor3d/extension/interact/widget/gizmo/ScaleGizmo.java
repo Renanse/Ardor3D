@@ -10,9 +10,12 @@
 
 package com.ardor3d.extension.interact.widget.gizmo;
 
+import java.nio.FloatBuffer;
+import java.util.EnumMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
+import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.gizmo.GizmoHandle.FadeMode;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -28,7 +31,10 @@ import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -66,6 +72,21 @@ public class ScaleGizmo extends AbstractGizmo {
   /** Bounds on the scale factor applied by a single input event, guarding ratio blow-ups. */
   public static final double MIN_EVENT_FACTOR = 0.01;
   public static final double MAX_EVENT_FACTOR = 100.0;
+
+  /**
+   * Bounds on the visual shaft stretch while dragging an axis handle. Display only - the applied
+   * scale is not clamped by these.
+   */
+  public static final double MIN_DISPLAY_STRETCH = 0.32;
+  public static final double MAX_DISPLAY_STRETCH = 8.0;
+
+  /** The dragged axis' shaft and tip, stretched during drags to track the applied scale. */
+  protected final EnumMap<GizmoPart, Line> _axisShafts = new EnumMap<>(GizmoPart.class);
+  protected final EnumMap<GizmoPart, Mesh> _axisTips = new EnumMap<>(GizmoPart.class);
+  protected final EnumMap<GizmoPart, Double> _appliedStretch = new EnumMap<>(GizmoPart.class);
+
+  /** State scale captured when a drag started, for measuring the applied ratio. */
+  protected Vector3 _dragStartScale = null;
 
   public ScaleGizmo() {
     super("scaleGizmo");
@@ -110,12 +131,14 @@ public class ScaleGizmo extends AbstractGizmo {
     final Line shaft = GizmoGeometry.segmentStroke("shaft", new Vector3(0, 0, ScaleGizmo.SHAFT_START),
         new Vector3(0, 0, ScaleGizmo.TIP_CENTER - ScaleGizmo.TIP_HALF_EXTENT), ScaleGizmo.SHAFT_WIDTH);
     root.attachChild(shaft);
+    _axisShafts.put(part, shaft);
 
     final Box tip = new Box("tip", Vector3.ZERO, ScaleGizmo.TIP_HALF_EXTENT, ScaleGizmo.TIP_HALF_EXTENT,
         ScaleGizmo.TIP_HALF_EXTENT);
     tip.getMeshData().translatePoints(0, 0, ScaleGizmo.TIP_CENTER);
     tip.updateModelBound();
     root.attachChild(tip);
+    _axisTips.put(part, tip);
 
     // The visible geometry is only a few pixels wide - pick against an invisible, fatter proxy.
     final double proxyLength = ScaleGizmo.TIP_CENTER + ScaleGizmo.TIP_HALF_EXTENT - ScaleGizmo.SHAFT_START;
@@ -174,6 +197,10 @@ public class ScaleGizmo extends AbstractGizmo {
     final double factor = getScaleFactor(handle, _calcVec2A, current, camera);
 
     final Transform transform = manager.getSpatialState().getTransform();
+    if (_dragStartScale == null) {
+      // First event of the drag - the state still holds the pristine pre-drag scale here.
+      _dragStartScale = new Vector3(transform.getScale());
+    }
     final Vector3 scale = new Vector3(transform.getScale());
     switch (handle.getPart()) {
       case AxisX -> scale.setX(scale.getX() * factor);
@@ -219,5 +246,79 @@ public class ScaleGizmo extends AbstractGizmo {
       }
     }
     return MathUtils.clamp(factor, ScaleGizmo.MIN_EVENT_FACTOR, ScaleGizmo.MAX_EVENT_FACTOR);
+  }
+
+  @Override
+  public void render(final Renderer renderer, final InteractManager manager) {
+    updateShaftStretch(manager);
+    super.render(renderer, manager);
+  }
+
+  /**
+   * While an axis drag is active, stretch that axis' shaft and tip to track the scale actually
+   * applied to the state - read back after filters ran, like the rotate gizmo's readout, so any
+   * snapping shows true. Everything else sits at rest length.
+   */
+  protected void updateShaftStretch(final InteractManager manager) {
+    GizmoPart activePart = null;
+    double stretch = 1.0;
+    if (_dragState != DragState.NONE && _dragStartScale != null && manager.getSpatialTarget() != null) {
+      final GizmoHandle handle = findGizmoHandle(_lastDragSpatial);
+      if (handle != null) {
+        final ReadOnlyVector3 scale = manager.getSpatialState().getTransform().getScale();
+        switch (handle.getPart()) {
+          case AxisX -> stretch = scale.getX() / _dragStartScale.getX();
+          case AxisY -> stretch = scale.getY() / _dragStartScale.getY();
+          case AxisZ -> stretch = scale.getZ() / _dragStartScale.getZ();
+          default -> {
+          }
+        }
+        if (stretch != 1.0) {
+          activePart = handle.getPart();
+        }
+      }
+    }
+    for (final GizmoPart part : _axisShafts.keySet()) {
+      setAxisStretch(part, part == activePart ? stretch : 1.0);
+    }
+  }
+
+  /**
+   * Stretch an axis handle to the given factor: the tip cube slides to factor times its rest
+   * distance and the shaft's far endpoint follows it. The factor is clamped to the display
+   * bounds; the tip keeps its shape and the shaft never inverts through the gizmo center.
+   */
+  protected void setAxisStretch(final GizmoPart part, final double stretch) {
+    final double clamped = MathUtils.clamp(stretch, ScaleGizmo.MIN_DISPLAY_STRETCH, ScaleGizmo.MAX_DISPLAY_STRETCH);
+    final Double previous = _appliedStretch.get(part);
+    if (previous != null && previous.doubleValue() == clamped) {
+      return;
+    }
+    _appliedStretch.put(part, clamped);
+
+    final double tipCenter = ScaleGizmo.TIP_CENTER * clamped;
+
+    final Line shaft = _axisShafts.get(part);
+    if (shaft != null) {
+      final FloatBuffer verts = shaft.getMeshData().getVertexBuffer();
+      // vertex 1's z: the shaft runs from SHAFT_START to the near face of the tip cube.
+      verts.put(5, (float) Math.max(ScaleGizmo.SHAFT_START + 0.01, tipCenter - ScaleGizmo.TIP_HALF_EXTENT));
+      shaft.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+      shaft.updateModelBound();
+    }
+
+    final Mesh tip = _axisTips.get(part);
+    if (tip != null) {
+      // The tip's points are baked at TIP_CENTER; translate the mesh to put it at the stretched
+      // distance without deforming it.
+      tip.setTranslation(0, 0, ScaleGizmo.TIP_CENTER * (clamped - 1.0));
+    }
+  }
+
+  @Override
+  public void endDrag(final InteractManager manager, final MouseState current) {
+    super.endDrag(manager, current);
+    // Shafts return to rest length on the next render, where no drag is active anymore.
+    _dragStartScale = null;
   }
 }

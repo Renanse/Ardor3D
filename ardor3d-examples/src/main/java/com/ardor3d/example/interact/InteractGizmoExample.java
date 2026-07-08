@@ -81,7 +81,8 @@ import com.ardor3d.util.TextureManager;
  * -Dgizmo.camera=far|xaxis overrides the start camera (to check constant screen sizing and axis
  * fading); -Dgizmo.hover=x simulates the mouse resting on the +X arrow (to check highlighting);
  * -Dgizmo.widget=rotate starts with the rotate gizmo active; -Dgizmo.drag=ringx simulates a slow
- * drag around the X ring (to check the pie wedge and angle readout).
+ * drag around the X ring (to check the pie wedge and angle readout); -Dgizmo.drag=scalex simulates
+ * pulling the +X scale cube outward (to check the shaft stretch).
  */
 @Purpose(
     htmlDescriptionKey = "com.ardor3d.example.interact.InteractGizmoExample", //
@@ -131,6 +132,9 @@ public class InteractGizmoExample extends ExampleBase {
     }
     if (shot != null && _frames >= 20 && "ringx".equals(System.getProperty("gizmo.drag"))) {
       simulateDragOnXRing();
+    }
+    if (shot != null && _frames >= 20 && "scalex".equals(System.getProperty("gizmo.drag"))) {
+      simulateDragOnXScale();
     }
 
     manager.render(renderer);
@@ -196,6 +200,41 @@ public class InteractGizmoExample extends ExampleBase {
     manager.getSpatialState().applyState(target);
   }
 
+  /**
+   * Feed the scale gizmo a synthetic left-button drag that pulls the +X cube outward along its
+   * axis, driving the full processInput path so a screenshot run can verify the shaft stretch.
+   */
+  private void simulateDragOnXScale() {
+    final Camera cam = _canvas.getCanvasRenderer().getCamera();
+    final Spatial target = manager.getSpatialTarget();
+    final ReadOnlyVector3 origin = target.getWorldTranslation();
+    final double scale = scaleGizmo.getHandle().getScale().getX();
+
+    // Start on the X tip cube and pull further out along the axis each frame. The target is
+    // unrotated in this scene, so its local X (the scale gizmo's frame) is world X.
+    final double pull = 1.0 + (_frames - 20) * 0.03;
+    final Vector3 onAxis = new Vector3(ScaleGizmo.TIP_CENTER * pull * scale, 0, 0).addLocal(origin);
+    final Vector3 screen = cam.getScreenCoordinates(onAxis);
+
+    final EnumMap<MouseButton, ButtonState> buttons = new EnumMap<>(MouseButton.class);
+    buttons.put(MouseButton.LEFT, ButtonState.DOWN);
+    // First frame: previous state has the button up at the same spot, starting the drag there.
+    final MouseState previous = _lastDragMouse != null ? _lastDragMouse
+        : new MouseState((int) screen.getX(), (int) screen.getY(), 0, 0, 0, null, null);
+    final MouseState current = new MouseState((int) screen.getX(), (int) screen.getY(),
+        (int) screen.getX() - previous.getX(), (int) screen.getY() - previous.getY(), 0, buttons, null);
+    _lastDragMouse = current;
+
+    final InputState previousState = new InputState(KeyboardState.NOTHING, previous, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+    final InputState currentState = new InputState(KeyboardState.NOTHING, current, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+
+    scaleGizmo.processInput(_canvas, new TwoInputStates(previousState, currentState), new AtomicBoolean(false),
+        manager);
+    manager.getSpatialState().applyState(target);
+  }
+
   @Override
   protected void initExample() {
     _canvas.setTitle("Interact Gizmo Example");
@@ -230,15 +269,18 @@ public class InteractGizmoExample extends ExampleBase {
     scaleGizmo = new ScaleGizmo().withAllHandles();
     manager.addWidget(scaleGizmo);
 
-    // The ring-drag simulation drives the rotate gizmo directly; it must also be the active
-    // widget or the manager would render a different gizmo than the one being dragged.
-    final boolean simulatedRingDrag = "ringx".equals(System.getProperty("gizmo.drag"));
-    manager.setActiveWidget(simulatedRingDrag ? rotateGizmo
-        : switch (System.getProperty("gizmo.widget", "translate")) {
-          case "rotate" -> rotateGizmo;
-          case "scale" -> scaleGizmo;
-          default -> translateGizmo;
-        });
+    // Drag simulations drive their gizmo directly; it must also be the active widget or the
+    // manager would render a different gizmo than the one being dragged.
+    final String simulatedDrag = System.getProperty("gizmo.drag", "");
+    manager.setActiveWidget(switch (simulatedDrag) {
+      case "ringx" -> rotateGizmo;
+      case "scalex" -> scaleGizmo;
+      default -> switch (System.getProperty("gizmo.widget", "translate")) {
+        case "rotate" -> rotateGizmo;
+        case "scale" -> scaleGizmo;
+        default -> translateGizmo;
+      };
+    });
 
     // switch widgets
     manager.getLogicalLayer().registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE),
@@ -296,8 +338,8 @@ public class InteractGizmoExample extends ExampleBase {
     sun.setIntensity(0.85f);
     sun.setShadowCaster(true);
     sun.getShadowData().setFilterMode(AbstractShadowData.FILTER_MODE_PCF);
-    sun.getShadowData().setMaxDistance(60);
-    sun.getShadowData().setCascades(2);
+    sun.getShadowData().setMaxDistance(200);
+    sun.getShadowData().setCascades(4);
     // High and to the right, slightly past the scene, so shadows fall toward the default camera
     // where dragging an object visibly moves them.
     sun.setTranslation(18, 25, -5);
@@ -413,11 +455,13 @@ public class InteractGizmoExample extends ExampleBase {
     System.out.println("GIZMO size=" + width + "x" + height + " redPixels=" + red + " greenPixels=" + green
         + " bluePixels=" + blue + " highlightPixels=" + highlight
         + (maxX < 0 ? " bbox=none" : " bbox=" + (maxX - minX + 1) + "x" + (maxY - minY + 1)));
-    if (System.getProperty("gizmo.drag") != null) {
+    if ("ringx".equals(System.getProperty("gizmo.drag"))) {
       final double targetAngle =
           new Quaternion().fromRotationMatrix(manager.getSpatialTarget().getRotation()).toAngleAxis(new Vector3());
       System.out.println("GIZMO dragAngle=" + rotateGizmo.getDragAngle() + " text='"
           + rotateGizmo.getAngleReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
+    } else if ("scalex".equals(System.getProperty("gizmo.drag"))) {
+      System.out.println("GIZMO targetScaleX=" + manager.getSpatialTarget().getScale().getX());
     }
 
     try {
