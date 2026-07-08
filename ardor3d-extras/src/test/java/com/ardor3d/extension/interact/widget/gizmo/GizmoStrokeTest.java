@@ -12,6 +12,7 @@ package com.ardor3d.extension.interact.widget.gizmo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -22,6 +23,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -75,6 +78,17 @@ public class GizmoStrokeTest {
     assertTrue(line.isAntialiased());
     assertEquals(2.5f, line.getLineWidth(), EPS);
     assertFalse(line.getSceneHints().isPickingHintEnabled(PickingHint.Pickable));
+  }
+
+  @Test
+  public void testStrokesDepthTestButNeverWrite() {
+    final Line line = GizmoGeometry.segmentStroke("seg", new Vector3(0, 0, 0.2), new Vector3(0, 0, 0.8), 2.5f);
+
+    final ZBufferState zstate = (ZBufferState) line.getLocalRenderStates().get(RenderState.StateType.ZBuffer);
+    assertNotNull("strokes must carry their own zbuffer state", zstate);
+    assertTrue(zstate.isEnabled());
+    assertEquals(ZBufferState.TestFunction.LessThanOrEqualTo, zstate.getFunction());
+    assertFalse("overlay strokes must not write depth", zstate.isWritable());
   }
 
   @Test

@@ -112,6 +112,7 @@ public class RotateGizmo extends AbstractGizmo {
     LightProperties.setLightReceiver(_pieMesh, false);
     _pieMesh.getSceneHints().setAllPickingHints(false);
     _pieMesh.getSceneHints().setCullHint(CullHint.Always);
+    GizmoGeometry.disableDepthWrite(_pieMesh);
     _handle.attachChild(_pieMesh);
     MaterialUtil.autoMaterials(_pieMesh);
 
@@ -127,6 +128,7 @@ public class RotateGizmo extends AbstractGizmo {
     LightProperties.setLightReceiver(_pieEdgeLine, false);
     _pieEdgeLine.getSceneHints().setAllPickingHints(false);
     _pieEdgeLine.getSceneHints().setCullHint(CullHint.Always);
+    GizmoGeometry.disableDepthWrite(_pieEdgeLine);
     _handle.attachChild(_pieEdgeLine);
     MaterialUtil.autoMaterials(_pieEdgeLine);
 

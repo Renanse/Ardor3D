@@ -17,6 +17,8 @@ import com.ardor3d.buffer.IndexBufferData;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -57,8 +59,22 @@ public final class GizmoGeometry {
     line.setAntialiased(true);
     line.setLineWidth(widthPixels);
     line.getSceneHints().setAllPickingHints(false);
+    GizmoGeometry.disableDepthWrite(line);
     line.updateModelBound();
     return line;
+  }
+
+  /**
+   * Depth-test the mesh against the scene but never write depth. Translucent overlay parts -
+   * strokes and fills - must not occlude each other through the depth buffer: a feathered stroke
+   * edge or a see-through fill that wrote depth would clip whatever gizmo part draws behind it
+   * next. Solid parts (cone tips, cubes) keep writing so they self-occlude correctly.
+   */
+  public static void disableDepthWrite(final Mesh mesh) {
+    final ZBufferState zstate = new ZBufferState();
+    zstate.setFunction(TestFunction.LessThanOrEqualTo);
+    zstate.setWritable(false);
+    mesh.setRenderState(zstate);
   }
 
   /** Build a single straight antialiased stroke between two points. See {@link #polylineStroke}. */

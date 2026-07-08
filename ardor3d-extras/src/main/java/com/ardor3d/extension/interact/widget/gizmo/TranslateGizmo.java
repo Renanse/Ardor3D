@@ -158,6 +158,7 @@ public class TranslateGizmo extends AbstractGizmo {
     final Quad fill = new Quad("fill", TranslateGizmo.PLANE_QUAD_SIZE, TranslateGizmo.PLANE_QUAD_SIZE);
     fill.getMeshData().translatePoints(TranslateGizmo.PLANE_QUAD_CENTER, TranslateGizmo.PLANE_QUAD_CENTER, 0);
     fill.updateModelBound();
+    GizmoGeometry.disableDepthWrite(fill);
     root.attachChild(fill);
 
     final double near = TranslateGizmo.PLANE_QUAD_CENTER - TranslateGizmo.PLANE_QUAD_SIZE * 0.5;
