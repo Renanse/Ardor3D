@@ -68,6 +68,17 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 
 ## Architecture notes
 
+- **Windowing / viewport integration** — the UI is Compose Desktop (Skia) hosted in a Swing
+  window; the 3D viewport is the engine's `Lwjgl3AwtCanvas` (lwjgl3-awt), a *heavyweight* AWT
+  canvas with a native GL context, embedded via `SwingPanel`. This gives the engine renderer a
+  real on-screen surface with zero per-frame copies, and reuses the same `ardor3d-lwjgl3-awt`
+  path any Swing-embedding application uses. The trade-off is classic heavyweight airspace:
+  the canvas paints above in-window Skia content, so Compose chrome belongs *beside* the
+  viewport, never layered over it — anything that must draw inside the viewport (grid, gizmos,
+  readouts) is engine-rendered on the editor overlay root instead. Compose popups and dialogs
+  are separate OS windows and are unaffected. If this constraint ever becomes limiting, the
+  seam is contained: swapping the `SwingPanel` for an offscreen-FBO-to-Skia-image bridge would
+  touch only the viewport composable and canvas setup.
 - **Document vs. overlay** — `EditorScene` renders two roots: the *document*
   (`EditorState.sceneRoot`, what the user edits and saves) and an *editor overlay* (grid, light
   gizmos) that never appears in the hierarchy, picking, or saved files.
