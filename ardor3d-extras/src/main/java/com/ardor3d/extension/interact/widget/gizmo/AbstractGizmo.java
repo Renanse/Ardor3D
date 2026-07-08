@@ -43,6 +43,7 @@ import com.ardor3d.renderer.state.ZBufferState.TestFunction;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.util.ReadOnlyTimer;
 
 /**
  * Base class for the v2 interact gizmos. Compared to the older widgets in the parent package,
@@ -78,6 +79,19 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   /** Chroma (max minus min channel) below which a handle counts as gray for highlighting. */
   public static final float HIGHLIGHT_CHROMA_FLOOR = 0.15f;
 
+  /**
+   * Default time constant for easing the hover highlight in and out, in seconds. At ~0.05s the
+   * handle reads as reaching full highlight in roughly 100ms - snappy but not instant.
+   */
+  public static final double DEFAULT_HIGHLIGHT_EASE_TAU = 0.05;
+
+  /**
+   * Default fraction a fully-highlighted handle's strokes thicken. The pop grows the stroke width
+   * in place rather than scaling the handle, so the geometry stays put under the cursor - important
+   * for the rings, where a growing radius would slide the line away from the mouse.
+   */
+  public static final double DEFAULT_HIGHLIGHT_LINE_WIDTH_POP = 0.5;
+
   /** Default on-screen footprint of a gizmo, in pixels. */
   public static final double DEFAULT_PIXEL_SIZE = 100;
 
@@ -94,6 +108,11 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected final ColorRGBA _highlightColor = new ColorRGBA(AbstractGizmo.DEFAULT_HIGHLIGHT_COLOR);
   protected float _ghostAlpha = AbstractGizmo.DEFAULT_GHOST_ALPHA;
   protected boolean _xray = true;
+
+  /** Time constant for easing the hover highlight in and out, in seconds. */
+  protected double _highlightEaseTau = AbstractGizmo.DEFAULT_HIGHLIGHT_EASE_TAU;
+  /** Fraction a fully-highlighted handle's strokes thicken, in place. */
+  protected double _highlightLineWidthPop = AbstractGizmo.DEFAULT_HIGHLIGHT_LINE_WIDTH_POP;
 
   /** View angle at or below which fading handles are fully hidden, in radians. */
   protected double _fadeHideAngle = 10 * MathUtils.DEG_TO_RAD;
@@ -118,6 +137,7 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected final Vector2 _calcVec2C = new Vector2();
   protected final Plane _calcPlane = new Plane();
   protected final ColorRGBA _calcColor = new ColorRGBA();
+  protected final ColorRGBA _calcColorB = new ColorRGBA();
 
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
@@ -177,6 +197,25 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     return null;
   }
 
+  /**
+   * Ease each handle's hover highlight toward its target - 1 for the handle under the mouse or
+   * being dragged, 0 for the rest - before the base class refreshes geometric state. The highlight
+   * drives both the color lerp and the scale pop applied in {@link #render}. Animation is advanced
+   * here, so a gizmo that is rendered without being updated each frame simply sits at rest; the
+   * standard {@link InteractManager} loop updates then renders every frame.
+   */
+  @Override
+  public void update(final ReadOnlyTimer timer, final InteractManager manager) {
+    final double dt = timer.getTimePerFrame();
+    final GizmoHandle active = getActiveHandle();
+    for (int i = _gizmoHandles.size(); --i >= 0;) {
+      final GizmoHandle handle = _gizmoHandles.get(i);
+      handle.setHighlight(
+          GizmoMath.approach(handle.getHighlight(), handle == active ? 1.0 : 0.0, dt, _highlightEaseTau));
+    }
+    super.update(timer, manager);
+  }
+
   @Override
   public void targetDataUpdated(final InteractManager manager) {
     final Spatial target = manager.getSpatialTarget();
@@ -212,14 +251,14 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
     updateCameraFacingHandles(camera);
     updateHandleFades(camera);
+    applyHandleLineWidths();
     _handle.updateGeometricState(0);
 
-    final GizmoHandle active = getActiveHandle();
     final RenderContext context = ContextManager.getCurrentContext();
 
     if (_xray) {
       // Occluded pass: only draw where the gizmo is behind scene geometry, dimmed.
-      applyHandleColors(active, _ghostAlpha);
+      applyHandleColors(_ghostAlpha);
       final RenderState previousZ = context.getEnforcedState(StateType.ZBuffer);
       context.enforceState(_ghostZState);
       renderer.draw(_handle);
@@ -231,8 +270,20 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     }
 
     // Visible pass: full strength wherever the gizmo passes the normal depth test.
-    applyHandleColors(active, 1.0f);
+    applyHandleColors(1.0f);
     renderer.draw(_handle);
+  }
+
+  /**
+   * Set each handle's stroke widths for the frame: the display DPI scale, thickened in place by the
+   * handle's current highlight amount. Growing the width rather than scaling the handle keeps the
+   * geometry under the cursor - a ring pops thicker without its radius sliding away from the mouse.
+   */
+  protected void applyHandleLineWidths() {
+    for (int i = _gizmoHandles.size(); --i >= 0;) {
+      final GizmoHandle handle = _gizmoHandles.get(i);
+      handle.applyLineWidthScale((float) (_appliedDpiScale * (1.0 + _highlightLineWidthPop * handle.getHighlight())));
+    }
   }
 
   /**
@@ -243,18 +294,14 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     /**/}
 
   /**
-   * Track the display's DPI scale, rescaling the gizmo's stroke widths when it changes. The
-   * gizmo's pixel footprint picks the scale up in render(). No-op until a scale provider is known
-   * - set one directly or let processInput capture the interacting canvas.
+   * Track the display's DPI scale. The gizmo's pixel footprint and per-frame stroke widths (see
+   * {@link #applyHandleLineWidths}) both pick it up in render(). No-op until a scale provider is
+   * known - set one directly or let processInput capture the interacting canvas.
    */
   protected void updateDpiScale() {
     final double scale = _dpiScaleProvider != null ? _dpiScaleProvider.scaleToScreenDpi(1.0) : 1.0;
-    if (scale == _appliedDpiScale || scale <= 0) {
-      return;
-    }
-    _appliedDpiScale = scale;
-    for (int i = _gizmoHandles.size(); --i >= 0;) {
-      _gizmoHandles.get(i).applyLineWidthScale((float) scale);
+    if (scale > 0) {
+      _appliedDpiScale = scale;
     }
   }
 
@@ -291,11 +338,23 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     }
   }
 
-  protected void applyHandleColors(final GizmoHandle active, final float alphaMultiplier) {
+  protected void applyHandleColors(final float alphaMultiplier) {
     for (int i = _gizmoHandles.size(); --i >= 0;) {
       final GizmoHandle handle = _gizmoHandles.get(i);
-      final ReadOnlyColorRGBA rgb = handle == active ? highlightColorFor(handle) : handle.getBaseColor();
-      final float alpha = handle.getBaseColor().getAlpha() * (float) handle.getFadeAlpha() * alphaMultiplier;
+      final ReadOnlyColorRGBA base = handle.getBaseColor();
+      final float h = (float) handle.getHighlight();
+      final ReadOnlyColorRGBA rgb;
+      if (h <= 0f) {
+        rgb = base;
+      } else {
+        // Lerp base -> its highlight color by the eased amount. highlightColorFor may hand back
+        // _calcColor, so lerp into the separate _calcColorB. Alpha is carried by the alpha arg.
+        final ReadOnlyColorRGBA hi = highlightColorFor(handle);
+        rgb = _calcColorB.set(base.getRed() + (hi.getRed() - base.getRed()) * h,
+            base.getGreen() + (hi.getGreen() - base.getGreen()) * h,
+            base.getBlue() + (hi.getBlue() - base.getBlue()) * h, base.getAlpha());
+      }
+      final float alpha = base.getAlpha() * (float) handle.getFadeAlpha() * alphaMultiplier;
       handle.applyColor(rgb, alpha);
     }
   }
@@ -391,6 +450,16 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   public ReadOnlyColorRGBA getHighlightColor() { return _highlightColor; }
 
   public void setHighlightColor(final ReadOnlyColorRGBA color) { _highlightColor.set(color); }
+
+  public double getHighlightEaseTau() { return _highlightEaseTau; }
+
+  /** Set the time constant for easing the hover highlight in and out, in seconds; 0 to snap. */
+  public void setHighlightEaseTau(final double seconds) { _highlightEaseTau = seconds; }
+
+  public double getHighlightLineWidthPop() { return _highlightLineWidthPop; }
+
+  /** Set the fraction a fully-highlighted handle's strokes thicken in place; 0 for no pop. */
+  public void setHighlightLineWidthPop(final double fraction) { _highlightLineWidthPop = fraction; }
 
   public boolean isXRay() { return _xray; }
 

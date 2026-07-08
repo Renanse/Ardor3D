@@ -161,4 +161,31 @@ public final class GizmoMath {
   public static double fadeAlpha(final double angle, final double hideBelow, final double fullAbove) {
     return MathUtils.clamp((angle - hideBelow) / (fullAbove - hideBelow), 0.0, 1.0);
   }
+
+  /**
+   * Advance a value toward a target by frame-rate independent exponential smoothing. Over an
+   * elapsed time equal to {@code tau} the value covers {@code 1 - 1/e} (~63%) of the remaining gap,
+   * ~95% over {@code 3*tau}; it eases in - fast then slow - and never overshoots the target.
+   * Composing two half-steps lands exactly where one full step of the summed time would, so the
+   * animation looks the same regardless of frame rate.
+   *
+   * @param current
+   *          the current value.
+   * @param target
+   *          the value to move toward.
+   * @param dt
+   *          elapsed time, in the same units as tau. Values &lt;= 0 leave current unchanged.
+   * @param tau
+   *          the smoothing time constant. Values &lt;= 0 snap straight to the target.
+   * @return the value moved toward the target.
+   */
+  public static double approach(final double current, final double target, final double dt, final double tau) {
+    if (tau <= 0.0) {
+      return target;
+    }
+    if (dt <= 0.0) {
+      return current;
+    }
+    return current + (target - current) * (1.0 - Math.exp(-dt / tau));
+  }
 }

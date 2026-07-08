@@ -55,6 +55,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.material.MaterialManager;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.SceneIndexer;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
@@ -81,6 +82,29 @@ public class GlGizmoRenderSmokeTest {
 
   private static final int SIZE = 256;
   private static final ColorRGBA CLEAR_COLOR = new ColorRGBA(0.1f, 0.15f, 0.3f, 1f);
+
+  // A fixed 50ms-per-frame timer so each scripted frame is a faithful update()+render() pair. The
+  // gizmos advance their eased hover highlight in update(); four frames at this step (200ms) take
+  // the highlight well past its ~100ms ease, matching what the interactive example shows.
+  private static final ReadOnlyTimer FIXED_TIMER = new ReadOnlyTimer() {
+    @Override
+    public double getTimeInSeconds() { return 0; }
+
+    @Override
+    public long getTime() { return 0; }
+
+    @Override
+    public long getResolution() { return 1_000_000_000L; }
+
+    @Override
+    public double getFrameRate() { return 20.0; }
+
+    @Override
+    public double getTimePerFrame() { return 0.05; }
+
+    @Override
+    public long getPreviousFrameTime() { return 0; }
+  };
 
   // How far a synthetic drag is walked, in per-frame steps, once it has started.
   private static final int DRAG_STEPS = 16;
@@ -150,6 +174,10 @@ public class GlGizmoRenderSmokeTest {
       cam.apply(renderer);
       _root.onDraw(renderer);
       renderer.renderBuckets();
+
+      // Advance the gizmo's animation for the frame (eased hover highlight, etc.), reacting to the
+      // hover/drag state the previous frame's input left, exactly like the example's update pass.
+      _manager.update(FIXED_TIMER);
 
       // Inject the phase's synthetic input before the gizmo draws, so the render reflects it.
       switch (_phase) {
