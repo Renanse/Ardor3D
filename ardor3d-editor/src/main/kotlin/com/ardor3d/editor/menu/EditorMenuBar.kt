@@ -185,119 +185,46 @@ fun EditorMenuBar(
                 )
                 HorizontalDivider()
 
-                // 3D Object submenu
+                // 3D Object submenu (opening one submenu closes the other)
                 DropdownMenuItem(
                     text = { Text("3D Object  ▶") },
-                    onClick = { shapesSubmenuExpanded = !shapesSubmenuExpanded }
+                    onClick = {
+                        shapesSubmenuExpanded = !shapesSubmenuExpanded
+                        if (shapesSubmenuExpanded) {
+                            lightsSubmenuExpanded = false
+                        }
+                    }
                 )
 
                 // Shapes submenu (shown inline when expanded)
                 if (shapesSubmenuExpanded) {
-                    // Basic shapes
-                    DropdownMenuItem(
-                        text = { Text("    Box") },
-                        onClick = {
-                            onAddShape(ShapeType.BOX)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Sphere") },
-                        onClick = {
-                            onAddShape(ShapeType.SPHERE)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Plane") },
-                        onClick = {
-                            onAddShape(ShapeType.PLANE)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Cylinder") },
-                        onClick = {
-                            onAddShape(ShapeType.CYLINDER)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Cone") },
-                        onClick = {
-                            onAddShape(ShapeType.CONE)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Capsule") },
-                        onClick = {
-                            onAddShape(ShapeType.CAPSULE)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Torus") },
-                        onClick = {
-                            onAddShape(ShapeType.TORUS)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Pyramid") },
-                        onClick = {
-                            onAddShape(ShapeType.PYRAMID)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Dome") },
-                        onClick = {
-                            onAddShape(ShapeType.DOME)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Disk") },
-                        onClick = {
-                            onAddShape(ShapeType.DISK)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Tube") },
-                        onClick = {
-                            onAddShape(ShapeType.TUBE)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    GeoSphere") },
-                        onClick = {
-                            onAddShape(ShapeType.GEOSPHERE)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("    Teapot") },
-                        onClick = {
-                            onAddShape(ShapeType.TEAPOT)
-                            gameObjectMenuExpanded = false
-                            shapesSubmenuExpanded = false
-                        }
-                    )
+                    listOf(
+                        "Box" to ShapeType.BOX,
+                        "Sphere" to ShapeType.SPHERE,
+                        "Plane" to ShapeType.PLANE,
+                        "Cylinder" to ShapeType.CYLINDER,
+                        "Cone" to ShapeType.CONE,
+                        "Capsule" to ShapeType.CAPSULE,
+                        "Torus" to ShapeType.TORUS,
+                        "Pyramid" to ShapeType.PYRAMID,
+                        "Dome" to ShapeType.DOME,
+                        "Disk" to ShapeType.DISK,
+                        "Tube" to ShapeType.TUBE,
+                        "GeoSphere" to ShapeType.GEOSPHERE,
+                        "Dodecahedron" to ShapeType.DODECAHEDRON,
+                        "Icosahedron" to ShapeType.ICOSAHEDRON,
+                        "Octahedron" to ShapeType.OCTAHEDRON,
+                        "Teapot" to ShapeType.TEAPOT
+                    ).forEach { (label, type) ->
+                        DropdownMenuItem(
+                            text = { Text("    $label") },
+                            onClick = {
+                                onAddShape(type)
+                                gameObjectMenuExpanded = false
+                                shapesSubmenuExpanded = false
+                            }
+                        )
+                    }
                 }
 
                 HorizontalDivider()
@@ -305,7 +232,12 @@ fun EditorMenuBar(
                 // Light submenu
                 DropdownMenuItem(
                     text = { Text("Light  ▶") },
-                    onClick = { lightsSubmenuExpanded = !lightsSubmenuExpanded }
+                    onClick = {
+                        lightsSubmenuExpanded = !lightsSubmenuExpanded
+                        if (lightsSubmenuExpanded) {
+                            shapesSubmenuExpanded = false
+                        }
+                    }
                 )
                 if (lightsSubmenuExpanded) {
                     DropdownMenuItem(

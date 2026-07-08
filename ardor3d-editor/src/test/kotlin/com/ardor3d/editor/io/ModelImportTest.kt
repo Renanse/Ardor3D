@@ -41,6 +41,20 @@ class ModelImportTest {
         folder.newFile(name).apply { writeText(content) }
 
     @Test
+    fun ensureModelBoundsReplacesTheDefaultInfiniteSphere() {
+        // A new Mesh defaults to an infinite bounding sphere, not a null bound
+        val box = com.ardor3d.scenegraph.shape.Box("box", com.ardor3d.math.Vector3.ZERO, 1.0, 1.0, 1.0)
+        assertTrue((box.modelBound as com.ardor3d.bounding.BoundingSphere).radius.isInfinite())
+        val scene = Node("scene").apply { attachChild(box) }
+
+        ModelImport.ensureModelBounds(scene)
+
+        val radius = (box.modelBound as com.ardor3d.bounding.BoundingSphere).radius
+        assertTrue("bound radius should be finite after import, was $radius", radius.isFinite())
+        assertTrue(radius > 0.0)
+    }
+
+    @Test
     fun loadsObjTriangle() {
         val file = writeFile(
             "triangle.obj",

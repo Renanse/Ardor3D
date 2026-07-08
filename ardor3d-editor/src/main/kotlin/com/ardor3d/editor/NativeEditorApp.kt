@@ -133,7 +133,10 @@ private fun addDefaultResourceLocators() {
             ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MATERIAL, "occluder/basic.yaml")
         )
     } catch (ex: Exception) {
+        // Without material/shader locators and default materials the editor cannot render
+        // anything meaningful - fail fast rather than launch in a broken state.
         logger.log(Level.SEVERE, "Failed to set up default resource locators", ex)
+        throw IllegalStateException("Editor startup failed: could not load default materials/shaders", ex)
     }
 }
 
@@ -1060,7 +1063,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 BinaryExporter().save(root, file)
                 editorState.markSaved(file)
             } catch (ex: Exception) {
-                logger.log(Level.SEVERE, "Failed to save scene to $file", ex)
+                reportError("Failed to save scene to ${file.name}", ex)
             }
         }
     }
@@ -1073,14 +1076,34 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             try {
                 val loaded = BinaryImporter().load(file) as? Node
                 if (loaded == null) {
-                    logger.severe("$file did not contain a scene root Node")
+                    reportError("${file.name} did not contain a scene root Node", null)
                     return@add
                 }
                 installDocumentRoot(loaded)
                 editorState.markSaved(file)
             } catch (ex: Exception) {
-                logger.log(Level.SEVERE, "Failed to open scene $file", ex)
+                reportError("Failed to open scene ${file.name}", ex)
             }
+        }
+    }
+
+    /**
+     * Logs a failure and surfaces it to the user. The dialog is deferred with invokeLater so a
+     * modal never pumps the event queue from inside the render update that ran this action.
+     */
+    private fun reportError(message: String, ex: Exception?) {
+        if (ex != null) {
+            logger.log(Level.SEVERE, message, ex)
+        } else {
+            logger.severe(message)
+        }
+        javax.swing.SwingUtilities.invokeLater {
+            javax.swing.JOptionPane.showMessageDialog(
+                null,
+                if (ex != null) "$message:\n${ex.message ?: ex.javaClass.simpleName}" else message,
+                "Ardor3D Editor",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+            )
         }
     }
 
@@ -1104,7 +1127,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 )
                 editorState.sealUndoMerge()
             } catch (ex: Exception) {
-                logger.log(Level.SEVERE, "Failed to import model $file", ex)
+                reportError("Failed to import model ${file.name}", ex)
             }
         }
     }

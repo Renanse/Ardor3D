@@ -476,18 +476,19 @@ private fun ColorPropertyField(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // RGB sliders (compact)
+        // RGB sliders (compact). The UI has no alpha channel - preserve the color's existing
+        // alpha rather than forcing it opaque.
         ColorSlider(label = "R", value = red, color = Color.Red, onEditFinished = onEditFinished) {
             red = it
-            onColorChange(ColorRGBA(red, green, blue, 1f))
+            onColorChange(ColorRGBA(red, green, blue, color.alpha))
         }
         ColorSlider(label = "G", value = green, color = Color.Green, onEditFinished = onEditFinished) {
             green = it
-            onColorChange(ColorRGBA(red, green, blue, 1f))
+            onColorChange(ColorRGBA(red, green, blue, color.alpha))
         }
         ColorSlider(label = "B", value = blue, color = Color.Blue, onEditFinished = onEditFinished) {
             blue = it
-            onColorChange(ColorRGBA(red, green, blue, 1f))
+            onColorChange(ColorRGBA(red, green, blue, color.alpha))
         }
     }
 }
@@ -549,7 +550,9 @@ private fun ColorSlider(
     onEditFinished: () -> Unit = {},
     onValueChange: (Float) -> Unit
 ) {
-    var textValue by remember(value) { mutableStateOf(String.format(Locale.ROOT, "%.2f", value)) }
+    // Deliberately not keyed on `value`: each parsed keystroke changes the bound value, and a
+    // keyed remember would reset the in-progress text. Focus entry re-seeds it instead.
+    var textValue by remember { mutableStateOf(String.format(Locale.ROOT, "%.2f", value)) }
     var isFocused by remember { mutableStateOf(false) }
 
     Row(

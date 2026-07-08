@@ -41,12 +41,25 @@ object ModelImport {
             )
         }
         scene.name = file.name.substringBeforeLast('.')
+        ensureModelBounds(scene)
+        return scene
+    }
+
+    /**
+     * Ensures every mesh in [scene] has a finite, up-to-date model bound. A new Mesh defaults
+     * to an INFINITE bounding sphere (not null), so bounds an importer never refreshed would
+     * otherwise break picking and camera framing.
+     */
+    internal fun ensureModelBounds(scene: Node) {
         scene.acceptVisitor({ spatial ->
-            if (spatial is Mesh && spatial.modelBound == null) {
-                spatial.setModelBound(BoundingBox())
+            if (spatial is Mesh) {
+                if (spatial.modelBound == null) {
+                    spatial.setModelBound(BoundingBox())
+                } else {
+                    spatial.updateModelBound()
+                }
             }
         }, false)
-        return scene
     }
 
     private fun loadObj(file: File): Node {

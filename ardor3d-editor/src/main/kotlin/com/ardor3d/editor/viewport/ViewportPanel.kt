@@ -101,7 +101,7 @@ fun ViewportStatusBar(
 ) {
     Surface(
         modifier = modifier,
-        color = Color(0xFF252526),
+        color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 0.dp
     ) {
         Row(
@@ -119,7 +119,7 @@ fun ViewportStatusBar(
             Text(
                 text = selectionText,
                 style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFFAAAAAA)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             // Transform mode and frame rate
@@ -127,12 +127,12 @@ fun ViewportStatusBar(
                 Text(
                     text = editorState.transformMode.name,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFFAAAAAA)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "${editorState.framesPerSecond} FPS",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFFAAAAAA)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
