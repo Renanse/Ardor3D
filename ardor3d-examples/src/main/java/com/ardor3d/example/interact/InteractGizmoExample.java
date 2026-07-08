@@ -160,6 +160,8 @@ public class InteractGizmoExample extends ExampleBase {
     translateGizmo.checkMouseOver(_canvas, hover, manager);
   }
 
+  // Shared by both drag simulators, but only one runs per probe JVM (selected by -Dgizmo.drag),
+  // so it carries the previous frame's mouse for whichever drag is active with no cross-talk.
   private MouseState _lastDragMouse = null;
 
   /**
