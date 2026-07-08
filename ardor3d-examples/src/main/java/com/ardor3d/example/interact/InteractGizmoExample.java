@@ -86,7 +86,7 @@ import com.ardor3d.util.TextureManager;
  */
 @Purpose(
     htmlDescriptionKey = "com.ardor3d.example.interact.InteractGizmoExample", //
-    thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractExample.jpg", //
+    thumbnailPath = "com/ardor3d/example/media/thumbnails/interact_InteractGizmoExample.jpg", //
     maxHeapMemory = 64)
 public class InteractGizmoExample extends ExampleBase {
 
