@@ -21,4 +21,8 @@ dependencies {
 	implementation("org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives")
 	implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives")
 	implementation("org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives")
+
+	// The GL smoke tests render extras' interact gizmos in a real context; test-only, so this
+	// does not add a runtime dependency (extras depends on core, not on lwjgl3).
+	testImplementation(project(":ardor3d-extras"))
 }
