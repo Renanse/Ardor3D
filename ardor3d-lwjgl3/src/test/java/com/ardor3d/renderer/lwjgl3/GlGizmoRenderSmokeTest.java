@@ -142,11 +142,11 @@ public class GlGizmoRenderSmokeTest {
     int txRed, txGreen, txBlue, txHighlight;
     // Translate gizmo with the +X arrow hovered.
     int hoverRed, hoverHighlight;
-    // Rotate gizmo mid-drag.
-    int rotRed, rotGreen, rotBlue;
+    // Rotate gizmo: rings at rest, then mid-drag (drag-focus dims the inactive Y/Z rings).
+    int rotRestGreen, rotRestBlue, rotRed, rotGreen, rotBlue;
     double dragAngleDeg, readoutDeg, targetAngleDeg;
-    // Scale gizmo mid-drag.
-    int scRed, scGreen, scBlue;
+    // Scale gizmo: shafts at rest, then mid-drag (drag-focus dims the inactive Y/Z shafts).
+    int scRestGreen, scRestBlue, scRed, scGreen, scBlue;
     double targetScaleX;
 
     void setCanvas(final Canvas canvas) { _canvas = canvas; }
@@ -242,6 +242,12 @@ public class GlGizmoRenderSmokeTest {
           }
         }
         case ROTATE -> {
+          if (_phaseFrame == 0) {
+            // Rings at rest (no drag yet): the AA-stroke pipeline rasterizes all three ring colors.
+            classify(renderer);
+            rotRestGreen = _green;
+            rotRestBlue = _blue;
+          }
           if (_phaseFrame == DRAG_STEPS) {
             classify(renderer);
             rotRed = _red;
@@ -255,6 +261,12 @@ public class GlGizmoRenderSmokeTest {
           }
         }
         case SCALE -> {
+          if (_phaseFrame == 0) {
+            // Shafts at rest (no drag yet): all three axis-shaft colors rasterize.
+            classify(renderer);
+            scRestGreen = _green;
+            scRestBlue = _blue;
+          }
           if (_phaseFrame == DRAG_STEPS) {
             classify(renderer);
             scRed = _red;
@@ -436,16 +448,21 @@ public class GlGizmoRenderSmokeTest {
       System.out.println("GIZMO SMOKE on '" + scene.glRenderer + "'"
           + " translate[r=" + scene.txRed + " g=" + scene.txGreen + " b=" + scene.txBlue + " hi=" + scene.txHighlight
           + "] hover[r=" + scene.hoverRed + " hi=" + scene.hoverHighlight + "]"
-          + " rotate[r=" + scene.rotRed + " g=" + scene.rotGreen + " b=" + scene.rotBlue
-          + " dragAngle=" + scene.dragAngleDeg + " readout=" + scene.readoutDeg + " target=" + scene.targetAngleDeg + "]"
-          + " scale[r=" + scene.scRed + " g=" + scene.scGreen + " b=" + scene.scBlue + " sx=" + scene.targetScaleX + "]");
+          + " rotate[rest g=" + scene.rotRestGreen + " b=" + scene.rotRestBlue + "; drag r=" + scene.rotRed + " g="
+          + scene.rotGreen + " b=" + scene.rotBlue + " dragAngle=" + scene.dragAngleDeg + " readout=" + scene.readoutDeg
+          + " target=" + scene.targetAngleDeg + "]"
+          + " scale[rest g=" + scene.scRestGreen + " b=" + scene.scRestBlue + "; drag r=" + scene.scRed + " g="
+          + scene.scGreen + " b=" + scene.scBlue + " sx=" + scene.targetScaleX + "]");
 
       final String on = " on '" + scene.glRenderer + "'";
 
-      // 1. Every gizmo's three axis colors rasterize (the AA-stroke line pipeline works).
+      // 1. Every gizmo's three axis colors rasterize at rest (the AA-stroke line pipeline works):
+      // the translate arrows, the rotate rings, and the scale shafts each build their own geometry.
       assertTrue("translate X (red) did not render" + on, scene.txRed > 40);
       assertTrue("translate Y (green) did not render" + on, scene.txGreen > 40);
       assertTrue("translate Z (blue) did not render" + on, scene.txBlue > 40);
+      assertTrue("rotate rings did not render at rest" + on, scene.rotRestGreen > 40 && scene.rotRestBlue > 40);
+      assertTrue("scale shafts did not render at rest" + on, scene.scRestGreen > 40 && scene.scRestBlue > 40);
 
       // 2. Hovering the +X arrow lights it up - a distinct highlight render path. A chromatic
       // handle brightens toward white rather than toward the yellow highlight tint, so its pixels
@@ -454,20 +471,24 @@ public class GlGizmoRenderSmokeTest {
       assertTrue("hovering the +X arrow did not change its pixels (highlight path)" + on,
           scene.hoverRed < scene.txRed - 150);
 
-      // 3. The rotate rings render and a ring drag leaves drag angle, readout and applied rotation
-      // all agreeing on a clearly nonzero sweep.
-      assertTrue("rotate rings did not render" + on, scene.rotRed > 40 && scene.rotGreen > 40 && scene.rotBlue > 40);
+      // 3. A ring drag leaves drag angle, readout and applied rotation all agreeing on a clearly
+      // nonzero sweep, and the swept pie wedge (its red edges) rasterizes.
+      assertTrue("rotate pie wedge did not render" + on, scene.rotRed > 40);
       assertTrue("ring drag produced no rotation" + on, scene.targetAngleDeg > 15);
       assertEquals("drag angle and readout disagree" + on, scene.dragAngleDeg, scene.readoutDeg, 3.0);
       assertEquals("drag angle and applied target rotation disagree" + on, scene.dragAngleDeg, scene.targetAngleDeg,
           6.0);
 
-      // 4. The scale gizmo renders and a +X drag grows the target's X scale into a sane range. The
-      // dragged X axis is the active handle, so it is highlighted out of the red bucket (like the
-      // hovered arrow above); the resting Y and Z axes show the stroke pipeline still rasterizes.
-      assertTrue("scale gizmo did not render" + on, scene.scGreen > 40 && scene.scBlue > 40);
+      // 4. A +X scale drag grows the target's X scale into a sane range.
       assertTrue("scale drag did not grow target X scale (was " + scene.targetScaleX + ")" + on,
           scene.targetScaleX > 1.1 && scene.targetScaleX < 20.0);
+
+      // 5. Drag-focus dims the inactive handles: mid-drag, the Y/Z rings and shafts (not the dragged
+      // axis) fade well below their resting counts as they blend toward the background.
+      assertTrue("drag-focus did not dim the inactive rotate rings" + on,
+          scene.rotGreen < scene.rotRestGreen / 2 && scene.rotBlue < scene.rotRestBlue / 2);
+      assertTrue("drag-focus did not dim the inactive scale shafts" + on,
+          scene.scGreen < scene.scRestGreen / 2 && scene.scBlue < scene.scRestBlue / 2);
     } finally {
       canvas.close();
     }

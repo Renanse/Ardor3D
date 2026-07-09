@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.interact.widget.gizmo;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,9 +46,13 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.ZBufferState.TestFunction;
+import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
 
 /**
@@ -97,6 +102,19 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
    */
   public static final double DEFAULT_HIGHLIGHT_LINE_WIDTH_POP = 0.5;
 
+  /**
+   * Default opacity the inactive handles fade to while a drag is in progress, so the handle being
+   * dragged stands out. 1 disables the drag-focus dim.
+   */
+  public static final double DEFAULT_DRAG_FOCUS_DIM = 0.15;
+
+  /** Half-length of the axis guide line, in gizmo-local units; large enough to span any viewport. */
+  public static final double AXIS_GUIDE_HALF_LENGTH = 100.0;
+  /** Axis guide stroke width, in screen pixels at 1:1 DPI scale. */
+  public static final float AXIS_GUIDE_WIDTH = 1.5f;
+  /** Axis guide opacity. */
+  public static final float AXIS_GUIDE_ALPHA = 0.55f;
+
   /** Default on-screen footprint of a gizmo, in pixels. */
   public static final double DEFAULT_PIXEL_SIZE = 100;
 
@@ -118,6 +136,10 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected double _highlightEaseTau = AbstractGizmo.DEFAULT_HIGHLIGHT_EASE_TAU;
   /** Fraction a fully-highlighted handle's strokes thicken, in place. */
   protected double _highlightLineWidthPop = AbstractGizmo.DEFAULT_HIGHLIGHT_LINE_WIDTH_POP;
+  /** Opacity the inactive handles fade to while dragging. */
+  protected double _dragFocusDim = AbstractGizmo.DEFAULT_DRAG_FOCUS_DIM;
+  /** Eased drag-focus amount in [0, 1]: 0 at rest, 1 while a drag is in progress. */
+  protected double _dragFocus = 0.0;
 
   /** View angle at or below which fading handles are fully hidden, in radians. */
   protected double _fadeHideAngle = 10 * MathUtils.DEG_TO_RAD;
@@ -149,6 +171,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   /** Whether {@link #_dragStartTransform} holds a snapshot for the active drag. */
   protected boolean _hasDragStartTransform = false;
 
+  /**
+   * A long stroke through the gizmo origin along the axis of an active single-axis drag, extending
+   * the constraint line across the viewport. Hidden except during axis drags; its two endpoints are
+   * rewritten each frame onto the active axis.
+   */
+  protected final Line _axisGuide;
+
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
     LightProperties.setLightReceiver(_handle, false);
@@ -166,6 +195,15 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     final CullState cull = new CullState();
     cull.setCullFace(CullState.Face.None);
     _handle.setRenderState(cull);
+
+    // Axis constraint guide: an antialiased stroke along +/-X, reoriented onto the active axis and
+    // shown only during single-axis drags (see updateAxisGuide). Built like the handle strokes.
+    _axisGuide = GizmoGeometry.segmentStroke("axisGuide", new Vector3(-AbstractGizmo.AXIS_GUIDE_HALF_LENGTH, 0, 0),
+        new Vector3(AbstractGizmo.AXIS_GUIDE_HALF_LENGTH, 0, 0), AbstractGizmo.AXIS_GUIDE_WIDTH);
+    LightProperties.setLightReceiver(_axisGuide, false);
+    _axisGuide.getSceneHints().setCullHint(CullHint.Always);
+    _handle.attachChild(_axisGuide);
+    MaterialUtil.autoMaterials(_axisGuide);
 
     // Render immediately when drawn rather than queueing - the gizmo is drawn once per pass by
     // render(), after the scene buckets have flushed.
@@ -223,6 +261,8 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
       handle.setHighlight(
           GizmoMath.approach(handle.getHighlight(), handle == active ? 1.0 : 0.0, dt, _highlightEaseTau));
     }
+    // Ease the drag-focus dim in while a drag is active, out when it ends.
+    _dragFocus = GizmoMath.approach(_dragFocus, _dragState != DragState.NONE ? 1.0 : 0.0, dt, _highlightEaseTau);
     super.update(timer, manager);
   }
 
@@ -308,6 +348,7 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     updateCameraFacingHandles(camera);
     updateHandleFades(camera);
     applyHandleLineWidths();
+    updateAxisGuide();
     _handle.updateGeometricState(0);
 
     final RenderContext context = ContextManager.getCurrentContext();
@@ -340,6 +381,41 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
       final GizmoHandle handle = _gizmoHandles.get(i);
       handle.applyLineWidthScale((float) (_appliedDpiScale * (1.0 + _highlightLineWidthPop * handle.getHighlight())));
     }
+  }
+
+  /**
+   * Reorient and show the axis guide line while a single-axis drag is active, or hide it otherwise.
+   * The guide runs through the gizmo origin along the dragged axis (in the gizmo's local frame) and
+   * takes that axis's color, so the constraint line reads across the whole viewport.
+   */
+  protected void updateAxisGuide() {
+    final GizmoHandle active = getActiveHandle();
+    final boolean axisDrag = _dragState != DragState.NONE && active != null && switch (active.getPart()) {
+      case AxisX, AxisY, AxisZ -> true;
+      default -> false;
+    };
+    if (!axisDrag) {
+      if (_axisGuide.getSceneHints().getCullHint() != CullHint.Always) {
+        _axisGuide.getSceneHints().setCullHint(CullHint.Always);
+      }
+      return;
+    }
+
+    final ReadOnlyVector3 axis = active.getAxis();
+    final float x = (float) (axis.getX() * AbstractGizmo.AXIS_GUIDE_HALF_LENGTH);
+    final float y = (float) (axis.getY() * AbstractGizmo.AXIS_GUIDE_HALF_LENGTH);
+    final float z = (float) (axis.getZ() * AbstractGizmo.AXIS_GUIDE_HALF_LENGTH);
+    final FloatBuffer verts = _axisGuide.getMeshData().getVertexBuffer();
+    verts.clear();
+    verts.put(-x).put(-y).put(-z).put(x).put(y).put(z);
+    verts.rewind();
+    _axisGuide.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+    _axisGuide.updateModelBound();
+
+    final ReadOnlyColorRGBA c = active.getBaseColor();
+    _axisGuide.setDefaultColor(c.getRed(), c.getGreen(), c.getBlue(), AbstractGizmo.AXIS_GUIDE_ALPHA);
+    _axisGuide.setLineWidth(AbstractGizmo.AXIS_GUIDE_WIDTH * (float) _appliedDpiScale);
+    _axisGuide.getSceneHints().setCullHint(CullHint.Never);
   }
 
   /**
@@ -410,7 +486,11 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
             base.getGreen() + (hi.getGreen() - base.getGreen()) * h,
             base.getBlue() + (hi.getBlue() - base.getBlue()) * h, base.getAlpha());
       }
-      final float alpha = base.getAlpha() * (float) handle.getFadeAlpha() * alphaMultiplier;
+      // Drag-focus: dim the handles that are not the drag's focus toward _dragFocusDim while a
+      // drag is active. Keyed off the eased highlight, so the dragged (highlight ~1) handle stays
+      // full and the rest fade; zero effect when no drag is active (_dragFocus ~0).
+      final float focus = 1f - (float) (_dragFocus * (1.0 - _dragFocusDim) * (1.0 - h));
+      final float alpha = base.getAlpha() * (float) handle.getFadeAlpha() * focus * alphaMultiplier;
       handle.applyColor(rgb, alpha);
     }
   }
@@ -516,6 +596,14 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   /** Set the fraction a fully-highlighted handle's strokes thicken in place; 0 for no pop. */
   public void setHighlightLineWidthPop(final double fraction) { _highlightLineWidthPop = fraction; }
+
+  public double getDragFocusDim() { return _dragFocusDim; }
+
+  /** Set the opacity inactive handles fade to while dragging; 1 disables the drag-focus dim. */
+  public void setDragFocusDim(final double opacity) { _dragFocusDim = opacity; }
+
+  /** @return the shared axis constraint guide line, shown during single-axis drags. */
+  public Line getAxisGuide() { return _axisGuide; }
 
   public boolean isXRay() { return _xray; }
 
