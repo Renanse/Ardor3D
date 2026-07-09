@@ -27,6 +27,7 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.AngleSnapFilter;
 import com.ardor3d.extension.interact.filter.GridSnapFilter;
+import com.ardor3d.extension.interact.filter.ScaleSnapFilter;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
 import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.ScaleGizmo;
@@ -74,9 +75,9 @@ import com.ardor3d.util.TextureManager;
  * Showcases the v2 interact gizmos. Hover a handle to highlight it, drag to manipulate the
  * target. Click objects to change the interact target. Press 1 for the translate gizmo, 2 for
  * rotate, 3 for scale, and R to toggle between world and local interact frames. Hold Ctrl while
- * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps. Press Escape while
- * dragging to cancel, restoring the target to where the drag began. Press U to toggle the rotate
- * angle readout between degrees and radians.
+ * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps, scale to quarter
+ * steps. Press Escape while dragging to cancel, restoring the target to where the drag began.
+ * Press U to toggle the rotate angle readout between degrees and radians.
  *
  * For unattended verification, -Dgizmo.shot=path skips the settings dialog, grabs a frame to the
  * given PNG once the scene has settled, prints a summary of gizmo-colored pixels and exits.
@@ -315,27 +316,33 @@ public class InteractGizmoExample extends ExampleBase {
             (source, inputStates, tpf) -> rotateGizmo.setReadoutFormatter(rotateGizmo.getReadoutFormatter() == null
                 ? (angleRadians, m) -> String.format("%.3f rad", angleRadians) : null)));
 
-    // hold Ctrl to snap: translate to a 1-unit grid, rotate to 15 degree steps
+    // hold Ctrl to snap: translate to a 1-unit grid, rotate to 15 degree steps, scale to quarters
     final GridSnapFilter gridSnap = new GridSnapFilter(1.0);
     gridSnap.setEnabled(false);
     translateGizmo.addFilter(gridSnap);
     final AngleSnapFilter angleSnap = new AngleSnapFilter(15 * MathUtils.DEG_TO_RAD);
     angleSnap.setEnabled(false);
     rotateGizmo.addFilter(angleSnap);
+    final ScaleSnapFilter scaleSnap = new ScaleSnapFilter(0.25);
+    scaleSnap.setEnabled(false);
+    scaleGizmo.addFilter(scaleSnap);
     manager.getLogicalLayer()
         .registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT_CONTROL), (source, inputStates, tpf) -> {
           gridSnap.setEnabled(true);
           angleSnap.setEnabled(true);
+          scaleSnap.setEnabled(true);
         }));
     manager.getLogicalLayer()
         .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LEFT_CONTROL), (source, inputStates, tpf) -> {
           gridSnap.setEnabled(false);
           angleSnap.setEnabled(false);
+          scaleSnap.setEnabled(false);
         }));
     if (System.getProperty("gizmo.snap") != null) {
       // Simulated-drag screenshot runs mute real input, so Ctrl can't reach the triggers.
       gridSnap.setEnabled(true);
       angleSnap.setEnabled(true);
+      scaleSnap.setEnabled(true);
     }
   }
 

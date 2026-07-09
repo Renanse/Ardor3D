@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.util.EnumMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.gizmo.GizmoHandle.FadeMode;
@@ -31,6 +32,7 @@ import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -80,6 +82,17 @@ public class ScaleGizmo extends AbstractGizmo {
   public static final double MIN_DISPLAY_STRETCH = 0.32;
   public static final double MAX_DISPLAY_STRETCH = 8.0;
 
+  /** Snap tick crossbars along the axis: half length across the axis, half thickness along it, units. */
+  public static final double SNAP_TICK_HALF = 0.05;
+  public static final double SNAP_TICK_THICK = 0.01;
+  public static final float SNAP_TICK_ALPHA = 0.9f;
+  /** Cap on snap ticks and how far along the axis they run, in local units. Scale is one-sided. */
+  public static final int SNAP_TICK_MAX = 24;
+  public static final double SNAP_TICK_MAX_EXTENT = 7.0;
+  /** On-screen tick spacing (px) below which ticks fade fully out, and above which they are full. */
+  public static final double SNAP_TICK_MIN_SCREEN_SPACING = 10;
+  public static final double SNAP_TICK_FULL_SCREEN_SPACING = 24;
+
   /** The dragged axis' shaft and tip, stretched during drags to track the applied scale. */
   protected final EnumMap<GizmoPart, Line> _axisShafts = new EnumMap<>(GizmoPart.class);
   protected final EnumMap<GizmoPart, Mesh> _axisTips = new EnumMap<>(GizmoPart.class);
@@ -87,6 +100,14 @@ public class ScaleGizmo extends AbstractGizmo {
 
   /** State scale captured when a drag started, for measuring the applied ratio. */
   protected Vector3 _dragStartScale = null;
+
+  /** Snap tick crossbars along the active axis, shown while a snapping axis drag is active. */
+  protected final Mesh _snapTicks;
+  protected final FloatBuffer _snapTickBuffer = BufferUtils.createVector3Buffer(ScaleGizmo.SNAP_TICK_MAX * 6);
+  /** Last snapped factor step index, to pulse when it changes; Long.MIN_VALUE when not snapping. */
+  protected long _lastSnapStep = Long.MIN_VALUE;
+  /** The dragged axis' applied factor (current / start scale), captured each frame for the pulse. */
+  protected double _snapActiveFactor = 1.0;
 
   /** Formats the scale factor readout - see {@link ScaleGizmo#setReadoutFormatter}. */
   @FunctionalInterface
@@ -108,6 +129,18 @@ public class ScaleGizmo extends AbstractGizmo {
 
   public ScaleGizmo() {
     super("scaleGizmo");
+
+    // Snap tick crossbars along the active axis, shown while a snapping axis drag is active;
+    // updateSnapTicks() rewrites them each frame. Non-indexed triangles, two per tick.
+    _snapTicks = new Mesh("snapTicks");
+    _snapTicks.getMeshData().setVertexBuffer(_snapTickBuffer);
+    _snapTicks.getMeshData().setIndexMode(IndexMode.Triangles);
+    LightProperties.setLightReceiver(_snapTicks, false);
+    _snapTicks.getSceneHints().setAllPickingHints(false);
+    _snapTicks.getSceneHints().setCullHint(CullHint.Always);
+    GizmoGeometry.disableDepthWrite(_snapTicks);
+    _handle.attachChild(_snapTicks);
+    MaterialUtil.autoMaterials(_snapTicks);
   }
 
   /** Add the full set of handles: three axis cubes and the uniform center cube. */
@@ -319,14 +352,16 @@ public class ScaleGizmo extends AbstractGizmo {
   protected void updateShaftStretch(final InteractManager manager) {
     GizmoPart activePart = null;
     double stretch = 1.0;
+    // The active axis' factor also drives the snap-tick pulse, even at rest length (stretch 1.0).
+    _snapActiveFactor = 1.0;
     if (_dragState != DragState.NONE && _dragStartScale != null && manager.getSpatialTarget() != null) {
       final GizmoHandle handle = findGizmoHandle(_lastDragSpatial);
       if (handle != null) {
         final ReadOnlyVector3 scale = manager.getSpatialState().getTransform().getScale();
         switch (handle.getPart()) {
-          case AxisX -> stretch = scale.getX() / _dragStartScale.getX();
-          case AxisY -> stretch = scale.getY() / _dragStartScale.getY();
-          case AxisZ -> stretch = scale.getZ() / _dragStartScale.getZ();
+          case AxisX -> _snapActiveFactor = stretch = scale.getX() / _dragStartScale.getX();
+          case AxisY -> _snapActiveFactor = stretch = scale.getY() / _dragStartScale.getY();
+          case AxisZ -> _snapActiveFactor = stretch = scale.getZ() / _dragStartScale.getZ();
           default -> {
           }
         }
@@ -373,9 +408,107 @@ public class ScaleGizmo extends AbstractGizmo {
   }
 
   @Override
+  protected void updateCameraFacingHandles(final Camera camera) {
+    updateSnapTicks(camera);
+  }
+
+  /**
+   * Rebuild the snap tick crossbars along the active axis at the factor increment, or hide them
+   * when no snapping axis drag is active. Pulses when the snapped factor steps. The ticks mark
+   * where the tip cube clicks to: the cube sits at TIP_CENTER at the start scale (factor 1), so a
+   * factor of k*inc maps to TIP_CENTER * k*inc along the axis - a fixed on-screen spacing whatever
+   * the camera distance, since the gizmo holds a constant screen size.
+   */
+  protected void updateSnapTicks(final Camera camera) {
+    final GizmoHandle active = _dragState != DragState.NONE ? findGizmoHandle(_lastDragSpatial) : null;
+    final boolean axisDrag = active != null && switch (active.getPart()) {
+      case AxisX, AxisY, AxisZ -> true;
+      default -> false;
+    };
+    final double inc = activeSnapIncrement();
+    if (!axisDrag || inc <= 0) {
+      hideSnapTicks();
+      return;
+    }
+
+    // One factor increment is this far along the axis in local units; fade the ticks out as that
+    // on-screen spacing gets too small to read.
+    final double spacing = ScaleGizmo.TIP_CENTER * inc;
+    final double density = GizmoMath.fadeAlpha(spacing * _pixelSize * _appliedDpiScale,
+        ScaleGizmo.SNAP_TICK_MIN_SCREEN_SPACING, ScaleGizmo.SNAP_TICK_FULL_SCREEN_SPACING);
+    if (density <= 0) {
+      hideSnapTicks();
+      return;
+    }
+
+    // Pulse when the snapped factor steps to a new increment.
+    final long step = Math.round(_snapActiveFactor / inc);
+    if (_lastSnapStep != Long.MIN_VALUE && step != _lastSnapStep) {
+      triggerSnapPulse();
+    }
+    _lastSnapStep = step;
+
+    final ReadOnlyVector3 axis = active.getAxis();
+    // Crossbar direction: perpendicular to the axis, facing the camera. The axis is faded out when
+    // near edge-on, so it is well-conditioned during a real drag; guard the degenerate case anyway.
+    final Vector3 camDir = _handle.getRotation().applyPre(camera.getDirection(), _calcVec3A);
+    final Vector3 perp = axis.cross(camDir, _calcVec3B);
+    if (perp.lengthSquared() < 1e-10) {
+      axis.cross(Vector3.UNIT_Y, perp);
+      if (perp.lengthSquared() < 1e-10) {
+        axis.cross(Vector3.UNIT_X, perp);
+      }
+    }
+    perp.normalizeLocal();
+
+    // Ticks run outward from the origin (factor 0) to the display cap; scale is one-sided.
+    final int count =
+        Math.min(ScaleGizmo.SNAP_TICK_MAX, (int) Math.floor(ScaleGizmo.SNAP_TICK_MAX_EXTENT / spacing));
+    _snapTickBuffer.clear();
+    for (int k = 1; k <= count; k++) {
+      putTick(axis, perp, k * spacing);
+    }
+    _snapTickBuffer.flip();
+    _snapTicks.getMeshData().updateVertexCount();
+    _snapTicks.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+    _snapTicks.updateModelBound();
+
+    final ReadOnlyColorRGBA base = active.getBaseColor();
+    final float p = (float) getSnapPulse();
+    _snapTicks.setDefaultColor(base.getRed() + (1f - base.getRed()) * p, base.getGreen() + (1f - base.getGreen()) * p,
+        base.getBlue() + (1f - base.getBlue()) * p, ScaleGizmo.SNAP_TICK_ALPHA * (float) density);
+    _snapTicks.getSceneHints().setCullHint(CullHint.Never);
+  }
+
+  private void hideSnapTicks() {
+    if (_snapTicks.getSceneHints().getCullHint() != CullHint.Always) {
+      _snapTicks.getSceneHints().setCullHint(CullHint.Always);
+    }
+    _lastSnapStep = Long.MIN_VALUE;
+  }
+
+  /** Append one tick crossbar (two triangles) centered at axis*along, spanning perp. */
+  private void putTick(final ReadOnlyVector3 axis, final ReadOnlyVector3 perp, final double along) {
+    final double t = ScaleGizmo.SNAP_TICK_THICK, h = ScaleGizmo.SNAP_TICK_HALF;
+    final double ax = axis.getX(), ay = axis.getY(), az = axis.getZ();
+    final double px = perp.getX(), py = perp.getY(), pz = perp.getZ();
+    final float c0x = (float) (ax * (along - t) - px * h), c0y = (float) (ay * (along - t) - py * h),
+        c0z = (float) (az * (along - t) - pz * h);
+    final float c1x = (float) (ax * (along + t) - px * h), c1y = (float) (ay * (along + t) - py * h),
+        c1z = (float) (az * (along + t) - pz * h);
+    final float c2x = (float) (ax * (along + t) + px * h), c2y = (float) (ay * (along + t) + py * h),
+        c2z = (float) (az * (along + t) + pz * h);
+    final float c3x = (float) (ax * (along - t) + px * h), c3y = (float) (ay * (along - t) + py * h),
+        c3z = (float) (az * (along - t) + pz * h);
+    _snapTickBuffer.put(c0x).put(c0y).put(c0z).put(c1x).put(c1y).put(c1z).put(c2x).put(c2y).put(c2z);
+    _snapTickBuffer.put(c0x).put(c0y).put(c0z).put(c2x).put(c2y).put(c2z).put(c3x).put(c3y).put(c3z);
+  }
+
+  @Override
   public void endDrag(final InteractManager manager, final MouseState current) {
     super.endDrag(manager, current);
     // Shafts return to rest length on the next render, where no drag is active anymore.
     _dragStartScale = null;
+    _lastSnapStep = Long.MIN_VALUE;
   }
 }

@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import com.ardor3d.extension.interact.filter.AngleSnapFilter;
 import com.ardor3d.extension.interact.filter.GridSnapFilter;
+import com.ardor3d.extension.interact.filter.ScaleSnapFilter;
 import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.util.MathUtils;
@@ -51,6 +52,32 @@ public class GizmoSnapTest {
           return;
         }
       }
+    }
+
+    void ticks(final Camera camera) {
+      updateSnapTicks(camera);
+    }
+
+    Mesh tickMesh() {
+      return _snapTicks;
+    }
+  }
+
+  /** Drives scale snap ticks headlessly (no GL / picking). */
+  private static class ScaleProbe extends ScaleGizmo {
+    void forceAxisDrag() {
+      for (final GizmoHandle handle : getGizmoHandles()) {
+        if (handle.getPart() == GizmoPart.AxisX) {
+          _lastDragSpatial = handle.getMeshes().get(0);
+          setDragState(DragState.DRAG);
+          return;
+        }
+      }
+    }
+
+    /** Set the dragged axis' applied factor directly - normally captured from the state in render. */
+    void setActiveFactor(final double factor) {
+      _snapActiveFactor = factor;
     }
 
     void ticks(final Camera camera) {
@@ -147,6 +174,76 @@ public class GizmoSnapTest {
     assertEquals(2.0, filter.getSnapIncrement(), EPS);
     filter.setEnabled(false);
     assertFalse("disabled filter does not snap", filter.isSnapping());
+  }
+
+  @Test
+  public void testScaleSnapFilterIsSnapSource() {
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    assertTrue(filter.isSnapping());
+    assertEquals(0.25, filter.getSnapIncrement(), EPS);
+    filter.setEnabled(false);
+    assertFalse("disabled filter does not snap", filter.isSnapping());
+  }
+
+  @Test
+  public void testScaleTicksShowOnlyWhileSnappingAnAxisDrag() {
+    final ScaleProbe gizmo = new ScaleProbe();
+    gizmo.withAllHandles();
+    gizmo.getHandle().setScale(1.0);
+    gizmo.getHandle().updateGeometricState(0);
+    final Camera camera = threeQuarterCamera();
+    gizmo.forceAxisDrag();
+
+    // Dragging an axis, but no snap filter -> ticks stay hidden.
+    gizmo.ticks(camera);
+    assertEquals(CullHint.Always, gizmo.tickMesh().getSceneHints().getCullHint());
+
+    // With scale snap active, the ticks appear along the axis.
+    gizmo.addFilter(new ScaleSnapFilter(0.25));
+    gizmo.ticks(camera);
+    assertEquals(CullHint.Never, gizmo.tickMesh().getSceneHints().getCullHint());
+    assertTrue("ticks should have geometry", gizmo.tickMesh().getMeshData().getVertexCount() > 0);
+  }
+
+  @Test
+  public void testScaleTicksFadeOutWhenStepTooFineOnScreen() {
+    final ScaleProbe gizmo = new ScaleProbe();
+    gizmo.withAllHandles();
+    gizmo.getHandle().setScale(1.0);
+    gizmo.getHandle().updateGeometricState(0);
+    final Camera camera = threeQuarterCamera();
+    gizmo.forceAxisDrag();
+
+    // A quarter step spans ~22px between ticks on screen (the factor grid is fixed to the gizmo's
+    // pixel footprint, not the camera distance), so the ticks show.
+    gizmo.addFilter(new ScaleSnapFilter(0.25));
+    gizmo.ticks(camera);
+    assertEquals(CullHint.Never, gizmo.tickMesh().getSceneHints().getCullHint());
+
+    // A tiny 0.02 step packs the ticks a couple of pixels apart: sub-threshold, so they hide.
+    gizmo.clearFilters();
+    gizmo.addFilter(new ScaleSnapFilter(0.02));
+    gizmo.ticks(camera);
+    assertEquals(CullHint.Always, gizmo.tickMesh().getSceneHints().getCullHint());
+  }
+
+  @Test
+  public void testScaleSnapPulsesWhenTheSnappedFactorSteps() {
+    final ScaleProbe gizmo = new ScaleProbe();
+    gizmo.withAllHandles();
+    gizmo.getHandle().setScale(1.0);
+    gizmo.getHandle().updateGeometricState(0);
+    final Camera camera = threeQuarterCamera();
+    gizmo.forceAxisDrag();
+    gizmo.addFilter(new ScaleSnapFilter(0.25));
+
+    // First frame records the factor step; no pulse yet.
+    gizmo.setActiveFactor(1.0);
+    gizmo.ticks(camera);
+    // Stepping to the next quarter re-arms the pulse.
+    gizmo.setActiveFactor(1.25);
+    gizmo.ticks(camera);
+    assertTrue("stepping to a new factor pulses", gizmo.getSnapPulse() > 0.5);
   }
 
   @Test
