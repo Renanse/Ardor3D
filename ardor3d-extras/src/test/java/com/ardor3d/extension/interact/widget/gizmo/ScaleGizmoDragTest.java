@@ -33,7 +33,7 @@ import com.ardor3d.scenegraph.Node;
  */
 public class ScaleGizmoDragTest {
 
-  private static final double EPS = 1e-9;
+  private static final double EPS = MathUtils.ZERO_TOLERANCE;
 
   private Node _target;
   private InteractManager _manager;

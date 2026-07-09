@@ -34,7 +34,7 @@ import com.ardor3d.scenegraph.Node;
  */
 public class TranslateGizmoDragTest {
 
-  private static final double EPS = 1e-9;
+  private static final double EPS = MathUtils.ZERO_TOLERANCE;
 
   private Node _parent;
   private Node _target;

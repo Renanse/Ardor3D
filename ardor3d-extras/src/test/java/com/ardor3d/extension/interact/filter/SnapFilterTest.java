@@ -27,7 +27,7 @@ import com.ardor3d.scenegraph.Node;
 
 public class SnapFilterTest {
 
-  private static final double EPS = 1e-9;
+  private static final double EPS = MathUtils.ZERO_TOLERANCE;
 
   private Node _target;
   private InteractManager _manager;
@@ -55,7 +55,7 @@ public class SnapFilterTest {
   private static void assertMatrixEquals(final ReadOnlyMatrix3 expected, final ReadOnlyMatrix3 actual) {
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
-        assertEquals("[" + r + "," + c + "]", expected.getValue(r, c), actual.getValue(r, c), 1e-9);
+        assertEquals("[" + r + "," + c + "]", expected.getValue(r, c), actual.getValue(r, c), EPS);
       }
     }
   }
