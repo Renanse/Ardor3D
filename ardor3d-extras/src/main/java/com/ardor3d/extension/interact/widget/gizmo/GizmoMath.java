@@ -85,8 +85,13 @@ public final class GizmoMath {
   public static double calculateFixedScreenScale(final Camera camera, final ReadOnlyVector3 worldPos,
       final double pixels) {
     if (camera.getProjectionMode() == ProjectionMode.Perspective) {
-      final double depth = Math.max(camera.getFrustumNear(),
-          worldPos.subtract(camera.getLocation(), null).dot(camera.getDirection()));
+      // Depth = (worldPos - cameraLocation) . cameraDirection, computed inline: this runs every
+      // frame per gizmo, so avoid allocating a scratch vector for the subtraction.
+      final ReadOnlyVector3 loc = camera.getLocation();
+      final ReadOnlyVector3 dir = camera.getDirection();
+      final double along = (worldPos.getX() - loc.getX()) * dir.getX() + (worldPos.getY() - loc.getY()) * dir.getY()
+          + (worldPos.getZ() - loc.getZ()) * dir.getZ();
+      final double depth = Math.max(camera.getFrustumNear(), along);
       return worldSizeForPixels(pixels, depth, camera.getFrustumTop(), camera.getFrustumNear(), camera.getHeight());
     }
 
