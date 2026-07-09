@@ -31,6 +31,7 @@ import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -54,6 +55,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.scenegraph.shape.Disk;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BasicText;
@@ -124,6 +126,17 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   /** Time constant for the snap pulse to ease back out after a snapped-value change, in seconds. */
   public static final double DEFAULT_SNAP_PULSE_TAU = 0.12;
+
+  /** Neutral tint of the origin ghost marker drawn where a translate drag began. */
+  public static final ReadOnlyColorRGBA DEFAULT_ORIGIN_GHOST_COLOR = new ColorRGBA(0.85f, 0.85f, 0.85f, 1.0f);
+  /** Opacity of the origin ghost marker. */
+  public static final float ORIGIN_GHOST_ALPHA = 0.4f;
+  /** Origin ghost ring radius and center-dot radius, in gizmo-local units (constant screen size). */
+  public static final double ORIGIN_GHOST_RADIUS = 0.12;
+  public static final double ORIGIN_GHOST_DOT_RADIUS = 0.025;
+  /** Origin ghost ring stroke width, in screen pixels at 1:1 DPI scale, and its arc sample count. */
+  public static final float ORIGIN_GHOST_WIDTH = 2.5f;
+  public static final int ORIGIN_GHOST_SAMPLES = 40;
 
   /** Point size of the drag readout text. */
   public static final double DEFAULT_READOUT_SIZE = 20;
@@ -202,6 +215,7 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected final Vector2 _calcVec2B = new Vector2();
   protected final Vector2 _calcVec2C = new Vector2();
   protected final Plane _calcPlane = new Plane();
+  protected final Quaternion _calcQuat = new Quaternion();
   protected final ColorRGBA _calcColor = new ColorRGBA();
   protected final ColorRGBA _calcColorB = new ColorRGBA();
 
@@ -223,6 +237,20 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
    * the gizmo shows, positions and fills it. Content comes from {@link #getReadoutText}.
    */
   protected final BasicText _readoutText;
+
+  /**
+   * A faint marker drawn at the world origin where the current drag began, shown once the origin has
+   * moved away from it - a "you moved from here" anchor. Only translate drags move the origin, so it
+   * self-hides for rotate and scale (whose origin stays put). Standalone, not a child of
+   * {@link #_handle}, which tracks the moving target; positioned and sized per frame in render().
+   */
+  protected final Node _originGhost;
+  /** Gizmo world origin captured at drag start - where the ghost is drawn. */
+  protected final Vector3 _dragStartWorldTranslation = new Vector3();
+  /** Whether a drag with a captured start origin is active. */
+  protected boolean _hasOriginGhost = false;
+  /** Whether to show the origin ghost at all. */
+  protected boolean _showOriginGhost = true;
 
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
@@ -257,6 +285,32 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     _readoutText.setTextColor(ColorRGBA.WHITE);
     _readoutText.setAlign(BMText.Align.Center);
     _readoutText.getSceneHints().setCullHint(CullHint.Always);
+
+    // Origin ghost: a faint camera-facing ring plus a center dot, marking where a translate drag
+    // began. Standalone (not under _handle) so it stays at the start point while the gizmo tracks
+    // the moving target; drawn immediately by render() like _handle. updateOriginGhost() positions,
+    // orients and shows/hides it each frame.
+    _originGhost = new Node("originGhost");
+    LightProperties.setLightReceiver(_originGhost, false);
+    final BlendState ghostBlend = new BlendState();
+    ghostBlend.setBlendEnabled(true);
+    _originGhost.setRenderState(ghostBlend);
+    final ReadOnlyColorRGBA gc = AbstractGizmo.DEFAULT_ORIGIN_GHOST_COLOR;
+    final Line ghostRing = GizmoGeometry.arcStroke("ghostRing", AbstractGizmo.ORIGIN_GHOST_RADIUS, 0,
+        MathUtils.TWO_PI, AbstractGizmo.ORIGIN_GHOST_SAMPLES, AbstractGizmo.ORIGIN_GHOST_WIDTH);
+    ghostRing.setDefaultColor(gc.getRed(), gc.getGreen(), gc.getBlue(), AbstractGizmo.ORIGIN_GHOST_ALPHA);
+    _originGhost.attachChild(ghostRing);
+    final Disk ghostDot = new Disk("ghostDot", 2, 16, AbstractGizmo.ORIGIN_GHOST_DOT_RADIUS);
+    ghostDot.updateModelBound();
+    LightProperties.setLightReceiver(ghostDot, false);
+    ghostDot.setDefaultColor(gc.getRed(), gc.getGreen(), gc.getBlue(), AbstractGizmo.ORIGIN_GHOST_ALPHA);
+    GizmoGeometry.disableDepthWrite(ghostDot);
+    _originGhost.attachChild(ghostDot);
+    _originGhost.getSceneHints().setAllPickingHints(false);
+    _originGhost.getSceneHints().setCullHint(CullHint.Always);
+    _originGhost.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+    MaterialUtil.autoMaterials(_originGhost);
+    _originGhost.updateGeometricState(0);
 
     // Render immediately when drawn rather than queueing - the gizmo is drawn once per pass by
     // render(), after the scene buckets have flushed.
@@ -345,10 +399,16 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   public void beginDrag(final InteractManager manager, final MouseState current) {
     super.beginDrag(manager, current);
     // super sets START_DRAG only if a handle was picked; snapshot the pre-drag transform so the
-    // drag can be cancelled back to it (see cancelDrag).
+    // drag can be cancelled back to it (see cancelDrag), and the world origin so the origin ghost
+    // can anchor there (see updateOriginGhost).
     if (_dragState != DragState.NONE) {
       _dragStartTransform.set(manager.getSpatialState().getTransform());
       _hasDragStartTransform = true;
+      final Spatial target = manager.getSpatialTarget();
+      if (target != null) {
+        _dragStartWorldTranslation.set(target.getWorldTranslation());
+        _hasOriginGhost = true;
+      }
     }
   }
 
@@ -357,6 +417,7 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     super.endDrag(manager, current);
     // The pre-drag snapshot is only valid during a drag - drop it so the readout stops showing.
     _hasDragStartTransform = false;
+    _hasOriginGhost = false;
   }
 
   /**
@@ -440,6 +501,11 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     applyHandleLineWidths();
     updateAxisGuide();
     _handle.updateGeometricState(0);
+
+    // Origin ghost: a standalone marker at the drag's start point, drawn under the gizmo. Self-hides
+    // (via its cull hint) when not applicable, so the draw call is a no-op then.
+    updateOriginGhost(camera);
+    renderer.draw(_originGhost);
 
     final RenderContext context = ContextManager.getCurrentContext();
 
@@ -541,6 +607,40 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     _axisGuide.setDefaultColor(c.getRed(), c.getGreen(), c.getBlue(), AbstractGizmo.AXIS_GUIDE_ALPHA);
     _axisGuide.setLineWidth(AbstractGizmo.AXIS_GUIDE_WIDTH * (float) _appliedDpiScale);
     _axisGuide.getSceneHints().setCullHint(CullHint.Never);
+  }
+
+  /**
+   * Position, orient and show the origin ghost for the frame, or hide it. The ghost anchors at the
+   * world origin captured when the drag began and appears only once the current origin has moved
+   * away from it - so it marks "you moved from here" during a translate drag and stays hidden for
+   * rotate and scale, whose origin does not move. Sized to a constant screen footprint like the
+   * gizmo and turned to face the camera so the ring always reads as a circle.
+   */
+  protected void updateOriginGhost(final Camera camera) {
+    if (!_showOriginGhost || !_hasOriginGhost || _dragState == DragState.NONE) {
+      hideOriginGhost();
+      return;
+    }
+    final ReadOnlyVector3 current = _handle.getWorldTranslation();
+    if (_dragStartWorldTranslation.distanceSquared(current) <= MathUtils.ZERO_TOLERANCE) {
+      // Origin has not moved: rotate/scale drag, or a translate drag that has not moved yet.
+      hideOriginGhost();
+      return;
+    }
+    _originGhost.setTranslation(_dragStartWorldTranslation);
+    _originGhost.setScale(Math.max(AbstractInteractWidget.MIN_SCALE, GizmoMath.calculateFixedScreenScale(camera,
+        _dragStartWorldTranslation, _pixelSize * _appliedDpiScale)));
+    _calcVec3A.set(camera.getDirection()).negateLocal();
+    _calcQuat.fromVectorToVector(Vector3.UNIT_Z, _calcVec3A);
+    _originGhost.setRotation(_calcQuat);
+    _originGhost.getSceneHints().setCullHint(CullHint.Never);
+    _originGhost.updateGeometricState(0);
+  }
+
+  private void hideOriginGhost() {
+    if (_originGhost.getSceneHints().getCullHint() != CullHint.Always) {
+      _originGhost.getSceneHints().setCullHint(CullHint.Always);
+    }
   }
 
   /**
@@ -729,6 +829,14 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   /** @return the shared axis constraint guide line, shown during single-axis drags. */
   public Line getAxisGuide() { return _axisGuide; }
+
+  /** @return the origin ghost marker drawn at a translate drag's start point. */
+  public Node getOriginGhost() { return _originGhost; }
+
+  public boolean isShowOriginGhost() { return _showOriginGhost; }
+
+  /** Enable or disable the faint marker drawn where a translate drag began. */
+  public void setShowOriginGhost(final boolean show) { _showOriginGhost = show; }
 
   /**
    * @return the screen-space drag readout. Attach it to an application node rendered in ortho/screen

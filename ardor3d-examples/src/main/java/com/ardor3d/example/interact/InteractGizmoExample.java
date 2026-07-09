@@ -85,7 +85,8 @@ import com.ardor3d.util.TextureManager;
  * fading); -Dgizmo.hover=x simulates the mouse resting on the +X arrow (to check highlighting);
  * -Dgizmo.widget=rotate starts with the rotate gizmo active; -Dgizmo.drag=ringx simulates a slow
  * drag around the X ring (to check the pie wedge and angle readout); -Dgizmo.drag=scalex simulates
- * pulling the +X scale cube outward (to check the shaft stretch).
+ * pulling the +X scale cube outward (to check the shaft stretch); -Dgizmo.drag=movex simulates
+ * dragging the +X translate arrow (to check the origin ghost and translate snap ticks).
  */
 @Purpose(
     htmlDescriptionKey = "com.ardor3d.example.interact.InteractGizmoExample", //
@@ -133,6 +134,9 @@ public class InteractGizmoExample extends ExampleBase {
       // (absent) mouse each update.
       simulateHoverOnXArrow();
     }
+    if (shot != null && _frames >= 20 && "movex".equals(System.getProperty("gizmo.drag"))) {
+      simulateDragOnXTranslate();
+    }
     if (shot != null && _frames >= 20 && "ringx".equals(System.getProperty("gizmo.drag"))) {
       simulateDragOnXRing();
     }
@@ -166,6 +170,42 @@ public class InteractGizmoExample extends ExampleBase {
   // Shared by both drag simulators, but only one runs per probe JVM (selected by -Dgizmo.drag),
   // so it carries the previous frame's mouse for whichever drag is active with no cross-talk.
   private MouseState _lastDragMouse = null;
+
+  /**
+   * Feed the translate gizmo a synthetic left-button drag that slides the +X arrow outward, driving
+   * the full processInput path so a screenshot run can verify the origin ghost and translate snap
+   * ticks (the target's origin moves, so the ghost anchors at the start point).
+   */
+  private void simulateDragOnXTranslate() {
+    final Camera cam = _canvas.getCanvasRenderer().getCamera();
+    final Spatial target = manager.getSpatialTarget();
+    final ReadOnlyVector3 origin = target.getWorldTranslation();
+    final double scale = translateGizmo.getHandle().getScale().getX();
+
+    // Grab mid-shaft on the +X arrow and slide the grab point along the axis a bit more each frame,
+    // pulling the target along X. The target is unrotated in this scene, so its local X is world X.
+    final double alongX = (0.6 + (_frames - 20) * 0.05) * scale;
+    final Vector3 onAxis = new Vector3(alongX, origin.getY(), origin.getZ());
+    final Vector3 screen = cam.getScreenCoordinates(onAxis);
+
+    final EnumMap<MouseButton, ButtonState> buttons = new EnumMap<>(MouseButton.class);
+    buttons.put(MouseButton.LEFT, ButtonState.DOWN);
+    // First frame: previous state has the button up at the same spot, starting the drag there.
+    final MouseState previous = _lastDragMouse != null ? _lastDragMouse
+        : new MouseState((int) screen.getX(), (int) screen.getY(), 0, 0, 0, null, null);
+    final MouseState current = new MouseState((int) screen.getX(), (int) screen.getY(),
+        (int) screen.getX() - previous.getX(), (int) screen.getY() - previous.getY(), 0, buttons, null);
+    _lastDragMouse = current;
+
+    final InputState previousState = new InputState(KeyboardState.NOTHING, previous, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+    final InputState currentState = new InputState(KeyboardState.NOTHING, current, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+
+    translateGizmo.processInput(_canvas, new TwoInputStates(previousState, currentState), new AtomicBoolean(false),
+        manager);
+    manager.getSpatialState().applyState(target);
+  }
 
   /**
    * Feed the rotate gizmo a synthetic left-button drag that walks around the X ring, driving the
@@ -484,6 +524,8 @@ public class InteractGizmoExample extends ExampleBase {
           + rotateGizmo.getReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
     } else if ("scalex".equals(System.getProperty("gizmo.drag"))) {
       System.out.println("GIZMO targetScaleX=" + manager.getSpatialTarget().getScale().getX());
+    } else if ("movex".equals(System.getProperty("gizmo.drag"))) {
+      System.out.println("GIZMO targetTranslateX=" + manager.getSpatialTarget().getTranslation().getX());
     }
 
     try {
