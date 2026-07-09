@@ -21,10 +21,12 @@ import com.ardor3d.extension.interact.filter.UpdateFilter;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
+import com.ardor3d.extension.interact.widget.SetCursorCallback;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.IDpiScaleProvider;
 import com.ardor3d.input.keyboard.Key;
 import com.ardor3d.input.keyboard.KeyboardState;
+import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.light.LightProperties;
@@ -174,6 +176,14 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   /** Handles are not pickable once faded below this alpha. */
   public static final double PICK_ALPHA_FLOOR = 0.2;
 
+  /**
+   * Cursor shown while the mouse is over a gizmo handle (and during a drag), restored to the system
+   * default otherwise. Null disables cursor feedback. Set this before constructing gizmos to opt in
+   * - the constructor wires it as the mouse-over callback, mirroring {@code MoveWidget.DEFAULT_CURSOR}.
+   * An app that wants per-gizmo cursors can instead call {@link #setMouseOverCallback} on each gizmo.
+   */
+  public static MouseCursor DEFAULT_CURSOR = null;
+
   protected double _pixelSize = AbstractGizmo.DEFAULT_PIXEL_SIZE;
   protected final ColorRGBA _highlightColor = new ColorRGBA(AbstractGizmo.DEFAULT_HIGHLIGHT_COLOR);
   protected float _ghostAlpha = AbstractGizmo.DEFAULT_GHOST_ALPHA;
@@ -319,6 +329,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
     _ghostZState.setFunction(TestFunction.GreaterThan);
     _ghostZState.setWritable(false);
+
+    // Cursor feedback: if an app has opted in by setting DEFAULT_CURSOR, show it while a handle is
+    // hovered (or dragged) and restore the default when the mouse leaves. Fires only on hover
+    // enter/leave, not per frame. Mirrors MoveWidget.
+    if (AbstractGizmo.DEFAULT_CURSOR != null) {
+      setMouseOverCallback(new SetCursorCallback(AbstractGizmo.DEFAULT_CURSOR));
+    }
   }
 
   protected void addGizmoHandle(final GizmoHandle handle) {
