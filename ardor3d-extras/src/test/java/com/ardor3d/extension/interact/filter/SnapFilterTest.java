@@ -240,4 +240,127 @@ public class SnapFilterTest {
 
     assertTrue(filter.isEnabled());
   }
+
+  // --- ScaleSnapFilter ---
+
+  private void startScale(final double x, final double y, final double z) {
+    _target.setScale(x, y, z);
+    _target.updateGeometricState(0);
+    _manager.getSpatialState().copyState(_target);
+  }
+
+  @Test
+  public void testScaleSnapRoundsFactor() {
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    // Drag has grown X by 1.37x: snaps to 1.25x. Y and Z are untouched, so they stay put.
+    _manager.getSpatialState().getTransform().setScale(1.37, 1, 1);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.25, 1.0, 1.0, _manager.getSpatialState().getTransform().getScale());
+  }
+
+  @Test
+  public void testScaleSnapStepsFromDragStart() {
+    // Snapping is relative to the start scale, so the factor - not the absolute scale - lands on a
+    // clean multiple: a 2.0-scaled object snapped to a 1.25x factor ends at 2.5, not 1.25.
+    startScale(2, 2, 2);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(2.74, 2, 2); // 1.37x
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(2.5, 2.0, 2.0, _manager.getSpatialState().getTransform().getScale());
+  }
+
+  @Test
+  public void testScaleSnapLeavesUntouchedAxesExactlyAlone() {
+    // Y and Z start off any grid; an X-only drag must not nudge them onto the factor grid.
+    startScale(1, 1.1, 1.1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(2.0, 1.1, 1.1);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(2.0, 1.1, 1.1, _manager.getSpatialState().getTransform().getScale());
+  }
+
+  @Test
+  public void testScaleSnapAccumulatesAcrossInputCycles() {
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    // The manager copies the state from the target before every input event, so each event's raw
+    // factor (1.1x here) alone rounds back to 1.0x and would lose the drag. Ten of them must
+    // compound to 1.1^10 ~= 2.59x and snap to 2.5x - not round away to nothing cycle after cycle.
+    for (int i = 0; i < 10; i++) {
+      _manager.getSpatialState().copyState(_target);
+      final ReadOnlyVector3 s = _manager.getSpatialState().getTransform().getScale();
+      _manager.getSpatialState().getTransform().setScale(s.getX() * 1.1, s.getY(), s.getZ());
+      filter.applyFilter(_manager, _widget);
+      _manager.getSpatialState().applyState(_target);
+    }
+
+    assertVectorEquals(2.5, 1.0, 1.0, _target.getScale());
+  }
+
+  @Test
+  public void testScaleSnapFloorsAtOneStep() {
+    // Shrinking below half a step would round the factor to zero; it floors at one step instead.
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(0.05, 1, 1);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(0.25, 1.0, 1.0, _manager.getSpatialState().getTransform().getScale());
+  }
+
+  @Test
+  public void testScaleSnapExactStepUnchanged() {
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(1.5, 1, 1); // exactly 6 steps
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.5, 1.0, 1.0, _manager.getSpatialState().getTransform().getScale());
+    assertTrue(filter.isEnabled());
+  }
+
+  @Test
+  public void testScaleSnapDisabled() {
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.setEnabled(false);
+    filter.beginDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(1.37, 1, 1);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.37, 1.0, 1.0, _manager.getSpatialState().getTransform().getScale());
+  }
+
+  @Test
+  public void testScaleSnapWithoutDragIsANoOp() {
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    // no beginDrag
+    _manager.getSpatialState().getTransform().setScale(1.37, 1, 1);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.37, 1.0, 1.0, _manager.getSpatialState().getTransform().getScale());
+  }
+
+  @Test
+  public void testScaleSnapEndDragClearsCapture() {
+    startScale(1, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+    filter.endDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(1.37, 1, 1);
+    filter.applyFilter(_manager, _widget);
+    assertVectorEquals(1.37, 1.0, 1.0, _manager.getSpatialState().getTransform().getScale());
+  }
 }
