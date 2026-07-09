@@ -10,9 +10,12 @@
 
 package com.ardor3d.extension.interact.widget.gizmo;
 
+import java.nio.FloatBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ardor3d.buffer.BufferUtils;
 import com.ardor3d.extension.interact.InteractManager;
+import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.gizmo.GizmoHandle.FadeMode;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -29,7 +32,10 @@ import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -62,9 +68,27 @@ public class TranslateGizmo extends AbstractGizmo {
   public static final int CIRCLE_SAMPLES = 48;
   public static final float PLANE_FILL_ALPHA = 0.45f;
 
+  /** Snap tick crossbars on the axis: half length across the axis, half thickness along it, units. */
+  public static final double SNAP_TICK_HALF = 0.05;
+  public static final double SNAP_TICK_THICK = 0.01;
+  public static final float SNAP_TICK_ALPHA = 0.9f;
+  /** Cap on snap ticks per side of the origin, and how far along the axis they run, in local units. */
+  public static final int SNAP_TICK_MAX_PER_SIDE = 10;
+  public static final double SNAP_TICK_MAX_EXTENT = 6.0;
+  /** On-screen tick spacing (px) below which ticks fade fully out, and above which they are full. */
+  public static final double SNAP_TICK_MIN_SCREEN_SPACING = 10;
+  public static final double SNAP_TICK_FULL_SCREEN_SPACING = 24;
+
   protected GizmoHandle _centerHandle;
 
   protected final Quaternion _calcQuat = new Quaternion();
+
+  /** Snap tick crossbars along the active axis, shown while a snapping axis drag is active. */
+  protected final Mesh _snapTicks;
+  protected final FloatBuffer _snapTickBuffer =
+      BufferUtils.createVector3Buffer((2 * TranslateGizmo.SNAP_TICK_MAX_PER_SIDE + 1) * 6);
+  /** Last snapped translation, to pulse when it steps; null when not snapping. */
+  protected Vector3 _lastSnapTranslation = null;
 
   /** Formats the translation readout - see {@link TranslateGizmo#setReadoutFormatter}. */
   @FunctionalInterface
@@ -86,6 +110,18 @@ public class TranslateGizmo extends AbstractGizmo {
 
   public TranslateGizmo() {
     super("translateGizmo");
+
+    // Snap tick crossbars along the active axis, shown while a snapping axis drag is active;
+    // updateSnapTicks() rewrites them each frame. Non-indexed triangles, two per tick.
+    _snapTicks = new Mesh("snapTicks");
+    _snapTicks.getMeshData().setVertexBuffer(_snapTickBuffer);
+    _snapTicks.getMeshData().setIndexMode(IndexMode.Triangles);
+    LightProperties.setLightReceiver(_snapTicks, false);
+    _snapTicks.getSceneHints().setAllPickingHints(false);
+    _snapTicks.getSceneHints().setCullHint(CullHint.Always);
+    GizmoGeometry.disableDepthWrite(_snapTicks);
+    _handle.attachChild(_snapTicks);
+    MaterialUtil.autoMaterials(_snapTicks);
   }
 
   /** Add the full set of handles: axis arrows, plane quads and the view-plane center disk. */
@@ -196,6 +232,7 @@ public class TranslateGizmo extends AbstractGizmo {
 
   @Override
   protected void updateCameraFacingHandles(final Camera camera) {
+    updateSnapTicks(camera);
     if (_centerHandle == null) {
       return;
     }
@@ -204,6 +241,100 @@ public class TranslateGizmo extends AbstractGizmo {
     _handle.getRotation().applyPre(_calcVec3A, _calcVec3A);
     _calcQuat.fromVectorToVector(Vector3.UNIT_Z, _calcVec3A);
     _centerHandle.getRoot().setRotation(_calcQuat);
+  }
+
+  /**
+   * Rebuild the snap tick crossbars along the active axis at the grid increment, or hide them when
+   * no snapping axis drag is active. Pulses when the snapped position steps to a new grid cell. The
+   * grid is in world units while the gizmo holds a constant screen size, so the increment is divided
+   * by the gizmo's scale to get its length in the local frame the ticks live in.
+   */
+  protected void updateSnapTicks(final Camera camera) {
+    final GizmoHandle active = _dragState != DragState.NONE ? findGizmoHandle(_lastDragSpatial) : null;
+    final boolean axisDrag = active != null && switch (active.getPart()) {
+      case AxisX, AxisY, AxisZ -> true;
+      default -> false;
+    };
+    final double inc = activeSnapIncrement();
+    if (!axisDrag || inc <= 0) {
+      hideSnapTicks();
+      return;
+    }
+
+    // The grid is world-spaced but the gizmo holds a constant screen size, so a coarse grid seen
+    // from far away crowds many ticks into the gizmo. Convert the increment to the local frame the
+    // ticks live in (1 local unit is ~the gizmo's pixel footprint on screen) and fade the ticks out
+    // as that on-screen spacing gets too small to read.
+    final double spacing = inc / _handle.getScale().getX();
+    final double density = GizmoMath.fadeAlpha(spacing * _pixelSize * _appliedDpiScale,
+        TranslateGizmo.SNAP_TICK_MIN_SCREEN_SPACING, TranslateGizmo.SNAP_TICK_FULL_SCREEN_SPACING);
+    if (density <= 0) {
+      hideSnapTicks();
+      return;
+    }
+
+    // Pulse when the snapped gizmo position steps to a new grid cell.
+    final ReadOnlyVector3 pos = _handle.getTranslation();
+    if (_lastSnapTranslation == null) {
+      _lastSnapTranslation = new Vector3(pos);
+    } else if (!_lastSnapTranslation.equals(pos)) {
+      triggerSnapPulse();
+      _lastSnapTranslation.set(pos);
+    }
+
+    final ReadOnlyVector3 axis = active.getAxis();
+    // Crossbar direction: perpendicular to the axis, facing the camera. The axis is faded out when
+    // near edge-on, so it is well-conditioned during a real drag; guard the degenerate case anyway.
+    final Vector3 camDir = _handle.getRotation().applyPre(camera.getDirection(), _calcVec3A);
+    final Vector3 perp = axis.cross(camDir, _calcVec3B);
+    if (perp.lengthSquared() < 1e-10) {
+      axis.cross(Vector3.UNIT_Y, perp);
+      if (perp.lengthSquared() < 1e-10) {
+        axis.cross(Vector3.UNIT_X, perp);
+      }
+    }
+    perp.normalizeLocal();
+
+    final int perSide = Math.min(TranslateGizmo.SNAP_TICK_MAX_PER_SIDE,
+        (int) Math.floor(TranslateGizmo.SNAP_TICK_MAX_EXTENT / spacing));
+    _snapTickBuffer.clear();
+    for (int k = -perSide; k <= perSide; k++) {
+      putTick(axis, perp, k * spacing);
+    }
+    _snapTickBuffer.flip();
+    _snapTicks.getMeshData().updateVertexCount();
+    _snapTicks.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+    _snapTicks.updateModelBound();
+
+    final ReadOnlyColorRGBA base = active.getBaseColor();
+    final float p = (float) getSnapPulse();
+    _snapTicks.setDefaultColor(base.getRed() + (1f - base.getRed()) * p, base.getGreen() + (1f - base.getGreen()) * p,
+        base.getBlue() + (1f - base.getBlue()) * p, TranslateGizmo.SNAP_TICK_ALPHA * (float) density);
+    _snapTicks.getSceneHints().setCullHint(CullHint.Never);
+  }
+
+  private void hideSnapTicks() {
+    if (_snapTicks.getSceneHints().getCullHint() != CullHint.Always) {
+      _snapTicks.getSceneHints().setCullHint(CullHint.Always);
+    }
+    _lastSnapTranslation = null;
+  }
+
+  /** Append one tick crossbar (two triangles) centered at axis*along, spanning perp. */
+  private void putTick(final ReadOnlyVector3 axis, final ReadOnlyVector3 perp, final double along) {
+    final double t = TranslateGizmo.SNAP_TICK_THICK, h = TranslateGizmo.SNAP_TICK_HALF;
+    final double ax = axis.getX(), ay = axis.getY(), az = axis.getZ();
+    final double px = perp.getX(), py = perp.getY(), pz = perp.getZ();
+    final float c0x = (float) (ax * (along - t) - px * h), c0y = (float) (ay * (along - t) - py * h),
+        c0z = (float) (az * (along - t) - pz * h);
+    final float c1x = (float) (ax * (along + t) - px * h), c1y = (float) (ay * (along + t) - py * h),
+        c1z = (float) (az * (along + t) - pz * h);
+    final float c2x = (float) (ax * (along + t) + px * h), c2y = (float) (ay * (along + t) + py * h),
+        c2z = (float) (az * (along + t) + pz * h);
+    final float c3x = (float) (ax * (along - t) + px * h), c3y = (float) (ay * (along - t) + py * h),
+        c3z = (float) (az * (along - t) + pz * h);
+    _snapTickBuffer.put(c0x).put(c0y).put(c0z).put(c1x).put(c1y).put(c1z).put(c2x).put(c2y).put(c2z);
+    _snapTickBuffer.put(c0x).put(c0y).put(c0z).put(c2x).put(c2y).put(c2z).put(c3x).put(c3y).put(c3z);
   }
 
   @Override
