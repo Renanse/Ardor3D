@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -38,6 +38,7 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.PixelDataType;
 import com.ardor3d.input.focus.FocusWrapper;
+import com.ardor3d.input.glfw.GLFWMouseManager;
 import com.ardor3d.input.mouse.MouseManager;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -202,6 +203,10 @@ public class GLFWCanvas implements NativeCanvas, FocusWrapper {
 
   @Override
   public void close() {
+    // Destroy any cached native cursors while the window (and GLFW) are still up.
+    if (_manager instanceof GLFWMouseManager) {
+      ((GLFWMouseManager) _manager).cleanup();
+    }
     if (_windowId != 0) {
       Callbacks.glfwFreeCallbacks(_windowId);
       GLFW.glfwDestroyWindow(_windowId);
