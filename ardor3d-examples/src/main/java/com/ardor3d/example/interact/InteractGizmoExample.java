@@ -74,7 +74,8 @@ import com.ardor3d.util.TextureManager;
  * Showcases the v2 interact gizmos. Hover a handle to highlight it, drag to manipulate the
  * target. Click objects to change the interact target. Press 1 for the translate gizmo, 2 for
  * rotate, 3 for scale, and R to toggle between world and local interact frames. Hold Ctrl while
- * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps.
+ * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps. Press Escape while
+ * dragging to cancel, restoring the target to where the drag began.
  *
  * For unattended verification, -Dgizmo.shot=path skips the settings dialog, grabs a frame to the
  * given PNG once the scene has settled, prints a summary of gizmo-colored pixels and exits.

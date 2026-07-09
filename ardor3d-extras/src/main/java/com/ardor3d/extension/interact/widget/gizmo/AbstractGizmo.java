@@ -12,6 +12,7 @@ package com.ardor3d.extension.interact.widget.gizmo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
@@ -19,11 +20,15 @@ import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.IDpiScaleProvider;
+import com.ardor3d.input.keyboard.Key;
+import com.ardor3d.input.keyboard.KeyboardState;
+import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.light.LightProperties;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -139,6 +144,11 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected final ColorRGBA _calcColor = new ColorRGBA();
   protected final ColorRGBA _calcColorB = new ColorRGBA();
 
+  /** The target's transform when the current drag began, restored if the drag is cancelled. */
+  protected final Transform _dragStartTransform = new Transform();
+  /** Whether {@link #_dragStartTransform} holds a snapshot for the active drag. */
+  protected boolean _hasDragStartTransform = false;
+
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
     LightProperties.setLightReceiver(_handle, false);
@@ -214,6 +224,52 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
           GizmoMath.approach(handle.getHighlight(), handle == active ? 1.0 : 0.0, dt, _highlightEaseTau));
     }
     super.update(timer, manager);
+  }
+
+  @Override
+  public void beginDrag(final InteractManager manager, final MouseState current) {
+    super.beginDrag(manager, current);
+    // super sets START_DRAG only if a handle was picked; snapshot the pre-drag transform so the
+    // drag can be cancelled back to it (see cancelDrag).
+    if (_dragState != DragState.NONE) {
+      _dragStartTransform.set(manager.getSpatialState().getTransform());
+      _hasDragStartTransform = true;
+    }
+  }
+
+  /**
+   * Cancel an in-progress drag: restore the target to the transform it had when the drag began and
+   * end the interaction, discarding the drag's changes. A no-op when no drag is active.
+   */
+  public void cancelDrag(final InteractManager manager, final MouseState current) {
+    if (_dragState == DragState.NONE) {
+      return;
+    }
+    final Spatial target = manager.getSpatialTarget();
+    if (_hasDragStartTransform && target != null) {
+      manager.getSpatialState().getTransform().set(_dragStartTransform);
+      manager.getSpatialState().applyState(target);
+      manager.fireTargetDataUpdated();
+    }
+    endDrag(manager, current);
+    _hasDragStartTransform = false;
+  }
+
+  /**
+   * If a drag is active and Escape is held, cancel it and mark the input consumed. Gizmos call this
+   * at the top of processInput so Escape aborts a drag in progress; the drag stays cancelled until
+   * the mouse button is released and pressed again.
+   *
+   * @return true if a drag was cancelled by this call.
+   */
+  protected boolean cancelDragIfRequested(final KeyboardState keyboard, final MouseState current,
+      final AtomicBoolean inputConsumed, final InteractManager manager) {
+    if (_dragState == DragState.NONE || keyboard == null || !keyboard.isDown(Key.ESCAPE)) {
+      return false;
+    }
+    cancelDrag(manager, current);
+    inputConsumed.set(true);
+    return true;
   }
 
   @Override

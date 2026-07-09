@@ -179,6 +179,11 @@ public class ScaleGizmo extends AbstractGizmo {
 
     captureDpiScaleProvider(source);
 
+    // Escape aborts a drag in progress, restoring the target to its pre-drag transform.
+    if (cancelDragIfRequested(inputStates.getCurrent().getKeyboardState(), current, inputConsumed, manager)) {
+      return;
+    }
+
     // first process mouse over state
     checkMouseOver(source, current, manager);
 
