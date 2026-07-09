@@ -52,8 +52,13 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.ui.text.BMFont;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.URLResourceSource;
 
 /**
  * Base class for the v2 interact gizmos. Compared to the older widgets in the parent package,
@@ -114,6 +119,30 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   public static final float AXIS_GUIDE_WIDTH = 1.5f;
   /** Axis guide opacity. */
   public static final float AXIS_GUIDE_ALPHA = 0.55f;
+
+  /** Point size of the drag readout text. */
+  public static final double DEFAULT_READOUT_SIZE = 20;
+  /** Pixels the readout floats above the top of the gizmo's on-screen footprint. */
+  public static final double READOUT_MARGIN = 16;
+
+  /**
+   * Outlined font for the drag readout, lazily loaded and shared across gizmos. Its baked dark
+   * glyph halo keeps the white numbers legible over any background (e.g. a bright, sun-lit floor)
+   * without a separate backing panel. Falls back to the plain default font if it cannot be loaded.
+   */
+  protected static BMFont READOUT_FONT;
+
+  protected static synchronized BMFont readoutFont() {
+    if (AbstractGizmo.READOUT_FONT == null) {
+      try {
+        AbstractGizmo.READOUT_FONT = new BMFont(new URLResourceSource(ResourceLocatorTool
+            .getClassPathResource(BasicText.class, "com/ardor3d/ui/text/DroidSans-20-bold-regular-outline2.fnt")), true);
+      } catch (final Exception ex) {
+        AbstractGizmo.READOUT_FONT = BasicText.DEFAULT_FONT;
+      }
+    }
+    return AbstractGizmo.READOUT_FONT;
+  }
 
   /** Default on-screen footprint of a gizmo, in pixels. */
   public static final double DEFAULT_PIXEL_SIZE = 100;
@@ -178,6 +207,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
    */
   protected final Line _axisGuide;
 
+  /**
+   * Screen-space numeric readout shown while dragging (translation delta, angle, or scale factor).
+   * Lives in the application's ortho/screen root - the app attaches {@link #getReadout()} there and
+   * the gizmo shows, positions and fills it. Content comes from {@link #getReadoutText}.
+   */
+  protected final BasicText _readoutText;
+
   public AbstractGizmo(final String name) {
     _handle = new Node(name);
     LightProperties.setLightReceiver(_handle, false);
@@ -204,6 +240,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     _axisGuide.getSceneHints().setCullHint(CullHint.Always);
     _handle.attachChild(_axisGuide);
     MaterialUtil.autoMaterials(_axisGuide);
+
+    // Drag readout: a centered, outlined-font label the app renders in its ortho root. Hidden until
+    // a drag is active. Not attached to _handle - it lives in screen space, not the gizmo's frame.
+    _readoutText = new BasicText("gizmoReadout", "", AbstractGizmo.readoutFont(), AbstractGizmo.DEFAULT_READOUT_SIZE);
+    _readoutText.setTextColor(ColorRGBA.WHITE);
+    _readoutText.setAlign(BMText.Align.Center);
+    _readoutText.getSceneHints().setCullHint(CullHint.Always);
 
     // Render immediately when drawn rather than queueing - the gizmo is drawn once per pass by
     // render(), after the scene buckets have flushed.
@@ -277,6 +320,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     }
   }
 
+  @Override
+  public void endDrag(final InteractManager manager, final MouseState current) {
+    super.endDrag(manager, current);
+    // The pre-drag snapshot is only valid during a drag - drop it so the readout stops showing.
+    _hasDragStartTransform = false;
+  }
+
   /**
    * Cancel an in-progress drag: restore the target to the transform it had when the drag began and
    * end the interaction, discarding the drag's changes. A no-op when no drag is active.
@@ -310,6 +360,14 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     cancelDrag(manager, current);
     inputConsumed.set(true);
     return true;
+  }
+
+  @Override
+  public void lostControl(final InteractManager manager) {
+    super.lostControl(manager);
+    // A deactivated gizmo's render() no longer runs, so its readout (which lives in the shared ortho
+    // root) would otherwise stay frozen on screen if it was mid-drag. Hide it here.
+    hideReadout();
   }
 
   @Override
@@ -369,6 +427,41 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     // Visible pass: full strength wherever the gizmo passes the normal depth test.
     applyHandleColors(1.0f);
     renderer.draw(_handle);
+
+    updateReadout(manager);
+  }
+
+  /**
+   * Show and position the drag readout for the frame, filling it from {@link #getReadoutText}, or
+   * hide it when no drag is active. The readout floats just above the gizmo's on-screen footprint,
+   * centered; it lives in the app's ortho root, so it is positioned in screen pixels.
+   */
+  protected void updateReadout(final InteractManager manager) {
+    final String text = _dragState != DragState.NONE && manager.getSpatialTarget() != null ? getReadoutText(manager)
+        : null;
+    if (text == null) {
+      hideReadout();
+      return;
+    }
+    _readoutText.setText(text);
+    final Vector3 screen = Camera.getCurrentCamera().getScreenCoordinates(_handle.getWorldTranslation(), _calcVec3A);
+    final double above = _pixelSize * _appliedDpiScale + AbstractGizmo.READOUT_MARGIN;
+    _readoutText.setTranslation(Math.round(screen.getX()), Math.round(screen.getY() + above), 0);
+    _readoutText.getSceneHints().setCullHint(CullHint.Never);
+  }
+
+  protected void hideReadout() {
+    if (_readoutText.getSceneHints().getCullHint() != CullHint.Always) {
+      _readoutText.getSceneHints().setCullHint(CullHint.Always);
+    }
+  }
+
+  /**
+   * The numeric readout string for the current drag, or null to show nothing. Overridden per gizmo
+   * (translation delta, rotation angle, scale factor); the base gizmo shows no readout.
+   */
+  protected String getReadoutText(final InteractManager manager) {
+    return null;
   }
 
   /**
@@ -604,6 +697,13 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
 
   /** @return the shared axis constraint guide line, shown during single-axis drags. */
   public Line getAxisGuide() { return _axisGuide; }
+
+  /**
+   * @return the screen-space drag readout. Attach it to an application node rendered in ortho/screen
+   *         coordinates (origin at the bottom left) to enable it; the gizmo handles visibility,
+   *         position and content.
+   */
+  public BasicText getReadout() { return _readoutText; }
 
   public boolean isXRay() { return _xray; }
 

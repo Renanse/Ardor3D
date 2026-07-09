@@ -66,6 +66,24 @@ public class TranslateGizmo extends AbstractGizmo {
 
   protected final Quaternion _calcQuat = new Quaternion();
 
+  /** Formats the translation readout - see {@link TranslateGizmo#setReadoutFormatter}. */
+  @FunctionalInterface
+  public interface ReadoutFormatter {
+    /**
+     * @param delta
+     *          translation applied since the drag began, in the target's parent frame.
+     * @param position
+     *          the target's current local translation.
+     * @param manager
+     *          the interact manager (for the target, etc.).
+     * @return the readout text, or null to show nothing.
+     */
+    String format(ReadOnlyVector3 delta, ReadOnlyVector3 position, InteractManager manager);
+  }
+
+  /** Custom formatter for the translation readout; the built-in delta text is used when null. */
+  protected ReadoutFormatter _readoutFormatter;
+
   public TranslateGizmo() {
     super("translateGizmo");
   }
@@ -225,6 +243,31 @@ public class TranslateGizmo extends AbstractGizmo {
     // apply our filters, if any, now that we've made updates.
     applyFilters(manager);
   }
+
+  @Override
+  protected String getReadoutText(final InteractManager manager) {
+    if (!_hasDragStartTransform || manager.getSpatialTarget() == null) {
+      return null;
+    }
+    final ReadOnlyVector3 now = manager.getSpatialTarget().getTranslation();
+    final ReadOnlyVector3 start = _dragStartTransform.getTranslation();
+    final double dx = now.getX() - start.getX();
+    final double dy = now.getY() - start.getY();
+    final double dz = now.getZ() - start.getZ();
+    if (_readoutFormatter != null) {
+      return _readoutFormatter.format(new Vector3(dx, dy, dz), now, manager);
+    }
+    // Built-in: signed delta from where the drag began (ASCII; the signs read as a delta).
+    return String.format("%+.2f, %+.2f, %+.2f", dx, dy, dz);
+  }
+
+  public ReadoutFormatter getReadoutFormatter() { return _readoutFormatter; }
+
+  /**
+   * Set a custom formatter for the translation readout (e.g. converted to cm/m, or absolute
+   * position instead of delta). Pass null to restore the built-in delta text.
+   */
+  public void setReadoutFormatter(final ReadoutFormatter formatter) { _readoutFormatter = formatter; }
 
   /**
    * Work out the translation delta, in the target's parent coordinate space, described by the

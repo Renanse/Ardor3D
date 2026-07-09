@@ -147,7 +147,7 @@ public class GlGizmoRenderSmokeTest {
     double dragAngleDeg, readoutDeg, targetAngleDeg;
     // Scale gizmo: shafts at rest, then mid-drag (drag-focus dims the inactive Y/Z shafts).
     int scRestGreen, scRestBlue, scRed, scGreen, scBlue;
-    double targetScaleX;
+    double targetScaleX, scReadout;
 
     void setCanvas(final Canvas canvas) { _canvas = canvas; }
 
@@ -254,7 +254,7 @@ public class GlGizmoRenderSmokeTest {
             rotGreen = _green;
             rotBlue = _blue;
             dragAngleDeg = Math.abs(_rotate.getDragAngle()) * MathUtils.RAD_TO_DEG;
-            readoutDeg = Math.abs(parseReadout(_rotate.getAngleReadout().getText()));
+            readoutDeg = Math.abs(parseReadout(_rotate.getReadout().getText()));
             targetAngleDeg = new Quaternion().fromRotationMatrix(_target.getRotation()).toAngleAxis(new Vector3())
                 * MathUtils.RAD_TO_DEG;
             enter(Phase.SCALE);
@@ -273,6 +273,7 @@ public class GlGizmoRenderSmokeTest {
             scGreen = _green;
             scBlue = _blue;
             targetScaleX = _target.getScale().getX();
+            scReadout = parseReadout(_scale.getReadout().getText());
             enter(Phase.DONE);
             done = true;
           }
@@ -452,7 +453,7 @@ public class GlGizmoRenderSmokeTest {
           + scene.rotGreen + " b=" + scene.rotBlue + " dragAngle=" + scene.dragAngleDeg + " readout=" + scene.readoutDeg
           + " target=" + scene.targetAngleDeg + "]"
           + " scale[rest g=" + scene.scRestGreen + " b=" + scene.scRestBlue + "; drag r=" + scene.scRed + " g="
-          + scene.scGreen + " b=" + scene.scBlue + " sx=" + scene.targetScaleX + "]");
+          + scene.scGreen + " b=" + scene.scBlue + " sx=" + scene.targetScaleX + " readout=" + scene.scReadout + "]");
 
       final String on = " on '" + scene.glRenderer + "'";
 
@@ -479,9 +480,10 @@ public class GlGizmoRenderSmokeTest {
       assertEquals("drag angle and applied target rotation disagree" + on, scene.dragAngleDeg, scene.targetAngleDeg,
           6.0);
 
-      // 4. A +X scale drag grows the target's X scale into a sane range.
+      // 4. A +X scale drag grows the target's X scale into a sane range, and the readout agrees.
       assertTrue("scale drag did not grow target X scale (was " + scene.targetScaleX + ")" + on,
           scene.targetScaleX > 1.1 && scene.targetScaleX < 20.0);
+      assertEquals("scale readout disagrees with applied X factor" + on, scene.targetScaleX, scene.scReadout, 0.02);
 
       // 5. Drag-focus dims the inactive handles: mid-drag, the Y/Z rings and shafts (not the dragged
       // axis) fade well below their resting counts as they blend toward the background.

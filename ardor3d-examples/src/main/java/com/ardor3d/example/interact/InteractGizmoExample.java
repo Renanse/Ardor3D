@@ -75,7 +75,8 @@ import com.ardor3d.util.TextureManager;
  * target. Click objects to change the interact target. Press 1 for the translate gizmo, 2 for
  * rotate, 3 for scale, and R to toggle between world and local interact frames. Hold Ctrl while
  * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps. Press Escape while
- * dragging to cancel, restoring the target to where the drag began.
+ * dragging to cancel, restoring the target to where the drag began. Press U to toggle the rotate
+ * angle readout between degrees and radians.
  *
  * For unattended verification, -Dgizmo.shot=path skips the settings dialog, grabs a frame to the
  * given PNG once the scene has settled, prints a summary of gizmo-colored pixels and exits.
@@ -266,11 +267,15 @@ public class InteractGizmoExample extends ExampleBase {
 
     rotateGizmo = new RotateGizmo().withAllHandles();
     manager.addWidget(rotateGizmo);
-    // the angle readout is screen-space ui - it renders with the ortho pass
-    _orthoRoot.attachChild(rotateGizmo.getAngleReadout());
 
     scaleGizmo = new ScaleGizmo().withAllHandles();
     manager.addWidget(scaleGizmo);
+
+    // Each gizmo's drag readout is screen-space ui rendered with the ortho pass; only the active
+    // gizmo shows its own while dragging.
+    _orthoRoot.attachChild(translateGizmo.getReadout());
+    _orthoRoot.attachChild(rotateGizmo.getReadout());
+    _orthoRoot.attachChild(scaleGizmo.getReadout());
 
     // Drag simulations drive their gizmo directly; it must also be the active widget or the
     // manager would render a different gizmo than the one being dragged.
@@ -302,6 +307,13 @@ public class InteractGizmoExample extends ExampleBase {
           rotateGizmo.setInteractMatrix(next);
           manager.fireTargetDataUpdated();
         }));
+
+    // toggle the rotate angle readout between the built-in degrees text and a radians formatter,
+    // demonstrating the readout formatter callback
+    manager.getLogicalLayer()
+        .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.U),
+            (source, inputStates, tpf) -> rotateGizmo.setReadoutFormatter(rotateGizmo.getReadoutFormatter() == null
+                ? (angleRadians, m) -> String.format("%.3f rad", angleRadians) : null)));
 
     // hold Ctrl to snap: translate to a 1-unit grid, rotate to 15 degree steps
     final GridSnapFilter gridSnap = new GridSnapFilter(1.0);
@@ -462,7 +474,7 @@ public class InteractGizmoExample extends ExampleBase {
       final double targetAngle =
           new Quaternion().fromRotationMatrix(manager.getSpatialTarget().getRotation()).toAngleAxis(new Vector3());
       System.out.println("GIZMO dragAngle=" + rotateGizmo.getDragAngle() + " text='"
-          + rotateGizmo.getAngleReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
+          + rotateGizmo.getReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
     } else if ("scalex".equals(System.getProperty("gizmo.drag"))) {
       System.out.println("GIZMO targetScaleX=" + manager.getSpatialTarget().getScale().getX());
     }

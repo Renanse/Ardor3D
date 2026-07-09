@@ -39,7 +39,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.MaterialUtil;
 import com.ardor3d.util.geom.GeometryTool;
 
@@ -70,6 +69,22 @@ public class RotateGizmo extends AbstractGizmo {
   /** The roll ring's white, a touch brighter than the shared center-handle gray. */
   public static final ReadOnlyColorRGBA VIEW_RING_COLOR = new ColorRGBA(0.95f, 0.95f, 0.95f, 0.9f);
 
+  /** Formats the drag angle readout - see {@link RotateGizmo#setReadoutFormatter}. */
+  @FunctionalInterface
+  public interface ReadoutFormatter {
+    /**
+     * @param angleRadians
+     *          the applied drag angle, in radians.
+     * @param manager
+     *          the interact manager (for the target, etc.).
+     * @return the readout text, or null to show nothing.
+     */
+    String format(double angleRadians, InteractManager manager);
+  }
+
+  /** Custom formatter for the angle readout; the built-in degrees text is used when null. */
+  protected ReadoutFormatter _readoutFormatter;
+
   protected GizmoHandle _viewRingHandle;
 
   protected final Quaternion _calcQuat = new Quaternion();
@@ -97,7 +112,6 @@ public class RotateGizmo extends AbstractGizmo {
   /** Stroke along the pie wedge's two radial edges: grab direction and current direction. */
   protected final Line _pieEdgeLine;
   protected final FloatBuffer _pieEdgeBuffer = BufferUtils.createVector3Buffer(3);
-  protected final BasicText _angleText;
 
   public RotateGizmo() {
     super("rotateGizmo");
@@ -131,21 +145,7 @@ public class RotateGizmo extends AbstractGizmo {
     GizmoGeometry.disableDepthWrite(_pieEdgeLine);
     _handle.attachChild(_pieEdgeLine);
     MaterialUtil.autoMaterials(_pieEdgeLine);
-
-    // Screen-space angle readout, living in the ortho render queue. The gizmo shows, hides,
-    // positions and updates it during ring drags; the application decides where it renders by
-    // attaching it to its UI/ortho root (see getAngleReadout()).
-    _angleText = BasicText.createDefaultTextLabel("angleReadout", "", 16);
-    _angleText.setTextColor(ColorRGBA.WHITE);
-    _angleText.getSceneHints().setCullHint(CullHint.Always);
   }
-
-  /**
-   * @return the screen-space angle readout shown while dragging a ring. Attach it to an
-   *         application node rendered in ortho/screen coordinates (with the ortho origin at the
-   *         bottom left) to enable it; the gizmo takes care of visibility, position and content.
-   */
-  public BasicText getAngleReadout() { return _angleText; }
 
   /** Add the full set of handles: the three axis rings and the view roll ring. */
   public RotateGizmo withAllHandles() {
@@ -237,10 +237,31 @@ public class RotateGizmo extends AbstractGizmo {
 
   @Override
   public void render(final Renderer renderer, final InteractManager manager) {
+    // Resolve the applied angle before super.render(), which fills the shared readout via
+    // getReadoutText().
     _displayAngle = calculateAppliedAngle(manager);
     super.render(renderer, manager);
-    updateAngleReadout(manager);
   }
+
+  @Override
+  protected String getReadoutText(final InteractManager manager) {
+    if (_dragStartDir == null) {
+      return null;
+    }
+    if (_readoutFormatter != null) {
+      return _readoutFormatter.format(_displayAngle, manager);
+    }
+    // ASCII only - the outlined readout font carries just printable ASCII, no degree glyph.
+    return String.format("%.1f deg", _displayAngle * MathUtils.RAD_TO_DEG);
+  }
+
+  public ReadoutFormatter getReadoutFormatter() { return _readoutFormatter; }
+
+  /**
+   * Set a custom formatter for the drag angle readout (e.g. radians, or a localized string). Pass
+   * null to restore the built-in degrees text.
+   */
+  public void setReadoutFormatter(final ReadoutFormatter formatter) { _readoutFormatter = formatter; }
 
   /**
    * The drag angle actually applied to the spatial state, read back after filters ran. A snap
@@ -278,26 +299,6 @@ public class RotateGizmo extends AbstractGizmo {
       diff += MathUtils.TWO_PI;
     }
     return _dragAngle + diff;
-  }
-
-  protected void updateAngleReadout(final InteractManager manager) {
-    if (manager.getSpatialTarget() == null || _dragState == DragState.NONE || _dragStartDir == null) {
-      hideAngleReadout();
-      return;
-    }
-
-    // Show the readout just above the gizmo center, in screen coordinates (ortho space).
-    final Camera camera = Camera.getCurrentCamera();
-    final Vector3 screen = camera.getScreenCoordinates(_handle.getWorldTranslation(), _calcVec3A);
-    _angleText.setText(String.format("%.1f°", _displayAngle * MathUtils.RAD_TO_DEG));
-    _angleText.setTranslation((int) (screen.getX() + 12), (int) (screen.getY() + 12), 0);
-    _angleText.getSceneHints().setCullHint(CullHint.Never);
-  }
-
-  protected void hideAngleReadout() {
-    if (_angleText.getSceneHints().getCullHint() != CullHint.Always) {
-      _angleText.getSceneHints().setCullHint(CullHint.Always);
-    }
   }
 
   /**
@@ -364,7 +365,6 @@ public class RotateGizmo extends AbstractGizmo {
     _dragStartRotation = null;
     _dragAngle = 0;
     _displayAngle = 0;
-    hideAngleReadout();
   }
 
   @Override

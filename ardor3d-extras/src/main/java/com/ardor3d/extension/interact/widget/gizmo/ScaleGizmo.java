@@ -88,6 +88,24 @@ public class ScaleGizmo extends AbstractGizmo {
   /** State scale captured when a drag started, for measuring the applied ratio. */
   protected Vector3 _dragStartScale = null;
 
+  /** Formats the scale factor readout - see {@link ScaleGizmo#setReadoutFormatter}. */
+  @FunctionalInterface
+  public interface ReadoutFormatter {
+    /**
+     * @param factor
+     *          the per-axis scale factor applied since the drag began.
+     * @param manager
+     *          the interact manager (for the target, etc.).
+     * @return the readout text, or null to show nothing.
+     */
+    String format(ReadOnlyVector3 factor, InteractManager manager);
+  }
+
+  /** Custom formatter for the scale readout; the built-in factor text is used when null. */
+  protected ReadoutFormatter _readoutFormatter;
+  /** Scratch for the per-axis factor handed to the formatter. */
+  protected final Vector3 _calcFactor = new Vector3();
+
   public ScaleGizmo() {
     super("scaleGizmo");
   }
@@ -258,6 +276,40 @@ public class ScaleGizmo extends AbstractGizmo {
     updateShaftStretch(manager);
     super.render(renderer, manager);
   }
+
+  @Override
+  protected String getReadoutText(final InteractManager manager) {
+    if (_dragStartScale == null) {
+      return null;
+    }
+    final GizmoHandle handle = findGizmoHandle(_lastDragSpatial);
+    if (handle == null) {
+      return null;
+    }
+    // Per-axis factor applied since the drag began, read back from the state so any snap shows true.
+    final ReadOnlyVector3 scale = manager.getSpatialState().getTransform().getScale();
+    final double fx = scale.getX() / _dragStartScale.getX();
+    final double fy = scale.getY() / _dragStartScale.getY();
+    final double fz = scale.getZ() / _dragStartScale.getZ();
+    if (_readoutFormatter != null) {
+      return _readoutFormatter.format(_calcFactor.set(fx, fy, fz), manager);
+    }
+    // Built-in: the dragged axis' factor (uniform cube uses X). ASCII 'x', not the multiply glyph.
+    final double ratio = switch (handle.getPart()) {
+      case AxisY -> fy;
+      case AxisZ -> fz;
+      default -> fx;
+    };
+    return String.format("%.2fx", ratio);
+  }
+
+  public ReadoutFormatter getReadoutFormatter() { return _readoutFormatter; }
+
+  /**
+   * Set a custom formatter for the scale readout (e.g. per-axis, or percentages). Pass null to
+   * restore the built-in factor text.
+   */
+  public void setReadoutFormatter(final ReadoutFormatter formatter) { _readoutFormatter = formatter; }
 
   /**
    * While an axis drag is active, stretch that axis' shaft and tip to track the scale actually
