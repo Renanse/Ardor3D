@@ -26,7 +26,7 @@ import com.ardor3d.math.Vector3;
  * while Ctrl is held); the raw total keeps accumulating while disabled, so mid-drag toggles snap
  * relative to the whole drag.
  */
-public class GridSnapFilter extends UpdateFilterAdapter {
+public class GridSnapFilter extends UpdateFilterAdapter implements SnapSource {
 
   protected final Vector3 _calcVec = new Vector3();
 
@@ -87,4 +87,10 @@ public class GridSnapFilter extends UpdateFilterAdapter {
   public boolean isEnabled() { return _enabled; }
 
   public void setEnabled(final boolean enabled) { _enabled = enabled; }
+
+  @Override
+  public boolean isSnapping() { return _enabled && _gridSize > 0; }
+
+  @Override
+  public double getSnapIncrement() { return _gridSize; }
 }

@@ -29,7 +29,7 @@ import com.ardor3d.math.Vector3;
  * held); the raw total keeps accumulating while disabled, so mid-drag toggles snap relative to
  * the whole drag.
  */
-public class AngleSnapFilter extends UpdateFilterAdapter {
+public class AngleSnapFilter extends UpdateFilterAdapter implements SnapSource {
 
   protected final Matrix3 _calcMat3A = new Matrix3();
   protected final Matrix3 _calcMat3B = new Matrix3();
@@ -104,4 +104,10 @@ public class AngleSnapFilter extends UpdateFilterAdapter {
   public boolean isEnabled() { return _enabled; }
 
   public void setEnabled(final boolean enabled) { _enabled = enabled; }
+
+  @Override
+  public boolean isSnapping() { return _enabled && _snapAngle > 0; }
+
+  @Override
+  public double getSnapIncrement() { return _snapAngle; }
 }

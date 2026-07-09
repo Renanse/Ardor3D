@@ -66,6 +66,13 @@ public class RotateGizmo extends AbstractGizmo {
   public static final int PIE_MAX_SEGMENTS = 256;
   public static final int ARC_SAMPLES = 48;
 
+  /** Snap tick notches straddle the ring: half radial extent and half tangential width, in units. */
+  public static final double SNAP_TICK_RADIAL = 0.06;
+  public static final double SNAP_TICK_TANGENT = 0.012;
+  public static final float SNAP_TICK_ALPHA = 0.9f;
+  /** Cap on snap ticks drawn to each side of the grab direction. */
+  public static final int SNAP_TICK_MAX_PER_SIDE = 18;
+
   /** The roll ring's white, a touch brighter than the shared center-handle gray. */
   public static final ReadOnlyColorRGBA VIEW_RING_COLOR = new ColorRGBA(0.95f, 0.95f, 0.95f, 0.9f);
 
@@ -113,6 +120,13 @@ public class RotateGizmo extends AbstractGizmo {
   protected final Line _pieEdgeLine;
   protected final FloatBuffer _pieEdgeBuffer = BufferUtils.createVector3Buffer(3);
 
+  /** Radial snap tick notches around the active ring, shown while a snapping ring drag is active. */
+  protected final Mesh _snapTicks;
+  protected final FloatBuffer _snapTickBuffer =
+      BufferUtils.createVector3Buffer((2 * RotateGizmo.SNAP_TICK_MAX_PER_SIDE + 1) * 6);
+  /** Last snapped step index, to pulse when it changes; Long.MIN_VALUE when not snapping. */
+  protected long _lastSnapStep = Long.MIN_VALUE;
+
   public RotateGizmo() {
     super("rotateGizmo");
 
@@ -145,6 +159,18 @@ public class RotateGizmo extends AbstractGizmo {
     GizmoGeometry.disableDepthWrite(_pieEdgeLine);
     _handle.attachChild(_pieEdgeLine);
     MaterialUtil.autoMaterials(_pieEdgeLine);
+
+    // Snap tick notches (small solid quads straddling the ring), shown while a snapping ring drag
+    // is active; updateSnapTicks() rewrites them each frame. Non-indexed triangles, two per notch.
+    _snapTicks = new Mesh("snapTicks");
+    _snapTicks.getMeshData().setVertexBuffer(_snapTickBuffer);
+    _snapTicks.getMeshData().setIndexMode(IndexMode.Triangles);
+    LightProperties.setLightReceiver(_snapTicks, false);
+    _snapTicks.getSceneHints().setAllPickingHints(false);
+    _snapTicks.getSceneHints().setCullHint(CullHint.Always);
+    GizmoGeometry.disableDepthWrite(_snapTicks);
+    _handle.attachChild(_snapTicks);
+    MaterialUtil.autoMaterials(_snapTicks);
   }
 
   /** Add the full set of handles: the three axis rings and the view roll ring. */
@@ -233,6 +259,75 @@ public class RotateGizmo extends AbstractGizmo {
     }
 
     updatePie();
+    updateSnapTicks();
+  }
+
+  /**
+   * Rebuild the radial snap tick notches around the active ring at the snap increment, or hide them
+   * when no snapping ring drag is active. Also pulses when the applied angle crosses to a new step.
+   */
+  protected void updateSnapTicks() {
+    final GizmoHandle active = _dragState != DragState.NONE ? findGizmoHandle(_lastDragSpatial) : null;
+    final double inc = activeSnapIncrement();
+    if (active == null || _dragStartDir == null || inc <= 0) {
+      if (_snapTicks.getSceneHints().getCullHint() != CullHint.Always) {
+        _snapTicks.getSceneHints().setCullHint(CullHint.Always);
+      }
+      _lastSnapStep = Long.MIN_VALUE;
+      return;
+    }
+
+    // Pulse when the applied (snapped) angle crosses to a new increment.
+    final long step = Math.round(_displayAngle / inc);
+    if (_lastSnapStep != Long.MIN_VALUE && step != _lastSnapStep) {
+      triggerSnapPulse();
+    }
+    _lastSnapStep = step;
+
+    // In-plane basis from the grab direction and drag axis, in the gizmo's local frame (as updatePie).
+    final Vector3 axisLocal = _calcVec3A.set(_dragAxis);
+    _handle.getRotation().applyPre(axisLocal, axisLocal);
+    final Vector3 e1 = _calcVec3B.set(_dragStartDir);
+    _handle.getRotation().applyPre(e1, e1);
+    final Vector3 e2 = axisLocal.cross(e1, _calcVec3C);
+
+    final int perSide = Math.min(RotateGizmo.SNAP_TICK_MAX_PER_SIDE, (int) Math.floor(MathUtils.HALF_PI / inc));
+    final double rIn = RotateGizmo.RING_RADIUS - RotateGizmo.SNAP_TICK_RADIAL;
+    final double rOut = RotateGizmo.RING_RADIUS + RotateGizmo.SNAP_TICK_RADIAL;
+    final double w = RotateGizmo.SNAP_TICK_TANGENT;
+    _snapTickBuffer.clear();
+    for (int k = -perSide; k <= perSide; k++) {
+      final double theta = k * inc;
+      final double c = Math.cos(theta), s = Math.sin(theta);
+      // radial unit dir and tangent, in local space
+      final double dx = e1.getX() * c + e2.getX() * s, dy = e1.getY() * c + e2.getY() * s,
+          dz = e1.getZ() * c + e2.getZ() * s;
+      final double tx = -e1.getX() * s + e2.getX() * c, ty = -e1.getY() * s + e2.getY() * c,
+          tz = -e1.getZ() * s + e2.getZ() * c;
+      putTick(dx, dy, dz, tx, ty, tz, rIn, rOut, w);
+    }
+    _snapTickBuffer.flip();
+    _snapTicks.getMeshData().updateVertexCount();
+    _snapTicks.getMeshData().markBufferDirty(MeshData.KEY_VertexCoords);
+    _snapTicks.updateModelBound();
+
+    // Color: the active ring's color, brightened toward white by the snap pulse.
+    final ReadOnlyColorRGBA base = active.getBaseColor();
+    final float p = (float) getSnapPulse();
+    _snapTicks.setDefaultColor(base.getRed() + (1f - base.getRed()) * p, base.getGreen() + (1f - base.getGreen()) * p,
+        base.getBlue() + (1f - base.getBlue()) * p, RotateGizmo.SNAP_TICK_ALPHA);
+    _snapTicks.getSceneHints().setCullHint(CullHint.Never);
+  }
+
+  /** Append one tick notch (two triangles) spanning the radial range at the given in-plane dir/tangent. */
+  private void putTick(final double dx, final double dy, final double dz, final double tx, final double ty,
+      final double tz, final double rIn, final double rOut, final double w) {
+    final float ix = (float) (dx * rIn - tx * w), iy = (float) (dy * rIn - ty * w), iz = (float) (dz * rIn - tz * w);
+    final float ox = (float) (dx * rOut - tx * w), oy = (float) (dy * rOut - ty * w), oz = (float) (dz * rOut - tz * w);
+    final float ox2 = (float) (dx * rOut + tx * w), oy2 = (float) (dy * rOut + ty * w), oz2 = (float) (dz * rOut + tz * w);
+    final float ix2 = (float) (dx * rIn + tx * w), iy2 = (float) (dy * rIn + ty * w), iz2 = (float) (dz * rIn + tz * w);
+    _snapTickBuffer.put(ix).put(iy).put(iz).put(ox).put(oy).put(oz).put(ox2).put(oy2).put(oz2);
+    _snapTickBuffer.put(ix).put(iy).put(iz).put(ox2).put(oy2).put(oz2).put(ix2).put(iy2).put(iz2);
   }
 
   @Override
@@ -365,6 +460,7 @@ public class RotateGizmo extends AbstractGizmo {
     _dragStartRotation = null;
     _dragAngle = 0;
     _displayAngle = 0;
+    _lastSnapStep = Long.MIN_VALUE;
   }
 
   @Override

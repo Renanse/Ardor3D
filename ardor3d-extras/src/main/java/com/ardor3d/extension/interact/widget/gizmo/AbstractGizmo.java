@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.extension.interact.InteractManager;
+import com.ardor3d.extension.interact.filter.SnapSource;
+import com.ardor3d.extension.interact.filter.UpdateFilter;
 import com.ardor3d.extension.interact.widget.AbstractInteractWidget;
 import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
@@ -120,6 +122,9 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   /** Axis guide opacity. */
   public static final float AXIS_GUIDE_ALPHA = 0.55f;
 
+  /** Time constant for the snap pulse to ease back out after a snapped-value change, in seconds. */
+  public static final double DEFAULT_SNAP_PULSE_TAU = 0.12;
+
   /** Point size of the drag readout text. */
   public static final double DEFAULT_READOUT_SIZE = 20;
   /** Pixels the readout floats above the top of the gizmo's on-screen footprint. */
@@ -169,6 +174,11 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   protected double _dragFocusDim = AbstractGizmo.DEFAULT_DRAG_FOCUS_DIM;
   /** Eased drag-focus amount in [0, 1]: 0 at rest, 1 while a drag is in progress. */
   protected double _dragFocus = 0.0;
+
+  /** Time constant for the snap pulse to ease out. */
+  protected double _snapPulseTau = AbstractGizmo.DEFAULT_SNAP_PULSE_TAU;
+  /** Eased snap pulse in [0, 1]: set to 1 on a snapped-value change, eases back to 0. */
+  protected double _snapPulse = 0.0;
 
   /** View angle at or below which fading handles are fully hidden, in radians. */
   protected double _fadeHideAngle = 10 * MathUtils.DEG_TO_RAD;
@@ -306,8 +316,30 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     }
     // Ease the drag-focus dim in while a drag is active, out when it ends.
     _dragFocus = GizmoMath.approach(_dragFocus, _dragState != DragState.NONE ? 1.0 : 0.0, dt, _highlightEaseTau);
+    // The snap pulse eases back to rest; gizmos re-arm it on each snapped-value change.
+    _snapPulse = GizmoMath.approach(_snapPulse, 0.0, dt, _snapPulseTau);
     super.update(timer, manager);
   }
+
+  /**
+   * @return the increment (in the gizmo's native quantity) of the first actively-snapping filter on
+   *         this gizmo, or 0 if none is snapping. Used to draw the snap tick grid during a drag.
+   */
+  protected double activeSnapIncrement() {
+    for (final UpdateFilter filter : _filters) {
+      if (filter instanceof SnapSource snap && snap.isSnapping()) {
+        return snap.getSnapIncrement();
+      }
+    }
+    return 0.0;
+  }
+
+  /** Re-arm the snap pulse to full; it eases back out over {@link #_snapPulseTau}. */
+  protected void triggerSnapPulse() {
+    _snapPulse = 1.0;
+  }
+
+  public double getSnapPulse() { return _snapPulse; }
 
   @Override
   public void beginDrag(final InteractManager manager, final MouseState current) {
