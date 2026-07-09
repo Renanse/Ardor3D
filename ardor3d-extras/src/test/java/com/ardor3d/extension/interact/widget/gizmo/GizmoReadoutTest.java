@@ -24,6 +24,7 @@ import com.ardor3d.extension.interact.widget.DragState;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -35,7 +36,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
  */
 public class GizmoReadoutTest {
 
-  private static final double EPS = 1e-9;
+  private static final double EPS = MathUtils.ZERO_TOLERANCE;
 
   private Node _target;
   private InteractManager _manager;

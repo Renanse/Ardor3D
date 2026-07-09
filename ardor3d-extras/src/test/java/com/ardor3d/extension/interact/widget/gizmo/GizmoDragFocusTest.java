@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ardor3d.extension.interact.widget.DragState;
+import com.ardor3d.math.util.MathUtils;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.hint.CullHint;
 
@@ -28,7 +29,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
  */
 public class GizmoDragFocusTest {
 
-  private static final double EPS = 1e-9;
+  private static final double EPS = MathUtils.ZERO_TOLERANCE;
   private static final float L = (float) AbstractGizmo.AXIS_GUIDE_HALF_LENGTH;
 
   private TestGizmo _gizmo;
