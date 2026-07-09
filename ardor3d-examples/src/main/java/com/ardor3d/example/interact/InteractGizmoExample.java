@@ -10,11 +10,6 @@
 
 package com.ardor3d.example.interact;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -34,14 +29,13 @@ import com.ardor3d.extension.interact.filter.AngleSnapFilter;
 import com.ardor3d.extension.interact.filter.GridSnapFilter;
 import com.ardor3d.extension.interact.filter.ScaleSnapFilter;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
-import com.ardor3d.extension.interact.widget.gizmo.AbstractGizmo;
+import com.ardor3d.extension.interact.widget.SetCursorCallback;
 import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.ScaleGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.TranslateGizmo;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.util.awt.AWTImageLoader;
+import com.ardor3d.image.util.awt.CursorFactory;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.character.CharacterInputState;
 import com.ardor3d.input.controller.ControllerState;
@@ -55,7 +49,6 @@ import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.mouse.ButtonState;
 import com.ardor3d.input.mouse.MouseButton;
-import com.ardor3d.input.mouse.MouseCursor;
 import com.ardor3d.input.mouse.MouseState;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.Pickable;
@@ -81,9 +74,9 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * Showcases the v2 interact gizmos. Hover a handle to highlight it (the cursor also swaps to a
- * move cursor), drag to manipulate the target. Click objects to change the interact target. Press
- * 1 for the translate gizmo, 2 for
+ * Showcases the v2 interact gizmos. Hover a handle to highlight it (the cursor also swaps to match
+ * the gizmo - move, rotate or scale), drag to manipulate the target. Click objects to change the
+ * interact target. Press 1 for the translate gizmo, 2 for
  * rotate, 3 for scale, and R to toggle between world and local interact frames. Hold Ctrl while
  * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps, scale to quarter
  * steps. Press Escape while dragging to cancel, restoring the target to where the drag began.
@@ -313,10 +306,6 @@ public class InteractGizmoExample extends ExampleBase {
     manager = new InteractManager();
     manager.setupInput(_canvas, _physicalLayer, _logicalLayer);
 
-    // Show a move cursor while the mouse is over any gizmo handle (and during a drag). Set before
-    // constructing the gizmos so each wires it as its mouse-over callback (AbstractGizmo.DEFAULT_CURSOR).
-    AbstractGizmo.DEFAULT_CURSOR = buildMoveCursor();
-
     translateGizmo = new TranslateGizmo().withAllHandles();
     manager.addWidget(translateGizmo);
 
@@ -325,6 +314,14 @@ public class InteractGizmoExample extends ExampleBase {
 
     scaleGizmo = new ScaleGizmo().withAllHandles();
     manager.addWidget(scaleGizmo);
+
+    // Per-gizmo cursor feedback: while a handle is hovered (and during a drag) the cursor swaps to
+    // one matching that gizmo's manipulation, restored to the default on leave. SetCursorCallback is
+    // the shared mouse-over hook; setting AbstractGizmo.DEFAULT_CURSOR would give all gizmos one
+    // cursor instead.
+    translateGizmo.setMouseOverCallback(new SetCursorCallback(CursorFactory.move()));
+    rotateGizmo.setMouseOverCallback(new SetCursorCallback(CursorFactory.rotate()));
+    scaleGizmo.setMouseOverCallback(new SetCursorCallback(CursorFactory.scale()));
 
     // Each gizmo's drag readout is screen-space ui rendered with the ortho pass; only the active
     // gizmo shows its own while dragging.
@@ -398,43 +395,6 @@ public class InteractGizmoExample extends ExampleBase {
       angleSnap.setEnabled(true);
       scaleSnap.setEnabled(true);
     }
-  }
-
-  /**
-   * Build the shared "move" cursor shown while a gizmo handle is hovered: a filled white four-way
-   * arrow with a dark outline, drawn large enough to read clearly on any background (a thin
-   * outline-only cursor reads as a broken/missing pointer). The hotspot is the arrow's center.
-   */
-  private static MouseCursor buildMoveCursor() {
-    // 40px so it reads clearly; arrowheads kept well apart so the notches between arms stay open
-    // (a fatter shaft/heads would let the outline stroke close the gaps into a solid diamond).
-    final int size = 40, c = size / 2, r = 18, arrowBase = 12, headHalf = 6, shaftHalf = 3;
-    // The classic 24-vertex four-way arrow, centered, traced clockwise from the top tip.
-    final int[][] pts = {{0, -r}, {headHalf, -arrowBase}, {shaftHalf, -arrowBase}, {shaftHalf, -shaftHalf},
-        {arrowBase, -shaftHalf}, {arrowBase, -headHalf}, {r, 0}, {arrowBase, headHalf}, {arrowBase, shaftHalf},
-        {shaftHalf, shaftHalf}, {shaftHalf, arrowBase}, {headHalf, arrowBase}, {0, r}, {-headHalf, arrowBase},
-        {-shaftHalf, arrowBase}, {-shaftHalf, shaftHalf}, {-arrowBase, shaftHalf}, {-arrowBase, headHalf}, {-r, 0},
-        {-arrowBase, -headHalf}, {-arrowBase, -shaftHalf}, {-shaftHalf, -shaftHalf}, {-shaftHalf, -arrowBase},
-        {-headHalf, -arrowBase}};
-    final Path2D.Double path = new Path2D.Double();
-    path.moveTo(c + pts[0][0], c + pts[0][1]);
-    for (int i = 1; i < pts.length; i++) {
-      path.lineTo(c + pts[i][0], c + pts[i][1]);
-    }
-    path.closePath();
-
-    final BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-    final Graphics2D g = img.createGraphics();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setColor(Color.WHITE);
-    g.fill(path);
-    g.setStroke(new BasicStroke(2f));
-    g.setColor(new Color(0, 0, 0, 235));
-    g.draw(path);
-    g.dispose();
-
-    final Image image = AWTImageLoader.makeArdor3dImage(img, false);
-    return new MouseCursor("gizmoMove", image, c, c);
   }
 
   /**
