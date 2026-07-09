@@ -502,6 +502,10 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
   public void render(final Renderer renderer, final InteractManager manager) {
     final Spatial target = manager.getSpatialTarget();
     if (target == null) {
+      // No target, so the rest of render() (which shows/positions these) is skipped. The readout
+      // lives in the app's ortho root and would otherwise stay frozen on screen; hide both here.
+      hideReadout();
+      hideOriginGhost();
       return;
     }
 
@@ -563,6 +567,9 @@ public abstract class AbstractGizmo extends AbstractInteractWidget {
     final double above = _pixelSize * _appliedDpiScale + AbstractGizmo.READOUT_MARGIN;
     _readoutText.setTranslation(Math.round(screen.getX()), Math.round(screen.getY() + above), 0);
     _readoutText.getSceneHints().setCullHint(CullHint.Never);
+    // The readout is mutated here, outside the scene's normal update pass, then drawn by the app's
+    // ortho root - refresh its world transform now so it is not a frame stale (like _handle above).
+    _readoutText.updateGeometricState(0);
   }
 
   protected void hideReadout() {
