@@ -19,6 +19,7 @@ import com.ardor3d.editor.command.SetterCommand
 import com.ardor3d.editor.io.ModelImport
 import com.ardor3d.editor.util.Insertion
 import com.ardor3d.editor.util.SelectionUtil
+import com.ardor3d.editor.interact.GizmoReadoutFormat
 import com.ardor3d.editor.interact.GizmoUndoFilter
 import com.ardor3d.editor.menu.ShapeType
 import com.ardor3d.extension.interact.InteractManager
@@ -30,10 +31,10 @@ import com.ardor3d.extension.interact.widget.SetCursorCallback
 import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo
 import com.ardor3d.extension.interact.widget.gizmo.ScaleGizmo
 import com.ardor3d.extension.interact.widget.gizmo.TranslateGizmo
+import com.ardor3d.framework.Canvas
 import com.ardor3d.framework.Scene
 import com.ardor3d.framework.Updater
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer
-import com.ardor3d.framework.lwjgl3.awt.Lwjgl3AwtCanvas
 import com.ardor3d.image.util.awt.CursorFactory
 import com.ardor3d.input.PhysicalLayer
 import com.ardor3d.input.control.FirstPersonControl
@@ -54,6 +55,7 @@ import com.ardor3d.light.Light
 import com.ardor3d.light.PointLight
 import com.ardor3d.light.SpotLight
 import com.ardor3d.math.*
+import com.ardor3d.renderer.Camera
 import com.ardor3d.renderer.ContextManager
 import com.ardor3d.renderer.Renderer
 import com.ardor3d.renderer.queue.RenderBucketType
@@ -87,6 +89,12 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     private val overlayRoot = Node("EditorOverlay")
     private val gridNode = createGrid()
 
+    // Screen-space root + camera for the transform gizmos' drag readouts: an ExampleBase-style
+    // second pass drawn after the gizmo, so the numeric readout sits over the scene in pixel
+    // coordinates. The camera is created lazily once the canvas reports a real size.
+    private val orthoRoot = Node("EditorOrtho")
+    private var orthoCam: Camera? = null
+
     // One overlay gizmo per light in the document, refreshed on structure changes.
     private val lightGizmos = mutableMapOf<Light, Node>()
     private var lastStructureVersion = -1L
@@ -112,7 +120,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             }
         }
     var canvasRenderer: Lwjgl3CanvasRenderer? = null
-    var canvas: Lwjgl3AwtCanvas? = null
+    var canvas: Canvas? = null
     private var firstPersonControl: FirstPersonControl? = null
     private var initialized = false
     private var lastWidth = 0
@@ -124,6 +132,10 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     private var rotateGizmo: RotateGizmo? = null
     private var scaleGizmo: ScaleGizmo? = null
     private var lastTransformMode: TransformMode? = null
+
+    /** Test seam: the interact manager driving the gizmos, so the headless GL readout test can
+     * reach the active gizmo to script a drag. Not part of the editor's public surface. */
+    internal val interactManagerForTest: InteractManager? get() = interactManager
 
     // Reconciliation caches used by update() to notify the UI only on real changes.
     private var lastSelection: Spatial? = null
@@ -138,7 +150,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     /**
      * Sets up the interact manager and transform widgets.
      */
-    fun setupInteractManager(canvas: Lwjgl3AwtCanvas, physicalLayer: PhysicalLayer, logicalLayer: LogicalLayer) {
+    fun setupInteractManager(canvas: Canvas, physicalLayer: PhysicalLayer, logicalLayer: LogicalLayer) {
         val manager = InteractManager()
         interactManager = manager
         manager.setupInput(canvas, physicalLayer, logicalLayer)
@@ -154,6 +166,19 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         manager.addWidget(translate)
         manager.addWidget(rotate)
         manager.addWidget(scale)
+
+        // The drag readout is screen-space UI: each gizmo positions and fills its own BasicText,
+        // which lives in the editor's ortho root and is drawn in the second pass (see render()).
+        orthoRoot.attachChild(translate.readout)
+        orthoRoot.attachChild(rotate.readout)
+        orthoRoot.attachChild(scale.readout)
+
+        // Axis-aware readout text: name the axis (or axes) the active handle manipulates so the
+        // value is unambiguous without relying on the red/green/blue = X/Y/Z coloring. Wired through
+        // the gizmos' own formatter hooks, so no gizmo-library change is needed.
+        translate.setReadoutFormatter { delta, _, _ -> GizmoReadoutFormat.translate(delta, translate.activeHandle?.part) }
+        rotate.setReadoutFormatter { angleRadians, _ -> GizmoReadoutFormat.rotate(angleRadians, rotate.activeHandle?.part) }
+        scale.setReadoutFormatter { factor, _ -> GizmoReadoutFormat.scale(factor, scale.activeHandle?.part) }
 
         // Per-gizmo cursor feedback: the cursor swaps to match the hovered or dragged gizmo.
         translate.setMouseOverCallback(SetCursorCallback(CursorFactory.move()))
@@ -370,6 +395,9 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             node.setRenderState(zBuffer)
             node.sceneHints.renderBucketType = RenderBucketType.Opaque
         }
+
+        // The screen-space readout root draws in pixel order (no depth), like any HUD overlay.
+        orthoRoot.sceneHints.renderBucketType = RenderBucketType.OrthoOrder
 
         // Editor overlay: grid (light gizmos are added per light as the scene changes)
         gridNode.sceneHints.setPickingHint(PickingHint.Pickable, false)
@@ -907,6 +935,20 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         renderer.renderBuckets()
         interactManager?.render(renderer)
 
+        // Screen-space pass: the active gizmo's drag readout lives in the ortho root. Draw it after
+        // the gizmo in pixel coordinates, then restore the perspective camera. This is the
+        // ExampleBase.renderExample ortho pattern. The ortho camera is created lazily once the
+        // canvas reports a real size; its own resize listener keeps it in sync thereafter.
+        if (orthoCam == null && cvs != null && cvs.contentWidth > 0 && cvs.contentHeight > 0) {
+            orthoCam = Camera.newOrthoCamera(cvs)
+        }
+        orthoCam?.let { oc ->
+            oc.apply(renderer)
+            renderer.draw(orthoRoot)
+            renderer.renderBuckets()
+            camera?.apply(renderer)
+        }
+
         return true
     }
 
@@ -974,9 +1016,10 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 if (light.sceneHints.cullHint == CullHint.Always) CullHint.Always else CullHint.Inherit
         }
 
-        // Update geometric state for the document and the editor overlay
+        // Update geometric state for the document, the editor overlay, and the readout root
         root.updateGeometricState(timer.timePerFrame, true)
         overlayRoot.updateGeometricState(timer.timePerFrame, true)
+        orthoRoot.updateGeometricState(timer.timePerFrame, true)
 
         // Status bar FPS, refreshed twice a second
         fpsAccumulatedTime += timer.timePerFrame
