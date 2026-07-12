@@ -54,8 +54,17 @@ public class GizmoHandle {
   /** Stroke widths as authored, in pixels, so they can be rescaled for display DPI. */
   protected final Map<Line, Float> _baseLineWidths = new IdentityHashMap<>();
 
+  /** The scale last pushed to the strokes, so the per-frame width update only writes on change. */
+  protected float _appliedLineWidthScale = Float.NaN;
+
   /** Most recently calculated view-angle fade, applied as an alpha multiplier. */
   protected double _fadeAlpha = 1.0;
+
+  /**
+   * Eased hover-highlight amount in [0, 1]: 0 at rest, 1 fully highlighted. The owning gizmo eases
+   * this toward its target each frame and uses it to lerp the handle's color and pop its scale.
+   */
+  protected double _highlight = 0.0;
 
   /**
    * @param part
@@ -117,9 +126,14 @@ public class GizmoHandle {
 
   /**
    * Rescale this handle's stroke widths, multiplying each stroke's authored pixel width - used to
-   * match the display's DPI scale.
+   * match the display's DPI scale and to thicken the strokes on hover. Cheap to call every frame:
+   * it only writes when the scale actually changes.
    */
   public void applyLineWidthScale(final float scale) {
+    if (scale == _appliedLineWidthScale) {
+      return;
+    }
+    _appliedLineWidthScale = scale;
     for (final Map.Entry<Line, Float> entry : _baseLineWidths.entrySet()) {
       entry.getKey().setLineWidth(entry.getValue().floatValue() * scale);
     }
@@ -142,6 +156,10 @@ public class GizmoHandle {
   public double getFadeAlpha() { return _fadeAlpha; }
 
   public void setFadeAlpha(final double alpha) { _fadeAlpha = alpha; }
+
+  public double getHighlight() { return _highlight; }
+
+  public void setHighlight(final double highlight) { _highlight = highlight; }
 
   public List<Mesh> getMeshes() { return _meshes; }
 }

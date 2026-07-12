@@ -27,12 +27,15 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.interact.InteractManager;
 import com.ardor3d.extension.interact.filter.AngleSnapFilter;
 import com.ardor3d.extension.interact.filter.GridSnapFilter;
+import com.ardor3d.extension.interact.filter.ScaleSnapFilter;
 import com.ardor3d.extension.interact.widget.InteractMatrix;
+import com.ardor3d.extension.interact.widget.SetCursorCallback;
 import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.ScaleGizmo;
 import com.ardor3d.extension.interact.widget.gizmo.TranslateGizmo;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.util.awt.CursorFactory;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.character.CharacterInputState;
 import com.ardor3d.input.controller.ControllerState;
@@ -71,10 +74,13 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * Showcases the v2 interact gizmos. Hover a handle to highlight it, drag to manipulate the
- * target. Click objects to change the interact target. Press 1 for the translate gizmo, 2 for
+ * Showcases the v2 interact gizmos. Hover a handle to highlight it (the cursor also swaps to match
+ * the gizmo - move, rotate or scale), drag to manipulate the target. Click objects to change the
+ * interact target. Press 1 for the translate gizmo, 2 for
  * rotate, 3 for scale, and R to toggle between world and local interact frames. Hold Ctrl while
- * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps.
+ * dragging to snap: translation to a 1-unit grid, rotation to 15 degree steps, scale to quarter
+ * steps. Press Escape while dragging to cancel, restoring the target to where the drag began.
+ * Press U to toggle the rotate angle readout between degrees and radians.
  *
  * For unattended verification, -Dgizmo.shot=path skips the settings dialog, grabs a frame to the
  * given PNG once the scene has settled, prints a summary of gizmo-colored pixels and exits.
@@ -82,7 +88,8 @@ import com.ardor3d.util.TextureManager;
  * fading); -Dgizmo.hover=x simulates the mouse resting on the +X arrow (to check highlighting);
  * -Dgizmo.widget=rotate starts with the rotate gizmo active; -Dgizmo.drag=ringx simulates a slow
  * drag around the X ring (to check the pie wedge and angle readout); -Dgizmo.drag=scalex simulates
- * pulling the +X scale cube outward (to check the shaft stretch).
+ * pulling the +X scale cube outward (to check the shaft stretch); -Dgizmo.drag=movex simulates
+ * dragging the +X translate arrow (to check the origin ghost and translate snap ticks).
  */
 @Purpose(
     htmlDescriptionKey = "com.ardor3d.example.interact.InteractGizmoExample", //
@@ -130,6 +137,9 @@ public class InteractGizmoExample extends ExampleBase {
       // (absent) mouse each update.
       simulateHoverOnXArrow();
     }
+    if (shot != null && _frames >= 20 && "movex".equals(System.getProperty("gizmo.drag"))) {
+      simulateDragOnXTranslate();
+    }
     if (shot != null && _frames >= 20 && "ringx".equals(System.getProperty("gizmo.drag"))) {
       simulateDragOnXRing();
     }
@@ -163,6 +173,42 @@ public class InteractGizmoExample extends ExampleBase {
   // Shared by both drag simulators, but only one runs per probe JVM (selected by -Dgizmo.drag),
   // so it carries the previous frame's mouse for whichever drag is active with no cross-talk.
   private MouseState _lastDragMouse = null;
+
+  /**
+   * Feed the translate gizmo a synthetic left-button drag that slides the +X arrow outward, driving
+   * the full processInput path so a screenshot run can verify the origin ghost and translate snap
+   * ticks (the target's origin moves, so the ghost anchors at the start point).
+   */
+  private void simulateDragOnXTranslate() {
+    final Camera cam = _canvas.getCanvasRenderer().getCamera();
+    final Spatial target = manager.getSpatialTarget();
+    final ReadOnlyVector3 origin = target.getWorldTranslation();
+    final double scale = translateGizmo.getHandle().getScale().getX();
+
+    // Grab mid-shaft on the +X arrow and slide the grab point along the axis a bit more each frame,
+    // pulling the target along X. The target is unrotated in this scene, so its local X is world X.
+    final double alongX = (0.6 + (_frames - 20) * 0.05) * scale;
+    final Vector3 onAxis = new Vector3(alongX, origin.getY(), origin.getZ());
+    final Vector3 screen = cam.getScreenCoordinates(onAxis);
+
+    final EnumMap<MouseButton, ButtonState> buttons = new EnumMap<>(MouseButton.class);
+    buttons.put(MouseButton.LEFT, ButtonState.DOWN);
+    // First frame: previous state has the button up at the same spot, starting the drag there.
+    final MouseState previous = _lastDragMouse != null ? _lastDragMouse
+        : new MouseState((int) screen.getX(), (int) screen.getY(), 0, 0, 0, null, null);
+    final MouseState current = new MouseState((int) screen.getX(), (int) screen.getY(),
+        (int) screen.getX() - previous.getX(), (int) screen.getY() - previous.getY(), 0, buttons, null);
+    _lastDragMouse = current;
+
+    final InputState previousState = new InputState(KeyboardState.NOTHING, previous, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+    final InputState currentState = new InputState(KeyboardState.NOTHING, current, ControllerState.NOTHING,
+        GestureState.NOTHING, CharacterInputState.NOTHING);
+
+    translateGizmo.processInput(_canvas, new TwoInputStates(previousState, currentState), new AtomicBoolean(false),
+        manager);
+    manager.getSpatialState().applyState(target);
+  }
 
   /**
    * Feed the rotate gizmo a synthetic left-button drag that walks around the X ring, driving the
@@ -265,11 +311,23 @@ public class InteractGizmoExample extends ExampleBase {
 
     rotateGizmo = new RotateGizmo().withAllHandles();
     manager.addWidget(rotateGizmo);
-    // the angle readout is screen-space ui - it renders with the ortho pass
-    _orthoRoot.attachChild(rotateGizmo.getAngleReadout());
 
     scaleGizmo = new ScaleGizmo().withAllHandles();
     manager.addWidget(scaleGizmo);
+
+    // Per-gizmo cursor feedback: while a handle is hovered (and during a drag) the cursor swaps to
+    // one matching that gizmo's manipulation, restored to the default on leave. SetCursorCallback is
+    // the shared mouse-over hook; setting AbstractGizmo.DEFAULT_CURSOR would give all gizmos one
+    // cursor instead.
+    translateGizmo.setMouseOverCallback(new SetCursorCallback(CursorFactory.move()));
+    rotateGizmo.setMouseOverCallback(new SetCursorCallback(CursorFactory.rotate()));
+    scaleGizmo.setMouseOverCallback(new SetCursorCallback(CursorFactory.scale()));
+
+    // Each gizmo's drag readout is screen-space ui rendered with the ortho pass; only the active
+    // gizmo shows its own while dragging.
+    _orthoRoot.attachChild(translateGizmo.getReadout());
+    _orthoRoot.attachChild(rotateGizmo.getReadout());
+    _orthoRoot.attachChild(scaleGizmo.getReadout());
 
     // Drag simulations drive their gizmo directly; it must also be the active widget or the
     // manager would render a different gizmo than the one being dragged.
@@ -302,27 +360,40 @@ public class InteractGizmoExample extends ExampleBase {
           manager.fireTargetDataUpdated();
         }));
 
-    // hold Ctrl to snap: translate to a 1-unit grid, rotate to 15 degree steps
+    // toggle the rotate angle readout between the built-in degrees text and a radians formatter,
+    // demonstrating the readout formatter callback
+    manager.getLogicalLayer()
+        .registerTrigger(new InputTrigger(new KeyPressedCondition(Key.U),
+            (source, inputStates, tpf) -> rotateGizmo.setReadoutFormatter(rotateGizmo.getReadoutFormatter() == null
+                ? (angleRadians, m) -> String.format("%.3f rad", angleRadians) : null)));
+
+    // hold Ctrl to snap: translate to a 1-unit grid, rotate to 15 degree steps, scale to quarters
     final GridSnapFilter gridSnap = new GridSnapFilter(1.0);
     gridSnap.setEnabled(false);
     translateGizmo.addFilter(gridSnap);
     final AngleSnapFilter angleSnap = new AngleSnapFilter(15 * MathUtils.DEG_TO_RAD);
     angleSnap.setEnabled(false);
     rotateGizmo.addFilter(angleSnap);
+    final ScaleSnapFilter scaleSnap = new ScaleSnapFilter(0.25);
+    scaleSnap.setEnabled(false);
+    scaleGizmo.addFilter(scaleSnap);
     manager.getLogicalLayer()
         .registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT_CONTROL), (source, inputStates, tpf) -> {
           gridSnap.setEnabled(true);
           angleSnap.setEnabled(true);
+          scaleSnap.setEnabled(true);
         }));
     manager.getLogicalLayer()
         .registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LEFT_CONTROL), (source, inputStates, tpf) -> {
           gridSnap.setEnabled(false);
           angleSnap.setEnabled(false);
+          scaleSnap.setEnabled(false);
         }));
     if (System.getProperty("gizmo.snap") != null) {
       // Simulated-drag screenshot runs mute real input, so Ctrl can't reach the triggers.
       gridSnap.setEnabled(true);
       angleSnap.setEnabled(true);
+      scaleSnap.setEnabled(true);
     }
   }
 
@@ -461,9 +532,11 @@ public class InteractGizmoExample extends ExampleBase {
       final double targetAngle =
           new Quaternion().fromRotationMatrix(manager.getSpatialTarget().getRotation()).toAngleAxis(new Vector3());
       System.out.println("GIZMO dragAngle=" + rotateGizmo.getDragAngle() + " text='"
-          + rotateGizmo.getAngleReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
+          + rotateGizmo.getReadout().getText() + "' targetAngleDeg=" + targetAngle * MathUtils.RAD_TO_DEG);
     } else if ("scalex".equals(System.getProperty("gizmo.drag"))) {
       System.out.println("GIZMO targetScaleX=" + manager.getSpatialTarget().getScale().getX());
+    } else if ("movex".equals(System.getProperty("gizmo.drag"))) {
+      System.out.println("GIZMO targetTranslateX=" + manager.getSpatialTarget().getTranslation().getX());
     }
 
     try {

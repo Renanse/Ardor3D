@@ -193,4 +193,53 @@ public class GizmoMathTest {
     assertEquals(1.0, GizmoMath.fadeAlpha(full, hide, full), EPS);
     assertEquals(1.0, GizmoMath.fadeAlpha(MathUtils.HALF_PI, hide, full), EPS);
   }
+
+  // --- approach ---
+
+  @Test
+  public void testApproachSnapsWhenTauNonPositive() {
+    assertEquals(5.0, GizmoMath.approach(2.0, 5.0, 0.016, 0.0), EPS);
+    assertEquals(5.0, GizmoMath.approach(2.0, 5.0, 0.016, -1.0), EPS);
+  }
+
+  @Test
+  public void testApproachUnchangedWhenNoTimePasses() {
+    assertEquals(2.0, GizmoMath.approach(2.0, 5.0, 0.0, 0.05), EPS);
+    assertEquals(2.0, GizmoMath.approach(2.0, 5.0, -0.01, 0.05), EPS);
+  }
+
+  @Test
+  public void testApproachCoversOneMinusInverseEAfterOneTau() {
+    // After dt == tau, exactly (1 - 1/e) of the gap toward the target is covered.
+    assertEquals(1.0 - 1.0 / Math.E, GizmoMath.approach(0.0, 1.0, 0.05, 0.05), 1e-12);
+  }
+
+  @Test
+  public void testApproachConvergesMonotonicallyWithoutOvershoot() {
+    double v = 0.0;
+    for (int i = 0; i < 100; i++) {
+      final double next = GizmoMath.approach(v, 1.0, 0.016, 0.05);
+      assertTrue("must not overshoot the target", next <= 1.0 + EPS);
+      assertTrue("must move toward the target", next >= v);
+      v = next;
+    }
+    assertEquals("should be nearly converged after ~1.6s at tau=0.05", 1.0, v, 1e-6);
+  }
+
+  @Test
+  public void testApproachIsSymmetricDecreasing() {
+    // Falling toward a target mirrors rising toward it.
+    final double up = GizmoMath.approach(0.0, 1.0, 0.05, 0.05);
+    final double down = GizmoMath.approach(1.0, 0.0, 0.05, 0.05);
+    assertEquals(up, 1.0 - down, 1e-12);
+  }
+
+  @Test
+  public void testApproachIsFrameRateIndependent() {
+    // One step of 0.1s lands where two steps of 0.05s do - exponential smoothing composes.
+    final double oneBig = GizmoMath.approach(0.0, 1.0, 0.1, 0.05);
+    double two = GizmoMath.approach(0.0, 1.0, 0.05, 0.05);
+    two = GizmoMath.approach(two, 1.0, 0.05, 0.05);
+    assertEquals(oneBig, two, 1e-12);
+  }
 }
