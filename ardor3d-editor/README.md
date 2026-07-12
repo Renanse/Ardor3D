@@ -40,7 +40,8 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   edits to every selected mesh, and light edits to every selected light - each gesture is one
   merged undo step. Transform fields show a dash where the selection disagrees.
 - **Viewport** — WASD + drag fly camera, mouse-wheel dolly, primitive-accurate click selection,
-  interact-widget gizmos for translate/rotate/scale, per-light overlay gizmos, reference grid.
+  v2 transform gizmos for translate/rotate/scale (eased hover highlight, per-gizmo cursors,
+  Ctrl-snap, Escape to cancel a drag), per-light overlay gizmos, reference grid.
 - **Undo/redo everywhere** — every mutation goes through a command stack
   (`com.ardor3d.editor.command`). Continuous gestures (slider drags, typing, gizmo drags)
   coalesce into single undo steps. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`.
@@ -59,6 +60,8 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 | Key | Action |
 | --- | --- |
 | `1` / `2` / `3` | Translate / Rotate / Scale mode (viewport focused) |
+| `R` | Toggle world / local gizmo frame (viewport focused) |
+| `Ctrl` (hold while dragging a gizmo) | Snap: translate to 1 unit, rotate to 15°, scale to ¼ |
 | `F` | Frame selection (viewport focused) |
 | `Delete` | Delete selection (viewport focused) |
 | `Escape` | Clear selection (viewport focused) |
@@ -104,7 +107,6 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   there, unlike the transform fields).
 - Window-wide shortcuts (Ctrl+Z/D/N/O/S) fire even while a text field has focus — same seam as
   the pre-existing undo/redo binding; Compose offers no clean focus check at the Window level.
-- Scale gizmo is uniform-only (`SimpleScaleWidget`).
 - Rotation is edited as XYZ Euler angles. The inspector keeps the angles you type (even at the
   attitude ±90° singularity, where the decomposition isn't unique) and only re-derives them from
   the matrix after a gizmo drag or undo — after one of those, an equivalent-but-different

@@ -22,18 +22,26 @@ import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.interact.GizmoUndoFilter
 import com.ardor3d.editor.menu.ShapeType
 import com.ardor3d.extension.interact.InteractManager
-import com.ardor3d.extension.interact.widget.MoveWidget
-import com.ardor3d.extension.interact.widget.RotateWidget
-import com.ardor3d.extension.interact.widget.SimpleScaleWidget
+import com.ardor3d.extension.interact.filter.AngleSnapFilter
+import com.ardor3d.extension.interact.filter.GridSnapFilter
+import com.ardor3d.extension.interact.filter.ScaleSnapFilter
+import com.ardor3d.extension.interact.widget.InteractMatrix
+import com.ardor3d.extension.interact.widget.SetCursorCallback
+import com.ardor3d.extension.interact.widget.gizmo.RotateGizmo
+import com.ardor3d.extension.interact.widget.gizmo.ScaleGizmo
+import com.ardor3d.extension.interact.widget.gizmo.TranslateGizmo
 import com.ardor3d.framework.Scene
 import com.ardor3d.framework.Updater
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer
 import com.ardor3d.framework.lwjgl3.awt.Lwjgl3AwtCanvas
+import com.ardor3d.image.util.awt.CursorFactory
 import com.ardor3d.input.PhysicalLayer
 import com.ardor3d.input.control.FirstPersonControl
 import com.ardor3d.input.keyboard.Key as ArdorKey
 import com.ardor3d.input.logical.InputTrigger
+import com.ardor3d.input.logical.KeyHeldCondition
 import com.ardor3d.input.logical.KeyPressedCondition
+import com.ardor3d.input.logical.KeyReleasedCondition
 import com.ardor3d.input.logical.LogicalLayer
 import com.ardor3d.input.logical.MouseButtonClickedCondition
 import com.ardor3d.input.logical.MouseWheelMovedCondition
@@ -109,11 +117,11 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     private var lastWidth = 0
     private var lastHeight = 0
 
-    // Interact manager and widgets for transform gizmos
+    // Interact manager and v2 transform gizmos
     private var interactManager: InteractManager? = null
-    private var moveWidget: MoveWidget? = null
-    private var rotateWidget: RotateWidget? = null
-    private var scaleWidget: SimpleScaleWidget? = null
+    private var translateGizmo: TranslateGizmo? = null
+    private var rotateGizmo: RotateGizmo? = null
+    private var scaleGizmo: ScaleGizmo? = null
     private var lastTransformMode: TransformMode? = null
 
     // Reconciliation caches used by update() to notify the UI only on real changes.
@@ -130,21 +138,56 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
      * Sets up the interact manager and transform widgets.
      */
     fun setupInteractManager(canvas: Lwjgl3AwtCanvas, physicalLayer: PhysicalLayer, logicalLayer: LogicalLayer) {
-        interactManager = InteractManager()
-        interactManager?.setupInput(canvas, physicalLayer, logicalLayer)
+        val manager = InteractManager()
+        interactManager = manager
+        manager.setupInput(canvas, physicalLayer, logicalLayer)
 
-        // Create transform widgets
-        moveWidget = MoveWidget().withXAxis().withYAxis().withZAxis()
-        rotateWidget = RotateWidget().withXAxis().withYAxis().withZAxis()
-        // SimpleScaleWidget only supports one axis - use Y for uniform scaling
-        scaleWidget = SimpleScaleWidget().withArrow(Vector3.UNIT_Y, ColorRGBA(0f, 1f, 0f, 0.65f))
+        // v2 transform gizmos, each with its full handle set. The scale gizmo drives all three
+        // axes (the old SimpleScaleWidget was uniform-Y only).
+        val translate = TranslateGizmo().withAllHandles()
+        val rotate = RotateGizmo().withAllHandles()
+        val scale = ScaleGizmo().withAllHandles()
+        translateGizmo = translate
+        rotateGizmo = rotate
+        scaleGizmo = scale
+        manager.addWidget(translate)
+        manager.addWidget(rotate)
+        manager.addWidget(scale)
 
-        interactManager?.addWidget(moveWidget)
-        interactManager?.addWidget(rotateWidget)
-        interactManager?.addWidget(scaleWidget)
+        // Per-gizmo cursor feedback: the cursor swaps to match the hovered or dragged gizmo.
+        translate.setMouseOverCallback(SetCursorCallback(CursorFactory.move()))
+        rotate.setMouseOverCallback(SetCursorCallback(CursorFactory.rotate()))
+        scale.setMouseOverCallback(SetCursorCallback(CursorFactory.scale()))
+
+        // Hold Ctrl to snap: translate to a 1-unit grid, rotate to 15-degree steps, scale to
+        // quarter steps. The filters are registered disabled and toggled by the Ctrl held/released
+        // triggers below, on the manager's own logical layer so they still fire mid-drag.
+        val gridSnap = GridSnapFilter(1.0).apply { isEnabled = false }
+        val angleSnap = AngleSnapFilter(Math.toRadians(15.0)).apply { isEnabled = false }
+        val scaleSnap = ScaleSnapFilter(0.25).apply { isEnabled = false }
+        translate.addFilter(gridSnap)
+        rotate.addFilter(angleSnap)
+        scale.addFilter(scaleSnap)
+        val setSnap = { enabled: Boolean ->
+            gridSnap.isEnabled = enabled
+            angleSnap.isEnabled = enabled
+            scaleSnap.isEnabled = enabled
+        }
+        manager.logicalLayer.registerTrigger(
+            InputTrigger(KeyHeldCondition(ArdorKey.LEFT_CONTROL)) { _, _, _ -> setSnap(true) })
+        manager.logicalLayer.registerTrigger(
+            InputTrigger(KeyReleasedCondition(ArdorKey.LEFT_CONTROL)) { _, _, _ -> setSnap(false) })
+
+        // R toggles the world/local interact frame (the scale gizmo is always local).
+        manager.logicalLayer.registerTrigger(InputTrigger(KeyPressedCondition(ArdorKey.R)) { _, _, _ ->
+            val next = if (translate.interactMatrix == InteractMatrix.World) InteractMatrix.Local else InteractMatrix.World
+            translate.interactMatrix = next
+            rotate.interactMatrix = next
+            manager.fireTargetDataUpdated()
+        })
 
         // Record completed gizmo drags in the undo history
-        interactManager?.addFilterToWidgets(GizmoUndoFilter(editorState))
+        manager.addFilterToWidgets(GizmoUndoFilter(editorState))
 
         // Set default widget based on editor state
         updateActiveWidget()
@@ -155,9 +198,9 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
      */
     fun updateActiveWidget() {
         val widget = when (editorState.transformMode) {
-            TransformMode.TRANSLATE -> moveWidget
-            TransformMode.ROTATE -> rotateWidget
-            TransformMode.SCALE -> scaleWidget
+            TransformMode.TRANSLATE -> translateGizmo
+            TransformMode.ROTATE -> rotateGizmo
+            TransformMode.SCALE -> scaleGizmo
         }
         interactManager?.setActiveWidget(widget)
     }
