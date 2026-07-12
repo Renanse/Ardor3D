@@ -94,7 +94,7 @@ public class RotateGizmo extends AbstractGizmo {
 
   protected GizmoHandle _viewRingHandle;
 
-  protected final Quaternion _calcQuat = new Quaternion();
+  // _calcQuat is the shared scratch quaternion from AbstractGizmo.
   protected final Matrix3 _calcMat3 = new Matrix3();
   protected final Matrix3 _calcMat3B = new Matrix3();
 

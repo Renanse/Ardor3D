@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -102,6 +104,27 @@ public class GizmoReadoutTest {
     final String moved = _gizmo.readout(_manager);
     assertNotNull(moved);
     assertNotEquals("readout tracks the moving target", atStart, moved);
+  }
+
+  @Test
+  public void testBuiltInReadoutIsLocaleIndependent() {
+    // The built-in delta text uses ", " between components, so a comma-decimal locale must not turn
+    // the decimals into commas and collide with the delimiters. Formatting is pinned to a fixed
+    // locale, so the output stays dot-decimal whatever the JVM default is.
+    final Locale previous = Locale.getDefault();
+    try {
+      Locale.setDefault(Locale.GERMANY); // comma as the decimal separator
+      _gizmo.seedDrag(new Vector2(50, 50), _camera, _manager);
+      _target.setTranslation(6.5, 2, -3); // dx = 1.5 from the (5, 2, -3) start
+      _target.updateGeometricState(0);
+
+      final String readout = _gizmo.readout(_manager);
+      assertTrue("built-in readout should use dot decimals regardless of locale: " + readout,
+          readout.contains("+1.50"));
+      assertEquals("exactly two component delimiters", 2, readout.chars().filter(c -> c == ',').count());
+    } finally {
+      Locale.setDefault(previous);
+    }
   }
 
   @Test

@@ -307,6 +307,25 @@ public class SnapFilterTest {
   }
 
   @Test
+  public void testScaleSnapSurvivesZeroTargetScale() {
+    // A degenerate target scale of 0 on an axis would divide to Infinity and poison the running
+    // per-axis factor; the guard keeps it finite. (Asserted on _accumulated - where the poison
+    // lands - since the axis' output is 0 either way; this test shares the filter's package.)
+    startScale(0, 1, 1);
+    final ScaleSnapFilter filter = new ScaleSnapFilter(0.25);
+    filter.beginDrag(_manager, _widget, null);
+
+    _manager.getSpatialState().getTransform().setScale(0.001, 2.0, 1); // X clamped off 0; Y grown 2x
+    filter.applyFilter(_manager, _widget);
+
+    assertTrue("a zero target scale must not poison the accumulated factor",
+        Double.isFinite(filter._accumulated.getX()) && Double.isFinite(filter._accumulated.getY())
+            && Double.isFinite(filter._accumulated.getZ()));
+    assertEquals("the touched axis still snaps", 2.0,
+        _manager.getSpatialState().getTransform().getScale().getY(), EPS);
+  }
+
+  @Test
   public void testScaleSnapFloorsAtOneStep() {
     // Shrinking below half a step would round the factor to zero; it floors at one step instead.
     startScale(1, 1, 1);

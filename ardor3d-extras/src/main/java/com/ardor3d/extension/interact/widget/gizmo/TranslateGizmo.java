@@ -11,6 +11,7 @@
 package com.ardor3d.extension.interact.widget.gizmo;
 
 import java.nio.FloatBuffer;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.buffer.BufferUtils;
@@ -80,8 +81,6 @@ public class TranslateGizmo extends AbstractGizmo {
   public static final double SNAP_TICK_FULL_SCREEN_SPACING = 24;
 
   protected GizmoHandle _centerHandle;
-
-  protected final Quaternion _calcQuat = new Quaternion();
 
   /** Snap tick crossbars along the active axis, shown while a snapping axis drag is active. */
   protected final Mesh _snapTicks;
@@ -388,8 +387,10 @@ public class TranslateGizmo extends AbstractGizmo {
     if (_readoutFormatter != null) {
       return _readoutFormatter.format(new Vector3(dx, dy, dz), now, manager);
     }
-    // Built-in: signed delta from where the drag began (ASCII; the signs read as a delta).
-    return String.format("%+.2f, %+.2f, %+.2f", dx, dy, dz);
+    // Built-in: signed delta from where the drag began (ASCII; the signs read as a delta). Format
+    // with a fixed locale: this readout uses ", " to separate the components, so a comma-decimal
+    // locale would collide the decimal and the delimiter into an unreadable string.
+    return String.format(Locale.ROOT, "%+.2f, %+.2f, %+.2f", dx, dy, dz);
   }
 
   public ReadoutFormatter getReadoutFormatter() { return _readoutFormatter; }

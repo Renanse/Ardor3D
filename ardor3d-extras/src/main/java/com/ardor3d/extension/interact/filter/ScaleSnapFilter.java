@@ -72,8 +72,8 @@ public class ScaleSnapFilter extends UpdateFilterAdapter implements SnapSource {
     // has not yet updated this cycle. Fold it into the running per-axis total.
     final ReadOnlyVector3 target = manager.getSpatialTarget().getTransform().getScale();
     final ReadOnlyVector3 current = state.getTransform().getScale();
-    _accumulated.multiplyLocal(current.getX() / target.getX(), current.getY() / target.getY(),
-        current.getZ() / target.getZ());
+    _accumulated.multiplyLocal(ratio(current.getX(), target.getX()), ratio(current.getY(), target.getY()),
+        ratio(current.getZ(), target.getZ()));
 
     if (!_enabled || _snapStep <= 0) {
       return;
@@ -86,10 +86,18 @@ public class ScaleSnapFilter extends UpdateFilterAdapter implements SnapSource {
         snap(_accumulated.getZ(), _startScale.getZ(), current.getZ()));
   }
 
+  /** This event's raw factor for one axis, guarding a zero (degenerate) target scale that would
+   * otherwise poison the running total with NaN/Infinity. */
+  private static double ratio(final double current, final double target) {
+    return target != 0.0 ? current / target : 1.0;
+  }
+
   /**
    * Snap one axis: if the drag has changed this axis' factor, round it to the nearest step (floored
    * at one step so it never collapses to zero) and apply it to the start scale; otherwise leave the
-   * axis at the value the widget already left in the state.
+   * axis at the value the widget already left in the state. Assumes a positive factor - the interact
+   * widgets floor scale at a small positive minimum, so factors are always positive; a negative
+   * factor would be forced positive by the one-step floor.
    */
   protected double snap(final double factor, final double startScale, final double unsnapped) {
     if (Math.abs(factor - 1.0) <= MathUtils.ZERO_TOLERANCE) {
