@@ -888,9 +888,6 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         renderer.draw(root)
         renderer.draw(overlayRoot)
 
-        // Render interact widgets (transform gizmos)
-        interactManager?.render(renderer)
-
         // Draw selection highlight (bounding box) for selected objects. The gizmo target
         // already has a widget on it, so skip its bounds.
         val gizmoTarget = interactManager?.spatialTarget
@@ -899,6 +896,16 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 Debugger.drawBounds(selected, renderer, false)
             }
         }
+
+        // Flush the scene + bounds so their depth is in the buffer before the gizmo draws.
+        // draw() only queues into render buckets (nothing rasterizes until renderBuckets/
+        // flushFrame), but the gizmo handles are Skip-bucket and render immediately - so without
+        // this flush the gizmo would draw against an empty depth buffer and then be painted over
+        // by the deferred scene flush (the occlusion we started with). With the scene depth
+        // present, the gizmo's own two-pass x-ray shows its occluded parts ghosted (dimmed) and
+        // its front parts at full strength, instead of being hidden.
+        renderer.renderBuckets()
+        interactManager?.render(renderer)
 
         return true
     }
