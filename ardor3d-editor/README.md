@@ -51,7 +51,8 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   point/directional/spot lights. New objects are created under the selected Node (or the scene
   root).
 - **Visibility** — per-row eye toggle in the hierarchy hides/shows a subtree (undoable). Hidden
-  objects are culled and unpickable, so viewport clicks pass through them.
+  objects are culled and unpickable, so viewport clicks pass through them, and every light in the
+  hidden subtree is disabled so it stops illuminating the scene (restored on show/undo).
 
 ### Keyboard shortcuts
 
@@ -103,8 +104,6 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   there, unlike the transform fields).
 - Window-wide shortcuts (Ctrl+Z/D/N/O/S) fire even while a text field has focus — same seam as
   the pre-existing undo/redo binding; Compose offers no clean focus check at the Window level.
-- Hiding a Node disables only lights hidden *directly*; lights nested inside a hidden subtree
-  keep illuminating (the engine collects lights regardless of cull state).
 - Scale gizmo is uniform-only (`SimpleScaleWidget`).
 - Rotation is edited as XYZ Euler angles. The inspector keeps the angles you type (even at the
   attitude ±90° singularity, where the decomposition isn't unique) and only re-derives them from
