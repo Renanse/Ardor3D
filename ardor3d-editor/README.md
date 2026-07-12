@@ -61,7 +61,7 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 | --- | --- |
 | `1` / `2` / `3` | Translate / Rotate / Scale mode (viewport focused) |
 | `R` | Toggle world / local gizmo frame (viewport focused) |
-| `Ctrl` (hold while dragging a gizmo) | Snap: translate to 1 unit, rotate to 15°, scale to ¼ |
+| `Ctrl` / `Cmd` (hold while dragging a gizmo) | Snap: translate to 1 unit, rotate to 15°, scale to ¼ |
 | `F` | Frame selection (viewport focused) |
 | `Delete` | Delete selection (viewport focused) |
 | `Escape` | Clear selection (viewport focused) |

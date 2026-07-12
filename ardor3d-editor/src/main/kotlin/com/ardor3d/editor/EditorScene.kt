@@ -45,6 +45,7 @@ import com.ardor3d.input.logical.KeyReleasedCondition
 import com.ardor3d.input.logical.LogicalLayer
 import com.ardor3d.input.logical.MouseButtonClickedCondition
 import com.ardor3d.input.logical.MouseWheelMovedCondition
+import com.ardor3d.input.logical.TwoInputStates
 import com.ardor3d.input.mouse.MouseButton
 import com.ardor3d.intersection.PickingUtil
 import com.ardor3d.intersection.PrimitivePickResults
@@ -159,24 +160,27 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         rotate.setMouseOverCallback(SetCursorCallback(CursorFactory.rotate()))
         scale.setMouseOverCallback(SetCursorCallback(CursorFactory.scale()))
 
-        // Hold Ctrl to snap: translate to a 1-unit grid, rotate to 15-degree steps, scale to
-        // quarter steps. The filters are registered disabled and toggled by the Ctrl held/released
-        // triggers below, on the manager's own logical layer so they still fire mid-drag.
+        // Hold Ctrl/Cmd to snap: translate to a 1-unit grid, rotate to 15-degree steps, scale to
+        // quarter steps. Snap tracks whether any Ctrl/Meta key is down - matching the editor's
+        // selection modifier (setupPickingTrigger) and staying correct when one of two held
+        // modifiers is released. Wired on the manager's own logical layer so it also fires mid-drag.
         val gridSnap = GridSnapFilter(1.0).apply { isEnabled = false }
         val angleSnap = AngleSnapFilter(Math.toRadians(15.0)).apply { isEnabled = false }
         val scaleSnap = ScaleSnapFilter(0.25).apply { isEnabled = false }
         translate.addFilter(gridSnap)
         rotate.addFilter(angleSnap)
         scale.addFilter(scaleSnap)
-        val setSnap = { enabled: Boolean ->
-            gridSnap.isEnabled = enabled
-            angleSnap.isEnabled = enabled
-            scaleSnap.isEnabled = enabled
+        val syncSnap = { states: TwoInputStates ->
+            val on = states.current.keyboardState.isAtLeastOneDown(
+                ArdorKey.LEFT_CONTROL, ArdorKey.RIGHT_CONTROL, ArdorKey.LEFT_META, ArdorKey.RIGHT_META)
+            gridSnap.isEnabled = on
+            angleSnap.isEnabled = on
+            scaleSnap.isEnabled = on
         }
-        manager.logicalLayer.registerTrigger(
-            InputTrigger(KeyHeldCondition(ArdorKey.LEFT_CONTROL)) { _, _, _ -> setSnap(true) })
-        manager.logicalLayer.registerTrigger(
-            InputTrigger(KeyReleasedCondition(ArdorKey.LEFT_CONTROL)) { _, _, _ -> setSnap(false) })
+        for (key in listOf(ArdorKey.LEFT_CONTROL, ArdorKey.RIGHT_CONTROL, ArdorKey.LEFT_META, ArdorKey.RIGHT_META)) {
+            manager.logicalLayer.registerTrigger(InputTrigger(KeyHeldCondition(key)) { _, states, _ -> syncSnap(states) })
+            manager.logicalLayer.registerTrigger(InputTrigger(KeyReleasedCondition(key)) { _, states, _ -> syncSnap(states) })
+        }
 
         // R toggles the world/local interact frame (the scale gizmo is always local).
         manager.logicalLayer.registerTrigger(InputTrigger(KeyPressedCondition(ArdorKey.R)) { _, _, _ ->
