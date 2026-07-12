@@ -41,6 +41,7 @@ import com.ardor3d.editor.viewport.ViewportToolbar
 import com.ardor3d.framework.FrameHandler
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer
 import com.ardor3d.framework.lwjgl3.awt.Lwjgl3AwtCanvas
+import com.ardor3d.image.util.awt.AWTImageLoader
 import com.ardor3d.input.PhysicalLayer
 import com.ardor3d.input.awt.AwtFocusWrapper
 import com.ardor3d.input.awt.AwtKeyboardWrapper
@@ -66,6 +67,11 @@ private val logger = Logger.getLogger("com.ardor3d.editor")
  */
 private fun addDefaultResourceLocators() {
     try {
+        // Image loading: register the AWT/ImageIO loader for PNG, JPG, etc. Without it only the
+        // built-in DDS/HDR/TGA/ABI handlers exist, so texture PNGs (e.g. the gizmo readout's bitmap
+        // font atlas) fail to decode and fall back to the magenta "missing texture" image.
+        AWTImageLoader.registerLoader()
+
         // Material resources
         ResourceLocatorTool.addResourceLocator(
             ResourceLocatorTool.TYPE_MATERIAL,
