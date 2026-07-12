@@ -273,23 +273,32 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
-     * State captured and applied by the visibility (eye) toggle: the cull hint plus, for
-     * lights, the enabled flag - a culled light still illuminates the scene, so hiding one
-     * must also disable it.
+     * State captured and applied by the visibility (eye) toggle: the toggled spatial's local
+     * cull hint plus the enabled flag of every Light in its subtree. A culled light still
+     * illuminates the scene - LightManager gathers lights by isEnabled() and ignores cull hints -
+     * so hiding a spatial must also disable the lights it contains, and show/undo restores them.
      */
-    private data class VisibilityState(val cullHint: CullHint, val lightEnabled: Boolean?)
+    private data class VisibilityState(val cullHint: CullHint, val lightEnabled: Map<Light, Boolean>)
 
     /**
      * Toggles viewport visibility of the given spatial (undoable). Hiding culls the subtree,
-     * which also removes it from picking (findPick skips CullHint.Always subtrees), so no other
-     * hints are modified. Undo restores the exact previous state; Show restores Inherit.
+     * which also removes it from picking (findPick skips CullHint.Always subtrees) and disables
+     * every light within it, so no other hints are modified. Undo restores the exact previous
+     * state; Show restores Inherit and re-enables the subtree's lights.
      */
     fun toggleVisibility(spatial: Spatial) {
-        val hide = spatial.sceneHints.cullHint != CullHint.Always
-        val oldState = VisibilityState(spatial.sceneHints.cullHint, (spatial as? Light)?.isEnabled)
+        // Read the local hint (setCullHint writes local): resolving up-tree would restore a
+        // spatial's own Inherit as the parent's Dynamic after a hide/show cycle.
+        val hide = spatial.sceneHints.localCullHint != CullHint.Always
+        val subtreeLights = mutableListOf<Light>()
+        collectLights(spatial, subtreeLights)
+        val oldState = VisibilityState(
+            cullHint = spatial.sceneHints.localCullHint,
+            lightEnabled = subtreeLights.associateWith { it.isEnabled }
+        )
         val newState = VisibilityState(
             cullHint = if (hide) CullHint.Always else CullHint.Inherit,
-            lightEnabled = if (spatial is Light) !hide else null
+            lightEnabled = subtreeLights.associateWith { !hide }
         )
         editorState.execute(
             SetterCommand(
@@ -298,9 +307,7 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 newValue = newState,
                 setter = { state ->
                     spatial.sceneHints.cullHint = state.cullHint
-                    if (state.lightEnabled != null && spatial is Light) {
-                        spatial.isEnabled = state.lightEnabled
-                    }
+                    state.lightEnabled.forEach { (light, enabled) -> light.isEnabled = enabled }
                 }
             )
         )
