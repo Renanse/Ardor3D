@@ -113,6 +113,7 @@ class EditorReadoutRenderSmokeTest {
             canvas = GLFWCanvas(DisplaySettings(W, H, 24, 0), canvasRenderer)
             canvas.init()
         } catch (t: Throwable) {
+            canvas?.close() // constructed but init() failed - release it before we bail
             skipOrFail("Could not create a GL context here: $t")
             return
         }
