@@ -48,7 +48,18 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   The viewport toolbar's **Play** button (green ▶) renders the scene through the selected camera
   object — or the first one if none is selected — filling the panel with that camera's view and
   hiding all editor overlays; **Stop** (red ■) restores the editor fly camera exactly where it
-  was. Play mode is view state only: it never touches the undo history or the dirty flag.
+  was.
+- **Edit/play boundary** — entering Play snapshots the document (via the binary serializer) and
+  Stop restores it, so anything a running game does to the scene is discarded on Stop (entering
+  Play is a history boundary). Play mode never touches the dirty flag. Code lives in
+  `com.ardor3d.editor.play`: `PlaySession` (snapshot/restore), a small `GameMode` /
+  `GameContext` / `GameInput` behaviour SPI, and `GameInputController` (play-mode input routing).
+- **Sample game: checkers** — Game > Play Checkers launches a full game of American/English
+  draughts (`com.ardor3d.editor.checkers`): a pure, unit-tested rules engine (`Board`) as the
+  model, a `CheckersView` as its scene view, and a `CheckersGame` (`GameMode`) tying clicks to
+  moves. Click a piece to see its legal moves highlighted, click a square to move (jumps play their
+  whole mandatory chain); the status bar shows whose turn it is and the result. A worked example of
+  the state/view split the play framework is built around.
 - **Undo/redo everywhere** — every mutation goes through a command stack
   (`com.ardor3d.editor.command`). Continuous gestures (slider drags, typing, gizmo drags)
   coalesce into single undo steps. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`.
@@ -122,9 +133,12 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 - A camera object's stored aspect ratio is nominal — play mode always renders with the viewport's
   own aspect (fitting the camera's vertical field of view to the panel), and the frustum gizmo is
   drawn with the camera's stored aspect. There is no explicit aspect control in the inspector.
-- Play mode drives a single camera and does not run any game logic — it is a viewpoint preview,
-  not a runtime. There is no in-viewport control of the played camera (WASD is suspended);
-  animate or move the `CameraNode` to change the view.
+- Play mode renders through a single camera object; there is no in-viewport fly control of it
+  (WASD is suspended). A running `GameMode` receives input and drives the scene, but a game is
+  launched from code/menu (e.g. Game > Play Checkers) — there is no in-editor game picker, and
+  `activeGameMode` is a one-shot per play session (cleared on Stop).
+- The checkers sample builds its board and pieces procedurally (no imported art) and animates
+  moves with a simple linear slide; PBR models and richer animation are later-phase work.
 - Model import covers OBJ and COLLADA (static geometry; COLLADA cameras and animations are not
   brought into the editor). Other formats in `ardor3d-extras` could be added to
   `com.ardor3d.editor.io.ModelImport` the same way.

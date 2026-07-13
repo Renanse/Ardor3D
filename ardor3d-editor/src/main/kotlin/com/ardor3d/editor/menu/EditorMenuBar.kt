@@ -54,6 +54,7 @@ fun EditorMenuBar(
     var gameObjectMenuExpanded by remember { mutableStateOf(false) }
     var shapesSubmenuExpanded by remember { mutableStateOf(false) }
     var lightsSubmenuExpanded by remember { mutableStateOf(false) }
+    var gameMenuExpanded by remember { mutableStateOf(false) }
 
     Surface(
         tonalElevation = 2.dp,
@@ -275,6 +276,23 @@ fun EditorMenuBar(
                         gameObjectMenuExpanded = false
                         shapesSubmenuExpanded = false
                         lightsSubmenuExpanded = false
+                    }
+                )
+            }
+
+            // Game menu - launch a sample game in play mode.
+            TextButton(onClick = { gameMenuExpanded = true }) {
+                Text("Game")
+            }
+            DropdownMenu(
+                expanded = gameMenuExpanded,
+                onDismissRequest = { gameMenuExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Play Checkers") },
+                    onClick = {
+                        operations.playCheckers()
+                        gameMenuExpanded = false
                     }
                 )
             }

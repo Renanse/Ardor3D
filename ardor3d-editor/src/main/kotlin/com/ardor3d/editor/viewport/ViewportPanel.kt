@@ -165,10 +165,13 @@ fun ViewportStatusBar(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Selection info - or, while playing, which camera the viewport is rendering through.
+            // Selection info - or, while playing, the active game's status (if any) else which
+            // camera the viewport is rendering through.
             if (editorState.playing) {
+                val gameStatus = editorState.gameStatus
                 Text(
-                    text = "▶ PLAYING — ${editorState.playCameraName ?: "camera"}",
+                    text = if (gameStatus != null) "▶ $gameStatus"
+                        else "▶ PLAYING — ${editorState.playCameraName ?: "camera"}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.error
                 )

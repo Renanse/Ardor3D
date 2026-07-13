@@ -250,7 +250,8 @@ fun NativeEditorApp(
             insertSpatial = editorScene::insertSpatial,
             toggleVisibility = editorScene::toggleVisibility,
             createEmpty = editorScene::createEmptyNode,
-            togglePlayMode = editorScene::togglePlayMode
+            togglePlayMode = editorScene::togglePlayMode,
+            playCheckers = editorScene::startCheckers
         )
     }
     val fileOperations = remember(editorScene, window) {

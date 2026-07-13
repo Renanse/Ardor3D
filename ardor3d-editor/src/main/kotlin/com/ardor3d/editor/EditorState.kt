@@ -53,10 +53,20 @@ class EditorState {
     var hasCamera: Boolean by mutableStateOf(false)
         private set
 
+    // A short status line reported by the active game (e.g. "Red to move", "Black wins!"), shown in
+    // the play status bar. Null when no game is reporting. View state - never touches undo/dirty.
+    var gameStatus: String? by mutableStateOf(null)
+        private set
+
     /** Set by the scene when entering/leaving play mode. */
     fun setPlaying(playing: Boolean, cameraName: String?) {
         this.playing = playing
         this.playCameraName = cameraName
+    }
+
+    /** Set by the scene as the active game reports status (null clears it). */
+    fun updateGameStatus(status: String?) {
+        this.gameStatus = status
     }
 
     /** Set by the scene as camera objects are added/removed. */

@@ -1036,10 +1036,21 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // (which syncPlayCamera drives to match the play camera each frame). Whatever onStart does to
         // the scene is inside the snapshot boundary, so Stop discards it.
         activeGameMode?.let { game ->
-            val context = SceneGameContext(root, render)
+            val context = SceneGameContext(root, render) { status -> editorState.updateGameStatus(status) }
             gameContext = context
             game.onStart(context)
         }
+    }
+
+    /**
+     * Launches a game of checkers: sets it as the active game mode and enters play. Ensures a camera
+     * exists first (adding one framing the board), since play renders through a camera object.
+     */
+    fun startCheckers() {
+        if (editorState.playing) return
+        activeGameMode = com.ardor3d.editor.checkers.CheckersGame()
+        if (playCameraCandidate() == null) addCamera()
+        enterPlayMode()
     }
 
     /**
@@ -1057,9 +1068,12 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             if (!editorState.playing) return@add
 
             // Stop the game while the play scene is still live (references still valid), before the
-            // snapshot restore throws its scene away.
+            // snapshot restore throws its scene away. Each launch is a one-shot game: clear it so
+            // the next plain Play is view-only again.
             activeGameMode?.onStop()
+            activeGameMode = null
             gameContext = null
+            editorState.updateGameStatus(null)
 
             val render = canvasRenderer?.camera
             if (render != null && hasSavedEditorCamera) {

@@ -24,7 +24,8 @@ enum class LightType {
 /**
  * Scene operations exposed to the UI panels. Implemented by the scene owner (EditorScene) and
  * passed to menus/panels so they stay decoupled from scene internals. Most are undoable document
- * edits; [togglePlayMode] is the exception - it toggles view state, not the document.
+ * edits; [togglePlayMode] and [playCheckers] are the exceptions - they toggle view/play state,
+ * not the document.
  */
 class SceneOperations(
     val addShape: (ShapeType) -> Unit,
@@ -39,5 +40,6 @@ class SceneOperations(
     val insertSpatial: (Spatial, Insertion) -> Unit,
     val toggleVisibility: (Spatial) -> Unit,
     val createEmpty: () -> Unit,
-    val togglePlayMode: () -> Unit
+    val togglePlayMode: () -> Unit,
+    val playCheckers: () -> Unit
 )
