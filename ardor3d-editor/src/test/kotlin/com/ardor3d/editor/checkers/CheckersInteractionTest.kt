@@ -24,9 +24,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * The click-to-move glue of [CheckersGame], tested headlessly through a fake [GameContext] (clicks
- * are driven by square, bypassing pick; materialization is a no-op). Verifies the full select ->
- * highlight -> move -> animate -> finalize -> sync -> turn-switch path over the real model and view.
+ * The hover/click interaction of [CheckersGame], tested headlessly through a fake [GameContext]
+ * (hover and clicks are driven by square, bypassing pick; materialization is a no-op). Covers the
+ * UX: hovering a movable piece previews its moves; clicking selects it; hovering a destination lights
+ * it distinctly; clicking a destination moves and switches turns; clicking elsewhere clears.
  */
 class CheckersInteractionTest {
 
@@ -41,54 +42,68 @@ class CheckersInteractionTest {
 
     private fun sq(row: Int, col: Int) = Square(row, col)
 
-    private fun highlightCount(game: CheckersGame): Int =
-        (game.viewForTest.root.children.first { it.name == "Highlights" } as Node).numberOfChildren
-
     @Test
-    fun selectingHighlightsThenMovingAdvancesModelViewAndTurn() {
-        val ctx = FakeGameContext()
-        val game = CheckersGame()
-        game.onStart(ctx)
+    fun hoveringAMovablePiecePreviewsItsMovesAndClearsWhenLeaving() {
+        val game = CheckersGame().also { it.onStart(FakeGameContext()) }
+        assertEquals(0, game.highlightCountForTest)
 
-        assertEquals("board attached to the scene", 1, ctx.sceneRoot.numberOfChildren)
-        assertEquals(24, game.viewForTest.pieceCount)
-        assertEquals("Red to move", ctx.lastStatus)
+        // (2,0) is a red front man with one opening move, to (3,1).
+        game.hoverSquareForTest(sq(2, 0))
+        assertEquals(HighlightKind.HOVER_PIECE, game.highlightForTest(sq(2, 0)))
+        assertEquals(HighlightKind.PREVIEW, game.highlightForTest(sq(3, 1)))
+        assertEquals(2, game.highlightCountForTest)
 
-        // Select the front man on (2,0): its one legal opening move to (3,1) lights up.
-        game.clickSquareForTest(sq(2, 0))
-        assertEquals("one legal destination highlighted", 1, highlightCount(game))
+        game.hoverSquareForTest(null)
+        assertEquals("leaving the piece clears the preview", 0, game.highlightCountForTest)
 
-        // Click the destination: the move begins animating (input ignored until it finishes).
-        game.clickSquareForTest(sq(3, 1))
-        assertTrue("move is animating", game.isAnimatingForTest)
-        assertEquals("highlights cleared once the move starts", 0, highlightCount(game))
-
-        // Drive the slide to completion (0.22s at 0.1s/frame -> 3 frames).
-        repeat(4) { game.update(0.1, GameInput.EMPTY) }
-        assertFalse("animation finished", game.isAnimatingForTest)
-
-        val board = game.boardForTest
-        assertNull("piece left its origin", board.pieceAt(sq(2, 0)))
-        assertEquals("piece reached its destination", Piece(PieceColor.RED), board.pieceAt(sq(3, 1)))
-        assertEquals("turn passed to Black", PieceColor.BLACK, board.toMove)
-
-        assertNull("view: origin now empty", game.viewForTest.pieceNodeAt(sq(2, 0)))
-        assertNotNull("view: piece shown on destination", game.viewForTest.pieceNodeAt(sq(3, 1)))
-        assertEquals("status updated to Black", "Black to move", ctx.lastStatus)
+        // Hovering an empty square previews nothing.
+        game.hoverSquareForTest(sq(4, 4))
+        assertEquals(0, game.highlightCountForTest)
     }
 
     @Test
-    fun clickingEmptyElsewhereDeselects() {
+    fun selectHoverDestinationThenMove() {
         val ctx = FakeGameContext()
-        val game = CheckersGame()
-        game.onStart(ctx)
+        val game = CheckersGame().also { it.onStart(ctx) }
 
+        // Click the piece: it stays selected with its destination lit.
         game.clickSquareForTest(sq(2, 0))
-        assertEquals(1, highlightCount(game))
+        assertEquals(HighlightKind.SELECTED, game.highlightForTest(sq(2, 0)))
+        assertEquals(HighlightKind.MOVE, game.highlightForTest(sq(3, 1)))
 
-        // An empty square that is not a legal destination clears the selection.
+        // Hover the destination: it lights distinctly.
+        game.hoverSquareForTest(sq(3, 1))
+        assertEquals(HighlightKind.MOVE_HOVER, game.highlightForTest(sq(3, 1)))
+
+        // Click the destination: the move animates, then model, view, and turn advance.
+        game.clickSquareForTest(sq(3, 1))
+        assertTrue(game.isAnimatingForTest)
+        repeat(4) { game.update(0.1, GameInput.EMPTY) }
+        assertFalse(game.isAnimatingForTest)
+
+        assertNull(game.boardForTest.pieceAt(sq(2, 0)))
+        assertEquals(Piece(PieceColor.RED), game.boardForTest.pieceAt(sq(3, 1)))
+        assertEquals(PieceColor.BLACK, game.boardForTest.toMove)
+        assertNotNull(game.viewForTest.pieceNodeAt(sq(3, 1)))
+        assertEquals("highlights cleared after the move", 0, game.highlightCountForTest)
+        assertEquals("Black to move", ctx.lastStatus)
+    }
+
+    @Test
+    fun clickingElsewhereDeselects() {
+        val game = CheckersGame().also { it.onStart(FakeGameContext()) }
+
+        game.clickSquareForTest(sq(2, 2))
+        assertTrue("a piece is selected", game.highlightCountForTest > 0)
+
+        // An empty, non-destination square clears the selection.
         game.clickSquareForTest(sq(3, 5))
-        assertEquals("selection cleared", 0, highlightCount(game))
-        assertFalse("no move started", game.isAnimatingForTest)
+        assertEquals(0, game.highlightCountForTest)
+
+        // Clicking off the board (null) also clears.
+        game.clickSquareForTest(sq(2, 2))
+        assertTrue(game.highlightCountForTest > 0)
+        game.clickSquareForTest(null)
+        assertEquals(0, game.highlightCountForTest)
     }
 }

@@ -57,9 +57,10 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 - **Sample game: checkers** — Game > Play Checkers launches a full game of American/English
   draughts (`com.ardor3d.editor.checkers`): a pure, unit-tested rules engine (`Board`) as the
   model, a `CheckersView` as its scene view, and a `CheckersGame` (`GameMode`) tying clicks to
-  moves. Click a piece to see its legal moves highlighted, click a square to move (jumps play their
-  whole mandatory chain); the status bar shows whose turn it is and the result. A worked example of
-  the state/view split the play framework is built around.
+  moves. Hover a movable piece to preview its legal moves; click to select it (it stays lit, and the
+  destination under the pointer highlights distinctly); click a destination to move (jumps play their
+  whole mandatory chain); click elsewhere to clear. The status bar shows whose turn it is and the
+  result. A worked example of the state/view split the play framework is built around.
 - **Undo/redo everywhere** — every mutation goes through a command stack
   (`com.ardor3d.editor.command`). Continuous gestures (slider drags, typing, gizmo drags)
   coalesce into single undo steps. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`.

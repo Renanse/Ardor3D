@@ -78,21 +78,27 @@ class CheckersView {
         }
     }
 
-    /** Shows a legal-destination marker on each of [squares]; replaces any previous markers. */
-    fun showHighlights(squares: Collection<Square>) {
+    /** The node holding the highlight markers, so the caller can materialize just these. */
+    val highlightRoot: Node get() = highlightsRoot
+
+    /** Replaces the highlight markers with one per entry, coloured by its [HighlightKind]. */
+    fun setHighlights(highlights: Map<Square, HighlightKind>) {
         highlightsRoot.detachAllChildren()
-        for (square in squares) {
-            val marker = Box("highlight", Vector3.ZERO, 0.42, 0.03, 0.42)
-            marker.setDefaultColor(HIGHLIGHT_COLOR)
+        for ((square, kind) in highlights) {
+            val marker = Box("highlight", Vector3.ZERO, 0.46, 0.03, 0.46)
+            marker.setDefaultColor(colorFor(kind))
             marker.setTranslation(square.col - OFFSET, TILE_TOP + 0.02, square.row - OFFSET)
             marker.sceneHints.setPickingHint(PickingHint.Pickable, false)
             highlightsRoot.attachChild(marker)
         }
     }
 
-    /** Clears any destination markers. */
-    fun clearHighlights() {
-        highlightsRoot.detachAllChildren()
+    private fun colorFor(kind: HighlightKind): ColorRGBA = when (kind) {
+        HighlightKind.SELECTED -> SELECTED_COLOR
+        HighlightKind.HOVER_PIECE -> HOVER_PIECE_COLOR
+        HighlightKind.MOVE -> MOVE_COLOR
+        HighlightKind.MOVE_HOVER -> MOVE_HOVER_COLOR
+        HighlightKind.PREVIEW -> PREVIEW_COLOR
     }
 
     // --- construction ------------------------------------------------------------------------
@@ -165,6 +171,30 @@ class CheckersView {
         private val RED_PIECE = ColorRGBA(0.72f, 0.14f, 0.11f, 1f)
         private val BLACK_PIECE = ColorRGBA(0.10f, 0.10f, 0.12f, 1f)
         private val CROWN_COLOR = ColorRGBA(0.90f, 0.78f, 0.25f, 1f)
-        private val HIGHLIGHT_COLOR = ColorRGBA(0.30f, 0.85f, 0.35f, 1f)
+
+        // Highlight colours (see HighlightKind).
+        private val SELECTED_COLOR = ColorRGBA(1.0f, 0.85f, 0.20f, 1f)   // the committed piece
+        private val HOVER_PIECE_COLOR = ColorRGBA(0.95f, 0.92f, 0.55f, 1f) // a piece being hovered (preview)
+        private val MOVE_COLOR = ColorRGBA(0.20f, 0.80f, 0.32f, 1f)      // a legal destination
+        private val MOVE_HOVER_COLOR = ColorRGBA(0.35f, 0.95f, 0.95f, 1f) // the destination under the pointer
+        private val PREVIEW_COLOR = ColorRGBA(0.22f, 0.55f, 0.50f, 1f)   // previewed destinations (no selection)
     }
+}
+
+/** How a highlighted square is shown - drives its colour. */
+enum class HighlightKind {
+    /** The piece the player has clicked to move. */
+    SELECTED,
+
+    /** A movable piece under the pointer, previewing its moves (no selection yet). */
+    HOVER_PIECE,
+
+    /** A legal destination of the selected piece. */
+    MOVE,
+
+    /** A legal destination currently under the pointer. */
+    MOVE_HOVER,
+
+    /** A destination previewed from hovering a piece (no selection). */
+    PREVIEW
 }

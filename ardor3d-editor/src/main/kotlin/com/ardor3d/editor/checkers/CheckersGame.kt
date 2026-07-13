@@ -24,16 +24,20 @@ import com.ardor3d.scenegraph.extension.CameraNode
  * [CheckersView] is its scene view, and this class is the only place they meet - it turns clicks
  * into model moves and re-syncs the view.
  *
- * Interaction: click a piece of the side to move to select it (its legal destinations light up),
- * then click a highlighted square to move (a jump plays its whole mandatory chain). Clicking
- * elsewhere reselects or clears. Moves animate with a short slide; input is ignored mid-slide and
- * once the game is over.
+ * Interaction: hovering a movable piece previews its legal moves; clicking one selects it (it
+ * stays lit with its destinations), and the destination under the pointer highlights distinctly.
+ * Clicking a destination moves (a jump plays its whole mandatory chain); clicking another of your
+ * pieces reselects; clicking elsewhere clears. Moves animate with a short slide; input is ignored
+ * mid-slide and once the game is over.
  */
 class CheckersGame : GameMode {
     private var context: GameContext? = null
     private lateinit var view: CheckersView
     private var board: Board = Board.initial()
     private var selected: Square? = null
+
+    // The highlight set currently shown, so it is only rebuilt/re-materialized when it changes.
+    private var lastHighlights: Map<Square, HighlightKind> = emptyMap()
 
     // Move animation: slide the moving piece from its old square to its new one before the board
     // (and view) snap to the applied position.
@@ -82,13 +86,13 @@ class CheckersGame : GameMode {
         }
         if (board.isGameOver()) return
 
-        val click = input.click ?: return
-        val square = squareAt(context, click.x, click.y)
-        if (square == null) {
-            deselect()
-            return
+        // The square under the pointer this frame (null = off the board).
+        val hover = squareAt(context, input.mouseX, input.mouseY)
+        if (input.click != null) {
+            processClick(hover)
+            if (animating) return // a move started; beginMove already cleared the highlights
         }
-        onSquareClicked(square)
+        refreshHighlights(hover)
     }
 
     override fun onStop() {
@@ -99,7 +103,12 @@ class CheckersGame : GameMode {
 
     // --- interaction -------------------------------------------------------------------------
 
-    private fun onSquareClicked(square: Square) {
+    /** Handles a click on [square] (null = off the board): select, move, reselect, or deselect. */
+    private fun processClick(square: Square?) {
+        if (square == null) {
+            deselect()
+            return
+        }
         val from = selected
         if (from == null) {
             trySelect(square)
@@ -108,31 +117,61 @@ class CheckersGame : GameMode {
         val move = board.legalMovesFrom(from).firstOrNull { it.to == square }
         when {
             move != null -> beginMove(move)
-            board.pieceAt(square)?.color == board.toMove -> {
-                deselect()
-                trySelect(square)
-            }
+            isMovable(square) -> selected = square // clicked another of my movable pieces: reselect
             else -> deselect()
         }
     }
 
+    /** Selects [square] if it holds a piece of the side to move that has at least one legal move. */
     private fun trySelect(square: Square) {
-        val piece = board.pieceAt(square)
-        if (piece == null || piece.color != board.toMove) return
-        val destinations = board.legalMovesFrom(square).map { it.to }
-        if (destinations.isEmpty()) return // a piece with no legal move (e.g. a capture is forced elsewhere)
-        selected = square
-        view.showHighlights(destinations)
-        context?.materialize(view.root) // materialize the new highlight meshes
+        if (isMovable(square)) selected = square
+    }
+
+    private fun isMovable(square: Square): Boolean {
+        val piece = board.pieceAt(square) ?: return false
+        return piece.color == board.toMove && board.legalMovesFrom(square).isNotEmpty()
     }
 
     private fun deselect() {
         selected = null
-        view.clearHighlights()
+    }
+
+    // --- highlighting ------------------------------------------------------------------------
+
+    /** Recomputes the hover/selection highlight set and applies it if it changed. */
+    private fun refreshHighlights(hover: Square?) {
+        applyHighlights(computeHighlights(hover))
+    }
+
+    private fun computeHighlights(hover: Square?): Map<Square, HighlightKind> {
+        val map = linkedMapOf<Square, HighlightKind>()
+        val from = selected
+        if (from != null) {
+            // A piece is committed: mark it and its destinations; light the one under the pointer.
+            map[from] = HighlightKind.SELECTED
+            for (dest in board.legalMovesFrom(from).map { it.to }) {
+                map[dest] = if (dest == hover) HighlightKind.MOVE_HOVER else HighlightKind.MOVE
+            }
+        } else if (hover != null && isMovable(hover)) {
+            // Nothing committed: preview the hovered piece's moves.
+            map[hover] = HighlightKind.HOVER_PIECE
+            for (dest in board.legalMovesFrom(hover).map { it.to }) {
+                map[dest] = HighlightKind.PREVIEW
+            }
+        }
+        return map
+    }
+
+    private fun applyHighlights(desired: Map<Square, HighlightKind>) {
+        if (desired == lastHighlights) return
+        lastHighlights = desired
+        view.setHighlights(desired)
+        context?.materialize(view.highlightRoot)
     }
 
     private fun beginMove(move: Move) {
         deselect()
+        applyHighlights(emptyMap()) // clear highlights for the duration of the slide
         pendingBoard = board.apply(move)
         val node = view.pieceNodeAt(move.from)
         if (node == null) {
@@ -163,6 +202,7 @@ class CheckersGame : GameMode {
         animating = false
         animNode = null
         view.rebuild(board)
+        applyHighlights(emptyMap())
         context?.let {
             it.materialize(view.root)
             it.setStatus(statusText())
@@ -180,8 +220,22 @@ class CheckersGame : GameMode {
     /** Whether a move slide is in progress - for interaction tests. */
     internal val isAnimatingForTest: Boolean get() = animating
 
-    /** Drives a click on [square] (bypassing pick) - for interaction tests. */
-    internal fun clickSquareForTest(square: Square) = onSquareClicked(square)
+    /** Number of highlight markers currently shown - for interaction tests. */
+    internal val highlightCountForTest: Int get() = lastHighlights.size
+
+    /** The highlight kind shown on [square], or null - for interaction tests. */
+    internal fun highlightForTest(square: Square): HighlightKind? = lastHighlights[square]
+
+    /** Simulates a click at [square] (null = off the board), then refreshes highlights - for tests. */
+    internal fun clickSquareForTest(square: Square?) {
+        processClick(square)
+        if (!animating) refreshHighlights(square)
+    }
+
+    /** Simulates the pointer moving to [square] (null = off the board) - for tests. */
+    internal fun hoverSquareForTest(square: Square?) {
+        if (!animating) refreshHighlights(square)
+    }
 
     // --- helpers -----------------------------------------------------------------------------
 

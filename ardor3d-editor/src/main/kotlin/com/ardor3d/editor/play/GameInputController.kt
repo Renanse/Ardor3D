@@ -14,6 +14,8 @@ import com.ardor3d.framework.Canvas
 import com.ardor3d.input.PhysicalLayer
 import com.ardor3d.input.logical.InputTrigger
 import com.ardor3d.input.logical.LogicalLayer
+import com.ardor3d.input.logical.MouseButtonClickedCondition
+import com.ardor3d.input.mouse.MouseButton
 import java.util.function.Predicate
 
 /**
@@ -23,9 +25,13 @@ import java.util.function.Predicate
  *
  * Only [poll] drains input, and the editor calls it only while playing - so it never competes with
  * the editor's own layers (which don't run during play), and draining every play frame keeps input
- * events from piling up unseen. A single catch-all trigger runs on every drained input state, which
- * is what makes click detection reliable: a press+release that both land within one frame are
- * distinct states in the drained batch, so no click is missed by only sampling frame endpoints.
+ * events from piling up unseen.
+ *
+ * Pointer position and keys are captured by a catch-all trigger (idempotent - safe to re-run against
+ * the stale last state when no new input arrives). Clicks, however, must be *edge* events: a
+ * [MouseButtonClickedCondition] fires once on the press-release transition, so a click is reported
+ * exactly once - not re-reported every frame from a state whose click count is still set (which made
+ * selection "stick" to the mouse and behave erratically).
  */
 class GameInputController(canvas: Canvas, physicalLayer: PhysicalLayer) {
     private val logicalLayer = LogicalLayer()
@@ -34,13 +40,14 @@ class GameInputController(canvas: Canvas, physicalLayer: PhysicalLayer) {
     init {
         logicalLayer.registerInput(canvas, physicalLayer)
         logicalLayer.registerTrigger(InputTrigger(Predicate { true }) { _, states, _ ->
-            val current = states.current
-            input.capture(current)
-            val mouse = current.mouseState
-            for (button in mouse.buttonsClicked) {
-                input.recordClick(mouse.x, mouse.y, button)
-            }
+            input.capture(states.current)
         })
+        for (button in listOf(MouseButton.LEFT, MouseButton.RIGHT)) {
+            logicalLayer.registerTrigger(InputTrigger(MouseButtonClickedCondition(button)) { _, states, _ ->
+                val mouse = states.current.mouseState
+                input.recordClick(mouse.x, mouse.y, button)
+            })
+        }
     }
 
     /**
