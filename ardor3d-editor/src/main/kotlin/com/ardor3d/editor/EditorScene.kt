@@ -22,7 +22,12 @@ import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.interact.GizmoReadoutFormat
 import com.ardor3d.editor.interact.GizmoUndoFilter
 import com.ardor3d.editor.menu.ShapeType
+import com.ardor3d.editor.play.GameContext
+import com.ardor3d.editor.play.GameInput
+import com.ardor3d.editor.play.GameInputController
+import com.ardor3d.editor.play.GameMode
 import com.ardor3d.editor.play.PlaySession
+import com.ardor3d.editor.play.SceneGameContext
 import com.ardor3d.editor.util.CameraObjectUtil
 import com.ardor3d.extension.interact.InteractManager
 import com.ardor3d.extension.interact.filter.AngleSnapFilter
@@ -111,6 +116,13 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     // exactly where the user was looking.
     private val playSession = PlaySession()
     private var playCamera: CameraNode? = null
+
+    // The game driven by play mode, if any. Null means Play is just "view through the camera" - the
+    // behavior before Phase 2. Set by the code that starts a game (a sample game, a test). The
+    // context is built on enter and lives for the play session; input is drained per play frame.
+    var activeGameMode: GameMode? = null
+    private var gameContext: GameContext? = null
+    private var gameInputController: GameInputController? = null
     private val savedEditorLocation = Vector3()
     private val savedEditorLeft = Vector3()
     private val savedEditorUp = Vector3()
@@ -172,6 +184,10 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         val manager = InteractManager()
         interactManager = manager
         manager.setupInput(canvas, physicalLayer, logicalLayer)
+
+        // Play-mode input routes through its own logical layer on the shared physical layer; the
+        // editor drives it (and only it) while playing. See GameInputController.
+        gameInputController = GameInputController(canvas, physicalLayer)
 
         // v2 transform gizmos, each with its full handle set. The scale gizmo drives all three
         // axes (the old SimpleScaleWidget was uniform-Y only).
@@ -1015,6 +1031,15 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         playCamera = cameraNode
         interactManager?.setSpatialTarget(null)
         editorState.setPlaying(true, cameraNode.name)
+
+        // Start the game (if one is set) on the live play scene, viewed through the render camera
+        // (which syncPlayCamera drives to match the play camera each frame). Whatever onStart does to
+        // the scene is inside the snapshot boundary, so Stop discards it.
+        activeGameMode?.let { game ->
+            val context = SceneGameContext(root, render)
+            gameContext = context
+            game.onStart(context)
+        }
     }
 
     /**
@@ -1030,6 +1055,11 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
             // A double-toggle can enqueue two exits; the first flips playing off, so the second
             // finds nothing to do rather than trying to stop an already-stopped session.
             if (!editorState.playing) return@add
+
+            // Stop the game while the play scene is still live (references still valid), before the
+            // snapshot restore throws its scene away.
+            activeGameMode?.onStop()
+            gameContext = null
 
             val render = canvasRenderer?.camera
             if (render != null && hasSavedEditorCamera) {
@@ -1190,12 +1220,13 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         val playing = editorState.playing
 
         // Input routing switch. While playing, the viewport is the game view: editor input
-        // (fly camera, picking, transform gizmo, hotkeys) is off and input is routed to the active
-        // game instead. Until a game attaches an input layer this dispatches nowhere - the same as
-        // the old "suppress input while playing" behavior, but now it is a routing seam rather than
-        // a dead end.
+        // (fly camera, picking, transform gizmo, hotkeys) is off. Input is drained through the game
+        // input layer every play frame (both to feed the game and to keep events from piling up) and
+        // the active game, if any, is ticked with it - before updateGeometricState below, so this
+        // frame's model changes are baked and syncPlayCamera sees them.
         if (playing) {
-            playSession.routeInput(timer.timePerFrame)
+            val input = gameInputController?.poll(timer.timePerFrame) ?: GameInput.EMPTY
+            activeGameMode?.update(timer.timePerFrame, input)
         } else {
             // Check if transform mode changed and update active widget
             if (lastTransformMode != editorState.transformMode) {

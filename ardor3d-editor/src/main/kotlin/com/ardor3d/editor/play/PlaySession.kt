@@ -10,7 +10,6 @@
 
 package com.ardor3d.editor.play
 
-import com.ardor3d.input.logical.LogicalLayer
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.util.export.binary.BinaryExporter
 import com.ardor3d.util.export.binary.BinaryImporter
@@ -29,12 +28,8 @@ import java.io.ByteArrayOutputStream
  * The snapshot/restore pair is deliberately GL-free and side-effect-free (it only reads and builds
  * scene graphs), so it can be unit-tested headlessly and reused wherever a scene needs a disposable
  * working copy. Installing the restored root back into the running editor - swapping the document,
- * reindexing, re-deriving materials - is the caller's job.
- *
- * A session also owns the play-mode input routing switch ([gameInput] / [routeInput]): while a
- * session is active the editor drives the game's input instead of its own selection/gizmo input.
- * Until a game attaches a layer this is a no-op, which is exactly today's "input suppressed while
- * playing" behavior.
+ * reindexing, re-deriving materials - is the caller's job, as is routing play-mode input to the
+ * game (see [GameInputController]) and driving its [GameMode].
  */
 class PlaySession {
     // The pre-play snapshot, held for the lifetime of the session. Non-null iff a session is active.
@@ -61,33 +56,14 @@ class PlaySession {
         val bytes = snapshotBytes ?: error("play session not active")
         val restored = deserialize(bytes)
         snapshotBytes = null
-        gameInput = null
         return restored
     }
 
     /**
      * The exact bytes captured at [start], or null when no session is active. Exposed so a test can
-     * confirm the snapshot round-trips byte-identically.
+     * confirm the snapshot faithfully captures the pre-play document.
      */
     val snapshot: ByteArray? get() = snapshotBytes
-
-    /**
-     * Input routing target for play mode. A game registers its triggers on this layer; while a
-     * session is active the editor calls [routeInput] each frame to dispatch input here instead of
-     * to editor selection/gizmos. Null (the default) means input is simply not routed - play mode
-     * with no game behaves as before. Cleared on [stop].
-     */
-    var gameInput: LogicalLayer? = null
-
-    /**
-     * Dispatches one frame of input to the active game. A no-op unless a session is active and a
-     * [gameInput] layer is attached.
-     */
-    fun routeInput(timePerFrame: Double) {
-        if (isActive) {
-            gameInput?.checkTriggers(timePerFrame)
-        }
-    }
 
     companion object {
         /** Serializes [node] to Ardor3D's binary format - the same format `.a3d` files use. */
