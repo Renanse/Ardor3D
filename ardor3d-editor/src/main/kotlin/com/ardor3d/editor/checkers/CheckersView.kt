@@ -10,6 +10,7 @@
 
 package com.ardor3d.editor.checkers
 
+import com.ardor3d.bounding.BoundingBox
 import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.Quaternion
 import com.ardor3d.math.Vector3
@@ -102,6 +103,10 @@ class CheckersView {
                 val square = Square(row, col)
                 val tile = Box("tile_${row}_$col", Vector3.ZERO, 0.5, TILE_HALF_HEIGHT, 0.5)
                 tile.setTranslation(col - OFFSET, TILE_TOP - TILE_HALF_HEIGHT, row - OFFSET)
+                // A finite model bound is required for picking: the default bound is an infinite
+                // BoundingSphere, whose ray broad-phase fails, so findPick would skip the tile.
+                tile.modelBound = BoundingBox()
+                tile.updateModelBound()
                 if (square.isPlayable) {
                     tile.setDefaultColor(DARK_TILE)
                     squareByTile[tile] = square // only playable tiles are click targets

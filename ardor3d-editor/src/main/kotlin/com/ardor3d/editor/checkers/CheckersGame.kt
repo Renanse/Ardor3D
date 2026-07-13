@@ -16,6 +16,7 @@ import com.ardor3d.editor.play.GameMode
 import com.ardor3d.light.PointLight
 import com.ardor3d.math.Vector3
 import com.ardor3d.scenegraph.Spatial
+import com.ardor3d.scenegraph.extension.CameraNode
 
 /**
  * A playable game of checkers, driven by the editor's play mode. It is the worked example of the
@@ -48,6 +49,12 @@ class CheckersGame : GameMode {
         board = Board.initial()
         selected = null
         animating = false
+
+        // Take over the scene: clear the editing content (keeping camera objects, which play mode
+        // renders through) so the board stands alone. This is inside the snapshot boundary, so Stop
+        // restores whatever was here.
+        context.sceneRoot.children.filter { it !is CameraNode }.toList()
+            .forEach { context.sceneRoot.detachChild(it) }
 
         val view = CheckersView()
         this.view = view

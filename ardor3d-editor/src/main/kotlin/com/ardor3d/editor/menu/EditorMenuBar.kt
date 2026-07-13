@@ -10,6 +10,7 @@
 
 package com.ardor3d.editor.menu
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -61,7 +62,10 @@ fun EditorMenuBar(
         modifier = modifier
     ) {
         Row(modifier = Modifier.padding(horizontal = 4.dp)) {
+            // Each menu button + its dropdown is wrapped in a Box so the dropdown anchors to the
+            // button's position, not the Row's start (otherwise every menu opens at the far left).
             // File menu
+            Box {
             TextButton(onClick = { fileMenuExpanded = true }) {
                 Text("File")
             }
@@ -114,8 +118,10 @@ fun EditorMenuBar(
                     }
                 )
             }
+            }
 
             // Edit menu
+            Box {
             TextButton(onClick = { editMenuExpanded = true }) {
                 Text("Edit")
             }
@@ -164,8 +170,10 @@ fun EditorMenuBar(
                     }
                 )
             }
+            }
 
             // GameObject menu
+            Box {
             TextButton(onClick = { gameObjectMenuExpanded = true }) {
                 Text("GameObject")
             }
@@ -279,8 +287,10 @@ fun EditorMenuBar(
                     }
                 )
             }
+            }
 
             // Game menu - launch a sample game in play mode.
+            Box {
             TextButton(onClick = { gameMenuExpanded = true }) {
                 Text("Game")
             }
@@ -295,6 +305,7 @@ fun EditorMenuBar(
                         gameMenuExpanded = false
                     }
                 )
+            }
             }
         }
     }

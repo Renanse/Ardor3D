@@ -1049,7 +1049,15 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     fun startCheckers() {
         if (editorState.playing) return
         activeGameMode = com.ardor3d.editor.checkers.CheckersGame()
-        if (playCameraCandidate() == null) addCamera()
+        if (playCameraCandidate() == null) {
+            // Auto-add a camera framed on the board (an existing camera is left as the user set it).
+            addCamera()
+            (editorState.primarySelection as? CameraNode)?.camera?.let { cam ->
+                cam.setLocation(Vector3(5.5, 5.0, 8.5))
+                cam.lookAt(Vector3.ZERO, Vector3.UNIT_Y)
+            }
+            (editorState.primarySelection as? CameraNode)?.updateFromCamera()
+        }
         enterPlayMode()
     }
 
