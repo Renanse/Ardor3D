@@ -41,16 +41,23 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   merged undo step. Transform fields show a dash where the selection disagrees.
 - **Viewport** — WASD + drag fly camera, mouse-wheel dolly, primitive-accurate click selection,
   v2 transform gizmos for translate/rotate/scale (eased hover highlight, per-gizmo cursors,
-  Ctrl-snap, Escape to cancel a drag), per-light overlay gizmos, reference grid.
+  Ctrl-snap, Escape to cancel a drag), per-light and per-camera overlay gizmos, reference grid.
+- **Camera objects & play mode** — GameObject > Camera adds a `CameraNode` (a movable scene
+  object carrying its own frustum), shown as a wireframe frustum gizmo that reflects its field of
+  view and points where it looks. The inspector edits field of view and the near/far clip planes.
+  The viewport toolbar's **Play** button (green ▶) renders the scene through the selected camera
+  object — or the first one if none is selected — filling the panel with that camera's view and
+  hiding all editor overlays; **Stop** (red ■) restores the editor fly camera exactly where it
+  was. Play mode is view state only: it never touches the undo history or the dirty flag.
 - **Undo/redo everywhere** — every mutation goes through a command stack
   (`com.ardor3d.editor.command`). Continuous gestures (slider drags, typing, gizmo drags)
   coalesce into single undo steps. `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y`.
 - **Persistence** — File > New / Open / Save / Save As using Ardor3D's binary format (`.a3d`),
   plus Wavefront OBJ and COLLADA (`.dae`) import. Unsaved changes are flagged in the title bar
   and confirmed before being discarded.
-- **Object creation** — GameObject menu: 13 primitive shapes, empty nodes, and
-  point/directional/spot lights. New objects are created under the selected Node (or the scene
-  root).
+- **Object creation** — GameObject menu: 16 primitive shapes, empty nodes,
+  point/directional/spot lights, and camera objects. New objects are created under the selected
+  Node (or the scene root).
 - **Visibility** — per-row eye toggle in the hierarchy hides/shows a subtree (undoable). Hidden
   objects are culled and unpickable, so viewport clicks pass through them, and every light in the
   hidden subtree is disabled so it stops illuminating the scene (restored on show/undo).
@@ -68,6 +75,7 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 | `W A S D` + right-drag | Fly camera (viewport focused) |
 | `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+Y` | Undo / Redo (window-wide) |
 | `Ctrl+D` | Duplicate selection (window-wide) |
+| `Ctrl+P` | Toggle play mode (window-wide) |
 | `Ctrl+N` / `Ctrl+O` / `Ctrl+S` / `Ctrl+Shift+S` | New / Open / Save / Save As (window-wide) |
 
 ## Architecture notes
@@ -111,7 +119,12 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
   attitude ±90° singularity, where the decomposition isn't unique) and only re-derives them from
   the matrix after a gizmo drag or undo — after one of those, an equivalent-but-different
   triplet may be shown.
-- No camera objects or play mode.
-- Model import covers OBJ and COLLADA (static geometry; COLLADA animations are not brought into
-  the editor). Other formats in `ardor3d-extras` could be added to
+- A camera object's stored aspect ratio is nominal — play mode always renders with the viewport's
+  own aspect (fitting the camera's vertical field of view to the panel), and the frustum gizmo is
+  drawn with the camera's stored aspect. There is no explicit aspect control in the inspector.
+- Play mode drives a single camera and does not run any game logic — it is a viewpoint preview,
+  not a runtime. There is no in-viewport control of the played camera (WASD is suspended);
+  animate or move the `CameraNode` to change the view.
+- Model import covers OBJ and COLLADA (static geometry; COLLADA cameras and animations are not
+  brought into the editor). Other formats in `ardor3d-extras` could be added to
   `com.ardor3d.editor.io.ModelImport` the same way.

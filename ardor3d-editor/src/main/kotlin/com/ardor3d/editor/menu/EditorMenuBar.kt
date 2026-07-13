@@ -266,10 +266,16 @@ fun EditorMenuBar(
                     )
                 }
 
+                HorizontalDivider()
+
                 DropdownMenuItem(
                     text = { Text("Camera") },
-                    enabled = false,
-                    onClick = { gameObjectMenuExpanded = false }
+                    onClick = {
+                        operations.addCamera()
+                        gameObjectMenuExpanded = false
+                        shapesSubmenuExpanded = false
+                        lightsSubmenuExpanded = false
+                    }
                 )
             }
         }

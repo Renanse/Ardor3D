@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.ardor3d.editor.EditorState
 import com.ardor3d.editor.command.CompositeCommand
 import com.ardor3d.editor.command.SetterCommand
+import com.ardor3d.editor.util.CameraObjectUtil
 import com.ardor3d.editor.util.EulerUtil
 import com.ardor3d.light.Light
 import com.ardor3d.math.ColorRGBA
@@ -41,6 +42,7 @@ import com.ardor3d.renderer.state.WireframeState
 import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.Spatial
+import com.ardor3d.scenegraph.extension.CameraNode
 import com.ardor3d.surface.ColorSurface
 import java.util.Locale
 
@@ -104,10 +106,11 @@ fun InspectorPanel(
                     // Transform section - observe transformVersion to trigger refresh
                     TransformSection(selection, editorState)
 
-                    // Type-specific sections
+                    // Type-specific sections. CameraNode is a Node, so it must be matched first.
                     when (selection) {
                         is Light -> LightSection(selection, editorState)
                         is Mesh -> MeshSection(selection, editorState)
+                        is CameraNode -> CameraSection(selection, editorState)
                         is Node -> NodeSection(selection)
                     }
                 }
@@ -744,6 +747,131 @@ private fun LightSection(light: Light, editorState: EditorState) {
                 }
             },
             onEditFinished = { editorState.sealUndoMerge() }
+        )
+    }
+}
+
+@Composable
+private fun CameraSection(cameraNode: CameraNode, editorState: EditorState) {
+    val cam = cameraNode.camera
+    if (cam == null) {
+        InspectorSection(title = "Camera") {
+            Text(
+                text = "No camera",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        return
+    }
+    val camKey = System.identityHashCode(cam)
+
+    InspectorSection(title = "Camera") {
+        // Field of view (vertical, in degrees). Derived from the frustum planes, edited by
+        // rebuilding a symmetric perspective that keeps the current aspect, near and far.
+        var fov by remember(cameraNode, editorState.propertyVersion) {
+            mutableStateOf(CameraObjectUtil.fovYDegrees(cam).toFloat())
+        }
+        Text(
+            text = "Field of View",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Slider(
+                value = fov.coerceIn(20f, 120f),
+                onValueChange = { new ->
+                    fov = new
+                    editorState.execute(
+                        SetterCommand(
+                            name = "Edit Field of View",
+                            oldValue = CameraObjectUtil.fovYDegrees(cam),
+                            newValue = new.toDouble(),
+                            mergeKey = "cameraFov:$camKey",
+                            setter = { f ->
+                                CameraObjectUtil.setPerspective(
+                                    cam, f, CameraObjectUtil.aspect(cam), cam.frustumNear, cam.frustumFar
+                                )
+                            }
+                        )
+                    )
+                },
+                onValueChangeFinished = { editorState.sealUndoMerge() },
+                valueRange = 20f..120f,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = String.format(Locale.ROOT, "%.0f°", fov),
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.width(40.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Near / far clip planes. Editing one keeps the field of view and the other plane.
+        // ComponentField shows the live value while unfocused, so it re-reads after undo/redo
+        // (CameraSection recomposes on propertyVersion via the FOV remember above).
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ComponentField(
+                value = cam.frustumNear,
+                label = "Near",
+                modifier = Modifier.weight(1f),
+                onValueChange = { near ->
+                    editorState.execute(
+                        SetterCommand(
+                            name = "Edit Near Plane",
+                            oldValue = cam.frustumNear,
+                            newValue = near,
+                            mergeKey = "cameraNear:$camKey",
+                            setter = { n ->
+                                CameraObjectUtil.setPerspective(
+                                    cam, CameraObjectUtil.fovYDegrees(cam), CameraObjectUtil.aspect(cam),
+                                    n, cam.frustumFar
+                                )
+                            }
+                        )
+                    )
+                },
+                onEditFinished = { editorState.sealUndoMerge() }
+            )
+            ComponentField(
+                value = cam.frustumFar,
+                label = "Far",
+                modifier = Modifier.weight(1f),
+                onValueChange = { far ->
+                    editorState.execute(
+                        SetterCommand(
+                            name = "Edit Far Plane",
+                            oldValue = cam.frustumFar,
+                            newValue = far,
+                            mergeKey = "cameraFar:$camKey",
+                            setter = { f ->
+                                CameraObjectUtil.setPerspective(
+                                    cam, CameraObjectUtil.fovYDegrees(cam), CameraObjectUtil.aspect(cam),
+                                    cam.frustumNear, f
+                                )
+                            }
+                        )
+                    )
+                },
+                onEditFinished = { editorState.sealUndoMerge() }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Use the Play button to view the scene through this camera.",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

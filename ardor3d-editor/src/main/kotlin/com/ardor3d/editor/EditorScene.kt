@@ -22,6 +22,8 @@ import com.ardor3d.editor.util.SelectionUtil
 import com.ardor3d.editor.interact.GizmoReadoutFormat
 import com.ardor3d.editor.interact.GizmoUndoFilter
 import com.ardor3d.editor.menu.ShapeType
+import com.ardor3d.editor.play.PlaySession
+import com.ardor3d.editor.util.CameraObjectUtil
 import com.ardor3d.extension.interact.InteractManager
 import com.ardor3d.extension.interact.filter.AngleSnapFilter
 import com.ardor3d.extension.interact.filter.GridSnapFilter
@@ -64,6 +66,7 @@ import com.ardor3d.scenegraph.Mesh
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.SceneIndexer
 import com.ardor3d.scenegraph.Spatial
+import com.ardor3d.scenegraph.extension.CameraNode
 import com.ardor3d.scenegraph.hint.CullHint
 import com.ardor3d.scenegraph.hint.PickingHint
 import com.ardor3d.scenegraph.shape.*
@@ -98,6 +101,21 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     // One overlay gizmo per light in the document, refreshed on structure changes.
     private val lightGizmos = mutableMapOf<Light, Node>()
     private var lastStructureVersion = -1L
+
+    // One overlay frustum gizmo per camera object, rebuilt when its frustum shape changes.
+    private val cameraGizmos = mutableMapOf<CameraNode, Node>()
+    private val cameraGizmoShapes = mutableMapOf<CameraNode, DoubleArray>()
+
+    // Play mode: the edit/play boundary (snapshot on enter, restore on exit), the camera object
+    // currently driving the viewport, plus the editor fly camera's saved pose so Stop restores
+    // exactly where the user was looking.
+    private val playSession = PlaySession()
+    private var playCamera: CameraNode? = null
+    private val savedEditorLocation = Vector3()
+    private val savedEditorLeft = Vector3()
+    private val savedEditorUp = Vector3()
+    private val savedEditorDirection = Vector3()
+    private var hasSavedEditorCamera = false
 
     // Document lifecycle actions deferred to update() so they run with the GL context current.
     private val pendingActions = java.util.concurrent.ConcurrentLinkedQueue<() -> Unit>()
@@ -345,6 +363,39 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
     }
 
     /**
+     * Adds a new camera object (a [CameraNode] managing its own [Camera]) to the scene (undoable)
+     * and selects it. The camera starts framed on the scene origin, matching the editor's default
+     * viewpoint; its transform - editable by gizmo or inspector - drives the managed camera, and
+     * play mode renders the viewport through it.
+     */
+    fun addCamera() {
+        val count = shapeCounters.merge("Camera", 1, Int::plus)!!
+        val cam = Camera(100, 100)
+        CameraObjectUtil.setPerspective(
+            cam, CameraObjectUtil.DEFAULT_FOV_DEGREES, 1.0,
+            CameraObjectUtil.DEFAULT_NEAR, CameraObjectUtil.DEFAULT_FAR
+        )
+        cam.setLocation(Vector3(8.0, 6.0, 12.0))
+        cam.lookAt(Vector3.ZERO, Vector3.UNIT_Y)
+
+        val node = CameraNode("Camera $count", cam)
+        // Seed the node's local transform from the camera frame; from here the node is the source
+        // of truth and updateWorldTransform keeps the managed camera in sync.
+        node.updateFromCamera()
+
+        editorState.execute(
+            AttachChildCommand(
+                parent = creationParent(),
+                child = node,
+                name = "Add Camera $count",
+                onExecuted = { editorState.select(node) },
+                onUndone = { if (editorState.isSelected(node)) editorState.clearSelection() }
+            )
+        )
+        editorState.sealUndoMerge()
+    }
+
+    /**
      * State captured and applied by the visibility (eye) toggle: the toggled spatial's local
      * cull hint plus the enabled flag of every Light in its subtree. A culled light still
      * illuminates the scene - LightManager gathers lights by isEnabled() and ignores cull hints -
@@ -458,6 +509,60 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 gizmo
             }
         }
+    }
+
+    /**
+     * Collects all camera objects in the document.
+     */
+    private fun collectCameras(spatial: Spatial, into: MutableList<CameraNode>) {
+        if (spatial is CameraNode) {
+            into.add(spatial)
+        }
+        if (spatial is Node) {
+            for (child in spatial.children) {
+                collectCameras(child, into)
+            }
+        }
+    }
+
+    /**
+     * Keeps one overlay frustum gizmo per camera object: adds/removes gizmos as cameras come and
+     * go, rebuilds a gizmo's geometry when its frustum shape changes (fov / aspect / near edited
+     * in the inspector), and each frame moves every gizmo onto its camera's world pose and mirrors
+     * its cull state. Also refreshes [EditorState.hasCamera] so the Play button can enable itself.
+     */
+    private fun syncCameraGizmos() {
+        val cameras = mutableListOf<CameraNode>()
+        collectCameras(root, cameras)
+
+        val stale = cameraGizmos.keys - cameras.toSet()
+        for (camera in stale) {
+            cameraGizmos.remove(camera)?.let(overlayRoot::detachChild)
+            cameraGizmoShapes.remove(camera)
+        }
+        for (node in cameras) {
+            val cam = node.camera ?: continue
+            val shape = CameraObjectUtil.frustumShape(cam)
+            val existing = cameraGizmos[node]
+            if (existing == null || !shape.contentEquals(cameraGizmoShapes[node])) {
+                existing?.let(overlayRoot::detachChild)
+                val gizmo = createCameraGizmo(cam)
+                overlayRoot.attachChild(gizmo)
+                MaterialUtil.autoMaterials(gizmo)
+                cameraGizmos[node] = gizmo
+                cameraGizmoShapes[node] = shape
+            }
+        }
+        // Position each gizmo on its camera (translation and rotation, so the frustum points where
+        // the camera looks), hidden along with a hidden camera.
+        for ((node, gizmo) in cameraGizmos) {
+            gizmo.setRotation(node.worldRotation)
+            gizmo.setTranslation(node.worldTranslation)
+            gizmo.sceneHints.cullHint =
+                if (node.sceneHints.cullHint == CullHint.Always) CullHint.Always else CullHint.Inherit
+        }
+
+        editorState.updateHasCamera(cameras.isNotEmpty())
     }
 
     /**
@@ -870,6 +975,102 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         camera.lookAt(Vector3.ZERO, Vector3.UNIT_Y)
     }
 
+    /**
+     * The camera object play mode should render through: the selected one if a camera is selected,
+     * otherwise the first camera found in the document. Null when the scene has no cameras.
+     */
+    private fun playCameraCandidate(): CameraNode? {
+        (editorState.primarySelection as? CameraNode)?.let { return it }
+        val cameras = mutableListOf<CameraNode>()
+        collectCameras(root, cameras)
+        return cameras.firstOrNull()
+    }
+
+    /** Toggles play mode. */
+    fun togglePlayMode() {
+        if (editorState.playing) exitPlayMode() else enterPlayMode()
+    }
+
+    /**
+     * Enters play mode: snapshots the document so Stop can discard whatever play does to it, saves
+     * the editor fly camera's pose, and starts driving the viewport from a camera object. No-op if
+     * already playing or the scene has no camera. The per-frame sync in [update] does the actual
+     * driving; here we only capture state and clear editor affordances.
+     */
+    fun enterPlayMode() {
+        if (editorState.playing) return
+        val cameraNode = playCameraCandidate() ?: return
+        val render = canvasRenderer?.camera ?: return
+
+        // Snapshot the pre-play document. From here play-mode code may mutate the live scene freely;
+        // exitPlayMode restores this snapshot, so nothing play does survives Stop.
+        playSession.start(root)
+
+        savedEditorLocation.set(render.location)
+        savedEditorLeft.set(render.left)
+        savedEditorUp.set(render.up)
+        savedEditorDirection.set(render.direction)
+        hasSavedEditorCamera = true
+
+        playCamera = cameraNode
+        interactManager?.setSpatialTarget(null)
+        editorState.setPlaying(true, cameraNode.name)
+    }
+
+    /**
+     * Leaves play mode: restores the editor fly camera's pose and reinstalls the pre-play scene from
+     * the snapshot, discarding every play-mode mutation. The document swap runs as a deferred action
+     * (like Open/New) so it happens at a clean point in [update] with the same context conditions as
+     * the other document-root operations; that same drain flips `playing` off, so the next render
+     * shows the restored scene with editor overlays back.
+     */
+    fun exitPlayMode() {
+        if (!editorState.playing) return
+        pendingActions.add {
+            // A double-toggle can enqueue two exits; the first flips playing off, so the second
+            // finds nothing to do rather than trying to stop an already-stopped session.
+            if (!editorState.playing) return@add
+
+            val render = canvasRenderer?.camera
+            if (render != null && hasSavedEditorCamera) {
+                render.setFrame(savedEditorLocation, savedEditorLeft, savedEditorUp, savedEditorDirection)
+            }
+            hasSavedEditorCamera = false
+            playCamera = null
+
+            // Rebuild the pre-play document and install it, discarding play-mode changes. This
+            // resets the undo history: entering play is a history boundary.
+            installDocumentRoot(playSession.stop())
+
+            editorState.setPlaying(false, null)
+            resetLastDimensions()
+            lastSelection = null
+        }
+    }
+
+    /**
+     * While playing, drives the viewport render camera from the active camera object: copies its
+     * frame and applies its field of view / near / far with the *viewport's* aspect (so the play
+     * view fills the panel). Called at the end of [update], after the document's world transforms
+     * are current, so the managed camera reflects this frame's node pose.
+     */
+    private fun syncPlayCamera() {
+        val cameraNode = playCamera ?: return
+        val render = canvasRenderer?.camera ?: return
+        val cvs = canvas ?: return
+        val gameCam = cameraNode.camera ?: return
+
+        render.setFrame(gameCam)
+        val w = cvs.contentWidth
+        val h = cvs.contentHeight
+        if (w > 0 && h > 0) {
+            CameraObjectUtil.setPerspective(
+                render, CameraObjectUtil.fovYDegrees(gameCam), w.toDouble() / h.toDouble(),
+                gameCam.frustumNear, gameCam.frustumFar
+            )
+        }
+    }
+
     override fun render(renderer: Renderer): Boolean {
         // Setup on first render (GL context now available)
         if (!initialized) {
@@ -901,12 +1102,16 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 lastWidth = w
                 lastHeight = h
                 camera.resize(w, h)
-                camera.setFrustumPerspective(
-                    45.0,
-                    w.toDouble() / h.toDouble(),
-                    0.1,
-                    1000.0
-                )
+                // In play mode the frustum is driven per-frame from the active camera object
+                // (see syncPlayCamera); don't clobber it with the editor's default perspective.
+                if (!editorState.playing) {
+                    camera.setFrustumPerspective(
+                        45.0,
+                        w.toDouble() / h.toDouble(),
+                        0.1,
+                        1000.0
+                    )
+                }
             }
         }
 
@@ -914,6 +1119,15 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         SceneIndexer.getCurrent()?.onRender(renderer)
 
         renderer.draw(root)
+
+        // In play mode the viewport shows only the document, exactly as the game camera sees it:
+        // no grid, light/camera gizmos, selection bounds, transform gizmo, or drag readout. Just
+        // flush the scene and return.
+        if (editorState.playing) {
+            renderer.renderBuckets()
+            return true
+        }
+
         renderer.draw(overlayRoot)
 
         // Draw selection highlight (bounding box) for selected objects. The gizmo target
@@ -973,33 +1187,44 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         // Execute updateQueue item
         GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.UPDATE).execute()
 
-        // Check if transform mode changed and update active widget
-        if (lastTransformMode != editorState.transformMode) {
-            lastTransformMode = editorState.transformMode
-            updateActiveWidget()
-        }
+        val playing = editorState.playing
 
-        interactManager?.let {
-            it.logicalLayer.checkTriggers(timer.timePerFrame)
-            it.update(timer)
-        } ?: logicalLayer?.checkTriggers(timer.timePerFrame)
+        // Input routing switch. While playing, the viewport is the game view: editor input
+        // (fly camera, picking, transform gizmo, hotkeys) is off and input is routed to the active
+        // game instead. Until a game attaches an input layer this dispatches nowhere - the same as
+        // the old "suppress input while playing" behavior, but now it is a routing seam rather than
+        // a dead end.
+        if (playing) {
+            playSession.routeInput(timer.timePerFrame)
+        } else {
+            // Check if transform mode changed and update active widget
+            if (lastTransformMode != editorState.transformMode) {
+                lastTransformMode = editorState.transformMode
+                updateActiveWidget()
+            }
 
-        // Sync the gizmo target with the editor selection (which may have been
-        // changed by the hierarchy panel, picking, or programmatically).
-        if (lastSelection !== editorState.primarySelection) {
-            lastSelection = editorState.primarySelection
-            transformCacheValid = false
-            updateInteractTarget()
-        }
+            interactManager?.let {
+                it.logicalLayer.checkTriggers(timer.timePerFrame)
+                it.update(timer)
+            } ?: logicalLayer?.checkTriggers(timer.timePerFrame)
 
-        // Notify the UI when the selected spatial's transform actually changed
-        // (e.g. dragged by a gizmo) so the inspector refreshes.
-        val selected = lastSelection
-        if (selected != null) {
-            if (!transformCacheValid || lastSelectedTransform != selected.transform) {
-                lastSelectedTransform.set(selected.transform)
-                transformCacheValid = true
-                editorState.notifyTransformChanged()
+            // Sync the gizmo target with the editor selection (which may have been
+            // changed by the hierarchy panel, picking, or programmatically).
+            if (lastSelection !== editorState.primarySelection) {
+                lastSelection = editorState.primarySelection
+                transformCacheValid = false
+                updateInteractTarget()
+            }
+
+            // Notify the UI when the selected spatial's transform actually changed
+            // (e.g. dragged by a gizmo) so the inspector refreshes.
+            val selected = lastSelection
+            if (selected != null) {
+                if (!transformCacheValid || lastSelectedTransform != selected.transform) {
+                    lastSelectedTransform.set(selected.transform)
+                    transformCacheValid = true
+                    editorState.notifyTransformChanged()
+                }
             }
         }
 
@@ -1016,10 +1241,18 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
                 if (light.sceneHints.cullHint == CullHint.Always) CullHint.Always else CullHint.Inherit
         }
 
+        // Keep camera gizmos in sync (add/remove/reshape, and position onto each camera).
+        syncCameraGizmos()
+
         // Update geometric state for the document, the editor overlay, and the readout root
         root.updateGeometricState(timer.timePerFrame, true)
         overlayRoot.updateGeometricState(timer.timePerFrame, true)
         orthoRoot.updateGeometricState(timer.timePerFrame, true)
+
+        // With world transforms now current, drive the viewport from the active camera object.
+        if (playing) {
+            syncPlayCamera()
+        }
 
         // Status bar FPS, refreshed twice a second
         fpsAccumulatedTime += timer.timePerFrame
