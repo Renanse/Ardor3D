@@ -38,6 +38,42 @@ class EditorState {
     // Render loop frame rate, updated by the scene for the status bar
     var framesPerSecond: Int by mutableStateOf(0)
 
+    // Play mode: when true the viewport renders through a camera object instead of the editor
+    // fly camera, with editor overlays and controls suspended. This is view state, not a
+    // document edit - it never touches the undo history or the dirty flag.
+    var playing: Boolean by mutableStateOf(false)
+        private set
+
+    // Name of the camera object play mode is rendering through, for the status bar.
+    var playCameraName: String? by mutableStateOf(null)
+        private set
+
+    // Whether the document contains at least one camera object, so the Play button can enable
+    // itself. Refreshed by the scene as the structure changes.
+    var hasCamera: Boolean by mutableStateOf(false)
+        private set
+
+    // A short status line reported by the active game (e.g. "Red to move", "Black wins!"), shown in
+    // the play status bar. Null when no game is reporting. View state - never touches undo/dirty.
+    var gameStatus: String? by mutableStateOf(null)
+        private set
+
+    /** Set by the scene when entering/leaving play mode. */
+    fun setPlaying(playing: Boolean, cameraName: String?) {
+        this.playing = playing
+        this.playCameraName = cameraName
+    }
+
+    /** Set by the scene as the active game reports status (null clears it). */
+    fun updateGameStatus(status: String?) {
+        this.gameStatus = status
+    }
+
+    /** Set by the scene as camera objects are added/removed. */
+    fun updateHasCamera(hasCamera: Boolean) {
+        this.hasCamera = hasCamera
+    }
+
     // Version counter observed by the inspector - bumped when a transform
     // actually changes so the UI recomposes only when needed.
     var transformVersion: Long by mutableStateOf(0L)

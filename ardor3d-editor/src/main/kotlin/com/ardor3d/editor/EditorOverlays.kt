@@ -12,6 +12,7 @@ package com.ardor3d.editor
 
 import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.Vector3
+import com.ardor3d.renderer.Camera
 import com.ardor3d.scenegraph.Line
 import com.ardor3d.scenegraph.Node
 import com.ardor3d.scenegraph.shape.Box
@@ -119,6 +120,61 @@ internal fun createLightGizmo(): Node {
         ray.lineWidth = 2.0f
         gizmoNode.attachChild(ray)
     }
+
+    return gizmoNode
+}
+
+/**
+ * Creates a wireframe frustum gizmo for a camera object. The apex sits at the local origin and
+ * the frustum opens along local +Z, matching [com.ardor3d.scenegraph.extension.CameraNode]'s
+ * axis mapping (world-rotation column 2 is the view direction). The rectangle is drawn to a
+ * fixed display distance - scaled to the camera's field of view and aspect - so a camera with a
+ * far plane of 1000 doesn't draw a kilometre-long cone; only the shape (fov, aspect) is
+ * reflected, not the absolute near/far distances.
+ */
+internal fun createCameraGizmo(camera: Camera): Node {
+    val gizmoNode = Node("CameraGizmo")
+    val color = ColorRGBA(0.3f, 0.85f, 1f, 1f)  // cyan, distinct from the yellow light gizmo
+
+    // Small body box marking the camera position/orientation.
+    val body = Box("CameraBody", Vector3.ZERO, 0.15, 0.15, 0.2)
+    body.setDefaultColor(color)
+    gizmoNode.attachChild(body)
+
+    // Half-extents of the frustum rectangle at the display distance. tan(fov/2) == top/near and
+    // tan(fov/2)*aspect == right/near, so the frustum's proportions come straight from the planes.
+    val d = 1.5
+    val near = camera.frustumNear
+    val halfHeight = if (near > 0.0) d * camera.frustumTop / near else d * 0.5
+    val halfWidth = if (near > 0.0) d * camera.frustumRight / near else d * 0.5
+
+    val corners = arrayOf(
+        Vector3(-halfWidth, -halfHeight, d),
+        Vector3(halfWidth, -halfHeight, d),
+        Vector3(halfWidth, halfHeight, d),
+        Vector3(-halfWidth, halfHeight, d)
+    )
+
+    val verts = mutableListOf<Vector3>()
+    // Four edges from the apex to the far-plane corners.
+    for (corner in corners) {
+        verts.add(Vector3())
+        verts.add(Vector3(corner))
+    }
+    // The far-plane rectangle.
+    for (i in corners.indices) {
+        verts.add(Vector3(corners[i]))
+        verts.add(Vector3(corners[(i + 1) % 4]))
+    }
+    // A small "up" triangle above the top edge so roll is legible at a glance.
+    val tipY = halfHeight + halfHeight * 0.5
+    verts.add(Vector3(-halfWidth * 0.4, halfHeight, d)); verts.add(Vector3(0.0, tipY, d))
+    verts.add(Vector3(0.0, tipY, d)); verts.add(Vector3(halfWidth * 0.4, halfHeight, d))
+
+    val frustum = Line("CameraFrustum", verts.toTypedArray(), null, null, null)
+    frustum.setDefaultColor(color)
+    frustum.lineWidth = 1.5f
+    gizmoNode.attachChild(frustum)
 
     return gizmoNode
 }

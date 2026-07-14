@@ -22,12 +22,15 @@ enum class LightType {
 }
 
 /**
- * Undoable scene operations exposed to the UI panels. Implemented by the scene owner
- * (EditorScene) and passed to menus/panels so they stay decoupled from scene internals.
+ * Scene operations exposed to the UI panels. Implemented by the scene owner (EditorScene) and
+ * passed to menus/panels so they stay decoupled from scene internals. Most are undoable document
+ * edits; [togglePlayMode] and [playCheckers] are the exceptions - they toggle view/play state,
+ * not the document.
  */
 class SceneOperations(
     val addShape: (ShapeType) -> Unit,
     val addLight: (LightType) -> Unit,
+    val addCamera: () -> Unit,
     val deleteSpatial: (Spatial) -> Unit,
     val duplicateSpatial: (Spatial) -> Unit,
     val deleteSelection: () -> Unit,
@@ -36,5 +39,7 @@ class SceneOperations(
     val reparentSpatial: (Spatial, Node) -> Unit,
     val insertSpatial: (Spatial, Insertion) -> Unit,
     val toggleVisibility: (Spatial) -> Unit,
-    val createEmpty: () -> Unit
+    val createEmpty: () -> Unit,
+    val togglePlayMode: () -> Unit,
+    val playCheckers: () -> Unit
 )

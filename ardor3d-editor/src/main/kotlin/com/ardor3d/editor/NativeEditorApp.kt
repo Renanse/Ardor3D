@@ -154,6 +154,11 @@ fun main() = application {
                         true
                     }
 
+                    Key.P -> {
+                        shortcuts.sceneOperations?.togglePlayMode?.invoke()
+                        true
+                    }
+
                     Key.N -> {
                         shortcuts.fileOperations?.newScene?.invoke()
                         true
@@ -235,6 +240,7 @@ fun NativeEditorApp(
         SceneOperations(
             addShape = editorScene::addShape,
             addLight = editorScene::addLight,
+            addCamera = editorScene::addCamera,
             deleteSpatial = editorScene::deleteSpatial,
             duplicateSpatial = editorScene::duplicateSpatial,
             deleteSelection = editorScene::deleteSelection,
@@ -243,7 +249,9 @@ fun NativeEditorApp(
             reparentSpatial = editorScene::reparentSpatial,
             insertSpatial = editorScene::insertSpatial,
             toggleVisibility = editorScene::toggleVisibility,
-            createEmpty = editorScene::createEmptyNode
+            createEmpty = editorScene::createEmptyNode,
+            togglePlayMode = editorScene::togglePlayMode,
+            playCheckers = editorScene::startCheckers
         )
     }
     val fileOperations = remember(editorScene, window) {
@@ -311,6 +319,7 @@ fun NativeEditorApp(
                         // Toolbar at top
                         ViewportToolbar(
                             editorState = editorState,
+                            onTogglePlay = { sceneOperations.togglePlayMode() },
                             modifier = Modifier.padding(8.dp)
                         )
 

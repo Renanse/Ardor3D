@@ -11,12 +11,15 @@
 package com.ardor3d.editor.io
 
 import com.ardor3d.bounding.BoundingBox
+import com.ardor3d.editor.util.CameraObjectUtil
 import com.ardor3d.light.PointLight
 import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.Vector3
+import com.ardor3d.renderer.Camera
 import com.ardor3d.renderer.state.RenderState
 import com.ardor3d.renderer.state.WireframeState
 import com.ardor3d.scenegraph.Node
+import com.ardor3d.scenegraph.extension.CameraNode
 import com.ardor3d.scenegraph.shape.Box
 import com.ardor3d.surface.ColorSurface
 import com.ardor3d.util.export.binary.BinaryExporter
@@ -59,12 +62,20 @@ class SceneRoundTripTest {
         light.setTranslation(5.0, 8.0, 5.0)
         root.attachChild(light)
 
+        val cameraObject = Camera(100, 100)
+        CameraObjectUtil.setPerspective(cameraObject, 35.0, 1.6, 0.5, 250.0)
+        cameraObject.setLocation(2.0, 3.0, 9.0)
+        cameraObject.lookAt(0.0, 0.0, 0.0, Vector3.UNIT_Y)
+        val cameraNode = CameraNode("Main Camera", cameraObject)
+        cameraNode.updateFromCamera()
+        root.attachChild(cameraNode)
+
         val bytes = ByteArrayOutputStream()
         BinaryExporter().save(root, bytes)
         val loaded = BinaryImporter().load(ByteArrayInputStream(bytes.toByteArray())) as Node
 
         assertEquals("Scene Root", loaded.name)
-        assertEquals(3, loaded.numberOfChildren)
+        assertEquals(4, loaded.numberOfChildren)
 
         val loadedBox = loaded.getChild("Crate") as Box
         assertEquals(1.0, loadedBox.translation.x, 0.0)
@@ -88,5 +99,15 @@ class SceneRoundTripTest {
 
         val loadedGroup = loaded.getChild("Group") as Node
         assertEquals(-4.0, loadedGroup.translation.x, 0.0)
+
+        // Camera object: the CameraNode and its managed camera's frustum survive. Field of view is
+        // recovered from the frustum planes, since Camera.write() does not persist the fovY value.
+        val loadedCamera = loaded.getChild("Main Camera") as CameraNode
+        val loadedCam = loadedCamera.camera
+        assertNotNull("managed camera should survive", loadedCam)
+        assertEquals(0.5, loadedCam!!.frustumNear, 1e-6)
+        assertEquals(250.0, loadedCam.frustumFar, 1e-6)
+        assertEquals(35.0, CameraObjectUtil.fovYDegrees(loadedCam), 1e-6)
+        assertEquals(1.6, CameraObjectUtil.aspect(loadedCam), 1e-6)
     }
 }
