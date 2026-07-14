@@ -11,10 +11,10 @@
 package com.ardor3d.editor.play
 
 /**
- * A game's behavior, driven by the editor's play mode. This is the editor/sample-side sandbox for
- * the behavior-model questions a future Ardor3D 2.0 must answer (an ordered service layer, explicit
- * update phases, a jME-`AppState`-style split): patterns proven here are *candidate designs*, not
- * promoted into core by this work.
+ * A game's behavior, driven by the editor's play mode. This is a deliberately small,
+ * editor/sample-side SPI - a sandbox for trying behavior-model ideas (an ordered service layer,
+ * explicit update phases) in purely additive code: patterns proven here are candidate designs,
+ * not something this work promotes into the engine core.
  *
  * Lifecycle, all on the render/update thread:
  * - [onStart] once when play begins, with the play-session [GameContext]. Set up the model and its
