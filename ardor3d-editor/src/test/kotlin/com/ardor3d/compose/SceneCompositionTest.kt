@@ -15,7 +15,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.ardor3d.scenegraph.Node
-import com.ardor3d.scenegraph.Spatial
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -31,56 +30,6 @@ import java.lang.management.ManagementFactory
  * idle frame produces zero applier traffic of any kind.
  */
 class SceneCompositionTest {
-
-    /** Instruments every applier entry point, structural and navigational, for the silence gate. */
-    private class CountingApplier(root: Node) : SpatialApplier(root) {
-        var structuralOps = 0
-            private set
-        var navigations = 0
-            private set
-
-        val operations: Int get() = structuralOps + navigations
-
-        fun resetCounts() {
-            structuralOps = 0
-            navigations = 0
-        }
-
-        override fun insertTopDown(index: Int, instance: Spatial) {
-            structuralOps++
-            super.insertTopDown(index, instance)
-        }
-
-        override fun insertBottomUp(index: Int, instance: Spatial) {
-            structuralOps++
-            super.insertBottomUp(index, instance)
-        }
-
-        override fun remove(index: Int, count: Int) {
-            structuralOps++
-            super.remove(index, count)
-        }
-
-        override fun move(from: Int, to: Int, count: Int) {
-            structuralOps++
-            super.move(from, to, count)
-        }
-
-        override fun onClear() {
-            structuralOps++
-            super.onClear()
-        }
-
-        override fun down(node: Spatial) {
-            navigations++
-            super.down(node)
-        }
-
-        override fun up() {
-            navigations++
-            super.up()
-        }
-    }
 
     @Test
     fun setContentEmitsTheTreeSynchronously() {

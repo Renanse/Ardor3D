@@ -56,3 +56,9 @@ compose.desktop {
 kotlin {
     jvmToolchain(17)
 }
+
+tasks.test {
+    // The composition scale gates hold 50k-spatial scenes; the default 512m test heap is tight
+    // enough there that GC would skew the allocation accounting the gates assert on.
+    maxHeapSize = "2g"
+}
