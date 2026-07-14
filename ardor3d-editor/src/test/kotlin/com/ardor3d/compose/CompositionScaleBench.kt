@@ -36,8 +36,9 @@ import java.lang.management.ManagementFactory
  */
 class CompositionScaleBench {
 
-    private val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
-    private val self = Thread.currentThread().id
+    // Lazy so instantiating the (normally skipped) bench never touches com.sun.management.
+    private val threads by lazy { ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean }
+    private val self by lazy { Thread.currentThread().id }
 
     private class ChurnOps(val remove: () -> Unit, val insert: () -> Unit, val move: () -> Unit)
 
@@ -95,7 +96,7 @@ class CompositionScaleBench {
     fun printScaleCurves() {
         Assume.assumeTrue(
             "set A3D_COMPOSE_BENCH=1 to run the bench",
-            System.getenv("A3D_COMPOSE_BENCH") != null
+            System.getenv("A3D_COMPOSE_BENCH") == "1"
         )
         val only = System.getenv("A3D_BENCH_SHAPES")?.split(',')?.map { it.trim() }?.toSet()
 

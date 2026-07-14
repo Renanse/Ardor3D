@@ -53,6 +53,20 @@ class CompositionScaleGateTest {
         override fun close() = scene.close()
     }
 
+    /**
+     * The allocation gates are only meaningful if thread-allocation accounting is actually on:
+     * when it is unsupported or disabled, getThreadAllocatedBytes returns -1 for every call and
+     * a before/after delta is 0 - the gate would pass vacuously. Fail loudly instead.
+     */
+    private fun allocationAccounting(): com.sun.management.ThreadMXBean {
+        val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
+        assertTrue(
+            "thread allocation accounting must be supported and enabled for the allocation gates",
+            threads.isThreadAllocatedMemorySupported && threads.isThreadAllocatedMemoryEnabled
+        )
+        return threads
+    }
+
     private fun assertConfined(name: String, model: ScaleModel, pokeId: Int, compose: Harness.() -> Unit) {
         Harness().use { h ->
             h.compose()
@@ -114,7 +128,7 @@ class CompositionScaleGateTest {
         val model = ScaleModel(leafCount)
         Harness().use { h ->
             h.scene.setContent { FlatScene(model) } // no sync hook: measure the bare path
-            val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
+            val threads = allocationAccounting()
             val self = Thread.currentThread().id
             var value = 1.0
 
@@ -238,7 +252,7 @@ class CompositionScaleGateTest {
             h.scene.setContent { EntityScene(model, h.onLeafSync) }
             assertTrue("the scene must actually be at scale", countSpatials(h.root) >= 50_000)
 
-            val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
+            val threads = allocationAccounting()
             val self = Thread.currentThread().id
             repeat(10_000) { h.frame() } // warmup, mirroring the small-scene gate
 

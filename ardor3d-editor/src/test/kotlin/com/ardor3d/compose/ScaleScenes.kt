@@ -96,6 +96,10 @@ internal fun FlatScene(model: ScaleModel, onLeafSync: (() -> Unit)? = null) {
  */
 @Composable
 internal fun TreeScene(model: ScaleModel, branching: Int, depth: Int, onLeafSync: (() -> Unit)? = null) {
+    val leaves = generateSequence(1) { it * branching }.elementAt(depth)
+    require(model.leafCount == leaves) {
+        "TreeScene emits exactly branching^depth leaves; model has ${model.leafCount}, shape yields $leaves"
+    }
     TreeLevel(0, model.leafCount, branching, depth, model, onLeafSync)
 }
 
