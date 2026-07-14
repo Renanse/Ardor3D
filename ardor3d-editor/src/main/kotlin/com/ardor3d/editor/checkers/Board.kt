@@ -24,7 +24,9 @@ class Board private constructor(
     /** Whose turn it is. */
     val toMove: PieceColor,
     /** Plies since the last capture or man move - the draw clock. */
-    val pliesSinceProgress: Int
+    val pliesSinceProgress: Int,
+    /** Stable piece identities by square - see [idAt]. */
+    private val ids: Map<Square, Int>
 ) {
     /** The piece on [square], or null if empty. */
     fun pieceAt(square: Square): Piece? = pieces[square]
@@ -34,6 +36,14 @@ class Board private constructor(
 
     /** Count of [color]'s pieces still on the board. */
     fun count(color: PieceColor): Int = pieces.values.count { it.color == color }
+
+    /**
+     * A stable identity for the piece on [square] (which must be occupied): assigned when a position
+     * is first built and carried with the piece as it moves and crowns. [Piece] itself is a pure
+     * value - two red men are equal - so continuity across [apply] lives here; a view that keys its
+     * scene nodes by this keeps a moving piece's node instead of rebuilding it.
+     */
+    fun idAt(square: Square): Int = ids[square] ?: error("no piece at $square")
 
     /**
      * Every legal move for [toMove]. If any capture exists, only captures are returned (mandatory
@@ -59,9 +69,14 @@ class Board private constructor(
         for (captured in move.captured) next.remove(captured)
         val crowned = !piece.king && isKingRow(piece.color, move.to)
         next[move.to] = if (crowned) piece.copy(king = true) else piece
+        // The identity travels with the piece; captured identities fall away with their pieces.
+        val nextIds = ids.toMutableMap()
+        val movedId = nextIds.remove(move.from) ?: error("no piece to move at ${move.from}")
+        for (captured in move.captured) nextIds.remove(captured)
+        nextIds[move.to] = movedId
         // A capture or any man move is progress; only quiet king shuffling advances the draw clock.
         val progress = move.isCapture || !piece.king
-        return Board(next, toMove.opponent, if (progress) 0 else pliesSinceProgress + 1)
+        return Board(next, toMove.opponent, if (progress) 0 else pliesSinceProgress + 1, nextIds)
     }
 
     /** The winner, or null if the game is not decided by a side being unable to move. */
@@ -159,11 +174,18 @@ class Board private constructor(
                     }
                 }
             }
-            return Board(pieces, PieceColor.RED, 0)
+            return Board(pieces, PieceColor.RED, 0, assignIds(pieces))
         }
 
         /** Builds a board from an explicit placement - used by tests to set up specific positions. */
-        fun of(toMove: PieceColor, pieces: Map<Square, Piece>, pliesSinceProgress: Int = 0): Board =
-            Board(pieces.toMap(), toMove, pliesSinceProgress)
+        fun of(toMove: PieceColor, pieces: Map<Square, Piece>, pliesSinceProgress: Int = 0): Board {
+            val copy = pieces.toMap()
+            return Board(copy, toMove, pliesSinceProgress, assignIds(copy))
+        }
+
+        /** Initial identity assignment: one id per occupied square, in board order (see [idAt]). */
+        private fun assignIds(pieces: Map<Square, Piece>): Map<Square, Int> =
+            pieces.keys.sortedWith(compareBy({ it.row }, { it.col })).withIndex()
+                .associate { (id, square) -> square to id }
     }
 }

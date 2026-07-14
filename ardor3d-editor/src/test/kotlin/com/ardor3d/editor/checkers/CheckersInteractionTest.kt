@@ -20,6 +20,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -84,9 +85,41 @@ class CheckersInteractionTest {
         assertNull(game.boardForTest.pieceAt(sq(2, 0)))
         assertEquals(Piece(PieceColor.RED), game.boardForTest.pieceAt(sq(3, 1)))
         assertEquals(PieceColor.BLACK, game.boardForTest.toMove)
-        assertNotNull(game.viewForTest.pieceNodeAt(sq(3, 1)))
+        assertNotNull(game.pieceNodeForTest(sq(3, 1)))
         assertEquals("highlights cleared after the move", 0, game.highlightCountForTest)
         assertEquals("Black to move", ctx.lastStatus)
+    }
+
+    @Test
+    fun slideIsImperativeWithZeroRecompositionAndTheNodeSurvivesTheMove() {
+        val game = CheckersGame().also { it.onStart(FakeGameContext()) }
+
+        game.clickSquareForTest(sq(2, 0))
+        val node = game.pieceNodeForTest(sq(2, 0))
+        assertNotNull(node)
+        game.clickSquareForTest(sq(3, 1))
+        assertTrue(game.isAnimatingForTest)
+
+        // The first update applies the highlight clear that beginMove wrote; count syncs after it.
+        game.update(0.05, GameInput.EMPTY)
+        val syncsAtSlideStart = game.syncCountForTest
+        val xAtStart = node!!.translation.x
+
+        // Mid-slide frames: the piece moves by imperative writes alone - zero recomposition.
+        repeat(2) { game.update(0.05, GameInput.EMPTY) }
+        assertTrue("still sliding", game.isAnimatingForTest)
+        assertTrue("the piece is actually moving", node.translation.x > xAtStart)
+        assertEquals("zero recomposition during the slide", syncsAtSlideStart, game.syncCountForTest)
+
+        // Finish: the board applies, and recomposition keeps the very same node - moved, not
+        // rebuilt - snapping its transform to the slide's own endpoint rather than stomping it.
+        game.update(0.2, GameInput.EMPTY)
+        assertFalse(game.isAnimatingForTest)
+        assertTrue("the move recomposed the pieces", game.syncCountForTest > syncsAtSlideStart)
+        assertSame("the same node instance after the move", node, game.pieceNodeForTest(sq(3, 1)))
+        val dest = worldPositionOf(sq(3, 1))
+        assertEquals(dest.x, node.translation.x, 1e-9)
+        assertEquals(dest.z, node.translation.z, 1e-9)
     }
 
     @Test
