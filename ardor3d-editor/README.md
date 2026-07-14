@@ -21,7 +21,7 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 
 ### Tests
 
-```
+```bash
 LIBGL_ALWAYS_SOFTWARE=1 ./gradlew :ardor3d-editor:test
 ```
 

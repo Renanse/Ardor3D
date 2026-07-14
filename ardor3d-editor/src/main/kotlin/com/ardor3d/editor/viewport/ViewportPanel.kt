@@ -141,10 +141,11 @@ private fun TransformToolButton(
             imageVector = icon,
             contentDescription = contentDescription,
             modifier = Modifier.size(20.dp),
-            tint = if (selected)
-                MaterialTheme.colorScheme.onPrimaryContainer
-            else
-                MaterialTheme.colorScheme.onSurface
+            tint = when {
+                !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                selected -> MaterialTheme.colorScheme.onPrimaryContainer
+                else -> MaterialTheme.colorScheme.onSurface
+            }
         )
     }
 }

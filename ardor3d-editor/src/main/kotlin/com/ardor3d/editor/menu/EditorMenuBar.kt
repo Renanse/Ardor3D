@@ -11,6 +11,7 @@
 package com.ardor3d.editor.menu
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -62,16 +63,10 @@ fun EditorMenuBar(
         modifier = modifier
     ) {
         Row(modifier = Modifier.padding(horizontal = 4.dp)) {
-            // Each menu button + its dropdown is wrapped in a Box so the dropdown anchors to the
-            // button's position, not the Row's start (otherwise every menu opens at the far left).
-            // File menu
-            Box {
-            TextButton(onClick = { fileMenuExpanded = true }) {
-                Text("File")
-            }
-            DropdownMenu(
+            MenuBarItem(
+                label = "File",
                 expanded = fileMenuExpanded,
-                onDismissRequest = { fileMenuExpanded = false }
+                onExpandedChange = { fileMenuExpanded = it }
             ) {
                 DropdownMenuItem(
                     text = { Text("New Scene") },
@@ -118,16 +113,11 @@ fun EditorMenuBar(
                     }
                 )
             }
-            }
 
-            // Edit menu
-            Box {
-            TextButton(onClick = { editMenuExpanded = true }) {
-                Text("Edit")
-            }
-            DropdownMenu(
+            MenuBarItem(
+                label = "Edit",
                 expanded = editMenuExpanded,
-                onDismissRequest = { editMenuExpanded = false }
+                onExpandedChange = { editMenuExpanded = it }
             ) {
                 // Observe historyVersion so enabled state and labels refresh
                 @Suppress("UNUSED_VARIABLE")
@@ -170,19 +160,17 @@ fun EditorMenuBar(
                     }
                 )
             }
-            }
 
-            // GameObject menu
-            Box {
-            TextButton(onClick = { gameObjectMenuExpanded = true }) {
-                Text("GameObject")
-            }
-            DropdownMenu(
+            MenuBarItem(
+                label = "GameObject",
                 expanded = gameObjectMenuExpanded,
-                onDismissRequest = {
-                    gameObjectMenuExpanded = false
-                    shapesSubmenuExpanded = false
-                    lightsSubmenuExpanded = false
+                onExpandedChange = { open ->
+                    gameObjectMenuExpanded = open
+                    if (!open) {
+                        // Dismissing the menu collapses its inline submenus too.
+                        shapesSubmenuExpanded = false
+                        lightsSubmenuExpanded = false
+                    }
                 }
             ) {
                 DropdownMenuItem(
@@ -287,16 +275,12 @@ fun EditorMenuBar(
                     }
                 )
             }
-            }
 
             // Game menu - launch a sample game in play mode.
-            Box {
-            TextButton(onClick = { gameMenuExpanded = true }) {
-                Text("Game")
-            }
-            DropdownMenu(
+            MenuBarItem(
+                label = "Game",
                 expanded = gameMenuExpanded,
-                onDismissRequest = { gameMenuExpanded = false }
+                onExpandedChange = { gameMenuExpanded = it }
             ) {
                 DropdownMenuItem(
                     text = { Text("Play Checkers") },
@@ -306,7 +290,30 @@ fun EditorMenuBar(
                     }
                 )
             }
-            }
         }
+    }
+}
+
+/**
+ * One top-level menu bar entry: a text button that opens a dropdown anchored to itself. The Box is
+ * what anchors the dropdown to the button's position rather than the Row's start (otherwise every
+ * menu opens at the far left).
+ */
+@Composable
+private fun MenuBarItem(
+    label: String,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Box {
+        TextButton(onClick = { onExpandedChange(true) }) {
+            Text(label)
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+            content = content
+        )
     }
 }

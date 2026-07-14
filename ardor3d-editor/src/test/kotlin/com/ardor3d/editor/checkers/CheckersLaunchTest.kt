@@ -10,25 +10,20 @@
 
 package com.ardor3d.editor.checkers
 
+import com.ardor3d.editor.EditorGlTestSupport.TIMER
+import com.ardor3d.editor.EditorGlTestSupport.initCanvasOrSkip
+import com.ardor3d.editor.EditorGlTestSupport.setupResourceLocators
 import com.ardor3d.editor.EditorScene
 import com.ardor3d.editor.EditorState
-import com.ardor3d.framework.DisplaySettings
-import com.ardor3d.framework.lwjgl3.GLFWCanvas
 import com.ardor3d.framework.lwjgl3.Lwjgl3CanvasRenderer
-import com.ardor3d.image.util.awt.AWTImageLoader
 import com.ardor3d.input.PhysicalLayer
 import com.ardor3d.input.logical.LogicalLayer
-import com.ardor3d.renderer.material.MaterialManager
 import com.ardor3d.scenegraph.Node
-import com.ardor3d.util.ReadOnlyTimer
-import com.ardor3d.util.resource.ResourceLocatorTool
-import com.ardor3d.util.resource.SimpleResourceLocator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Assume
 import org.junit.Test
 
 /**
@@ -38,17 +33,6 @@ import org.junit.Test
  * canvas; SKIPS without a GL context (ARDOR3D_REQUIRE_GL_SMOKE=1 turns the skip into a failure).
  */
 class CheckersLaunchTest {
-
-    private companion object {
-        val TIMER: ReadOnlyTimer = object : ReadOnlyTimer {
-            override fun getTimeInSeconds() = 0.0
-            override fun getTime() = 0L
-            override fun getResolution() = 1_000_000_000L
-            override fun getFrameRate() = 20.0
-            override fun getTimePerFrame() = 0.05
-            override fun getPreviousFrameTime() = 0L
-        }
-    }
 
     private fun checkersNode(root: Node): Node? = root.children.firstOrNull { it.name == "Checkers" } as? Node
 
@@ -60,15 +44,7 @@ class CheckersLaunchTest {
         val scene = EditorScene(state)
         val canvasRenderer = Lwjgl3CanvasRenderer(scene)
 
-        var canvas: GLFWCanvas? = null
-        try {
-            canvas = GLFWCanvas(DisplaySettings(320, 240, 24, 0), canvasRenderer)
-            canvas.init()
-        } catch (t: Throwable) {
-            canvas?.close()
-            skipOrFail("Could not create a GL context here: $t")
-            return
-        }
+        val canvas = initCanvasOrSkip(canvasRenderer)
 
         try {
             scene.canvasRenderer = canvasRenderer
@@ -96,20 +72,5 @@ class CheckersLaunchTest {
         } finally {
             canvas.close()
         }
-    }
-
-    private fun setupResourceLocators() {
-        AWTImageLoader.registerLoader()
-        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MATERIAL, SimpleResourceLocator(
-            ResourceLocatorTool.getClassPathResource(MaterialManager::class.java, "com/ardor3d/renderer/material")))
-        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_SHADER, SimpleResourceLocator(
-            ResourceLocatorTool.getClassPathResource(MaterialManager::class.java, "com/ardor3d/renderer/shader")))
-    }
-
-    private fun skipOrFail(reason: String) {
-        if ("1" == System.getenv("ARDOR3D_REQUIRE_GL_SMOKE")) {
-            org.junit.Assert.fail("$reason - and ARDOR3D_REQUIRE_GL_SMOKE=1 requires this test to run")
-        }
-        Assume.assumeTrue(reason, false)
     }
 }

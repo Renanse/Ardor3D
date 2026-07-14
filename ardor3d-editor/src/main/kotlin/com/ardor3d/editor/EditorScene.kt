@@ -1032,9 +1032,14 @@ class EditorScene(private val editorState: EditorState) : Scene, Updater {
         interactManager?.setSpatialTarget(null)
         editorState.setPlaying(true, cameraNode.name)
 
+        // Align the render camera with the play camera now, not at the end of the next update, so
+        // onStart below already sees the camera it will play through (a game may pick or frame
+        // content from it immediately).
+        syncPlayCamera()
+
         // Start the game (if one is set) on the live play scene, viewed through the render camera
-        // (which syncPlayCamera drives to match the play camera each frame). Whatever onStart does to
-        // the scene is inside the snapshot boundary, so Stop discards it.
+        // (which syncPlayCamera keeps matched to the play camera each frame). Whatever onStart does
+        // to the scene is inside the snapshot boundary, so Stop discards it.
         activeGameMode?.let { game ->
             val context = SceneGameContext(root, render) { status -> editorState.updateGameStatus(status) }
             gameContext = context

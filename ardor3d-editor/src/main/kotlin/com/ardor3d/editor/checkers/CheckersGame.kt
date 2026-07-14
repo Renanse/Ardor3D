@@ -88,8 +88,11 @@ class CheckersGame : GameMode {
 
         // The square under the pointer this frame (null = off the board).
         val hover = squareAt(context, input.mouseX, input.mouseY)
-        if (input.click != null) {
-            processClick(hover)
+        val click = input.click
+        if (click != null) {
+            // Resolve the click where it happened, not where the pointer is now - the pointer can
+            // move between the release and this frame's poll.
+            processClick(squareAt(context, click.x, click.y))
             if (animating) return // a move started; beginMove already cleared the highlights
         }
         refreshHighlights(hover)

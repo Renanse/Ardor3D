@@ -784,7 +784,9 @@ private fun CameraSection(cameraNode: CameraNode, editorState: EditorState) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Slider(
-                value = fov.coerceIn(20f, 120f),
+                value = fov.coerceIn(
+                    CameraObjectUtil.MIN_FOV_DEGREES.toFloat(), CameraObjectUtil.MAX_FOV_DEGREES.toFloat()
+                ),
                 onValueChange = { new ->
                     fov = new
                     editorState.execute(
@@ -802,7 +804,7 @@ private fun CameraSection(cameraNode: CameraNode, editorState: EditorState) {
                     )
                 },
                 onValueChangeFinished = { editorState.sealUndoMerge() },
-                valueRange = 20f..120f,
+                valueRange = CameraObjectUtil.MIN_FOV_DEGREES.toFloat()..CameraObjectUtil.MAX_FOV_DEGREES.toFloat(),
                 modifier = Modifier.weight(1f)
             )
             Text(
