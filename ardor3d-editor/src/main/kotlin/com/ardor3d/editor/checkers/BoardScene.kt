@@ -171,7 +171,7 @@ private fun BoardHighlights(
                     factory = { buildHighlightMarker().also(materialize) },
                     update = {
                         set(square) { setTranslation(it.col - OFFSET, TILE_TOP + 0.02, it.row - OFFSET) }
-                        set(kind) { setDefaultColor(colorFor(it)) }
+                        set(kind) { defaultColor = colorFor(it) }
                     }
                 )
             }
@@ -190,10 +190,10 @@ private fun buildTile(square: Square): Box {
     tile.modelBound = BoundingBox()
     tile.updateModelBound()
     if (square.isPlayable) {
-        tile.setDefaultColor(DARK_TILE)
+        tile.defaultColor = DARK_TILE
         tile.setProperty(PROP_TILE, square.row * Board.SIZE + square.col) // a click target
     } else {
-        tile.setDefaultColor(LIGHT_TILE)
+        tile.defaultColor = LIGHT_TILE
         tile.sceneHints.setPickingHint(PickingHint.Pickable, false)
     }
     return tile
@@ -202,7 +202,7 @@ private fun buildTile(square: Square): Box {
 private fun buildDisk(color: PieceColor): Cylinder {
     val disk = Cylinder("disk", 2, 24, PIECE_RADIUS, PIECE_HEIGHT, true)
     disk.setRotation(Quaternion().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X)) // stand the disk on the board
-    disk.setDefaultColor(if (color == PieceColor.RED) RED_PIECE else BLACK_PIECE)
+    disk.defaultColor = if (color == PieceColor.RED) RED_PIECE else BLACK_PIECE
     return disk
 }
 
@@ -210,7 +210,7 @@ private fun buildCrown(): Cylinder {
     val crown = Cylinder("crown", 2, 24, PIECE_RADIUS * 0.6, PIECE_HEIGHT, true)
     crown.setRotation(Quaternion().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X))
     crown.setTranslation(0.0, PIECE_HEIGHT, 0.0)
-    crown.setDefaultColor(CROWN_COLOR)
+    crown.defaultColor = CROWN_COLOR
     return crown
 }
 
