@@ -76,6 +76,7 @@ class CompositionScaleBench {
     private fun cellChurn(model: CellModel): ChurnOps {
         val c = model.cells.size / 2
         var pulled = -1
+        var onLoan = -1 // id currently transferred to cell c+1, or -1 when it is home in cell c
         return ChurnOps(
             remove = {
                 val cell = model.cells[c].value
@@ -83,11 +84,17 @@ class CompositionScaleBench {
                 model.cells[c].value = cell - pulled
             },
             insert = { model.cells[c].value = model.cells[c].value.toMutableList().apply { add(size / 2, pulled) } },
-            move = { // transfer one leaf to the neighboring cell: the cross-parent case
-                val from = model.cells[c].value
-                val id = from.first()
-                model.cells[c].value = from.drop(1)
-                model.cells[c + 1].value = model.cells[c + 1].value + id
+            move = { // the cross-parent case: transfer one leaf across the c/c+1 boundary, alternating
+                if (onLoan < 0) { // direction each call so both cells stay bounded and the partition holds
+                    val from = model.cells[c].value
+                    onLoan = from.first()
+                    model.cells[c].value = from.drop(1)
+                    model.cells[c + 1].value = model.cells[c + 1].value + onLoan
+                } else { // return the same leaf to its original cell
+                    model.cells[c + 1].value = model.cells[c + 1].value - onLoan
+                    model.cells[c].value = model.cells[c].value + onLoan
+                    onLoan = -1
+                }
             }
         )
     }
@@ -156,6 +163,9 @@ class CompositionScaleBench {
         val spatialCount = countSpatials(imperative!!)
         gcSettle()
         val imperativeBytes = usedHeap() - baseline
+        // countSpatials is imperative's last read; without a fence the JIT may let gcSettle above
+        // reclaim the tree before this delta, undercounting what it actually retains.
+        java.lang.ref.Reference.reachabilityFence(imperative)
         @Suppress("UNUSED_VALUE")
         imperative = null
 

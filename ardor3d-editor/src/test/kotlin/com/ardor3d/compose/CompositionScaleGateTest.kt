@@ -56,14 +56,18 @@ class CompositionScaleGateTest {
     /**
      * The allocation gates are only meaningful if thread-allocation accounting is actually on:
      * when it is unsupported or disabled, getThreadAllocatedBytes returns -1 for every call and
-     * a before/after delta is 0 - the gate would pass vacuously. Fail loudly instead.
+     * a before/after delta is 0 - the gate would pass vacuously. Enable it when the JVM merely
+     * left it off; fail loudly only when the platform cannot support it at all.
      */
     private fun allocationAccounting(): com.sun.management.ThreadMXBean {
         val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
         assertTrue(
-            "thread allocation accounting must be supported and enabled for the allocation gates",
-            threads.isThreadAllocatedMemorySupported && threads.isThreadAllocatedMemoryEnabled
+            "thread allocation accounting must be supported for the allocation gates",
+            threads.isThreadAllocatedMemorySupported
         )
+        if (!threads.isThreadAllocatedMemoryEnabled) {
+            threads.isThreadAllocatedMemoryEnabled = true
+        }
         return threads
     }
 
