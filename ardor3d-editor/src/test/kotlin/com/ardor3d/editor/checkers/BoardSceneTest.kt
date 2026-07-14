@@ -76,11 +76,16 @@ class BoardSceneTest {
         var board by mutableStateOf(initial)
         var highlights by mutableStateOf<Map<Square, HighlightKind>>(emptyMap())
 
+        var syncs = 0
+            private set
+
         private val composition = SceneComposition(applier)
         private var frames = 0L
 
         init {
-            composition.setContent { BoardScene(board = { board }, highlights = { highlights }) }
+            composition.setContent {
+                BoardScene(board = { board }, highlights = { highlights }, onSync = { syncs++ })
+            }
         }
 
         fun frame() = composition.frame(++frames)
@@ -181,6 +186,21 @@ class BoardSceneTest {
             h.highlights = emptyMap()
             h.frame()
             assertEquals(0, markers.numberOfChildren)
+        }
+    }
+
+    @Test
+    fun recompositionConfinesItselfToTheChangedSubtree() {
+        Harness().use { h ->
+            val base = h.syncs // the initial composition of the pieces and highlights subtrees
+
+            h.highlights = mapOf(sq(2, 0) to HighlightKind.HOVER_PIECE)
+            h.frame()
+            assertEquals("a highlight change recomposes only the highlights", base + 1, h.syncs)
+
+            h.board = h.board.apply(h.board.legalMoves().first())
+            h.frame()
+            assertEquals("a board change recomposes only the pieces", base + 2, h.syncs)
         }
     }
 

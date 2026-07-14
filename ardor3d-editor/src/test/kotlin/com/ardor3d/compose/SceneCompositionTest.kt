@@ -21,6 +21,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.lang.management.ManagementFactory
 
 /**
  * The composition host and applier, tested headlessly - composing is pure scene-graph construction
@@ -185,6 +186,35 @@ class SceneCompositionTest {
             assertSame("the same node instance is renamed, not replaced", node, root.children.single())
             assertEquals("king", node.name)
             assertEquals("an attribute change must not restructure", 0, applier.structuralOps)
+        }
+    }
+
+    @Test
+    fun idleFramesAllocateNothing() {
+        val root = Node("root")
+        SceneComposition(root).use { scene ->
+            var pieces by mutableStateOf(2)
+            scene.setContent {
+                SceneNode("pieces") {
+                    repeat(pieces) { i -> SceneNode("piece_$i") }
+                }
+            }
+
+            val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
+            val self = Thread.currentThread().id
+            // Warm up so JIT and any lazy caching inside the runtime are done allocating.
+            repeat(10_000) { scene.frame(it.toLong()) }
+
+            val before = threads.getThreadAllocatedBytes(self)
+            repeat(10_000) { scene.frame(10_000L + it) }
+            val allocated = threads.getThreadAllocatedBytes(self) - before
+
+            assertEquals("an idle frame must not allocate on the Java heap", 0L, allocated)
+
+            // And the gate must not have been trivially satisfied by a dead composition.
+            pieces = 3
+            scene.frame(20_001L)
+            assertEquals(3, (root.children.single() as Node).getNumberOfChildren())
         }
     }
 
