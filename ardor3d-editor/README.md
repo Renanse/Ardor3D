@@ -19,6 +19,18 @@ Note: on WSLg (and Mesa drivers generally), lit meshes were historically invisib
 an engine bug (two shadow-sampler types sharing a texture unit; strict drivers reject the draw),
 fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under WSLg.
 
+### Tests
+
+```
+LIBGL_ALWAYS_SOFTWARE=1 ./gradlew :ardor3d-editor:test
+```
+
+Some tests create a real GL context; on WSL the default driver can crash the forked test JVM,
+while software GL is reliable (and plenty fast) there. Gradle does not forward `-D` system
+properties to test JVMs — use environment variables. On a `/mnt/c` checkout, pointing the
+project cache at a Linux-side directory (`--project-cache-dir <linux path>`) avoids
+Windows-filesystem cache corruption.
+
 ## Features
 
 - **Hierarchy panel** — live scene tree with selection, right-click context menu
@@ -116,6 +128,13 @@ fixed in `LightManager`/`Lwjgl3ShaderUtils`. The editor now renders fully under 
 - **Commands** — `EditorCommand` / `CommandStack` in `com.ardor3d.editor.command`. UI code
   builds `SetterCommand`s with merge keys for coalescing; gizmo drags are captured by
   `GizmoUndoFilter`, an interact-system `UpdateFilter` that records one command per drag.
+- **Game behavior (play SPI)** — a `GameMode` runs only between Play and Stop: it receives a
+  `GameContext` (live scene root, play camera, picking, status line) at start and a `GameInput`
+  each frame. The design contract is *state vs. view*: the game owns a plain, engine-free model
+  and syncs the scene graph from it, never treating the scene as the source of truth — in the
+  checkers sample, `Board` is pure logic and `CheckersView` is its renderer. Because entering
+  Play snapshots the document, `onStart` may freely clear or rebuild the scene; Stop restores
+  the pre-play document exactly.
 - **Serialization** — scenes save with `BinaryExporter`. Render materials are not serialized;
   they are re-derived on load with `MaterialUtil.autoMaterials`. `ColorSurface` properties,
   render states, lights and transforms round-trip (covered by `SceneRoundTripTest`).
