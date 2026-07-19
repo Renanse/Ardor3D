@@ -87,7 +87,7 @@ class CheckersGame(
 
     override fun onStart(context: GameContext) {
         this.context = context
-        board = Board.initial()
+        board = initialBoardForTest ?: Board.initial()
         highlights = emptyMap()
         selected = null
         animating = false
@@ -318,6 +318,9 @@ class CheckersGame(
 
     /** Pins the hover for update()-driven tests, whose fake pick would otherwise see nothing. */
     internal var forcedHoverForTest: Square? = null
+
+    /** Overrides the opening position for the next [onStart] - for the gate tests. */
+    internal var initialBoardForTest: Board? = null
 
     /** The channel rig - for the gate tests. */
     internal val channelsForTest: SceneChannels? get() = channels
