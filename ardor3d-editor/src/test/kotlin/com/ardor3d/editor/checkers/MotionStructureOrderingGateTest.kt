@@ -277,21 +277,25 @@ class MotionStructureOrderingGateTest {
     @Test
     fun disposingTheCompositionWithALiveWriterRetiresEverythingOnceAndKillsTheWriter() {
         val h = Harness(twoPieceBoard())
-        h.highlights = mapOf(sq(3, 3) to HighlightKind.MOVE)
-        h.frame()
-        val handle = h.channels.transformHandle(0)
-        h.channels.writeTranslation(handle, -1.25, 0.11, -1.25) // slide in flight
-        assertEquals(2, h.channels.liveTransformCount)
-        assertEquals(1, h.channels.liveParamCount)
+        try {
+            h.highlights = mapOf(sq(3, 3) to HighlightKind.MOVE)
+            h.frame()
+            val handle = h.channels.transformHandle(0)
+            h.channels.writeTranslation(handle, -1.25, 0.11, -1.25) // slide in flight
+            assertEquals(2, h.channels.liveTransformCount)
+            assertEquals(1, h.channels.liveParamCount)
 
-        h.close() // the onStop-mid-slide shape
+            h.close() // the onStop-mid-slide shape
 
-        assertEquals("every transform retired", 0, h.channels.liveTransformCount)
-        assertEquals("every param retired", 0, h.channels.liveParamCount)
-        val e = assertThrows(IllegalStateException::class.java) {
-            h.channels.writeTranslation(handle, 9.0, 9.0, 9.0)
+            assertEquals("every transform retired", 0, h.channels.liveTransformCount)
+            assertEquals("every param retired", 0, h.channels.liveParamCount)
+            val e = assertThrows(IllegalStateException::class.java) {
+                h.channels.writeTranslation(handle, 9.0, 9.0, 9.0)
+            }
+            assertTrue("the writer died by name: ${e.message}", e.message!!.contains("stale"))
+        } finally {
+            h.close() // idempotent - cleans up if an assertion failed before the act above
         }
-        assertTrue("the writer died by name: ${e.message}", e.message!!.contains("stale"))
     }
 
     @Test
@@ -299,34 +303,36 @@ class MotionStructureOrderingGateTest {
         val channels = SceneChannels(transformCapacity = 32, paramCapacity = 48)
         val root = Node("Checkers")
         val composition = SceneComposition(root)
-        var board by mutableStateOf(twoPieceBoard())
-        var explode by mutableStateOf(false)
-        composition.setContent {
-            BoardScene(channels, board = { board }, highlights = { emptyMap() })
-            if (explode) error("recomposition fails after the new piece bound")
-        }
-        val before = channels.liveTransformCount
-        assertEquals(2, before)
-        val pieces = root.getChild("Pieces") as Node
+        try {
+            var board by mutableStateOf(twoPieceBoard())
+            var explode by mutableStateOf(false)
+            composition.setContent {
+                BoardScene(channels, board = { board }, highlights = { emptyMap() })
+                if (explode) error("recomposition fails after the new piece bound")
+            }
+            val before = channels.liveTransformCount
+            assertEquals(2, before)
+            val pieces = root.getChild("Pieces") as Node
 
-        // One frame both adds a piece (a new binding is created during recomposition) and
-        // fails the composition: the new binding must be released through onAbandoned.
-        board = Board.of(
-            PieceColor.RED,
-            mapOf(
-                sq(2, 2) to Piece(PieceColor.RED),
-                sq(5, 5) to Piece(PieceColor.BLACK),
-                sq(1, 1) to Piece(PieceColor.RED)
+            // One frame both adds a piece (a new binding is created during recomposition) and
+            // fails the composition: the new binding must be released through onAbandoned.
+            board = Board.of(
+                PieceColor.RED,
+                mapOf(
+                    sq(2, 2) to Piece(PieceColor.RED),
+                    sq(5, 5) to Piece(PieceColor.BLACK),
+                    sq(1, 1) to Piece(PieceColor.RED)
+                )
             )
-        )
-        explode = true
-        assertThrows(IllegalStateException::class.java) { composition.frame(1L) }
+            explode = true
+            assertThrows(IllegalStateException::class.java) { composition.frame(1L) }
 
-        assertEquals("the abandoned binding leaked nothing", before, channels.liveTransformCount)
-        assertEquals("no structural change from the failed frame", 2, pieces.numberOfChildren)
-
+            assertEquals("the abandoned binding leaked nothing", before, channels.liveTransformCount)
+            assertEquals("no structural change from the failed frame", 2, pieces.numberOfChildren)
+        } finally {
+            composition.close()
+        }
         // Disposal after the failure still releases the survivors exactly once.
-        composition.close()
         assertEquals(0, channels.liveTransformCount)
     }
 }

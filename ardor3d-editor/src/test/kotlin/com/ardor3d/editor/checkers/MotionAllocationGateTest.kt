@@ -83,22 +83,28 @@ class MotionAllocationGateTest {
 
         // Session one: pure warmup, discarded.
         val warmup = startSession()
-        repeat(SESSION_CYCLES) { cycle(warmup) }
-        warmup.onStop()
+        try {
+            repeat(SESSION_CYCLES) { cycle(warmup) }
+        } finally {
+            warmup.onStop()
+        }
 
         // Session two: fresh per-session objects settle over a short re-warm, then the gate.
         val game = startSession()
-        repeat(REWARM_CYCLES) { cycle(game) }
-        var total = 0L
-        repeat(MEASURED_CYCLES) { total += cycle(game) }
+        try {
+            repeat(REWARM_CYCLES) { cycle(game) }
+            var total = 0L
+            repeat(MEASURED_CYCLES) { total += cycle(game) }
 
-        assertEquals(
-            "a motion frame must allocate exactly nothing " +
-                "(${MEASURED_CYCLES * 4 * INTERIOR_FRAMES} frames measured)",
-            0L, total
-        )
-        assertTrue("the shuttle actually played", game.boardForTest.pieceAt(sq(0, 0)) != null)
-        game.onStop()
+            assertEquals(
+                "a motion frame must allocate exactly nothing " +
+                    "(${MEASURED_CYCLES * 4 * INTERIOR_FRAMES} frames measured)",
+                0L, total
+            )
+            assertTrue("the shuttle actually played", game.boardForTest.pieceAt(sq(0, 0)) != null)
+        } finally {
+            game.onStop()
+        }
     }
 
     private companion object {

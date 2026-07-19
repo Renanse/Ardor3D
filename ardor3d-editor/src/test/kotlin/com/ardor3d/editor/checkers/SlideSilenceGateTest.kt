@@ -42,7 +42,14 @@ class SlideSilenceGateTest {
         lateinit var applier: CountingApplier
         val game = CheckersGame(applierFactory = { CountingApplier(it).also { a -> applier = a } })
         game.onStart(FakeGameContext())
+        try {
+            slideUnderInstruments(game, applier)
+        } finally {
+            game.onStop() // idempotent - cleans up when an assertion fails mid-gate
+        }
+    }
 
+    private fun slideUnderInstruments(game: CheckersGame, applier: CountingApplier) {
         // Select and move: (2,0) has the single opening move to (3,1).
         game.clickSquareForTest(sq(2, 0))
         game.clickSquareForTest(sq(3, 1))
@@ -82,6 +89,5 @@ class SlideSilenceGateTest {
         while (game.isAnimatingForTest) game.update(0.05, GameInput.EMPTY)
         assertTrue("the landing recomposed the board", game.syncCountForTest > syncsAtSlideStart)
         assertEquals(Piece(PieceColor.RED), game.boardForTest.pieceAt(sq(3, 1)))
-        game.onStop()
     }
 }

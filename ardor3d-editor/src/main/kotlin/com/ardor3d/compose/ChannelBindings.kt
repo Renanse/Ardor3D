@@ -43,7 +43,10 @@ class TransformChannel internal constructor(
     fun writeTranslation(x: Double, y: Double, z: Double) =
         channels.writeTranslation(handle, x, y, z)
 
-    override fun onRemembered() {}
+    override fun onRemembered() {
+        // Nothing to do: the slot was already allocated in the remember lambda (see [handle]).
+    }
+
     override fun onForgotten() = channels.releaseTransform(key, handle)
     override fun onAbandoned() = channels.releaseTransform(key, handle)
 }
@@ -65,7 +68,10 @@ class ParamChannel internal constructor(
     /** Queues re-delivery of the current value - for when an outside input the target combines changed. */
     fun touch() = channels.touchParam(handle)
 
-    override fun onRemembered() {}
+    override fun onRemembered() {
+        // Nothing to do: the slot was already allocated in the remember lambda (see [handle]).
+    }
+
     override fun onForgotten() = channels.releaseParam(key, handle)
     override fun onAbandoned() = channels.releaseParam(key, handle)
 }

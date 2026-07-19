@@ -136,6 +136,14 @@ class GlowChannelGateTest {
         game.onStart(FakeGameContext())
         val context = game.channelsForTest!!
 
+        try {
+            breatheThenRest(game, context)
+        } finally {
+            game.onStop() // idempotent - cleans up when an assertion fails mid-gate
+        }
+    }
+
+    private fun breatheThenRest(game: CheckersGame, context: SceneChannels) {
         // Select the opening piece and park the pointer on its destination.
         game.clickSquareForTest(sq(2, 0))
         game.forcedHoverForTest = sq(3, 1)
@@ -165,7 +173,6 @@ class GlowChannelGateTest {
         game.update(0.1, GameInput.EMPTY)
         game.update(0.1, GameInput.EMPTY)
         assertEquals("and it stays at rest", atRest, ColorRGBA(markerAt(game, sq(3, 1)).getDefaultColor()))
-        game.onStop()
     }
 
     /** The highlight marker shown on [square], found by its placement. */

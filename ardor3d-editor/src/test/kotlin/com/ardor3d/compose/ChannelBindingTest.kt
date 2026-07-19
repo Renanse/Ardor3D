@@ -178,28 +178,32 @@ class ChannelBindingTest {
     @Test
     fun disposalReleasesEveryBinding() {
         val h = Harness()
-        var transform: TransformChannel? = null
-        var param: ParamChannel? = null
-        h.scene.setContent {
-            val a = remember { Node("a") }
-            val b = remember { Node("b") }
-            transform = rememberTransformChannel(h.channels, "a", a)
-            rememberTransformChannel(h.channels, "b", b)
-            param = rememberParamChannel(h.channels, "glow", 1f, { })
-            SceneNode("group") {
-                SceneSpatial(factory = { a })
-                SceneSpatial(factory = { b })
+        try {
+            var transform: TransformChannel? = null
+            var param: ParamChannel? = null
+            h.scene.setContent {
+                val a = remember { Node("a") }
+                val b = remember { Node("b") }
+                transform = rememberTransformChannel(h.channels, "a", a)
+                rememberTransformChannel(h.channels, "b", b)
+                param = rememberParamChannel(h.channels, "glow", 1f, { })
+                SceneNode("group") {
+                    SceneSpatial(factory = { a })
+                    SceneSpatial(factory = { b })
+                }
             }
+            assertEquals(2, h.channels.liveTransformCount)
+            assertEquals(1, h.channels.liveParamCount)
+
+            h.close() // the act under test; the finally re-close is an idempotent no-op
+
+            assertEquals("disposal releases every transform", 0, h.channels.liveTransformCount)
+            assertEquals("and every param", 0, h.channels.liveParamCount)
+            assertThrows(IllegalStateException::class.java) { transform!!.writeTranslation(1.0, 1.0, 1.0) }
+            assertThrows(IllegalStateException::class.java) { param!!.write(0.5f) }
+        } finally {
+            h.close()
         }
-        assertEquals(2, h.channels.liveTransformCount)
-        assertEquals(1, h.channels.liveParamCount)
-
-        h.close()
-
-        assertEquals("disposal releases every transform", 0, h.channels.liveTransformCount)
-        assertEquals("and every param", 0, h.channels.liveParamCount)
-        assertThrows(IllegalStateException::class.java) { transform!!.writeTranslation(1.0, 1.0, 1.0) }
-        assertThrows(IllegalStateException::class.java) { param!!.write(0.5f) }
     }
 
     @Test
