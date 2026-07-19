@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.ardor3d.compose.SceneChannels
 import com.ardor3d.compose.SceneComposition
+import com.ardor3d.compose.SpatialApplier
 import com.ardor3d.editor.play.GameContext
 import com.ardor3d.editor.play.GameInput
 import com.ardor3d.editor.play.GameMode
@@ -45,7 +46,10 @@ import com.ardor3d.scenegraph.extension.CameraNode
  * (a capture, a crowning) and motion land in a known order every frame, and a slide runs with
  * zero recomposition and zero applier traffic by construction, not by convention.
  */
-class CheckersGame : GameMode {
+class CheckersGame(
+    /** How the composed scene gets its applier - tests inject a counting one to gate silence. */
+    private val applierFactory: (Node) -> SpatialApplier = { SpatialApplier(it) }
+) : GameMode {
     private var context: GameContext? = null
 
     // Snapshot state - everything the composed view reads. Writing these is the entire view sync.
@@ -101,7 +105,7 @@ class CheckersGame : GameMode {
         // its slot until the old one is forgotten, so peak occupancy briefly exceeds live count).
         val sceneChannels = SceneChannels(transformCapacity = 32, paramCapacity = 48)
         channels = sceneChannels
-        composition = SceneComposition(root).apply {
+        composition = SceneComposition(applierFactory(root)).apply {
             setContent {
                 BoardScene(
                     channels = sceneChannels,
@@ -317,6 +321,9 @@ class CheckersGame : GameMode {
 
     /** The channel rig - for the gate tests. */
     internal val channelsForTest: SceneChannels? get() = channels
+
+    /** The composed host - the silence gates read its frame-clock instruments. */
+    internal val compositionForTest: SceneComposition? get() = composition
 
     // --- helpers -----------------------------------------------------------------------------
 

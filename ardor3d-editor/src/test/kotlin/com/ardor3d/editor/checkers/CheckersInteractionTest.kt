@@ -10,12 +10,7 @@
 
 package com.ardor3d.editor.checkers
 
-import com.ardor3d.editor.play.GameContext
 import com.ardor3d.editor.play.GameInput
-import com.ardor3d.intersection.PrimitivePickResults
-import com.ardor3d.renderer.Camera
-import com.ardor3d.scenegraph.Node
-import com.ardor3d.scenegraph.Spatial
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -31,15 +26,6 @@ import org.junit.Test
  * it distinctly; clicking a destination moves and switches turns; clicking elsewhere clears.
  */
 class CheckersInteractionTest {
-
-    private class FakeGameContext : GameContext {
-        override val sceneRoot: Node = Node("scene")
-        override val camera: Camera = Camera(1, 1)
-        var lastStatus: String? = null
-        override fun pick(x: Int, y: Int): PrimitivePickResults = PrimitivePickResults()
-        override fun setStatus(text: String?) { lastStatus = text }
-        override fun materialize(spatial: Spatial) { /* no material system in this test */ }
-    }
 
     private fun sq(row: Int, col: Int) = Square(row, col)
 

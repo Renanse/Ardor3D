@@ -72,10 +72,19 @@ class SceneComposition(applier: SpatialApplier) : AutoCloseable {
     fun frame(frameTimeNanos: Long) {
         Snapshot.sendApplyNotifications()
         if (clock.hasAwaiters) {
+            framesSent++
             clock.sendFrame(frameTimeNanos)
         }
         failure?.let { throw IllegalStateException("Scene recomposition failed", it) }
     }
+
+    private var framesSent = 0
+
+    /** How many [frame] calls actually sent a clock frame - the silence gates count this. */
+    internal val framesSentForTest: Int get() = framesSent
+
+    /** Whether anything currently awaits a clock frame - a truly idle host has no awaiters. */
+    internal val hasFrameAwaitersForTest: Boolean get() = clock.hasAwaiters
 
     override fun close() {
         composition.dispose()
