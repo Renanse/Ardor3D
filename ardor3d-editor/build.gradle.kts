@@ -61,4 +61,10 @@ tasks.test {
     // The composition scale gates hold 50k-spatial scenes; the default 512m test heap is tight
     // enough there that GC would skew the allocation accounting the gates assert on.
     maxHeapSize = "2g"
+
+    // Force Mesa's software rasterizer for the GL smoke tests: WSLg's d3d12 passthrough
+    // segfaults natively when a second GL context comes up in the same process, and its
+    // framebuffer readback returns zeros anyway. llvmpipe renders these tests correctly and
+    // deterministically; on non-Mesa platforms the variable is ignored.
+    environment("LIBGL_ALWAYS_SOFTWARE", "1")
 }

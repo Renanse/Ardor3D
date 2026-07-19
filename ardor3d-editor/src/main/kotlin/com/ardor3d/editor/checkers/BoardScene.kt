@@ -14,10 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import com.ardor3d.bounding.BoundingBox
+import com.ardor3d.compose.SceneChannels
 import com.ardor3d.compose.SceneNode
 import com.ardor3d.compose.SceneSpatial
 import com.ardor3d.compose.SpatialApplier
+import com.ardor3d.compose.rememberParamChannel
+import com.ardor3d.compose.rememberTransformChannel
 import com.ardor3d.light.PointLight
 import com.ardor3d.math.ColorRGBA
 import com.ardor3d.math.Quaternion
@@ -35,11 +39,23 @@ import com.ardor3d.scenegraph.shape.Cylinder
  * job here. It contains no game rules, only presentation and the click-target mapping the game
  * needs.
  *
- * Attribute ownership: composition owns structure, and owns an attribute only through a
- * `set(value)` keyed on the model value it derives from - such a setter re-runs only when that
- * value changes. That is what legitimizes the move slide's *imperative* translation writes: while
- * a piece's square is unchanged, composition never touches its translation, and when the square
- * does change, the snap it writes is the slide's own endpoint.
+ * Attribute ownership is structural, not conventional. Every attribute is one of:
+ *
+ *  - **Composition-owned:** set through a `set(value)` keyed on the model value it derives from
+ *    (a piece's pick metadata, its king flag). Such a setter re-runs only when that value
+ *    changes.
+ *  - **Channel-owned:** composition owns the *binding* - a [SceneChannels] slot allocated when
+ *    the node enters the composition, released when it leaves - and never the value. A piece's
+ *    translation and a highlight marker's glow intensity live here: game code writes them
+ *    imperatively every frame by handle, the sampler applies them after the composition frame,
+ *    and recomposition of the owning node must not (and structurally cannot - there is no
+ *    setter left) write them back. A marker's color is the worked example of the two meeting:
+ *    the *base* color is composition-owned input (it follows the highlight kind), the *glow*
+ *    is channel-owned, and only the sampler writes the derived `defaultColor = base x glow`.
+ *
+ * The move slide is no longer an exception politely tolerated - it is a channel writer like any
+ * other, and a test can violate the ownership split and be caught by the channel's staleness
+ * and the scene's silence gates.
  *
  * Picking model (unchanged from the imperative view): only playable board tiles are pickable and
  * carry their square (see [squareForTile]); pieces and highlights are non-pickable, so a click
@@ -51,6 +67,7 @@ import com.ardor3d.scenegraph.shape.Cylinder
  */
 @Composable
 fun BoardScene(
+    channels: SceneChannels,
     board: () -> Board,
     highlights: () -> Map<Square, HighlightKind>,
     materialize: (Spatial) -> Unit = {},
@@ -61,8 +78,8 @@ fun BoardScene(
     // nothing and are composed exactly once.
     BoardLight()
     BoardTiles(materialize)
-    BoardPieces(board, materialize, onSync)
-    BoardHighlights(highlights, materialize, onSync)
+    BoardPieces(channels, board, materialize, onSync)
+    BoardHighlights(channels, highlights, materialize, onSync)
 }
 
 /** Metadata property keys on composed spatials (same key strings the imperative view used). */
@@ -116,16 +133,16 @@ private fun BoardTiles(materialize: (Spatial) -> Unit) {
 }
 
 @Composable
-private fun BoardPieces(board: () -> Board, materialize: (Spatial) -> Unit, onSync: () -> Unit) {
+private fun BoardPieces(channels: SceneChannels, board: () -> Board, materialize: (Spatial) -> Unit, onSync: () -> Unit) {
     SceneNode("Pieces") {
         val current = board()
         // Keyed by the model's stable piece identity and kept in identity order: a piece that moves
-        // keeps its node *and* its place among siblings, so a plain move is zero structural traffic -
-        // just the translation snap in BoardPiece's update.
+        // keeps its node, its channel binding, *and* its place among siblings, so a plain move is
+        // zero structural traffic - the translation itself belongs to the channel.
         for (entry in current.occupied.entries.sortedBy { current.idAt(it.key) }) {
             val id = current.idAt(entry.key)
             key(id) {
-                BoardPiece(id, entry.value, entry.key, materialize)
+                BoardPiece(channels, id, entry.value, entry.key, materialize)
             }
         }
         SideEffect { onSync() }
@@ -133,20 +150,24 @@ private fun BoardPieces(board: () -> Board, materialize: (Spatial) -> Unit, onSy
 }
 
 @Composable
-private fun BoardPiece(id: Int, piece: Piece, square: Square, materialize: (Spatial) -> Unit) {
+private fun BoardPiece(channels: SceneChannels, id: Int, piece: Piece, square: Square, materialize: (Spatial) -> Unit) {
+    // Created here rather than in the ComposeNode factory so the channel can bind to the
+    // instance at composition time. Spawn placement happens once, at creation; from then on the
+    // translation is channel-owned - the slide writes it by handle, the sampler applies it, and
+    // recomposition never writes it (there is deliberately no translation snap in the update
+    // block below).
+    val node = remember {
+        Node("piece_$id").apply {
+            // Pieces are presentation only - never picked (clicks resolve through the tile beneath).
+            sceneHints.setPickingHint(PickingHint.Pickable, false)
+            setTranslation(worldPositionOf(square))
+        }
+    }
+    rememberTransformChannel(channels, id, node)
     ComposeNode<Node, SpatialApplier>(
-        factory = {
-            Node("piece_$id").apply {
-                // Pieces are presentation only - never picked (clicks resolve through the tile beneath).
-                sceneHints.setPickingHint(PickingHint.Pickable, false)
-            }
-        },
+        factory = { node },
         update = {
-            // Placement is owned through the square (see the file doc's ownership policy).
-            set(square) {
-                setTranslation(worldPositionOf(it))
-                setProperty(PROP_SQUARE, it.row * Board.SIZE + it.col)
-            }
+            set(square) { setProperty(PROP_SQUARE, it.row * Board.SIZE + it.col) }
             set(piece.color) { setProperty(PROP_COLOR, it.name) }
             set(piece.king) { setProperty(PROP_KING, it) }
         }
@@ -160,6 +181,7 @@ private fun BoardPiece(id: Int, piece: Piece, square: Square, materialize: (Spat
 
 @Composable
 private fun BoardHighlights(
+    channels: SceneChannels,
     highlights: () -> Map<Square, HighlightKind>,
     materialize: (Spatial) -> Unit,
     onSync: () -> Unit
@@ -167,18 +189,57 @@ private fun BoardHighlights(
     SceneNode("Highlights") {
         for ((square, kind) in highlights()) {
             key(square) {
-                SceneSpatial(
-                    factory = { buildHighlightMarker().also(materialize) },
-                    update = {
-                        set(square) { setTranslation(it.col - OFFSET, TILE_TOP + 0.02, it.row - OFFSET) }
-                        set(kind) { defaultColor = colorFor(it) }
-                    }
-                )
+                HighlightMarker(channels, square, kind, materialize)
             }
         }
         SideEffect { onSync() }
     }
 }
+
+@Composable
+private fun HighlightMarker(
+    channels: SceneChannels,
+    square: Square,
+    kind: HighlightKind,
+    materialize: (Spatial) -> Unit
+) {
+    // Like a piece: created at composition time so the glow channel can bind to it, and placed
+    // once - markers never move; a different square is a different marker under key(square).
+    val marker = remember {
+        buildHighlightMarker().apply {
+            setTranslation(square.col - OFFSET, TILE_TOP + 0.02, square.row - OFFSET)
+        }.also(materialize)
+    }
+    val glow = remember { GlowTarget(marker) }
+    val glowChannel = rememberParamChannel(channels, square, GLOW_REST, glow)
+    SceneSpatial(
+        factory = { marker },
+        update = {
+            // The base color is composition-owned input; the shown color is derived by the
+            // sampler (base x glow), so a kind change updates the base and re-queues delivery
+            // instead of writing the mesh - the glow value itself is never touched from here.
+            set(kind) {
+                glow.base.set(colorFor(it))
+                glowChannel.touch()
+            }
+        }
+    )
+}
+
+/**
+ * Combines the composition-owned base color with the channel-owned glow intensity; only the
+ * sampler calls [apply], so this is the single writer of the marker's shown color.
+ */
+private class GlowTarget(private val marker: Spatial) : SceneChannels.FloatTarget {
+    val base = ColorRGBA()
+
+    override fun apply(value: Float) {
+        marker.setDefaultColor(base.red * value, base.green * value, base.blue * value, base.alpha)
+    }
+}
+
+/** A glow channel's resting intensity: the marker shows exactly its base color. */
+internal const val GLOW_REST = 1f
 
 // --- construction --------------------------------------------------------------------------
 
