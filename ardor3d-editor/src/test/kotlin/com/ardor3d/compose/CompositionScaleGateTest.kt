@@ -14,7 +14,6 @@ import com.ardor3d.scenegraph.Node
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.lang.management.ManagementFactory
 
 /**
  * Scale gates for the composed scene layer: the checkers board proved the paradigm at ~90 nodes,
@@ -51,24 +50,6 @@ class CompositionScaleGateTest {
         }
 
         override fun close() = scene.close()
-    }
-
-    /**
-     * The allocation gates are only meaningful if thread-allocation accounting is actually on:
-     * when it is unsupported or disabled, getThreadAllocatedBytes returns -1 for every call and
-     * a before/after delta is 0 - the gate would pass vacuously. Enable it when the JVM merely
-     * left it off; fail loudly only when the platform cannot support it at all.
-     */
-    private fun allocationAccounting(): com.sun.management.ThreadMXBean {
-        val threads = ManagementFactory.getThreadMXBean() as com.sun.management.ThreadMXBean
-        assertTrue(
-            "thread allocation accounting must be supported for the allocation gates",
-            threads.isThreadAllocatedMemorySupported
-        )
-        if (!threads.isThreadAllocatedMemoryEnabled) {
-            threads.isThreadAllocatedMemoryEnabled = true
-        }
-        return threads
     }
 
     private fun assertConfined(name: String, model: ScaleModel, pokeId: Int, compose: Harness.() -> Unit) {
