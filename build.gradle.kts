@@ -99,7 +99,7 @@ subprojects {
 
     dependencies {
         testImplementation("junit:junit:4.13.2")
-        testImplementation("org.easymock:easymock:5.6.0")
+        testImplementation("org.easymock:easymock:5.7.0")
     }
 }
 
