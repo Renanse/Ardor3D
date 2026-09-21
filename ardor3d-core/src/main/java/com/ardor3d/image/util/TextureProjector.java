@@ -39,7 +39,7 @@ public class TextureProjector extends Camera {
 
   /**
    * Computes the matrix taking a world position to this projector's texture space: bias * projection *
-   * view, applied as M * v like the camera matrices it is built from. Divide s and t by q.
+   * view, applied as M * v like the camera matrices it is built from. Divide s, t and r (depth) by q.
    *
    * @param matrixStore
    *          the matrix to store the result in.
