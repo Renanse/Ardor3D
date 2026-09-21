@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2024 Bird Dog Games, Inc.
+ * Copyright (c) 2008-2026 Bird Dog Games, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -17,11 +17,12 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class TextureProjector extends Camera {
 
+  /** Takes clip space [-1, 1] to texture space [0, 1]. Laid out for column vectors, as our camera matrices are. */
   private final static ReadOnlyMatrix4 BIAS = new Matrix4( //
-      0.5, 0.0, 0.0, 0.0, //
-      0.0, 0.5, 0.0, 0.0, //
-      0.0, 0.0, 0.5, 0.0, //
-      0.5, 0.5, 0.5, 1.0);
+      0.5, 0.0, 0.0, 0.5, //
+      0.0, 0.5, 0.0, 0.5, //
+      0.0, 0.0, 0.5, 0.5, //
+      0.0, 0.0, 0.0, 1.0);
 
   public TextureProjector() {
     super(1, 1);
@@ -36,10 +37,17 @@ public class TextureProjector extends Camera {
     updateTextureMatrix(texMat);
   }
 
+  /**
+   * Computes the matrix taking a world position to this projector's texture space: bias * projection *
+   * view, applied as M * v like the camera matrices it is built from. Divide s, t and r (depth) by q.
+   *
+   * @param matrixStore
+   *          the matrix to store the result in.
+   */
   public void updateTextureMatrix(final Matrix4 matrixStore) {
     update();
     final ReadOnlyMatrix4 projectorView = getViewMatrix();
     final ReadOnlyMatrix4 projectorProjection = getProjectionMatrix();
-    matrixStore.set(projectorView).multiplyLocal(projectorProjection).multiplyLocal(BIAS);
+    matrixStore.set(BIAS).multiplyLocal(projectorProjection).multiplyLocal(projectorView);
   }
 }
