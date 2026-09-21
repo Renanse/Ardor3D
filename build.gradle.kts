@@ -8,11 +8,11 @@ plugins {
 }
 
 group = "com.ardor3d"
-version = "1.7.0"
+version = "1.7.1"
 
 val collectJarsDir = layout.buildDirectory.dir("collected-jars")
 
-extra["lwjglVersion"] = "3.4.1"
+extra["lwjglVersion"] = "3.4.3"
 extra["lwjglNatives"] = when {
     OperatingSystem.current().isWindows -> "natives-windows"
     OperatingSystem.current().isLinux -> "natives-linux"
